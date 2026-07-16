@@ -48,6 +48,12 @@ const moduleInset = document.getElementById('module-inset');
 const moduleInsetValue = document.getElementById('module-inset-value');
 const moduleRotation = document.getElementById('module-rotation');
 const moduleRotationValue = document.getElementById('module-rotation-value');
+const eyeShape = document.getElementById('eye-shape');
+const eyeCustomControls = document.getElementById('eye-custom-controls');
+const eyeOuterRounding = document.getElementById('eye-outer-rounding');
+const eyeOuterRoundingValue = document.getElementById('eye-outer-rounding-value');
+const eyeCenterRounding = document.getElementById('eye-center-rounding');
+const eyeCenterRoundingValue = document.getElementById('eye-center-rounding-value');
 const optionsJson = document.getElementById('options-json');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
@@ -463,6 +469,20 @@ function getCurrentModuleShapeOptions() {
   };
 }
 
+function syncEyeShapeControls() {
+  eyeCustomControls.hidden = eyeShape.value !== 'custom';
+  eyeOuterRoundingValue.textContent = `${eyeOuterRounding.value}%`;
+  eyeCenterRoundingValue.textContent = `${eyeCenterRounding.value}%`;
+}
+
+function getCurrentEyeShapeOptions() {
+  return {
+    type: eyeShape.value,
+    outerRounding: readInteger(eyeOuterRounding) ?? 20,
+    centerRounding: readInteger(eyeCenterRounding) ?? 35,
+  };
+}
+
 function colorWithTransparency(color, transparencyInput) {
   const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : '#000000';
   const transparency = Math.min(100, Math.max(0, Number.parseInt(transparencyInput.value, 10) || 0));
@@ -499,6 +519,7 @@ function syncOutputs() {
   syncGradientControls();
   getCurrentFrameMessage();
   syncModuleShapeControls();
+  syncEyeShapeControls();
   formatVersionLabel();
   formatErrorCorrection();
   qrVersion.disabled = versionAuto.checked;
@@ -2440,6 +2461,14 @@ function isFinderRegion(size, row, column) {
   );
 }
 
+function isFinderPattern(size, row, column) {
+  return (
+    isInSquare(row, column, 0, 0, 7) ||
+    isInSquare(row, column, 0, size - 7, 7) ||
+    isInSquare(row, column, size - 7, 0, 7)
+  );
+}
+
 function isTimingRegion(size, row, column) {
   if (row === 6 && column >= 8 && column <= size - 9) {
     return true;
@@ -3406,6 +3435,75 @@ function drawQrModule(context, x, y, cellSize, shapeOptions) {
   context.restore();
 }
 
+function getEyeShapeGeometry(eyeOptions) {
+  switch (eyeOptions.type) {
+    case 'square':
+      return { outerRounding: 0, centerRounding: 0 };
+    case 'rounded':
+      return { outerRounding: 18, centerRounding: 32 };
+    case 'circle':
+      return { outerRounding: 50, centerRounding: 50 };
+    case 'custom':
+      return {
+        outerRounding: Math.min(50, Math.max(0, eyeOptions.outerRounding ?? 20)),
+        centerRounding: Math.min(50, Math.max(0, eyeOptions.centerRounding ?? 35)),
+      };
+    default:
+      return null;
+  }
+}
+
+function fillEyeShape(context, x, y, size, rounding, fillStyle) {
+  context.fillStyle = fillStyle;
+  addRoundedRectPath(context, x, y, size, size, size * (rounding / 100));
+  context.fill();
+}
+
+function drawFinderEyes(
+  context,
+  moduleCount,
+  marginModules,
+  cellSize,
+  eyeOptions,
+  moduleFillStyle,
+  lightColor,
+  transparentLight
+) {
+  const geometry = getEyeShapeGeometry(eyeOptions);
+  if (!geometry) {
+    return;
+  }
+
+  const origins = [
+    [0, 0],
+    [0, moduleCount - 7],
+    [moduleCount - 7, 0],
+  ];
+
+  origins.forEach(([row, column]) => {
+    const x = (column + marginModules) * cellSize;
+    const y = (row + marginModules) * cellSize;
+    fillEyeShape(context, x, y, cellSize * 7, geometry.outerRounding, moduleFillStyle);
+
+    context.save();
+    context.globalCompositeOperation = 'destination-out';
+    fillEyeShape(context, x + cellSize, y + cellSize, cellSize * 5, geometry.outerRounding, '#000000');
+    context.restore();
+    if (!transparentLight) {
+      fillEyeShape(context, x + cellSize, y + cellSize, cellSize * 5, geometry.outerRounding, lightColor);
+    }
+
+    fillEyeShape(
+      context,
+      x + cellSize * 2,
+      y + cellSize * 2,
+      cellSize * 3,
+      geometry.centerRounding,
+      moduleFillStyle
+    );
+  });
+}
+
 function createQrModuleFill(context, startColor, gradientOptions, marginModules, moduleCount, cellSize) {
   if (gradientOptions.type === 'solid') {
     return startColor;
@@ -3542,6 +3640,8 @@ function drawQr(qrDefinition, options) {
   const debugActive = isDebugOverlayActive();
   const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
   const moduleShapeOptions = getCurrentModuleShapeOptions();
+  const eyeShapeOptions = getCurrentEyeShapeOptions();
+  const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
   const gradientOptions = getCurrentGradientOptions();
   const lightAlpha = getColorAlpha(options.color.light);
   const gradientHasTransparency = gradientOptions.type !== 'solid' && getColorAlpha(gradientOptions.endColor) < 1;
@@ -3597,6 +3697,9 @@ function drawQr(qrDefinition, options) {
       if (!moduleIsDark(qrDefinition, row, column)) {
         continue;
       }
+      if (customEyesActive && isFinderPattern(moduleCount, row, column)) {
+        continue;
+      }
 
       const category = debugActive
         ? getDebugCategory(row, column, qrDefinition, debugModel, 'overlay')
@@ -3610,6 +3713,19 @@ function drawQr(qrDefinition, options) {
         moduleShapeOptions
       );
     }
+  }
+
+  if (customEyesActive) {
+    drawFinderEyes(
+      context,
+      moduleCount,
+      marginModules,
+      cellSize,
+      eyeShapeOptions,
+      moduleFillStyle,
+      options.color.light,
+      transparentLight
+    );
   }
 
   if (debugActive) {
@@ -3962,6 +4078,9 @@ choiceButtons.forEach((button) => {
     }
     if (target === moduleShape) {
       syncModuleShapeControls();
+    }
+    if (target === eyeShape) {
+      syncEyeShapeControls();
     }
     if (target === wifiEncryption) {
       syncWifiSecurityState();

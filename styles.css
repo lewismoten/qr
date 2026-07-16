@@ -387,11 +387,20 @@ select:disabled {
   gap: 0.55rem;
 }
 
+.eye-shape-field {
+  display: grid;
+  gap: 0.55rem;
+}
+
 .field-label {
   font-weight: 800;
 }
 
 .module-shape-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.eye-shape-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -491,7 +500,8 @@ select:disabled {
 }
 
 @media (min-width: 720px) {
-  .module-shape-grid {
+  .module-shape-grid,
+  .eye-shape-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

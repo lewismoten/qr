@@ -300,6 +300,38 @@
                     <input id="module-rotation" name="module-rotation" type="range" min="-45" max="45" step="1" value="0" />
                   </div>
 
+                  <div class="eye-shape-field">
+                    <span class="field-label" id="eye-shape-label">Corner eyes</span>
+                    <div class="choice-grid eye-shape-grid" role="group" aria-labelledby="eye-shape-label">
+                      <button type="button" class="choice-button is-active" data-choice-target="eye-shape" data-choice-value="default" aria-pressed="true">Default</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="square" aria-pressed="false">Square</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="rounded" aria-pressed="false">Rounded</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="circle" aria-pressed="false">Circle</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="custom" aria-pressed="false">Custom</button>
+                    </div>
+                    <select id="eye-shape" name="eye-shape" class="sr-only" aria-labelledby="eye-shape-label">
+                      <option value="default" selected>Default modules</option>
+                      <option value="square">Square</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="circle">Circle</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+
+                  <div id="eye-custom-controls" class="module-custom-controls" hidden>
+                    <label class="slider-field" for="eye-outer-rounding">
+                      <span>Outer rounding</span>
+                      <output id="eye-outer-rounding-value" for="eye-outer-rounding">20%</output>
+                    </label>
+                    <input id="eye-outer-rounding" name="eye-outer-rounding" type="range" min="0" max="50" step="1" value="20" />
+
+                    <label class="slider-field" for="eye-center-rounding">
+                      <span>Center rounding</span>
+                      <output id="eye-center-rounding-value" for="eye-center-rounding">35%</output>
+                    </label>
+                    <input id="eye-center-rounding" name="eye-center-rounding" type="range" min="0" max="50" step="1" value="35" />
+                  </div>
+
                   <p class="hint module-shape-hint">Decorative modules can reduce scanning reliability. Test the finished code at its intended size.</p>
 
                   <div class="color-grid">
