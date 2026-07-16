@@ -29,6 +29,25 @@ const colorDarkTransparency = document.getElementById('color-dark-transparency')
 const colorDarkTransparencyValue = document.getElementById('color-dark-transparency-value');
 const colorLightTransparency = document.getElementById('color-light-transparency');
 const colorLightTransparencyValue = document.getElementById('color-light-transparency-value');
+const gradientType = document.getElementById('gradient-type');
+const gradientControls = document.getElementById('gradient-controls');
+const gradientAngleControls = document.getElementById('gradient-angle-controls');
+const gradientAngle = document.getElementById('gradient-angle');
+const gradientAngleValue = document.getElementById('gradient-angle-value');
+const colorGradientEnd = document.getElementById('color-gradient-end');
+const colorGradientEndTransparency = document.getElementById('color-gradient-end-transparency');
+const colorGradientEndTransparencyValue = document.getElementById('color-gradient-end-transparency-value');
+const frameMessageMode = document.getElementById('frame-message-mode');
+const customFrameMessageField = document.getElementById('custom-frame-message-field');
+const customFrameMessage = document.getElementById('custom-frame-message');
+const moduleShape = document.getElementById('module-shape');
+const moduleCustomControls = document.getElementById('module-custom-controls');
+const moduleRounding = document.getElementById('module-rounding');
+const moduleRoundingValue = document.getElementById('module-rounding-value');
+const moduleInset = document.getElementById('module-inset');
+const moduleInsetValue = document.getElementById('module-inset-value');
+const moduleRotation = document.getElementById('module-rotation');
+const moduleRotationValue = document.getElementById('module-rotation-value');
 const optionsJson = document.getElementById('options-json');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
@@ -342,6 +361,106 @@ function formatMarginLabel() {
 function formatColorTransparency() {
   colorDarkTransparencyValue.textContent = `${colorDarkTransparency.value}%`;
   colorLightTransparencyValue.textContent = `${colorLightTransparency.value}%`;
+  colorGradientEndTransparencyValue.textContent = `${colorGradientEndTransparency.value}%`;
+}
+
+function syncGradientControls() {
+  const isGradient = gradientType.value !== 'solid';
+  gradientControls.hidden = !isGradient;
+  gradientAngleControls.hidden = gradientType.value !== 'linear';
+  gradientAngleValue.textContent = `${gradientAngle.value} degrees`;
+}
+
+function getCurrentGradientOptions() {
+  return {
+    type: gradientType.value,
+    angle: readInteger(gradientAngle) ?? 0,
+    endColor: colorWithTransparency(colorGradientEnd.value.trim() || '#0f766e', colorGradientEndTransparency),
+  };
+}
+
+function shortenFrameValue(value, maximumLength = 64) {
+  const normalized = String(value || '').replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maximumLength) {
+    return normalized;
+  }
+  return `${normalized.slice(0, Math.max(0, maximumLength - 3)).trimEnd()}...`;
+}
+
+function getShortTextFrameValue(value) {
+  const normalized = String(value || '').trim();
+  if (!normalized) {
+    return '';
+  }
+
+  try {
+    const url = new URL(normalized);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      const host = url.host.replace(/^www\./i, '');
+      const path = url.pathname === '/' ? '' : url.pathname.replace(/\/$/, '');
+      return shortenFrameValue(`${host}${path}`);
+    }
+  } catch (error) {
+    // Plain text and incomplete URLs fall through to a compact text label.
+  }
+
+  const domainLikeValue = normalized.match(/^(?:https?:\/\/)?(?:www\.)?([^\s?#]+)(?:[?#].*)?$/i);
+  return shortenFrameValue(domainLikeValue ? domainLikeValue[1].replace(/\/$/, '') : normalized);
+}
+
+function getAutomaticFrameMessage() {
+  switch (qrFormat.value) {
+    case 'text':
+      return getShortTextFrameValue(textInput.value);
+    case 'wifi':
+      return shortenFrameValue(wifiSsid.value);
+    case 'email':
+      return shortenFrameValue(emailTo.value);
+    case 'phone':
+      return shortenFrameValue(phoneNumber.value);
+    case 'sms':
+      return shortenFrameValue(smsNumber.value);
+    case 'geo':
+      return shortenFrameValue(
+        geoQuery.value || (geoLatitude.value && geoLongitude.value ? `${geoLatitude.value}, ${geoLongitude.value}` : '')
+      );
+    case 'vcard':
+      return shortenFrameValue(vcardName.value || vcardOrg.value || vcardEmail.value);
+    case 'file':
+      return shortenFrameValue(getActiveFile()?.name || '');
+    default:
+      return '';
+  }
+}
+
+function getCurrentFrameMessage() {
+  const isCustom = frameMessageMode.value === 'custom';
+  customFrameMessageField.hidden = !isCustom;
+
+  return (
+    frameMessageMode.value === 'none'
+      ? ''
+      : isCustom
+        ? shortenFrameValue(customFrameMessage.value, 80)
+        : getAutomaticFrameMessage()
+  );
+}
+
+function syncModuleShapeControls() {
+  const isCustom = moduleShape.value === 'custom';
+  moduleCustomControls.hidden = !isCustom;
+  moduleRoundingValue.textContent = `${moduleRounding.value}%`;
+  moduleInsetValue.textContent = `${moduleInset.value}%`;
+  moduleRotationValue.textContent = `${moduleRotation.value} degrees`;
+}
+
+function getCurrentModuleShapeOptions() {
+  return {
+    type: moduleShape.value,
+    rounding: readInteger(moduleRounding) ?? 25,
+    inset: readInteger(moduleInset) ?? 4,
+    rotation: readInteger(moduleRotation) ?? 0,
+  };
 }
 
 function colorWithTransparency(color, transparencyInput) {
@@ -377,6 +496,9 @@ function syncOutputs() {
   formatScaleLabel();
   formatMarginLabel();
   formatColorTransparency();
+  syncGradientControls();
+  getCurrentFrameMessage();
+  syncModuleShapeControls();
   formatVersionLabel();
   formatErrorCorrection();
   qrVersion.disabled = versionAuto.checked;
@@ -3229,6 +3351,155 @@ function drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cel
   });
 }
 
+function addRoundedRectPath(context, x, y, width, height, radius) {
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.beginPath();
+  context.moveTo(x + safeRadius, y);
+  context.lineTo(x + width - safeRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  context.lineTo(x + width, y + height - safeRadius);
+  context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  context.lineTo(x + safeRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  context.lineTo(x, y + safeRadius);
+  context.quadraticCurveTo(x, y, x + safeRadius, y);
+  context.closePath();
+}
+
+function getModuleShapeGeometry(shapeOptions = {}) {
+  switch (shapeOptions.type) {
+    case 'rounded':
+      return { inset: 0, rounding: 32, rotation: 0 };
+    case 'dots':
+      return { inset: 8, rounding: 50, rotation: 0 };
+    case 'diamond':
+      return { inset: 15, rounding: 0, rotation: 45 };
+    case 'custom':
+      return {
+        inset: Math.min(30, Math.max(0, shapeOptions.inset ?? 4)),
+        rounding: Math.min(50, Math.max(0, shapeOptions.rounding ?? 25)),
+        rotation: Math.min(45, Math.max(-45, shapeOptions.rotation ?? 0)),
+      };
+    default:
+      return null;
+  }
+}
+
+function drawQrModule(context, x, y, cellSize, shapeOptions) {
+  const geometry = getModuleShapeGeometry(shapeOptions);
+  if (!geometry || cellSize < 2) {
+    context.fillRect(x, y, Math.ceil(cellSize), Math.ceil(cellSize));
+    return;
+  }
+
+  const inset = cellSize * (geometry.inset / 100);
+  const size = Math.max(0, cellSize - inset * 2);
+  const radius = size * (geometry.rounding / 100);
+  const centerX = x + cellSize / 2;
+  const centerY = y + cellSize / 2;
+
+  context.save();
+  context.translate(centerX, centerY);
+  context.rotate((geometry.rotation * Math.PI) / 180);
+  addRoundedRectPath(context, -size / 2, -size / 2, size, size, radius);
+  context.fill();
+  context.restore();
+}
+
+function createQrModuleFill(context, startColor, gradientOptions, marginModules, moduleCount, cellSize) {
+  if (gradientOptions.type === 'solid') {
+    return startColor;
+  }
+
+  const qrStart = marginModules * cellSize;
+  const qrSize = moduleCount * cellSize;
+  const center = qrStart + qrSize / 2;
+  let gradient;
+
+  if (gradientOptions.type === 'radial') {
+    gradient = context.createRadialGradient(center, center, 0, center, center, (qrSize * Math.SQRT2) / 2);
+  } else {
+    const radians = (gradientOptions.angle * Math.PI) / 180;
+    const cosine = Math.cos(radians);
+    const sine = Math.sin(radians);
+    const extent = (qrSize / 2) * (Math.abs(cosine) + Math.abs(sine));
+    gradient = context.createLinearGradient(
+      center - cosine * extent,
+      center - sine * extent,
+      center + cosine * extent,
+      center + sine * extent
+    );
+  }
+
+  gradient.addColorStop(0, startColor);
+  gradient.addColorStop(1, gradientOptions.endColor);
+  return gradient;
+}
+
+function fitCanvasText(context, text, maximumWidth) {
+  let fitted = text;
+  while (fitted && context.measureText(`${fitted}...`).width > maximumWidth) {
+    fitted = fitted.slice(0, -1).trimEnd();
+  }
+  return fitted ? `${fitted}...` : '...';
+}
+
+function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2) {
+  let remaining = message.replace(/\s+/g, ' ').trim();
+  const lines = [];
+
+  while (remaining && lines.length < maximumLines) {
+    let length = 1;
+    while (length <= remaining.length && context.measureText(remaining.slice(0, length)).width <= maximumWidth) {
+      length += 1;
+    }
+    length = Math.max(1, length - 1);
+
+    if (length < remaining.length) {
+      const wordBoundary = remaining.lastIndexOf(' ', length);
+      if (wordBoundary >= Math.floor(length / 2)) {
+        length = wordBoundary;
+      }
+    }
+
+    const line = remaining.slice(0, length).trim();
+    remaining = remaining.slice(length).trim();
+    lines.push(line);
+  }
+
+  if (remaining && lines.length) {
+    lines[lines.length - 1] = fitCanvasText(context, lines[lines.length - 1], maximumWidth);
+  }
+  return lines;
+}
+
+function drawFrameMessage(context, messageLines, canvasSize, captionHeight, fontSize, lineHeight, transparentLight, textColor) {
+  if (!messageLines.length || captionHeight <= 0) {
+    return;
+  }
+
+  context.save();
+  if (!transparentLight) {
+    context.strokeStyle = 'rgba(19, 34, 53, 0.12)';
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(canvasSize * 0.12, canvasSize + 0.5);
+    context.lineTo(canvasSize * 0.88, canvasSize + 0.5);
+    context.stroke();
+  }
+
+  context.fillStyle = textColor;
+  context.font = `800 ${fontSize}px "Avenir Next", "Segoe UI", sans-serif`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  const blockHeight = messageLines.length * lineHeight;
+  const firstLineY = canvasSize + (captionHeight - blockHeight) / 2 + lineHeight / 2;
+  messageLines.forEach((line, index) => {
+    context.fillText(line, canvasSize / 2, firstLineY + index * lineHeight);
+  });
+  context.restore();
+}
+
 function drawQr(qrDefinition, options) {
   const marginModules = options.margin ?? 4;
   const moduleCount = qrDefinition.modules.size;
@@ -3255,14 +3526,29 @@ function drawQr(qrDefinition, options) {
   canvas.style.setProperty('--qr-corner-radius', `${cornerRadius.toFixed(2)}px`);
   const cellSize = canvasSize / totalModules;
   const context = canvas.getContext('2d');
-  const debugActive = isDebugOverlayActive();
-  const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
-  const lightAlpha = getColorAlpha(options.color.light);
-  const hasTransparency = getColorAlpha(options.color.dark) < 1 || lightAlpha < 1;
-  const transparentLight = lightAlpha === 0;
-
+  const frameMessageText = getCurrentFrameMessage();
+  const captionFontSize = Math.max(10, Math.min(18, canvasSize * 0.05));
+  const captionLineHeight = captionFontSize * 1.25;
+  const captionPadding = Math.max(7, Math.min(14, canvasSize * 0.035));
   canvas.width = canvasSize;
   canvas.height = canvasSize;
+  context.font = `800 ${captionFontSize}px "Avenir Next", "Segoe UI", sans-serif`;
+  const frameMessageLines = frameMessageText
+    ? wrapFrameMessage(context, frameMessageText, Math.max(20, canvasSize - captionPadding * 2))
+    : [];
+  const captionHeight = frameMessageLines.length
+    ? Math.ceil(frameMessageLines.length * captionLineHeight + captionPadding * 2)
+    : 0;
+  const debugActive = isDebugOverlayActive();
+  const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
+  const moduleShapeOptions = getCurrentModuleShapeOptions();
+  const gradientOptions = getCurrentGradientOptions();
+  const lightAlpha = getColorAlpha(options.color.light);
+  const gradientHasTransparency = gradientOptions.type !== 'solid' && getColorAlpha(gradientOptions.endColor) < 1;
+  const hasTransparency = getColorAlpha(options.color.dark) < 1 || gradientHasTransparency || lightAlpha < 1;
+  const transparentLight = lightAlpha === 0;
+
+  canvas.height = canvasSize + captionHeight;
   canvas.classList.toggle('has-transparency', hasTransparency);
 
   const backgroundColor = options.color.light;
@@ -3281,6 +3567,15 @@ function drawQr(qrDefinition, options) {
       moduleCount * cellSize
     );
   }
+
+  const moduleFillStyle = createQrModuleFill(
+    context,
+    options.color.dark,
+    gradientOptions,
+    marginModules,
+    moduleCount,
+    cellSize
+  );
 
   if (debugActive) {
     for (let row = 0; row < moduleCount; row += 1) {
@@ -3306,12 +3601,13 @@ function drawQr(qrDefinition, options) {
       const category = debugActive
         ? getDebugCategory(row, column, qrDefinition, debugModel, 'overlay')
         : getModuleCategory(qrDefinition, row, column);
-      context.fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : options.color.dark;
-      context.fillRect(
+      context.fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : moduleFillStyle;
+      drawQrModule(
+        context,
         (column + marginModules) * cellSize,
         (row + marginModules) * cellSize,
-        Math.ceil(cellSize),
-        Math.ceil(cellSize)
+        cellSize,
+        moduleShapeOptions
       );
     }
   }
@@ -3321,6 +3617,20 @@ function drawQr(qrDefinition, options) {
     drawCodewordOutlines(context, debugModel, marginModules, cellSize);
     drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize);
   }
+
+  const frameTextColor = /^#[0-9a-f]{6}/i.test(options.color.dark)
+    ? options.color.dark.slice(0, 7)
+    : '#132235';
+  drawFrameMessage(
+    context,
+    frameMessageLines,
+    canvasSize,
+    captionHeight,
+    captionFontSize,
+    captionLineHeight,
+    transparentLight,
+    frameTextColor
+  );
 }
 
 function drawInvalidOverlay(message) {
@@ -3647,6 +3957,12 @@ choiceButtons.forEach((button) => {
 
     target.value = choiceValue;
     syncChoiceButtons();
+    if (target === gradientType) {
+      syncGradientControls();
+    }
+    if (target === moduleShape) {
+      syncModuleShapeControls();
+    }
     if (target === wifiEncryption) {
       syncWifiSecurityState();
     }

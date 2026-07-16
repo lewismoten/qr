@@ -262,9 +262,49 @@
                   </label>
                   <input id="qr-margin" name="qr-margin" type="range" min="0" max="12" step="1" value="1" />
 
+                  <div class="module-shape-field">
+                    <span class="field-label" id="module-shape-label">Module shape</span>
+                    <div class="choice-grid module-shape-grid" role="group" aria-labelledby="module-shape-label">
+                      <button type="button" class="choice-button module-shape-button is-active" data-choice-target="module-shape" data-choice-value="square" aria-pressed="true"><span class="module-shape-icon shape-square" aria-hidden="true"></span>Square</button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="rounded" aria-pressed="false"><span class="module-shape-icon shape-rounded" aria-hidden="true"></span>Rounded</button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="dots" aria-pressed="false"><span class="module-shape-icon shape-dots" aria-hidden="true"></span>Dots</button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="diamond" aria-pressed="false"><span class="module-shape-icon shape-diamond" aria-hidden="true"></span>Diamond</button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="custom" aria-pressed="false"><span class="module-shape-icon shape-custom" aria-hidden="true"></span>Custom</button>
+                    </div>
+                    <select id="module-shape" name="module-shape" class="sr-only" aria-labelledby="module-shape-label">
+                      <option value="square" selected>Square</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="dots">Dots</option>
+                      <option value="diamond">Diamond</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+
+                  <div id="module-custom-controls" class="module-custom-controls" hidden>
+                    <label class="slider-field" for="module-rounding">
+                      <span>Corner rounding</span>
+                      <output id="module-rounding-value" for="module-rounding">25%</output>
+                    </label>
+                    <input id="module-rounding" name="module-rounding" type="range" min="0" max="50" step="1" value="25" />
+
+                    <label class="slider-field" for="module-inset">
+                      <span>Spacing</span>
+                      <output id="module-inset-value" for="module-inset">4%</output>
+                    </label>
+                    <input id="module-inset" name="module-inset" type="range" min="0" max="30" step="1" value="4" />
+
+                    <label class="slider-field" for="module-rotation">
+                      <span>Rotation</span>
+                      <output id="module-rotation-value" for="module-rotation">0 degrees</output>
+                    </label>
+                    <input id="module-rotation" name="module-rotation" type="range" min="-45" max="45" step="1" value="0" />
+                  </div>
+
+                  <p class="hint module-shape-hint">Decorative modules can reduce scanning reliability. Test the finished code at its intended size.</p>
+
                   <div class="color-grid">
                     <div class="color-field">
-                      <label for="color-dark">Dark</label>
+                      <label for="color-dark">Dark / Gradient start</label>
                       <input id="color-dark" name="color-dark" type="color" value="#111827" />
                       <label class="slider-field color-transparency-label" for="color-dark-transparency">
                         <span>Transparency</span>
@@ -283,6 +323,59 @@
                       <input id="color-light-transparency" name="color-light-transparency" type="range" min="0" max="100" step="1" value="0" />
                     </div>
                   </div>
+
+                  <div class="gradient-field">
+                    <span class="field-label" id="gradient-type-label">Dark color fill</span>
+                    <div class="choice-grid gradient-type-grid" role="group" aria-labelledby="gradient-type-label">
+                      <button type="button" class="choice-button is-active" data-choice-target="gradient-type" data-choice-value="solid" aria-pressed="true">Solid</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="linear" aria-pressed="false">Linear</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="radial" aria-pressed="false">Radial</button>
+                    </div>
+                    <select id="gradient-type" name="gradient-type" class="sr-only" aria-labelledby="gradient-type-label">
+                      <option value="solid" selected>Solid</option>
+                      <option value="linear">Linear</option>
+                      <option value="radial">Radial</option>
+                    </select>
+                  </div>
+
+                  <div id="gradient-controls" class="gradient-controls" hidden>
+                    <div class="color-field gradient-end-color">
+                      <label for="color-gradient-end">Gradient end</label>
+                      <input id="color-gradient-end" name="color-gradient-end" type="color" value="#0f766e" />
+                      <label class="slider-field color-transparency-label" for="color-gradient-end-transparency">
+                        <span>Transparency</span>
+                        <output id="color-gradient-end-transparency-value" for="color-gradient-end-transparency">0%</output>
+                      </label>
+                      <input id="color-gradient-end-transparency" name="color-gradient-end-transparency" type="range" min="0" max="100" step="1" value="0" />
+                    </div>
+
+                    <div id="gradient-angle-controls" class="gradient-angle-controls">
+                      <label class="slider-field" for="gradient-angle">
+                        <span>Direction</span>
+                        <output id="gradient-angle-value" for="gradient-angle">0 degrees</output>
+                      </label>
+                      <input id="gradient-angle" name="gradient-angle" type="range" min="0" max="360" step="1" value="0" />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="option-group">
+                  <legend>Frame message</legend>
+                  <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode">
+                    <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true">Auto</button>
+                    <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false">Custom</button>
+                    <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false">None</button>
+                  </div>
+                  <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode">
+                    <option value="auto" selected>Automatic short value</option>
+                    <option value="custom">Custom message</option>
+                    <option value="none">No message</option>
+                  </select>
+                  <div id="custom-frame-message-field" class="custom-frame-message-field" hidden>
+                    <label for="custom-frame-message">Custom message</label>
+                    <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" />
+                  </div>
+                  <p class="hint">The message is embedded below the QR in the exported image. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
                 </fieldset>
               </div>
             </section>
