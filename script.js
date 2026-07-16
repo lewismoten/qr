@@ -54,6 +54,25 @@ const eyeOuterRounding = document.getElementById('eye-outer-rounding');
 const eyeOuterRoundingValue = document.getElementById('eye-outer-rounding-value');
 const eyeCenterRounding = document.getElementById('eye-center-rounding');
 const eyeCenterRoundingValue = document.getElementById('eye-center-rounding-value');
+const centerArtMode = document.getElementById('center-art-mode');
+const centerArtControls = document.getElementById('center-art-controls');
+const centerArtSize = document.getElementById('center-art-size');
+const centerArtSizeValue = document.getElementById('center-art-size-value');
+const centerArtBackground = document.getElementById('center-art-background');
+const centerLogoControls = document.getElementById('center-logo-controls');
+const centerLogoInput = document.getElementById('center-logo-input');
+const centerLogoClear = document.getElementById('center-logo-clear');
+const centerEmojiControls = document.getElementById('center-emoji-controls');
+const centerEmoji = document.getElementById('center-emoji');
+const emojiOptions = document.querySelectorAll('.emoji-option');
+const centerPixelControls = document.getElementById('center-pixel-controls');
+const pixelArtColor = document.getElementById('pixel-art-color');
+const pixelArtClear = document.getElementById('pixel-art-clear');
+const pixelArtPalette = document.getElementById('pixel-art-palette');
+const pixelArtMatchModuleShape = document.getElementById('pixel-art-match-module-shape');
+const pixelArtSizeInput = document.getElementById('pixel-art-size');
+const pixelArtSizeValue = document.getElementById('pixel-art-size-value');
+const pixelArtGrid = document.getElementById('pixel-art-grid');
 const optionsJson = document.getElementById('options-json');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
@@ -70,8 +89,12 @@ const modeValidation = document.getElementById('mode-validation');
 const formatValidation = document.getElementById('format-validation');
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabPanels = document.querySelectorAll('.tab-panel');
-const debugSubtabButtons = document.querySelectorAll('.subtab-button');
-const debugSubtabPanels = document.querySelectorAll('.subtab-panel');
+const debugSubtabButtons = document.querySelectorAll('[data-tab-panel="debug"] .subtab-button');
+const debugSubtabPanels = document.querySelectorAll('[data-tab-panel="debug"] .subtab-panel');
+const styleSubtabButtons = document.querySelectorAll('.style-subtab-button');
+const styleSubtabPanels = document.querySelectorAll('.style-subtab-panel');
+const contentSubtabButtons = document.querySelectorAll('.content-subtab-button');
+const contentSubtabPanels = document.querySelectorAll('.content-subtab-panel');
 const debugEnabled = document.getElementById('debug-enabled');
 const debugOutlineModeButtons = document.querySelectorAll('.outline-mode-button');
 
@@ -238,6 +261,33 @@ let cachedTransferBytes = null;
 let cachedChunkCapacityInfoKey = '';
 let cachedChunkCapacityInfoValue = null;
 let chunkSettingsRefreshTimer = 0;
+const EGA_COLORS = [
+  ['Black', '#000000'],
+  ['Blue', '#0000aa'],
+  ['Green', '#00aa00'],
+  ['Cyan', '#00aaaa'],
+  ['Red', '#aa0000'],
+  ['Magenta', '#aa00aa'],
+  ['Brown', '#aa5500'],
+  ['Light gray', '#aaaaaa'],
+  ['Dark gray', '#555555'],
+  ['Bright blue', '#5555ff'],
+  ['Bright green', '#55ff55'],
+  ['Bright cyan', '#55ffff'],
+  ['Bright red', '#ff5555'],
+  ['Bright magenta', '#ff55ff'],
+  ['Yellow', '#ffff55'],
+  ['White', '#ffffff'],
+];
+let centerLogoImage = null;
+let centerLogoObjectUrl = '';
+let centerLogoLoadRequest = 0;
+let pixelArtSize = 16;
+let pixelArtPixels = Array(pixelArtSize * pixelArtSize).fill(null);
+let activePixelPaintColor = '#000000';
+let pixelPaintValue = null;
+let pixelPainting = false;
+let pixelRenderFrame = 0;
 let chunkSettingsRefreshRequest = 0;
 let transferSettingsRevision = 0;
 let renderedQrWidth = null;
@@ -483,6 +533,146 @@ function getCurrentEyeShapeOptions() {
   };
 }
 
+function syncEmojiSelection() {
+  emojiOptions.forEach((button) => {
+    const isActive = button.dataset.emoji === centerEmoji.value;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function syncCenterArtworkControls() {
+  const mode = centerArtMode.value;
+  centerArtControls.hidden = mode === 'none';
+  centerLogoControls.hidden = mode !== 'logo';
+  centerEmojiControls.hidden = mode !== 'emoji';
+  centerPixelControls.hidden = mode !== 'pixel';
+  centerArtSizeValue.textContent = `${centerArtSize.value}%`;
+  pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
+  syncEmojiSelection();
+}
+
+function syncPixelArtCell(cell) {
+  const index = Number.parseInt(cell.dataset.pixelIndex, 10);
+  const color = pixelArtPixels[index];
+  cell.classList.toggle('is-painted', Boolean(color));
+  if (color) {
+    cell.style.setProperty('--pixel-color', color);
+  } else {
+    cell.style.removeProperty('--pixel-color');
+  }
+  cell.setAttribute('aria-pressed', String(Boolean(color)));
+}
+
+function syncPixelArtGrid() {
+  pixelArtGrid.querySelectorAll('.pixel-art-cell').forEach(syncPixelArtCell);
+}
+
+function syncPixelArtPalette() {
+  pixelArtPalette.querySelectorAll('.pixel-palette-button').forEach((button) => {
+    const color = button.dataset.pixelColor || null;
+    const isActive = color === activePixelPaintColor;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+  pixelArtColor.classList.toggle(
+    'is-active',
+    Boolean(activePixelPaintColor) && !EGA_COLORS.some(([, color]) => color === activePixelPaintColor)
+  );
+}
+
+function ensurePixelArtPalette() {
+  if (pixelArtPalette.childElementCount) {
+    return;
+  }
+
+  const paletteEntries = [['Transparent / eraser', null], ...EGA_COLORS];
+  const fragment = document.createDocumentFragment();
+  paletteEntries.forEach(([label, color]) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `pixel-palette-button${color ? '' : ' is-eraser'}`;
+    button.dataset.pixelColor = color || '';
+    button.title = label;
+    button.setAttribute('aria-label', label);
+    button.setAttribute('aria-pressed', 'false');
+    if (color) {
+      button.style.setProperty('--palette-color', color);
+    }
+    fragment.append(button);
+  });
+  pixelArtPalette.append(fragment);
+  syncPixelArtPalette();
+}
+
+function schedulePixelArtRender() {
+  if (pixelRenderFrame) {
+    return;
+  }
+  pixelRenderFrame = window.requestAnimationFrame(() => {
+    pixelRenderFrame = 0;
+    renderQr();
+  });
+}
+
+function paintPixelArtCell(cell) {
+  if (!cell?.classList.contains('pixel-art-cell')) {
+    return;
+  }
+  const index = Number.parseInt(cell.dataset.pixelIndex, 10);
+  if (!Number.isInteger(index) || pixelArtPixels[index] === pixelPaintValue) {
+    return;
+  }
+  pixelArtPixels[index] = pixelPaintValue;
+  syncPixelArtCell(cell);
+  schedulePixelArtRender();
+}
+
+function ensurePixelArtGrid() {
+  if (pixelArtGrid.childElementCount) {
+    return;
+  }
+  pixelArtGrid.style.setProperty('--pixel-grid-size', String(pixelArtSize));
+  pixelArtGrid.setAttribute('aria-label', `${pixelArtSize} by ${pixelArtSize} pixel art editor`);
+  const fragment = document.createDocumentFragment();
+  for (let index = 0; index < pixelArtSize * pixelArtSize; index += 1) {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'pixel-art-cell';
+    cell.dataset.pixelIndex = String(index);
+    cell.setAttribute('role', 'gridcell');
+    cell.setAttribute('aria-label', `Pixel ${index + 1}`);
+    cell.setAttribute('aria-pressed', 'false');
+    fragment.append(cell);
+  }
+  pixelArtGrid.append(fragment);
+}
+
+function resizePixelArt(nextSize) {
+  const normalizedSize = Math.min(32, Math.max(8, nextSize - (nextSize % 2)));
+  if (normalizedSize === pixelArtSize) {
+    return;
+  }
+
+  const previousSize = pixelArtSize;
+  const previousPixels = pixelArtPixels;
+  const resizedPixels = Array(normalizedSize * normalizedSize).fill(null);
+  for (let row = 0; row < normalizedSize; row += 1) {
+    for (let column = 0; column < normalizedSize; column += 1) {
+      const sourceRow = Math.min(previousSize - 1, Math.floor((row * previousSize) / normalizedSize));
+      const sourceColumn = Math.min(previousSize - 1, Math.floor((column * previousSize) / normalizedSize));
+      resizedPixels[row * normalizedSize + column] = previousPixels[sourceRow * previousSize + sourceColumn];
+    }
+  }
+
+  pixelArtSize = normalizedSize;
+  pixelArtPixels = resizedPixels;
+  pixelArtGrid.replaceChildren();
+  ensurePixelArtGrid();
+  syncPixelArtGrid();
+  pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
+}
+
 function colorWithTransparency(color, transparencyInput) {
   const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : '#000000';
   const transparency = Math.min(100, Math.max(0, Number.parseInt(transparencyInput.value, 10) || 0));
@@ -520,6 +710,7 @@ function syncOutputs() {
   getCurrentFrameMessage();
   syncModuleShapeControls();
   syncEyeShapeControls();
+  syncCenterArtworkControls();
   formatVersionLabel();
   formatErrorCorrection();
   qrVersion.disabled = versionAuto.checked;
@@ -3598,6 +3789,87 @@ function drawFrameMessage(context, messageLines, canvasSize, captionHeight, font
   context.restore();
 }
 
+function getOpaqueArtworkBackground(lightColor) {
+  return /^#[0-9a-f]{6}/i.test(lightColor) ? lightColor.slice(0, 7) : '#ffffff';
+}
+
+function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
+  const mode = centerArtMode.value;
+  const emoji = centerEmoji.value.trim();
+  const hasPixelArt = pixelArtPixels.some(Boolean);
+  const hasArtwork =
+    (mode === 'logo' && centerLogoImage) ||
+    (mode === 'emoji' && emoji) ||
+    (mode === 'pixel' && hasPixelArt);
+  if (!hasArtwork) {
+    return;
+  }
+
+  const badgeSize = qrSize * ((readInteger(centerArtSize) ?? 20) / 100);
+  const center = qrStart + qrSize / 2;
+  const badgeX = center - badgeSize / 2;
+  const badgeY = center - badgeSize / 2;
+  const artPadding = centerArtBackground.checked ? badgeSize * 0.13 : 0;
+  const artSize = badgeSize - artPadding * 2;
+
+  context.save();
+  if (centerArtBackground.checked) {
+    fillEyeShape(
+      context,
+      badgeX,
+      badgeY,
+      badgeSize,
+      20,
+      getOpaqueArtworkBackground(lightColor)
+    );
+  }
+
+  if (mode === 'logo') {
+    const scale = Math.min(artSize / centerLogoImage.naturalWidth, artSize / centerLogoImage.naturalHeight);
+    const width = centerLogoImage.naturalWidth * scale;
+    const height = centerLogoImage.naturalHeight * scale;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = 'high';
+    context.drawImage(centerLogoImage, center - width / 2, center - height / 2, width, height);
+  } else if (mode === 'emoji') {
+    context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(emoji, center, center + artSize * 0.04);
+  } else if (mode === 'pixel') {
+    const pixelSize = artSize / pixelArtSize;
+    const artX = center - artSize / 2;
+    const artY = center - artSize / 2;
+    const matchModuleShape = pixelArtMatchModuleShape.checked && moduleShape.value !== 'square';
+    const pixelShapeOptions = getCurrentModuleShapeOptions();
+    context.imageSmoothingEnabled = false;
+    pixelArtPixels.forEach((color, index) => {
+      if (!color) {
+        return;
+      }
+      const row = Math.floor(index / pixelArtSize);
+      const column = index % pixelArtSize;
+      const left = Math.round(artX + column * pixelSize);
+      const top = Math.round(artY + row * pixelSize);
+      const right = Math.round(artX + (column + 1) * pixelSize);
+      const bottom = Math.round(artY + (row + 1) * pixelSize);
+      context.fillStyle = color;
+      if (matchModuleShape) {
+        drawQrModule(
+          context,
+          artX + column * pixelSize,
+          artY + row * pixelSize,
+          pixelSize,
+          pixelShapeOptions
+        );
+      } else {
+        context.fillRect(left, top, right - left, bottom - top);
+      }
+    });
+  }
+  context.restore();
+}
+
 function drawQr(qrDefinition, options) {
   const marginModules = options.margin ?? 4;
   const moduleCount = qrDefinition.modules.size;
@@ -3733,6 +4005,8 @@ function drawQr(qrDefinition, options) {
     drawCodewordOutlines(context, debugModel, marginModules, cellSize);
     drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize);
   }
+
+  drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, options.color.light);
 
   const frameTextColor = /^#[0-9a-f]{6}/i.test(options.color.dark)
     ? options.color.dark.slice(0, 7)
@@ -3913,6 +4187,40 @@ function activateDebugSubtab(subtabName) {
   renderQr();
 }
 
+function activateStyleSubtab(subtabName) {
+  styleSubtabButtons.forEach((button) => {
+    const isActive = button.dataset.styleSubtab === subtabName;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+
+  styleSubtabPanels.forEach((panel) => {
+    const isActive = panel.dataset.styleSubtabPanel === subtabName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+}
+
+function activateContentSubtab(subtabName) {
+  contentSubtabButtons.forEach((button) => {
+    const isActive = button.dataset.contentSubtab === subtabName;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+
+  contentSubtabPanels.forEach((panel) => {
+    const isActive = panel.dataset.contentSubtabPanel === subtabName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+
+  if (subtabName === 'data' && qrFormat.value === 'geo') {
+    window.requestAnimationFrame(() => {
+      updateGeoMap();
+    });
+  }
+}
+
 function syncChoiceButtons() {
   choiceButtons.forEach((button) => {
     const targetId = button.dataset.choiceTarget;
@@ -4052,6 +4360,7 @@ qrFormat.addEventListener('change', () => {
   setFormatVisibility();
   syncChoiceButtons();
   syncWifiSecurityState();
+  activateContentSubtab('data');
   renderQr();
 });
 
@@ -4082,12 +4391,16 @@ choiceButtons.forEach((button) => {
     if (target === eyeShape) {
       syncEyeShapeControls();
     }
+    if (target === centerArtMode) {
+      syncCenterArtworkControls();
+    }
     if (target === wifiEncryption) {
       syncWifiSecurityState();
     }
 
     if (target === qrFormat) {
       setFormatVisibility();
+      activateContentSubtab('data');
     }
 
     if (target === fileEncodingMode) {
@@ -4102,6 +4415,127 @@ choiceButtons.forEach((button) => {
 
     renderQr();
   });
+});
+
+emojiOptions.forEach((button) => {
+  button.addEventListener('click', () => {
+    centerEmoji.value = button.dataset.emoji || '';
+    syncEmojiSelection();
+    renderQr();
+  });
+});
+
+pixelArtPalette.addEventListener('click', (event) => {
+  const button = event.target.closest('.pixel-palette-button');
+  if (!button) {
+    return;
+  }
+  activePixelPaintColor = button.dataset.pixelColor || null;
+  syncPixelArtPalette();
+});
+
+pixelArtColor.addEventListener('input', () => {
+  activePixelPaintColor = pixelArtColor.value;
+  syncPixelArtPalette();
+});
+
+pixelArtSizeInput.addEventListener('input', () => {
+  resizePixelArt(Number.parseInt(pixelArtSizeInput.value, 10) || 16);
+});
+
+centerLogoInput.addEventListener('change', () => {
+  const loadRequest = ++centerLogoLoadRequest;
+  if (centerLogoObjectUrl) {
+    URL.revokeObjectURL(centerLogoObjectUrl);
+    centerLogoObjectUrl = '';
+  }
+  centerLogoImage = null;
+  const [file] = centerLogoInput.files || [];
+  if (!file || !file.type.startsWith('image/')) {
+    renderQr();
+    return;
+  }
+
+  centerLogoObjectUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.onload = () => {
+    if (loadRequest !== centerLogoLoadRequest) {
+      return;
+    }
+    centerLogoImage = image;
+    URL.revokeObjectURL(centerLogoObjectUrl);
+    centerLogoObjectUrl = '';
+    renderQr();
+  };
+  image.onerror = () => {
+    if (loadRequest !== centerLogoLoadRequest) {
+      return;
+    }
+    centerLogoImage = null;
+    URL.revokeObjectURL(centerLogoObjectUrl);
+    centerLogoObjectUrl = '';
+    renderQr();
+  };
+  image.src = centerLogoObjectUrl;
+});
+
+centerLogoClear.addEventListener('click', () => {
+  centerLogoLoadRequest += 1;
+  if (centerLogoObjectUrl) {
+    URL.revokeObjectURL(centerLogoObjectUrl);
+    centerLogoObjectUrl = '';
+  }
+  centerLogoImage = null;
+  centerLogoInput.value = '';
+  renderQr();
+});
+
+pixelArtGrid.addEventListener('pointerdown', (event) => {
+  const cell = event.target.closest('.pixel-art-cell');
+  if (!cell) {
+    return;
+  }
+  event.preventDefault();
+  pixelPainting = true;
+  pixelPaintValue = activePixelPaintColor;
+  paintPixelArtCell(cell);
+});
+
+pixelArtGrid.addEventListener('pointermove', (event) => {
+  if (!pixelPainting) {
+    return;
+  }
+  event.preventDefault();
+  const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest('.pixel-art-cell');
+  if (cell && pixelArtGrid.contains(cell)) {
+    paintPixelArtCell(cell);
+  }
+});
+
+pixelArtGrid.addEventListener('click', (event) => {
+  if (event.detail !== 0) {
+    return;
+  }
+  const cell = event.target.closest('.pixel-art-cell');
+  if (!cell) {
+    return;
+  }
+  pixelPaintValue = activePixelPaintColor;
+  paintPixelArtCell(cell);
+});
+
+window.addEventListener('pointerup', () => {
+  pixelPainting = false;
+});
+
+window.addEventListener('pointercancel', () => {
+  pixelPainting = false;
+});
+
+pixelArtClear.addEventListener('click', () => {
+  pixelArtPixels = Array(pixelArtSize * pixelArtSize).fill(null);
+  syncPixelArtGrid();
+  renderQr();
 });
 
 fileChunkIndex.addEventListener('input', () => {
@@ -4258,6 +4692,21 @@ debugSubtabButtons.forEach((button) => {
   });
 });
 
+styleSubtabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    activateStyleSubtab(button.dataset.styleSubtab || 'size');
+  });
+});
+
+contentSubtabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    activateContentSubtab(button.dataset.contentSubtab || 'data');
+  });
+});
+
+ensurePixelArtPalette();
+ensurePixelArtGrid();
+syncPixelArtGrid();
 syncOutputs();
 textInput.value = getDefaultUrlValue();
 setFormatVisibility();
@@ -4278,6 +4727,8 @@ syncMessageValuesAcrossAll(textInput);
 syncSmsLengthHint();
 syncEmailBodyLengthHint();
 syncDebugOutlineSelection();
+activateContentSubtab('data');
+activateStyleSubtab('size');
 activateDebugSubtab('encoding');
 activateTab('content');
 triggerDownloadFromLocationPayload();

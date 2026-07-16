@@ -153,6 +153,10 @@ canvas {
   background-size: 12px 12px;
 }
 
+#qr-canvas {
+  max-height: min(32vh, 15rem);
+}
+
 .tab-panel-shell {
   min-height: 0;
 }
@@ -499,10 +503,139 @@ select:disabled {
   display: none;
 }
 
+.center-art-mode-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.center-art-controls,
+.center-art-mode-controls {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.center-art-controls[hidden],
+.center-art-mode-controls[hidden] {
+  display: none;
+}
+
+.emoji-picker {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.emoji-option {
+  min-width: 0;
+  min-height: 2.8rem;
+  padding: 0.3rem;
+  border: 1px solid rgba(19, 34, 53, 0.12);
+  border-radius: 0.75rem;
+  background: white;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.emoji-option.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 2px rgba(15, 118, 110, 0.18);
+}
+
+.pixel-art-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pixel-art-toolbar input[type="color"] {
+  width: 3rem;
+  height: 2.8rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.pixel-art-toolbar input[type="color"].is-active {
+  outline: 3px solid rgba(15, 118, 110, 0.35);
+  outline-offset: 2px;
+}
+
+.pixel-art-grid {
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(var(--pixel-grid-size, 16), minmax(0, 1fr));
+  overflow: hidden;
+  border: 2px solid rgba(19, 34, 53, 0.2);
+  border-radius: 0.65rem;
+  background:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%),
+    #ffffff;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+  touch-action: none;
+  user-select: none;
+}
+
+.pixel-art-cell {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid rgba(19, 34, 53, 0.12);
+  border-bottom: 1px solid rgba(19, 34, 53, 0.12);
+  border-radius: 0;
+  background: transparent;
+}
+
+.pixel-art-cell.is-painted {
+  background: var(--pixel-color, #111827);
+}
+
+.pixel-art-palette {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.pixel-palette-button {
+  position: relative;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid rgba(19, 34, 53, 0.16);
+  border-radius: 0.65rem;
+  background: var(--palette-color, transparent);
+}
+
+.pixel-palette-button.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+}
+
+.pixel-palette-button.is-eraser {
+  background:
+    linear-gradient(45deg, transparent 43%, #dc2626 44%, #dc2626 56%, transparent 57%),
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    #ffffff;
+  background-size: auto, 12px 12px, 12px 12px, auto;
+}
+
 @media (min-width: 720px) {
   .module-shape-grid,
   .eye-shape-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .pixel-art-palette {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
   }
 }
 
@@ -758,7 +891,7 @@ output {
 
 .tab-bar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.4rem;
   min-height: var(--tabbar-height);
   padding: 0.55rem;
@@ -809,6 +942,34 @@ output {
   background: linear-gradient(135deg, rgba(15, 118, 110, 0.98), rgba(17, 94, 89, 0.94));
   color: white;
   box-shadow: 0 10px 22px rgba(15, 118, 110, 0.16);
+}
+
+.style-subtab-bar,
+.content-subtab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: rgba(247, 250, 252, 0.98);
+  backdrop-filter: blur(12px);
+}
+
+.style-subtab-bar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.content-subtab-bar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.style-subtab-button {
+  min-height: 2.8rem;
+  padding: 0.45rem 0.1rem;
+  font-size: 0.74rem;
+}
+
+.style-subtab-panels,
+.content-subtab-panels {
+  min-height: 0;
 }
 
 .subtab-panels {
@@ -883,8 +1044,12 @@ output {
     min-height: 24rem;
   }
 
+  #qr-canvas {
+    max-height: none;
+  }
+
   .tab-bar {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.55rem;
   }
 

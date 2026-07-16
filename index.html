@@ -35,7 +35,6 @@
         <section class="tab-navigation-card">
           <nav class="tab-bar" aria-label="QR controls">
             <button type="button" class="tab-button is-active" data-tab="content">Content</button>
-            <button type="button" class="tab-button" data-tab="format">Format</button>
             <button type="button" class="tab-button" data-tab="style">Style</button>
             <button type="button" class="tab-button" data-tab="debug">Debug</button>
           </nav>
@@ -43,8 +42,16 @@
 
         <section class="tab-panel-shell">
           <div class="tab-panels">
-            <section class="tab-panel" data-tab-panel="format" hidden>
+            <section class="tab-panel is-active" data-tab-panel="content">
               <div class="panel-card compact-stack">
+                <nav class="subtab-bar content-subtab-bar" aria-label="Content tools">
+                  <button type="button" class="subtab-button content-subtab-button is-active" data-content-subtab="data">Data</button>
+                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="format">Format</button>
+                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="frame">Frame</button>
+                </nav>
+
+                <div class="subtab-panels content-subtab-panels">
+                <section class="subtab-panel content-subtab-panel" data-content-subtab-panel="format" hidden>
                 <fieldset class="option-group">
                   <legend class="sr-only">Payload format</legend>
 
@@ -70,11 +77,9 @@
                     <option value="file">File</option>
                   </select>
                 </fieldset>
-              </div>
-            </section>
+                </section>
 
-            <section class="tab-panel is-active" data-tab-panel="content">
-              <div class="panel-card compact-stack">
+                <section class="subtab-panel content-subtab-panel is-active" data-content-subtab-panel="data">
                 <fieldset class="option-group format-fields" data-format-fields="text" hidden>
                   <legend class="sr-only">Text or URL content</legend>
                   <label class="sr-only" for="text-input">Text or URL payload</label>
@@ -231,13 +236,45 @@
 
                 <div id="format-validation" class="validation-message" hidden></div>
 
+                </section>
+
+                <section class="subtab-panel content-subtab-panel" data-content-subtab-panel="frame" hidden>
+                  <fieldset class="option-group">
+                    <legend>Frame message</legend>
+                    <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode">
+                      <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true">Auto</button>
+                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false">Custom</button>
+                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false">None</button>
+                    </div>
+                    <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode">
+                      <option value="auto" selected>Automatic short value</option>
+                      <option value="custom">Custom message</option>
+                      <option value="none">No message</option>
+                    </select>
+                    <div id="custom-frame-message-field" class="custom-frame-message-field" hidden>
+                      <label for="custom-frame-message">Custom message</label>
+                      <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" />
+                    </div>
+                    <p class="hint">The message is embedded below the QR in the exported image. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
+                  </fieldset>
+                </section>
+                </div>
               </div>
             </section>
 
             <section class="tab-panel" data-tab-panel="style" hidden>
               <div class="panel-card compact-stack">
+                <nav class="subtab-bar style-subtab-bar" aria-label="Style tools">
+                  <button type="button" class="subtab-button style-subtab-button is-active" data-style-subtab="size">Size</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="modules">Modules</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="colors">Colors</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="artwork">Art</button>
+                </nav>
+
+                <div class="subtab-panels style-subtab-panels">
+                <section class="subtab-panel style-subtab-panel is-active" data-style-subtab-panel="size">
                 <fieldset class="option-group">
-                  <legend>Appearance</legend>
+                  <legend>Size &amp; margin</legend>
 
                   <label class="slider-field" for="qr-width">
                     <span>Target width</span>
@@ -261,6 +298,12 @@
                     <output id="qr-margin-value" for="qr-margin">1</output>
                   </label>
                   <input id="qr-margin" name="qr-margin" type="range" min="0" max="12" step="1" value="1" />
+                </fieldset>
+                </section>
+
+                <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="modules" hidden>
+                <fieldset class="option-group">
+                  <legend>Modules &amp; corner eyes</legend>
 
                   <div class="module-shape-field">
                     <span class="field-label" id="module-shape-label">Module shape</span>
@@ -333,6 +376,12 @@
                   </div>
 
                   <p class="hint module-shape-hint">Decorative modules can reduce scanning reliability. Test the finished code at its intended size.</p>
+                </fieldset>
+                </section>
+
+                <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="colors" hidden>
+                <fieldset class="option-group">
+                  <legend>Colors &amp; fills</legend>
 
                   <div class="color-grid">
                     <div class="color-field">
@@ -390,25 +439,85 @@
                     </div>
                   </div>
                 </fieldset>
+                </section>
 
+                <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="artwork" hidden>
                 <fieldset class="option-group">
-                  <legend>Frame message</legend>
-                  <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode">
-                    <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true">Auto</button>
-                    <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false">Custom</button>
-                    <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false">None</button>
+                  <legend>Center artwork</legend>
+                  <div class="choice-grid center-art-mode-grid" role="group" aria-label="Center artwork type">
+                    <button type="button" class="choice-button is-active" data-choice-target="center-art-mode" data-choice-value="none" aria-pressed="true">None</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="logo" aria-pressed="false">Logo</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="emoji" aria-pressed="false">Emoji</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="pixel" aria-pressed="false">Pixel art</button>
                   </div>
-                  <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode">
-                    <option value="auto" selected>Automatic short value</option>
-                    <option value="custom">Custom message</option>
-                    <option value="none">No message</option>
+                  <select id="center-art-mode" name="center-art-mode" class="sr-only" aria-label="Center artwork type">
+                    <option value="none" selected>None</option>
+                    <option value="logo">Logo</option>
+                    <option value="emoji">Emoji</option>
+                    <option value="pixel">Pixel art</option>
                   </select>
-                  <div id="custom-frame-message-field" class="custom-frame-message-field" hidden>
-                    <label for="custom-frame-message">Custom message</label>
-                    <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" />
+
+                  <div id="center-art-controls" class="center-art-controls" hidden>
+                    <label class="slider-field" for="center-art-size">
+                      <span>Artwork size</span>
+                      <output id="center-art-size-value" for="center-art-size">20%</output>
+                    </label>
+                    <input id="center-art-size" name="center-art-size" type="range" min="10" max="30" step="1" value="20" />
+                    <label class="toggle-field">
+                      <input id="center-art-background" name="center-art-background" type="checkbox" checked />
+                      <span>Protect with a light background</span>
+                    </label>
+
+                    <div id="center-logo-controls" class="center-art-mode-controls" hidden>
+                      <label for="center-logo-input">Logo image</label>
+                      <input id="center-logo-input" name="center-logo-input" type="file" accept="image/*" />
+                      <button id="center-logo-clear" type="button" class="secondary-button">Clear logo</button>
+                    </div>
+
+                    <div id="center-emoji-controls" class="center-art-mode-controls" hidden>
+                      <label for="center-emoji">Emoji</label>
+                      <input id="center-emoji" name="center-emoji" type="text" maxlength="8" value="&#128279;" aria-describedby="emoji-picker-label" />
+                      <span id="emoji-picker-label" class="field-label">Quick picks</span>
+                      <div id="emoji-picker" class="emoji-picker" role="group" aria-labelledby="emoji-picker-label">
+                        <button type="button" class="emoji-option" data-emoji="&#128279;" aria-label="Link">&#128279;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128241;" aria-label="Phone">&#128241;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9993;&#65039;" aria-label="Envelope">&#9993;&#65039;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128205;" aria-label="Location pin">&#128205;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127968;" aria-label="Home">&#127968;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128722;" aria-label="Shopping cart">&#128722;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127873;" aria-label="Gift">&#127873;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#11088;" aria-label="Star">&#11088;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#10084;&#65039;" aria-label="Heart">&#10084;&#65039;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9989;" aria-label="Check mark">&#9989;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128640;" aria-label="Rocket">&#128640;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128161;" aria-label="Light bulb">&#128161;</button>
+                      </div>
+                    </div>
+
+                    <div id="center-pixel-controls" class="center-art-mode-controls" hidden>
+                      <label class="slider-field" for="pixel-art-size">
+                        <span>Canvas width</span>
+                        <output id="pixel-art-size-value" for="pixel-art-size">16 x 16</output>
+                      </label>
+                      <input id="pixel-art-size" name="pixel-art-size" type="range" min="8" max="32" step="2" value="16" />
+                      <div class="pixel-art-toolbar">
+                        <label for="pixel-art-color">Custom color</label>
+                        <input id="pixel-art-color" name="pixel-art-color" type="color" value="#111827" />
+                        <button id="pixel-art-clear" type="button" class="secondary-button">Clear</button>
+                      </div>
+                      <div id="pixel-art-palette" class="pixel-art-palette" role="group" aria-label="EGA paint colors"></div>
+                      <label class="toggle-field">
+                        <input id="pixel-art-match-module-shape" name="pixel-art-match-module-shape" type="checkbox" />
+                        <span>Match the QR module shape</span>
+                      </label>
+                      <div id="pixel-art-grid" class="pixel-art-grid" role="grid" aria-label="16 by 16 pixel art editor"></div>
+                      <p class="hint">Choose a color or Transparent, then tap or drag across the canvas.</p>
+                    </div>
                   </div>
-                  <p class="hint">The message is embedded below the QR in the exported image. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
+                  <p class="hint">Center artwork covers QR modules. Keep it small, use stronger error correction, and test it with real scanners.</p>
                 </fieldset>
+                </section>
+                </div>
               </div>
             </section>
 
