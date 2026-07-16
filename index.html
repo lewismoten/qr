@@ -385,7 +385,7 @@
 
                   <div class="color-grid">
                     <div class="color-field">
-                      <label for="color-dark">Dark / Gradient start</label>
+                      <label for="color-dark">Dark</label>
                       <input id="color-dark" name="color-dark" type="color" value="#111827" />
                       <label class="slider-field color-transparency-label" for="color-dark-transparency">
                         <span>Transparency</span>
@@ -402,6 +402,21 @@
                         <output id="color-light-transparency-value" for="color-light-transparency">0%</output>
                       </label>
                       <input id="color-light-transparency" name="color-light-transparency" type="range" min="0" max="100" step="1" value="0" />
+                    </div>
+                  </div>
+
+                  <label class="toggle-field">
+                    <input id="eye-custom-colors-enabled" name="eye-custom-colors-enabled" type="checkbox" />
+                    <span>Use custom corner eye colors</span>
+                  </label>
+                  <div id="eye-color-controls" class="color-grid eye-color-controls" hidden>
+                    <div class="color-field">
+                      <label for="eye-outer-color">Eye outer ring</label>
+                      <input id="eye-outer-color" name="eye-outer-color" type="color" value="#0f766e" />
+                    </div>
+                    <div class="color-field">
+                      <label for="eye-center-color">Eye center</label>
+                      <input id="eye-center-color" name="eye-center-color" type="color" value="#111827" />
                     </div>
                   </div>
 
@@ -465,7 +480,7 @@
                     <input id="center-art-size" name="center-art-size" type="range" min="10" max="30" step="1" value="20" />
                     <label class="toggle-field">
                       <input id="center-art-background" name="center-art-background" type="checkbox" checked />
-                      <span>Protect with a light background</span>
+                      <span id="center-art-background-label">Protect with a light background</span>
                     </label>
 
                     <div id="center-logo-controls" class="center-art-mode-controls" hidden>
@@ -491,6 +506,18 @@
                         <button type="button" class="emoji-option" data-emoji="&#9989;" aria-label="Check mark">&#9989;</button>
                         <button type="button" class="emoji-option" data-emoji="&#128640;" aria-label="Rocket">&#128640;</button>
                         <button type="button" class="emoji-option" data-emoji="&#128161;" aria-label="Light bulb">&#128161;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127760;" aria-label="Globe">&#127760;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128247;" aria-label="Camera">&#128247;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127925;" aria-label="Music">&#127925;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9749;" aria-label="Coffee">&#9749;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128273;" aria-label="Key">&#128273;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128274;" aria-label="Lock">&#128274;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128246;" aria-label="Signal bars">&#128246;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128214;" aria-label="Book">&#128214;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128197;" aria-label="Calendar">&#128197;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127915;" aria-label="Ticket">&#127915;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127828;" aria-label="Food">&#127828;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128522;" aria-label="Smile">&#128522;</button>
                       </div>
                     </div>
 
@@ -514,7 +541,6 @@
                       <p class="hint">Choose a color or Transparent, then tap or drag across the canvas.</p>
                     </div>
                   </div>
-                  <p class="hint">Center artwork covers QR modules. Keep it small, use stronger error correction, and test it with real scanners.</p>
                 </fieldset>
                 </section>
                 </div>
@@ -523,7 +549,7 @@
 
             <section class="tab-panel" data-tab-panel="debug" hidden>
               <div class="panel-card compact-stack">
-                <nav class="subtab-bar" aria-label="Debug tools">
+                <nav class="subtab-bar debug-subtab-bar" aria-label="Debug tools">
                   <button type="button" class="subtab-button is-active" data-subtab="encoding">Encoding</button>
                   <button type="button" class="subtab-button" data-subtab="mask">Mask</button>
                   <button type="button" class="subtab-button" data-subtab="advanced">Advanced</button>

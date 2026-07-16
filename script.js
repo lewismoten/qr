@@ -54,11 +54,16 @@ const eyeOuterRounding = document.getElementById('eye-outer-rounding');
 const eyeOuterRoundingValue = document.getElementById('eye-outer-rounding-value');
 const eyeCenterRounding = document.getElementById('eye-center-rounding');
 const eyeCenterRoundingValue = document.getElementById('eye-center-rounding-value');
+const eyeCustomColorsEnabled = document.getElementById('eye-custom-colors-enabled');
+const eyeColorControls = document.getElementById('eye-color-controls');
+const eyeOuterColor = document.getElementById('eye-outer-color');
+const eyeCenterColor = document.getElementById('eye-center-color');
 const centerArtMode = document.getElementById('center-art-mode');
 const centerArtControls = document.getElementById('center-art-controls');
 const centerArtSize = document.getElementById('center-art-size');
 const centerArtSizeValue = document.getElementById('center-art-size-value');
 const centerArtBackground = document.getElementById('center-art-background');
+const centerArtBackgroundLabel = document.getElementById('center-art-background-label');
 const centerLogoControls = document.getElementById('center-logo-controls');
 const centerLogoInput = document.getElementById('center-logo-input');
 const centerLogoClear = document.getElementById('center-logo-clear');
@@ -521,6 +526,7 @@ function getCurrentModuleShapeOptions() {
 
 function syncEyeShapeControls() {
   eyeCustomControls.hidden = eyeShape.value !== 'custom';
+  eyeColorControls.hidden = !eyeCustomColorsEnabled.checked;
   eyeOuterRoundingValue.textContent = `${eyeOuterRounding.value}%`;
   eyeCenterRoundingValue.textContent = `${eyeCenterRounding.value}%`;
 }
@@ -548,6 +554,8 @@ function syncCenterArtworkControls() {
   centerEmojiControls.hidden = mode !== 'emoji';
   centerPixelControls.hidden = mode !== 'pixel';
   centerArtSizeValue.textContent = `${centerArtSize.value}%`;
+  centerArtBackgroundLabel.textContent =
+    mode === 'emoji' ? 'Protect with a light outline' : 'Protect with a light background';
   pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
   syncEmojiSelection();
 }
@@ -2660,6 +2668,29 @@ function isFinderPattern(size, row, column) {
   );
 }
 
+function getFinderPatternPart(size, row, column) {
+  const origins = [
+    [0, 0],
+    [0, size - 7],
+    [size - 7, 0],
+  ];
+  for (const [top, left] of origins) {
+    if (!isInSquare(row, column, top, left, 7)) {
+      continue;
+    }
+    const localRow = row - top;
+    const localColumn = column - left;
+    if (localRow >= 2 && localRow <= 4 && localColumn >= 2 && localColumn <= 4) {
+      return 'center';
+    }
+    if (localRow === 0 || localRow === 6 || localColumn === 0 || localColumn === 6) {
+      return 'outer';
+    }
+    return null;
+  }
+  return null;
+}
+
 function isTimingRegion(size, row, column) {
   if (row === 6 && column >= 8 && column <= size - 9) {
     return true;
@@ -3656,7 +3687,8 @@ function drawFinderEyes(
   marginModules,
   cellSize,
   eyeOptions,
-  moduleFillStyle,
+  outerFillStyle,
+  centerFillStyle,
   lightColor,
   transparentLight
 ) {
@@ -3674,7 +3706,7 @@ function drawFinderEyes(
   origins.forEach(([row, column]) => {
     const x = (column + marginModules) * cellSize;
     const y = (row + marginModules) * cellSize;
-    fillEyeShape(context, x, y, cellSize * 7, geometry.outerRounding, moduleFillStyle);
+    fillEyeShape(context, x, y, cellSize * 7, geometry.outerRounding, outerFillStyle);
 
     context.save();
     context.globalCompositeOperation = 'destination-out';
@@ -3690,7 +3722,7 @@ function drawFinderEyes(
       y + cellSize * 2,
       cellSize * 3,
       geometry.centerRounding,
-      moduleFillStyle
+      centerFillStyle
     );
   });
 }
@@ -3793,6 +3825,51 @@ function getOpaqueArtworkBackground(lightColor) {
   return /^#[0-9a-f]{6}/i.test(lightColor) ? lightColor.slice(0, 7) : '#ffffff';
 }
 
+function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
+  const outlineWidth = Math.max(1.5, artSize * 0.065);
+  const bufferSize = Math.ceil(artSize + outlineWidth * 6);
+  const emojiCanvas = document.createElement('canvas');
+  const maskCanvas = document.createElement('canvas');
+  emojiCanvas.width = bufferSize;
+  emojiCanvas.height = bufferSize;
+  maskCanvas.width = bufferSize;
+  maskCanvas.height = bufferSize;
+  const emojiContext = emojiCanvas.getContext('2d');
+  const maskContext = maskCanvas.getContext('2d');
+  if (!emojiContext || !maskContext) {
+    return;
+  }
+
+  let fontSize = artSize * 0.82;
+  const fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+  emojiContext.font = `${fontSize}px ${fontFamily}`;
+  const measuredWidth = emojiContext.measureText(emoji).width;
+  if (measuredWidth > artSize * 0.92) {
+    fontSize *= (artSize * 0.92) / measuredWidth;
+  }
+
+  emojiContext.font = `${fontSize}px ${fontFamily}`;
+  emojiContext.textAlign = 'center';
+  emojiContext.textBaseline = 'middle';
+  emojiContext.fillText(emoji, bufferSize / 2, bufferSize / 2 + fontSize * 0.04);
+
+  maskContext.drawImage(emojiCanvas, 0, 0);
+  maskContext.globalCompositeOperation = 'source-in';
+  maskContext.fillStyle = outlineColor;
+  maskContext.fillRect(0, 0, bufferSize, bufferSize);
+
+  const target = center - bufferSize / 2;
+  for (let step = 0; step < 24; step += 1) {
+    const angle = (step / 24) * Math.PI * 2;
+    context.drawImage(
+      maskCanvas,
+      target + Math.cos(angle) * outlineWidth,
+      target + Math.sin(angle) * outlineWidth
+    );
+  }
+  context.drawImage(emojiCanvas, target, target);
+}
+
 function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
   const mode = centerArtMode.value;
   const emoji = centerEmoji.value.trim();
@@ -3813,7 +3890,7 @@ function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
   const artSize = badgeSize - artPadding * 2;
 
   context.save();
-  if (centerArtBackground.checked) {
+  if (centerArtBackground.checked && mode !== 'emoji') {
     fillEyeShape(
       context,
       badgeX,
@@ -3832,10 +3909,14 @@ function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
     context.imageSmoothingQuality = 'high';
     context.drawImage(centerLogoImage, center - width / 2, center - height / 2, width, height);
   } else if (mode === 'emoji') {
-    context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(emoji, center, center + artSize * 0.04);
+    if (centerArtBackground.checked) {
+      drawOutlinedEmoji(context, emoji, center, artSize, getOpaqueArtworkBackground(lightColor));
+    } else {
+      context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(emoji, center, center + artSize * 0.04);
+    }
   } else if (mode === 'pixel') {
     const pixelSize = artSize / pixelArtSize;
     const artX = center - artSize / 2;
@@ -3914,6 +3995,7 @@ function drawQr(qrDefinition, options) {
   const moduleShapeOptions = getCurrentModuleShapeOptions();
   const eyeShapeOptions = getCurrentEyeShapeOptions();
   const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
+  const customEyeColorsActive = !debugActive && eyeCustomColorsEnabled.checked;
   const gradientOptions = getCurrentGradientOptions();
   const lightAlpha = getColorAlpha(options.color.light);
   const gradientHasTransparency = gradientOptions.type !== 'solid' && getColorAlpha(gradientOptions.endColor) < 1;
@@ -3948,6 +4030,8 @@ function drawQr(qrDefinition, options) {
     moduleCount,
     cellSize
   );
+  const eyeOuterFillStyle = customEyeColorsActive ? eyeOuterColor.value : moduleFillStyle;
+  const eyeCenterFillStyle = customEyeColorsActive ? eyeCenterColor.value : moduleFillStyle;
 
   if (debugActive) {
     for (let row = 0; row < moduleCount; row += 1) {
@@ -3976,7 +4060,16 @@ function drawQr(qrDefinition, options) {
       const category = debugActive
         ? getDebugCategory(row, column, qrDefinition, debugModel, 'overlay')
         : getModuleCategory(qrDefinition, row, column);
-      context.fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : moduleFillStyle;
+      let fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : moduleFillStyle;
+      if (customEyeColorsActive) {
+        const eyePart = getFinderPatternPart(moduleCount, row, column);
+        if (eyePart === 'outer') {
+          fillStyle = eyeOuterFillStyle;
+        } else if (eyePart === 'center') {
+          fillStyle = eyeCenterFillStyle;
+        }
+      }
+      context.fillStyle = fillStyle;
       drawQrModule(
         context,
         (column + marginModules) * cellSize,
@@ -3994,7 +4087,8 @@ function drawQr(qrDefinition, options) {
       marginModules,
       cellSize,
       eyeShapeOptions,
-      moduleFillStyle,
+      eyeOuterFillStyle,
+      eyeCenterFillStyle,
       options.color.light,
       transparentLight
     );
