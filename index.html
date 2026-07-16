@@ -23,29 +23,44 @@
       <form id="qr-form" class="app-layout">
         <section class="preview-card" aria-live="polite">
           <div class="preview-frame">
-            <canvas id="qr-canvas" width="320" height="320"></canvas>
+            <div id="chunk-preview-nav" class="chunk-preview-nav">
+              <button id="chunk-preview-prev" type="button" class="chunk-nav-button" aria-label="Previous QR code">‹</button>
+              <canvas id="qr-canvas" width="320" height="320"></canvas>
+              <button id="chunk-preview-next" type="button" class="chunk-nav-button" aria-label="Next QR code">›</button>
+            </div>
+            <p id="chunk-preview-status" class="chunk-preview-status" hidden>1 of 1</p>
           </div>
+        </section>
+
+        <section class="tab-navigation-card">
           <nav class="tab-bar" aria-label="QR controls">
             <button type="button" class="tab-button is-active" data-tab="content">Content</button>
+            <button type="button" class="tab-button" data-tab="format">Format</button>
             <button type="button" class="tab-button" data-tab="style">Style</button>
-            <button type="button" class="tab-button" data-tab="encoding">Encoding</button>
-            <button type="button" class="tab-button" data-tab="mask">Mask</button>
-            <button type="button" class="tab-button" data-tab="advanced">Advanced</button>
             <button type="button" class="tab-button" data-tab="debug">Debug</button>
           </nav>
         </section>
 
         <section class="tab-panel-shell">
           <div class="tab-panels">
-            <section class="tab-panel is-active" data-tab-panel="content">
+            <section class="tab-panel" data-tab-panel="format" hidden>
               <div class="panel-card compact-stack">
                 <fieldset class="option-group">
                   <legend class="sr-only">Payload format</legend>
 
                   <label for="qr-format">QR format</label>
-                  <select id="qr-format" name="qr-format">
+                  <div id="qr-format-buttons" class="choice-grid" role="radiogroup" aria-label="QR format">
+                    <button type="button" class="choice-button is-active" data-choice-target="qr-format" data-choice-value="text" aria-pressed="true">Text / URL</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="wifi" aria-pressed="false">Wi-Fi</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="email" aria-pressed="false">Email</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="phone" aria-pressed="false">Phone</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="sms" aria-pressed="false">SMS</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="geo" aria-pressed="false">Geo</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="vcard" aria-pressed="false">vCard</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="file" aria-pressed="false">File</button>
+                  </div>
+                  <select id="qr-format" name="qr-format" class="sr-only" aria-hidden="true" tabindex="-1">
                     <option value="text">Text</option>
-                    <option value="url" selected>URL</option>
                     <option value="wifi">Wi-Fi</option>
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
@@ -55,17 +70,15 @@
                     <option value="file">File</option>
                   </select>
                 </fieldset>
+              </div>
+            </section>
 
+            <section class="tab-panel is-active" data-tab-panel="content">
+              <div class="panel-card compact-stack">
                 <fieldset class="option-group format-fields" data-format-fields="text" hidden>
-                  <legend class="sr-only">Text content</legend>
-                  <label class="sr-only" for="text-input">Text payload</label>
-                  <textarea id="text-input" name="text-input" rows="4" placeholder="Enter plain text"></textarea>
-                </fieldset>
-
-                <fieldset class="option-group format-fields is-active" data-format-fields="url">
-                  <legend class="sr-only">URL content</legend>
-                  <label class="sr-only" for="url-input">URL payload</label>
-                  <textarea id="url-input" name="url-input" rows="4" placeholder="https://example.com">https://example.com</textarea>
+                  <legend class="sr-only">Text or URL content</legend>
+                  <label class="sr-only" for="text-input">Text or URL payload</label>
+                  <textarea id="text-input" name="text-input" rows="4" placeholder="Paste text or a URL"></textarea>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="wifi" hidden>
@@ -75,7 +88,12 @@
                   <label for="wifi-password">Password</label>
                   <input id="wifi-password" name="wifi-password" type="password" placeholder="Password" />
                   <label for="wifi-encryption">Security</label>
-                  <select id="wifi-encryption" name="wifi-encryption">
+                  <div id="wifi-encryption-buttons" class="choice-grid choice-grid-compact wifi-security-grid" role="radiogroup" aria-label="Wi-Fi security">
+                    <button type="button" class="choice-button is-active" data-choice-target="wifi-encryption" data-choice-value="WPA" aria-pressed="true">WPA/2/3</button>
+                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="WEP" aria-pressed="false">WEP</button>
+                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="nopass" aria-pressed="false">Open</button>
+                  </div>
+                  <select id="wifi-encryption" name="wifi-encryption" class="sr-only" aria-hidden="true" tabindex="-1">
                     <option value="WPA">WPA/WPA2/WPA3</option>
                     <option value="WEP">WEP</option>
                     <option value="nopass">Open</option>
@@ -90,24 +108,40 @@
                   <legend>Email</legend>
                   <label for="email-to">To</label>
                   <input id="email-to" name="email-to" type="email" placeholder="name@example.com" />
-                  <label for="email-subject">Subject</label>
+                  <label for="email-subject">Subject (optional)</label>
                   <input id="email-subject" name="email-subject" type="text" placeholder="Subject" />
-                  <label for="email-body">Body</label>
+                  <label for="email-body">Body (optional)</label>
                   <textarea id="email-body" name="email-body" rows="3" placeholder="Message"></textarea>
+                  <p id="email-body-length-hint" class="hint">0 / 0</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="phone" hidden>
                   <legend>Phone</legend>
                   <label for="phone-number">Phone number</label>
-                  <input id="phone-number" name="phone-number" type="tel" placeholder="+15551234567" />
+                  <input id="phone-number" name="phone-number" type="tel" placeholder="+15551234567" value="+15305394775" />
+                  <label>Format</label>
+                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="Phone number format">
+                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true">USA</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false">Intl</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false">E.164</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false">Digits</button>
+                  </div>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="sms" hidden>
                   <legend>SMS</legend>
                   <label for="sms-number">Phone number</label>
-                  <input id="sms-number" name="sms-number" type="tel" placeholder="+15551234567" />
+                  <input id="sms-number" name="sms-number" type="tel" placeholder="+15551234567" value="+15305394775" />
+                  <label>Format</label>
+                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="SMS phone number format">
+                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true">USA</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false">Intl</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false">E.164</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false">Digits</button>
+                  </div>
                   <label for="sms-body">Message</label>
                   <textarea id="sms-body" name="sms-body" rows="3" placeholder="Text message"></textarea>
+                  <p id="sms-length-hint" class="hint">0 / 160</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="geo" hidden>
@@ -128,41 +162,75 @@
                   </div>
                   <div class="geo-map-card">
                     <div id="geo-map" class="geo-map" aria-label="Map preview for geo coordinates"></div>
-                    <p id="geo-map-status" class="hint">Enter latitude and longitude to preview the location.</p>
                   </div>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="vcard" hidden>
                   <legend>vCard</legend>
                   <label for="vcard-name">Full name</label>
-                  <input id="vcard-name" name="vcard-name" type="text" placeholder="Taylor Example" />
+                  <input id="vcard-name" name="vcard-name" type="text" placeholder="Taylor Example" value="Lewis Moten III" />
                   <label for="vcard-org">Organization</label>
-                  <input id="vcard-org" name="vcard-org" type="text" placeholder="OpenAI" />
+                  <input id="vcard-org" name="vcard-org" type="text" placeholder="OpenAI" value="LewisMoten.com" />
                   <label for="vcard-title">Title</label>
-                  <input id="vcard-title" name="vcard-title" type="text" placeholder="Engineer" />
+                  <input id="vcard-title" name="vcard-title" type="text" placeholder="Engineer" value="Owner" />
                   <label for="vcard-phone">Phone</label>
-                  <input id="vcard-phone" name="vcard-phone" type="tel" placeholder="+15551234567" />
+                  <input id="vcard-phone" name="vcard-phone" type="tel" placeholder="+15551234567" value="+15305394775" />
                   <label for="vcard-email">Email</label>
-                  <input id="vcard-email" name="vcard-email" type="email" placeholder="name@example.com" />
+                  <input id="vcard-email" name="vcard-email" type="email" placeholder="name@example.com" value="lewismoten@gmail.com" />
                   <label for="vcard-url">Website</label>
-                  <input id="vcard-url" name="vcard-url" type="url" placeholder="https://example.com" />
+                  <input id="vcard-url" name="vcard-url" type="url" placeholder="https://example.com" value="https://lewismoten.com" />
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="file" hidden>
                   <legend>File</legend>
+                  <label for="file-encoding-mode">Transport</label>
+                  <div id="file-encoding-mode-buttons" class="choice-grid choice-grid-compact file-mode-grid" role="radiogroup" aria-label="File transport mode">
+                    <button type="button" class="choice-button is-active" data-choice-target="file-encoding-mode" data-choice-value="data" aria-pressed="true">Data</button>
+                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="blob" aria-pressed="false">Blob URL</button>
+                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="chunked" aria-pressed="false">Chunked</button>
+                  </div>
+                  <select id="file-encoding-mode" name="file-encoding-mode" class="sr-only" aria-hidden="true" tabindex="-1">
+                    <option value="data">Data URL</option>
+                    <option value="blob">Blob URL</option>
+                    <option value="chunked">Chunked protocol</option>
+                  </select>
                   <label for="file-input">Choose a file</label>
                   <input id="file-input" name="file-input" type="file" />
-                  <p class="hint">Small files work best. Large files can exceed QR capacity quickly.</p>
+                  <div id="file-chunk-controls" class="chunk-controls" hidden>
+                    <label class="toggle-field">
+                      <input id="file-chunk-version-auto" name="file-chunk-version-auto" type="checkbox" checked />
+                      <span>Auto-pick version</span>
+                    </label>
+                    <label class="slider-field" for="file-chunk-version">
+                      <span>Chunk version target</span>
+                      <output id="file-chunk-version-value" for="file-chunk-version">V8</output>
+                    </label>
+                    <input id="file-chunk-version" name="file-chunk-version" type="range" min="1" max="40" step="1" value="8" />
+                    <label class="toggle-field">
+                      <input id="file-include-manifest" name="file-include-manifest" type="checkbox" checked />
+                      <span>Include manifest</span>
+                    </label>
+                    <label class="toggle-field">
+                      <input id="file-compress-transfer" name="file-compress-transfer" type="checkbox" checked />
+                      <span>Compress for transfer (gzip)</span>
+                    </label>
+                    <label for="file-custom-metadata">Custom metadata (optional JSON)</label>
+                    <textarea id="file-custom-metadata" name="file-custom-metadata" rows="3" placeholder='{"collection":"scavenger-hunt"}'></textarea>
+                    <label class="slider-field" for="file-chunk-index">
+                      <span>Chunk</span>
+                      <output id="file-chunk-index-value" for="file-chunk-index">1 / 1</output>
+                    </label>
+                    <input id="file-chunk-index" name="file-chunk-index" type="range" min="1" max="1" step="1" value="1" />
+                    <p class="hint"><code>FILE:1:S</code> is a complete single QR. Multi-QR transfers use <code>FILE:1:C</code> chunks with an ID, byte offset, and total length.</p>
+                  </div>
+                  <div class="file-status-row">
+                    <p id="file-capacity-hint" class="hint file-capacity-hint">Loaded 0 B of 0 B max (0%).</p>
+                    <button id="clear-file-button" type="button" class="secondary-button" disabled>Clear file</button>
+                  </div>
                 </fieldset>
 
-                <fieldset class="option-group">
-                  <legend>Encoded payload</legend>
-                  <label class="toggle-field payload-toggle" id="payload-reveal-toggle" hidden>
-                    <input id="payload-reveal-secrets" name="payload-reveal-secrets" type="checkbox" />
-                    <span>Reveal passwords and secrets in preview</span>
-                  </label>
-                  <pre id="encoded-preview"></pre>
-                </fieldset>
+                <div id="format-validation" class="validation-message" hidden></div>
+
               </div>
             </section>
 
@@ -172,18 +240,18 @@
                   <legend>Appearance</legend>
 
                   <label class="slider-field" for="qr-width">
-                    <span>Width</span>
-                    <output id="qr-width-value" for="qr-width">320 px</output>
+                    <span>Target width</span>
+                    <output id="qr-width-value" for="qr-width">320 px target</output>
                   </label>
-                  <input id="qr-width" name="qr-width" type="range" min="160" max="640" step="8" value="320" />
+                  <input id="qr-width" name="qr-width" type="range" min="64" max="640" step="64" value="320" />
 
                   <label class="toggle-field">
                     <input id="qr-width-auto" name="qr-width-auto" type="checkbox" />
-                    <span>Use scale instead of fixed width</span>
+                    <span>Size entirely from module scale</span>
                   </label>
 
                   <label class="slider-field" for="qr-scale">
-                    <span>Scale</span>
+                    <span>Minimum pixels per module</span>
                     <output id="qr-scale-value" for="qr-scale">4</output>
                   </label>
                   <input id="qr-scale" name="qr-scale" type="range" min="1" max="12" step="1" value="4" />
@@ -195,207 +263,238 @@
                   <input id="qr-margin" name="qr-margin" type="range" min="0" max="12" step="1" value="1" />
 
                   <div class="color-grid">
-                    <label class="color-field" for="color-dark">
-                      <span>Dark</span>
+                    <div class="color-field">
+                      <label for="color-dark">Dark</label>
                       <input id="color-dark" name="color-dark" type="color" value="#111827" />
-                    </label>
+                      <label class="slider-field color-transparency-label" for="color-dark-transparency">
+                        <span>Transparency</span>
+                        <output id="color-dark-transparency-value" for="color-dark-transparency">0%</output>
+                      </label>
+                      <input id="color-dark-transparency" name="color-dark-transparency" type="range" min="0" max="100" step="1" value="0" />
+                    </div>
 
-                    <label class="color-field" for="color-light">
-                      <span>Light</span>
+                    <div class="color-field">
+                      <label for="color-light">Light</label>
                       <input id="color-light" name="color-light" type="color" value="#ffffff" />
-                    </label>
-                  </div>
-                </fieldset>
-              </div>
-            </section>
-
-            <section class="tab-panel" data-tab-panel="encoding" hidden>
-              <div class="panel-card compact-stack">
-                <fieldset class="option-group">
-                  <legend>Error correction</legend>
-
-                  <label class="slider-field" for="error-correction">
-                    <span id="error-correction-label">Medium</span>
-                    <output id="error-correction-value" for="error-correction">M</output>
-                  </label>
-                  <input id="error-correction" name="error-correction" type="range" min="0" max="3" step="1" value="1" />
-                  <p class="hint" id="error-correction-help">Can still scan if roughly 15% of the symbol area is obscured or damaged.</p>
-                </fieldset>
-
-                <fieldset class="option-group">
-                  <legend>Input mode</legend>
-
-                  <label class="toggle-field">
-                    <input id="mode-auto" name="mode-auto" type="checkbox" checked />
-                    <span>Auto-detect best encoding mode</span>
-                  </label>
-
-                  <label for="encoding-mode">Manual mode</label>
-                  <select id="encoding-mode" name="encoding-mode">
-                    <option value="numeric">Numeric</option>
-                    <option value="alphanumeric">Alphanumeric</option>
-                    <option value="byte">Byte / Binary</option>
-                    <option value="kanji">Kanji</option>
-                  </select>
-
-                  <div class="info-grid">
-                    <div class="info-chip">
-                      <span class="info-label">Chosen mode</span>
-                      <strong id="detected-mode">Auto</strong>
-                    </div>
-                    <div class="info-chip">
-                      <span class="info-label">Segments</span>
-                      <strong id="segment-summary">0</strong>
-                    </div>
-                    <div class="info-chip">
-                      <span class="info-label">Version</span>
-                      <strong id="version-summary">Auto</strong>
-                    </div>
-                    <div class="info-chip">
-                      <span class="info-label">Capacity</span>
-                      <strong id="capacity-summary">-</strong>
+                      <label class="slider-field color-transparency-label" for="color-light-transparency">
+                        <span>Transparency</span>
+                        <output id="color-light-transparency-value" for="color-light-transparency">0%</output>
+                      </label>
+                      <input id="color-light-transparency" name="color-light-transparency" type="range" min="0" max="100" step="1" value="0" />
                     </div>
                   </div>
-                  <div id="mode-validation" class="validation-message" hidden></div>
-                </fieldset>
-
-                <fieldset class="option-group">
-                  <legend>Version</legend>
-
-                  <label class="toggle-field">
-                    <input id="version-auto" name="version-auto" type="checkbox" checked />
-                    <span>Auto-pick version</span>
-                  </label>
-
-                  <label class="slider-field" for="qr-version">
-                    <span>Version</span>
-                    <output id="qr-version-value" for="qr-version">Auto</output>
-                  </label>
-                  <input id="qr-version" name="qr-version" type="range" min="1" max="40" step="1" value="1" />
-                </fieldset>
-              </div>
-            </section>
-
-            <section class="tab-panel" data-tab-panel="mask" hidden>
-              <div class="panel-card compact-stack">
-                <fieldset class="option-group">
-                  <legend>Mask pattern</legend>
-                  <input id="mask-pattern" name="mask-pattern" type="hidden" value="" />
-                  <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices"></div>
-                </fieldset>
-              </div>
-            </section>
-
-            <section class="tab-panel" data-tab-panel="advanced" hidden>
-              <div class="panel-card compact-stack">
-                <fieldset class="option-group">
-                  <legend>Raw options</legend>
-                  <label for="options-json">Extra options JSON</label>
-                  <textarea
-                    id="options-json"
-                    name="options-json"
-                    rows="6"
-                    spellcheck="false"
-                  >{}</textarea>
-                  <p class="hint">
-                    Merged last into the QRCode options object. Function-based options such as
-                    <code>toSJISFunc</code> still need explicit code wiring.
-                  </p>
-                </fieldset>
-
-                <fieldset class="option-group">
-                  <legend>Preview payload</legend>
-                  <pre id="options-preview"></pre>
                 </fieldset>
               </div>
             </section>
 
             <section class="tab-panel" data-tab-panel="debug" hidden>
               <div class="panel-card compact-stack">
-                <fieldset class="option-group">
-                  <legend>Debug overlay</legend>
-                  <label class="toggle-field">
-                    <input id="debug-enabled" name="debug-enabled" type="checkbox" />
-                    <span>Keep overlays on in other tabs</span>
-                  </label>
-                  <fieldset class="option-group">
-                    <legend>Outline grouping</legend>
-                    <div class="debug-outline-control" role="group" aria-label="Outline grouping">
-                      <button type="button" class="outline-mode-button is-active" data-outline-mode="codewords" aria-pressed="true">
-                        Codewords
-                      </button>
-                      <button type="button" class="outline-mode-button" data-outline-mode="stream" aria-pressed="false">
-                        Stream
-                      </button>
-                      <button type="button" class="outline-mode-button" data-outline-mode="metadata" aria-pressed="false">
-                        Metadata
-                      </button>
-                    </div>
-                  </fieldset>
-                  <div class="color-grid debug-color-grid">
-                    <label class="color-field" for="debug-data-color">
-                      <span>Data stream</span>
-                      <input id="debug-data-color" type="color" value="#0ea5e9" />
-                    </label>
-                    <label class="color-field" for="debug-mode-color">
-                      <span>Mode bits</span>
-                      <input id="debug-mode-color" type="color" value="#0f766e" />
-                    </label>
-                    <label class="color-field" for="debug-char-count-color">
-                      <span>Char count</span>
-                      <input id="debug-char-count-color" type="color" value="#f97316" />
-                    </label>
-                    <label class="color-field" for="debug-ecl-color">
-                      <span>EC level bits</span>
-                      <input id="debug-ecl-color" type="color" value="#ec4899" />
-                    </label>
-                    <label class="color-field" for="debug-mask-color">
-                      <span>Mask bits</span>
-                      <input id="debug-mask-color" type="color" value="#2563eb" />
-                    </label>
-                    <label class="color-field" for="debug-ecc-color">
-                      <span>EC codewords</span>
-                      <input id="debug-ecc-color" type="color" value="#dc2626" />
-                    </label>
-                    <label class="color-field" for="debug-remainder-color">
-                      <span>Remainder bits</span>
-                      <input id="debug-remainder-color" type="color" value="#14b8a6" />
-                    </label>
-                    <label class="color-field" for="debug-padding-color">
-                      <span>Pad to byte / pad bytes</span>
-                      <input id="debug-padding-color" type="color" value="#64748b" />
-                    </label>
-                    <label class="color-field" for="debug-terminator-color">
-                      <span>Terminator</span>
-                      <input id="debug-terminator-color" type="color" value="#f59e0b" />
-                    </label>
-                    <label class="color-field" for="debug-finder-color">
-                      <span>Finder</span>
-                      <input id="debug-finder-color" type="color" value="#ef4444" />
-                    </label>
-                    <label class="color-field" for="debug-alignment-color">
-                      <span>Alignment</span>
-                      <input id="debug-alignment-color" type="color" value="#f59e0b" />
-                    </label>
-                    <label class="color-field" for="debug-timing-color">
-                      <span>Timing</span>
-                      <input id="debug-timing-color" type="color" value="#06b6d4" />
-                    </label>
-                    <label class="color-field" for="debug-format-color">
-                      <span>Format</span>
-                      <input id="debug-format-color" type="color" value="#8b5cf6" />
-                    </label>
-                    <label class="color-field" for="debug-dark-module-color">
-                      <span>Dark module</span>
-                      <input id="debug-dark-module-color" type="color" value="#4c1d95" />
-                    </label>
-                    <label class="color-field" for="debug-version-color">
-                      <span>Version (v7+)</span>
-                      <input id="debug-version-color" type="color" value="#10b981" />
-                    </label>
-                  </div>
-                  <p class="hint">Useful for seeing how the symbol is structured before styling or embedding it.</p>
-                </fieldset>
+                <nav class="subtab-bar" aria-label="Debug tools">
+                  <button type="button" class="subtab-button is-active" data-subtab="encoding">Encoding</button>
+                  <button type="button" class="subtab-button" data-subtab="mask">Mask</button>
+                  <button type="button" class="subtab-button" data-subtab="advanced">Advanced</button>
+                  <button type="button" class="subtab-button" data-subtab="payload">Payload</button>
+                  <button type="button" class="subtab-button" data-subtab="overlay">Overlay</button>
+                </nav>
+
+                <div class="subtab-panels">
+                  <section class="subtab-panel is-active" data-subtab-panel="encoding">
+                    <fieldset class="option-group">
+                      <legend>Error correction</legend>
+
+                      <label class="slider-field" for="error-correction">
+                        <span id="error-correction-label">Medium</span>
+                        <output id="error-correction-value" for="error-correction">M</output>
+                      </label>
+                      <input id="error-correction" name="error-correction" type="range" min="0" max="3" step="1" value="1" />
+                      <p class="hint" id="error-correction-help">Can still scan if roughly 15% of the symbol area is obscured or damaged.</p>
+                    </fieldset>
+
+                    <fieldset class="option-group">
+                      <legend>Input mode</legend>
+
+                      <label class="toggle-field">
+                        <input id="mode-auto" name="mode-auto" type="checkbox" checked />
+                        <span>Auto-detect best encoding mode</span>
+                      </label>
+
+                      <label for="encoding-mode">Manual mode</label>
+                      <select id="encoding-mode" name="encoding-mode">
+                        <option value="numeric">Numeric</option>
+                        <option value="alphanumeric">Alphanumeric</option>
+                        <option value="byte">Byte / Binary</option>
+                        <option value="kanji">Kanji</option>
+                      </select>
+
+                      <div class="info-grid">
+                        <div class="info-chip">
+                          <span class="info-label">Chosen mode</span>
+                          <strong id="detected-mode">Auto</strong>
+                        </div>
+                        <div class="info-chip">
+                          <span class="info-label">Segments</span>
+                          <strong id="segment-summary">0</strong>
+                        </div>
+                        <div class="info-chip">
+                          <span class="info-label">Version</span>
+                          <strong id="version-summary">Auto</strong>
+                        </div>
+                        <div class="info-chip">
+                          <span class="info-label">Capacity</span>
+                          <strong id="capacity-summary">-</strong>
+                        </div>
+                        <div class="info-chip">
+                          <span class="info-label">Unused</span>
+                          <strong id="unused-summary">-</strong>
+                        </div>
+                      </div>
+                      <div id="mode-validation" class="validation-message" hidden></div>
+                    </fieldset>
+
+                    <fieldset class="option-group">
+                      <legend>Version</legend>
+
+                      <label class="toggle-field">
+                        <input id="version-auto" name="version-auto" type="checkbox" checked />
+                        <span>Auto-pick version</span>
+                      </label>
+
+                      <label class="slider-field" for="qr-version">
+                        <span>Version</span>
+                        <output id="qr-version-value" for="qr-version">Auto</output>
+                      </label>
+                      <input id="qr-version" name="qr-version" type="range" min="1" max="40" step="1" value="8" />
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel" data-subtab-panel="mask" hidden>
+                    <fieldset class="option-group">
+                      <legend>Mask pattern</legend>
+                      <input id="mask-pattern" name="mask-pattern" type="hidden" value="" />
+                      <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices"></div>
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel" data-subtab-panel="advanced" hidden>
+                    <fieldset class="option-group">
+                      <legend>Raw options</legend>
+                      <label for="options-json">Extra options JSON</label>
+                      <textarea
+                        id="options-json"
+                        name="options-json"
+                        rows="6"
+                        spellcheck="false"
+                      >{}</textarea>
+                      <p class="hint">
+                        Merged last into the QRCode options object. Function-based options such as
+                        <code>toSJISFunc</code> still need explicit code wiring.
+                      </p>
+                    </fieldset>
+
+                    <fieldset class="option-group">
+                      <legend>Preview options</legend>
+                      <pre id="options-preview"></pre>
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel" data-subtab-panel="payload" hidden>
+                    <fieldset class="option-group">
+                      <legend>Encoded payload</legend>
+                      <label class="toggle-field payload-toggle" id="payload-reveal-toggle" hidden>
+                        <input id="payload-reveal-secrets" name="payload-reveal-secrets" type="checkbox" />
+                        <span>Reveal passwords and secrets in preview</span>
+                      </label>
+                      <pre id="encoded-preview"></pre>
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel" data-subtab-panel="overlay" hidden>
+                    <fieldset class="option-group">
+                      <legend>Debug overlay</legend>
+                      <label class="toggle-field">
+                        <input id="debug-enabled" name="debug-enabled" type="checkbox" />
+                        <span>Keep overlays on in other tabs</span>
+                      </label>
+                      <fieldset class="option-group">
+                        <legend>Outline grouping</legend>
+                        <div class="debug-outline-control" role="group" aria-label="Outline grouping">
+                          <button type="button" class="outline-mode-button is-active" data-outline-mode="codewords" aria-pressed="true">
+                            Codewords
+                          </button>
+                          <button type="button" class="outline-mode-button" data-outline-mode="stream" aria-pressed="false">
+                            Stream
+                          </button>
+                          <button type="button" class="outline-mode-button" data-outline-mode="metadata" aria-pressed="false">
+                            Metadata
+                          </button>
+                        </div>
+                      </fieldset>
+                      <div class="color-grid debug-color-grid">
+                        <label class="color-field" for="debug-data-color">
+                          <span>Data stream</span>
+                          <input id="debug-data-color" type="color" value="#0ea5e9" />
+                        </label>
+                        <label class="color-field" for="debug-mode-color">
+                          <span>Mode bits</span>
+                          <input id="debug-mode-color" type="color" value="#0f766e" />
+                        </label>
+                        <label class="color-field" for="debug-char-count-color">
+                          <span>Char count</span>
+                          <input id="debug-char-count-color" type="color" value="#f97316" />
+                        </label>
+                        <label class="color-field" for="debug-ecl-color">
+                          <span>EC level bits</span>
+                          <input id="debug-ecl-color" type="color" value="#ec4899" />
+                        </label>
+                        <label class="color-field" for="debug-mask-color">
+                          <span>Mask bits</span>
+                          <input id="debug-mask-color" type="color" value="#2563eb" />
+                        </label>
+                        <label class="color-field" for="debug-ecc-color">
+                          <span>EC codewords</span>
+                          <input id="debug-ecc-color" type="color" value="#dc2626" />
+                        </label>
+                        <label class="color-field" for="debug-remainder-color">
+                          <span>Remainder bits</span>
+                          <input id="debug-remainder-color" type="color" value="#14b8a6" />
+                        </label>
+                        <label class="color-field" for="debug-padding-color">
+                          <span>Pad to byte / pad bytes</span>
+                          <input id="debug-padding-color" type="color" value="#64748b" />
+                        </label>
+                        <label class="color-field" for="debug-terminator-color">
+                          <span>Terminator</span>
+                          <input id="debug-terminator-color" type="color" value="#f59e0b" />
+                        </label>
+                        <label class="color-field" for="debug-finder-color">
+                          <span>Finder</span>
+                          <input id="debug-finder-color" type="color" value="#ef4444" />
+                        </label>
+                        <label class="color-field" for="debug-alignment-color">
+                          <span>Alignment</span>
+                          <input id="debug-alignment-color" type="color" value="#f59e0b" />
+                        </label>
+                        <label class="color-field" for="debug-timing-color">
+                          <span>Timing</span>
+                          <input id="debug-timing-color" type="color" value="#06b6d4" />
+                        </label>
+                        <label class="color-field" for="debug-format-color">
+                          <span>Format</span>
+                          <input id="debug-format-color" type="color" value="#8b5cf6" />
+                        </label>
+                        <label class="color-field" for="debug-dark-module-color">
+                          <span>Dark module</span>
+                          <input id="debug-dark-module-color" type="color" value="#4c1d95" />
+                        </label>
+                        <label class="color-field" for="debug-version-color">
+                          <span>Version (v7+)</span>
+                          <input id="debug-version-color" type="color" value="#10b981" />
+                        </label>
+                      </div>
+                      <p class="hint">Useful for seeing how the symbol is structured before styling or embedding it.</p>
+                    </fieldset>
+                  </section>
+                </div>
               </div>
             </section>
           </div>

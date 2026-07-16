@@ -1,10 +1,15 @@
 const form = document.getElementById('qr-form');
 const canvas = document.getElementById('qr-canvas');
+const chunkPreviewNav = document.getElementById('chunk-preview-nav');
+const chunkPreviewPrev = document.getElementById('chunk-preview-prev');
+const chunkPreviewNext = document.getElementById('chunk-preview-next');
+const chunkPreviewStatus = document.getElementById('chunk-preview-status');
 const optionsPreview = document.getElementById('options-preview');
 const encodedPreview = document.getElementById('encoded-preview');
 const payloadRevealSecrets = document.getElementById('payload-reveal-secrets');
 const payloadRevealToggle = document.getElementById('payload-reveal-toggle');
 const qrFormat = document.getElementById('qr-format');
+const choiceButtons = document.querySelectorAll('.choice-button');
 const formatFieldsets = document.querySelectorAll('.format-fields');
 const qrVersion = document.getElementById('qr-version');
 const qrVersionValue = document.getElementById('qr-version-value');
@@ -20,6 +25,10 @@ const qrMargin = document.getElementById('qr-margin');
 const qrMarginValue = document.getElementById('qr-margin-value');
 const colorDark = document.getElementById('color-dark');
 const colorLight = document.getElementById('color-light');
+const colorDarkTransparency = document.getElementById('color-dark-transparency');
+const colorDarkTransparencyValue = document.getElementById('color-dark-transparency-value');
+const colorLightTransparency = document.getElementById('color-light-transparency');
+const colorLightTransparencyValue = document.getElementById('color-light-transparency-value');
 const optionsJson = document.getElementById('options-json');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
@@ -31,14 +40,17 @@ const detectedMode = document.getElementById('detected-mode');
 const segmentSummary = document.getElementById('segment-summary');
 const versionSummary = document.getElementById('version-summary');
 const capacitySummary = document.getElementById('capacity-summary');
+const unusedSummary = document.getElementById('unused-summary');
 const modeValidation = document.getElementById('mode-validation');
+const formatValidation = document.getElementById('format-validation');
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabPanels = document.querySelectorAll('.tab-panel');
+const debugSubtabButtons = document.querySelectorAll('.subtab-button');
+const debugSubtabPanels = document.querySelectorAll('.subtab-panel');
 const debugEnabled = document.getElementById('debug-enabled');
 const debugOutlineModeButtons = document.querySelectorAll('.outline-mode-button');
 
 const textInput = document.getElementById('text-input');
-const urlInput = document.getElementById('url-input');
 const wifiSsid = document.getElementById('wifi-ssid');
 const wifiPassword = document.getElementById('wifi-password');
 const wifiEncryption = document.getElementById('wifi-encryption');
@@ -46,14 +58,16 @@ const wifiHidden = document.getElementById('wifi-hidden');
 const emailTo = document.getElementById('email-to');
 const emailSubject = document.getElementById('email-subject');
 const emailBody = document.getElementById('email-body');
+const emailBodyLengthHint = document.getElementById('email-body-length-hint');
 const phoneNumber = document.getElementById('phone-number');
+const phoneFormatButtons = document.querySelectorAll('.phone-format-button');
 const smsNumber = document.getElementById('sms-number');
 const smsBody = document.getElementById('sms-body');
+const smsLengthHint = document.getElementById('sms-length-hint');
 const geoLatitude = document.getElementById('geo-latitude');
 const geoLongitude = document.getElementById('geo-longitude');
 const geoQuery = document.getElementById('geo-query');
 const geoMapElement = document.getElementById('geo-map');
-const geoMapStatus = document.getElementById('geo-map-status');
 const vcardName = document.getElementById('vcard-name');
 const vcardOrg = document.getElementById('vcard-org');
 const vcardTitle = document.getElementById('vcard-title');
@@ -61,6 +75,18 @@ const vcardPhone = document.getElementById('vcard-phone');
 const vcardEmail = document.getElementById('vcard-email');
 const vcardUrl = document.getElementById('vcard-url');
 const fileInput = document.getElementById('file-input');
+const fileEncodingMode = document.getElementById('file-encoding-mode');
+const fileChunkControls = document.getElementById('file-chunk-controls');
+const fileChunkVersionAuto = document.getElementById('file-chunk-version-auto');
+const fileChunkVersion = document.getElementById('file-chunk-version');
+const fileChunkVersionValue = document.getElementById('file-chunk-version-value');
+const fileIncludeManifest = document.getElementById('file-include-manifest');
+const fileCompressTransfer = document.getElementById('file-compress-transfer');
+const fileCustomMetadata = document.getElementById('file-custom-metadata');
+const fileChunkIndex = document.getElementById('file-chunk-index');
+const fileChunkIndexValue = document.getElementById('file-chunk-index-value');
+const fileCapacityHint = document.getElementById('file-capacity-hint');
+const clearFileButton = document.getElementById('clear-file-button');
 
 const debugColors = {
   data: document.getElementById('debug-data-color'),
@@ -177,15 +203,55 @@ const EC_CODEWORDS_TABLE = {
 let renderRequest = 0;
 let cachedFile = null;
 let cachedFilePayload = '';
+let cachedFileArrayBuffer = null;
+let cachedFileBase64 = '';
+let cachedFileObjectUrl = '';
+let cachedFileId = '';
+let cachedFileHash = '';
+let cachedFileManifest = null;
+let cachedTransferBytes = null;
+let cachedChunkCapacityInfoKey = '';
+let cachedChunkCapacityInfoValue = null;
+let chunkSettingsRefreshTimer = 0;
+let chunkSettingsRefreshRequest = 0;
+let transferSettingsRevision = 0;
+let renderedQrWidth = null;
+let renderedQrModuleScale = null;
 let geoMap = null;
 let geoMarker = null;
 let geoPopup = null;
 let geoLabelMarker = null;
 let activeTabName = 'content';
+let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
+let activePhoneFormat = 'usa';
+const SMS_MAX_LENGTH = 160;
+const EMAIL_SUBJECT_MAX_LENGTH = 120;
+const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
+const FILE_FRAME_PREFIX = 'FILE';
+const FILE_PROTOCOL_VERSION = '1';
+const FILE_MANIFEST_MAGIC = 'FILE';
+const FILE_ID_FILLER = 'aaaaaaaaaaaaaaaaaaaaaa';
+const DEFAULT_CHUNK_AUTO_VERSION = 8;
+const FILE_MANIFEST_HEADER_BYTES = 10;
+const FILE_TLV_HEADER_BYTES = 3;
+const FILE_MANIFEST_FLAGS = {
+  gzip: 0x01,
+};
+const FILE_MANIFEST_FIELDS = {
+  name: 1,
+  mimeType: 2,
+  modifiedAt: 3,
+  originalSize: 4,
+  validationType: 5,
+  validationValue: 6,
+  customMetadata: 8,
+};
 
 function isDebugOverlayActive() {
-  return activeTabName === 'debug' || debugEnabled.checked;
+  return (activeTabName === 'debug' && activeDebugSubtab === 'overlay') || debugEnabled.checked;
 }
 
 function getDefaultUrlValue() {
@@ -194,6 +260,14 @@ function getDefaultUrlValue() {
   }
 
   return window.location.href;
+}
+
+function getShareableAppUrl() {
+  if (window.location.protocol === 'file:') {
+    return 'https://qr.lewismoten.com/';
+  }
+
+  return `${window.location.origin}${window.location.pathname}`;
 }
 
 function parseCoordinate(value) {
@@ -247,7 +321,14 @@ function getCurrentEncodingMode() {
 }
 
 function formatWidthLabel() {
-  qrWidthValue.textContent = qrWidthAuto.checked ? 'Auto' : `${qrWidth.value} px`;
+  const minimumWidth = Number.parseInt(qrWidth.min, 10) || 1;
+  if (qrWidthAuto.checked) {
+    qrWidthValue.textContent = `${renderedQrWidth ?? minimumWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module`;
+    return;
+  }
+
+  const targetWidth = Number.parseInt(qrWidth.value, 10) || minimumWidth;
+  qrWidthValue.textContent = `${targetWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module`;
 }
 
 function formatScaleLabel() {
@@ -256,6 +337,28 @@ function formatScaleLabel() {
 
 function formatMarginLabel() {
   qrMarginValue.textContent = qrMargin.value;
+}
+
+function formatColorTransparency() {
+  colorDarkTransparencyValue.textContent = `${colorDarkTransparency.value}%`;
+  colorLightTransparencyValue.textContent = `${colorLightTransparency.value}%`;
+}
+
+function colorWithTransparency(color, transparencyInput) {
+  const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : '#000000';
+  const transparency = Math.min(100, Math.max(0, Number.parseInt(transparencyInput.value, 10) || 0));
+  const alpha = Math.round(255 * (1 - transparency / 100));
+  return `${normalizedColor}${alpha.toString(16).padStart(2, '0')}`;
+}
+
+function getColorAlpha(color) {
+  if (color === 'transparent') {
+    return 0;
+  }
+  if (/^#[0-9a-f]{8}$/i.test(color)) {
+    return Number.parseInt(color.slice(7, 9), 16) / 255;
+  }
+  return 1;
 }
 
 function formatVersionLabel() {
@@ -273,10 +376,413 @@ function syncOutputs() {
   formatWidthLabel();
   formatScaleLabel();
   formatMarginLabel();
+  formatColorTransparency();
   formatVersionLabel();
   formatErrorCorrection();
   qrVersion.disabled = versionAuto.checked;
   encodingMode.disabled = modeAuto.checked;
+  syncEmailBodyLengthHint();
+  syncFileCapacityHint();
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let value = bytes;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  const decimals = value >= 10 || unitIndex === 0 ? 0 : 1;
+  return `${value.toFixed(decimals)} ${units[unitIndex]}`;
+}
+
+function getSelectedFileEncodingMode() {
+  return fileEncodingMode.value || 'data';
+}
+
+function syncFileChunkLabel() {
+  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
+  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
+  fileChunkIndexValue.textContent = `${Math.min(current, total)} / ${total}`;
+}
+
+function getConfiguredChunkVersion() {
+  const version = Number.parseInt(fileChunkVersion.value, 10);
+  return Number.isFinite(version) ? version : DEFAULT_CHUNK_AUTO_VERSION;
+}
+
+function syncFileChunkVersionLabel() {
+  fileChunkVersionValue.textContent = `V${getConfiguredChunkVersion()}`;
+}
+
+function syncChunkVersionControls() {
+  fileChunkVersionAuto.checked = versionAuto.checked;
+  fileChunkVersion.value = qrVersion.value || String(DEFAULT_CHUNK_AUTO_VERSION);
+  const isChunked = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
+  fileChunkVersion.disabled = !isChunked || fileChunkVersionAuto.checked;
+  syncFileChunkVersionLabel();
+}
+
+function syncChunkPreviewNavigation() {
+  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
+  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
+  const current = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, total);
+  const shouldShowNavigation = isChunkedFile && total > 1;
+
+  chunkPreviewNav.classList.toggle('has-navigation', shouldShowNavigation);
+  chunkPreviewStatus.hidden = !shouldShowNavigation;
+  chunkPreviewStatus.textContent = `${current} of ${total}`;
+  chunkPreviewPrev.hidden = !shouldShowNavigation;
+  chunkPreviewNext.hidden = !shouldShowNavigation;
+  chunkPreviewPrev.disabled = !shouldShowNavigation || current <= 1;
+  chunkPreviewNext.disabled = !shouldShowNavigation || current >= total;
+}
+
+function getChunkCapacityCacheKey(file, options, configuredChunkVersion, autoVersion) {
+  return JSON.stringify({
+    file: file
+      ? {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+        }
+      : null,
+    options,
+    configuredChunkVersion,
+    autoVersion,
+    includeManifest: fileIncludeManifest.checked,
+    compressTransfer: isTransferCompressionEnabled(),
+    customMetadata: fileCustomMetadata.value.trim(),
+    transferBytes: cachedTransferBytes?.length ?? null,
+    manualMode: getCurrentEncodingMode() || 'auto',
+  });
+}
+
+function invalidateChunkCapacityCache() {
+  cachedChunkCapacityInfoKey = '';
+  cachedChunkCapacityInfoValue = null;
+}
+
+function resetTransferDerivedState() {
+  transferSettingsRevision += 1;
+  cachedFileHash = '';
+  cachedFileManifest = null;
+  cachedTransferBytes = null;
+  invalidateChunkCapacityCache();
+}
+
+function isTransferCompressionEnabled() {
+  return fileIncludeManifest.checked && fileCompressTransfer.checked;
+}
+
+function scheduleChunkSettingsRefresh({ resetChunkIndex = false, delay = 160 } = {}) {
+  chunkSettingsRefreshRequest += 1;
+  const refreshRequestId = chunkSettingsRefreshRequest;
+  renderRequest += 1;
+
+  if (chunkSettingsRefreshTimer) {
+    window.clearTimeout(chunkSettingsRefreshTimer);
+  }
+
+  if (resetChunkIndex) {
+    fileChunkIndex.value = '1';
+  }
+
+  // Never let an in-flight render reuse a capacity calculated for the old version.
+  invalidateChunkCapacityCache();
+
+  chunkSettingsRefreshTimer = window.setTimeout(() => {
+    if (refreshRequestId !== chunkSettingsRefreshRequest) {
+      return;
+    }
+
+    chunkSettingsRefreshTimer = 0;
+    syncFileCapacityHint();
+    renderQr();
+  }, delay);
+}
+
+function revokeCachedObjectUrl() {
+  if (cachedFileObjectUrl) {
+    URL.revokeObjectURL(cachedFileObjectUrl);
+    cachedFileObjectUrl = '';
+  }
+}
+
+function resetCachedFileState({ clearInput = false } = {}) {
+  transferSettingsRevision += 1;
+  revokeCachedObjectUrl();
+  cachedFile = null;
+  cachedFilePayload = '';
+  cachedFileArrayBuffer = null;
+  cachedFileBase64 = '';
+  cachedFileId = '';
+  cachedFileHash = '';
+  cachedFileManifest = null;
+  cachedTransferBytes = null;
+  invalidateChunkCapacityCache();
+  if (clearInput) {
+    fileInput.value = '';
+  }
+}
+
+function getActiveFile() {
+  return fileInput.files?.[0] ?? null;
+}
+
+function ensureFileCacheOwnership(file) {
+  if (cachedFile !== file) {
+    resetCachedFileState();
+    cachedFile = file;
+    cachedFileId = createCompactFileId();
+  }
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+
+  for (let index = 0; index < bytes.length; index += 0x8000) {
+    const chunk = bytes.subarray(index, index + 0x8000);
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return btoa(binary);
+}
+
+function base64ToBase64Url(base64) {
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function base64UrlToBase64(base64Url) {
+  const normalized = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const paddingLength = (4 - (normalized.length % 4 || 4)) % 4;
+  return `${normalized}${'='.repeat(paddingLength)}`;
+}
+
+function createCompactFileId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return base64ToBase64Url(arrayBufferToBase64(bytes.buffer));
+}
+
+async function getActiveFileBuffer() {
+  const file = getActiveFile();
+  if (!file) {
+    return null;
+  }
+
+  ensureFileCacheOwnership(file);
+
+  if (!cachedFileArrayBuffer) {
+    cachedFileArrayBuffer = await file.arrayBuffer();
+  }
+
+  return cachedFileArrayBuffer;
+}
+
+async function getActiveFileBase64() {
+  const buffer = await getActiveFileBuffer();
+  if (!buffer) {
+    return '';
+  }
+
+  if (!cachedFileBase64) {
+    cachedFileBase64 = arrayBufferToBase64(buffer);
+  }
+
+  return cachedFileBase64;
+}
+
+async function getTransferFileBytes() {
+  const settingsRevision = transferSettingsRevision;
+  const buffer = await getActiveFileBuffer();
+  if (!buffer) {
+    return null;
+  }
+
+  if (cachedTransferBytes) {
+    return cachedTransferBytes;
+  }
+
+  const originalBytes = new Uint8Array(buffer);
+  if (!isTransferCompressionEnabled()) {
+    cachedTransferBytes = originalBytes;
+    return cachedTransferBytes;
+  }
+
+  if (typeof CompressionStream !== 'function') {
+    throw new Error('Gzip transfer compression is not supported by this browser. Turn compression off to continue.');
+  }
+
+  const stream = new Blob([originalBytes]).stream().pipeThrough(new CompressionStream('gzip'));
+  const compressedBytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  if (settingsRevision === transferSettingsRevision) {
+    cachedTransferBytes = compressedBytes;
+  }
+  return compressedBytes;
+}
+
+async function getTransferIntegrityHash(manifest, transferBytes) {
+  if (cachedFileHash) {
+    return cachedFileHash;
+  }
+
+  const settingsRevision = transferSettingsRevision;
+  const canonicalBytes = new Uint8Array(manifest.length + transferBytes.length);
+  canonicalBytes.set(manifest, 0);
+  canonicalBytes.set(transferBytes, manifest.length);
+  const digest = await crypto.subtle.digest('SHA-256', canonicalBytes);
+  const hash = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+  if (settingsRevision === transferSettingsRevision) {
+    cachedFileHash = hash;
+  }
+  return hash;
+}
+
+function hexToBytes(hex) {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
+  }
+  return bytes;
+}
+
+function getCustomMetadataText({ validate = false } = {}) {
+  const value = fileCustomMetadata.value.trim();
+  if (!value) {
+    return '';
+  }
+
+  try {
+    return JSON.stringify(JSON.parse(value));
+  } catch (error) {
+    if (validate) {
+      throw new Error('Custom file metadata must be valid JSON.');
+    }
+    return value;
+  }
+}
+
+function uint64Bytes(value) {
+  const bytes = new Uint8Array(8);
+  new DataView(bytes.buffer).setBigUint64(0, BigInt(Math.max(0, value || 0)), false);
+  return bytes;
+}
+
+function createManifestField(type, value) {
+  return { type, value };
+}
+
+function getManifestFields(file, { validationValue = new Uint8Array(32) } = {}) {
+  const encoder = new TextEncoder();
+  const fields = [
+    createManifestField(FILE_MANIFEST_FIELDS.name, encoder.encode(file?.name || 'file.bin')),
+    createManifestField(FILE_MANIFEST_FIELDS.mimeType, encoder.encode(file?.type?.trim() || 'application/octet-stream')),
+    createManifestField(FILE_MANIFEST_FIELDS.modifiedAt, uint64Bytes(file?.lastModified || 0)),
+    createManifestField(FILE_MANIFEST_FIELDS.originalSize, uint64Bytes(file?.size || 0)),
+    createManifestField(FILE_MANIFEST_FIELDS.validationType, encoder.encode('SHA-256')),
+    createManifestField(FILE_MANIFEST_FIELDS.validationValue, validationValue),
+  ];
+
+  const customMetadata = getCustomMetadataText();
+  if (customMetadata) {
+    fields.push(createManifestField(FILE_MANIFEST_FIELDS.customMetadata, encoder.encode(customMetadata)));
+  }
+
+  return fields;
+}
+
+function getManifestByteLength(file) {
+  if (!fileIncludeManifest.checked) {
+    return 0;
+  }
+  return getManifestFields(file).reduce(
+    (length, field) => length + FILE_TLV_HEADER_BYTES + field.value.length,
+    FILE_MANIFEST_HEADER_BYTES
+  );
+}
+
+function serializeManifest(fields) {
+  const manifestLength = fields.reduce(
+    (length, field) => length + FILE_TLV_HEADER_BYTES + field.value.length,
+    FILE_MANIFEST_HEADER_BYTES
+  );
+  const manifest = new Uint8Array(manifestLength);
+  const view = new DataView(manifest.buffer);
+  manifest.set(new TextEncoder().encode(FILE_MANIFEST_MAGIC), 0);
+  manifest[4] = Number.parseInt(FILE_PROTOCOL_VERSION, 10);
+  manifest[5] = isTransferCompressionEnabled() ? FILE_MANIFEST_FLAGS.gzip : 0;
+  view.setUint32(6, manifestLength, false);
+
+  let offset = FILE_MANIFEST_HEADER_BYTES;
+  fields.forEach((field) => {
+    if (field.value.length > 0xffff) {
+      throw new Error(`Manifest field ${field.type} exceeds the 65,535-byte limit.`);
+    }
+    manifest[offset] = field.type;
+    view.setUint16(offset + 1, field.value.length, false);
+    manifest.set(field.value, offset + FILE_TLV_HEADER_BYTES);
+    offset += FILE_TLV_HEADER_BYTES + field.value.length;
+  });
+  return manifest;
+}
+
+async function getActiveFileManifest(transferBytes = null) {
+  const settingsRevision = transferSettingsRevision;
+  const file = getActiveFile();
+  if (!file) {
+    return null;
+  }
+
+  if (!fileIncludeManifest.checked) {
+    return new Uint8Array(0);
+  }
+
+  ensureFileCacheOwnership(file);
+  if (cachedFileManifest) {
+    return cachedFileManifest;
+  }
+
+  getCustomMetadataText({ validate: true });
+  const bytesToTransfer = transferBytes || (await getTransferFileBytes());
+  const canonicalManifest = serializeManifest(getManifestFields(file));
+  const validationValue = hexToBytes(await getTransferIntegrityHash(canonicalManifest, bytesToTransfer));
+  const manifest = serializeManifest(getManifestFields(file, { validationValue }));
+  if (settingsRevision === transferSettingsRevision) {
+    cachedFileManifest = manifest;
+  }
+  return manifest;
+}
+
+function getFileObjectUrlPayload(file = getActiveFile()) {
+  if (!file) {
+    return '';
+  }
+
+  ensureFileCacheOwnership(file);
+  return `${getShareableAppUrl()}#download=1&name=${encodeURIComponent(file.name)}&type=${encodeURIComponent(
+    file.type?.trim() || 'application/octet-stream'
+  )}&data=[base64url]`;
+}
+
+function syncSmsLengthHint() {
+  smsLengthHint.textContent = `${smsBody.value.length} / ${SMS_MAX_LENGTH}`;
+}
+
+function syncWifiSecurityState() {
+  const isOpenNetwork = wifiEncryption.value === 'nopass';
+  wifiPassword.disabled = isOpenNetwork;
+  wifiPassword.setAttribute('aria-disabled', String(isOpenNetwork));
+  wifiPassword.placeholder = isOpenNetwork ? 'Not used for open networks' : 'Password';
 }
 
 function setFormatVisibility() {
@@ -291,30 +797,444 @@ function setFormatVisibility() {
   const showSecretToggle = activeFormat === 'wifi';
   payloadRevealToggle.hidden = !showSecretToggle;
   payloadRevealToggle.setAttribute('aria-hidden', String(!showSecretToggle));
+  syncFileModeVisibility();
 }
 
 async function readSelectedFile() {
-  const file = fileInput.files?.[0];
+  const file = getActiveFile();
   if (!file) {
-    cachedFile = null;
-    cachedFilePayload = '';
+    resetCachedFileState();
     return '';
   }
 
-  if (cachedFile === file && cachedFilePayload) {
+  ensureFileCacheOwnership(file);
+
+  if (cachedFilePayload) {
     return cachedFilePayload;
   }
 
-  const payload = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error('Unable to read the selected file.'));
-    reader.readAsDataURL(file);
-  });
+  const base64 = await getActiveFileBase64();
+  cachedFilePayload = `${getFileDataUrlPrefix(file)}${base64}`;
+  return cachedFilePayload;
+}
 
-  cachedFile = file;
-  cachedFilePayload = payload;
-  return payload;
+function getFileDataUrlPrefix(file = getActiveFile()) {
+  const mimeType = file?.type?.trim() || 'application/octet-stream';
+  return `data:${mimeType};base64,`;
+}
+
+function getCompactFileExtension(value) {
+  const sanitized = String(value || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');
+  const segments = sanitized.split('.');
+  const extension = segments.length > 1 ? segments.pop() : '';
+  return (extension || 'BIN').slice(0, 8);
+}
+
+function getBase64UrlLength(byteCount) {
+  return Math.ceil((Math.max(0, byteCount) * 4) / 3);
+}
+
+function encodeStreamPosition(value, streamLength) {
+  const width = Math.max(1, Math.max(0, streamLength).toString(10).length);
+  return Math.max(0, value).toString(10).padStart(width, '0');
+}
+
+function getFrameManifestFlag() {
+  return fileIncludeManifest.checked ? 'M' : '-';
+}
+
+function buildChunkProtocolPayloadTemplate(byteCount, { file, streamLength = 0, offset = 0 } = {}) {
+  const safeFile = file ?? { name: 'file.bin', type: 'application/octet-stream', size: 0, lastModified: 0 };
+  // Lowercase forces the same byte-mode capacity used by real base64url data.
+  const dataToken = 'a'.repeat(getBase64UrlLength(byteCount));
+  return [
+    FILE_FRAME_PREFIX,
+    FILE_PROTOCOL_VERSION,
+    'C',
+    getFrameManifestFlag(),
+    FILE_ID_FILLER,
+    getCompactFileExtension(safeFile.name),
+    encodeStreamPosition(offset, streamLength),
+    Math.max(0, streamLength).toString(10),
+    dataToken,
+  ].join(':');
+}
+
+function buildSingleFilePayloadTemplate(byteCount, { file } = {}) {
+  const safeFile = file ?? { name: 'file.bin' };
+  const parts = [
+    FILE_FRAME_PREFIX,
+    FILE_PROTOCOL_VERSION,
+    'S',
+    getFrameManifestFlag(),
+  ];
+  if (!fileIncludeManifest.checked) {
+    parts.push(getCompactFileExtension(safeFile.name));
+  }
+  parts.push('a'.repeat(getBase64UrlLength(byteCount)));
+  return parts.join(':');
+}
+
+function getFileCapacityBytes() {
+  let options;
+  try {
+    options = buildOptions();
+  } catch (error) {
+    return 0;
+  }
+
+  const prefix = getFileDataUrlPrefix();
+
+  const canEncodeBytes = (byteCount) => {
+    const base64Length = Math.ceil(byteCount / 3) * 4;
+    const payload = `${prefix}${'A'.repeat(base64Length)}`;
+
+    try {
+      const qrPayload = buildPayload(payload);
+      QRCode.create(qrPayload, options);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  if (!canEncodeBytes(0)) {
+    return 0;
+  }
+
+  let low = 0;
+  let high = 256;
+
+  while (high <= 1024 * 1024 && canEncodeBytes(high)) {
+    low = high;
+    high *= 2;
+  }
+
+  while (low + 1 < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (canEncodeBytes(middle)) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
+}
+
+function getBlobUrlCapacityBytes(file = getActiveFile()) {
+  let options;
+  try {
+    options = buildOptions();
+  } catch (error) {
+    return 0;
+  }
+
+  const fileName = file?.name || 'file.bin';
+  const mimeType = file?.type?.trim() || 'application/octet-stream';
+  const prefix = `${getShareableAppUrl()}#download=1&name=${encodeURIComponent(fileName)}&type=${encodeURIComponent(
+    mimeType
+  )}&data=`;
+
+  const canEncodeBytes = (byteCount) => {
+    const base64Length = Math.ceil(byteCount / 3) * 4;
+    const payload = `${prefix}${base64ToBase64Url('A'.repeat(base64Length))}`;
+
+    try {
+      const qrPayload = buildPayload(payload);
+      QRCode.create(qrPayload, options);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  if (!canEncodeBytes(0)) {
+    return 0;
+  }
+
+  let low = 0;
+  let high = 256;
+
+  while (high <= 1024 * 1024 && canEncodeBytes(high)) {
+    low = high;
+    high *= 2;
+  }
+
+  while (low + 1 < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (canEncodeBytes(middle)) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
+}
+
+function getChunkedFileCapacityInfo(file = getActiveFile()) {
+  if (!file) {
+    return {
+      chunkCapacity: 0,
+      naturalChunkCapacity: 0,
+      configuredChunkVersion: getConfiguredChunkVersion(),
+      autoVersion: versionAuto.checked,
+      totalChunks: 1,
+      currentChunk: 1,
+    };
+  }
+
+  let options;
+  try {
+    options = buildOptions();
+  } catch (error) {
+    return {
+      chunkCapacity: 0,
+      naturalChunkCapacity: 0,
+      configuredChunkVersion: getConfiguredChunkVersion(),
+      autoVersion: versionAuto.checked,
+      totalChunks: 1,
+      currentChunk: 1,
+    };
+  }
+
+  const configuredChunkVersion = getConfiguredChunkVersion();
+  const autoVersion = versionAuto.checked;
+  const capacityOptions = {
+    ...options,
+    version: configuredChunkVersion,
+  };
+  const cacheKey = getChunkCapacityCacheKey(file, capacityOptions, configuredChunkVersion, autoVersion);
+  if (cachedChunkCapacityInfoKey === cacheKey && cachedChunkCapacityInfoValue) {
+    const cachedCurrentChunk = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, cachedChunkCapacityInfoValue.totalChunks);
+    return {
+      ...cachedChunkCapacityInfoValue,
+      currentChunk: cachedCurrentChunk,
+    };
+  }
+
+  const transferByteLength = cachedTransferBytes?.length ?? file.size;
+  const streamLength = transferByteLength + getManifestByteLength(file);
+  const canEncodeSingleFrame = () => {
+    try {
+      const payload = buildSingleFilePayloadTemplate(streamLength, { file });
+      QRCode.create(buildPayload(payload), capacityOptions);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  const canEncodeBytes = (byteCount) => {
+    try {
+      const payload = buildChunkProtocolPayloadTemplate(byteCount, {
+        file,
+        streamLength,
+        offset: Math.max(0, streamLength - 1),
+      });
+      const qrPayload = buildPayload(payload);
+      QRCode.create(qrPayload, capacityOptions);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const findCapacity = () => {
+    if (!canEncodeBytes(0)) {
+      return 0;
+    }
+
+    let low = 0;
+    let high = 256;
+
+    while (high <= 1024 * 1024 && canEncodeBytes(high)) {
+      low = high;
+      high *= 2;
+    }
+
+    while (low + 1 < high) {
+      const middle = Math.floor((low + high) / 2);
+      if (canEncodeBytes(middle)) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+
+    return low;
+  };
+
+  const isSingleFrame = canEncodeSingleFrame();
+  const chunkCapacity = isSingleFrame ? streamLength : findCapacity();
+  const naturalChunkCapacity = chunkCapacity;
+  const totalChunks = isSingleFrame ? 1 : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
+  const currentChunk = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, totalChunks);
+  const capacityInfo = {
+    chunkCapacity,
+    naturalChunkCapacity,
+    configuredChunkVersion,
+    autoVersion,
+    streamLength,
+    manifestLength: getManifestByteLength(file),
+    transferByteLength,
+    isSingleFrame,
+    totalChunks,
+    currentChunk,
+  };
+  cachedChunkCapacityInfoKey = cacheKey;
+  cachedChunkCapacityInfoValue = capacityInfo;
+  return capacityInfo;
+}
+
+function syncFileModeVisibility() {
+  const isChunked = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
+  fileChunkControls.hidden = !isChunked;
+  fileChunkControls.setAttribute('aria-hidden', String(!isChunked));
+
+  const { totalChunks, currentChunk } = getChunkedFileCapacityInfo();
+  fileChunkVersionAuto.disabled = !isChunked;
+  fileIncludeManifest.disabled = !isChunked;
+  fileCompressTransfer.disabled = !isChunked || !fileIncludeManifest.checked;
+  fileCustomMetadata.disabled = !isChunked || !fileIncludeManifest.checked;
+  fileChunkIndex.max = String(Math.max(totalChunks, 1));
+  fileChunkIndex.value = String(Math.min(currentChunk, totalChunks));
+  fileChunkIndex.disabled = !isChunked || totalChunks <= 1;
+  syncChunkVersionControls();
+  syncFileChunkLabel();
+  syncChunkPreviewNavigation();
+}
+
+function syncFileCapacityHint() {
+  const file = getActiveFile();
+  const loadedBytes = file?.size ?? 0;
+  const mode = getSelectedFileEncodingMode();
+
+  if (mode === 'blob') {
+    const maxBytes = getBlobUrlCapacityBytes(file);
+    const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+    fileCapacityHint.textContent = file
+      ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of about ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.`
+      : 'Choose a file to generate a shareable download URL.';
+    clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
+    syncFileModeVisibility();
+    return;
+  }
+
+  if (mode === 'chunked') {
+    const { chunkCapacity, configuredChunkVersion, autoVersion, totalChunks, currentChunk, streamLength, manifestLength, transferByteLength } = getChunkedFileCapacityInfo(file);
+    const currentFrameBytes = Math.max(
+      0,
+      Math.min(chunkCapacity, streamLength - Math.max(0, currentChunk - 1) * Math.max(chunkCapacity, 1))
+    );
+    const limitText = autoVersion
+      ? `auto-selected uniform V${configuredChunkVersion}`
+      : `uniform V${configuredChunkVersion}`;
+
+    fileCapacityHint.textContent = file
+      ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}); ${isTransferCompressionEnabled() ? `gzip transfer is ${transferByteLength.toLocaleString()} B (${formatBytes(transferByteLength)})` : 'transfer compression is off'}, plus a ${manifestLength.toLocaleString()} B manifest. Frame ${currentChunk} of ${totalChunks} carries ${currentFrameBytes.toLocaleString()} B with ${limitText}; full frames use ${chunkCapacity.toLocaleString()} B (${formatBytes(chunkCapacity)}) of stream capacity.`
+      : 'Choose a file to split it into chunked QR payloads.';
+    clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
+    syncFileModeVisibility();
+    return;
+  }
+
+  const maxBytes = getFileCapacityBytes();
+  const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+  fileCapacityHint.textContent = file
+    ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%).`
+    : 'Choose a file to embed it directly as a data URL.';
+  clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
+  syncFileModeVisibility();
+}
+
+function clearLoadedFile() {
+  resetCachedFileState({ clearInput: true });
+  fileChunkIndex.value = '1';
+  syncFileCapacityHint();
+}
+
+async function buildChunkedFilePayload() {
+  const file = getActiveFile();
+  if (!file) {
+    return '';
+  }
+
+  ensureFileCacheOwnership(file);
+
+  const settingsRevision = transferSettingsRevision;
+  const transferBytes = await getTransferFileBytes();
+  if (settingsRevision !== transferSettingsRevision) {
+    throw new DOMException('Transfer settings changed.', 'AbortError');
+  }
+  const manifestBytes = await getActiveFileManifest(transferBytes);
+  if (settingsRevision !== transferSettingsRevision) {
+    throw new DOMException('Transfer settings changed.', 'AbortError');
+  }
+  syncFileCapacityHint();
+  const { chunkCapacity, totalChunks, streamLength, isSingleFrame } = getChunkedFileCapacityInfo(file);
+  if (chunkCapacity <= 0) {
+    throw new Error('Unable to fit the current chunk protocol into this QR configuration.');
+  }
+
+  const chunkIndex = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, totalChunks);
+  const start = (chunkIndex - 1) * chunkCapacity;
+  const end = Math.min(start + chunkCapacity, streamLength);
+  const chunkBytes = new Uint8Array(end - start);
+  const manifestStart = Math.min(start, manifestBytes.length);
+  const manifestEnd = Math.min(end, manifestBytes.length);
+  if (manifestEnd > manifestStart) {
+    chunkBytes.set(manifestBytes.subarray(manifestStart, manifestEnd), 0);
+  }
+  const fileStart = Math.max(0, start - manifestBytes.length);
+  const fileEnd = Math.max(0, end - manifestBytes.length);
+  if (fileEnd > fileStart) {
+    chunkBytes.set(transferBytes.subarray(fileStart, fileEnd), Math.max(0, manifestBytes.length - start));
+  }
+  const compactExtension = getCompactFileExtension(file.name);
+  const chunkDataToken = base64ToBase64Url(arrayBufferToBase64(chunkBytes.buffer));
+  if (isSingleFrame) {
+    const parts = [
+      FILE_FRAME_PREFIX,
+      FILE_PROTOCOL_VERSION,
+      'S',
+      getFrameManifestFlag(),
+    ];
+    if (!fileIncludeManifest.checked) {
+      parts.push(compactExtension);
+    }
+    parts.push(chunkDataToken);
+    return parts.join(':');
+  }
+
+  return [
+    FILE_FRAME_PREFIX,
+    FILE_PROTOCOL_VERSION,
+    'C',
+    getFrameManifestFlag(),
+    cachedFileId || createCompactFileId(),
+    compactExtension,
+    encodeStreamPosition(start, streamLength),
+    streamLength.toString(10),
+    chunkDataToken,
+  ].join(':');
+}
+
+async function buildFilePayload() {
+  const file = getActiveFile();
+  if (!file) {
+    return '';
+  }
+
+  switch (getSelectedFileEncodingMode()) {
+    case 'blob':
+      return `${getFileObjectUrlPayload(file).replace('[base64url]', base64ToBase64Url(await getActiveFileBase64()))}`;
+    case 'chunked':
+      return buildChunkedFilePayload();
+    case 'data':
+    default:
+      return readSelectedFile();
+  }
 }
 
 function buildWifiPayload() {
@@ -347,13 +1267,117 @@ function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
 }
 
+function normalizePhoneNumber(value) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  const digits = trimmed.replace(/\D/g, '');
+  if (!digits) {
+    return '';
+  }
+
+  if (trimmed.startsWith('+')) {
+    return `+${digits}`;
+  }
+
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+
+  return `+${digits}`;
+}
+
+function formatPhoneNumberForDisplay(value, format) {
+  const normalized = normalizePhoneNumber(value);
+  if (!normalized) {
+    return value.trim();
+  }
+
+  const digits = normalized.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    const local = digits.slice(1);
+    const area = local.slice(0, 3);
+    const prefix = local.slice(3, 6);
+    const line = local.slice(6, 10);
+
+    if (format === 'usa') {
+      return `(${area}) ${prefix}-${line}`;
+    }
+
+    if (format === 'international') {
+      return `+1 ${area}-${prefix}-${line}`;
+    }
+  }
+
+  if (format === 'digits') {
+    return digits;
+  }
+
+  return normalized;
+}
+
+function applyPhoneFormatToInput(inputElement) {
+  const formatted = formatPhoneNumberForDisplay(inputElement.value, activePhoneFormat);
+  if (formatted) {
+    inputElement.value = formatted;
+  }
+}
+
+function syncPhoneFormatButtons() {
+  phoneFormatButtons.forEach((button) => {
+    const isActive = button.dataset.phoneFormat === activePhoneFormat;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function syncPhoneValues(sourceInput, targetInput) {
+  if (targetInput.value !== sourceInput.value) {
+    targetInput.value = sourceInput.value;
+  }
+}
+
+function syncPhoneValuesAcrossAll(sourceInput) {
+  [phoneNumber, smsNumber, vcardPhone].forEach((inputElement) => {
+    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
+      inputElement.value = sourceInput.value;
+    }
+  });
+}
+
+function syncEmailValuesAcrossAll(sourceInput) {
+  [emailTo, vcardEmail].forEach((inputElement) => {
+    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
+      inputElement.value = sourceInput.value;
+    }
+  });
+}
+
+function syncMessageValuesAcrossAll(sourceInput) {
+  [textInput, smsBody, emailBody].forEach((inputElement) => {
+    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
+      inputElement.value = sourceInput.value;
+    }
+  });
+}
+
 function buildEmailPayload() {
+  return buildEmailPayloadWithBody(emailBody.value);
+}
+
+function buildEmailPayloadWithBody(bodyValue) {
   const params = new URLSearchParams();
   if (emailSubject.value.trim()) {
     params.set('subject', emailSubject.value.trim());
   }
-  if (emailBody.value.trim()) {
-    params.set('body', emailBody.value.trim());
+  if (bodyValue.trim()) {
+    params.set('body', bodyValue.trim());
   }
 
   const suffix = params.toString() ? `?${params.toString()}` : '';
@@ -410,7 +1434,6 @@ function updateGeoMap() {
   }
 
   if (typeof L === 'undefined') {
-    geoMapStatus.textContent = 'Map preview could not load.';
     return;
   }
 
@@ -420,7 +1443,6 @@ function updateGeoMap() {
   const label = geoQuery.value.trim();
 
   if (!coordinates) {
-    geoMapStatus.textContent = 'Enter latitude and longitude to preview the location.';
     if (geoMarker) {
       geoMarker.setOpacity(0);
     }
@@ -432,10 +1454,6 @@ function updateGeoMap() {
   }
 
   const { latitude, longitude } = coordinates;
-  geoMapStatus.textContent = label
-    ? `Marker: ${label} at ${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`
-    : `Marker at ${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`;
-
   geoMarker.setLatLng([latitude, longitude]);
   geoMarker.setOpacity(1);
 
@@ -491,19 +1509,17 @@ async function buildEncodedText() {
   switch (qrFormat.value) {
     case 'text':
       return textInput.value;
-    case 'url':
-      return urlInput.value;
     case 'wifi':
       return buildWifiPayload();
     case 'email':
       return buildEmailPayload();
     case 'phone':
-      return phoneNumber.value.trim() ? `tel:${phoneNumber.value.trim()}` : '';
+      return normalizePhoneNumber(phoneNumber.value) ? `tel:${normalizePhoneNumber(phoneNumber.value)}` : '';
     case 'sms':
       if (!smsNumber.value.trim() && !smsBody.value.trim()) {
         return '';
       }
-      return `SMSTO:${smsNumber.value.trim()}:${smsBody.value}`;
+      return `SMSTO:${normalizePhoneNumber(smsNumber.value)}:${smsBody.value}`;
     case 'geo':
       if (!geoLatitude.value.trim() || !geoLongitude.value.trim()) {
         return '';
@@ -512,7 +1528,7 @@ async function buildEncodedText() {
     case 'vcard':
       return buildVCardPayload();
     case 'file':
-      return readSelectedFile();
+      return buildFilePayload();
     default:
       return '';
   }
@@ -521,9 +1537,7 @@ async function buildEncodedText() {
 function buildEncodedPreviewTemplate() {
   switch (qrFormat.value) {
     case 'text':
-      return textInput.value || '[enter plain text]';
-    case 'url':
-      return urlInput.value || 'https://example.com';
+      return textInput.value || '[enter text or a URL]';
     case 'wifi': {
       const encryption = wifiEncryption.value || 'WPA';
       const ssid = escapeWifiValue(placeholderValue(wifiSsid.value, '[network-name]'));
@@ -548,9 +1562,9 @@ function buildEncodedPreviewTemplate() {
       return `mailto:${to}?${params.toString()}`;
     }
     case 'phone':
-      return `tel:${placeholderValue(phoneNumber.value, '[phone-number]')}`;
+      return `tel:${normalizePhoneNumber(phoneNumber.value) || '[phone-number]'}`;
     case 'sms':
-      return `SMSTO:${placeholderValue(smsNumber.value, '[phone-number]')}:${placeholderValue(
+      return `SMSTO:${normalizePhoneNumber(smsNumber.value) || '[phone-number]'}:${placeholderValue(
         smsBody.value,
         '[message]'
       )}`;
@@ -577,8 +1591,32 @@ function buildEncodedPreviewTemplate() {
       return lines.join('\n');
     }
     case 'file': {
-      const file = fileInput.files?.[0];
-      return file ? `[data URL for ${file.name}]` : '[choose a file to encode]';
+      const file = getActiveFile();
+      const mode = getSelectedFileEncodingMode();
+      if (!file) {
+        return mode === 'chunked'
+          ? 'FILE:1:S:M:[base64url-data]'
+          : mode === 'blob'
+            ? '[shareable download URL]'
+            : '[data URL for a selected file]';
+      }
+
+      if (mode === 'blob') {
+        return `[shareable download URL for ${file.name}]`;
+      }
+
+      if (mode === 'chunked') {
+        const { chunkCapacity, currentChunk, streamLength, isSingleFrame } = getChunkedFileCapacityInfo(file);
+        if (isSingleFrame) {
+          return fileIncludeManifest.checked
+            ? 'FILE:1:S:M:[base64url-data]'
+            : `FILE:1:S:-:${getCompactFileExtension(file.name)}:[base64url-data]`;
+        }
+        const offset = Math.max(0, currentChunk - 1) * chunkCapacity;
+        return `FILE:1:C:${getFrameManifestFlag()}:[base64url-id]:${getCompactFileExtension(file.name)}:${encodeStreamPosition(offset, streamLength)}:${streamLength.toString(10)}:[base64url-data]`;
+      }
+
+      return `[data URL for ${file.name}]`;
     }
     default:
       return '';
@@ -592,8 +1630,8 @@ function buildOptions() {
     margin: readInteger(qrMargin) ?? 1,
     scale: readInteger(qrScale) ?? 4,
     color: {
-      dark: colorDark.value.trim() || '#111827',
-      light: colorLight.value.trim() || '#ffffff',
+      dark: colorWithTransparency(colorDark.value.trim() || '#111827', colorDarkTransparency),
+      light: colorWithTransparency(colorLight.value.trim() || '#ffffff', colorLightTransparency),
     },
   };
 
@@ -601,7 +1639,8 @@ function buildOptions() {
     baseOptions.width = readInteger(qrWidth) ?? 320;
   }
 
-  const version = versionAuto.checked ? undefined : readInteger(qrVersion);
+  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
+  const version = isChunkedFile ? getConfiguredChunkVersion() : versionAuto.checked ? undefined : readInteger(qrVersion);
   if (version !== undefined) {
     baseOptions.version = version;
   }
@@ -617,10 +1656,27 @@ function buildOptions() {
     extraOptions = JSON.parse(rawOptions);
   }
 
-  return { ...baseOptions, ...extraOptions };
+  const mergedOptions = {
+    ...baseOptions,
+    ...extraOptions,
+    color: {
+      ...baseOptions.color,
+      ...(extraOptions.color || {}),
+    },
+  };
+  if (isChunkedFile) {
+    mergedOptions.version = getConfiguredChunkVersion();
+  }
+  return mergedOptions;
 }
 
 function buildPayload(encodedText) {
+  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
+  if (isChunkedFile && encodedText.trim()) {
+    // FILE frames contain arbitrary base64url, so byte mode keeps capacity deterministic.
+    return [{ data: encodedText, mode: 'byte' }];
+  }
+
   const mode = getCurrentEncodingMode();
   if (!mode || !encodedText.trim()) {
     return encodedText;
@@ -643,8 +1699,425 @@ function getEncodedPreviewText(encodedText) {
   return previewText;
 }
 
+function decodeDownloadPayloadFromLocation() {
+  const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
+  if (!hash) {
+    return null;
+  }
+
+  const params = new URLSearchParams(hash);
+  if (params.get('download') !== '1') {
+    return null;
+  }
+
+  const name = params.get('name') || 'download.bin';
+  const mimeType = params.get('type') || 'application/octet-stream';
+  const data = params.get('data') || '';
+  if (!data) {
+    return null;
+  }
+
+  return { name, mimeType, data };
+}
+
+function triggerDownloadFromLocationPayload() {
+  const payload = decodeDownloadPayloadFromLocation();
+  if (!payload) {
+    return;
+  }
+
+  try {
+    const binary = atob(base64UrlToBase64(payload.data));
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const blob = new Blob([bytes], { type: payload.mimeType });
+    const downloadUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = downloadUrl;
+    anchor.download = payload.name;
+    anchor.rel = 'noopener';
+    anchor.style.display = 'none';
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  } catch (error) {
+    console.error('Unable to restore downloadable file from the QR URL.', error);
+  }
+}
+
 function updateEncodedPreview(encodedText) {
   encodedPreview.textContent = getEncodedPreviewText(encodedText);
+}
+
+function getEmailBodyCapacityInfo() {
+  const currentLength = emailBody.value.length;
+
+  let options;
+  try {
+    options = buildOptions();
+  } catch (error) {
+    return { current: currentLength, max: 0 };
+  }
+
+  const canEncodeLength = (length) => {
+    const testPayload = buildEmailPayloadWithBody('A'.repeat(length));
+    try {
+      const payload = buildPayload(testPayload);
+      QRCode.create(payload, options);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  if (!canEncodeLength(0)) {
+    return { current: currentLength, max: 0 };
+  }
+
+  let low = 0;
+  let high = Math.max(currentLength, 32);
+
+  while (high < 8192 && canEncodeLength(high)) {
+    low = high;
+    high *= 2;
+  }
+
+  while (low + 1 < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (canEncodeLength(middle)) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+
+  return { current: currentLength, max: low };
+}
+
+function syncEmailBodyLengthHint() {
+  const { current, max } = getEmailBodyCapacityInfo();
+  emailBodyLengthHint.textContent = `${current} / ${max}`;
+}
+
+function validateEmailValue(value, { required = true, label = 'email address' } = {}) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return required ? `Not valid for Email format yet: ${label} is required.` : '';
+  }
+
+  if (!EMAIL_PATTERN.test(trimmed)) {
+    return `Not valid for Email format yet: ${label} must be valid.`;
+  }
+
+  if (trimmed.length > 254) {
+    return `Not valid for Email format yet: ${label} should stay within 254 characters.`;
+  }
+
+  return '';
+}
+
+function validatePrintableText(value, { label, maxLength }) {
+  const trimmedLength = value.length;
+  if (trimmedLength > maxLength) {
+    return `${label} should stay within ${maxLength} characters.`;
+  }
+
+  if (!PRINTABLE_TEXT_PATTERN.test(value)) {
+    return `${label} can only use printable characters.`;
+  }
+
+  return '';
+}
+
+function validateTelephoneValue(value, { required = true, label = 'telephone number' } = {}) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return required ? `Not valid for Phone format yet: ${label} is required.` : '';
+  }
+
+  const allowedPattern = /^\+?[\d\s().-]+$/;
+  if (!allowedPattern.test(trimmed)) {
+    return `Not valid for Phone format yet: ${label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.`;
+  }
+
+  const plusCount = [...trimmed].filter((character) => character === '+').length;
+  if (plusCount > 1 || (plusCount === 1 && !trimmed.startsWith('+'))) {
+    return `Not valid for Phone format yet: ${label} can only use + at the beginning.`;
+  }
+
+  const digits = trimmed.replace(/\D/g, '');
+  if (digits.length < 10 || digits.length > 15) {
+    return `Not valid for Phone format yet: ${label} should contain a reasonable length of 10 to 15 digits.`;
+  }
+
+  return '';
+}
+
+function validateGeoLabel(value) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  if (trimmed.length > 80) {
+    return 'Not valid for Geo format yet: label should stay within 80 characters.';
+  }
+
+  const allowedPattern = /^[A-Za-z0-9 .,&#()'/:+-]*$/;
+  if (!allowedPattern.test(trimmed)) {
+    return 'Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.';
+  }
+
+  return '';
+}
+
+function validateVCardTextValue(value, { required = false, label, maxLength = 80 } = {}) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return required ? `Not valid for vCard format yet: ${label} is required.` : '';
+  }
+
+  if (trimmed.length > maxLength) {
+    return `Not valid for vCard format yet: ${label} should stay within ${maxLength} characters.`;
+  }
+
+  if (!VCARD_TEXT_PATTERN.test(trimmed)) {
+    return `Not valid for vCard format yet: ${label} can only use letters, numbers, spaces, and common punctuation.`;
+  }
+
+  return '';
+}
+
+function getWebsiteValidationState(value, { required = false, contextLabel = 'vCard' } = {}) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return {
+      error: required ? `Not valid for ${contextLabel} format yet: website is required.` : '',
+      warning: '',
+    };
+  }
+
+  if (trimmed.length > 2048) {
+    return {
+      error: `Not valid for ${contextLabel} format yet: website should stay within 2048 characters.`,
+      warning: '',
+    };
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(trimmed);
+  } catch (error) {
+    return {
+      error: `Not valid for ${contextLabel} format yet: website must include a full protocol such as https://.`,
+      warning: '',
+    };
+  }
+
+  if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
+    return {
+      error: `Not valid for ${contextLabel} format yet: website should start with https:// or http://.`,
+      warning: '',
+    };
+  }
+
+  return {
+    error: '',
+    warning:
+      parsedUrl.protocol === 'http:'
+        ? `Warning for ${contextLabel} format: website uses http://. https:// is strongly recommended.`
+        : '',
+  };
+}
+
+function getFormatValidationState() {
+  if (qrFormat.value === 'file') {
+    const file = getActiveFile();
+    if (!file) {
+      return {
+        error: 'Not valid for File format yet: choose a file to encode.',
+        warning: '',
+      };
+    }
+
+    if (getSelectedFileEncodingMode() === 'blob') {
+      return {
+        error: '',
+        warning: 'Warning for File format: this shareable download URL embeds the file bytes directly, so larger files will hit QR capacity quickly.',
+      };
+    }
+
+    if (getSelectedFileEncodingMode() === 'chunked') {
+      const { totalChunks } = getChunkedFileCapacityInfo(file);
+      return {
+        error: '',
+        warning:
+          totalChunks > 1
+            ? `Warning for File format: this compact FILE stream is split across ${totalChunks} QR codes. Each scan needs the same file ID plus every chunk to reconstruct the file.`
+            : '',
+      };
+    }
+
+    return { error: '', warning: '' };
+  }
+
+  if (qrFormat.value === 'email') {
+    const emailValidationMessage = validateEmailValue(emailTo.value, {
+      label: 'recipient email address',
+    });
+    if (emailValidationMessage) {
+      return {
+        error: emailValidationMessage,
+        warning: '',
+      };
+    }
+
+    const subjectValidationMessage = validatePrintableText(emailSubject.value, {
+      label: 'Not valid for Email format yet: subject',
+      maxLength: EMAIL_SUBJECT_MAX_LENGTH,
+    });
+    if (subjectValidationMessage) {
+      return {
+        error: subjectValidationMessage,
+        warning: '',
+      };
+    }
+
+    const emailBodyValidationMessage = validatePrintableText(emailBody.value, {
+      label: 'Not valid for Email format yet: body',
+      maxLength: Math.max(getEmailBodyCapacityInfo().max, 0),
+    });
+    if (emailBodyValidationMessage) {
+      return {
+        error: emailBodyValidationMessage,
+        warning: '',
+      };
+    }
+
+    const { current, max } = getEmailBodyCapacityInfo();
+    if (current > max) {
+      return {
+        error: `Not valid for Email format yet: body exceeds the current QR capacity (${current} / ${max}).`,
+        warning: '',
+      };
+    }
+
+    return {
+      error: '',
+      warning: '',
+    };
+  }
+
+  if (qrFormat.value === 'phone') {
+    return {
+      error: validateTelephoneValue(phoneNumber.value),
+      warning: '',
+    };
+  }
+
+  if (qrFormat.value === 'sms') {
+    const phoneValidationMessage = validateTelephoneValue(smsNumber.value, {
+      label: 'SMS phone number',
+    });
+    if (phoneValidationMessage) {
+      return {
+        error: phoneValidationMessage.replace('Phone format', 'SMS format'),
+        warning: '',
+      };
+    }
+
+    if (smsBody.value.length > 160) {
+      return {
+        error: `Not valid for SMS format yet: message should stay at ${SMS_MAX_LENGTH} characters or fewer for broad SMS compatibility.`,
+        warning: '',
+      };
+    }
+  }
+
+  if (qrFormat.value === 'geo') {
+    const latitudeText = geoLatitude.value.trim();
+    const longitudeText = geoLongitude.value.trim();
+
+    if (!latitudeText) {
+      return { error: 'Not valid for Geo format yet: latitude is required.', warning: '' };
+    }
+
+    if (!longitudeText) {
+      return { error: 'Not valid for Geo format yet: longitude is required.', warning: '' };
+    }
+
+    const latitude = parseCoordinate(latitudeText);
+    if (latitude === null) {
+      return { error: 'Not valid for Geo format yet: latitude must be a valid number.', warning: '' };
+    }
+
+    const longitude = parseCoordinate(longitudeText);
+    if (longitude === null) {
+      return { error: 'Not valid for Geo format yet: longitude must be a valid number.', warning: '' };
+    }
+
+    if (latitude < -90 || latitude > 90) {
+      return { error: 'Not valid for Geo format yet: latitude must be between -90 and 90.', warning: '' };
+    }
+
+    if (longitude < -180 || longitude > 180) {
+      return { error: 'Not valid for Geo format yet: longitude must be between -180 and 180.', warning: '' };
+    }
+
+    const labelValidationMessage = validateGeoLabel(geoQuery.value);
+    if (labelValidationMessage) {
+      return { error: labelValidationMessage, warning: '' };
+    }
+  }
+
+  if (qrFormat.value === 'vcard') {
+    const nameValidationMessage = validateVCardTextValue(vcardName.value, {
+      required: true,
+      label: 'full name',
+    });
+    if (nameValidationMessage) {
+      return { error: nameValidationMessage, warning: '' };
+    }
+
+    const organizationValidationMessage = validateVCardTextValue(vcardOrg.value, {
+      label: 'organization',
+    });
+    if (organizationValidationMessage) {
+      return { error: organizationValidationMessage, warning: '' };
+    }
+
+    const titleValidationMessage = validateVCardTextValue(vcardTitle.value, {
+      label: 'title',
+    });
+    if (titleValidationMessage) {
+      return { error: titleValidationMessage, warning: '' };
+    }
+
+    const phoneValidationMessage = validateTelephoneValue(vcardPhone.value, {
+      required: false,
+      label: 'vCard phone number',
+    });
+    if (phoneValidationMessage) {
+      return { error: phoneValidationMessage.replace('Phone format', 'vCard format'), warning: '' };
+    }
+
+    const emailValidationMessage = validateEmailValue(vcardEmail.value, {
+      required: false,
+      label: 'vCard email address',
+    });
+    if (emailValidationMessage) {
+      return { error: emailValidationMessage.replace('Email format', 'vCard format'), warning: '' };
+    }
+
+    const websiteValidationState = getWebsiteValidationState(vcardUrl.value, {
+      contextLabel: 'vCard',
+    });
+    if (websiteValidationState.error || websiteValidationState.warning) {
+      return websiteValidationState;
+    }
+  }
+
+  return { error: '', warning: '' };
 }
 
 function normalizeModeName(segmentMode) {
@@ -663,13 +2136,18 @@ function normalizeModeName(segmentMode) {
   return 'byte';
 }
 
-function setValidationMessage(message, invalidIndexes = []) {
+function setValidationMessage(message, invalidIndexes = [], level = 'error') {
   modeValidation.hidden = !message;
   modeValidation.textContent = message;
-  encodedPreview.classList.toggle('has-error', Boolean(message));
+  formatValidation.hidden = !message;
+  formatValidation.textContent = message;
+  modeValidation.classList.toggle('is-warning', level === 'warning');
+  formatValidation.classList.toggle('is-warning', level === 'warning');
+  encodedPreview.classList.toggle('has-error', Boolean(message) && level === 'error');
 
   const activeFieldset = document.querySelector(`.format-fields[data-format-fields="${qrFormat.value}"]`);
-  activeFieldset?.classList.toggle('has-error', Boolean(message));
+  activeFieldset?.classList.toggle('has-error', Boolean(message) && level === 'error');
+  activeFieldset?.classList.toggle('has-warning', Boolean(message) && level === 'warning');
 
   if (!message) {
     return;
@@ -739,6 +2217,7 @@ function updateEncodingSummary(qrDefinition, options) {
     segmentSummary.textContent = '0';
     versionSummary.textContent = 'Auto';
     capacitySummary.textContent = '-';
+    unusedSummary.textContent = '-';
     return;
   }
 
@@ -761,6 +2240,16 @@ function updateEncodingSummary(qrDefinition, options) {
     const capacity = MODE_CAPACITY[primaryMode]?.[correctionLevel];
     capacitySummary.textContent = capacity ? `${capacity} chars max` : '-';
   }
+
+  const dataCodewordsCount = getTotalDataCodewords(versionValue, correctionLevel);
+  const debugModel = buildDebugOverlayModel(qrDefinition, options);
+  const unusedBits = debugModel.bitRoles.filter(
+    (role) => role === 'terminator' || role === 'bytePad' || role === 'padByte'
+  ).length;
+  const unusedPercent = dataCodewordsCount > 0 ? Math.round((unusedBits / (dataCodewordsCount * 8)) * 100) : 0;
+  const unusedBytes = unusedBits / 8;
+  const unusedByteLabel = Number.isInteger(unusedBytes) ? `${unusedBytes}` : unusedBytes.toFixed(1);
+  unusedSummary.textContent = `${unusedByteLabel} B (${unusedPercent}%)`;
 }
 
 function buildMaskPreviewOptions(maskValue) {
@@ -770,8 +2259,8 @@ function buildMaskPreviewOptions(maskValue) {
     margin: 1,
     width: 72,
     color: {
-      dark: colorDark.value.trim() || '#111827',
-      light: colorLight.value.trim() || '#ffffff',
+      dark: colorWithTransparency(colorDark.value.trim() || '#111827', colorDarkTransparency),
+      light: colorWithTransparency(colorLight.value.trim() || '#ffffff', colorLightTransparency),
     },
   };
 
@@ -1744,29 +3233,54 @@ function drawQr(qrDefinition, options) {
   const marginModules = options.margin ?? 4;
   const moduleCount = qrDefinition.modules.size;
   const totalModules = moduleCount + marginModules * 2;
-  const canvasSize = typeof options.width === 'number' ? options.width : totalModules * (options.scale ?? 4);
+  const minimumModuleScale = Math.max(1, options.scale ?? 4);
+  const minimumCanvasSize = totalModules * minimumModuleScale;
+  const maximumModuleScale = Math.max(minimumModuleScale, Math.floor(640 / totalModules));
+  qrWidth.min = String(minimumCanvasSize);
+  qrWidth.max = String(totalModules * maximumModuleScale);
+  qrWidth.step = String(totalModules);
+  const requestedCanvasSize = typeof options.width === 'number' ? options.width : minimumCanvasSize;
+  const renderedModuleScale = Math.min(
+    maximumModuleScale,
+    Math.max(minimumModuleScale, Math.round(requestedCanvasSize / totalModules))
+  );
+  const canvasSize = totalModules * renderedModuleScale;
+  if (!qrWidthAuto.checked) {
+    qrWidth.value = String(canvasSize);
+  }
+  renderedQrWidth = canvasSize;
+  renderedQrModuleScale = renderedModuleScale;
+  formatWidthLabel();
+  const cornerRadius = Math.max(0, Math.min(16, ((canvasSize - 128) / 192) * 16));
+  canvas.style.setProperty('--qr-corner-radius', `${cornerRadius.toFixed(2)}px`);
   const cellSize = canvasSize / totalModules;
   const context = canvas.getContext('2d');
   const debugActive = isDebugOverlayActive();
   const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
+  const lightAlpha = getColorAlpha(options.color.light);
+  const hasTransparency = getColorAlpha(options.color.dark) < 1 || lightAlpha < 1;
+  const transparentLight = lightAlpha === 0;
 
   canvas.width = canvasSize;
   canvas.height = canvasSize;
+  canvas.classList.toggle('has-transparency', hasTransparency);
 
   const backgroundColor = options.color.light;
   const quietColor = options.color.light;
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = quietColor;
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  if (!transparentLight) {
+    context.fillStyle = quietColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-  context.fillStyle = backgroundColor;
-  context.fillRect(
-    marginModules * cellSize,
-    marginModules * cellSize,
-    moduleCount * cellSize,
-    moduleCount * cellSize
-  );
+    context.fillStyle = backgroundColor;
+    context.fillRect(
+      marginModules * cellSize,
+      marginModules * cellSize,
+      moduleCount * cellSize,
+      moduleCount * cellSize
+    );
+  }
 
   if (debugActive) {
     for (let row = 0; row < moduleCount; row += 1) {
@@ -1807,6 +3321,55 @@ function drawQr(qrDefinition, options) {
     drawCodewordOutlines(context, debugModel, marginModules, cellSize);
     drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize);
   }
+}
+
+function drawInvalidOverlay(message) {
+  const context = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  const bannerHeight = Math.max(56, height * 0.18);
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.64)';
+  context.fillRect(0, 0, width, height);
+
+  context.fillStyle = 'rgba(153, 27, 27, 0.92)';
+  context.fillRect(0, (height - bannerHeight) / 2, width, bannerHeight);
+
+  context.fillStyle = '#ffffff';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.font = `800 ${Math.max(18, width * 0.07)}px "Avenir Next", "Segoe UI", sans-serif`;
+  context.fillText('Invalid', width / 2, height / 2 - 8);
+
+  if (message) {
+    context.font = `600 ${Math.max(10, width * 0.027)}px "Avenir Next", "Segoe UI", sans-serif`;
+    context.fillText(message.slice(0, 80), width / 2, height / 2 + 16);
+  }
+}
+
+function renderInvalidPreview(previewText, options, message) {
+  const safeText = previewText?.trim() ? previewText : 'Invalid preview';
+  const previewOptions = options
+    ? { ...options }
+    : {
+        errorCorrectionLevel: 'M',
+        margin: 1,
+        scale: 4,
+        color: {
+          dark: '#111827',
+          light: '#ffffff',
+        },
+      };
+  delete previewOptions.version;
+
+  try {
+    const qrDefinition = QRCode.create(safeText, previewOptions);
+    drawQr(qrDefinition, previewOptions);
+  } catch (error) {
+    clearCanvas();
+  }
+
+  drawInvalidOverlay(message);
 }
 
 function createMaskButton(maskValue) {
@@ -1908,6 +3471,33 @@ function activateTab(tabName) {
   renderQr();
 }
 
+function activateDebugSubtab(subtabName) {
+  activeDebugSubtab = subtabName;
+
+  debugSubtabButtons.forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.subtab === subtabName);
+  });
+
+  debugSubtabPanels.forEach((panel) => {
+    const isActive = panel.dataset.subtabPanel === subtabName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+
+  renderQr();
+}
+
+function syncChoiceButtons() {
+  choiceButtons.forEach((button) => {
+    const targetId = button.dataset.choiceTarget;
+    const choiceValue = button.dataset.choiceValue;
+    const target = document.getElementById(targetId);
+    const isActive = Boolean(target) && target.value === choiceValue;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
 function syncDebugOutlineSelection() {
   debugOutlineModeButtons.forEach((button) => {
     const isActive = button.dataset.outlineMode === activeDebugOutlineMode;
@@ -1934,7 +3524,8 @@ async function renderQr() {
     }
     encodedPreview.textContent = error.message;
     encodedPreview.classList.add('has-error');
-    clearCanvas();
+    renderInvalidPreview(buildEncodedPreviewTemplate(), options, error.message);
+    setValidationMessage(error.message || 'Unable to build QR content.');
     console.error(error);
     return;
   }
@@ -1948,15 +3539,25 @@ async function renderQr() {
   syncMaskSelection();
   renderMaskPreviews(encodedText);
 
+  const formatValidationState = getFormatValidationState();
+  if (formatValidationState.error) {
+    setValidationMessage(formatValidationState.error);
+    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, formatValidationState.error);
+    updateEncodingSummary(null, options);
+    return;
+  }
+
   const isModeValid = validateManualMode(encodedText);
   if (!encodedText.trim()) {
-    clearCanvas();
+    const emptyMessage = 'Not valid yet: content is required.';
+    setValidationMessage(emptyMessage);
+    renderInvalidPreview(buildEncodedPreviewTemplate(), options, emptyMessage);
     updateEncodingSummary(null, options);
     return;
   }
 
   if (!isModeValid) {
-    clearCanvas();
+    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, modeValidation.textContent);
     updateEncodingSummary(null, options);
     return;
   }
@@ -1965,11 +3566,11 @@ async function renderQr() {
     const payload = buildPayload(encodedText);
     const qrDefinition = QRCode.create(payload, options);
     updateEncodingSummary(qrDefinition, options);
-    setValidationMessage('');
+    setValidationMessage(formatValidationState.warning, [], formatValidationState.warning ? 'warning' : 'error');
     drawQr(qrDefinition, options);
   } catch (error) {
-    clearCanvas();
     setValidationMessage(error.message || 'Unable to encode this content.');
+    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, error.message || 'Unable to encode this content.');
     updateEncodingSummary(null, options);
     console.error(error);
   }
@@ -1979,19 +3580,227 @@ form.addEventListener('submit', (event) => {
   event.preventDefault();
 });
 
-form.addEventListener('input', () => {
+form.addEventListener('input', (event) => {
+  if (event.target === fileIncludeManifest || event.target === fileCompressTransfer || event.target === fileCustomMetadata) {
+    resetTransferDerivedState();
+    scheduleChunkSettingsRefresh({ resetChunkIndex: true });
+    return;
+  }
+
+  if (event.target === fileChunkVersionAuto) {
+    // The checkbox's change handler synchronizes the shared version state.
+    return;
+  }
+
+  if (event.target === fileChunkVersion) {
+    fileChunkVersionValue.textContent = `V${fileChunkVersion.value}`;
+    qrVersion.value = fileChunkVersion.value;
+    formatVersionLabel();
+    scheduleChunkSettingsRefresh({ resetChunkIndex: true });
+    return;
+  }
+
+  if (event.target === fileChunkIndex) {
+    return;
+  }
+
+  syncSmsLengthHint();
+  syncEmailBodyLengthHint();
+  syncFileCapacityHint();
   renderQr();
 });
 
 fileInput.addEventListener('change', () => {
-  cachedFile = null;
-  cachedFilePayload = '';
+  resetCachedFileState();
+  fileChunkIndex.value = '1';
+  syncFileCapacityHint();
+  renderQr();
+});
+
+clearFileButton.addEventListener('click', () => {
+  clearLoadedFile();
   renderQr();
 });
 
 qrFormat.addEventListener('change', () => {
   setFormatVisibility();
+  syncChoiceButtons();
+  syncWifiSecurityState();
   renderQr();
+});
+
+wifiEncryption.addEventListener('change', () => {
+  syncChoiceButtons();
+  syncWifiSecurityState();
+  renderQr();
+});
+
+choiceButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const targetId = button.dataset.choiceTarget;
+    const choiceValue = button.dataset.choiceValue;
+    const target = document.getElementById(targetId);
+
+    if (!target || target.value === choiceValue) {
+      return;
+    }
+
+    target.value = choiceValue;
+    syncChoiceButtons();
+    if (target === wifiEncryption) {
+      syncWifiSecurityState();
+    }
+
+    if (target === qrFormat) {
+      setFormatVisibility();
+    }
+
+    if (target === fileEncodingMode) {
+      if (choiceValue === 'chunked' && versionAuto.checked) {
+        qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
+      }
+      syncChunkVersionControls();
+      formatVersionLabel();
+      scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
+      return;
+    }
+
+    renderQr();
+  });
+});
+
+fileChunkIndex.addEventListener('input', () => {
+  invalidateChunkCapacityCache();
+  syncFileCapacityHint();
+  renderQr();
+});
+
+chunkPreviewPrev.addEventListener('click', () => {
+  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
+  if (current <= 1) {
+    return;
+  }
+
+  fileChunkIndex.value = String(current - 1);
+  syncFileChunkLabel();
+  syncChunkPreviewNavigation();
+  renderQr();
+});
+
+chunkPreviewNext.addEventListener('click', () => {
+  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
+  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
+  if (current >= total) {
+    return;
+  }
+
+  fileChunkIndex.value = String(current + 1);
+  syncFileChunkLabel();
+  syncChunkPreviewNavigation();
+  renderQr();
+});
+
+fileChunkVersionAuto.addEventListener('change', () => {
+  versionAuto.checked = fileChunkVersionAuto.checked;
+  if (fileChunkVersionAuto.checked) {
+    qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
+  }
+  formatVersionLabel();
+  syncChunkVersionControls();
+  scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
+});
+
+fileChunkVersion.addEventListener('input', () => {
+  qrVersion.value = fileChunkVersion.value;
+  formatVersionLabel();
+  syncChunkVersionControls();
+  scheduleChunkSettingsRefresh({ resetChunkIndex: true });
+});
+
+versionAuto.addEventListener('change', () => {
+  if (versionAuto.checked && qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked') {
+    qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
+    scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
+  }
+  syncChunkVersionControls();
+});
+
+qrVersion.addEventListener('input', () => {
+  syncChunkVersionControls();
+});
+
+phoneFormatButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    activePhoneFormat = button.dataset.phoneFormat || 'usa';
+    syncPhoneFormatButtons();
+    applyPhoneFormatToInput(phoneNumber);
+    syncPhoneValuesAcrossAll(phoneNumber);
+    applyPhoneFormatToInput(smsNumber);
+    applyPhoneFormatToInput(vcardPhone);
+    renderQr();
+  });
+});
+
+phoneNumber.addEventListener('input', () => {
+  syncPhoneValuesAcrossAll(phoneNumber);
+});
+
+phoneNumber.addEventListener('blur', () => {
+  applyPhoneFormatToInput(phoneNumber);
+  syncPhoneValuesAcrossAll(phoneNumber);
+  applyPhoneFormatToInput(smsNumber);
+  applyPhoneFormatToInput(vcardPhone);
+  renderQr();
+});
+
+smsNumber.addEventListener('input', () => {
+  syncPhoneValuesAcrossAll(smsNumber);
+});
+
+smsNumber.addEventListener('blur', () => {
+  applyPhoneFormatToInput(smsNumber);
+  syncPhoneValuesAcrossAll(smsNumber);
+  applyPhoneFormatToInput(phoneNumber);
+  applyPhoneFormatToInput(vcardPhone);
+  renderQr();
+});
+
+vcardPhone.addEventListener('input', () => {
+  syncPhoneValuesAcrossAll(vcardPhone);
+});
+
+vcardPhone.addEventListener('blur', () => {
+  applyPhoneFormatToInput(vcardPhone);
+  syncPhoneValuesAcrossAll(vcardPhone);
+  applyPhoneFormatToInput(phoneNumber);
+  applyPhoneFormatToInput(smsNumber);
+  renderQr();
+});
+
+emailTo.addEventListener('input', () => {
+  syncEmailValuesAcrossAll(emailTo);
+});
+
+vcardEmail.addEventListener('input', () => {
+  syncEmailValuesAcrossAll(vcardEmail);
+});
+
+textInput.addEventListener('input', () => {
+  syncMessageValuesAcrossAll(textInput);
+  syncSmsLengthHint();
+  syncEmailBodyLengthHint();
+});
+
+smsBody.addEventListener('input', () => {
+  syncMessageValuesAcrossAll(smsBody);
+  syncSmsLengthHint();
+  syncEmailBodyLengthHint();
+});
+
+emailBody.addEventListener('input', () => {
+  syncMessageValuesAcrossAll(emailBody);
+  syncSmsLengthHint();
+  syncEmailBodyLengthHint();
 });
 
 debugOutlineModeButtons.forEach((button) => {
@@ -2008,11 +3817,33 @@ tabButtons.forEach((button) => {
   });
 });
 
+debugSubtabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    activateDebugSubtab(button.dataset.subtab || 'encoding');
+  });
+});
+
 syncOutputs();
-urlInput.value = getDefaultUrlValue();
+textInput.value = getDefaultUrlValue();
 setFormatVisibility();
 ensureMaskButtons();
 syncMaskSelection();
+syncChoiceButtons();
+syncWifiSecurityState();
+syncPhoneFormatButtons();
+syncFileCapacityHint();
+syncChunkVersionControls();
+syncFileChunkLabel();
+applyPhoneFormatToInput(phoneNumber);
+syncPhoneValuesAcrossAll(phoneNumber);
+applyPhoneFormatToInput(smsNumber);
+applyPhoneFormatToInput(vcardPhone);
+syncEmailValuesAcrossAll(vcardEmail);
+syncMessageValuesAcrossAll(textInput);
+syncSmsLengthHint();
+syncEmailBodyLengthHint();
 syncDebugOutlineSelection();
+activateDebugSubtab('encoding');
 activateTab('content');
+triggerDownloadFromLocationPayload();
 renderQr();
