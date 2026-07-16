@@ -10,17 +10,89 @@
   <body>
     <main class="app">
       <h1>QR Code Generator</h1>
-      <p>Enter text or a URL to create a QR code instantly.</p>
+      <p>Enter text or a URL, then tune the full set of browser QR rendering options.</p>
 
       <form id="qr-form">
         <label for="qr-input">Content</label>
-        <input id="qr-input" name="qr-input" type="text" value="https://example.com" />
+        <textarea id="qr-input" name="qr-input" rows="3">https://example.com</textarea>
+
+        <fieldset class="option-group">
+          <legend>QR Options</legend>
+
+          <label for="error-correction">Error correction level</label>
+          <select id="error-correction" name="error-correction">
+            <option value="L">L</option>
+            <option value="M" selected>M</option>
+            <option value="Q">Q</option>
+            <option value="H">H</option>
+          </select>
+
+          <label for="qr-version">Version</label>
+          <input
+            id="qr-version"
+            name="qr-version"
+            type="number"
+            min="1"
+            max="40"
+            placeholder="Auto"
+          />
+
+          <label for="mask-pattern">Mask pattern</label>
+          <select id="mask-pattern" name="mask-pattern">
+            <option value="">Auto</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="option-group">
+          <legend>Renderer Options</legend>
+
+          <label for="qr-width">Width</label>
+          <input id="qr-width" name="qr-width" type="number" min="64" value="240" />
+
+          <label for="qr-scale">Scale</label>
+          <input id="qr-scale" name="qr-scale" type="number" min="1" value="4" />
+
+          <label for="qr-margin">Margin</label>
+          <input id="qr-margin" name="qr-margin" type="number" min="0" value="1" />
+
+          <label for="color-dark">Dark color</label>
+          <input id="color-dark" name="color-dark" type="text" value="#111827" />
+
+          <label for="color-light">Light color</label>
+          <input id="color-light" name="color-light" type="text" value="#ffffff" />
+        </fieldset>
+
+        <fieldset class="option-group">
+          <legend>Advanced</legend>
+
+          <label for="options-json">Extra options JSON</label>
+          <textarea
+            id="options-json"
+            name="options-json"
+            rows="6"
+            spellcheck="false"
+          >{}</textarea>
+          <p class="hint">
+            Merged last into the QRCode options object. Use this for advanced overrides. Function-based
+            options such as <code>toSJISFunc</code> still need to be wired in code.
+          </p>
+        </fieldset>
+
         <button type="submit">Generate QR</button>
       </form>
 
       <section class="preview" aria-live="polite">
         <canvas id="qr-canvas" width="240" height="240"></canvas>
         <p id="status">Your QR code will appear here.</p>
+        <pre id="options-preview"></pre>
       </section>
     </main>
 
