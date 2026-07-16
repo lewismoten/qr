@@ -8,92 +8,179 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
   </head>
   <body>
-    <main class="app">
-      <h1>QR Code Generator</h1>
-      <p>Enter text or a URL, then tune the full set of browser QR rendering options.</p>
+    <main class="app-shell">
+      <form id="qr-form" class="app-layout">
+        <section class="preview-card" aria-live="polite">
+          <div class="preview-frame">
+            <canvas id="qr-canvas" width="320" height="320"></canvas>
+          </div>
+          <div class="preview-meta">
+            <p id="status"></p>
+          </div>
+        </section>
 
-      <form id="qr-form">
-        <label for="qr-input">Content</label>
-        <textarea id="qr-input" name="qr-input" rows="3">https://example.com</textarea>
+        <section class="tab-panel-shell">
+          <div class="tab-panels">
+            <section class="tab-panel is-active" data-tab-panel="content">
+              <div class="panel-card">
+                <label for="qr-input">Content</label>
+                <textarea id="qr-input" name="qr-input" rows="4">https://example.com</textarea>
+              </div>
+            </section>
 
-        <fieldset class="option-group">
-          <legend>QR Options</legend>
+            <section class="tab-panel" data-tab-panel="style" hidden>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend>Appearance</legend>
 
-          <label for="error-correction">Error correction level</label>
-          <select id="error-correction" name="error-correction">
-            <option value="L">L</option>
-            <option value="M" selected>M</option>
-            <option value="Q">Q</option>
-            <option value="H">H</option>
-          </select>
+                  <label class="slider-field" for="qr-width">
+                    <span>Width</span>
+                    <output id="qr-width-value" for="qr-width">320 px</output>
+                  </label>
+                  <input id="qr-width" name="qr-width" type="range" min="160" max="640" step="8" value="320" />
 
-          <label for="qr-version">Version</label>
-          <input
-            id="qr-version"
-            name="qr-version"
-            type="number"
-            min="1"
-            max="40"
-            placeholder="Auto"
-          />
+                  <label class="toggle-field">
+                    <input id="qr-width-auto" name="qr-width-auto" type="checkbox" />
+                    <span>Use scale instead of fixed width</span>
+                  </label>
 
-          <label for="mask-pattern">Mask pattern</label>
-          <select id="mask-pattern" name="mask-pattern">
-            <option value="">Auto</option>
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-          </select>
-        </fieldset>
+                  <label class="slider-field" for="qr-scale">
+                    <span>Scale</span>
+                    <output id="qr-scale-value" for="qr-scale">4</output>
+                  </label>
+                  <input id="qr-scale" name="qr-scale" type="range" min="1" max="12" step="1" value="4" />
 
-        <fieldset class="option-group">
-          <legend>Renderer Options</legend>
+                  <label class="slider-field" for="qr-margin">
+                    <span>Margin</span>
+                    <output id="qr-margin-value" for="qr-margin">1</output>
+                  </label>
+                  <input id="qr-margin" name="qr-margin" type="range" min="0" max="12" step="1" value="1" />
 
-          <label for="qr-width">Width</label>
-          <input id="qr-width" name="qr-width" type="number" min="64" value="240" />
+                  <div class="color-grid">
+                    <label class="color-field" for="color-dark">
+                      <span>Dark</span>
+                      <input id="color-dark" name="color-dark" type="color" value="#111827" />
+                    </label>
 
-          <label for="qr-scale">Scale</label>
-          <input id="qr-scale" name="qr-scale" type="number" min="1" value="4" />
+                    <label class="color-field" for="color-light">
+                      <span>Light</span>
+                      <input id="color-light" name="color-light" type="color" value="#ffffff" />
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </section>
 
-          <label for="qr-margin">Margin</label>
-          <input id="qr-margin" name="qr-margin" type="number" min="0" value="1" />
+            <section class="tab-panel" data-tab-panel="encoding" hidden>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend>Error correction</legend>
 
-          <label for="color-dark">Dark color</label>
-          <input id="color-dark" name="color-dark" type="text" value="#111827" />
+                  <label class="slider-field" for="error-correction">
+                    <span id="error-correction-label">Medium</span>
+                    <output id="error-correction-value" for="error-correction">M</output>
+                  </label>
+                  <input id="error-correction" name="error-correction" type="range" min="0" max="3" step="1" value="1" />
+                  <p class="hint" id="error-correction-help">About 15% recovery.</p>
+                </fieldset>
 
-          <label for="color-light">Light color</label>
-          <input id="color-light" name="color-light" type="text" value="#ffffff" />
-        </fieldset>
+                <fieldset class="option-group">
+                  <legend>Input mode</legend>
 
-        <fieldset class="option-group">
-          <legend>Advanced</legend>
+                  <label class="toggle-field">
+                    <input id="mode-auto" name="mode-auto" type="checkbox" checked />
+                    <span>Auto-detect best encoding mode</span>
+                  </label>
 
-          <label for="options-json">Extra options JSON</label>
-          <textarea
-            id="options-json"
-            name="options-json"
-            rows="6"
-            spellcheck="false"
-          >{}</textarea>
-          <p class="hint">
-            Merged last into the QRCode options object. Use this for advanced overrides. Function-based
-            options such as <code>toSJISFunc</code> still need to be wired in code.
-          </p>
-        </fieldset>
+                  <label for="encoding-mode">Manual mode</label>
+                  <select id="encoding-mode" name="encoding-mode">
+                    <option value="numeric">Numeric</option>
+                    <option value="alphanumeric">Alphanumeric</option>
+                    <option value="byte">Byte / Binary</option>
+                    <option value="kanji">Kanji</option>
+                  </select>
 
-        <button type="submit">Generate QR</button>
+                  <div class="info-grid">
+                    <div class="info-chip">
+                      <span class="info-label">Chosen mode</span>
+                      <strong id="detected-mode">Auto</strong>
+                    </div>
+                    <div class="info-chip">
+                      <span class="info-label">Segments</span>
+                      <strong id="segment-summary">0</strong>
+                    </div>
+                    <div class="info-chip">
+                      <span class="info-label">Version</span>
+                      <strong id="version-summary">Auto</strong>
+                    </div>
+                    <div class="info-chip">
+                      <span class="info-label">Capacity</span>
+                      <strong id="capacity-summary">-</strong>
+                    </div>
+                  </div>
+                </fieldset>
+
+                <fieldset class="option-group">
+                  <legend>Version</legend>
+
+                  <label class="toggle-field">
+                    <input id="version-auto" name="version-auto" type="checkbox" checked />
+                    <span>Auto-pick version</span>
+                  </label>
+
+                  <label class="slider-field" for="qr-version">
+                    <span>Version</span>
+                    <output id="qr-version-value" for="qr-version">Auto</output>
+                  </label>
+                  <input id="qr-version" name="qr-version" type="range" min="1" max="40" step="1" value="1" />
+                </fieldset>
+              </div>
+            </section>
+
+            <section class="tab-panel" data-tab-panel="mask" hidden>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend>Mask pattern</legend>
+                  <input id="mask-pattern" name="mask-pattern" type="hidden" value="" />
+                  <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices"></div>
+                </fieldset>
+              </div>
+            </section>
+
+            <section class="tab-panel" data-tab-panel="advanced" hidden>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend>Raw options</legend>
+                  <label for="options-json">Extra options JSON</label>
+                  <textarea
+                    id="options-json"
+                    name="options-json"
+                    rows="6"
+                    spellcheck="false"
+                  >{}</textarea>
+                  <p class="hint">
+                    Merged last into the QRCode options object. Function-based options such as
+                    <code>toSJISFunc</code> still need explicit code wiring.
+                  </p>
+                </fieldset>
+
+                <fieldset class="option-group">
+                  <legend>Preview payload</legend>
+                  <pre id="options-preview"></pre>
+                </fieldset>
+              </div>
+            </section>
+          </div>
+
+          <nav class="tab-bar" aria-label="QR controls">
+            <button type="button" class="tab-button is-active" data-tab="content">Content</button>
+            <button type="button" class="tab-button" data-tab="style">Style</button>
+            <button type="button" class="tab-button" data-tab="encoding">Encoding</button>
+            <button type="button" class="tab-button" data-tab="mask">Mask</button>
+            <button type="button" class="tab-button" data-tab="advanced">Advanced</button>
+          </nav>
+        </section>
       </form>
-
-      <section class="preview" aria-live="polite">
-        <canvas id="qr-canvas" width="240" height="240"></canvas>
-        <p id="status">Your QR code will appear here.</p>
-        <pre id="options-preview"></pre>
-      </section>
     </main>
 
     <script src="script.js"></script>
