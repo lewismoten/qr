@@ -4,8 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QR Code Generator</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
   </head>
   <body>
     <main class="app-shell">
@@ -14,17 +25,144 @@
           <div class="preview-frame">
             <canvas id="qr-canvas" width="320" height="320"></canvas>
           </div>
-          <div class="preview-meta">
-            <p id="status"></p>
-          </div>
+          <nav class="tab-bar" aria-label="QR controls">
+            <button type="button" class="tab-button is-active" data-tab="content">Content</button>
+            <button type="button" class="tab-button" data-tab="style">Style</button>
+            <button type="button" class="tab-button" data-tab="encoding">Encoding</button>
+            <button type="button" class="tab-button" data-tab="mask">Mask</button>
+            <button type="button" class="tab-button" data-tab="advanced">Advanced</button>
+            <button type="button" class="tab-button" data-tab="debug">Debug</button>
+          </nav>
         </section>
 
         <section class="tab-panel-shell">
           <div class="tab-panels">
             <section class="tab-panel is-active" data-tab-panel="content">
-              <div class="panel-card">
-                <label for="qr-input">Content</label>
-                <textarea id="qr-input" name="qr-input" rows="4">https://example.com</textarea>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend class="sr-only">Payload format</legend>
+
+                  <label for="qr-format">QR format</label>
+                  <select id="qr-format" name="qr-format">
+                    <option value="text">Text</option>
+                    <option value="url" selected>URL</option>
+                    <option value="wifi">Wi-Fi</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone</option>
+                    <option value="sms">SMS</option>
+                    <option value="geo">Geo</option>
+                    <option value="vcard">vCard</option>
+                    <option value="file">File</option>
+                  </select>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="text" hidden>
+                  <legend class="sr-only">Text content</legend>
+                  <label class="sr-only" for="text-input">Text payload</label>
+                  <textarea id="text-input" name="text-input" rows="4" placeholder="Enter plain text"></textarea>
+                </fieldset>
+
+                <fieldset class="option-group format-fields is-active" data-format-fields="url">
+                  <legend class="sr-only">URL content</legend>
+                  <label class="sr-only" for="url-input">URL payload</label>
+                  <textarea id="url-input" name="url-input" rows="4" placeholder="https://example.com">https://example.com</textarea>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="wifi" hidden>
+                  <legend>Wi-Fi</legend>
+                  <label for="wifi-ssid">Network name</label>
+                  <input id="wifi-ssid" name="wifi-ssid" type="text" placeholder="My Wi-Fi" />
+                  <label for="wifi-password">Password</label>
+                  <input id="wifi-password" name="wifi-password" type="password" placeholder="Password" />
+                  <label for="wifi-encryption">Security</label>
+                  <select id="wifi-encryption" name="wifi-encryption">
+                    <option value="WPA">WPA/WPA2/WPA3</option>
+                    <option value="WEP">WEP</option>
+                    <option value="nopass">Open</option>
+                  </select>
+                  <label class="toggle-field">
+                    <input id="wifi-hidden" name="wifi-hidden" type="checkbox" />
+                    <span>Hidden network</span>
+                  </label>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="email" hidden>
+                  <legend>Email</legend>
+                  <label for="email-to">To</label>
+                  <input id="email-to" name="email-to" type="email" placeholder="name@example.com" />
+                  <label for="email-subject">Subject</label>
+                  <input id="email-subject" name="email-subject" type="text" placeholder="Subject" />
+                  <label for="email-body">Body</label>
+                  <textarea id="email-body" name="email-body" rows="3" placeholder="Message"></textarea>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="phone" hidden>
+                  <legend>Phone</legend>
+                  <label for="phone-number">Phone number</label>
+                  <input id="phone-number" name="phone-number" type="tel" placeholder="+15551234567" />
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="sms" hidden>
+                  <legend>SMS</legend>
+                  <label for="sms-number">Phone number</label>
+                  <input id="sms-number" name="sms-number" type="tel" placeholder="+15551234567" />
+                  <label for="sms-body">Message</label>
+                  <textarea id="sms-body" name="sms-body" rows="3" placeholder="Text message"></textarea>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="geo" hidden>
+                  <legend>Geo</legend>
+                  <div class="geo-row">
+                    <div class="geo-field">
+                      <label for="geo-latitude">Latitude</label>
+                      <input id="geo-latitude" name="geo-latitude" type="text" value="38.9182" />
+                    </div>
+                    <div class="geo-field">
+                      <label for="geo-longitude">Longitude</label>
+                      <input id="geo-longitude" name="geo-longitude" type="text" value="-78.1944" />
+                    </div>
+                    <div class="geo-field geo-label-field">
+                      <label for="geo-query">Label</label>
+                      <input id="geo-query" name="geo-query" type="text" value="Front Royal, VA" />
+                    </div>
+                  </div>
+                  <div class="geo-map-card">
+                    <div id="geo-map" class="geo-map" aria-label="Map preview for geo coordinates"></div>
+                    <p id="geo-map-status" class="hint">Enter latitude and longitude to preview the location.</p>
+                  </div>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="vcard" hidden>
+                  <legend>vCard</legend>
+                  <label for="vcard-name">Full name</label>
+                  <input id="vcard-name" name="vcard-name" type="text" placeholder="Taylor Example" />
+                  <label for="vcard-org">Organization</label>
+                  <input id="vcard-org" name="vcard-org" type="text" placeholder="OpenAI" />
+                  <label for="vcard-title">Title</label>
+                  <input id="vcard-title" name="vcard-title" type="text" placeholder="Engineer" />
+                  <label for="vcard-phone">Phone</label>
+                  <input id="vcard-phone" name="vcard-phone" type="tel" placeholder="+15551234567" />
+                  <label for="vcard-email">Email</label>
+                  <input id="vcard-email" name="vcard-email" type="email" placeholder="name@example.com" />
+                  <label for="vcard-url">Website</label>
+                  <input id="vcard-url" name="vcard-url" type="url" placeholder="https://example.com" />
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="file" hidden>
+                  <legend>File</legend>
+                  <label for="file-input">Choose a file</label>
+                  <input id="file-input" name="file-input" type="file" />
+                  <p class="hint">Small files work best. Large files can exceed QR capacity quickly.</p>
+                </fieldset>
+
+                <fieldset class="option-group">
+                  <legend>Encoded payload</legend>
+                  <label class="toggle-field payload-toggle" id="payload-reveal-toggle" hidden>
+                    <input id="payload-reveal-secrets" name="payload-reveal-secrets" type="checkbox" />
+                    <span>Reveal passwords and secrets in preview</span>
+                  </label>
+                  <pre id="encoded-preview"></pre>
+                </fieldset>
               </div>
             </section>
 
@@ -81,7 +219,7 @@
                     <output id="error-correction-value" for="error-correction">M</output>
                   </label>
                   <input id="error-correction" name="error-correction" type="range" min="0" max="3" step="1" value="1" />
-                  <p class="hint" id="error-correction-help">About 15% recovery.</p>
+                  <p class="hint" id="error-correction-help">Can still scan if roughly 15% of the symbol area is obscured or damaged.</p>
                 </fieldset>
 
                 <fieldset class="option-group">
@@ -118,6 +256,7 @@
                       <strong id="capacity-summary">-</strong>
                     </div>
                   </div>
+                  <div id="mode-validation" class="validation-message" hidden></div>
                 </fieldset>
 
                 <fieldset class="option-group">
@@ -170,15 +309,96 @@
                 </fieldset>
               </div>
             </section>
-          </div>
 
-          <nav class="tab-bar" aria-label="QR controls">
-            <button type="button" class="tab-button is-active" data-tab="content">Content</button>
-            <button type="button" class="tab-button" data-tab="style">Style</button>
-            <button type="button" class="tab-button" data-tab="encoding">Encoding</button>
-            <button type="button" class="tab-button" data-tab="mask">Mask</button>
-            <button type="button" class="tab-button" data-tab="advanced">Advanced</button>
-          </nav>
+            <section class="tab-panel" data-tab-panel="debug" hidden>
+              <div class="panel-card compact-stack">
+                <fieldset class="option-group">
+                  <legend>Debug overlay</legend>
+                  <label class="toggle-field">
+                    <input id="debug-enabled" name="debug-enabled" type="checkbox" />
+                    <span>Keep overlays on in other tabs</span>
+                  </label>
+                  <fieldset class="option-group">
+                    <legend>Outline grouping</legend>
+                    <div class="debug-outline-control" role="group" aria-label="Outline grouping">
+                      <button type="button" class="outline-mode-button is-active" data-outline-mode="codewords" aria-pressed="true">
+                        Codewords
+                      </button>
+                      <button type="button" class="outline-mode-button" data-outline-mode="stream" aria-pressed="false">
+                        Stream
+                      </button>
+                      <button type="button" class="outline-mode-button" data-outline-mode="metadata" aria-pressed="false">
+                        Metadata
+                      </button>
+                    </div>
+                  </fieldset>
+                  <div class="color-grid debug-color-grid">
+                    <label class="color-field" for="debug-data-color">
+                      <span>Data stream</span>
+                      <input id="debug-data-color" type="color" value="#0ea5e9" />
+                    </label>
+                    <label class="color-field" for="debug-mode-color">
+                      <span>Mode bits</span>
+                      <input id="debug-mode-color" type="color" value="#0f766e" />
+                    </label>
+                    <label class="color-field" for="debug-char-count-color">
+                      <span>Char count</span>
+                      <input id="debug-char-count-color" type="color" value="#f97316" />
+                    </label>
+                    <label class="color-field" for="debug-ecl-color">
+                      <span>EC level bits</span>
+                      <input id="debug-ecl-color" type="color" value="#ec4899" />
+                    </label>
+                    <label class="color-field" for="debug-mask-color">
+                      <span>Mask bits</span>
+                      <input id="debug-mask-color" type="color" value="#2563eb" />
+                    </label>
+                    <label class="color-field" for="debug-ecc-color">
+                      <span>EC codewords</span>
+                      <input id="debug-ecc-color" type="color" value="#dc2626" />
+                    </label>
+                    <label class="color-field" for="debug-remainder-color">
+                      <span>Remainder bits</span>
+                      <input id="debug-remainder-color" type="color" value="#14b8a6" />
+                    </label>
+                    <label class="color-field" for="debug-padding-color">
+                      <span>Pad to byte / pad bytes</span>
+                      <input id="debug-padding-color" type="color" value="#64748b" />
+                    </label>
+                    <label class="color-field" for="debug-terminator-color">
+                      <span>Terminator</span>
+                      <input id="debug-terminator-color" type="color" value="#f59e0b" />
+                    </label>
+                    <label class="color-field" for="debug-finder-color">
+                      <span>Finder</span>
+                      <input id="debug-finder-color" type="color" value="#ef4444" />
+                    </label>
+                    <label class="color-field" for="debug-alignment-color">
+                      <span>Alignment</span>
+                      <input id="debug-alignment-color" type="color" value="#f59e0b" />
+                    </label>
+                    <label class="color-field" for="debug-timing-color">
+                      <span>Timing</span>
+                      <input id="debug-timing-color" type="color" value="#06b6d4" />
+                    </label>
+                    <label class="color-field" for="debug-format-color">
+                      <span>Format</span>
+                      <input id="debug-format-color" type="color" value="#8b5cf6" />
+                    </label>
+                    <label class="color-field" for="debug-dark-module-color">
+                      <span>Dark module</span>
+                      <input id="debug-dark-module-color" type="color" value="#4c1d95" />
+                    </label>
+                    <label class="color-field" for="debug-version-color">
+                      <span>Version (v7+)</span>
+                      <input id="debug-version-color" type="color" value="#10b981" />
+                    </label>
+                  </div>
+                  <p class="hint">Useful for seeing how the symbol is structured before styling or embedding it.</p>
+                </fieldset>
+              </div>
+            </section>
+          </div>
         </section>
       </form>
     </main>
