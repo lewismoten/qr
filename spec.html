@@ -34,6 +34,7 @@
         <a href="#stream">Data stream</a>
         <a href="#masks">Masks</a>
         <a href="#recovery">Recovery</a>
+        <a href="#implementation">Build it</a>
         <a href="#references">References</a>
       </nav>
     </header>
@@ -288,6 +289,31 @@
           <li><span>4</span><div><strong>Deinterleave and correct</strong><p>Reconstruct Reed-Solomon blocks, detect errors and recover codewords where redundancy permits.</p></div></li>
           <li><span>5</span><div><strong>Parse segments</strong><p>Read each mode and count header, then decode its payload units until the terminator or data capacity is reached.</p></div></li>
         </ol>
+      </section>
+
+      <section id="implementation" class="guide-section implementation-section">
+        <div class="section-intro">
+          <p class="section-number">06 / Implementation boundaries</p>
+          <h2>Use the guide to learn; use the source to reproduce</h2>
+          <p>This visual guide explains the structure and read order, but it does not reproduce every normative table, polynomial, coordinate, bit-width rule or edge case needed to build a conforming encoder. The links below show where this generator implements those details. They are readable implementation references, not replacements for ISO/IEC 18004.</p>
+        </div>
+
+        <div class="reference-links implementation-links">
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"><strong>Modes, count widths and block tables</strong><span><code>constants.js</code> defines mode indicators, the alphanumeric alphabet, character-count widths, EC-level format values, EC codewords per block and block counts for versions 1–40.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"><strong>Segments and data codewords</strong><span><code>segments.js</code> implements Numeric, Alphanumeric, UTF-8 Byte and Kanji payload bits, mixed-mode optimization, version selection, terminators, byte alignment and alternating pad words.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"><strong>Capacity and remainder geometry</strong><span><code>capacity.js</code> calculates raw data modules, character-count widths and usable data codewords from version, recovery level and block structure.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/error-correction.js"><strong>Reed-Solomon and interleaving</strong><span><code>error-correction.js</code> contains GF(256) multiplication, generator-divisor construction, remainder generation, short/long block division and data/EC interleaving.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/index.js"><strong>Matrix, metadata and placement</strong><span><code>index.js</code> places finder, separator, timing and alignment patterns; writes BCH-protected format/version data; traverses codeword bits; scores masks; and produces the final matrix.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"><strong>Eight mask formulas</strong><span><code>mask.js</code> gives the exact row/column predicate used by every mask candidate.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"><strong>Shift JIS Kanji conversion</strong><span><code>kanji.js</code> builds the browser-supported Shift JIS map, validates the two QR Kanji ranges and transforms characters into 13-bit values.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/qr-native.test.js"><strong>Structural and capacity tests</strong><span><code>qr-native.test.js</code> exercises versions, modes, capacities, masks, codewords and expected matrices.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/qr-native.parity.test.js"><strong>Reference parity tests</strong><span><code>qr-native.parity.test.js</code> compares the first-party encoder against 1,287 reference matrices when the optional reference bundle is available.</span></a>
+        </div>
+
+        <div class="implementation-warning">
+          <strong>Not implemented by this encoder</strong>
+          <p>The current source targets standard Model 2 QR Codes in Numeric, Alphanumeric, Byte and manually selected Kanji modes. It is not an implementation reference for ECI segments, Structured Append, FNC1/GS1, Hanzi mode, Micro QR, Rectangular Micro QR, Model 1 symbols or QR decoding. Consult the applicable normative specification before claiming compatibility beyond the tested scope.</p>
+        </div>
       </section>
 
       <section id="references" class="guide-section references-section">

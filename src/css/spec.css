@@ -887,6 +887,37 @@ h1 {
   font-size: 0.8rem;
 }
 
+.implementation-links {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.implementation-links a {
+  align-content: start;
+}
+
+.implementation-links code {
+  padding: 0;
+  background: transparent;
+}
+
+.implementation-warning {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 1rem;
+  background: rgba(255, 247, 224, 0.88);
+}
+
+.implementation-warning strong {
+  color: #8a4b08;
+}
+
+.implementation-warning p {
+  margin: 0.35rem 0 0;
+  color: #59451f;
+  line-height: 1.55;
+}
+
 .spec-footer {
   width: min(calc(100% - 1.5rem), 76rem);
   margin: 0 auto 0.75rem;
@@ -929,7 +960,8 @@ h1 {
   }
 
   .visual-grid,
-  .reference-links {
+  .reference-links,
+  .implementation-links {
     grid-template-columns: minmax(0, 1fr);
   }
 
