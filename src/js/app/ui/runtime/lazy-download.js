@@ -1,4 +1,5 @@
 import { createFrameNavigation } from '../preview/frame-navigation.js';
+import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 export function createLazyDownloadSetup({
   elements: e,
@@ -36,8 +37,11 @@ export function createLazyDownloadSetup({
   const ensure = () => {
     if (controller) return Promise.resolve(controller);
     if (!request) {
-      request = import('../download/application-setup.js')
-        .then(({ createApplicationDownloadSetup }) => {
+      request = Promise.all([
+        loadFeatureStylesheet('download'),
+        import('../download/application-setup.js'),
+      ])
+        .then(([, { createApplicationDownloadSetup }]) => {
           controller = createApplicationDownloadSetup({
             elements: e,
             frames,

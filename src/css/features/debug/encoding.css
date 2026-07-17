@@ -1,0 +1,60 @@
+.encoding-control-group {
+  gap: 0.55rem;
+  padding: 0.7rem;
+}
+
+.encoding-control-group .toggle-field {
+  min-height: 2.8rem;
+  padding: 0.55rem 0.65rem;
+}
+
+.encoding-auto-toggle span {
+  font-size: clamp(0.68rem, 2.5vw, 0.78rem);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.encoding-mode-group .field-label {
+  font-size: 0.72rem;
+}
+
+.encoding-mode-group .encoding-mode-button {
+  min-height: 2.75rem;
+  padding-block: 0.5rem;
+  font-size: 0.7rem;
+}
+
+.encoding-mode-summary {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid rgba(19, 34, 53, 0.08);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.encoding-mode-summary .info-label {
+  font-size: 0.64rem;
+}
+
+.encoding-mode-summary strong {
+  font-size: 0.82rem;
+  line-height: 1.15;
+}
+
+.encoding-version-group .slider-field span {
+  font-size: 0.72rem;
+}
+
+.version-auto-row .version-current {
+  margin-left: auto;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.version-auto-row .version-current strong {
+  color: var(--accent-strong);
+}

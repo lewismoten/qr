@@ -38,7 +38,15 @@ const builds = [
   {
     ...shared,
     entryPoints: {
+      'chunks/debug-encoding.min': 'src/css/features/debug/encoding.css',
+      'chunks/debug-mask.min': 'src/css/features/debug/mask.css',
+      'chunks/debug-overlay.min': 'src/css/features/debug/overlay.css',
+      'chunks/download.min': 'src/css/features/download/index.css',
+      'chunks/geo-map.min': 'src/css/features/content/geo-map.css',
       'chunks/i18n-debug.min': 'src/css/components/i18n-debug.css',
+      'chunks/style-artwork.min': 'src/css/features/style/artwork.css',
+      'chunks/style-colors.min': 'src/css/features/style/colors.css',
+      'chunks/style-modules.min': 'src/css/features/style/modules.css',
       'chunks/task-progress.min': 'src/css/components/task-progress.css',
     },
     outdir: 'dist',

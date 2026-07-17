@@ -1,3 +1,5 @@
+import { loadFeatureStylesheet } from '../../../stylesheets.js';
+
 function moduleIsDark(qrDefinition, row, column) {
   if (typeof qrDefinition.modules.get === 'function')
     return qrDefinition.modules.get(row, column);
@@ -31,14 +33,20 @@ export function createLazyDebugSetup(options) {
   };
   const loadEncoding = () =>
     loadOnce('encoding', () =>
-      import('./encoding-setup.js').then(({ createDebugEncodingSetup }) => {
+      Promise.all([
+        loadFeatureStylesheet('debug-encoding'),
+        import('./encoding-setup.js'),
+      ]).then(([, { createDebugEncodingSetup }]) => {
         diagnostics = createDebugEncodingSetup(options);
         return diagnostics;
       }),
     );
   const loadMask = () =>
     loadOnce('mask', () =>
-      import('./mask-setup.js').then(({ createDebugMaskSetup }) => {
+      Promise.all([
+        loadFeatureStylesheet('debug-mask'),
+        import('./mask-setup.js'),
+      ]).then(([, { createDebugMaskSetup }]) => {
         masks = createDebugMaskSetup({
           ...options,
           render: options.runtime.render,
@@ -48,7 +56,10 @@ export function createLazyDebugSetup(options) {
     );
   const loadOverlay = () =>
     loadOnce('overlay', () =>
-      import('./overlay-setup.js').then(({ createDebugOverlaySetup }) => {
+      Promise.all([
+        loadFeatureStylesheet('debug-overlay'),
+        import('./overlay-setup.js'),
+      ]).then(([, { createDebugOverlaySetup }]) => {
         overlay = createDebugOverlaySetup({
           elements: options.elements,
           colorElements,

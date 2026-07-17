@@ -2,6 +2,7 @@ import {
   installArtworkDrawing,
   installShapeDrawing,
 } from '../preview/style-drawing.js';
+import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 const readInteger = (input, fallback) => {
   const value = Number.parseInt(input.value, 10);
@@ -34,10 +35,12 @@ export function createStyleSetup({
   const loadModules = () =>
     loadOnce('modules', async () => {
       const [
+        ,
         { createModuleShapeSection },
         { createEyeShapeSection },
         shapeDrawing,
       ] = await Promise.all([
+        loadFeatureStylesheet('style-modules'),
         import('./modules/section.js'),
         import('./eyes/section.js'),
         import('./drawing/shapes.js'),
@@ -72,10 +75,12 @@ export function createStyleSetup({
   const loadColors = () =>
     loadOnce('colors', async () => {
       const [
+        ,
         { createColorSection },
         { createImageInputController },
         shapeDrawing,
       ] = await Promise.all([
+        loadFeatureStylesheet('style-colors'),
         import('./colors/section.js'),
         import('./art/image-input.js'),
         import('./drawing/shapes.js'),
@@ -119,12 +124,14 @@ export function createStyleSetup({
   const loadArtwork = () =>
     loadOnce('artwork', async () => {
       const [
+        ,
         { createArtworkControls },
         { createImageInputController },
         { createLazyPixelArtEditor },
         artworkDrawing,
         shapeDrawing,
       ] = await Promise.all([
+        loadFeatureStylesheet('style-artwork'),
         import('./art/controls.js'),
         import('./art/image-input.js'),
         import('./art/lazy-pixel-editor.js'),

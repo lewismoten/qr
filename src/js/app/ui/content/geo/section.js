@@ -1,4 +1,5 @@
 import { serializeGeo } from '../../../content-formats.js';
+import { loadFeatureStylesheet } from '../../../../stylesheets.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
 
@@ -40,7 +41,10 @@ export function createGeoSection({
   const ensureMap = () => {
     if (map) return Promise.resolve(map);
     if (!mapRequest) {
-      mapRequest = import('./slippy-map.js').then(({ createSlippyMap }) => {
+      mapRequest = Promise.all([
+        loadFeatureStylesheet('geo-map'),
+        import('./slippy-map.js'),
+      ]).then(([, { createSlippyMap }]) => {
         map = createSlippyMap(mapElement, {
           center: DEFAULT_CENTER,
           zoom: 13,
