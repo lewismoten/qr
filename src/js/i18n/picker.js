@@ -30,6 +30,42 @@ function isDebugLocale(locale) {
   return locale?.debug === true || locale?.code === 'en-XA';
 }
 
+function canonicalizeLocale(locale) {
+  try {
+    return Intl.getCanonicalLocales(locale)[0];
+  } catch {
+    return undefined;
+  }
+}
+
+export function prioritizeLocales(locales, requestedLocales = []) {
+  const requested = Array.isArray(requestedLocales) ? requestedLocales : [requestedLocales];
+  const preferences = [...new Set(requested
+    .map(canonicalizeLocale)
+    .filter(Boolean))];
+  const ranked = locales.map((locale, index) => {
+    const code = canonicalizeLocale(locale.code);
+    let rank = Number.POSITIVE_INFINITY;
+    preferences.forEach((preference, preferenceIndex) => {
+      const exact = code === preference;
+      const sameLanguage = code?.split('-')[0] === preference.split('-')[0];
+      if (exact || sameLanguage) {
+        rank = Math.min(rank, preferenceIndex * 2 + (exact ? 0 : 1));
+      }
+    });
+    return { locale, index, rank };
+  });
+
+  return ranked.sort((left, right) => {
+    const leftGroup = isDebugLocale(left.locale) ? 2 : Number.isFinite(left.rank) ? 0 : 1;
+    const rightGroup = isDebugLocale(right.locale) ? 2 : Number.isFinite(right.rank) ? 0 : 1;
+    const rankDifference = Number.isFinite(left.rank) && Number.isFinite(right.rank)
+      ? left.rank - right.rank
+      : 0;
+    return leftGroup - rightGroup || rankDifference || left.index - right.index;
+  }).map(({ locale }) => locale);
+}
+
 export function getSavedLocale(storage) {
   try {
     return (storage || getDefaultStorage())?.getItem(LOCALE_STORAGE_KEY) || undefined;
@@ -41,6 +77,7 @@ export function getSavedLocale(storage) {
 export function setupLanguagePicker({
   document = globalThis.document,
   storage,
+  languages = globalThis.navigator?.languages || [globalThis.navigator?.language],
   reload = () => globalThis.location?.reload(),
 } = {}) {
   const picker = document?.getElementById('language-picker');
@@ -50,9 +87,7 @@ export function setupLanguagePicker({
   if (!picker || !trigger || !panel || !grid) return;
 
   const activeLocale = getActiveLocale();
-  const locales = [...getAvailableLocales()].sort(
-    (left, right) => Number(isDebugLocale(left)) - Number(isDebugLocale(right)),
-  );
+  const locales = prioritizeLocales(getAvailableLocales(), languages);
   const active = locales.find(({ code }) => code === activeLocale) || locales[0];
   const close = ({ focus = false } = {}) => {
     panel.hidden = true;

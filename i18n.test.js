@@ -9,7 +9,7 @@ import {
   isDebugLanguage,
   lookup,
 } from './src/js/i18n/index.js';
-import { getSavedLocale, LOCALE_STORAGE_KEY } from './src/js/i18n/picker.js';
+import { getSavedLocale, LOCALE_STORAGE_KEY, prioritizeLocales } from './src/js/i18n/picker.js';
 import {
   validateGeoLabel,
   validatePrintableText,
@@ -32,6 +32,17 @@ const baseUrl = new URL('https://example.test/locales/');
 
 assert.equal(getSavedLocale({ getItem: (key) => key === LOCALE_STORAGE_KEY ? 'es' : null }), 'es');
 assert.equal(getSavedLocale({ getItem: () => { throw new Error('Storage blocked'); } }), undefined);
+assert.deepEqual(
+  prioritizeLocales([
+    { code: 'en-US' },
+    { code: 'zh-CN' },
+    { code: 'hi-IN' },
+    { code: 'es' },
+    { code: 'en-GB' },
+    { code: 'en-XA', debug: true },
+  ], ['es-MX', 'en-GB']).map(({ code }) => code),
+  ['es', 'en-GB', 'en-US', 'zh-CN', 'hi-IN', 'en-XA'],
+);
 
 await initializeLanguage({
   languages: ['fr-CA', 'en-US'],
