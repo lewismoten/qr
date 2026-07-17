@@ -28,8 +28,8 @@ const COLORS = {
   charCount: '#f97316',
   data: '#0ea5e9',
   terminator: '#84cc16',
-  padding: '#64748b',
-  errorCorrection: '#dc2626',
+  padding: '#cbd5e1',
+  errorCorrection: '#111827',
   remainder: '#14b8a6',
   maskEffect: '#2563eb',
 };

@@ -22,8 +22,8 @@
   --count: #f97316;
   --data: #0ea5e9;
   --terminator: #84cc16;
-  --padding: #64748b;
-  --ec-words: #dc2626;
+  --padding: #cbd5e1;
+  --ec-words: #111827;
   --remainder: #14b8a6;
 }
 
@@ -670,7 +670,10 @@ h1 {
 .bit-field.count { background: var(--count); }
 .bit-field.data { background: var(--data); }
 .bit-field.terminator { background: #5f970e; }
-.bit-field.padding { background: var(--padding); }
+.bit-field.padding {
+  color: #111827;
+  background: var(--padding);
+}
 .bit-field.ec { background: var(--ec-words); }
 .bit-field.remainder { background: var(--remainder); }
 
