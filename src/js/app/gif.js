@@ -63,8 +63,7 @@ export function createAnimationStage(frames) {
   return stage;
 }
 
-export function drawAnimationStageFrame(stage, frame, flatten = false) {
-  const context = stage.getContext('2d');
+export function drawAnimationStageFrame(stage, frame, flatten = false, context = stage.getContext('2d')) {
   context.clearRect(0, 0, stage.width, stage.height);
   if (flatten) {
     context.fillStyle = '#ffffff';
@@ -73,7 +72,7 @@ export function drawAnimationStageFrame(stage, frame, flatten = false) {
   context.drawImage(frame, (stage.width - frame.width) / 2, (stage.height - frame.height) / 2);
 }
 
-function getGifPaletteAndIndexes(stage) {
+function getGifPaletteAndIndexes(stage, context) {
   const levels = [0, 51, 102, 153, 204, 255];
   const palette = new Uint8Array(256 * 3);
   for (let red = 0; red < 6; red += 1) {
@@ -87,7 +86,7 @@ function getGifPaletteAndIndexes(stage) {
     }
   }
 
-  const pixels = stage.getContext('2d').getImageData(0, 0, stage.width, stage.height).data;
+  const pixels = context.getImageData(0, 0, stage.width, stage.height).data;
   const indexes = new Uint8Array(stage.width * stage.height);
   for (let index = 0; index < indexes.length; index += 1) {
     const pixel = index * 4;
@@ -105,8 +104,9 @@ function getGifPaletteAndIndexes(stage) {
 
 export function createAnimatedGifBlob(frames, frameDurationMs) {
   const stage = createAnimationStage(frames);
-  drawAnimationStageFrame(stage, frames[0]);
-  const { palette } = getGifPaletteAndIndexes(stage);
+  const context = stage.getContext('2d', { willReadFrequently: true });
+  drawAnimationStageFrame(stage, frames[0], false, context);
+  const { palette } = getGifPaletteAndIndexes(stage, context);
   const delay = Math.max(1, Math.min(65535, Math.round(frameDurationMs / 10)));
   const bytes = [...textBytes('GIF89a')];
   pushUint16LE(bytes, stage.width);
@@ -114,8 +114,8 @@ export function createAnimatedGifBlob(frames, frameDurationMs) {
   bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xff, 0x0b, ...textBytes('NETSCAPE2.0'), 3, 1, 0, 0, 0);
 
   frames.forEach((frame) => {
-    drawAnimationStageFrame(stage, frame);
-    const { indexes } = getGifPaletteAndIndexes(stage);
+    drawAnimationStageFrame(stage, frame, false, context);
+    const { indexes } = getGifPaletteAndIndexes(stage, context);
     const packed = encodeGifLzw(indexes);
     bytes.push(0x21, 0xf9, 4, 9);
     pushUint16LE(bytes, delay);
