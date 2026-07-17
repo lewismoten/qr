@@ -1,6 +1,6 @@
 import { getDataCodewords, getRawDataModules } from './capacity.js';
 import { FORMAT_ECL_BITS } from './constants.js';
-import { addErrorCorrection, getReedSolomonRemainder, makeReedSolomonDivisor } from './error-correction.js';
+import { addErrorCorrection, getReedSolomonRemainder, makeReedSolomonDivisor } from './reed-solomon.js';
 import { toShiftJis } from './kanji.js';
 import { isMaskActive } from './mask.js';
 import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from './segments.js';

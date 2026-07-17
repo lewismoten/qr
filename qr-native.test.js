@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import NativeQRCode from './src/js/qr/index.js';
+import NativeQRCode from './src/js/qr/matrix-encoder.js';
 
 function matrixSignature(definition) {
   return Buffer.from(definition.modules.data).toString('base64');

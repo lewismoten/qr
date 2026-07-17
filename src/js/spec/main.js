@@ -1,4 +1,4 @@
-import qrEncoder from '../qr/index.js';
+import qrEncoder from '../qr/matrix-encoder.js';
 import {
   buildDebugOverlayModel,
   getDebugCategory,

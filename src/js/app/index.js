@@ -18,7 +18,7 @@ import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
 import { createPreviewSetup } from './ui/preview/setup.js';
 import { createStyleSetup } from './ui/style/setup.js';
 import { createTaskProgress } from './ui/download/progress.js';
-import qrEncoder from '../qr/index.js';
+import qrEncoder from '../qr/matrix-encoder.js';
 
 const elements = getApplicationElements(document);
 const taskProgress = createTaskProgress({
