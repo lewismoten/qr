@@ -59,6 +59,8 @@ import { createVCardSection } from './ui/content/vcard/section.js';
 import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createMaskSelector } from './ui/debug/mask-selector.js';
+import { createEncodingDiagnostics } from './ui/debug/encoding.js';
+import { createDebugStyles } from './ui/debug/styles.js';
 import {
   drawCodewordOutlines,
   drawHighlightedBoundaries,
@@ -372,13 +374,6 @@ const MASK_LABELS = {
   5: 'row * col mod 2 + row * col mod 3 = 0',
   6: '((row * col mod 2) + (row * col mod 3)) mod 2 = 0',
   7: '((row + col mod 2) + (row * col mod 3)) mod 2 = 0',
-};
-
-const CHAR_COUNT_BITS = {
-  numeric: [10, 12, 14],
-  alphanumeric: [9, 11, 13],
-  byte: [8, 16, 16],
-  kanji: [8, 10, 12],
 };
 
 let renderRequest = 0;
@@ -2189,155 +2184,31 @@ function getFormatValidationState() {
   return { error: '', warning: '' };
 }
 
-function normalizeModeName(segmentMode) {
-  if (!segmentMode) {
-    return 'byte';
-  }
-  if (typeof segmentMode === 'string') {
-    return segmentMode.toLowerCase();
-  }
-  if (typeof segmentMode.id === 'string') {
-    return segmentMode.id.toLowerCase();
-  }
-  if (typeof segmentMode.name === 'string') {
-    return segmentMode.name.toLowerCase();
-  }
-  return 'byte';
-}
-
-function setValidationMessage(message, invalidIndexes = [], level = 'error') {
-  modeValidation.hidden = !message;
-  modeValidation.textContent = message;
-  formatValidation.hidden = !message;
-  formatValidation.textContent = message;
-  modeValidation.classList.toggle('is-warning', level === 'warning');
-  formatValidation.classList.toggle('is-warning', level === 'warning');
-  encodedPreview.classList.toggle('has-error', Boolean(message) && level === 'error');
-
-  const activeFieldset = document.querySelector(`.format-fields[data-format-fields="${qrFormat.value}"]`);
-  activeFieldset?.classList.toggle('has-error', Boolean(message) && level === 'error');
-  activeFieldset?.classList.toggle('has-warning', Boolean(message) && level === 'warning');
-  bulkFields.classList.toggle('has-error', isBulkMode() && Boolean(message) && level === 'error');
-  bulkFields.classList.toggle('has-warning', isBulkMode() && Boolean(message) && level === 'warning');
-
-  if (!message) {
-    return;
-  }
-
-  if (!invalidIndexes.length) {
-    return;
-  }
-
-  const shown = invalidIndexes.slice(0, 20).map((index) => index + 1).join(', ');
-  const suffix = invalidIndexes.length > 20 ? ', ...' : '';
-  modeValidation.textContent = `${message} Positions: ${shown}${suffix}.`;
-}
-
-function getInvalidCharacters(text, mode) {
-  if (mode === 'byte') {
-    return [];
-  }
-
-  if (mode === 'kanji') {
-    const invalid = [];
-    [...text].forEach((char, index) => {
-      let shiftJisValue;
-      try {
-        shiftJisValue = qrEncoder.toSJIS(char);
-      } catch (error) {
-        shiftJisValue = undefined;
-      }
-      const isQrKanji =
-        Number.isInteger(shiftJisValue) &&
-        ((shiftJisValue >= 0x8140 && shiftJisValue <= 0x9ffc) ||
-          (shiftJisValue >= 0xe040 && shiftJisValue <= 0xebbf));
-      if (!isQrKanji) {
-        invalid.push({ char, index });
-      }
-    });
-    return invalid;
-  }
-
-  const invalid = [];
-  const alphanumericChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
-
-  [...text].forEach((char, index) => {
-    if (mode === 'numeric' && !/[0-9]/.test(char)) {
-      invalid.push({ char, index });
-    }
-    if (mode === 'alphanumeric' && !alphanumericChars.includes(char)) {
-      invalid.push({ char, index });
-    }
-  });
-
-  return invalid;
-}
-
-function validateManualMode(encodedText) {
-  const mode = getCurrentEncodingMode();
-  if (!mode || !encodedText) {
-    setValidationMessage('');
-    return true;
-  }
-
-  if (mode === 'kanji') {
-    if (typeof qrEncoder.toSJIS !== 'function') {
-      setValidationMessage('Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.');
-      return false;
-    }
-  }
-
-  const invalid = getInvalidCharacters(encodedText, mode);
-  if (!invalid?.length) {
-    setValidationMessage('');
-    return true;
-  }
-
-  const characters = [...new Set(invalid.map(({ char }) => JSON.stringify(char)))].join(', ');
-  setValidationMessage(`Incompatible with ${MODE_LABELS[mode]} mode. Invalid characters: ${characters}.`, invalid.map(({ index }) => index));
-  return false;
-}
-
-function updateEncodingSummary(qrDefinition, options) {
-  if (!qrDefinition) {
-    detectedMode.textContent = 'Waiting for content';
-    segmentSummary.textContent = '0';
-    versionSummary.textContent = 'Auto';
-    capacitySummary.textContent = '-';
-    unusedSummary.textContent = '-';
-    return;
-  }
-
-  const modes = qrDefinition.segments.map((segment) => normalizeModeName(segment.mode));
-  const uniqueModes = [...new Set(modes)];
-  const primaryMode = uniqueModes.length === 1 ? uniqueModes[0] : 'mixed';
-  const correctionLevel = options.errorCorrectionLevel;
-  const versionValue = qrDefinition.version;
-
-  detectedMode.textContent =
-    primaryMode === 'mixed'
-      ? `Mixed (${uniqueModes.map((mode) => MODE_LABELS[mode] ?? mode).join(', ')})`
-      : MODE_LABELS[primaryMode] ?? primaryMode;
-  segmentSummary.textContent = String(qrDefinition.segments.length);
-  versionSummary.textContent = `V${versionValue}`;
-
-  if (primaryMode === 'mixed') {
-    capacitySummary.textContent = 'Mixed mode';
-  } else {
-    const capacity = MODE_CAPACITY[primaryMode]?.[correctionLevel];
-    capacitySummary.textContent = capacity ? `${capacity} chars max` : '-';
-  }
-
-  const dataCodewordsCount = getTotalDataCodewords(versionValue, correctionLevel);
-  const debugModel = buildDebugOverlayModel(qrDefinition, options);
-  const unusedBits = debugModel.bitRoles.filter(
-    (role) => role === 'terminator' || role === 'bytePad' || role === 'padByte'
-  ).length;
-  const unusedPercent = dataCodewordsCount > 0 ? Math.round((unusedBits / (dataCodewordsCount * 8)) * 100) : 0;
-  const unusedBytes = unusedBits / 8;
-  const unusedByteLabel = Number.isInteger(unusedBytes) ? `${unusedBytes}` : unusedBytes.toFixed(1);
-  unusedSummary.textContent = `${unusedByteLabel} B (${unusedPercent}%)`;
-}
+const encodingDiagnostics = createEncodingDiagnostics({
+  encoder: qrEncoder,
+  modeLabels: MODE_LABELS,
+  modeCapacity: MODE_CAPACITY,
+  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+  elements: {
+    detectedMode,
+    segmentSummary,
+    versionSummary,
+    capacitySummary,
+    unusedSummary,
+    modeValidation,
+    formatValidation,
+    encodedPreview,
+    bulkFields,
+  },
+  getCurrentMode: getCurrentEncodingMode,
+  getFormat: () => qrFormat.value,
+  getActiveFieldset: (format) => document.querySelector(`.format-fields[data-format-fields="${format}"]`),
+  isBulkMode,
+  buildDebugModel: buildDebugOverlayModel,
+});
+const setValidationMessage = encodingDiagnostics.setValidation;
+const validateManualMode = encodingDiagnostics.validateManualMode;
+const updateEncodingSummary = encodingDiagnostics.updateSummary;
 
 function buildMaskPreviewOptions(maskValue) {
   const selectedErrorLevel = getSelectedErrorLevel();
@@ -2358,112 +2229,13 @@ function buildMaskPreviewOptions(maskValue) {
   return options;
 }
 
-function getTotalDataCodewords(version, errorCorrectionLevel) {
-  return qrEncoder.internals.getDataCodewords(version, errorCorrectionLevel);
-}
-
-function getCharCountBits(mode, version) {
-  const bucket = version <= 9 ? 0 : version <= 26 ? 1 : 2;
-  return CHAR_COUNT_BITS[mode]?.[bucket] ?? CHAR_COUNT_BITS.byte[bucket];
-}
-
-function getGroupBaseColor(group) {
-  const rolePriority = [
-    ['version', debugColors.version.value],
-    ['format', debugColors.format.value],
-    ['errorCorrection', debugColors.errorCorrection.value],
-    ['terminator', debugColors.terminator.value],
-    ['charCount', debugColors.charCount.value],
-    ['mode', debugColors.mode.value],
-    ['payload', debugColors.data.value],
-    ['bytePad', debugColors.padding.value],
-    ['padByte', debugColors.padding.value],
-    ['remainder', debugColors.remainder.value],
-  ];
-
-  for (const [role, color] of rolePriority) {
-    if (group.roles?.includes(role)) {
-      return color;
-    }
-  }
-
-  switch (group.kind) {
-    case 'errorCorrection':
-      return debugColors.errorCorrection.value;
-    case 'metadata':
-      return debugColors.format.value;
-    case 'remainder':
-      return debugColors.remainder.value;
-    case 'padding':
-    case 'padByte':
-      return debugColors.padding.value;
-    case 'header':
-      return debugColors.mode.value;
-    case 'data':
-    default:
-      return debugColors.data.value;
-  }
-}
-
-function getCodewordStyle(group) {
-  const color = getGroupBaseColor(group);
-
-  let opacity = 0.7;
-  if (group.kind === 'header') {
-    opacity = 0.9;
-  } else if (group.kind === 'padding' || group.kind === 'padByte') {
-    opacity = 0.75;
-  } else if (group.kind === 'remainder') {
-    opacity = 0.78;
-  }
-
-  return {
-    color,
-    strokeColor: getContrastingHex(color),
-    opacity,
-  };
-}
-
-function getCategoryOverlayColor(category) {
-  switch (category) {
-    case 'mode':
-      return debugColors.mode.value;
-    case 'charCount':
-      return debugColors.charCount.value;
-    case 'ecLevel':
-      return debugColors.ecLevel.value;
-    case 'mask':
-      return debugColors.mask.value;
-    case 'errorCorrection':
-      return debugColors.errorCorrection.value;
-    case 'padding':
-      return debugColors.padding.value;
-    case 'remainder':
-      return debugColors.remainder.value;
-    case 'terminator':
-      return debugColors.terminator.value;
-    case 'finder':
-      return debugColors.finder.value;
-    case 'alignment':
-      return debugColors.alignment.value;
-    case 'timing':
-      return debugColors.timing.value;
-    case 'darkModule':
-      return debugColors.darkModule.value;
-    case 'format':
-      return debugColors.format.value;
-    case 'version':
-      return debugColors.version.value;
-    case 'data':
-    default:
-      return debugColors.data.value;
-  }
-}
-
-function getModuleContrastColor(module, qrDefinition, debugModel) {
-  const category = getDebugCategory(module.row, module.column, qrDefinition, debugModel, 'overlay');
-  return getContrastingHex(getCategoryOverlayColor(category));
-}
+const debugStyles = createDebugStyles({
+  colors: debugColors,
+  getContrastingHex,
+  getCategory: getDebugCategory,
+});
+const getCodewordStyle = debugStyles.getCodewordStyle;
+const getModuleContrastColor = debugStyles.getModuleContrastColor;
 
 
 
