@@ -126,7 +126,7 @@ const debugSetup = createLazyDebugSetup({
   getErrorLevel: runtimeHelpers.getErrorLevel,
   isBulkMode: contentData.isBulkMode,
   runtime: { render: runtime.render, getOutlineMode: runtime.getOutlineMode,
-    setOutlineMode: runtime.setOutlineMode },
+    setOutlineMode: runtime.setOutlineMode, getDebugState: runtime.getDebugState },
 });
 const navigation = createApplicationNavigation({
   elements,

@@ -47,6 +47,7 @@ export function createContentEncodingSetup({ e, encoder, bulk, file, sections, r
     body: e.emailBody, hint: e.emailBodyLengthHint, encoder,
     buildOptions: qr.buildOptions, buildPayload: qr.buildPayload,
     buildEmail: sections.shared.buildEmailPayloadWithBody,
+    isActive: () => e.qrFormat.value === 'email',
   });
   const validation = createFormatValidator({
     elements: { qrFormat: e.qrFormat, urlInput: e.urlInput,

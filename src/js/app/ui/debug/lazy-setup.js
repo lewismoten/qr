@@ -9,6 +9,10 @@ export function createLazyDebugSetup(options) {
   let diagnostics = null;
   let masks = null;
   let overlay = null;
+  const isActive = (name) => {
+    const state = options.runtime.getDebugState();
+    return state.tab === 'debug' && state.subtab === name;
+  };
 
   const loadOnce = (name, loader) => {
     if (!requests.has(name)) {
@@ -47,7 +51,7 @@ export function createLazyDebugSetup(options) {
     diagnostics: {
       setValidation: (...args) => diagnostics?.setValidation(...args),
       validateManualMode: (...args) => diagnostics?.validateManualMode(...args) ?? true,
-      updateSummary: (...args) => diagnostics?.updateSummary(...args),
+      updateSummary: (...args) => isActive('encoding') && diagnostics?.updateSummary(...args),
     },
     styles: {
       getCodewordStyle: (...args) => overlay?.styles.getCodewordStyle(...args) ?? ({
@@ -56,9 +60,9 @@ export function createLazyDebugSetup(options) {
       getModuleContrastColor: (...args) => overlay?.styles.getModuleContrastColor(...args) ?? '#ffffff',
     },
     masks: {
-      ensure: (...args) => masks?.ensure(...args),
-      sync: (...args) => masks?.sync(...args),
-      renderPreviews: (...args) => masks?.renderPreviews(...args),
+      ensure: (...args) => isActive('mask') && masks?.ensure(...args),
+      sync: (...args) => isActive('mask') && masks?.sync(...args),
+      renderPreviews: (...args) => isActive('mask') && masks?.renderPreviews(...args),
     },
     outlines: { sync: (...args) => overlay?.outlines.sync(...args) },
     renderer: {
