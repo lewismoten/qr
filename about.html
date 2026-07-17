@@ -17,12 +17,12 @@
         <header class="info-dialog-header info-page-header">
           <div>
             <p class="info-kicker">Inside the matrix</p>
-            <h1>About the QR Code Generator</h1>
+            <h1 id="about-page-title">About the QR Code Generator</h1>
           </div>
           <a class="info-page-back" href="index.html">Open generator</a>
         </header>
         <div class="info-dialog-content">
-          <p class="info-lead">This free, browser-based QR code generator is built for quick everyday codes and unusually deep inspection. Paste a URL and leave, or control encoding, version, masks, artwork, print size, file chunks and the path of individual bits.</p>
+          <p id="about-page-content" class="info-lead">This free, browser-based QR code generator is built for quick everyday codes and unusually deep inspection. Paste a URL and leave, or control encoding, version, masks, artwork, print size, file chunks and the path of individual bits.</p>
 
           <section>
             <h2>What you can create</h2>
@@ -57,6 +57,10 @@
             <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format requests visible map tiles directly from OpenStreetMap. That service receives normal web request information such as an IP address, referrer and browser headers; it is not contacted unless Geo is opened.</p>
           </section>
         </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="About page navigation"><a href="index.html">Generator</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#about-page-content">Back to top</a></nav>
+        </footer>
       </article>
     </main>
     <script type="module" src="dist/info.min.js"></script>

@@ -15,11 +15,11 @@
     <main class="standalone-info-page">
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
-          <div><p class="info-kicker">Technology inventory</p><h1>Technology, standards and licenses</h1></div>
+          <div><p class="info-kicker">Technology inventory</p><h1 id="technology-page-title">Technology, standards and licenses</h1></div>
           <a class="info-page-back" href="index.html">Open generator</a>
         </header>
         <div class="info-dialog-content">
-          <p class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, development tools and network services used by this application.</p>
+          <p id="technology-page-content" class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, development tools and network services used by this application.</p>
 
           <section>
             <h2>First-party QR implementation</h2>
@@ -174,6 +174,10 @@
 
           <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. The deployed application has no third-party browser runtime library; esbuild is build-only, node-qrcode is optional test-only, and no separate package performs production QR generation, mapping or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
         </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Technology page navigation"><a href="index.html">Generator</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#technology-page-content">Back to top</a></nav>
+        </footer>
       </article>
     </main>
     <script type="module" src="dist/info.min.js"></script>

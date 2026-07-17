@@ -17,12 +17,12 @@
         <header class="info-dialog-header info-page-header">
           <div>
             <p class="info-kicker">Privacy and data use</p>
-            <h1>How this site handles your information</h1>
+            <h1 id="privacy-page-title">How this site handles your information</h1>
           </div>
           <a class="info-page-back" href="index.html">Open generator</a>
         </header>
         <div class="info-dialog-content">
-          <p class="info-lead">The QR Code Generator is designed to do its work in your browser. It has no user accounts, advertising, behavioral analytics or application database, and it does not intentionally upload the content you enter or the files you select to its own server.</p>
+          <p id="privacy-page-content" class="info-lead">The QR Code Generator is designed to do its work in your browser. It has no user accounts, advertising, behavioral analytics or application database, and it does not intentionally upload the content you enter or the files you select to its own server.</p>
           <p><strong>Last updated:</strong> July 17, 2026</p>
 
           <section>
@@ -76,6 +76,10 @@
             <p>Questions or corrections can be raised through the <a href="https://git.lewismoten.com/lewismoten/qr">project source repository</a>.</p>
           </section>
         </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Privacy page navigation"><a href="index.html">Generator</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#privacy-page-content">Back to top</a></nav>
+        </footer>
       </article>
     </main>
     <script type="module" src="dist/info.min.js"></script>

@@ -2562,26 +2562,39 @@ input[type="color"] {
 }
 
 .info-page-body {
+  height: 100dvh;
   min-width: 18rem;
   margin: 0;
   padding: 0.75rem;
+  overflow: hidden;
 }
 
 .standalone-info-page {
   width: min(52rem, 100%);
+  height: 100%;
   margin: 0 auto;
 }
 
 .standalone-info-page .info-dialog-shell {
-  max-height: none;
-  overflow: visible;
+  height: 100%;
+  max-height: 100%;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 1.4rem;
   box-shadow: 0 30px 80px rgba(7, 24, 39, 0.2);
 }
 
 .standalone-info-page .info-dialog-content {
-  overflow: visible;
+  grid-row: 2;
+  overflow-y: auto;
+}
+
+.info-page-header {
+  z-index: 2;
+  grid-row: 1;
+  position: sticky;
+  top: 0;
 }
 
 .info-page-back {
@@ -2589,6 +2602,55 @@ input[type="color"] {
   color: #0f615c;
   font-weight: 900;
   text-decoration: none;
+}
+
+.info-page-footer {
+  z-index: 2;
+  grid-row: 3;
+  min-width: 0;
+  padding: 0.45rem 0.65rem 0.45rem 0.9rem;
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: #071827;
+  color: rgba(226, 242, 241, 0.72);
+}
+
+.info-page-footer > span {
+  color: #5eead4;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.info-page-footer nav {
+  min-width: 0;
+  display: flex;
+  overflow-x: auto;
+}
+
+.info-page-footer a {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.65rem;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border-radius: 0.7rem;
+  color: #fffaf0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.info-page-footer a:hover,
+.info-page-footer a:focus-visible {
+  background: rgba(94, 234, 212, 0.12);
 }
 
 .is-embedded .info-page-body {
@@ -2607,8 +2669,20 @@ input[type="color"] {
   box-shadow: none;
 }
 
-.is-embedded .info-page-header {
+.is-embedded .info-page-header,
+.is-embedded .info-page-footer {
   display: none;
+}
+
+@media (max-width: 34rem) {
+  .info-page-footer > span {
+    display: none;
+  }
+
+  .info-page-footer nav {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .info-dialog::backdrop {

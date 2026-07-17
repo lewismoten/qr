@@ -20,8 +20,14 @@ export function initializeDialogs({ document, window }) {
   };
 
   document.querySelectorAll('[data-dialog-target]').forEach((link) => {
-    link.addEventListener('click', () => {
-      if (window.location.hash === link.getAttribute('href')) window.requestAnimationFrame(syncFromHash);
+    link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const targetId = link.dataset.dialogTarget;
+      const targetHash = `#${targetId}`;
+      if (![...dialogs].some((dialog) => dialog.id === targetId)) return;
+      event.preventDefault();
+      if (window.location.hash === targetHash) window.requestAnimationFrame(syncFromHash);
+      else window.location.hash = targetHash;
     });
   });
   document.querySelectorAll('[data-close-dialog]').forEach((button) => {
