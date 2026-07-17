@@ -1,0 +1,20 @@
+{
+  "navigation": {
+    "content": "Content",
+    "style": "Style",
+    "download": "Download",
+    "debug": "Debug"
+  },
+  "content": {
+    "data": "Data",
+    "format": "Format",
+    "frame": "Frame"
+  },
+  "footer": {
+    "name": "QR Code Generator",
+    "about": "About",
+    "specification": "QR spec",
+    "technology": "Technology",
+    "source": "Source"
+  }
+}

@@ -52,10 +52,10 @@
 
         <section class="tab-navigation-card">
           <nav class="tab-bar" aria-label="QR controls">
-            <button type="button" class="tab-button is-active" data-tab="content">Content</button>
-            <button type="button" class="tab-button" data-tab="style">Style</button>
-            <button type="button" class="tab-button" data-tab="download">Download</button>
-            <button type="button" class="tab-button" data-tab="debug">Debug</button>
+            <button type="button" class="tab-button is-active" data-tab="content" data-i18n="navigation.content">Content</button>
+            <button type="button" class="tab-button" data-tab="style" data-i18n="navigation.style">Style</button>
+            <button type="button" class="tab-button" data-tab="download" data-i18n="navigation.download">Download</button>
+            <button type="button" class="tab-button" data-tab="debug" data-i18n="navigation.debug">Debug</button>
           </nav>
         </section>
 
@@ -64,9 +64,9 @@
             <section class="tab-panel is-active" data-tab-panel="content">
               <div class="panel-card compact-stack">
                 <nav class="subtab-bar content-subtab-bar" aria-label="Content tools">
-                  <button type="button" class="subtab-button content-subtab-button is-active" data-content-subtab="data">Data</button>
-                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="format">Format</button>
-                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="frame">Frame</button>
+                  <button type="button" class="subtab-button content-subtab-button is-active" data-content-subtab="data" data-i18n="content.data">Data</button>
+                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="format" data-i18n="content.format">Format</button>
+                  <button type="button" class="subtab-button content-subtab-button" data-content-subtab="frame" data-i18n="content.frame">Frame</button>
                 </nav>
 
                 <div class="subtab-panels content-subtab-panels">
@@ -1042,12 +1042,12 @@
       </form>
 
       <footer class="site-footer">
-        <p>QR Code Generator</p>
+        <p data-i18n="footer.name">QR Code Generator</p>
         <nav aria-label="Site information">
-          <a href="#about" data-dialog-target="about">About</a>
-          <a href="spec.html">QR spec</a>
-          <a href="#third-party" data-dialog-target="third-party">Technology</a>
-          <a href="https://git.lewismoten.com/lewismoten/qr">Source</a>
+          <a href="#about" data-dialog-target="about" data-i18n="footer.about">About</a>
+          <a href="spec.html" data-i18n="footer.specification">QR spec</a>
+          <a href="#third-party" data-dialog-target="third-party" data-i18n="footer.technology">Technology</a>
+          <a href="https://git.lewismoten.com/lewismoten/qr" data-i18n="footer.source">Source</a>
         </nav>
       </footer>
     </main>
