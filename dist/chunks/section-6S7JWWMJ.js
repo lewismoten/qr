@@ -1,0 +1,2 @@
+function v({shape:u,controls:a,rounding:e,roundingValue:r,inset:t,insetValue:s,rotation:n,rotationValue:l}){return{sync:()=>{a.hidden=u.value!=="custom",r.textContent=`${e.value}%`,s.textContent=`${t.value}%`,l.textContent=`${n.value} degrees`},getOptions:()=>({type:u.value,rounding:Number.isNaN(Number.parseInt(e.value,10))?25:Number.parseInt(e.value,10),inset:Number.isNaN(Number.parseInt(t.value,10))?4:Number.parseInt(t.value,10),rotation:Number.parseInt(n.value,10)||0})}}export{v as createModuleShapeSection};
+//# sourceMappingURL=section-6S7JWWMJ.js.map

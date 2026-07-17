@@ -41,7 +41,6 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   bindApplicationEvents({ elements, actions: eventActions, defaultChunkVersion });
   const dialogs = initializeDialogs({ document, window });
 
-  systems.style.pixelEditor.initialize();
   systems.contentSections.event.initialize();
   elements.urlInput.value = runtime.getDefaultUrl();
   systems.output.sync();
@@ -59,7 +58,6 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   systems.contentEncoding.emailCapacity.sync();
   systems.debug.outlines.sync();
   systems.navigation.activateContent('data');
-  systems.navigation.activateStyle('size');
   systems.navigation.activateDownload('image');
   systems.navigation.activateDebug('encoding');
   systems.navigation.activateTab('content');

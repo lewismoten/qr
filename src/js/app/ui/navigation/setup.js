@@ -4,8 +4,10 @@ import { createStyleSubtabs } from '../style/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
 import { createTabSet } from '../tab-set.js';
 
-export function createNavigation({ elements: e, format, render, updateMap, prepareDebug,
+export function createNavigation({ elements: e, format, render, updateMap, prepareDebug, prepareStyle,
   setActiveTab, setActiveDebugSubtab }) {
+  let activeStyleSubtab = 'size';
+  const loadStyle = (name) => Promise.resolve(prepareStyle?.(name)).then(render).catch(console.error);
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,
@@ -13,6 +15,10 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
       setActiveTab(name);
       if (name === 'debug') {
         Promise.resolve(prepareDebug?.()).then(render).catch(console.error);
+        return;
+      }
+      if (name === 'style') {
+        loadStyle(activeStyleSubtab);
         return;
       }
       if (name === 'content' && format.value === 'geo') window.requestAnimationFrame(updateMap);
@@ -31,7 +37,14 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
       render();
     },
   });
-  const activateStyle = createStyleSubtabs({ buttons: e.styleTabs, panels: e.stylePanels });
+  const activateStyle = createStyleSubtabs({
+    buttons: e.styleTabs,
+    panels: e.stylePanels,
+    onActivate(name) {
+      activeStyleSubtab = name;
+      loadStyle(name);
+    },
+  });
   const activateDownload = createDownloadSubtabs({ buttons: e.downloadTabs, panels: e.downloadPanels });
   const activateContent = createContentSubtabs({
     buttons: e.contentTabs,

@@ -134,6 +134,7 @@ const navigation = createApplicationNavigation({
   render: runtime.render,
   updateMap: contentSections.geo.update,
   prepareDebug: debugSetup.load,
+  prepareStyle: (name) => name === 'size' ? previewControls.loadSize() : styleSetup.load(name),
   state: { setActiveTab: runtime.setActiveTab,
     setActiveDebugSubtab: runtime.setActiveDebugSubtab },
 });

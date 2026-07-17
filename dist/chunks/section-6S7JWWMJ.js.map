@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/style/modules/section.js"],
+  "sourcesContent": ["export function createModuleShapeSection({ shape, controls, rounding, roundingValue, inset, insetValue, rotation, rotationValue }) {\n  const sync = () => {\n    controls.hidden = shape.value !== 'custom';\n    roundingValue.textContent = `${rounding.value}%`;\n    insetValue.textContent = `${inset.value}%`;\n    rotationValue.textContent = `${rotation.value} degrees`;\n  };\n\n  const getOptions = () => ({\n    type: shape.value,\n    rounding: Number.isNaN(Number.parseInt(rounding.value, 10)) ? 25 : Number.parseInt(rounding.value, 10),\n    inset: Number.isNaN(Number.parseInt(inset.value, 10)) ? 4 : Number.parseInt(inset.value, 10),\n    rotation: Number.parseInt(rotation.value, 10) || 0,\n  });\n\n  return { sync, getOptions };\n}\n"],
+  "mappings": "AAAO,SAASA,EAAyB,CAAE,MAAAC,EAAO,SAAAC,EAAU,SAAAC,EAAU,cAAAC,EAAe,MAAAC,EAAO,WAAAC,EAAY,SAAAC,EAAU,cAAAC,CAAc,EAAG,CAejI,MAAO,CAAE,KAdI,IAAM,CACjBN,EAAS,OAASD,EAAM,QAAU,SAClCG,EAAc,YAAc,GAAGD,EAAS,KAAK,IAC7CG,EAAW,YAAc,GAAGD,EAAM,KAAK,IACvCG,EAAc,YAAc,GAAGD,EAAS,KAAK,UAC/C,EASe,WAPI,KAAO,CACxB,KAAMN,EAAM,MACZ,SAAU,OAAO,MAAM,OAAO,SAASE,EAAS,MAAO,EAAE,CAAC,EAAI,GAAK,OAAO,SAASA,EAAS,MAAO,EAAE,EACrG,MAAO,OAAO,MAAM,OAAO,SAASE,EAAM,MAAO,EAAE,CAAC,EAAI,EAAI,OAAO,SAASA,EAAM,MAAO,EAAE,EAC3F,SAAU,OAAO,SAASE,EAAS,MAAO,EAAE,GAAK,CACnD,EAE0B,CAC5B",
+  "names": ["createModuleShapeSection", "shape", "controls", "rounding", "roundingValue", "inset", "insetValue", "rotation", "rotationValue"]
+}

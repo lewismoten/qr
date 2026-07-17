@@ -1,8 +1,8 @@
 import { getColorAlpha, hexToRgba } from '../../colors.js';
 import { drawCenteredFrameMessage, drawFrameMessage, fitFrameMessage } from '../../frame-text.js';
 import { getFinderPatternPart, getModuleCategory, isFinderPattern } from '../../qr-regions.js';
-import { drawCenterArtwork } from '../style/art/drawing.js';
-import { createQrImageLayer, createQrModuleFill, drawFinderEyes, drawQrModule } from '../style/drawing/shapes.js';
+import { createQrImageLayer, createQrModuleFill, drawCenterArtwork,
+  drawFinderEyes, drawQrModule } from './style-drawing.js';
 
 export function createQrRenderer(deps) {
   const {
