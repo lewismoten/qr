@@ -1092,7 +1092,7 @@
 
           <section>
             <h2>Privacy and network use</h2>
-            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Loading the application fetches Leaflet assets from a public CDN. Opening the Geo format requests map tiles from OpenStreetMap, which receives normal web request information such as an IP address and browser headers.</p>
+            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format lazy-loads Leaflet assets from a public CDN and requests map tiles from OpenStreetMap. Those services receive normal web request information such as an IP address and browser headers; they are not contacted unless Geo is opened.</p>
           </section>
         </div>
       </article>
@@ -1132,16 +1132,21 @@
           </section>
 
           <section>
-            <h2>Payload formats and URI standards</h2>
+            <h2>Payload and transfer formats</h2>
             <div class="dependency-list">
               <article>
+                <div><h3>Raw text, numbers, URLs and data URLs</h3><span class="version-badge">QR text payloads</span></div>
+                <p>Text and number formats place their resulting characters directly into one or more QR data segments without an additional wrapper. Website codes carry an absolute HTTP or HTTPS URL. Single-file Data mode uses a <code>data:</code> URL with standard Base64, while the first-party chunk protocol uses unpadded Base64url for compact binary transport.</p>
+                <nav aria-label="Raw payload references"><a href="https://www.rfc-editor.org/info/rfc3986">RFC 3986 URI syntax</a><a href="https://www.rfc-editor.org/info/rfc2397">RFC 2397 data URLs</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64 and Base64url</a></nav>
+              </article>
+              <article>
                 <div><h3>Contacts and calendar events</h3><span class="version-badge">IETF formats</span></div>
-                <p>Contact codes are serialized as vCard 3.0 for broad scanner compatibility; RFC 2426 defines that version, while RFC 6350 is the newer vCard 4.0 specification. Calendar codes are iCalendar 2.0 objects containing a VEVENT, UID, timestamp, dates or local date-times, summary and optional details under RFC 5545. These are payload formats carried as QR text, not alternate QR symbol types.</p>
+                <p>Contact codes use a deliberately small vCard 3.0-style subset containing <code>FN</code> and optional organization, title, telephone, email and URL properties. It targets common scanner behavior but does not implement every RFC 2426 escaping, folding or property rule; RFC 6350 defines the newer vCard 4.0 format. Calendar codes are iCalendar 2.0 objects containing a <code>VEVENT</code>, UID, timestamp, dates or floating local date-times, summary and optional details under RFC 5545. These are text payload conventions, not alternate QR symbol types.</p>
                 <nav aria-label="Contact and calendar format references"><a href="https://www.rfc-editor.org/info/rfc2426">RFC 2426 vCard 3.0</a><a href="https://www.rfc-editor.org/info/rfc6350">RFC 6350 vCard 4.0</a><a href="https://www.rfc-editor.org/info/rfc5545">RFC 5545 iCalendar</a></nav>
               </article>
               <article>
                 <div><h3>Web, email, phone and location</h3><span class="version-badge">URI standards</span></div>
-                <p>Website content uses ordinary HTTP or HTTPS URLs. Email uses the <code>mailto:</code> URI scheme, phone numbers use <code>tel:</code>, and geographic coordinates use <code>geo:</code> with WGS 84 latitude and longitude. Recognition and the action offered after scanning still depend on the receiving application.</p>
+                <p>Email uses the <code>mailto:</code> URI scheme, phone numbers use <code>tel:</code>, and geographic coordinates use <code>geo:</code> with WGS 84 latitude and longitude. A Geo label is added through the commonly recognized <code>q</code> query convention rather than a dedicated RFC 5870 label field. Recognition and the action offered after scanning still depend on the receiving application.</p>
                 <nav aria-label="Payload URI references"><a href="https://www.rfc-editor.org/info/rfc3986">RFC 3986 URI syntax</a><a href="https://www.rfc-editor.org/info/rfc6068">RFC 6068 mailto</a><a href="https://www.rfc-editor.org/info/rfc3966">RFC 3966 tel</a><a href="https://www.rfc-editor.org/info/rfc5870">RFC 5870 geo</a></nav>
               </article>
               <article>
@@ -1149,16 +1154,15 @@
                 <p>Wi-Fi credentials use the widely implemented <code>WIFI:T:...;S:...;P:...;;</code> text convention cataloged by ZXing, including escaping and the hidden-network flag. SMS uses the commonly recognized <code>SMSTO:</code> form. Neither wrapper is defined by ISO/IEC 18004 or by an IETF QR payload standard, and scanner support can vary by platform.</p>
                 <nav aria-label="Scanner payload convention references"><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11">ZXing Wi-Fi convention</a><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime">ZXing messaging conventions</a></nav>
               </article>
-            </div>
-          </section>
-
-          <section>
-            <h2>Bulk import format</h2>
-            <div class="dependency-list">
               <article>
                 <div><h3>Comma-separated values (CSV)</h3><span class="version-badge">RFC 4180-style</span></div>
                 <p>Bulk Import uses a first-party CSV parser modeled on the common format documented by RFC 4180 and the registered <code>text/csv</code> media type; RFC 4180 is informational rather than an Internet Standard. Files are read as UTF-8 and use commas, a required format-specific header row, optional quoted fields, doubled quotes for embedded quote characters, and CRLF, LF or CR record endings. Quoted fields may contain commas and line breaks. Blank header cells cause their columns to be ignored, fully blank data rows are ignored, and imports are limited to 5 MiB and 10,000 populated rows. No third-party CSV parser is bundled.</p>
                 <nav aria-label="CSV references"><a href="https://www.rfc-editor.org/info/rfc4180">RFC 4180 CSV format</a><a href="https://www.iana.org/assignments/media-types/text/csv">IANA text/csv registration</a><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text">File API Blob.text()</a></nav>
+              </article>
+              <article>
+                <div><h3>FILE:1 binary transport</h3><span class="version-badge">First-party protocol</span></div>
+                <p>The application-defined <code>FILE:1</code> format carries a single file or random-order chunks. Its readable header identifies single/chunk mode, manifest presence, a 128-bit random transfer ID encoded as 22 Base64url characters, extension hint, byte offset and total transfer length. An optional typed manifest can include filename, MIME type, modified time, original size, JSON metadata and SHA-256 validation; a flag records optional gzip transfer encoding. This is not an ISO, IETF or established scanner standard, so receiving it requires compatible software.</p>
+                <nav aria-label="FILE protocol references"><a href="README.md#file-chunked-transport">Protocol documentation</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64url</a><a href="https://www.rfc-editor.org/info/rfc8259">RFC 8259 JSON</a><a href="https://www.rfc-editor.org/info/rfc1952">RFC 1952 gzip</a></nav>
               </article>
             </div>
           </section>
@@ -1168,7 +1172,7 @@
             <div class="dependency-list">
               <article>
                 <div><h3>Raster and vector images</h3><span class="version-badge">First-party + Canvas</span></div>
-                <p>PNG and JPEG use the browser's canvas encoders: PNG preserves lossless pixels and transparency, while JPEG is lossy, honors the selected quality, and flattens transparency onto white. The first-party GIF89a encoder quantizes colors to a 216-color cube plus transparency and directly implements the format's Lempel-Ziv-Welch (LZW) image-data encoding; no third-party GIF or LZW codec is bundled. The historical patents that drove GIF/LZW licensing concerns have expired. Animated GIFs use the Netscape looping extension, loop continuously, and express frame delays in hundredths of a second. SVG export traces modules, artwork and text into paths rather than relying on an SVG generation library.</p>
+                <p>PNG and JPEG use the browser's canvas encoders: PNG preserves lossless pixels and transparency, while JPEG is lossy, honors the selected quality, and flattens transparency onto white. The first-party GIF89a encoder quantizes colors to a fixed 216-color RGB cube plus transparency and writes a valid, literal-oriented Lempel-Ziv-Welch (LZW) image stream; it favors a small implementation over strong compression. Animated GIFs use the Netscape looping extension, loop continuously, and express frame delays in hundredths of a second. SVG export traces the final raster canvas into merged same-color rectangular paths, including rasterized text and artwork, rather than retaining semantic text or using an SVG library.</p>
                 <nav aria-label="Image format references"><a href="https://www.w3.org/TR/png-3/">PNG specification</a><a href="https://jpeg.org/jpeg/">JPEG information</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.gnu.org/philosophy/gif.html">GIF/LZW patent history</a><a href="https://www.w3.org/TR/SVG2/">SVG 2</a></nav>
               </article>
               <article>
@@ -1178,7 +1182,7 @@
               </article>
               <article>
                 <div><h3>ZIP archives</h3><span class="version-badge">ZIP 2.0 stored entries</span></div>
-                <p>The first-party ZIP writer creates local headers, a central directory and UTF-8 file names. Entries use compression method 0 (stored without ZIP-level compression) because PNG, JPEG, GIF and PDF files are already encoded. Each local and central-directory entry includes the CRC-32 checksum described below.</p>
+                <p>The first-party ZIP writer creates local headers, a central directory and UTF-8 file names. Entries deliberately use compression method 0, so the archive is a broadly compatible container with no ZIP-level compression. Each local and central-directory entry includes the CRC-32 checksum described below.</p>
                 <nav aria-label="ZIP references"><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
               </article>
               <article>
@@ -1193,30 +1197,50 @@
             <h2>Browser platform features</h2>
             <div class="dependency-list">
               <article>
+                <div><h3>HTML, CSS, JavaScript and text encoding</h3><span class="version-badge">Web platform</span></div>
+                <p>The interface uses native HTML forms and dialogs, CSS layout and media queries, Canvas 2D drawing, ECMAScript modules on hosted pages, and a bundled fallback for <code>file:</code> use. <code>TextEncoder</code> produces UTF-8 bytes throughout the encoder and export code. Opt-in Kanji mode builds its Shift JIS mapping with the browser's <code>TextDecoder</code>; it reports an error when that encoding is unavailable.</p>
+                <nav aria-label="Web platform foundation references"><a href="https://html.spec.whatwg.org/">HTML Living Standard</a><a href="https://tc39.es/ecma262/">ECMAScript</a><a href="https://html.spec.whatwg.org/multipage/canvas.html">Canvas 2D</a><a href="https://encoding.spec.whatwg.org/">WHATWG Encoding</a></nav>
+              </article>
+              <article>
                 <div><h3>Files, URLs and downloads</h3><span class="version-badge">Web platform</span></div>
-                <p>File selection, Blob storage, object URLs, data URLs and client-side downloads use browser APIs. The custom FILE chunk protocol and its manifest are first-party application formats.</p>
+                <p>File selection and reading, Blob storage, object URLs, data URLs and client-side downloads use browser APIs. Object URLs are session-local references and do not embed file bytes in the QR payload; the custom FILE transport described above is a separate first-party format.</p>
                 <nav aria-label="File and URL API references"><a href="https://www.w3.org/TR/FileAPI/">File API</a><a href="https://url.spec.whatwg.org/">URL Standard</a><a href="https://html.spec.whatwg.org/multipage/links.html#downloading-resources">HTML downloads</a></nav>
               </article>
               <article>
                 <div><h3>Integrity and compression</h3><span class="version-badge">Web platform</span></div>
-                <p>SHA-256 verification uses Web Crypto. Optional gzip transfer compression uses Compression Streams when the browser provides it; the underlying formats follow FIPS 180-4 and RFC 1952.</p>
+                <p>SHA-256 verification and cryptographically strong 128-bit transfer identifiers use Web Crypto. Optional gzip transfer compression uses Compression Streams when the browser provides it; the underlying hash and gzip formats follow FIPS 180-4 and RFC 1952. SHA-256 detects changed transfer content but is not a signature and does not prove who created a file.</p>
                 <nav aria-label="Integrity and compression references"><a href="https://www.w3.org/TR/WebCryptoAPI/">Web Cryptography API</a><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4</a><a href="https://compression.spec.whatwg.org/">Compression Streams</a><a href="https://www.rfc-editor.org/rfc/rfc1952">RFC 1952 gzip</a></nav>
               </article>
               <article>
                 <div><h3>Animation and media recording</h3><span class="version-badge">First-party + Web API</span></div>
-                <p>Animated GIF frames are encoded directly. MP4 export uses MediaRecorder and therefore depends on the codecs and media container support exposed by the current browser.</p>
+                <p>Animated GIF frames are encoded directly. MP4 export draws frames to a Canvas capture stream and records through <code>MediaRecorder</code>; it is offered only when the browser reports support for an MP4 MIME type, and the exact AVC codec and timing behavior depend on that browser.</p>
                 <nav aria-label="Animation and recording references"><a href="https://www.w3.org/TR/mediastream-recording/">MediaStream Recording</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.iana.org/assignments/media-types/media-types.xhtml#video">IANA video media types</a></nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Third-party runtime library</h2>
+            <h2>Third-party software</h2>
             <div class="dependency-list">
               <article>
                 <div><h3>Leaflet</h3><span class="version-badge">1.9.4</span></div>
-                <p>Provides the interactive map, zoom controls, click coordinates, marker and label used by the Geo format.</p>
-                <nav aria-label="Leaflet links"><a href="https://leafletjs.com/">Website</a><a href="https://github.com/Leaflet/Leaflet">Repository</a><a href="https://github.com/Leaflet/Leaflet/blob/main/LICENSE">BSD 2-Clause license</a></nav>
+                <p>Provides the interactive map, zoom controls, click coordinates, marker and label used by the Geo format. It is the only third-party browser runtime library and is lazy-loaded from UNPKG only when Geo is opened.</p>
+                <nav aria-label="Leaflet links"><a href="https://leafletjs.com/">Website</a><a href="https://github.com/Leaflet/Leaflet/tree/v1.9.4">1.9.4 repository tag</a><a href="https://github.com/Leaflet/Leaflet/blob/v1.9.4/LICENSE">BSD 2-Clause license</a></nav>
+              </article>
+              <article>
+                <div><h3>esbuild</h3><span class="version-badge">0.28.1 build-only</span></div>
+                <p>Bundles and minifies the modular JavaScript and CSS, creates source maps, splits lazy-loaded hosted chunks and emits the self-contained <code>file:</code> fallback. It is a development dependency under the MIT License and is not a browser runtime library or network request made by the deployed application.</p>
+                <nav aria-label="esbuild links"><a href="https://esbuild.github.io/">Documentation</a><a href="https://github.com/evanw/esbuild">Repository</a><a href="https://github.com/evanw/esbuild/blob/main/LICENSE.md">MIT license</a></nav>
+              </article>
+              <article>
+                <div><h3>Node.js</h3><span class="version-badge">Development platform</span></div>
+                <p>Runs the local build script, automated tests, favicon generator and static development server. The project does not pin a Node.js release or ship Node.js to visitors; deployed application code runs in the browser.</p>
+                <nav aria-label="Node.js links"><a href="https://nodejs.org/">Website</a><a href="https://github.com/nodejs/node">Repository</a><a href="https://github.com/nodejs/node/blob/main/LICENSE">License and bundled notices</a></nav>
+              </article>
+              <article>
+                <div><h3>node-qrcode reference bundle</h3><span class="version-badge">1.5.0 test-only</span></div>
+                <p>The optional parity test can load manually downloaded browser bundles from the MIT-licensed <code>qrcode</code> package and compare the first-party encoder against 1,287 reference matrices. These files stay outside the repository, are not npm dependencies, and are never included in production builds.</p>
+                <nav aria-label="node-qrcode reference links"><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">npm 1.5.0</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a><a href="README.md#first-party-qr-encoder">Parity-test setup</a></nav>
               </article>
             </div>
           </section>
@@ -1226,18 +1250,18 @@
             <div class="dependency-list">
               <article>
                 <div><h3>OpenStreetMap</h3><span class="version-badge">Live data</span></div>
-                <p>Supplies geographic data and standard raster map tiles for the Geo preview. Map data is licensed under ODbL; hosted tiles are also governed by the tile usage policy.</p>
+                <p>Serves standard raster map tiles rendered from OpenStreetMap geographic data for the Geo preview. The underlying map database is licensed under ODbL; hosted tiles are also governed by the tile usage policy and include the required contributor attribution in the map.</p>
                 <nav aria-label="OpenStreetMap links"><a href="https://www.openstreetmap.org/">Website</a><a href="https://github.com/openstreetmap/openstreetmap-website">Website repository</a><a href="https://www.openstreetmap.org/copyright">Copyright and ODbL</a><a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a></nav>
               </article>
               <article>
                 <div><h3>UNPKG</h3><span class="version-badge">CDN service</span></div>
-                <p>Delivers the pinned Leaflet 1.9.4 JavaScript and stylesheet files.</p>
+                <p>Delivers the pinned Leaflet 1.9.4 JavaScript and stylesheet files when the Geo format is opened. It is not contacted during normal non-Geo use.</p>
                 <nav aria-label="UNPKG links"><a href="https://unpkg.com/">Website</a><a href="https://github.com/unpkg/unpkg">Repository</a><a href="https://github.com/unpkg/unpkg/blob/main/LICENSE">MIT license</a></nav>
               </article>
             </div>
           </section>
 
-          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. No separate third-party runtime package is used for QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
+          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. Leaflet is the only third-party runtime library; esbuild is build-only, node-qrcode is optional test-only, and no separate third-party package performs production QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
         </div>
       </article>
     </dialog>
