@@ -34,13 +34,17 @@
         z-index: 1000;
         inset: 0;
         display: grid;
-        grid-auto-flow: column;
-        gap: 0.7rem;
         place-content: center;
-        align-items: center;
         color: #ecfeff;
         background: #071827;
         font: 800 1rem sans-serif;
+      }
+      .boot-loading-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 0.7rem;
+        align-items: center;
+        width: min(18rem, calc(100vw - 2rem));
       }
       .boot-loading-spinner {
         width: 1.2rem;
@@ -49,6 +53,12 @@
         border-top-color: #5eead4;
         border-radius: 50%;
         animation: boot-spin 650ms linear infinite;
+      }
+      .boot-loading-progress {
+        grid-column: 1 / -1;
+        width: 100%;
+        height: 0.45rem;
+        accent-color: #5eead4;
       }
       @keyframes boot-spin {
         to {
@@ -74,8 +84,12 @@
   </head>
   <body>
     <div id="boot-loading" class="boot-loading" role="status" aria-live="polite">
-      <span class="boot-loading-spinner" aria-hidden="true"></span>
-      <span data-i18n="common.loading">Loading...</span>
+      <div class="boot-loading-card">
+        <span class="boot-loading-spinner" aria-hidden="true"></span>
+        <span data-i18n="common.loading">Loading...</span>
+        <output id="boot-loading-percent" for="boot-loading-progress">5%</output>
+        <progress id="boot-loading-progress" class="boot-loading-progress" max="100" value="5" aria-label="Loading" data-i18n-aria-label="common.loading">5%</progress>
+      </div>
     </div>
     <main class="app-shell">
       <h1 class="sr-only" data-i18n="page.title">Free QR Code Generator, Designer and Debugger</h1>

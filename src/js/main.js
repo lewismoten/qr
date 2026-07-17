@@ -9,6 +9,40 @@ import {
 import { getSavedLocale, setupLanguagePicker } from './i18n/picker.js';
 import { loadFeatureStylesheet } from './stylesheets.js';
 
+const bootProgress = document.getElementById('boot-loading-progress');
+const bootPercent = document.getElementById('boot-loading-percent');
+const completedMilestones = new Set();
+let progressPaint = Promise.resolve();
+const milestoneWeights = {
+  stylesheet: 20,
+  localization: 15,
+  application: 35,
+  render: 25,
+};
+
+function nextPaint() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+function completeMilestone(name) {
+  if (completedMilestones.has(name)) return progressPaint;
+  completedMilestones.add(name);
+  const value =
+    5 +
+    [...completedMilestones].reduce(
+      (total, milestone) => total + milestoneWeights[milestone],
+      0,
+    );
+  progressPaint = progressPaint
+    .then(nextPaint)
+    .then(() => {
+      if (bootProgress) bootProgress.value = value;
+      if (bootPercent) bootPercent.value = `${value}%`;
+    })
+    .then(nextPaint);
+  return progressPaint;
+}
+
 function waitForApplicationStyles() {
   const stylesheet = document.getElementById('app-styles');
   if (!stylesheet || stylesheet.sheet) return Promise.resolve();
@@ -19,8 +53,11 @@ function waitForApplicationStyles() {
 }
 
 async function start() {
-  const stylesReady = waitForApplicationStyles();
+  const stylesReady = waitForApplicationStyles().then(() => {
+    return completeMilestone('stylesheet');
+  });
   await initializeLanguage({ locale: getSavedLocale() });
+  await completeMilestone('localization');
   let debugTooltip;
   if (isDebugLanguage()) {
     [, debugTooltip] = await Promise.all([
@@ -34,7 +71,11 @@ async function start() {
   setupLanguagePicker();
   debugTooltip?.setupTranslationDebugTooltip();
   const application = await import('./app/index.js');
-  await Promise.all([application.applicationReady, stylesReady]);
+  await completeMilestone('application');
+  await application.applicationReady;
+  await completeMilestone('render');
+  await stylesReady;
+  await new Promise((resolve) => setTimeout(resolve, 160));
 }
 
 const bootLoading = document.getElementById('boot-loading');
