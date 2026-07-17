@@ -25,29 +25,17 @@ import {
   getOpaqueArtworkBackground,
 } from './frame-text.js';
 import {
-  coordKey,
   getAlignmentPatternCenters,
-  getDataTraversal,
   getFinderPatternPart,
-  getFormatBitGroups,
-  getFormatInfoCoordinates,
   getModuleCategory,
-  getVersionInfoCoordinates,
   isAlignmentRegion,
   isDarkModuleRegion,
   isFinderPattern,
   isFinderRegion,
   isFormatRegion,
-  isFunctionModule,
   isTimingRegion,
   isVersionRegion,
 } from './qr-regions.js';
-import {
-  buildEncodingUnitGroups,
-  buildPostHeaderStreamGroups,
-  classifyTraversalBits,
-  summarizeCodewordRoles,
-} from './qr-stream.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { createEventSection } from './ui/content/event/section.js';
@@ -59,6 +47,18 @@ import { createSharedFieldsSection } from './ui/content/shared-fields.js';
 import { createVCardSection } from './ui/content/vcard/section.js';
 import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
+import {
+  drawCodewordOutlines,
+  drawHighlightedBoundaries,
+  getActiveOutlineGroups,
+} from './ui/debug/boundaries.js';
+import {
+  buildDebugOverlayModel,
+  getDebugCategory,
+  moduleIsDark,
+  moduleIsDarkForPreview,
+} from './ui/debug/model.js';
+import { drawCodewordPaths, drawStreamFieldStarts } from './ui/debug/paths.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
 import { createAnimationSection } from './ui/download/animation/section.js';
@@ -70,6 +70,13 @@ import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
+import {
+  createQrImageLayer,
+  createQrModuleFill,
+  drawFinderEyes,
+  drawQrModule,
+  fillEyeShape,
+} from './ui/style/drawing/shapes.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
 import qrEncoder from '../qr/index.js';
@@ -2627,233 +2634,6 @@ function getCharCountBits(mode, version) {
   return CHAR_COUNT_BITS[mode]?.[bucket] ?? CHAR_COUNT_BITS.byte[bucket];
 }
 
-function moduleIsDark(qrDefinition, row, column) {
-  if (typeof qrDefinition.modules.get === 'function') {
-    return qrDefinition.modules.get(row, column);
-  }
-  return Boolean(qrDefinition.modules.data[row * qrDefinition.modules.size + column]);
-}
-
-function isMaskedModule(mask, row, column) {
-  switch (mask) {
-    case 0:
-      return (row + column) % 2 === 0;
-    case 1:
-      return row % 2 === 0;
-    case 2:
-      return column % 3 === 0;
-    case 3:
-      return (row + column) % 3 === 0;
-    case 4:
-      return (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0;
-    case 5:
-      return ((row * column) % 2) + ((row * column) % 3) === 0;
-    case 6:
-      return (((row * column) % 2) + ((row * column) % 3)) % 2 === 0;
-    case 7:
-      return (((row + column) % 2) + ((row * column) % 3)) % 2 === 0;
-    default:
-      return false;
-  }
-}
-
-function moduleIsDarkForPreview(qrDefinition, row, column, debugActive) {
-  const dark = moduleIsDark(qrDefinition, row, column);
-  if (!debugActive || !debugUnmask.checked || isFunctionModule(qrDefinition, row, column)) {
-    return dark;
-  }
-
-  return isMaskedModule(qrDefinition.maskPattern, row, column) ? !dark : dark;
-}
-
-function splitMetadataCoordinateRuns(coordinates) {
-  if (coordinates.length === 0) {
-    return [];
-  }
-
-  const runs = [[coordinates[0]]];
-
-  for (let index = 1; index < coordinates.length; index += 1) {
-    const previous = coordinates[index - 1];
-    const current = coordinates[index];
-    const distance = Math.abs(current[0] - previous[0]) + Math.abs(current[1] - previous[1]);
-
-    if (distance === 1) {
-      runs[runs.length - 1].push(current);
-    } else {
-      runs.push([current]);
-    }
-  }
-
-  return runs;
-}
-
-function pushMetadataFieldGroups(groups, coordinates, role, sequenceId) {
-  const runs = splitMetadataCoordinateRuns(coordinates);
-
-  runs.forEach((run, runIndex) => {
-    groups.push({
-      kind: 'metadata',
-      modules: run.map(([row, column]) => ({ row, column })),
-      roles: [role],
-      metadataRole: role,
-      metadataSequenceId: sequenceId,
-      metadataRunIndex: runIndex,
-      metadataRunCount: runs.length,
-    });
-  });
-}
-
-function buildMetadataGroups(qrDefinition) {
-  const size = qrDefinition.modules.size;
-  const formatInfo = getFormatInfoCoordinates(size);
-  const groups = [];
-  const primary = formatInfo.primary;
-  const secondary = formatInfo.secondary;
-
-  pushMetadataFieldGroups(groups, primary.slice(0, 2), 'ecLevel', 'ecLevel-primary');
-  pushMetadataFieldGroups(groups, primary.slice(2, 5), 'mask', 'mask-primary');
-  pushMetadataFieldGroups(groups, primary.slice(5), 'format', 'format-primary');
-
-  pushMetadataFieldGroups(groups, secondary.slice(0, 2), 'ecLevel', 'ecLevel-secondary');
-  pushMetadataFieldGroups(groups, secondary.slice(2, 5), 'mask', 'mask-secondary');
-  pushMetadataFieldGroups(groups, secondary.slice(5), 'format', 'format-secondary');
-
-  if (qrDefinition.version >= 7) {
-    const versionInfo = getVersionInfoCoordinates(size);
-    pushMetadataFieldGroups(groups, versionInfo.primary, 'version', 'version-primary');
-    pushMetadataFieldGroups(groups, versionInfo.secondary, 'version', 'version-secondary');
-  }
-
-  return groups;
-}
-
-function buildDebugOverlayModel(qrDefinition, options) {
-  const traversal = getDataTraversal(qrDefinition);
-  const dataCodewordsCount = getTotalDataCodewords(qrDefinition.version, options.errorCorrectionLevel);
-  const modeBits = new Set();
-  const charCountBits = new Set();
-  const payloadBits = new Set();
-  const terminatorBits = new Set();
-  const bytePadBits = new Set();
-  const errorCorrectionBits = new Set();
-  const remainderBits = new Set();
-  const codewords = [];
-  const bitRoles = classifyTraversalBits(qrDefinition, dataCodewordsCount, traversal.length);
-  const fieldStarts = [];
-
-  bitRoles.forEach((role, index) => {
-    if (index === 0 || role !== bitRoles[index - 1]) {
-      fieldStarts.push({
-        role,
-        module: traversal[index],
-      });
-    }
-  });
-
-  traversal.forEach((module, index) => {
-    const role = bitRoles[index];
-    const key = coordKey(module.row, module.column);
-
-    if (role === 'mode') {
-      modeBits.add(key);
-    } else if (role === 'charCount') {
-      charCountBits.add(key);
-    } else if (role === 'payload') {
-      payloadBits.add(key);
-    } else if (role === 'terminator') {
-      terminatorBits.add(key);
-    } else if (role === 'bytePad' || role === 'padByte') {
-      bytePadBits.add(key);
-    } else if (role === 'errorCorrection') {
-      errorCorrectionBits.add(key);
-    } else if (role === 'remainder') {
-      remainderBits.add(key);
-    }
-  });
-
-  for (let index = 0; index < traversal.length; index += 8) {
-    const modules = traversal.slice(index, index + 8);
-    const roles = bitRoles.slice(index, index + 8);
-    const kind = summarizeCodewordRoles(roles);
-
-    codewords.push({
-      kind,
-      modules,
-      roles,
-    });
-  }
-
-  const { ecLevelBits, maskBits } = getFormatBitGroups(qrDefinition.modules.size);
-  const streamGroups = buildPostHeaderStreamGroups(traversal, bitRoles);
-  const encodingUnitGroups = buildEncodingUnitGroups(qrDefinition, traversal);
-  const metadataGroups = buildMetadataGroups(qrDefinition);
-
-  return {
-    modeBits,
-    charCountBits,
-    payloadBits,
-    terminatorBits,
-    bytePadBits,
-    ecLevelBits,
-    maskBits,
-    errorCorrectionBits,
-    remainderBits,
-    bitRoles,
-    fieldStarts,
-    codewords,
-    streamGroups,
-    encodingUnitGroups,
-    metadataGroups,
-  };
-}
-
-function getDebugCategory(row, column, qrDefinition, debugModel, purpose = 'overlay') {
-  const key = coordKey(row, column);
-
-  if (debugModel.errorCorrectionBits.has(key)) {
-    return 'errorCorrection';
-  }
-  if (debugModel.modeBits.has(key)) {
-    return 'mode';
-  }
-  if (debugModel.charCountBits.has(key)) {
-    return 'charCount';
-  }
-  if (debugModel.payloadBits.has(key)) {
-    return 'data';
-  }
-  if (debugModel.terminatorBits.has(key)) {
-    return 'terminator';
-  }
-  if (debugModel.bytePadBits.has(key)) {
-    return 'padding';
-  }
-  if (debugModel.remainderBits.has(key)) {
-    return 'remainder';
-  }
-  if (debugModel.codewords.length === 0 && purpose === 'overlay') {
-    return getModuleCategory(qrDefinition, row, column);
-  }
-  if (debugModel.ecLevelBits.has(key)) {
-    return 'ecLevel';
-  }
-  if (debugModel.maskBits.has(key)) {
-    return 'mask';
-  }
-  if (purpose === 'overlay') {
-    const remainderCodeword = debugModel.codewords.find((codeword) =>
-      codeword.kind === 'remainder' &&
-      codeword.modules.some((module) => module.row === row && module.column === column)
-    );
-    if (remainderCodeword) {
-      return 'remainder';
-    }
-  }
-
-  return getModuleCategory(qrDefinition, row, column);
-}
-
 function getGroupBaseColor(group) {
   const rolePriority = [
     ['version', debugColors.version.value],
@@ -2911,10 +2691,6 @@ function getCodewordStyle(group) {
   };
 }
 
-function getMetadataRouteIndex(group, groups) {
-  return groups.indexOf(group);
-}
-
 function getCategoryOverlayColor(category) {
   switch (category) {
     case 'mode':
@@ -2956,582 +2732,6 @@ function getModuleContrastColor(module, qrDefinition, debugModel) {
   return getContrastingHex(getCategoryOverlayColor(category));
 }
 
-function shouldDrawCategoryBoundary(category) {
-  return category !== 'data';
-}
-
-function drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize) {
-  const size = qrDefinition.modules.size;
-  const lineWidth = Math.max(0.8, cellSize * 0.08);
-
-  for (let row = 0; row < size; row += 1) {
-    for (let column = 0; column < size; column += 1) {
-      const category = getDebugCategory(row, column, qrDefinition, debugModel, 'overlay');
-
-      if (!shouldDrawCategoryBoundary(category)) {
-        continue;
-      }
-
-      const strokeColor = getContrastingHex(getCategoryOverlayColor(category));
-      const left = (column + marginModules) * cellSize;
-      const top = (row + marginModules) * cellSize;
-      const right = left + cellSize;
-      const bottom = top + cellSize;
-
-      const neighbors = {
-        left: column > 0 ? getDebugCategory(row, column - 1, qrDefinition, debugModel, 'overlay') : null,
-        right: column < size - 1 ? getDebugCategory(row, column + 1, qrDefinition, debugModel, 'overlay') : null,
-        top: row > 0 ? getDebugCategory(row - 1, column, qrDefinition, debugModel, 'overlay') : null,
-        bottom: row < size - 1 ? getDebugCategory(row + 1, column, qrDefinition, debugModel, 'overlay') : null,
-      };
-
-      context.strokeStyle = hexToRgba(strokeColor, 0.75);
-      context.lineWidth = lineWidth;
-      context.lineCap = 'round';
-
-      if (neighbors.left !== category) {
-        context.beginPath();
-        context.moveTo(left, top);
-        context.lineTo(left, bottom);
-        context.stroke();
-      }
-      if (neighbors.right !== category) {
-        context.beginPath();
-        context.moveTo(right, top);
-        context.lineTo(right, bottom);
-        context.stroke();
-      }
-      if (neighbors.top !== category) {
-        context.beginPath();
-        context.moveTo(left, top);
-        context.lineTo(right, top);
-        context.stroke();
-      }
-      if (neighbors.bottom !== category) {
-        context.beginPath();
-        context.moveTo(left, bottom);
-        context.lineTo(right, bottom);
-        context.stroke();
-      }
-    }
-  }
-}
-
-function getActiveOutlineGroups(debugModel) {
-  const selectedMode = activeDebugOutlineMode;
-
-  if (selectedMode === 'stream') {
-    return debugModel.streamGroups;
-  }
-
-  if (selectedMode === 'units') {
-    return debugModel.encodingUnitGroups;
-  }
-
-  if (selectedMode === 'metadata') {
-    return debugModel.metadataGroups;
-  }
-
-  return debugModel.codewords;
-}
-
-function drawSegmentPerimeter(context, modules, marginModules, cellSize, strokeStyle, lineWidth) {
-  const moduleSet = new Set(modules.map(({ row, column }) => coordKey(row, column)));
-
-  context.strokeStyle = strokeStyle;
-  context.lineWidth = lineWidth;
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
-
-  modules.forEach(({ row, column }) => {
-    const left = (column + marginModules) * cellSize;
-    const top = (row + marginModules) * cellSize;
-    const right = left + cellSize;
-    const bottom = top + cellSize;
-
-    if (!moduleSet.has(coordKey(row, column - 1))) {
-      context.beginPath();
-      context.moveTo(left, top);
-      context.lineTo(left, bottom);
-      context.stroke();
-    }
-
-    if (!moduleSet.has(coordKey(row, column + 1))) {
-      context.beginPath();
-      context.moveTo(right, top);
-      context.lineTo(right, bottom);
-      context.stroke();
-    }
-
-    if (!moduleSet.has(coordKey(row - 1, column))) {
-      context.beginPath();
-      context.moveTo(left, top);
-      context.lineTo(right, top);
-      context.stroke();
-    }
-
-    if (!moduleSet.has(coordKey(row + 1, column))) {
-      context.beginPath();
-      context.moveTo(left, bottom);
-      context.lineTo(right, bottom);
-      context.stroke();
-    }
-  });
-}
-
-function drawCodewordOutlines(context, debugModel, marginModules, cellSize) {
-  const lineWidth = Math.max(1.25, cellSize * 0.14);
-  const groups = getActiveOutlineGroups(debugModel);
-  const outlinedKinds = new Set(['header', 'data', 'errorCorrection', 'metadata']);
-  if (activeDebugOutlineMode === 'codewords') {
-    outlinedKinds.add('padding');
-    outlinedKinds.add('padByte');
-  }
-
-  groups.forEach((codeword, index) => {
-    if (codeword.modules.length === 0) {
-      return;
-    }
-
-    const style = getCodewordStyle(codeword);
-    if (outlinedKinds.has(codeword.kind)) {
-      drawSegmentPerimeter(
-        context,
-        codeword.modules,
-        marginModules,
-        cellSize,
-        hexToRgba(style.strokeColor, Math.min(1, style.opacity + 0.18)),
-        lineWidth
-      );
-    }
-
-    const first = codeword.modules[0];
-    const previousCodeword = groups[index - 1];
-    const nextCodeword = groups[index + 1];
-    const isMetadataSequenceStart =
-      codeword.kind === 'metadata' &&
-      (!previousCodeword || previousCodeword.metadataSequenceId !== codeword.metadataSequenceId);
-    const shouldDrawStartDot =
-      outlinedKinds.has(codeword.kind) &&
-      (codeword.kind !== 'metadata' || isMetadataSequenceStart);
-
-    if (first && shouldDrawStartDot) {
-      context.fillStyle = hexToRgba(style.strokeColor, Math.min(1, style.opacity + 0.1));
-      context.beginPath();
-      context.arc(
-        (first.column + marginModules + 0.5) * cellSize,
-        (first.row + marginModules + 0.5) * cellSize,
-        Math.max(codeword.kind === 'metadata' ? 2.2 : 1.4, cellSize * (codeword.kind === 'metadata' ? 0.24 : 0.18)),
-        0,
-        Math.PI * 2
-      );
-      context.fill();
-    }
-
-  });
-}
-
-function getMetadataOffsetVector(routeIndex, cellSize) {
-  const offset = Math.max(1.25, cellSize * 0.18);
-  const vectors = [
-    { x: -offset, y: -offset * 0.35 },
-    { x: offset, y: offset * 0.35 },
-    { x: -offset * 0.6, y: offset },
-    { x: offset * 0.6, y: -offset },
-  ];
-  return vectors[((routeIndex % vectors.length) + vectors.length) % vectors.length];
-}
-
-function drawMetadataSegment(context, from, to, strokeColor, strokeOpacity, lineWidth, offsetVector) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy);
-  const normal =
-    length === 0
-      ? { x: offsetVector.x, y: offsetVector.y }
-      : { x: (-dy / length) * offsetVector.x + offsetVector.x * 0.2, y: (dx / length) * offsetVector.y + offsetVector.y * 0.2 };
-
-  const control = {
-    x: (from.x + to.x) / 2 + normal.x,
-    y: (from.y + to.y) / 2 + normal.y,
-  };
-
-  context.strokeStyle = hexToRgba(strokeColor, strokeOpacity);
-  context.beginPath();
-  context.moveTo(from.x, from.y);
-  context.quadraticCurveTo(control.x, control.y, to.x, to.y);
-  context.stroke();
-}
-
-function drawMetadataBridge(context, from, to, strokeColor, strokeOpacity, lineWidth, routeIndex, cellSize) {
-  const horizontalDirection = to.x >= from.x ? 1 : -1;
-  const bridgeLift = Math.max(cellSize * 1.3, 12);
-  const bridgeSpread = Math.max(cellSize * 0.7, 7);
-  const curveDirection = routeIndex % 2 === 0 ? -1 : 1;
-  const control = {
-    x: (from.x + to.x) / 2 + horizontalDirection * bridgeSpread * 0.2,
-    y: Math.min(from.y, to.y) + curveDirection * bridgeLift,
-  };
-
-  context.strokeStyle = hexToRgba(strokeColor, strokeOpacity);
-  context.lineWidth = lineWidth;
-  context.beginPath();
-  context.moveTo(from.x, from.y);
-  context.quadraticCurveTo(control.x, control.y, to.x, to.y);
-  context.stroke();
-}
-
-function drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize) {
-  const lineWidth = Math.max(1, cellSize * 0.18);
-  const groups = getActiveOutlineGroups(debugModel);
-
-  groups.forEach((codeword, index) => {
-    if (codeword.modules.length === 0) {
-      return;
-    }
-
-    const points = codeword.modules.map(({ row, column }) => ({
-      x: (column + marginModules + 0.5) * cellSize,
-      y: (row + marginModules + 0.5) * cellSize,
-    }));
-
-    const dataOpacity = index % 2 === 0 ? 0.25 : 0.5;
-    const strokeOpacity = codeword.kind === 'data' ? dataOpacity : 0.5;
-    const effectiveLineWidth = codeword.kind === 'metadata' ? Math.max(0.8, cellSize * 0.11) : lineWidth;
-    context.lineWidth = effectiveLineWidth;
-    context.lineJoin = 'round';
-    context.lineCap = 'round';
-    const metadataRouteIndex = codeword.kind === 'metadata' ? getMetadataRouteIndex(codeword, groups) : -1;
-    const metadataOffset = codeword.kind === 'metadata' ? getMetadataOffsetVector(metadataRouteIndex, cellSize) : null;
-
-    for (let pointIndex = 1; pointIndex < points.length; pointIndex += 1) {
-      const targetModule = codeword.modules[pointIndex];
-      const strokeColor = getModuleContrastColor(targetModule, qrDefinition, debugModel);
-      if (codeword.kind === 'metadata') {
-        drawMetadataSegment(
-          context,
-          points[pointIndex - 1],
-          points[pointIndex],
-          strokeColor,
-          0.78,
-          effectiveLineWidth,
-          metadataOffset
-        );
-      } else {
-        context.strokeStyle = hexToRgba(strokeColor, strokeOpacity);
-        context.beginPath();
-        context.moveTo(points[pointIndex - 1].x, points[pointIndex - 1].y);
-        context.lineTo(points[pointIndex].x, points[pointIndex].y);
-        context.stroke();
-      }
-    }
-
-    const nextCodeword = groups[index + 1];
-    if (!nextCodeword || nextCodeword.modules.length === 0) {
-      return;
-    }
-
-    if (codeword.kind === 'metadata' && nextCodeword.kind === 'metadata') {
-      if (codeword.metadataSequenceId !== nextCodeword.metadataSequenceId) {
-        return;
-      }
-
-      const from = points[points.length - 1];
-      const next = nextCodeword.modules[0];
-      const to = {
-        x: (next.column + marginModules + 0.5) * cellSize,
-        y: (next.row + marginModules + 0.5) * cellSize,
-      };
-      const transitionColor = getModuleContrastColor(nextCodeword.modules[0], qrDefinition, debugModel);
-      drawMetadataBridge(
-        context,
-        from,
-        to,
-        transitionColor,
-        0.78,
-        Math.max(0.8, cellSize * 0.11),
-        metadataRouteIndex,
-        cellSize
-      );
-      return;
-    }
-
-    if (codeword.kind === 'metadata' || nextCodeword.kind === 'metadata') {
-      return;
-    }
-
-    const from = points[points.length - 1];
-    const next = nextCodeword.modules[0];
-    const to = {
-      x: (next.column + marginModules + 0.5) * cellSize,
-      y: (next.row + marginModules + 0.5) * cellSize,
-    };
-
-    const transitionColor = getModuleContrastColor(nextCodeword.modules[0], qrDefinition, debugModel);
-    context.strokeStyle = hexToRgba(transitionColor, strokeOpacity);
-    context.lineWidth = Math.max(1, cellSize * 0.1);
-    context.beginPath();
-    context.moveTo(from.x, from.y);
-    context.lineTo(to.x, to.y);
-    context.stroke();
-  });
-}
-
-function getBitRoleCategory(role) {
-  switch (role) {
-    case 'payload':
-      return 'data';
-    case 'bytePad':
-    case 'padByte':
-      return 'padding';
-    case 'errorCorrection':
-      return 'errorCorrection';
-    default:
-      return role;
-  }
-}
-
-function drawStreamFieldStarts(context, debugModel, marginModules, cellSize) {
-  if (activeDebugOutlineMode === 'metadata') {
-    return;
-  }
-
-  debugModel.fieldStarts.forEach(({ role, module }) => {
-    if (!module) {
-      return;
-    }
-
-    const category = getBitRoleCategory(role);
-    const categoryColor = debugColors[category]?.value ?? debugColors.data.value;
-    const contrastColor = getContrastingHex(categoryColor);
-    const centerX = (module.column + marginModules + 0.5) * cellSize;
-    const centerY = (module.row + marginModules + 0.5) * cellSize;
-
-    context.fillStyle = hexToRgba(contrastColor, 0.95);
-    context.beginPath();
-    context.arc(centerX, centerY, Math.max(2, cellSize * 0.28), 0, Math.PI * 2);
-    context.fill();
-
-    context.fillStyle = hexToRgba(categoryColor, 0.95);
-    context.beginPath();
-    context.arc(centerX, centerY, Math.max(0.9, cellSize * 0.12), 0, Math.PI * 2);
-    context.fill();
-  });
-}
-
-function addRoundedRectPath(context, x, y, width, height, radius) {
-  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
-  context.beginPath();
-  context.moveTo(x + safeRadius, y);
-  context.lineTo(x + width - safeRadius, y);
-  context.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
-  context.lineTo(x + width, y + height - safeRadius);
-  context.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
-  context.lineTo(x + safeRadius, y + height);
-  context.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
-  context.lineTo(x, y + safeRadius);
-  context.quadraticCurveTo(x, y, x + safeRadius, y);
-  context.closePath();
-}
-
-function getModuleShapeGeometry(shapeOptions = {}) {
-  switch (shapeOptions.type) {
-    case 'rounded':
-      return { inset: 0, rounding: 32, rotation: 0 };
-    case 'dots':
-      return { inset: 8, rounding: 50, rotation: 0 };
-    case 'diamond':
-      return { inset: 15, rounding: 0, rotation: 45 };
-    case 'custom':
-      return {
-        inset: Math.min(30, Math.max(0, shapeOptions.inset ?? 4)),
-        rounding: Math.min(50, Math.max(0, shapeOptions.rounding ?? 25)),
-        rotation: Math.min(45, Math.max(-45, shapeOptions.rotation ?? 0)),
-      };
-    default:
-      return null;
-  }
-}
-
-function drawQrModule(context, x, y, cellSize, shapeOptions) {
-  const geometry = getModuleShapeGeometry(shapeOptions);
-  if (!geometry || cellSize < 2) {
-    context.fillRect(x, y, Math.ceil(cellSize), Math.ceil(cellSize));
-    return;
-  }
-
-  const inset = cellSize * (geometry.inset / 100);
-  const size = Math.max(0, cellSize - inset * 2);
-  const radius = size * (geometry.rounding / 100);
-  const centerX = x + cellSize / 2;
-  const centerY = y + cellSize / 2;
-
-  context.save();
-  context.translate(centerX, centerY);
-  context.rotate((geometry.rotation * Math.PI) / 180);
-  addRoundedRectPath(context, -size / 2, -size / 2, size, size, radius);
-  context.restore();
-  // Build transformed geometry first, then fill in QR coordinates so gradients stay global.
-  context.fill();
-}
-
-function getEyeShapeGeometry(eyeOptions) {
-  switch (eyeOptions.type) {
-    case 'square':
-      return { outerRounding: 0, centerRounding: 0 };
-    case 'rounded':
-      return { outerRounding: 18, centerRounding: 32 };
-    case 'circle':
-      return { outerRounding: 50, centerRounding: 50 };
-    case 'custom':
-      return {
-        outerRounding: Math.min(50, Math.max(0, eyeOptions.outerRounding ?? 20)),
-        centerRounding: Math.min(50, Math.max(0, eyeOptions.centerRounding ?? 35)),
-      };
-    default:
-      return null;
-  }
-}
-
-function fillEyeShape(context, x, y, size, rounding, fillStyle) {
-  context.fillStyle = fillStyle;
-  addRoundedRectPath(context, x, y, size, size, size * (rounding / 100));
-  context.fill();
-}
-
-function fillImageEyeShape(context, x, y, size, rounding, imagePattern, overlayFillStyle) {
-  fillEyeShape(context, x, y, size, rounding, imagePattern);
-  fillEyeShape(context, x, y, size, rounding, overlayFillStyle);
-}
-
-function drawFinderEyes(
-  context,
-  moduleCount,
-  marginModules,
-  cellSize,
-  eyeOptions,
-  outerFillStyle,
-  centerFillStyle,
-  lightColor,
-  transparentLight,
-  imageFillOptions = null
-) {
-  const geometry = getEyeShapeGeometry(eyeOptions);
-  if (!geometry) {
-    return;
-  }
-
-  const origins = [
-    [0, 0],
-    [0, moduleCount - 7],
-    [moduleCount - 7, 0],
-  ];
-
-  origins.forEach(([row, column]) => {
-    const x = (column + marginModules) * cellSize;
-    const y = (row + marginModules) * cellSize;
-    if (imageFillOptions) {
-      fillImageEyeShape(
-        context,
-        x,
-        y,
-        cellSize * 7,
-        geometry.outerRounding,
-        imageFillOptions.pattern,
-        imageFillOptions.darkFillStyle
-      );
-      fillImageEyeShape(
-        context,
-        x + cellSize,
-        y + cellSize,
-        cellSize * 5,
-        geometry.outerRounding,
-        imageFillOptions.pattern,
-        imageFillOptions.lightFillStyle
-      );
-      fillImageEyeShape(
-        context,
-        x + cellSize * 2,
-        y + cellSize * 2,
-        cellSize * 3,
-        geometry.centerRounding,
-        imageFillOptions.pattern,
-        imageFillOptions.darkFillStyle
-      );
-      return;
-    }
-
-    fillEyeShape(context, x, y, cellSize * 7, geometry.outerRounding, outerFillStyle);
-
-    context.save();
-    context.globalCompositeOperation = 'destination-out';
-    fillEyeShape(context, x + cellSize, y + cellSize, cellSize * 5, geometry.outerRounding, '#000000');
-    context.restore();
-    if (!transparentLight) {
-      fillEyeShape(context, x + cellSize, y + cellSize, cellSize * 5, geometry.outerRounding, lightColor);
-    }
-
-    fillEyeShape(
-      context,
-      x + cellSize * 2,
-      y + cellSize * 2,
-      cellSize * 3,
-      geometry.centerRounding,
-      centerFillStyle
-    );
-  });
-}
-
-function drawImageCover(context, image, x, y, width, height) {
-  const imageWidth = image.naturalWidth || image.width;
-  const imageHeight = image.naturalHeight || image.height;
-  const scale = Math.max(width / imageWidth, height / imageHeight);
-  const drawWidth = imageWidth * scale;
-  const drawHeight = imageHeight * scale;
-  context.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
-}
-
-function createQrImageLayer(context, image, qrStart, qrSize) {
-  const layer = document.createElement('canvas');
-  layer.width = context.canvas.width;
-  layer.height = context.canvas.height;
-  const layerContext = layer.getContext('2d');
-  drawImageCover(layerContext, image, qrStart, qrStart, qrSize, qrSize);
-  return {
-    layer,
-    pattern: context.createPattern(layer, 'no-repeat'),
-  };
-}
-
-function createQrModuleFill(context, startColor, gradientOptions, marginModules, moduleCount, cellSize) {
-  if (gradientOptions.type === 'solid' || gradientOptions.type === 'image') {
-    return startColor;
-  }
-
-  const qrStart = marginModules * cellSize;
-  const qrSize = moduleCount * cellSize;
-  const center = qrStart + qrSize / 2;
-  let gradient;
-
-  if (gradientOptions.type === 'radial') {
-    gradient = context.createRadialGradient(center, center, 0, center, center, (qrSize * Math.SQRT2) / 2);
-  } else {
-    const radians = (gradientOptions.angle * Math.PI) / 180;
-    const cosine = Math.cos(radians);
-    const sine = Math.sin(radians);
-    const extent = (qrSize / 2) * (Math.abs(cosine) + Math.abs(sine));
-    gradient = context.createLinearGradient(
-      center - cosine * extent,
-      center - sine * extent,
-      center + cosine * extent,
-      center + sine * extent
-    );
-  }
-
-  gradient.addColorStop(0, startColor);
-  gradient.addColorStop(1, gradientOptions.endColor);
-  return gradient;
-}
 
 function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
   const outlineWidth = Math.max(1.5, artSize * 0.065);
@@ -3785,7 +2985,7 @@ function drawQr(qrDefinition, options) {
 
   for (let row = 0; row < moduleCount; row += 1) {
     for (let column = 0; column < moduleCount; column += 1) {
-      if (!moduleIsDarkForPreview(qrDefinition, row, column, debugActive)) {
+      if (!moduleIsDarkForPreview(qrDefinition, row, column, debugActive, debugUnmask.checked)) {
         continue;
       }
       if (customEyesActive && isFinderPattern(moduleCount, row, column)) {
@@ -3847,10 +3047,32 @@ function drawQr(qrDefinition, options) {
   }
 
   if (debugActive) {
-    drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize);
-    drawCodewordOutlines(context, debugModel, marginModules, cellSize);
-    drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize);
-    drawStreamFieldStarts(context, debugModel, marginModules, cellSize);
+    drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize, debugColors);
+    drawCodewordOutlines(
+      context,
+      debugModel,
+      marginModules,
+      cellSize,
+      activeDebugOutlineMode,
+      getCodewordStyle,
+    );
+    drawCodewordPaths(
+      context,
+      qrDefinition,
+      debugModel,
+      marginModules,
+      cellSize,
+      activeDebugOutlineMode,
+      getModuleContrastColor,
+    );
+    drawStreamFieldStarts(
+      context,
+      debugModel,
+      marginModules,
+      cellSize,
+      activeDebugOutlineMode,
+      debugColors,
+    );
   }
 
   drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, options.color.light);
