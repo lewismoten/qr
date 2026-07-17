@@ -51,7 +51,8 @@ export function createLazyDebugSetup(options) {
     diagnostics: {
       setValidation: (...args) => diagnostics?.setValidation(...args),
       validateManualMode: (...args) => diagnostics?.validateManualMode(...args) ?? true,
-      updateSummary: (...args) => isActive('encoding') && diagnostics?.updateSummary(...args),
+      updateSummary: (...args) => (isActive('encoding') || isActive('overlay'))
+        && diagnostics?.updateSummary(...args),
     },
     styles: {
       getCodewordStyle: (...args) => overlay?.styles.getCodewordStyle(...args) ?? ({
@@ -77,7 +78,7 @@ export function createLazyDebugSetup(options) {
     load(name = 'encoding') {
       if (name === 'encoding') return loadEncoding();
       if (name === 'mask') return loadMask();
-      if (name === 'overlay') return loadOverlay();
+      if (name === 'overlay') return Promise.all([loadOverlay(), loadEncoding()]);
       return Promise.resolve();
     },
   };

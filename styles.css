@@ -54,7 +54,8 @@ body::before {
 
 .app-layout {
   width: min(100%, 1180px);
-  min-height: max(0px, calc(100dvh - 6rem - env(safe-area-inset-bottom)));
+  height: max(0px, calc(100dvh - 6rem - env(safe-area-inset-bottom)));
+  min-height: 0;
   margin: 0 auto;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
@@ -281,15 +282,19 @@ canvas {
 
 .tab-panel-shell {
   min-height: 0;
+  overflow: hidden;
 }
 
 .tab-panels {
+  height: 100%;
   min-height: 0;
+  overflow: hidden;
   position: relative;
 }
 
 .tab-panel {
   height: 100%;
+  min-height: 0;
 }
 
 .tab-panel[hidden] {
@@ -307,6 +312,7 @@ canvas {
 
 .panel-card {
   height: 100%;
+  min-height: 0;
   border-radius: 1.4rem;
   padding: 0.85rem;
   overflow: auto;
@@ -1042,6 +1048,24 @@ output {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.debug-color-grid .color-field {
+  gap: 0.4rem;
+  padding: 0.55rem;
+}
+
+.debug-color-grid .color-field span {
+  overflow: hidden;
+  font-size: clamp(0.58rem, 2.3vw, 0.72rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overlay-info-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .color-field {
   flex: 1 1 0;
   display: grid;
@@ -1317,8 +1341,7 @@ output {
   white-space: nowrap;
 }
 
-.style-subtab-bar,
-.content-subtab-bar {
+.subtab-bar {
   position: sticky;
   top: 0;
   z-index: 5;
@@ -1412,7 +1435,7 @@ output {
   }
 
   .app-layout {
-    min-height: max(0px, calc(100dvh - 6.75rem - env(safe-area-inset-bottom)));
+    height: max(0px, calc(100dvh - 6.75rem - env(safe-area-inset-bottom)));
     gap: 1rem;
   }
 

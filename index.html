@@ -842,7 +842,7 @@
 
                       <label class="toggle-field">
                         <input id="mode-auto" name="mode-auto" type="checkbox" checked />
-                        <span>Auto-detect best encoding mode</span>
+                        <span>Auto-detect (excludes Kanji)</span>
                       </label>
 
                       <span class="field-label" id="encoding-mode-label">Manual mode</span>
@@ -875,10 +875,6 @@
                         <div class="info-chip">
                           <span class="info-label">Capacity</span>
                           <strong id="capacity-summary">-</strong>
-                        </div>
-                        <div class="info-chip">
-                          <span class="info-label">Unused</span>
-                          <strong id="unused-summary">-</strong>
                         </div>
                       </div>
                       <div id="mode-validation" class="validation-message" hidden></div>
@@ -931,6 +927,12 @@
                         <span>Show unmasked data modules</span>
                       </label>
                       <p class="hint">Reverses the selected mask for the debug preview only. Functional patterns and format information remain unchanged.</p>
+                      <div class="info-grid overlay-info-grid">
+                        <div class="info-chip">
+                          <span class="info-label">Unused capacity</span>
+                          <strong id="unused-summary">-</strong>
+                        </div>
+                      </div>
                       <fieldset class="option-group">
                         <legend>Outline grouping</legend>
                         <div class="debug-outline-control" role="group" aria-label="Outline grouping">
@@ -971,16 +973,16 @@
                           <input id="debug-mask-color" type="color" value="#2563eb" />
                         </label>
                         <label class="color-field" for="debug-ecc-color">
-                          <span>EC codewords</span>
-                          <input id="debug-ecc-color" type="color" value="#dc2626" />
+                          <span>EC words</span>
+                          <input id="debug-ecc-color" type="color" value="#dc2626" aria-label="Error correction codewords color" />
                         </label>
                         <label class="color-field" for="debug-remainder-color">
-                          <span>Remainder bits</span>
-                          <input id="debug-remainder-color" type="color" value="#14b8a6" />
+                          <span>Remainder</span>
+                          <input id="debug-remainder-color" type="color" value="#14b8a6" aria-label="Remainder bits color" />
                         </label>
                         <label class="color-field" for="debug-padding-color">
-                          <span>Pad to byte / pad bytes</span>
-                          <input id="debug-padding-color" type="color" value="#64748b" />
+                          <span>Padding</span>
+                          <input id="debug-padding-color" type="color" value="#64748b" aria-label="Pad-to-byte and pad codewords color" />
                         </label>
                         <label class="color-field" for="debug-terminator-color">
                           <span>Terminator</span>
