@@ -22,24 +22,15 @@ import {
   arrayBufferToBase64,
   createCompactFileId,
 } from './ui/content/file/protocol.js';
-import { createFileManifestController } from './ui/content/file/manifest.js';
-import { createFileCapacityCalculator } from './ui/content/file/capacity.js';
-import { createFileCache } from './ui/content/file/cache.js';
-import { createFilePayloadBuilder } from './ui/content/file/payload.js';
-import { createFileSection } from './ui/content/file/section.js';
-import { createFileSettings } from './ui/content/file/settings.js';
+import { createFileSetup } from './ui/content/file/setup.js';
 import { createFrameSection } from './ui/content/frame/section.js';
 import { createContentSections } from './ui/content/setup.js';
-import { createMaskSelector } from './ui/debug/mask-selector.js';
-import { createEncodingDiagnostics } from './ui/debug/encoding.js';
-import { createDebugStyles } from './ui/debug/styles.js';
 import { getActiveOutlineGroups } from './ui/debug/boundaries.js';
 import {
   buildDebugOverlayModel,
   getDebugCategory,
-  moduleIsDark,
 } from './ui/debug/model.js';
-import { createOutlineSelector } from './ui/debug/outline.js';
+import { createDebugSetup } from './ui/debug/setup.js';
 import { createDownloadControls } from './ui/download/controls.js';
 import { restoreLocationDownload } from './ui/download/location.js';
 import { createQrConfiguration } from './ui/encoding/configuration.js';
@@ -128,76 +119,30 @@ const { sms: SMS_MAX_LENGTH, emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
   printPixelsPerInch: PRINT_PIXELS_PER_INCH, minPrintModuleInches: MIN_PRINT_MODULE_INCHES,
   calendarTitle: CALENDAR_TITLE_MAX_LENGTH, calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
   calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH } = LIMITS;
-const { version: FILE_PROTOCOL_VERSION, magic: FILE_MANIFEST_MAGIC,
-  defaultChunkVersion: DEFAULT_CHUNK_AUTO_VERSION, headerBytes: FILE_MANIFEST_HEADER_BYTES,
-  fieldHeaderBytes: FILE_TLV_HEADER_BYTES, flags: FILE_MANIFEST_FLAGS,
-  fieldTypes: FILE_MANIFEST_FIELDS } = FILE_PROTOCOL;
-const fileCache = createFileCache({
-  input: fileInput,
+const DEFAULT_CHUNK_AUTO_VERSION = FILE_PROTOCOL.defaultChunkVersion;
+const fileSetup = createFileSetup({
+  elements: { input: fileInput, format: qrFormat, mode: fileEncodingMode,
+    capacityHint: fileCapacityHint, clearButton: clearFileButton, chunkControls: fileChunkControls,
+    chunkVersionAuto: fileChunkVersionAuto, chunkVersion: fileChunkVersion,
+    chunkVersionValue: fileChunkVersionValue, includeManifest: fileIncludeManifest,
+    compressTransfer: fileCompressTransfer, customMetadata: fileCustomMetadata,
+    chunkIndex: fileChunkIndex, chunkIndexValue: fileChunkIndexValue,
+    versionAuto, qrVersion },
+  encoder: qrEncoder,
+  protocol: FILE_PROTOCOL,
   createId: createCompactFileId,
   encodeBase64: arrayBufferToBase64,
-  isCompressionEnabled: isTransferCompressionEnabled,
+  runtime: { buildOptions: () => buildOptions(), buildPayload: (text) => buildPayload(text),
+    getEncodingMode: () => getCurrentEncodingMode(), getShareableAppUrl,
+    syncNavigation: () => syncChunkPreviewNavigation(), cancelRender: () => cancelRenderRequest(),
+    render: () => renderQr() },
 });
+const fileCache = fileSetup.cache;
 const getActiveFile = fileCache.getFile;
-const ensureFileCacheOwnership = fileCache.ensureOwnership;
-const getTransferFileBytes = fileCache.getTransferBytes;
-const fileManifestController = createFileManifestController({
-  cache: fileCache,
-  includeManifest: () => fileIncludeManifest.checked,
-  getCustomMetadata: () => fileCustomMetadata.value,
-  isCompressionEnabled: isTransferCompressionEnabled,
-  protocol: {
-    version: FILE_PROTOCOL_VERSION,
-    magic: FILE_MANIFEST_MAGIC,
-    headerBytes: FILE_MANIFEST_HEADER_BYTES,
-    fieldHeaderBytes: FILE_TLV_HEADER_BYTES,
-    flags: FILE_MANIFEST_FLAGS,
-    fieldTypes: FILE_MANIFEST_FIELDS,
-  },
-});
-const getManifestByteLength = fileManifestController.getByteLength;
-const getActiveFileManifest = fileManifestController.getManifest;
-const fileCapacityCalculator = createFileCapacityCalculator({
-  encoder: qrEncoder,
-  cache: fileCache,
-  getOptions: buildOptions,
-  buildPayload,
-  getConfiguredVersion: () => getConfiguredChunkVersion(),
-  isAutoVersion: () => versionAuto.checked,
-  getCurrentChunk: () => Number.parseInt(fileChunkIndex.value, 10) || 1,
-  includeManifest: () => fileIncludeManifest.checked,
-  isCompressionEnabled: isTransferCompressionEnabled,
-  getCustomMetadata: () => fileCustomMetadata.value.trim(),
-  getManualMode: getCurrentEncodingMode,
-  getManifestLength: getManifestByteLength,
-  getShareableAppUrl,
-});
+const fileCapacityCalculator = fileSetup.capacity;
 const invalidateChunkCapacityCache = fileCapacityCalculator.invalidate;
-const getFileCapacityBytes = fileCapacityCalculator.getDataUrlCapacity;
-const getBlobUrlCapacityBytes = fileCapacityCalculator.getDownloadUrlCapacity;
 const getChunkedFileCapacityInfo = fileCapacityCalculator.getChunkInfo;
-const fileSection = createFileSection({
-  format: qrFormat,
-  mode: fileEncodingMode,
-  input: fileInput,
-  capacityHint: fileCapacityHint,
-  clearButton: clearFileButton,
-  chunkControls: fileChunkControls,
-  chunkVersionAuto: fileChunkVersionAuto,
-  includeManifest: fileIncludeManifest,
-  compressTransfer: fileCompressTransfer,
-  customMetadata: fileCustomMetadata,
-  chunkIndex: fileChunkIndex,
-  cache: fileCache,
-  getDataUrlCapacity: getFileCapacityBytes,
-  getDownloadUrlCapacity: getBlobUrlCapacityBytes,
-  getChunkInfo: getChunkedFileCapacityInfo,
-  isCompressionEnabled: isTransferCompressionEnabled,
-  syncChunkVersionControls: () => syncChunkVersionControls(),
-  syncChunkLabel: syncFileChunkLabel,
-  syncNavigation: () => syncChunkPreviewNavigation(),
-  resetCache: resetCachedFileState,
-});
+const fileSection = fileSetup.section;
 const getSelectedFileEncodingMode = fileSection.getMode;
 const syncFileModeVisibility = fileSection.syncMode;
 const syncFileCapacityHint = fileSection.syncCapacity;
@@ -353,22 +298,7 @@ const syncDownloadControls = createDownloadControls({
   syncAnimation: () => syncAnimationDurationSummary(),
 });
 
-function isTransferCompressionEnabled() {
-  return fileIncludeManifest.checked && fileCompressTransfer.checked;
-}
-
-const fileSettings = createFileSettings({
-  elements: { chunkVersion: fileChunkVersion, chunkVersionAuto: fileChunkVersionAuto,
-    chunkVersionValue: fileChunkVersionValue, chunkIndex: fileChunkIndex,
-    chunkIndexValue: fileChunkIndexValue, versionAuto, qrVersion, format: qrFormat },
-  cache: fileCache,
-  capacity: fileCapacityCalculator,
-  getMode: getSelectedFileEncodingMode,
-  cancelRender: () => cancelRenderRequest(),
-  render: () => renderQr(),
-  syncCapacity: syncFileCapacityHint,
-  defaultVersion: DEFAULT_CHUNK_AUTO_VERSION,
-});
+const fileSettings = fileSetup.settings;
 const getConfiguredChunkVersion = fileSettings.getVersion;
 const syncFileChunkLabel = fileSettings.syncChunkLabel;
 const syncChunkVersionControls = fileSettings.syncVersion;
@@ -388,17 +318,7 @@ const setFormatVisibility = createFormatVisibility({
   syncEvent: () => syncCalendarEventControls(),
 });
 
-const filePayloadBuilder = createFilePayloadBuilder({
-  cache: fileCache,
-  getMode: getSelectedFileEncodingMode,
-  getShareableAppUrl,
-  includeManifest: () => fileIncludeManifest.checked,
-  chunkIndex: fileChunkIndex,
-  getManifest: getActiveFileManifest,
-  getCapacityInfo: getChunkedFileCapacityInfo,
-  syncCapacity: syncFileCapacityHint,
-});
-const buildFilePayload = filePayloadBuilder.build;
+const buildFilePayload = fileSetup.payload.build;
 
 function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
@@ -612,56 +532,28 @@ const getFormatValidationState = createFormatValidator({
   },
 });
 
-const encodingDiagnostics = createEncodingDiagnostics({
+const debugSetup = createDebugSetup({
+  elements: { format: qrFormat, diagnostics: { detectedMode, segmentSummary, versionSummary,
+    capacitySummary, unusedSummary, modeValidation, formatValidation, encodedPreview, bulkFields },
+    colors: debugColors, darkColor: colorDark, darkTransparency: colorDarkTransparency,
+    lightColor: colorLight, lightTransparency: colorLightTransparency, maskGrid, maskPattern,
+    outlineButtons: debugOutlineModeButtons },
   encoder: qrEncoder,
-  modeLabels: MODE_LABELS,
-  modeCapacity: MODE_CAPACITY,
-  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
-  elements: {
-    detectedMode,
-    segmentSummary,
-    versionSummary,
-    capacitySummary,
-    unusedSummary,
-    modeValidation,
-    formatValidation,
-    encodedPreview,
-    bulkFields,
-  },
-  getCurrentMode: getCurrentEncodingMode,
-  getFormat: () => qrFormat.value,
-  getActiveFieldset: (format) => document.querySelector(`.format-fields[data-format-fields="${format}"]`),
-  isBulkMode,
-  buildDebugModel: buildDebugOverlayModel,
+  config: { modeLabels: MODE_LABELS, modeCapacity: MODE_CAPACITY,
+    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES,
+    maskLabels: MASK_LABELS },
+  helpers: { getCurrentMode: getCurrentEncodingMode, isBulkMode,
+    buildDebugModel: buildDebugOverlayModel, getContrastingHex, getDebugCategory,
+    getErrorLevel: getSelectedErrorLevel, colorWithTransparency },
+  runtime: { render: () => renderQr(), getOutlineMode: () => activeDebugOutlineMode,
+    setOutlineMode: (value) => { activeDebugOutlineMode = value; } },
 });
+const encodingDiagnostics = debugSetup.diagnostics;
 const setValidationMessage = encodingDiagnostics.setValidation;
 const validateManualMode = encodingDiagnostics.validateManualMode;
 const updateEncodingSummary = encodingDiagnostics.updateSummary;
 
-function buildMaskPreviewOptions(maskValue) {
-  const selectedErrorLevel = getSelectedErrorLevel();
-  const options = {
-    errorCorrectionLevel: selectedErrorLevel.value,
-    margin: 1,
-    width: 72,
-    color: {
-      dark: colorWithTransparency(colorDark.value.trim() || '#111827', colorDarkTransparency),
-      light: colorWithTransparency(colorLight.value.trim() || '#ffffff', colorLightTransparency),
-    },
-  };
-
-  if (maskValue !== '') {
-    options.maskPattern = Number.parseInt(maskValue, 10);
-  }
-
-  return options;
-}
-
-const debugStyles = createDebugStyles({
-  colors: debugColors,
-  getContrastingHex,
-  getCategory: getDebugCategory,
-});
+const debugStyles = debugSetup.styles;
 const getCodewordStyle = debugStyles.getCodewordStyle;
 const getModuleContrastColor = debugStyles.getModuleContrastColor;
 
@@ -687,16 +579,7 @@ const renderInvalidPreview = createInvalidPreviewRenderer({
   clearCanvas,
 });
 
-const maskSelector = createMaskSelector({
-  grid: maskGrid,
-  input: maskPattern,
-  values: MASK_VALUES,
-  labels: MASK_LABELS,
-  encoder: qrEncoder,
-  moduleIsDark,
-  buildOptions: buildMaskPreviewOptions,
-  onChange: renderQr,
-});
+const maskSelector = debugSetup.masks;
 const ensureMaskButtons = maskSelector.ensure;
 const syncMaskSelection = maskSelector.sync;
 const renderMaskPreviews = maskSelector.renderPreviews;
@@ -719,14 +602,7 @@ const activateDownloadSubtab = navigation.activateDownload;
 const activateContentSubtab = navigation.activateContent;
 const syncChoiceButtons = navigation.syncChoices;
 
-const debugOutlineSelector = createOutlineSelector({
-  buttons: debugOutlineModeButtons,
-  defaultValue: activeDebugOutlineMode,
-  onChange(value) {
-    activeDebugOutlineMode = value;
-    renderQr();
-  },
-});
+const debugOutlineSelector = debugSetup.outlines;
 const syncDebugOutlineSelection = debugOutlineSelector.sync;
 
 const renderController = createRenderController({
