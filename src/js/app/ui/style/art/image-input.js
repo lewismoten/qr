@@ -1,3 +1,5 @@
+import { refreshFilePicker } from '../../file-picker.js';
+
 export function createImageInputController({ input, clearButton, onUpdate }) {
   let image = null;
   let objectUrl = '';
@@ -43,6 +45,7 @@ export function createImageInputController({ input, clearButton, onUpdate }) {
     revokeObjectUrl();
     image = null;
     input.value = '';
+    refreshFilePicker(input);
     notify();
   });
 

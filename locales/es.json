@@ -90,7 +90,7 @@
     "sms": { "length": "Aún no es válido para SMS: el mensaje debe tener {maxLength} caracteres o menos." },
     "file": { "required": "Aún no es válido para Archivo: elige un archivo para codificar." }
   },
-  "common": { "auto": "Automático", "autoLower": "automático", "none": "ninguno", "preview": "Vista previa", "sequence": "{current} de {total}", "count": "{current} / {total}" },
+  "common": { "auto": "Automático", "autoLower": "automático", "none": "ninguno", "preview": "Vista previa", "noFileSelected": "Ningún archivo seleccionado", "sequence": "{current} de {total}", "count": "{current} / {total}" },
   "bulk": {
     "loading": "Cargando las herramientas de importación masiva.", "warning": "Fila {rowNumber} de importación: {message}",
     "requiredValues": "Valores obligatorios: {values}",

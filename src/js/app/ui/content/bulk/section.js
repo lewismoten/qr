@@ -2,6 +2,7 @@ import { formatBytes } from '../../../bytes.js';
 import { parseCsv } from '../../../csv.js';
 import { validateBulkImport } from './validation.js';
 import { lookup } from '../../../../i18n/index.js';
+import { refreshFilePicker } from '../../file-picker.js';
 
 const MAX_ROWS = 10000;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -86,7 +87,10 @@ export function createBulkImportSection({
     rows = [];
     parseError = '';
     rowIndex.value = '1';
-    if (!preserveFileInput) fileInput.value = '';
+    if (!preserveFileInput) {
+      fileInput.value = '';
+      refreshFilePicker(fileInput);
+    }
     syncStatus();
   };
 

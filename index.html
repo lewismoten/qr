@@ -115,8 +115,11 @@
                   <p class="hint" data-i18n="form.data.bulkHeaders">The first row must contain these field names:</p>
                   <code id="bulk-expected-fields" class="bulk-expected-fields">url</code>
                   <p id="bulk-required-fields" class="hint" data-i18n="bulk.requiredValues">Required values: url</p>
-                  <label for="bulk-file-input" data-i18n="form.data.chooseCsv">Choose a CSV file</label>
-                  <input id="bulk-file-input" name="bulk-file-input" type="file" accept=".csv,text/csv" />
+                  <div class="file-picker">
+                    <input id="bulk-file-input" class="file-picker-input" name="bulk-file-input" type="file" accept=".csv,text/csv" aria-describedby="bulk-file-selection" />
+                    <label class="file-picker-button" for="bulk-file-input" data-i18n="form.data.chooseCsv">Choose a CSV file</label>
+                    <span id="bulk-file-selection" class="file-picker-selection" data-file-picker-status data-i18n="common.noFileSelected">No file selected</span>
+                  </div>
                   <input id="bulk-row-index" name="bulk-row-index" type="hidden" value="1" />
                   <div class="file-status-row">
                     <p id="bulk-status" class="hint file-capacity-hint">No CSV loaded.</p>
@@ -323,8 +326,11 @@
                     <option value="blob" data-i18n="form.data.blobUrl">Blob URL</option>
                     <option value="chunked" data-i18n="form.data.chunkedProtocol">Chunked protocol</option>
                   </select>
-                  <label for="file-input" data-i18n="form.data.chooseFile">Choose a file</label>
-                  <input id="file-input" name="file-input" type="file" />
+                  <div class="file-picker">
+                    <input id="file-input" class="file-picker-input" name="file-input" type="file" aria-describedby="file-selection" />
+                    <label class="file-picker-button" for="file-input" data-i18n="form.data.chooseFile">Choose a file</label>
+                    <span id="file-selection" class="file-picker-selection" data-file-picker-status data-i18n="common.noFileSelected">No file selected</span>
+                  </div>
                   <div id="file-chunk-controls" class="chunk-controls" hidden>
                     <label class="toggle-field">
                       <input id="file-chunk-version-auto" name="file-chunk-version-auto" type="checkbox" checked />
@@ -609,8 +615,11 @@
                   </div>
 
                   <div id="image-fill-controls" class="image-fill-controls" hidden>
-                    <label for="image-fill-input" data-i18n="style.colors.fillImage">Custom fill image</label>
-                    <input id="image-fill-input" name="image-fill-input" type="file" accept="image/*" />
+                    <div class="file-picker">
+                      <input id="image-fill-input" class="file-picker-input" name="image-fill-input" type="file" accept="image/*" aria-describedby="image-fill-selection" />
+                      <label class="file-picker-button" for="image-fill-input" data-i18n="style.colors.fillImage">Custom fill image</label>
+                      <span id="image-fill-selection" class="file-picker-selection" data-file-picker-status data-i18n="common.noFileSelected">No file selected</span>
+                    </div>
                     <div class="image-fill-actions">
                       <button id="image-fill-recommended" type="button" class="secondary-button" data-i18n="style.colors.recommendedContrast">Apply recommended contrast</button>
                       <button id="image-fill-clear" type="button" class="secondary-button" disabled data-i18n="style.colors.clearImage">Clear image</button>
@@ -652,8 +661,11 @@
                     </label>
 
                     <div id="center-logo-controls" class="center-art-mode-controls" hidden>
-                      <label for="center-logo-input" data-i18n="style.art.logoImage">Logo image</label>
-                      <input id="center-logo-input" name="center-logo-input" type="file" accept="image/*" />
+                      <div class="file-picker">
+                        <input id="center-logo-input" class="file-picker-input" name="center-logo-input" type="file" accept="image/*" aria-describedby="center-logo-selection" />
+                        <label class="file-picker-button" for="center-logo-input" data-i18n="style.art.logoImage">Logo image</label>
+                        <span id="center-logo-selection" class="file-picker-selection" data-file-picker-status data-i18n="common.noFileSelected">No file selected</span>
+                      </div>
                       <button id="center-logo-clear" type="button" class="secondary-button" data-i18n="style.art.clearLogo">Clear logo</button>
                     </div>
 

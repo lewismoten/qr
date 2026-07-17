@@ -1,2 +1,0 @@
-function d({input:c,clearButton:s,onUpdate:u}){let e=null,t="",r=0,n=()=>{t&&(URL.revokeObjectURL(t),t="")},l=()=>u(e);return c.addEventListener("change",()=>{let i=++r;n(),e=null;let[a]=c.files||[];if(!a||!a.type.startsWith("image/")){l();return}t=URL.createObjectURL(a);let o=new Image;o.onload=()=>{i===r&&(e=o,n(),l())},o.onerror=()=>{i===r&&(e=null,n(),l())},o.src=t}),s.addEventListener("click",()=>{r+=1,n(),e=null,c.value="",l()}),{getImage:()=>e}}export{d as createImageInputController};
-//# sourceMappingURL=image-input-AJEWXUSY.js.map

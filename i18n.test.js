@@ -150,6 +150,12 @@ const flattenMessages = (value, prefix = '', result = {}) => {
 const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const htmlKeys = [...new Set([...html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)].map((match) => match[1]))];
 const formControls = html.match(/<(?:input|textarea)\b[^>]*>/gs) || [];
+const fileControls = formControls.filter((tag) => /\btype=["']file["']/.test(tag));
+assert.equal(fileControls.length, 4, 'All expected file pickers should be present');
+assert.ok(
+  fileControls.every((tag) => /\bclass=["'][^"']*file-picker-input/.test(tag)),
+  'File inputs must use the localized custom picker',
+);
 assert.deepEqual(
   formControls.filter((tag) => /\bplaceholder=/.test(tag) && !/\bdata-i18n-placeholder=/.test(tag)),
   [],

@@ -1,4 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
+import { refreshFilePicker } from '../../file-picker.js';
 
 export function createFileCache({ input, createId, encodeBase64, isCompressionEnabled }) {
   let owner = null;
@@ -28,7 +29,10 @@ export function createFileCache({ input, createId, encodeBase64, isCompressionEn
     hash = '';
     manifest = null;
     transferBytes = null;
-    if (clearInput) input.value = '';
+    if (clearInput) {
+      input.value = '';
+      refreshFilePicker(input);
+    }
   };
 
   const getFile = () => input.files?.[0] ?? null;

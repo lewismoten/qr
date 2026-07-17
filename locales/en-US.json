@@ -250,6 +250,7 @@
     "autoLower": "auto",
     "none": "none",
     "preview": "Preview",
+    "noFileSelected": "No file selected",
     "sequence": "{current} of {total}",
     "count": "{current} / {total}"
   },
