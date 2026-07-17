@@ -1,4 +1,4 @@
-import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './bytes.js';
+import { formatBytes, hexToBytes } from './bytes.js';
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { normalizePhoneNumber } from './phone.js';
@@ -22,7 +22,6 @@ import {
   drawCenteredFrameMessage,
   drawFrameMessage,
   fitFrameMessage,
-  getOpaqueArtworkBackground,
 } from './frame-text.js';
 import {
   getAlignmentPatternCenters,
@@ -39,6 +38,21 @@ import {
 import { createContentSubtabs } from './ui/content/subtabs.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { createEventSection } from './ui/content/event/section.js';
+import {
+  arrayBufferToBase64,
+  base64ToBase64Url,
+  base64UrlToBase64,
+  createCompactFileId,
+  encodeStreamPosition,
+  getBase64UrlLength,
+  getCompactFileExtension,
+  getFileDataUrlPrefix,
+} from './ui/content/file/protocol.js';
+import {
+  buildManifestFields,
+  getSerializedManifestLength,
+  serializeManifest as encodeManifest,
+} from './ui/content/file/manifest.js';
 import { createFrameSection } from './ui/content/frame/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
@@ -70,12 +84,12 @@ import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
+import { drawCenterArtwork } from './ui/style/art/drawing.js';
 import {
   createQrImageLayer,
   createQrModuleFill,
   drawFinderEyes,
   drawQrModule,
-  fillEyeShape,
 } from './ui/style/drawing/shapes.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
@@ -790,34 +804,6 @@ function ensureFileCacheOwnership(file) {
   }
 }
 
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    const chunk = bytes.subarray(index, index + 0x8000);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return btoa(binary);
-}
-
-function base64ToBase64Url(base64) {
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
-function base64UrlToBase64(base64Url) {
-  const normalized = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const paddingLength = (4 - (normalized.length % 4 || 4)) % 4;
-  return `${normalized}${'='.repeat(paddingLength)}`;
-}
-
-function createCompactFileId() {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return base64ToBase64Url(arrayBufferToBase64(bytes.buffer));
-}
-
 async function getActiveFileBuffer() {
   const file = getActiveFile();
   if (!file) {
@@ -908,62 +894,35 @@ function getCustomMetadataText({ validate = false } = {}) {
   }
 }
 
-function createManifestField(type, value) {
-  return { type, value };
-}
-
 function getManifestFields(file, { validationValue = new Uint8Array(32) } = {}) {
-  const encoder = new TextEncoder();
-  const fields = [
-    createManifestField(FILE_MANIFEST_FIELDS.name, encoder.encode(file?.name || 'file.bin')),
-    createManifestField(FILE_MANIFEST_FIELDS.mimeType, encoder.encode(file?.type?.trim() || 'application/octet-stream')),
-    createManifestField(FILE_MANIFEST_FIELDS.modifiedAt, uint64Bytes(file?.lastModified || 0)),
-    createManifestField(FILE_MANIFEST_FIELDS.originalSize, uint64Bytes(file?.size || 0)),
-    createManifestField(FILE_MANIFEST_FIELDS.validationType, encoder.encode('SHA-256')),
-    createManifestField(FILE_MANIFEST_FIELDS.validationValue, validationValue),
-  ];
-
-  const customMetadata = getCustomMetadataText();
-  if (customMetadata) {
-    fields.push(createManifestField(FILE_MANIFEST_FIELDS.customMetadata, encoder.encode(customMetadata)));
-  }
-
-  return fields;
+  return buildManifestFields({
+    file,
+    customMetadata: getCustomMetadataText(),
+    validationValue,
+    fieldTypes: FILE_MANIFEST_FIELDS,
+  });
 }
 
 function getManifestByteLength(file) {
   if (!fileIncludeManifest.checked) {
     return 0;
   }
-  return getManifestFields(file).reduce(
-    (length, field) => length + FILE_TLV_HEADER_BYTES + field.value.length,
-    FILE_MANIFEST_HEADER_BYTES
+  return getSerializedManifestLength(
+    getManifestFields(file),
+    FILE_MANIFEST_HEADER_BYTES,
+    FILE_TLV_HEADER_BYTES,
   );
 }
 
 function serializeManifest(fields) {
-  const manifestLength = fields.reduce(
-    (length, field) => length + FILE_TLV_HEADER_BYTES + field.value.length,
-    FILE_MANIFEST_HEADER_BYTES
-  );
-  const manifest = new Uint8Array(manifestLength);
-  const view = new DataView(manifest.buffer);
-  manifest.set(new TextEncoder().encode(FILE_MANIFEST_MAGIC), 0);
-  manifest[4] = Number.parseInt(FILE_PROTOCOL_VERSION, 10);
-  manifest[5] = isTransferCompressionEnabled() ? FILE_MANIFEST_FLAGS.gzip : 0;
-  view.setUint32(6, manifestLength, false);
-
-  let offset = FILE_MANIFEST_HEADER_BYTES;
-  fields.forEach((field) => {
-    if (field.value.length > 0xffff) {
-      throw new Error(`Manifest field ${field.type} exceeds the 65,535-byte limit.`);
-    }
-    manifest[offset] = field.type;
-    view.setUint16(offset + 1, field.value.length, false);
-    manifest.set(field.value, offset + FILE_TLV_HEADER_BYTES);
-    offset += FILE_TLV_HEADER_BYTES + field.value.length;
+  return encodeManifest({
+    fields,
+    magic: FILE_MANIFEST_MAGIC,
+    version: FILE_PROTOCOL_VERSION,
+    flags: isTransferCompressionEnabled() ? FILE_MANIFEST_FLAGS.gzip : 0,
+    headerBytes: FILE_MANIFEST_HEADER_BYTES,
+    fieldHeaderBytes: FILE_TLV_HEADER_BYTES,
   });
-  return manifest;
 }
 
 async function getActiveFileManifest(transferBytes = null) {
@@ -1043,27 +1002,6 @@ async function readSelectedFile() {
   return cachedFilePayload;
 }
 
-function getFileDataUrlPrefix(file = getActiveFile()) {
-  const mimeType = file?.type?.trim() || 'application/octet-stream';
-  return `data:${mimeType};base64,`;
-}
-
-function getCompactFileExtension(value) {
-  const sanitized = String(value || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');
-  const segments = sanitized.split('.');
-  const extension = segments.length > 1 ? segments.pop() : '';
-  return (extension || 'BIN').slice(0, 8);
-}
-
-function getBase64UrlLength(byteCount) {
-  return Math.ceil((Math.max(0, byteCount) * 4) / 3);
-}
-
-function encodeStreamPosition(value, streamLength) {
-  const width = Math.max(1, Math.max(0, streamLength).toString(10).length);
-  return Math.max(0, value).toString(10).padStart(width, '0');
-}
-
 function getFrameManifestFlag() {
   return fileIncludeManifest.checked ? 'M' : '-';
 }
@@ -1108,7 +1046,7 @@ function getFileCapacityBytes() {
     return 0;
   }
 
-  const prefix = getFileDataUrlPrefix();
+  const prefix = getFileDataUrlPrefix(getActiveFile());
 
   const canEncodeBytes = (byteCount) => {
     const base64Length = Math.ceil(byteCount / 3) * 4;
@@ -2733,132 +2671,6 @@ function getModuleContrastColor(module, qrDefinition, debugModel) {
 }
 
 
-function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
-  const outlineWidth = Math.max(1.5, artSize * 0.065);
-  const bufferSize = Math.ceil(artSize + outlineWidth * 6);
-  const emojiCanvas = document.createElement('canvas');
-  const maskCanvas = document.createElement('canvas');
-  emojiCanvas.width = bufferSize;
-  emojiCanvas.height = bufferSize;
-  maskCanvas.width = bufferSize;
-  maskCanvas.height = bufferSize;
-  const emojiContext = emojiCanvas.getContext('2d');
-  const maskContext = maskCanvas.getContext('2d');
-  if (!emojiContext || !maskContext) {
-    return;
-  }
-
-  let fontSize = artSize * 0.82;
-  const fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", sans-serif';
-  emojiContext.font = `${fontSize}px ${fontFamily}`;
-  const measuredWidth = emojiContext.measureText(emoji).width;
-  if (measuredWidth > artSize * 0.92) {
-    fontSize *= (artSize * 0.92) / measuredWidth;
-  }
-
-  emojiContext.font = `${fontSize}px ${fontFamily}`;
-  emojiContext.textAlign = 'center';
-  emojiContext.textBaseline = 'middle';
-  emojiContext.fillText(emoji, bufferSize / 2, bufferSize / 2 + fontSize * 0.04);
-
-  maskContext.drawImage(emojiCanvas, 0, 0);
-  maskContext.globalCompositeOperation = 'source-in';
-  maskContext.fillStyle = outlineColor;
-  maskContext.fillRect(0, 0, bufferSize, bufferSize);
-
-  const target = center - bufferSize / 2;
-  for (let step = 0; step < 24; step += 1) {
-    const angle = (step / 24) * Math.PI * 2;
-    context.drawImage(
-      maskCanvas,
-      target + Math.cos(angle) * outlineWidth,
-      target + Math.sin(angle) * outlineWidth
-    );
-  }
-  context.drawImage(emojiCanvas, target, target);
-}
-
-function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
-  const mode = centerArtMode.value;
-  const emoji = centerEmoji.value.trim();
-  const pixelArt = pixelArtEditor.getState();
-  const hasPixelArt = pixelArt.pixels.some(Boolean);
-  const hasArtwork =
-    (mode === 'logo' && centerLogoImage) ||
-    (mode === 'emoji' && emoji) ||
-    (mode === 'pixel' && hasPixelArt);
-  if (!hasArtwork) {
-    return;
-  }
-
-  const badgeSize = qrSize * ((readInteger(centerArtSize) ?? 20) / 100);
-  const center = qrStart + qrSize / 2;
-  const badgeX = center - badgeSize / 2;
-  const badgeY = center - badgeSize / 2;
-  const artPadding = centerArtBackground.checked ? badgeSize * 0.13 : 0;
-  const artSize = badgeSize - artPadding * 2;
-
-  context.save();
-  if (centerArtBackground.checked && mode !== 'emoji') {
-    fillEyeShape(
-      context,
-      badgeX,
-      badgeY,
-      badgeSize,
-      20,
-      getOpaqueArtworkBackground(lightColor)
-    );
-  }
-
-  if (mode === 'logo') {
-    const scale = Math.min(artSize / centerLogoImage.naturalWidth, artSize / centerLogoImage.naturalHeight);
-    const width = centerLogoImage.naturalWidth * scale;
-    const height = centerLogoImage.naturalHeight * scale;
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = 'high';
-    context.drawImage(centerLogoImage, center - width / 2, center - height / 2, width, height);
-  } else if (mode === 'emoji') {
-    if (centerArtBackground.checked) {
-      drawOutlinedEmoji(context, emoji, center, artSize, getOpaqueArtworkBackground(lightColor));
-    } else {
-      context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillText(emoji, center, center + artSize * 0.04);
-    }
-  } else if (mode === 'pixel') {
-    const pixelSize = artSize / pixelArt.size;
-    const artX = center - artSize / 2;
-    const artY = center - artSize / 2;
-    const matchModuleShape = pixelArtMatchModuleShape.checked && moduleShape.value !== 'square';
-    const pixelShapeOptions = getCurrentModuleShapeOptions();
-    context.imageSmoothingEnabled = false;
-    pixelArt.pixels.forEach((color, index) => {
-      if (!color) {
-        return;
-      }
-      const row = Math.floor(index / pixelArt.size);
-      const column = index % pixelArt.size;
-      const left = Math.round(artX + column * pixelSize);
-      const top = Math.round(artY + row * pixelSize);
-      const right = Math.round(artX + (column + 1) * pixelSize);
-      const bottom = Math.round(artY + (row + 1) * pixelSize);
-      context.fillStyle = color;
-      if (matchModuleShape) {
-        drawQrModule(
-          context,
-          artX + column * pixelSize,
-          artY + row * pixelSize,
-          pixelSize,
-          pixelShapeOptions
-        );
-      } else {
-        context.fillRect(left, top, right - left, bottom - top);
-      }
-    });
-  }
-  context.restore();
-}
 
 function drawQr(qrDefinition, options) {
   const marginModules = options.margin ?? 4;
@@ -3075,7 +2887,17 @@ function drawQr(qrDefinition, options) {
     );
   }
 
-  drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, options.color.light);
+  drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, {
+    mode: centerArtMode.value,
+    logo: centerLogoImage,
+    emoji: centerEmoji.value.trim(),
+    pixelArt: pixelArtEditor.getState(),
+    sizePercent: readInteger(centerArtSize) ?? 20,
+    protectBackground: centerArtBackground.checked,
+    lightColor: options.color.light,
+    matchModuleShape: pixelArtMatchModuleShape.checked && moduleShape.value !== 'square',
+    moduleShape: getCurrentModuleShapeOptions(),
+  });
 
   if (frameMessageIsCentered) {
     drawCenteredFrameMessage(
