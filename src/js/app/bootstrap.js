@@ -1,6 +1,7 @@
 import { colorWithTransparency, getContrastingHex } from './colors.js';
+import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_LABELS, MASK_VALUES,
+  MODE_CAPACITY, MODE_LABELS, QR_ALPHANUMERIC_CHARACTERS } from './configuration.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
-import { getSupportedMp4MimeType } from './mp4.js';
 import { validatePrintableText } from './validation.js';
 import {
   getAlignmentPatternCenters,
@@ -42,9 +43,7 @@ import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadControls } from './ui/download/controls.js';
 import { restoreLocationDownload } from './ui/download/location.js';
 import { createQrConfiguration } from './ui/encoding/configuration.js';
-import { createAnimationSection } from './ui/download/animation/section.js';
-import { createDownloadActions } from './ui/download/actions.js';
-import { createFrameNavigation } from './ui/download/frames.js';
+import { createDownloadSetup } from './ui/download/setup.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { bindApplicationEvents } from './ui/events.js';
 import { getApplicationElements } from './ui/elements.js';
@@ -54,12 +53,7 @@ import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
 import { createRenderController } from './ui/preview/render.js';
 import { createQrRenderer } from './ui/preview/qr-renderer.js';
 import { createPreviewSizeControls } from './ui/preview/size.js';
-import { createColorSection } from './ui/style/colors/section.js';
-import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
-import { createArtworkControls } from './ui/style/art/controls.js';
-import { createImageInputController } from './ui/style/art/image-input.js';
-import { createEyeShapeSection } from './ui/style/eyes/section.js';
-import { createModuleShapeSection } from './ui/style/modules/section.js';
+import { createStyleSetup } from './ui/style/setup.js';
 import qrEncoder from '../qr/index.js';
 
 const {
@@ -113,58 +107,6 @@ const debugColors = {
   version: document.getElementById('debug-version-color'),
 };
 
-const MASK_VALUES = ['', '0', '1', '2', '3', '4', '5', '6', '7'];
-
-const ERROR_LEVELS = [
-  {
-    value: 'L',
-    label: 'Low',
-    detail: 'Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered.',
-  },
-  {
-    value: 'M',
-    label: 'Medium',
-    detail: 'Balances capacity and resilience, with recovery for about 15% of damaged or covered area.',
-  },
-  {
-    value: 'Q',
-    label: 'Quartile',
-    detail: 'Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion.',
-  },
-  {
-    value: 'H',
-    label: 'High',
-    detail: 'Uses the most correction data, so the code can often survive about 30% of its area being obscured.',
-  },
-];
-
-const MODE_LABELS = {
-  numeric: 'Numeric',
-  alphanumeric: 'Alphanumeric',
-  byte: 'Byte / Binary',
-  kanji: 'Kanji',
-  mixed: 'Mixed',
-};
-
-const MODE_CAPACITY = {
-  numeric: { L: 7089, M: 5596, Q: 3993, H: 3057 },
-  alphanumeric: { L: 4296, M: 3391, Q: 2420, H: 1852 },
-  byte: { L: 2953, M: 2331, Q: 1663, H: 1273 },
-  kanji: { L: 1817, M: 1435, Q: 1024, H: 784 },
-};
-
-const MASK_LABELS = {
-  '': 'Best fit',
-  0: '(row + col) mod 2 = 0',
-  1: 'row mod 2 = 0',
-  2: 'col mod 3 = 0',
-  3: '(row + col) mod 3 = 0',
-  4: '(floor(row / 2) + floor(col / 3)) mod 2 = 0',
-  5: 'row * col mod 2 + row * col mod 3 = 0',
-  6: '((row * col mod 2) + (row * col mod 3)) mod 2 = 0',
-  7: '((row + col mod 2) + (row * col mod 3)) mod 2 = 0',
-};
-
 let cancelRenderRequest = () => {};
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
@@ -178,45 +120,18 @@ const previewViewport = createPreviewViewport({
 });
 const setPreviewViewMode = previewViewport.setMode;
 const schedulePreviewViewportSync = previewViewport.scheduleSync;
-const pixelArtEditor = createPixelArtEditor({
-  paletteElement: pixelArtPalette,
-  customColorInput: pixelArtColor,
-  clearButton: pixelArtClear,
-  grid: pixelArtGrid,
-  sizeInput: pixelArtSizeInput,
-  sizeValue: pixelArtSizeValue,
-  onChange: renderQr,
-});
 let activeTabName = 'content';
 let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
-const SMS_MAX_LENGTH = 160;
-const EMAIL_SUBJECT_MAX_LENGTH = 120;
-const NUMBER_SERIES_MAX_FRAMES = 10000;
-const MAX_QR_TARGET_WIDTH = 2048;
-const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
-const PRINT_PIXELS_PER_INCH = 192;
-const MIN_PRINT_MODULE_INCHES = 0.02;
-const CALENDAR_TITLE_MAX_LENGTH = 120;
-const CALENDAR_LOCATION_MAX_LENGTH = 160;
-const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
-const FILE_PROTOCOL_VERSION = '1';
-const FILE_MANIFEST_MAGIC = 'FILE';
-const DEFAULT_CHUNK_AUTO_VERSION = 8;
-const FILE_MANIFEST_HEADER_BYTES = 10;
-const FILE_TLV_HEADER_BYTES = 3;
-const FILE_MANIFEST_FLAGS = {
-  gzip: 0x01,
-};
-const FILE_MANIFEST_FIELDS = {
-  name: 1,
-  mimeType: 2,
-  modifiedAt: 3,
-  originalSize: 4,
-  validationType: 5,
-  validationValue: 6,
-  customMetadata: 8,
-};
+const { sms: SMS_MAX_LENGTH, emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
+  numberFrames: NUMBER_SERIES_MAX_FRAMES, qrTargetWidth: MAX_QR_TARGET_WIDTH,
+  printPixelsPerInch: PRINT_PIXELS_PER_INCH, minPrintModuleInches: MIN_PRINT_MODULE_INCHES,
+  calendarTitle: CALENDAR_TITLE_MAX_LENGTH, calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
+  calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH } = LIMITS;
+const { version: FILE_PROTOCOL_VERSION, magic: FILE_MANIFEST_MAGIC,
+  defaultChunkVersion: DEFAULT_CHUNK_AUTO_VERSION, headerBytes: FILE_MANIFEST_HEADER_BYTES,
+  fieldHeaderBytes: FILE_TLV_HEADER_BYTES, flags: FILE_MANIFEST_FLAGS,
+  fieldTypes: FILE_MANIFEST_FIELDS } = FILE_PROTOCOL;
 const fileCache = createFileCache({
   input: fileInput,
   createId: createCompactFileId,
@@ -367,40 +282,28 @@ const syncPrintWidthControls = previewSizeControls.syncPrint;
 const formatWidthLabel = previewSizeControls.formatWidth;
 const syncSizeLabels = previewSizeControls.syncLabels;
 
-const moduleShapeSection = createModuleShapeSection({
-  shape: moduleShape,
-  controls: moduleCustomControls,
-  rounding: moduleRounding,
-  roundingValue: moduleRoundingValue,
-  inset: moduleInset,
-  insetValue: moduleInsetValue,
-  rotation: moduleRotation,
-  rotationValue: moduleRotationValue,
+const styleSetup = createStyleSetup({
+  elements: { pixelArtPalette, pixelArtColor, pixelArtClear, pixelArtGrid, pixelArtSizeInput,
+    pixelArtSizeValue, moduleShape, moduleCustomControls, moduleRounding, moduleRoundingValue,
+    moduleInset, moduleInsetValue, moduleRotation, moduleRotationValue, eyeShape, eyeCustomControls,
+    eyeOuterRounding, eyeOuterRoundingValue, eyeCenterRounding, eyeCenterRoundingValue,
+    eyeCustomColorsEnabled, eyeColorControls, gradientType, centerArtMode, centerArtControls,
+    centerLogoControls, centerEmojiControls, centerPixelControls, centerArtSize, centerArtSizeValue,
+    centerArtBackgroundLabel, centerEmoji, emojiOptions, colorDark, colorLight,
+    colorDarkTransparency, colorDarkTransparencyValue, colorLightTransparency,
+    colorLightTransparencyValue, gradientControls, gradientAngleControls, gradientAngle,
+    gradientAngleValue, colorGradientEnd, colorGradientEndTransparency,
+    colorGradientEndTransparencyValue, imageFillControls, imageFillClear, imageFillInput,
+    centerLogoInput, centerLogoClear },
+  render: () => renderQr(),
+  colorWithTransparency,
 });
-const syncModuleShapeControls = moduleShapeSection.sync;
-const getCurrentModuleShapeOptions = moduleShapeSection.getOptions;
-
-const eyeShapeSection = createEyeShapeSection({
-  shape: eyeShape,
-  controls: eyeCustomControls,
-  outerRounding: eyeOuterRounding,
-  outerRoundingValue: eyeOuterRoundingValue,
-  centerRounding: eyeCenterRounding,
-  centerRoundingValue: eyeCenterRoundingValue,
-  customColorsEnabled: eyeCustomColorsEnabled,
-  colorControls: eyeColorControls,
-  isImageFill: () => gradientType.value === 'image',
-});
-const syncEyeShapeControls = eyeShapeSection.sync;
-const getCurrentEyeShapeOptions = eyeShapeSection.getOptions;
-
-const artworkControls = createArtworkControls({
-  elements: { mode: centerArtMode, controls: centerArtControls, logoControls: centerLogoControls,
-    emojiControls: centerEmojiControls, pixelControls: centerPixelControls, size: centerArtSize,
-    sizeValue: centerArtSizeValue, backgroundLabel: centerArtBackgroundLabel,
-    emoji: centerEmoji, emojiOptions },
-  pixelEditor: pixelArtEditor,
-});
+const pixelArtEditor = styleSetup.pixelEditor;
+const syncModuleShapeControls = styleSetup.modules.sync;
+const getCurrentModuleShapeOptions = styleSetup.modules.getOptions;
+const syncEyeShapeControls = styleSetup.eyes.sync;
+const getCurrentEyeShapeOptions = styleSetup.eyes.getOptions;
+const artworkControls = styleSetup.artwork;
 const syncCenterArtworkControls = artworkControls.sync;
 const syncEmojiSelection = artworkControls.syncEmoji;
 
@@ -528,64 +431,28 @@ const getNumberSequenceInfo = numberSection.getSequenceInfo;
 const getNumberPayload = numberSection.getPayload;
 const syncNumberSequenceControls = numberSection.sync;
 
-const frameNavigation = createFrameNavigation({
-  format: qrFormat,
-  isBulkMode,
-  getBulkRowCount,
-  bulkRowIndex,
-  syncBulkStatus,
-  getFileEncodingMode: getSelectedFileEncodingMode,
-  fileChunkIndex,
-  syncFileChunkLabel,
-  numberSequenceIndex,
-  getNumberSequenceInfo,
-  syncNumberSequenceControls,
+const downloadSetup = createDownloadSetup({
+  elements: { format: qrFormat, bulkRowIndex, fileChunkIndex, numberSequenceIndex,
+    navigation: chunkPreviewNav, navigationStatus: chunkPreviewStatus,
+    previous: chunkPreviewPrev, next: chunkPreviewNext, animationTimingMode,
+    animationMinutes, animationSeconds, animationMilliseconds,
+    animationSummary: animationDurationSummary, animationMp4: downloadAnimationMp4,
+    canvas, downloadFormat, downloadQuality, downloadStatus, downloadCurrent,
+    downloadCurrentPdf, downloadZip, downloadAllPdf, downloadGif: downloadAnimatedGif },
+  bulk: { isMode: isBulkMode, getRowCount: getBulkRowCount, syncStatus: syncBulkStatus },
+  file: { getMode: getSelectedFileEncodingMode, syncChunkLabel: syncFileChunkLabel },
+  number: { getInfo: getNumberSequenceInfo, sync: syncNumberSequenceControls },
+  runtime: { syncControls: () => syncDownloadControls(), render: () => renderQr() },
   maxNumberFrames: NUMBER_SERIES_MAX_FRAMES,
-  navigation: chunkPreviewNav,
-  status: chunkPreviewStatus,
-  previousButton: chunkPreviewPrev,
-  nextButton: chunkPreviewNext,
-  onDownloadStateChange: syncDownloadControls,
+  getPrintWidth: getPrintWidthInches,
 });
+const frameNavigation = downloadSetup.frames;
 const getDownloadFrameCount = frameNavigation.getFrameCount;
 const getCurrentFrameIndex = frameNavigation.getCurrentFrame;
 const setCurrentFrameIndex = frameNavigation.setCurrentFrame;
 const syncChunkPreviewNavigation = frameNavigation.sync;
-
-const animationSection = createAnimationSection({
-  timingMode: animationTimingMode,
-  minutesInput: animationMinutes,
-  secondsInput: animationSeconds,
-  millisecondsInput: animationMilliseconds,
-  summary: animationDurationSummary,
-  mp4Button: downloadAnimationMp4,
-  getFrameCount: getDownloadFrameCount,
-  getSupportedMp4MimeType,
-});
-const getAnimationTiming = animationSection.getTiming;
-const formatAnimationDuration = animationSection.formatDuration;
+const animationSection = downloadSetup.animation;
 const syncAnimationDurationSummary = animationSection.sync;
-
-createDownloadActions({
-  canvas,
-  formatInput: downloadFormat,
-  qualityInput: downloadQuality,
-  status: downloadStatus,
-  currentButton: downloadCurrent,
-  currentPdfButton: downloadCurrentPdf,
-  zipButton: downloadZip,
-  allPdfButton: downloadAllPdf,
-  gifButton: downloadAnimatedGif,
-  mp4Button: downloadAnimationMp4,
-  getPrintWidthInches,
-  getFrameCount: getDownloadFrameCount,
-  getCurrentFrame: getCurrentFrameIndex,
-  setCurrentFrame: setCurrentFrameIndex,
-  syncFrameNavigation: syncChunkPreviewNavigation,
-  render: renderQr,
-  getAnimationTiming,
-  formatAnimationDuration,
-});
 
 const wifiSection = contentSections.wifi;
 const syncWifiSecurityState = wifiSection.sync;
@@ -596,47 +463,13 @@ const sharedFieldsSection = contentSections.shared;
 const buildEmailPayload = sharedFieldsSection.buildEmailPayload;
 const buildEmailPayloadWithBody = sharedFieldsSection.buildEmailPayloadWithBody;
 
-let imageFillController = null;
-const colorSection = createColorSection({
-  darkColor: colorDark,
-  lightColor: colorLight,
-  darkTransparency: colorDarkTransparency,
-  darkTransparencyValue: colorDarkTransparencyValue,
-  lightTransparency: colorLightTransparency,
-  lightTransparencyValue: colorLightTransparencyValue,
-  gradientType,
-  gradientControls,
-  gradientAngleControls,
-  gradientAngle,
-  gradientAngleValue,
-  gradientEndColor: colorGradientEnd,
-  gradientEndTransparency: colorGradientEndTransparency,
-  gradientEndTransparencyValue: colorGradientEndTransparencyValue,
-  imageFillControls,
-  imageFillClear,
-  hasImageFill: () => Boolean(imageFillController?.getImage()),
-  colorWithTransparency,
-});
+const colorSection = styleSetup.colors;
 const formatColorTransparency = colorSection.formatTransparency;
 const syncGradientControls = colorSection.sync;
 const getCurrentGradientOptions = colorSection.getGradientOptions;
 const applyRecommendedImageContrast = colorSection.applyRecommendedImageContrast;
-
-imageFillController = createImageInputController({
-  input: imageFillInput,
-  clearButton: imageFillClear,
-  onUpdate(image) {
-    if (image) applyRecommendedImageContrast();
-    syncGradientControls();
-    renderQr();
-  },
-});
-
-const centerLogoController = createImageInputController({
-  input: centerLogoInput,
-  clearButton: centerLogoClear,
-  onUpdate: renderQr,
-});
+const imageFillController = styleSetup.imageFill;
+const centerLogoController = styleSetup.centerLogo;
 
 const vcardSection = contentSections.vcard;
 const buildVCardPayload = vcardSection.buildPayload;
