@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Free QR Code Generator, Designer and Debugger</title>
+    <title data-i18n="page.title">Free QR Code Generator, Designer and Debugger</title>
     <meta name="description" content="Create, customize, inspect and download QR codes for URLs, Wi-Fi, contacts, messages, calendar events, locations, files and number sequences. Includes advanced styling, batch export and developer overlays." />
     <meta name="keywords" content="QR code generator, free QR code maker, custom QR code, QR code designer, Wi-Fi QR code, calendar event QR code, vCard QR code, file QR code, QR code debugger, QR code SVG, batch QR codes" />
     <meta name="application-name" content="QR Code Generator" />
@@ -31,12 +31,13 @@
   </head>
   <body>
     <main class="app-shell">
-      <h1 class="sr-only">Free QR Code Generator, Designer and Debugger</h1>
+      <h1 class="sr-only" data-i18n="page.title">Free QR Code Generator, Designer and Debugger</h1>
       <form id="qr-form" class="app-layout">
         <section class="preview-card" aria-live="polite">
-          <div id="preview-view-controls" class="preview-view-controls is-hidden" role="group" aria-label="QR preview size" aria-hidden="true">
-            <button id="preview-view-fit" type="button" class="preview-view-button is-active" aria-pressed="true">Fit</button>
-            <button id="preview-view-actual" type="button" class="preview-view-button" aria-label="Actual size" aria-pressed="false">1:1</button>
+          <p class="preview-title" data-i18n="preview.generatorTitle">QR Code Generator</p>
+          <div id="preview-view-controls" class="preview-view-controls is-hidden" role="group" aria-label="QR preview size" data-i18n-aria-label="preview.sizeControls" aria-hidden="true">
+            <button id="preview-view-fit" type="button" class="preview-view-button is-active" aria-label="Fit" data-i18n="preview.fit" data-i18n-aria-label="preview.fit" aria-pressed="true">Fit</button>
+            <button id="preview-view-actual" type="button" class="preview-view-button" aria-label="Actual size" data-i18n="preview.actualRatio" data-i18n-aria-label="preview.actualSize" aria-pressed="false">1:1</button>
           </div>
           <div class="preview-frame">
             <div id="chunk-preview-nav" class="chunk-preview-nav">

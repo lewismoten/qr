@@ -1,4 +1,5 @@
 {
+  "page": { "title": "Generador, diseñador y depurador de códigos QR gratuito" },
   "navigation": { "content": "Contenido", "style": "Estilo", "download": "Descargar", "debug": "Depurar" },
   "content": { "data": "Datos", "format": "Formato", "frame": "Marco", "tools": "Herramientas de contenido" },
   "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono", "text": "Texto", "number": "Número", "numberRange": "Rango numérico", "wifi": "Wi-Fi", "calendarEvent": "Evento de calendario", "geo": "Geo", "file": "Archivo" },
@@ -120,6 +121,7 @@
   },
   "mask": { "value": "Máscara {value}", "bestFit": "Mejor ajuste" },
   "preview": {
+    "generatorTitle": "Generador de códigos QR", "sizeControls": "Tamaño de vista previa del código QR", "fit": "Ajustar", "actualSize": "Tamaño real", "actualRatio": "1:1",
     "invalid": "No válido", "invalidPayload": "Vista previa no válida", "buildError": "No se pudo crear el contenido QR.",
     "encodeError": "No se pudo codificar este contenido.", "encoderError": "No se cargó el codificador QR propio.",
     "printSize": "{inches} in{automatic} - {millimeters} mm/módulo", "width": "{width} px · {scale} px/módulo · {inches} in a {ppi} ppp"

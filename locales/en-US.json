@@ -1,4 +1,7 @@
 {
+  "page": {
+    "title": "Free QR Code Generator, Designer and Debugger"
+  },
   "navigation": {
     "content": "Content",
     "style": "Style",
@@ -373,6 +376,11 @@
     "bestFit": "Best fit"
   },
   "preview": {
+    "generatorTitle": "QR Code Generator",
+    "sizeControls": "QR preview size",
+    "fit": "Fit",
+    "actualSize": "Actual size",
+    "actualRatio": "1:1",
     "invalid": "Invalid",
     "invalidPayload": "Invalid preview",
     "buildError": "Unable to build QR content.",

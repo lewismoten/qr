@@ -1,4 +1,5 @@
 {
+  "page": { "title": "免费二维码生成器、设计器和调试器" },
   "navigation": { "content": "内容", "style": "样式", "download": "下载", "debug": "调试" },
   "content": { "data": "数据", "format": "格式", "frame": "边框", "tools": "内容工具" },
   "formats": { "url": "网址", "event": "日历事件", "vcard": "电子名片", "sms": "短信", "email": "电子邮件", "phone": "电话", "text": "文本", "number": "数字", "numberRange": "数字范围", "wifi": "Wi-Fi", "calendarEvent": "日历事件", "geo": "地理位置", "file": "文件" },
@@ -101,6 +102,7 @@
   },
   "mask": { "value": "掩码 {value}", "bestFit": "最佳匹配" },
   "preview": {
+    "generatorTitle": "二维码生成器", "sizeControls": "二维码预览尺寸", "fit": "适应", "actualSize": "实际尺寸", "actualRatio": "1:1",
     "invalid": "无效", "invalidPayload": "无效预览", "buildError": "无法生成二维码内容。", "encodeError": "无法编码此内容。",
     "encoderError": "第一方二维码编码器未加载。", "printSize": "{inches} 英寸{automatic} - {millimeters} 毫米/模块",
     "width": "{width} px · {scale} px/模块 · {inches} 英寸（{ppi} ppi）"

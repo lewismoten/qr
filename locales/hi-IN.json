@@ -1,4 +1,5 @@
 {
+  "page": { "title": "मुफ़्त क्यूआर कोड जनरेटर, डिज़ाइनर और डीबगर" },
   "navigation": { "content": "सामग्री", "style": "शैली", "download": "डाउनलोड", "debug": "डीबग" },
   "content": { "data": "डेटा", "format": "प्रारूप", "frame": "फ़्रेम", "tools": "सामग्री उपकरण" },
   "formats": { "url": "यूआरएल", "event": "कार्यक्रम", "vcard": "वीकार्ड", "sms": "एसएमएस", "email": "ईमेल", "phone": "फ़ोन", "text": "पाठ", "number": "संख्या", "numberRange": "संख्या सीमा", "wifi": "वाई-फ़ाई", "calendarEvent": "कैलेंडर कार्यक्रम", "geo": "भौगोलिक स्थान", "file": "फ़ाइल" },
@@ -102,6 +103,7 @@
   },
   "mask": { "value": "मास्क {value}", "bestFit": "सर्वोत्तम मिलान" },
   "preview": {
+    "generatorTitle": "क्यूआर कोड जनरेटर", "sizeControls": "क्यूआर पूर्वावलोकन आकार", "fit": "अनुकूलित करें", "actualSize": "वास्तविक आकार", "actualRatio": "1:1",
     "invalid": "अमान्य", "invalidPayload": "अमान्य पूर्वावलोकन", "buildError": "क्यूआर सामग्री नहीं बनाई जा सकी।", "encodeError": "इस सामग्री को एन्कोड नहीं किया जा सका।",
     "encoderError": "प्रथम-पक्ष क्यूआर एन्कोडर लोड नहीं हुआ।", "printSize": "{inches} इंच{automatic} - {millimeters} मिमी/मॉड्यूल",
     "width": "{width} px · {scale} px/मॉड्यूल · {inches} इंच, {ppi} ppi पर"
