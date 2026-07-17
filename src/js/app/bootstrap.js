@@ -17,7 +17,6 @@ import { createContentPayload, createFilePayloadPreview } from './ui/content/pay
 import { createFormatValidator } from './ui/content/validation.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { serializeBulkRow } from './ui/content/bulk/payload.js';
-import { createEventSection } from './ui/content/event/section.js';
 import {
   arrayBufferToBase64,
   createCompactFileId,
@@ -29,12 +28,7 @@ import { createFilePayloadBuilder } from './ui/content/file/payload.js';
 import { createFileSection } from './ui/content/file/section.js';
 import { createFileSettings } from './ui/content/file/settings.js';
 import { createFrameSection } from './ui/content/frame/section.js';
-import { createGeoSection } from './ui/content/geo/section.js';
-import { createNumberSection } from './ui/content/number/section.js';
-import { createPhoneSection } from './ui/content/phone/section.js';
-import { createSharedFieldsSection } from './ui/content/shared-fields.js';
-import { createVCardSection } from './ui/content/vcard/section.js';
-import { createWifiSection } from './ui/content/wifi/section.js';
+import { createContentSections } from './ui/content/setup.js';
 import { createMaskSelector } from './ui/debug/mask-selector.js';
 import { createEncodingDiagnostics } from './ui/debug/encoding.js';
 import { createDebugStyles } from './ui/debug/styles.js';
@@ -507,51 +501,29 @@ function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
 }
 
-const eventSection = createEventSection({
-  title: eventTitle,
-  allDay: eventAllDay,
-  startDate: eventStartDate,
-  startTime: eventStartTime,
-  endDate: eventEndDate,
-  endTime: eventEndTime,
-  location: eventLocation,
-  description: eventDescription,
-  url: eventUrl,
-  timeFields: eventTimeFields,
-});
-const initializeCalendarEventDefaults = eventSection.initialize;
-const syncCalendarEventControls = eventSection.sync;
-const buildCalendarEventPayload = eventSection.buildPayload;
-
-const geoSection = createGeoSection({
-  latitudeInput: geoLatitude,
-  longitudeInput: geoLongitude,
-  labelInput: geoQuery,
-  mapElement: geoMapElement,
-  isActive: () => qrFormat.value === 'geo',
-  onChange: renderQr,
-});
-const buildGeoPayload = geoSection.buildPayload;
-const updateGeoMap = geoSection.update;
-
-const phoneSection = createPhoneSection({
-  buttons: phoneFormatButtons,
-  inputs: [phoneNumber, smsNumber, vcardPhone],
-  onChange: renderQr,
-});
-
-const numberSection = createNumberSection({
-  startInput: numberStart,
-  endInput: numberEnd,
-  stepInput: numberStep,
-  prefixInput: numberPrefix,
-  suffixInput: numberSuffix,
-  indexInput: numberSequenceIndex,
-  statusElement: numberSequenceValue,
-  maxFrames: NUMBER_SERIES_MAX_FRAMES,
+const contentSections = createContentSections({
+  elements: { format: qrFormat, eventTitle, eventAllDay, eventStartDate, eventStartTime,
+    eventEndDate, eventEndTime, eventLocation, eventDescription, eventUrl, eventTimeFields,
+    geoLatitude, geoLongitude, geoQuery, geoMapElement, phoneFormatButtons, phoneNumber,
+    smsNumber, vcardPhone, numberStart, numberEnd, numberStep, numberPrefix, numberSuffix,
+    numberSequenceIndex, numberSequenceValue, wifiSsid, wifiPassword, wifiEncryption,
+    wifiHidden, payloadRevealSecrets, emailTo, vcardEmail, textInput, smsBody, emailBody,
+    emailSubject, vcardName, vcardOrg, vcardTitle, vcardUrl },
+  runtime: { render: () => renderQr(), syncChoices: () => syncChoiceButtons(),
+    syncSmsLength: () => syncSmsLengthHint(), syncEmailLength: () => syncEmailBodyLengthHint() },
+  limits: { numberFrames: NUMBER_SERIES_MAX_FRAMES },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
 });
+const eventSection = contentSections.event;
+const initializeCalendarEventDefaults = eventSection.initialize;
+const syncCalendarEventControls = eventSection.sync;
+const buildCalendarEventPayload = eventSection.buildPayload;
+const geoSection = contentSections.geo;
+const buildGeoPayload = geoSection.buildPayload;
+const updateGeoMap = geoSection.update;
+const phoneSection = contentSections.phone;
+const numberSection = contentSections.number;
 const getNumberSequenceInfo = numberSection.getSequenceInfo;
 const getNumberPayload = numberSection.getPayload;
 const syncNumberSequenceControls = numberSection.sync;
@@ -615,30 +587,12 @@ createDownloadActions({
   formatAnimationDuration,
 });
 
-const wifiSection = createWifiSection({
-  ssid: wifiSsid,
-  password: wifiPassword,
-  encryption: wifiEncryption,
-  hidden: wifiHidden,
-  revealSecrets: payloadRevealSecrets,
-  onChange() {
-    syncChoiceButtons();
-    renderQr();
-  },
-});
+const wifiSection = contentSections.wifi;
 const syncWifiSecurityState = wifiSection.sync;
 const buildWifiPayload = wifiSection.buildPayload;
 const maskWifiPayload = wifiSection.maskPayload;
 
-const sharedFieldsSection = createSharedFieldsSection({
-  emailInputs: [emailTo, vcardEmail],
-  messageInputs: [textInput, smsBody, emailBody],
-  emailSubject,
-  onMessageChange() {
-    syncSmsLengthHint();
-    syncEmailBodyLengthHint();
-  },
-});
+const sharedFieldsSection = contentSections.shared;
 const buildEmailPayload = sharedFieldsSection.buildEmailPayload;
 const buildEmailPayloadWithBody = sharedFieldsSection.buildEmailPayloadWithBody;
 
@@ -684,14 +638,7 @@ const centerLogoController = createImageInputController({
   onUpdate: renderQr,
 });
 
-const vcardSection = createVCardSection({
-  name: vcardName,
-  organization: vcardOrg,
-  title: vcardTitle,
-  phone: vcardPhone,
-  email: vcardEmail,
-  website: vcardUrl,
-});
+const vcardSection = contentSections.vcard;
 const buildVCardPayload = vcardSection.buildPayload;
 
 function buildBulkEncodedText(row = getBulkCurrentRow()) {
