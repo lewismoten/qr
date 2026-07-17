@@ -1,11 +1,9 @@
 import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './bytes.js';
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean, parseCsv } from './csv.js';
-import { formatPhoneNumberForDisplay, normalizePhoneNumber } from './phone.js';
+import { normalizePhoneNumber } from './phone.js';
 import {
   createCalendarEventId,
-  formatCalendarInputDate,
-  formatCalendarInputTime,
   serializeCalendarEvent,
 } from './calendar.js';
 import {
@@ -57,6 +55,9 @@ import {
   summarizeCodewordRoles,
 } from './qr-stream.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createEventSection } from './ui/content/event/section.js';
+import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
+import { createPhoneSection } from './ui/content/phone/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
@@ -415,14 +416,9 @@ let chunkSettingsRefreshRequest = 0;
 let transferSettingsRevision = 0;
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
-let geoMap = null;
-let geoMarker = null;
-let geoPopup = null;
-let geoLabelMarker = null;
 let activeTabName = 'content';
 let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
-let activePhoneFormat = 'usa';
 const SMS_MAX_LENGTH = 160;
 const EMAIL_SUBJECT_MAX_LENGTH = 120;
 const NUMBER_SERIES_MAX_FRAMES = 10000;
@@ -625,26 +621,6 @@ function getShareableAppUrl() {
   }
 
   return `${window.location.origin}${window.location.pathname}`;
-}
-
-function parseCoordinate(value) {
-  const parsed = Number.parseFloat(value.trim());
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function formatCoordinate(value) {
-  return value.toFixed(5);
-}
-
-function getGeoCoordinates() {
-  const latitude = parseCoordinate(geoLatitude.value);
-  const longitude = parseCoordinate(geoLongitude.value);
-
-  if (latitude === null || longitude === null) {
-    return null;
-  }
-
-  return { latitude, longitude };
 }
 
 function clearCanvas() {
@@ -2451,35 +2427,6 @@ function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
 }
 
-function applyPhoneFormatToInput(inputElement) {
-  const formatted = formatPhoneNumberForDisplay(inputElement.value, activePhoneFormat);
-  if (formatted) {
-    inputElement.value = formatted;
-  }
-}
-
-function syncPhoneFormatButtons() {
-  phoneFormatButtons.forEach((button) => {
-    const isActive = button.dataset.phoneFormat === activePhoneFormat;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-}
-
-function syncPhoneValues(sourceInput, targetInput) {
-  if (targetInput.value !== sourceInput.value) {
-    targetInput.value = sourceInput.value;
-  }
-}
-
-function syncPhoneValuesAcrossAll(sourceInput) {
-  [phoneNumber, smsNumber, vcardPhone].forEach((inputElement) => {
-    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
-      inputElement.value = sourceInput.value;
-    }
-  });
-}
-
 function syncEmailValuesAcrossAll(sourceInput) {
   [emailTo, vcardEmail].forEach((inputElement) => {
     if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
@@ -2513,133 +2460,38 @@ function buildEmailPayloadWithBody(bodyValue) {
   return `mailto:${emailTo.value.trim()}${suffix}`;
 }
 
-function initializeCalendarEventDefaults() {
-  const start = new Date();
-  start.setSeconds(0, 0);
-  start.setMinutes(0);
-  start.setHours(start.getHours() + 1);
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
+const eventSection = createEventSection({
+  title: eventTitle,
+  allDay: eventAllDay,
+  startDate: eventStartDate,
+  startTime: eventStartTime,
+  endDate: eventEndDate,
+  endTime: eventEndTime,
+  location: eventLocation,
+  description: eventDescription,
+  url: eventUrl,
+  timeFields: eventTimeFields,
+});
+const initializeCalendarEventDefaults = eventSection.initialize;
+const syncCalendarEventControls = eventSection.sync;
+const buildCalendarEventPayload = eventSection.buildPayload;
 
-  eventStartDate.value = formatCalendarInputDate(start);
-  eventStartTime.value = formatCalendarInputTime(start);
-  eventEndDate.value = formatCalendarInputDate(end);
-  eventEndTime.value = formatCalendarInputTime(end);
-}
+const geoSection = createGeoSection({
+  latitudeInput: geoLatitude,
+  longitudeInput: geoLongitude,
+  labelInput: geoQuery,
+  mapElement: geoMapElement,
+  isActive: () => qrFormat.value === 'geo',
+  onChange: renderQr,
+});
+const buildGeoPayload = geoSection.buildPayload;
+const updateGeoMap = geoSection.update;
 
-function syncCalendarEventControls() {
-  const allDay = eventAllDay.checked;
-  eventStartTime.disabled = allDay;
-  eventEndTime.disabled = allDay;
-  eventTimeFields.forEach((field) => field.classList.toggle('is-disabled', allDay));
-}
-
-function buildCalendarEventPayload() {
-  return serializeCalendarEvent({
-    title: eventTitle.value,
-    allDay: eventAllDay.checked,
-    startDate: eventStartDate.value,
-    startTime: eventStartTime.value,
-    endDate: eventEndDate.value,
-    endTime: eventEndTime.value,
-    location: eventLocation.value,
-    description: eventDescription.value,
-    url: eventUrl.value,
-  });
-}
-
-function buildGeoPayload() {
-  const latitude = geoLatitude.value.trim();
-  const longitude = geoLongitude.value.trim();
-  const query = geoQuery.value.trim();
-  const coords = `${latitude},${longitude}`;
-  return query ? `geo:${coords}?q=${encodeURIComponent(query)}` : `geo:${coords}`;
-}
-
-function ensureGeoMap() {
-  if (geoMap || typeof L === 'undefined') {
-    return;
-  }
-
-  geoMap = L.map(geoMapElement, {
-    zoomControl: true,
-    attributionControl: true,
-  }).setView([38.9182, -78.1944], 13);
-
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-  }).addTo(geoMap);
-
-  geoMarker = L.marker([20, 0]).addTo(geoMap);
-  geoPopup = geoMarker.bindPopup('');
-  geoLabelMarker = L.marker([20, 0], {
-    interactive: false,
-    keyboard: false,
-    opacity: 0,
-    icon: L.divIcon({
-      className: 'geo-label-marker',
-      html: '',
-      iconSize: null,
-    }),
-  }).addTo(geoMap);
-
-  geoMap.on('click', (event) => {
-    const { lat, lng } = event.latlng;
-    geoLatitude.value = formatCoordinate(lat);
-    geoLongitude.value = formatCoordinate(lng);
-    renderQr();
-  });
-}
-
-function updateGeoMap() {
-  if (qrFormat.value !== 'geo') {
-    return;
-  }
-
-  if (typeof L === 'undefined') {
-    return;
-  }
-
-  ensureGeoMap();
-
-  const coordinates = getGeoCoordinates();
-  const label = geoQuery.value.trim();
-
-  if (!coordinates) {
-    if (geoMarker) {
-      geoMarker.setOpacity(0);
-    }
-    if (geoLabelMarker) {
-      geoLabelMarker.setOpacity(0);
-    }
-    geoMap.setView([38.9182, -78.1944], 13);
-    return;
-  }
-
-  const { latitude, longitude } = coordinates;
-  geoMarker.setLatLng([latitude, longitude]);
-  geoMarker.setOpacity(1);
-
-  const popupText = label || `${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`;
-  geoMarker.bindPopup(popupText);
-
-  if (geoLabelMarker) {
-    geoLabelMarker.setLatLng([latitude, longitude]);
-    geoLabelMarker.setOpacity(label ? 1 : 0);
-    geoLabelMarker.setIcon(
-      L.divIcon({
-        className: 'geo-label-marker',
-        html: label ? `<span>${label}</span>` : '',
-        iconSize: null,
-      })
-    );
-  }
-
-  const currentZoom = geoMap.getZoom();
-  const targetZoom = currentZoom < 15 ? 15 : currentZoom;
-  geoMap.setView([latitude, longitude], targetZoom, { animate: false });
-  geoMap.invalidateSize();
-}
+const phoneSection = createPhoneSection({
+  buttons: phoneFormatButtons,
+  inputs: [phoneNumber, smsNumber, vcardPhone],
+  onChange: renderQr,
+});
 
 function buildVCardPayload() {
   const lines = [
@@ -5602,54 +5454,6 @@ qrVersion.addEventListener('input', () => {
   syncChunkVersionControls();
 });
 
-phoneFormatButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activePhoneFormat = button.dataset.phoneFormat || 'usa';
-    syncPhoneFormatButtons();
-    applyPhoneFormatToInput(phoneNumber);
-    syncPhoneValuesAcrossAll(phoneNumber);
-    applyPhoneFormatToInput(smsNumber);
-    applyPhoneFormatToInput(vcardPhone);
-    renderQr();
-  });
-});
-
-phoneNumber.addEventListener('input', () => {
-  syncPhoneValuesAcrossAll(phoneNumber);
-});
-
-phoneNumber.addEventListener('blur', () => {
-  applyPhoneFormatToInput(phoneNumber);
-  syncPhoneValuesAcrossAll(phoneNumber);
-  applyPhoneFormatToInput(smsNumber);
-  applyPhoneFormatToInput(vcardPhone);
-  renderQr();
-});
-
-smsNumber.addEventListener('input', () => {
-  syncPhoneValuesAcrossAll(smsNumber);
-});
-
-smsNumber.addEventListener('blur', () => {
-  applyPhoneFormatToInput(smsNumber);
-  syncPhoneValuesAcrossAll(smsNumber);
-  applyPhoneFormatToInput(phoneNumber);
-  applyPhoneFormatToInput(vcardPhone);
-  renderQr();
-});
-
-vcardPhone.addEventListener('input', () => {
-  syncPhoneValuesAcrossAll(vcardPhone);
-});
-
-vcardPhone.addEventListener('blur', () => {
-  applyPhoneFormatToInput(vcardPhone);
-  syncPhoneValuesAcrossAll(vcardPhone);
-  applyPhoneFormatToInput(phoneNumber);
-  applyPhoneFormatToInput(smsNumber);
-  renderQr();
-});
-
 emailTo.addEventListener('input', () => {
   syncEmailValuesAcrossAll(emailTo);
 });
@@ -5781,14 +5585,10 @@ ensureMaskButtons();
 syncMaskSelection();
 syncChoiceButtons();
 syncWifiSecurityState();
-syncPhoneFormatButtons();
+phoneSection.initialize();
 syncFileCapacityHint();
 syncChunkVersionControls();
 syncFileChunkLabel();
-applyPhoneFormatToInput(phoneNumber);
-syncPhoneValuesAcrossAll(phoneNumber);
-applyPhoneFormatToInput(smsNumber);
-applyPhoneFormatToInput(vcardPhone);
 syncEmailValuesAcrossAll(vcardEmail);
 syncMessageValuesAcrossAll(textInput);
 syncSmsLengthHint();
