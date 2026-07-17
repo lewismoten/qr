@@ -1262,15 +1262,17 @@ output {
   font-size: 0.8rem;
 }
 
-.help-popover:hover .help-popover-content,
-.help-popover:focus-within .help-popover-content {
+.help-popover:hover:not(.is-dismissed) .help-popover-content,
+.help-popover:focus-within:not(.is-dismissed) .help-popover-content,
+.help-popover.is-open .help-popover-content {
   opacity: 1;
   transform: translateY(0);
   visibility: visible;
 }
 
-.help-popover:hover,
-.help-popover:focus-within {
+.help-popover:hover:not(.is-dismissed),
+.help-popover:focus-within:not(.is-dismissed),
+.help-popover.is-open {
   z-index: 40;
 }
 
