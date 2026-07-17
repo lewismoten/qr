@@ -11,7 +11,7 @@ import {
   isTimingRegion,
   isVersionRegion,
 } from './qr-regions.js';
-import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createEmailCapacity } from './ui/content/email/capacity.js';
 import { createContentPayload, createFilePayloadPreview } from './ui/content/payload.js';
 import { createFormatValidator } from './ui/content/validation.js';
@@ -27,6 +27,7 @@ import { createFileCapacityCalculator } from './ui/content/file/capacity.js';
 import { createFileCache } from './ui/content/file/cache.js';
 import { createFilePayloadBuilder } from './ui/content/file/payload.js';
 import { createFileSection } from './ui/content/file/section.js';
+import { createFileSettings } from './ui/content/file/settings.js';
 import { createFrameSection } from './ui/content/frame/section.js';
 import { createGeoSection } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
@@ -34,7 +35,6 @@ import { createPhoneSection } from './ui/content/phone/section.js';
 import { createSharedFieldsSection } from './ui/content/shared-fields.js';
 import { createVCardSection } from './ui/content/vcard/section.js';
 import { createWifiSection } from './ui/content/wifi/section.js';
-import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createMaskSelector } from './ui/debug/mask-selector.js';
 import { createEncodingDiagnostics } from './ui/debug/encoding.js';
 import { createDebugStyles } from './ui/debug/styles.js';
@@ -45,7 +45,7 @@ import {
   moduleIsDark,
 } from './ui/debug/model.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
-import { createDownloadSubtabs } from './ui/download/subtabs.js';
+import { createDownloadControls } from './ui/download/controls.js';
 import { restoreLocationDownload } from './ui/download/location.js';
 import { createQrConfiguration } from './ui/encoding/configuration.js';
 import { createAnimationSection } from './ui/download/animation/section.js';
@@ -54,15 +54,15 @@ import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { bindApplicationEvents } from './ui/events.js';
 import { getApplicationElements } from './ui/elements.js';
-import { createPrimaryTabs } from './ui/navigation.js';
+import { createNavigation } from './ui/navigation/setup.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
 import { createRenderController } from './ui/preview/render.js';
 import { createQrRenderer } from './ui/preview/qr-renderer.js';
 import { createPreviewSizeControls } from './ui/preview/size.js';
-import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
+import { createArtworkControls } from './ui/style/art/controls.js';
 import { createImageInputController } from './ui/style/art/image-input.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
@@ -171,8 +171,6 @@ const MASK_LABELS = {
   7: '((row + col mod 2) + (row * col mod 3)) mod 2 = 0',
 };
 
-let chunkSettingsRefreshTimer = 0;
-let chunkSettingsRefreshRequest = 0;
 let cancelRenderRequest = () => {};
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
@@ -255,7 +253,7 @@ const fileCapacityCalculator = createFileCapacityCalculator({
   cache: fileCache,
   getOptions: buildOptions,
   buildPayload,
-  getConfiguredVersion: getConfiguredChunkVersion,
+  getConfiguredVersion: () => getConfiguredChunkVersion(),
   isAutoVersion: () => versionAuto.checked,
   getCurrentChunk: () => Number.parseInt(fileChunkIndex.value, 10) || 1,
   includeManifest: () => fileIncludeManifest.checked,
@@ -286,7 +284,7 @@ const fileSection = createFileSection({
   getDownloadUrlCapacity: getBlobUrlCapacityBytes,
   getChunkInfo: getChunkedFileCapacityInfo,
   isCompressionEnabled: isTransferCompressionEnabled,
-  syncChunkVersionControls,
+  syncChunkVersionControls: () => syncChunkVersionControls(),
   syncChunkLabel: syncFileChunkLabel,
   syncNavigation: () => syncChunkPreviewNavigation(),
   resetCache: resetCachedFileState,
@@ -306,7 +304,7 @@ const bulkImportSection = createBulkImportSection({
   status: bulkStatus,
   clearButton: bulkClear,
   fileFormatButton: document.querySelector('[data-choice-target="qr-format"][data-choice-value="file"]'),
-  onFormatFallback: syncChoiceButtons,
+  onFormatFallback: () => syncChoiceButtons(),
   onChange: renderQr,
 });
 const getBulkSchema = bulkImportSection.getSchema;
@@ -402,26 +400,15 @@ const eyeShapeSection = createEyeShapeSection({
 const syncEyeShapeControls = eyeShapeSection.sync;
 const getCurrentEyeShapeOptions = eyeShapeSection.getOptions;
 
-function syncEmojiSelection() {
-  emojiOptions.forEach((button) => {
-    const isActive = button.dataset.emoji === centerEmoji.value;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-}
-
-function syncCenterArtworkControls() {
-  const mode = centerArtMode.value;
-  centerArtControls.hidden = mode === 'none';
-  centerLogoControls.hidden = mode !== 'logo';
-  centerEmojiControls.hidden = mode !== 'emoji';
-  centerPixelControls.hidden = mode !== 'pixel';
-  centerArtSizeValue.textContent = `${centerArtSize.value}%`;
-  centerArtBackgroundLabel.textContent =
-    mode === 'emoji' ? 'Protect with a light outline' : 'Protect with a light background';
-  pixelArtEditor.syncSizeLabel();
-  syncEmojiSelection();
-}
+const artworkControls = createArtworkControls({
+  elements: { mode: centerArtMode, controls: centerArtControls, logoControls: centerLogoControls,
+    emojiControls: centerEmojiControls, pixelControls: centerPixelControls, size: centerArtSize,
+    sizeValue: centerArtSizeValue, backgroundLabel: centerArtBackgroundLabel,
+    emoji: centerEmoji, emojiOptions },
+  pixelEditor: pixelArtEditor,
+});
+const syncCenterArtworkControls = artworkControls.sync;
+const syncEmojiSelection = artworkControls.syncEmoji;
 
 function formatVersionLabel() {
   qrVersionValue.textContent = versionAuto.checked ? 'Auto' : qrVersion.value;
@@ -459,113 +446,50 @@ function syncOutputs() {
   syncFileCapacityHint();
 }
 
-function syncDownloadControls() {
-  const isJpg = downloadFormat.value === 'jpg';
-  downloadQualityControls.hidden = !isJpg;
-  downloadQualityValue.textContent = `${downloadQuality.value}%`;
-  const frameCount = getDownloadFrameCount();
-  const hasAnimation = frameCount > 1;
-  downloadZip.hidden = frameCount <= 1;
-  downloadAllPdf.hidden = frameCount <= 1;
-  downloadAnimationTab.hidden = !hasAnimation;
-  downloadSubtabBar.classList.toggle('has-animation', hasAnimation);
-  if (!hasAnimation && downloadAnimationTab.classList.contains('is-active')) {
-    activateDownloadSubtab('image');
-  }
-  downloadActions.forEach((actions) => {
-    actions.classList.toggle('has-multiple', frameCount > 1);
-  });
-  if (frameCount > 1) {
-    downloadZip.textContent = `Download all ${frameCount} as ZIP`;
-    downloadAllPdf.textContent = `Download all ${frameCount} as PDF`;
-  }
-  syncAnimationDurationSummary();
-}
-
-function syncFileChunkLabel() {
-  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
-  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
-  fileChunkIndexValue.textContent = `${Math.min(current, total)} / ${total}`;
-}
-
-function getConfiguredChunkVersion() {
-  const version = Number.parseInt(fileChunkVersion.value, 10);
-  return Number.isFinite(version) ? version : DEFAULT_CHUNK_AUTO_VERSION;
-}
-
-function syncFileChunkVersionLabel() {
-  fileChunkVersionValue.textContent = `V${getConfiguredChunkVersion()}`;
-}
-
-function syncChunkVersionControls() {
-  fileChunkVersionAuto.checked = versionAuto.checked;
-  fileChunkVersion.value = qrVersion.value || String(DEFAULT_CHUNK_AUTO_VERSION);
-  const isChunked = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  fileChunkVersion.disabled = !isChunked || fileChunkVersionAuto.checked;
-  syncFileChunkVersionLabel();
-}
-
-function resetTransferDerivedState() {
-  fileCache.resetDerived();
-  invalidateChunkCapacityCache();
-}
+const syncDownloadControls = createDownloadControls({
+  elements: { format: downloadFormat, qualityControls: downloadQualityControls,
+    quality: downloadQuality, qualityValue: downloadQualityValue, zip: downloadZip,
+    allPdf: downloadAllPdf, animationTab: downloadAnimationTab, subtabBar: downloadSubtabBar,
+    actionGroups: downloadActions },
+  getFrameCount: () => getDownloadFrameCount(),
+  activateImageTab: () => activateDownloadSubtab('image'),
+  syncAnimation: () => syncAnimationDurationSummary(),
+});
 
 function isTransferCompressionEnabled() {
   return fileIncludeManifest.checked && fileCompressTransfer.checked;
 }
 
-function scheduleChunkSettingsRefresh({ resetChunkIndex = false, delay = 160 } = {}) {
-  chunkSettingsRefreshRequest += 1;
-  const refreshRequestId = chunkSettingsRefreshRequest;
-  cancelRenderRequest();
-
-  if (chunkSettingsRefreshTimer) {
-    window.clearTimeout(chunkSettingsRefreshTimer);
-  }
-
-  if (resetChunkIndex) {
-    fileChunkIndex.value = '1';
-  }
-
-  // Never let an in-flight render reuse a capacity calculated for the old version.
-  invalidateChunkCapacityCache();
-
-  chunkSettingsRefreshTimer = window.setTimeout(() => {
-    if (refreshRequestId !== chunkSettingsRefreshRequest) {
-      return;
-    }
-
-    chunkSettingsRefreshTimer = 0;
-    syncFileCapacityHint();
-    renderQr();
-  }, delay);
-}
-
-function resetCachedFileState({ clearInput = false } = {}) {
-  fileCache.reset({ clearInput });
-  invalidateChunkCapacityCache();
-}
+const fileSettings = createFileSettings({
+  elements: { chunkVersion: fileChunkVersion, chunkVersionAuto: fileChunkVersionAuto,
+    chunkVersionValue: fileChunkVersionValue, chunkIndex: fileChunkIndex,
+    chunkIndexValue: fileChunkIndexValue, versionAuto, qrVersion, format: qrFormat },
+  cache: fileCache,
+  capacity: fileCapacityCalculator,
+  getMode: getSelectedFileEncodingMode,
+  cancelRender: () => cancelRenderRequest(),
+  render: () => renderQr(),
+  syncCapacity: syncFileCapacityHint,
+  defaultVersion: DEFAULT_CHUNK_AUTO_VERSION,
+});
+const getConfiguredChunkVersion = fileSettings.getVersion;
+const syncFileChunkLabel = fileSettings.syncChunkLabel;
+const syncChunkVersionControls = fileSettings.syncVersion;
+const resetTransferDerivedState = fileSettings.resetDerived;
+const resetCachedFileState = fileSettings.resetCache;
+const scheduleChunkSettingsRefresh = fileSettings.schedule;
 
 function syncSmsLengthHint() {
   smsLengthHint.textContent = `${smsBody.value.length} / ${SMS_MAX_LENGTH}`;
 }
 
-function setFormatVisibility() {
-  syncBulkControls();
-  const activeFormat = qrFormat.value;
-  formatFieldsets.forEach((fieldset) => {
-    const isActive = !bulkEnabled.checked && fieldset.dataset.formatFields === activeFormat;
-    fieldset.hidden = !isActive;
-    fieldset.classList.toggle('is-active', isActive);
-    fieldset.setAttribute('aria-hidden', String(!isActive));
-  });
-
-  const showSecretToggle = activeFormat === 'wifi';
-  payloadRevealToggle.hidden = !showSecretToggle;
-  payloadRevealToggle.setAttribute('aria-hidden', String(!showSecretToggle));
-  syncFileModeVisibility();
-  syncCalendarEventControls();
-}
+const setFormatVisibility = createFormatVisibility({
+  elements: { format: qrFormat, fieldsets: formatFieldsets, bulkEnabled,
+    secretToggle: payloadRevealToggle },
+  syncBulk: syncBulkControls,
+  syncFile: syncFileModeVisibility,
+  syncEvent: () => syncCalendarEventControls(),
+});
 
 const filePayloadBuilder = createFilePayloadBuilder({
   cache: fileCache,
@@ -997,57 +921,23 @@ const ensureMaskButtons = maskSelector.ensure;
 const syncMaskSelection = maskSelector.sync;
 const renderMaskPreviews = maskSelector.renderPreviews;
 
-const activateTab = createPrimaryTabs({
-  buttons: tabButtons,
-  panels: tabPanels,
-  onActivate(tabName) {
-    activeTabName = tabName;
-    if (tabName === 'content' && qrFormat.value === 'geo') {
-      window.requestAnimationFrame(updateGeoMap);
-    }
-    renderQr();
-  },
+const navigation = createNavigation({
+  elements: { tabs: tabButtons, tabPanels, debugTabs: debugSubtabButtons,
+    debugPanels: debugSubtabPanels, styleTabs: styleSubtabButtons, stylePanels: styleSubtabPanels,
+    downloadTabs: downloadSubtabButtons, downloadPanels: downloadSubtabPanels,
+    contentTabs: contentSubtabButtons, contentPanels: contentSubtabPanels, choices: choiceButtons },
+  format: qrFormat,
+  render: () => renderQr(),
+  updateMap: updateGeoMap,
+  setActiveTab: (name) => { activeTabName = name; },
+  setActiveDebugSubtab: (name) => { activeDebugSubtab = name; },
 });
-
-const activateDebugSubtab = createDebugSubtabs({
-  buttons: debugSubtabButtons,
-  panels: debugSubtabPanels,
-  onActivate(subtabName) {
-    activeDebugSubtab = subtabName;
-    renderQr();
-  },
-});
-
-const activateStyleSubtab = createStyleSubtabs({
-  buttons: styleSubtabButtons,
-  panels: styleSubtabPanels,
-});
-
-const activateDownloadSubtab = createDownloadSubtabs({
-  buttons: downloadSubtabButtons,
-  panels: downloadSubtabPanels,
-});
-
-const activateContentSubtab = createContentSubtabs({
-  buttons: contentSubtabButtons,
-  panels: contentSubtabPanels,
-  onActivate(subtabName) {
-    if (subtabName === 'data' && qrFormat.value === 'geo') {
-      window.requestAnimationFrame(updateGeoMap);
-    }
-  },
-});
-
-function syncChoiceButtons() {
-  choiceButtons.forEach((button) => {
-    const targetId = button.dataset.choiceTarget;
-    const choiceValue = button.dataset.choiceValue;
-    const target = document.getElementById(targetId);
-    const isActive = Boolean(target) && target.value === choiceValue;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-}
+const activateTab = navigation.activateTab;
+const activateDebugSubtab = navigation.activateDebug;
+const activateStyleSubtab = navigation.activateStyle;
+const activateDownloadSubtab = navigation.activateDownload;
+const activateContentSubtab = navigation.activateContent;
+const syncChoiceButtons = navigation.syncChoices;
 
 const debugOutlineSelector = createOutlineSelector({
   buttons: debugOutlineModeButtons,
