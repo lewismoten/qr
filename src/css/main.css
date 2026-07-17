@@ -1,2 +1,5 @@
 /* Add future component styles as imports here; esbuild emits one deployable stylesheet. */
 @import '../../styles.css';
+@import './components/language-picker.css';
+@import './components/i18n-debug.css';
+@import './components/task-progress.css';
