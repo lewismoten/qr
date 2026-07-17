@@ -64,6 +64,7 @@ import { createAnimationSection } from './ui/download/animation/section.js';
 import { createDownloadActions } from './ui/download/actions.js';
 import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
+import { bindApplicationEvents } from './ui/events.js';
 import { createPrimaryTabs } from './ui/navigation.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
@@ -1710,226 +1711,33 @@ const renderController = createRenderController({
 const renderQr = renderController.render;
 cancelRenderRequest = renderController.cancel;
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-});
-
-form.addEventListener('input', (event) => {
-  if (event.target === bulkEnabled) {
-    setFormatVisibility();
-    activateContentSubtab('data');
-    if (bulkEnabled.checked && bulkFileInput.files?.[0]) {
-      loadBulkFile();
-    } else {
-      renderQr();
-    }
-    return;
-  }
-  if (event.target === bulkFileInput) {
-    return;
-  }
-  if ([animationMinutes, animationSeconds, animationMilliseconds].includes(event.target)) {
-    syncAnimationDurationSummary();
-    return;
-  }
-  if (event.target === downloadQuality) {
-    syncDownloadControls();
-    return;
-  }
-  if (event.target === fileIncludeManifest || event.target === fileCompressTransfer || event.target === fileCustomMetadata) {
-    resetTransferDerivedState();
-    scheduleChunkSettingsRefresh({ resetChunkIndex: true });
-    return;
-  }
-
-  if (event.target === fileChunkVersionAuto) {
-    // The checkbox's change handler synchronizes the shared version state.
-    return;
-  }
-
-  if (event.target === fileChunkVersion) {
-    fileChunkVersionValue.textContent = `V${fileChunkVersion.value}`;
-    qrVersion.value = fileChunkVersion.value;
-    formatVersionLabel();
-    scheduleChunkSettingsRefresh({ resetChunkIndex: true });
-    return;
-  }
-
-  if (event.target === fileChunkIndex) {
-    return;
-  }
-
-  syncSmsLengthHint();
-  syncEmailBodyLengthHint();
-  syncFileCapacityHint();
-  renderQr();
-});
-
-fileInput.addEventListener('change', () => {
-  resetCachedFileState();
-  fileChunkIndex.value = '1';
-  syncFileCapacityHint();
-  renderQr();
-});
-
-clearFileButton.addEventListener('click', () => {
-  clearLoadedFile();
-  renderQr();
-});
-
-qrFormat.addEventListener('change', () => {
-  setFormatVisibility();
-  syncChoiceButtons();
-  syncWifiSecurityState();
-  activateContentSubtab('data');
-  if (isBulkMode() && bulkFileInput.files?.[0]) {
-    loadBulkFile();
-    return;
-  }
-  renderQr();
-});
-
-frameMessageCenter.addEventListener('input', () => {
-  setFrameMessageCenter(frameMessageCenter.checked);
-});
-
-frameMessageCenterArt.addEventListener('input', () => {
-  setFrameMessageCenter(frameMessageCenterArt.checked);
-});
-
-choiceButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const targetId = button.dataset.choiceTarget;
-    const choiceValue = button.dataset.choiceValue;
-    const target = document.getElementById(targetId);
-
-    if (!target || target.value === choiceValue) {
-      return;
-    }
-
-    target.value = choiceValue;
-    syncChoiceButtons();
-    if (target === gradientType) {
-      syncGradientControls();
-    }
-    if (target === moduleShape) {
-      syncModuleShapeControls();
-    }
-    if (target === eyeShape) {
-      syncEyeShapeControls();
-    }
-    if (target === centerArtMode) {
-      if (choiceValue !== 'none') {
-        setFrameMessageCenter(false);
-      }
-      syncCenterArtworkControls();
-    }
-    if (target === wifiEncryption) {
-      syncWifiSecurityState();
-    }
-
-    if (target === qrFormat) {
-      setFormatVisibility();
-      activateContentSubtab('data');
-      if (isBulkMode() && bulkFileInput.files?.[0]) {
-        loadBulkFile();
-        return;
-      }
-    }
-
-    if (target === downloadFormat) {
-      syncDownloadControls();
-      return;
-    }
-
-    if (target === animationTimingMode) {
-      syncAnimationDurationSummary();
-      return;
-    }
-
-    if (target === fileEncodingMode) {
-      if (choiceValue === 'chunked' && versionAuto.checked) {
-        qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
-      }
-      syncChunkVersionControls();
-      formatVersionLabel();
-      scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
-      return;
-    }
-
-    renderQr();
-  });
-});
-
-emojiOptions.forEach((button) => {
-  button.addEventListener('click', () => {
-    centerEmoji.value = button.dataset.emoji || '';
-    syncEmojiSelection();
-    renderQr();
-  });
-});
-
-imageFillRecommended.addEventListener('click', () => {
-  applyRecommendedImageContrast();
-  renderQr();
-});
-
-fileChunkIndex.addEventListener('input', () => {
-  invalidateChunkCapacityCache();
-  syncFileCapacityHint();
-  renderQr();
-});
-
-chunkPreviewPrev.addEventListener('click', () => {
-  const current = getCurrentFrameIndex();
-  if (current <= 1) {
-    return;
-  }
-
-  setCurrentFrameIndex(current - 1);
-  syncChunkPreviewNavigation();
-  renderQr();
-});
-
-chunkPreviewNext.addEventListener('click', () => {
-  const current = getCurrentFrameIndex();
-  const total = getDownloadFrameCount();
-  if (current >= total) {
-    return;
-  }
-
-  setCurrentFrameIndex(current + 1);
-  syncChunkPreviewNavigation();
-  renderQr();
-});
-
-fileChunkVersionAuto.addEventListener('change', () => {
-  versionAuto.checked = fileChunkVersionAuto.checked;
-  if (fileChunkVersionAuto.checked) {
-    qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
-  }
-  formatVersionLabel();
-  syncChunkVersionControls();
-  scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
-});
-
-fileChunkVersion.addEventListener('input', () => {
-  qrVersion.value = fileChunkVersion.value;
-  formatVersionLabel();
-  syncChunkVersionControls();
-  scheduleChunkSettingsRefresh({ resetChunkIndex: true });
-});
-
-versionAuto.addEventListener('change', () => {
-  if (versionAuto.checked && qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked') {
-    qrVersion.value = String(DEFAULT_CHUNK_AUTO_VERSION);
-    scheduleChunkSettingsRefresh({ resetChunkIndex: true, delay: 0 });
-  }
-  syncChunkVersionControls();
-});
-
-qrVersion.addEventListener('input', () => {
-  syncChunkVersionControls();
+bindApplicationEvents({
+  elements: {
+    form, bulkEnabled, bulkFileInput, animationMinutes, animationSeconds, animationMilliseconds,
+    downloadQuality, fileIncludeManifest, fileCompressTransfer, fileCustomMetadata,
+    fileChunkVersionAuto, fileChunkVersion, fileChunkVersionValue, fileChunkIndex,
+    fileInput, clearFileButton, qrFormat, frameMessageCenter, frameMessageCenterArt,
+    choiceButtons, gradientType, moduleShape, eyeShape, centerArtMode, wifiEncryption,
+    downloadFormat, animationTimingMode, fileEncodingMode, versionAuto, qrVersion,
+    emojiOptions, centerEmoji, imageFillRecommended, chunkPreviewPrev, chunkPreviewNext,
+  },
+  actions: {
+    syncFormat: setFormatVisibility, activateContent: activateContentSubtab, loadBulkFile,
+    render: renderQr, syncAnimation: syncAnimationDurationSummary, syncDownloads: syncDownloadControls,
+    resetTransfer: resetTransferDerivedState, scheduleChunkRefresh: scheduleChunkSettingsRefresh,
+    formatVersion: formatVersionLabel, syncSmsLength: syncSmsLengthHint,
+    syncEmailLength: syncEmailBodyLengthHint, syncFileCapacity: syncFileCapacityHint,
+    resetFileCache: resetCachedFileState, clearFile: clearLoadedFile, syncChoices: syncChoiceButtons,
+    syncWifi: syncWifiSecurityState, isBulkMode, setFrameCentered: setFrameMessageCenter,
+    syncGradient: syncGradientControls, syncModules: syncModuleShapeControls,
+    syncEyes: syncEyeShapeControls, syncArtwork: syncCenterArtworkControls,
+    syncChunkVersion: syncChunkVersionControls, syncEmoji: syncEmojiSelection,
+    applyImageContrast: applyRecommendedImageContrast, invalidateCapacity: invalidateChunkCapacityCache,
+    getCurrentFrame: getCurrentFrameIndex, setCurrentFrame: setCurrentFrameIndex,
+    getFrameCount: getDownloadFrameCount, syncNavigation: syncChunkPreviewNavigation,
+    getFileMode: getSelectedFileEncodingMode,
+  },
+  defaultChunkVersion: DEFAULT_CHUNK_AUTO_VERSION,
 });
 
 const dialogs = initializeDialogs({ document, window });
