@@ -15,6 +15,47 @@ import {
 } from './gif.js';
 import { createAnimatedMp4Blob, getSupportedMp4MimeType } from './mp4.js';
 import { createSvgBlob } from './svg.js';
+import {
+  getWebsiteValidationState,
+  isValidBulkDate,
+  isValidBulkTime,
+  validateCalendarText,
+  validateEmailValue,
+  validateGeoLabel,
+  validatePrintableText,
+  validateTelephoneValue,
+  validateVCardTextValue,
+} from './validation.js';
+import {
+  drawCenteredFrameMessage,
+  drawFrameMessage,
+  fitFrameMessage,
+  getOpaqueArtworkBackground,
+} from './frame-text.js';
+import {
+  coordKey,
+  getAlignmentPatternCenters,
+  getDataTraversal,
+  getFinderPatternPart,
+  getFormatBitGroups,
+  getFormatInfoCoordinates,
+  getModuleCategory,
+  getVersionInfoCoordinates,
+  isAlignmentRegion,
+  isDarkModuleRegion,
+  isFinderPattern,
+  isFinderRegion,
+  isFormatRegion,
+  isFunctionModule,
+  isTimingRegion,
+  isVersionRegion,
+} from './qr-regions.js';
+import {
+  buildEncodingUnitGroups,
+  buildPostHeaderStreamGroups,
+  classifyTraversalBits,
+  summarizeCodewordRoles,
+} from './qr-stream.js';
 import { createZipBlob } from './zip.js';
 import { canvasToBlob } from './canvas-export.js';
 import {
@@ -319,41 +360,6 @@ const CHAR_COUNT_BITS = {
   kanji: [8, 10, 12],
 };
 
-const SYMBOL_TOTAL_CODEWORDS = [
-  0,
-  26, 44, 70, 100, 134, 172, 196, 242, 292, 346,
-  404, 466, 532, 581, 655, 733, 815, 901, 991, 1085,
-  1156, 1258, 1364, 1474, 1588, 1706, 1828, 1921, 2051, 2185,
-  2323, 2465, 2611, 2761, 2876, 3034, 3196, 3362, 3532, 3706,
-];
-
-const EC_CODEWORDS_TABLE = {
-  L: [
-    7, 10, 15, 20, 26, 36, 40, 48, 60, 72,
-    80, 96, 104, 120, 132, 144, 168, 180, 196, 224,
-    224, 252, 270, 300, 312, 336, 360, 390, 420, 450,
-    480, 510, 540, 570, 570, 600, 630, 660, 720, 750,
-  ],
-  M: [
-    10, 16, 26, 36, 48, 64, 72, 88, 110, 130,
-    150, 176, 198, 216, 240, 280, 308, 338, 364, 416,
-    442, 476, 504, 560, 588, 644, 700, 728, 784, 812,
-    868, 924, 980, 1036, 1064, 1120, 1204, 1260, 1316, 1372,
-  ],
-  Q: [
-    13, 22, 36, 52, 72, 96, 108, 132, 160, 192,
-    224, 260, 288, 320, 360, 408, 448, 504, 546, 600,
-    644, 690, 750, 810, 870, 952, 1020, 1050, 1140, 1200,
-    1290, 1350, 1440, 1530, 1590, 1680, 1770, 1860, 1950, 2040,
-  ],
-  H: [
-    17, 28, 44, 64, 88, 112, 130, 156, 192, 224,
-    264, 308, 352, 384, 432, 480, 532, 588, 650, 700,
-    750, 816, 900, 960, 1050, 1110, 1200, 1260, 1350, 1440,
-    1530, 1620, 1710, 1800, 1890, 1980, 2100, 2220, 2310, 2430,
-  ],
-};
-
 let renderRequest = 0;
 let cachedFile = null;
 let cachedFilePayload = '';
@@ -437,9 +443,6 @@ const ANIMATION_MAX_FRAMES = 200;
 const CALENDAR_TITLE_MAX_LENGTH = 120;
 const CALENDAR_LOCATION_MAX_LENGTH = 160;
 const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
-const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
 const FILE_FRAME_PREFIX = 'FILE';
 const FILE_PROTOCOL_VERSION = '1';
 const FILE_MANIFEST_MAGIC = 'FILE';
@@ -634,10 +637,6 @@ function getGeoCoordinates() {
   }
 
   return { latitude, longitude };
-}
-
-function coordKey(row, column) {
-  return `${row},${column}`;
 }
 
 function clearCanvas() {
@@ -3068,172 +3067,6 @@ function syncEmailBodyLengthHint() {
   emailBodyLengthHint.textContent = `${current} / ${max}`;
 }
 
-function validateEmailValue(value, { required = true, label = 'email address' } = {}) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return required ? `Not valid for Email format yet: ${label} is required.` : '';
-  }
-
-  if (!EMAIL_PATTERN.test(trimmed)) {
-    return `Not valid for Email format yet: ${label} must be valid.`;
-  }
-
-  if (trimmed.length > 254) {
-    return `Not valid for Email format yet: ${label} should stay within 254 characters.`;
-  }
-
-  return '';
-}
-
-function validatePrintableText(value, { label, maxLength }) {
-  const trimmedLength = value.length;
-  if (trimmedLength > maxLength) {
-    return `${label} should stay within ${maxLength} characters.`;
-  }
-
-  if (!PRINTABLE_TEXT_PATTERN.test(value)) {
-    return `${label} can only use printable characters.`;
-  }
-
-  return '';
-}
-
-function validateTelephoneValue(value, { required = true, label = 'telephone number' } = {}) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return required ? `Not valid for Phone format yet: ${label} is required.` : '';
-  }
-
-  const allowedPattern = /^\+?[\d\s().-]+$/;
-  if (!allowedPattern.test(trimmed)) {
-    return `Not valid for Phone format yet: ${label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.`;
-  }
-
-  const plusCount = [...trimmed].filter((character) => character === '+').length;
-  if (plusCount > 1 || (plusCount === 1 && !trimmed.startsWith('+'))) {
-    return `Not valid for Phone format yet: ${label} can only use + at the beginning.`;
-  }
-
-  const digits = trimmed.replace(/\D/g, '');
-  if (digits.length < 10 || digits.length > 15) {
-    return `Not valid for Phone format yet: ${label} should contain a reasonable length of 10 to 15 digits.`;
-  }
-
-  return '';
-}
-
-function validateGeoLabel(value) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return '';
-  }
-
-  if (trimmed.length > 80) {
-    return 'Not valid for Geo format yet: label should stay within 80 characters.';
-  }
-
-  const allowedPattern = /^[A-Za-z0-9 .,&#()'/:+-]*$/;
-  if (!allowedPattern.test(trimmed)) {
-    return 'Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.';
-  }
-
-  return '';
-}
-
-function validateVCardTextValue(value, { required = false, label, maxLength = 80 } = {}) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return required ? `Not valid for vCard format yet: ${label} is required.` : '';
-  }
-
-  if (trimmed.length > maxLength) {
-    return `Not valid for vCard format yet: ${label} should stay within ${maxLength} characters.`;
-  }
-
-  if (!VCARD_TEXT_PATTERN.test(trimmed)) {
-    return `Not valid for vCard format yet: ${label} can only use letters, numbers, spaces, and common punctuation.`;
-  }
-
-  return '';
-}
-
-function getWebsiteValidationState(value, { required = false, contextLabel = 'vCard' } = {}) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return {
-      error: required ? `Not valid for ${contextLabel} format yet: website is required.` : '',
-      warning: '',
-    };
-  }
-
-  if (trimmed.length > 2048) {
-    return {
-      error: `Not valid for ${contextLabel} format yet: website should stay within 2048 characters.`,
-      warning: '',
-    };
-  }
-
-  let parsedUrl;
-  try {
-    parsedUrl = new URL(trimmed);
-  } catch (error) {
-    return {
-      error: `Not valid for ${contextLabel} format yet: website must include a full protocol such as https://.`,
-      warning: '',
-    };
-  }
-
-  if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
-    return {
-      error: `Not valid for ${contextLabel} format yet: website should start with https:// or http://.`,
-      warning: '',
-    };
-  }
-
-  return {
-    error: '',
-    warning:
-      parsedUrl.protocol === 'http:'
-        ? `Warning for ${contextLabel} format: website uses http://. https:// is strongly recommended.`
-        : '',
-  };
-}
-
-function validateCalendarText(value, { required = false, label, maxLength, multiline = false }) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return required ? `Not valid for Event format yet: ${label} is required.` : '';
-  }
-  if (value.length > maxLength) {
-    return `Not valid for Event format yet: ${label} should stay within ${maxLength} characters.`;
-  }
-
-  const invalidControlPattern = multiline
-    ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/
-    : /[\x00-\x1f\x7f]/;
-  if (invalidControlPattern.test(value)) {
-    return `Not valid for Event format yet: ${label} contains unsupported control characters.`;
-  }
-  return '';
-}
-
-function isValidBulkDate(value) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-  const [year, month, day] = value.split('-').map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
-}
-
-function isValidBulkTime(value) {
-  if (!/^\d{2}:\d{2}$/.test(value)) {
-    return false;
-  }
-  const [hour, minute] = value.split(':').map(Number);
-  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
-}
-
 function getBulkValidationState() {
   if (bulkParseError) {
     return { error: `Not valid for Bulk Import yet: ${bulkParseError}`, warning: '' };
@@ -3805,9 +3638,7 @@ function buildMaskPreviewOptions(maskValue) {
 }
 
 function getTotalDataCodewords(version, errorCorrectionLevel) {
-  const total = SYMBOL_TOTAL_CODEWORDS[version];
-  const ec = EC_CODEWORDS_TABLE[errorCorrectionLevel]?.[version - 1];
-  return total && ec ? total - ec : 0;
+  return qrEncoder.internals.getDataCodewords(version, errorCorrectionLevel);
 }
 
 function getCharCountBits(mode, version) {
@@ -3852,363 +3683,6 @@ function moduleIsDarkForPreview(qrDefinition, row, column, debugActive) {
   }
 
   return isMaskedModule(qrDefinition.maskPattern, row, column) ? !dark : dark;
-}
-
-function getAlignmentPatternCenters(version) {
-  if (version === 1) {
-    return [];
-  }
-
-  const size = version * 4 + 17;
-  const count = Math.floor(version / 7) + 2;
-  const step = size === 145 ? 26 : Math.ceil((size - 13) / (count * 2 - 2)) * 2;
-  const centers = [6];
-
-  for (let pos = size - 7; centers.length < count; pos -= step) {
-    centers.splice(1, 0, pos);
-  }
-
-  return centers;
-}
-
-function isInSquare(row, column, top, left, size) {
-  return row >= top && row < top + size && column >= left && column < left + size;
-}
-
-function isFinderRegion(size, row, column) {
-  return (
-    isInSquare(row, column, 0, 0, 8) ||
-    isInSquare(row, column, 0, size - 8, 8) ||
-    isInSquare(row, column, size - 8, 0, 8)
-  );
-}
-
-function isFinderPattern(size, row, column) {
-  return (
-    isInSquare(row, column, 0, 0, 7) ||
-    isInSquare(row, column, 0, size - 7, 7) ||
-    isInSquare(row, column, size - 7, 0, 7)
-  );
-}
-
-function getFinderPatternPart(size, row, column) {
-  const origins = [
-    [0, 0],
-    [0, size - 7],
-    [size - 7, 0],
-  ];
-  for (const [top, left] of origins) {
-    if (!isInSquare(row, column, top, left, 7)) {
-      continue;
-    }
-    const localRow = row - top;
-    const localColumn = column - left;
-    if (localRow >= 2 && localRow <= 4 && localColumn >= 2 && localColumn <= 4) {
-      return 'center';
-    }
-    if (localRow === 0 || localRow === 6 || localColumn === 0 || localColumn === 6) {
-      return 'outer';
-    }
-    return null;
-  }
-  return null;
-}
-
-function isTimingRegion(size, row, column) {
-  if (row === 6 && column >= 8 && column <= size - 9) {
-    return true;
-  }
-  if (column === 6 && row >= 8 && row <= size - 9) {
-    return true;
-  }
-  return false;
-}
-
-function isFormatRegion(size, row, column) {
-  const topLeftRow = row === 8 && column <= 8 && column !== 6;
-  const topLeftColumn = column === 8 && row <= 8 && row !== 6;
-  const topRight = row === 8 && column >= size - 8;
-  const bottomLeft = column === 8 && row >= size - 7;
-  return topLeftRow || topLeftColumn || topRight || bottomLeft || (row === size - 8 && column === 8);
-}
-
-function isVersionRegion(size, version, row, column) {
-  if (version < 7) {
-    return false;
-  }
-  return (
-    (row < 6 && column >= size - 11 && column <= size - 9) ||
-    (column < 6 && row >= size - 11 && row <= size - 9)
-  );
-}
-
-function isDarkModuleRegion(size, row, column) {
-  return row === size - 8 && column === 8;
-}
-
-function getFormatInfoCoordinates(size) {
-  return {
-    primary: [
-      [8, 0], [8, 1], [8, 2], [8, 3], [8, 4],
-      [8, 5], [8, 7], [8, 8], [7, 8], [5, 8],
-      [4, 8], [3, 8], [2, 8], [1, 8], [0, 8],
-    ],
-    secondary: [
-      [size - 1, 8], [size - 2, 8], [size - 3, 8], [size - 4, 8], [size - 5, 8],
-      [size - 6, 8], [size - 7, 8], [8, size - 8], [8, size - 7], [8, size - 6],
-      [8, size - 5], [8, size - 4], [8, size - 3], [8, size - 2], [8, size - 1],
-    ],
-  };
-}
-
-function isFunctionModule(qrDefinition, row, column) {
-  const size = qrDefinition.modules.size;
-  const version = qrDefinition.version;
-
-  return (
-    isFinderRegion(size, row, column) ||
-    isTimingRegion(size, row, column) ||
-    isFormatRegion(size, row, column) ||
-    isVersionRegion(size, version, row, column) ||
-    isAlignmentRegion(version, size, row, column) ||
-    isDarkModuleRegion(size, row, column)
-  );
-}
-
-function getDataTraversal(qrDefinition) {
-  const size = qrDefinition.modules.size;
-  const traversal = [];
-  let upward = true;
-
-  for (let column = size - 1; column > 0; column -= 2) {
-    if (column === 6) {
-      column -= 1;
-    }
-
-    for (let offset = 0; offset < size; offset += 1) {
-      const row = upward ? size - 1 - offset : offset;
-
-      for (let pair = 0; pair < 2; pair += 1) {
-        const currentColumn = column - pair;
-        if (isFunctionModule(qrDefinition, row, currentColumn)) {
-          continue;
-        }
-
-        traversal.push({ row, column: currentColumn });
-      }
-    }
-
-    upward = !upward;
-  }
-
-  return traversal;
-}
-
-function getFormatBitGroups(size) {
-  const { primary, secondary } = getFormatInfoCoordinates(size);
-  const ecLevelBits = new Set();
-  const maskBits = new Set();
-
-  [primary, secondary].forEach((coords) => {
-    coords.slice(0, 2).forEach(([row, column]) => ecLevelBits.add(coordKey(row, column)));
-    coords.slice(2, 5).forEach(([row, column]) => maskBits.add(coordKey(row, column)));
-  });
-
-  return { ecLevelBits, maskBits };
-}
-
-function getVersionInfoCoordinates(size) {
-  const primary = [];
-  const secondary = [];
-
-  for (let row = 0; row < 6; row += 1) {
-    for (let column = size - 11; column <= size - 9; column += 1) {
-      primary.push([row, column]);
-    }
-  }
-
-  for (let column = 0; column < 6; column += 1) {
-    for (let row = size - 11; row <= size - 9; row += 1) {
-      secondary.push([row, column]);
-    }
-  }
-
-  return { primary, secondary };
-}
-
-function classifyTraversalBits(qrDefinition, dataCodewordsCount, traversalLength) {
-  const dataCapacityBits = dataCodewordsCount * 8;
-  const totalCodewords = SYMBOL_TOTAL_CODEWORDS[qrDefinition.version];
-  const totalCodewordBits = totalCodewords * 8;
-  const roles = Array(traversalLength).fill('remainder');
-  let cursor = 0;
-
-  qrDefinition.segments.forEach((segment) => {
-    const mode = normalizeModeName(segment.mode);
-
-    for (let index = 0; index < 4 && cursor < dataCapacityBits; index += 1) {
-      roles[cursor++] = 'mode';
-    }
-
-    const charCountBits = getCharCountBits(mode, qrDefinition.version);
-    for (let index = 0; index < charCountBits && cursor < dataCapacityBits; index += 1) {
-      roles[cursor++] = 'charCount';
-    }
-
-    const payloadBits = segment.getBitsLength();
-    for (let index = 0; index < payloadBits && cursor < dataCapacityBits; index += 1) {
-      roles[cursor++] = 'payload';
-    }
-  });
-
-  const terminatorBits = Math.min(4, Math.max(0, dataCapacityBits - cursor));
-  for (let index = 0; index < terminatorBits && cursor < dataCapacityBits; index += 1) {
-    roles[cursor++] = 'terminator';
-  }
-
-  while (cursor < dataCapacityBits && cursor % 8 !== 0) {
-    roles[cursor++] = 'bytePad';
-  }
-
-  while (cursor < dataCapacityBits) {
-    for (let index = 0; index < 8 && cursor < dataCapacityBits; index += 1) {
-      roles[cursor++] = 'padByte';
-    }
-  }
-
-  for (let index = dataCapacityBits; index < Math.min(totalCodewordBits, traversalLength); index += 1) {
-    roles[index] = 'errorCorrection';
-  }
-
-  return roles;
-}
-
-function summarizeCodewordRoles(roles) {
-  if (roles.every((role) => role === 'errorCorrection')) {
-    return 'errorCorrection';
-  }
-  if (roles.every((role) => role === 'remainder')) {
-    return 'remainder';
-  }
-  if (roles.every((role) => role === 'padByte')) {
-    return 'padByte';
-  }
-  if (roles.some((role) => role === 'mode' || role === 'charCount')) {
-    return 'header';
-  }
-  if (roles.some((role) => role === 'terminator' || role === 'bytePad' || role === 'padByte')) {
-    return 'padding';
-  }
-  return 'data';
-}
-
-function summarizeGroupRoles(roles) {
-  if (roles.every((role) => role === 'errorCorrection')) {
-    return 'errorCorrection';
-  }
-  if (roles.every((role) => role === 'remainder')) {
-    return 'remainder';
-  }
-  if (roles.every((role) => role === 'padByte' || role === 'bytePad')) {
-    return 'padByte';
-  }
-  if (roles.every((role) => role === 'terminator')) {
-    return 'terminator';
-  }
-  if (roles.some((role) => role === 'terminator' || role === 'bytePad' || role === 'padByte')) {
-    return 'padding';
-  }
-  if (roles.some((role) => role === 'mode' || role === 'charCount')) {
-    return 'header';
-  }
-  return 'data';
-}
-
-function buildPostHeaderStreamGroups(traversal, bitRoles) {
-  const streamBitIndexes = [];
-
-  bitRoles.forEach((role, index) => {
-    if (role === 'payload' || role === 'terminator' || role === 'bytePad' || role === 'padByte') {
-      streamBitIndexes.push(index);
-    }
-  });
-
-  const groups = [];
-  for (let index = 0; index < streamBitIndexes.length; index += 8) {
-    const indexes = streamBitIndexes.slice(index, index + 8);
-    const modules = indexes.map((bitIndex) => traversal[bitIndex]);
-    const roles = indexes.map((bitIndex) => bitRoles[bitIndex]);
-
-    groups.push({
-      kind: summarizeGroupRoles(roles),
-      modules,
-      roles,
-    });
-  }
-
-  return groups;
-}
-
-function getEncodingUnitBitLengths(segment, mode) {
-  const payloadBits = segment.getBitsLength();
-  const dataLength = typeof segment.getLength === 'function' ? segment.getLength() : 0;
-  const bitLengths = [];
-
-  if (mode === 'numeric') {
-    const completeGroups = Math.floor(dataLength / 3);
-    bitLengths.push(...Array(completeGroups).fill(10));
-    const remainingDigits = dataLength % 3;
-    if (remainingDigits > 0) {
-      bitLengths.push(remainingDigits === 1 ? 4 : 7);
-    }
-  } else if (mode === 'alphanumeric') {
-    bitLengths.push(...Array(Math.floor(dataLength / 2)).fill(11));
-    if (dataLength % 2 === 1) {
-      bitLengths.push(6);
-    }
-  } else if (mode === 'kanji') {
-    bitLengths.push(...Array(Math.floor(payloadBits / 13)).fill(13));
-  } else if (mode === 'byte') {
-    bitLengths.push(...Array(Math.floor(payloadBits / 8)).fill(8));
-  }
-
-  const describedBits = bitLengths.reduce((total, bitLength) => total + bitLength, 0);
-  if (describedBits < payloadBits) {
-    bitLengths.push(payloadBits - describedBits);
-  }
-
-  return bitLengths;
-}
-
-function buildEncodingUnitGroups(qrDefinition, traversal) {
-  const groups = [];
-  let cursor = 0;
-
-  qrDefinition.segments.forEach((segment, segmentIndex) => {
-    const mode = normalizeModeName(segment.mode);
-    cursor += 4 + getCharCountBits(mode, qrDefinition.version);
-    let segmentBitOffset = 0;
-
-    getEncodingUnitBitLengths(segment, mode).forEach((bitLength, unitIndex) => {
-      const start = cursor + segmentBitOffset;
-      const modules = traversal.slice(start, start + bitLength);
-      if (modules.length > 0) {
-        groups.push({
-          kind: 'data',
-          modules,
-          roles: Array(modules.length).fill('payload'),
-          encodingMode: mode,
-          segmentIndex,
-          unitIndex,
-        });
-      }
-      segmentBitOffset += bitLength;
-    });
-
-    cursor += segment.getBitsLength();
-  });
-
-  return groups;
 }
 
 function splitMetadataCoordinateRuns(coordinates) {
@@ -4351,52 +3825,6 @@ function buildDebugOverlayModel(qrDefinition, options) {
     encodingUnitGroups,
     metadataGroups,
   };
-}
-
-function isAlignmentRegion(version, size, row, column) {
-  const centers = getAlignmentPatternCenters(version);
-  for (const centerRow of centers) {
-    for (const centerColumn of centers) {
-      const overlapsFinder =
-        (centerRow === 6 && centerColumn === 6) ||
-        (centerRow === 6 && centerColumn === size - 7) ||
-        (centerRow === size - 7 && centerColumn === 6);
-
-      if (overlapsFinder) {
-        continue;
-      }
-
-      if (Math.abs(row - centerRow) <= 2 && Math.abs(column - centerColumn) <= 2) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function getModuleCategory(qrDefinition, row, column) {
-  const size = qrDefinition.modules.size;
-  const version = qrDefinition.version;
-
-  if (isFinderRegion(size, row, column)) {
-    return 'finder';
-  }
-  if (isTimingRegion(size, row, column)) {
-    return 'timing';
-  }
-  if (isDarkModuleRegion(size, row, column)) {
-    return 'darkModule';
-  }
-  if (isFormatRegion(size, row, column)) {
-    return 'format';
-  }
-  if (isVersionRegion(size, version, row, column)) {
-    return 'version';
-  }
-  if (isAlignmentRegion(version, size, row, column)) {
-    return 'alignment';
-  }
-  return 'data';
 }
 
 function getDebugCategory(row, column, qrDefinition, debugModel, purpose = 'overlay') {
@@ -5124,150 +4552,6 @@ function createQrModuleFill(context, startColor, gradientOptions, marginModules,
   return gradient;
 }
 
-function fitCanvasText(context, text, maximumWidth) {
-  let fitted = text;
-  while (fitted && context.measureText(`${fitted}...`).width > maximumWidth) {
-    fitted = fitted.slice(0, -1).trimEnd();
-  }
-  return fitted ? `${fitted}...` : '...';
-}
-
-function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2, truncate = true) {
-  const explicitLines = message
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-  if (explicitLines.length > 1) {
-    if (explicitLines.length <= maximumLines && explicitLines.every((line) => context.measureText(line).width <= maximumWidth)) {
-      return explicitLines;
-    }
-    if (!truncate) {
-      return null;
-    }
-    return explicitLines
-      .slice(0, maximumLines)
-      .map((line) => context.measureText(line).width <= maximumWidth ? line : fitCanvasText(context, line, maximumWidth));
-  }
-
-  let remaining = message.replace(/\s+/g, ' ').trim();
-  const lines = [];
-  const emailBreak = maximumLines >= 2 ? remaining.match(/^(.*?)(@[^\s@]+)$/) : null;
-  if (emailBreak && emailBreak[1].trim()) {
-    const emailLines = [emailBreak[1].trim(), emailBreak[2]];
-    if (emailLines.every((line) => context.measureText(line).width <= maximumWidth)) {
-      return emailLines;
-    }
-    if (!truncate) {
-      return null;
-    }
-  }
-
-  while (remaining && lines.length < maximumLines) {
-    let length = 1;
-    while (length <= remaining.length && context.measureText(remaining.slice(0, length)).width <= maximumWidth) {
-      length += 1;
-    }
-    length = Math.max(1, length - 1);
-
-    if (length < remaining.length) {
-      const wordBoundary = remaining.lastIndexOf(' ', length);
-      if (wordBoundary >= Math.floor(length / 2)) {
-        length = wordBoundary;
-      }
-    }
-
-    const line = remaining.slice(0, length).trim();
-    remaining = remaining.slice(length).trim();
-    lines.push(line);
-  }
-
-  if (!remaining && lines.length === 2 && !message.trim().includes(' ')) {
-    const combined = lines.join('');
-    const midpoint = Math.ceil(combined.length / 2);
-    lines[0] = combined.slice(0, midpoint);
-    lines[1] = combined.slice(midpoint);
-  }
-
-  if (remaining && !truncate) {
-    return null;
-  }
-  if (remaining && lines.length) {
-    lines[lines.length - 1] = fitCanvasText(context, lines[lines.length - 1], maximumWidth);
-  }
-  return lines;
-}
-
-function fitFrameMessage(context, message, maximumWidth, maximumLineHeight) {
-  const maximumFontSize = Math.ceil(maximumLineHeight * 2.5);
-
-  for (let fontSize = maximumFontSize; fontSize >= 4; fontSize -= 1) {
-    const font = getFrameFont(fontSize);
-    context.font = font;
-    const metrics = context.measureText('Mg');
-    const measuredHeight =
-      metrics.actualBoundingBoxAscent !== undefined && metrics.actualBoundingBoxDescent !== undefined
-        ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-        : fontSize;
-    if (measuredHeight > maximumLineHeight) {
-      continue;
-    }
-
-    const lines = wrapFrameMessage(context, message, maximumWidth, 2, false);
-    if (lines && lines.every((line) => context.measureText(line).width <= maximumWidth)) {
-      return { font, lines };
-    }
-  }
-
-  const font = getFrameFont(4);
-  context.font = font;
-  return { font, lines: wrapFrameMessage(context, message, maximumWidth) };
-}
-
-function drawFrameMessage(context, messageLines, canvasSize, captionHeight, font, lineHeight, textColor) {
-  if (!messageLines.length || captionHeight <= 0) {
-    return;
-  }
-
-  context.save();
-  context.fillStyle = textColor;
-  context.font = font;
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  const blockHeight = messageLines.length * lineHeight;
-  const firstLineY = canvasSize + (captionHeight - blockHeight) / 2 + lineHeight / 2;
-  messageLines.forEach((line, index) => {
-    context.fillText(line, canvasSize / 2, firstLineY + index * lineHeight);
-  });
-  context.restore();
-}
-
-function drawCenteredFrameMessage(context, messageLines, font, lineHeight, center, textColor, lightColor, cellSize) {
-  if (!messageLines.length) {
-    return;
-  }
-
-  context.save();
-  context.font = font;
-  context.strokeStyle = getOpaqueArtworkBackground(lightColor);
-  context.lineWidth = Math.max(2, cellSize * 0.8);
-  context.lineJoin = 'round';
-  context.miterLimit = 2;
-  context.fillStyle = textColor;
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  const firstLineY = center - ((messageLines.length - 1) * lineHeight) / 2;
-  messageLines.forEach((line, index) => {
-    const y = firstLineY + index * lineHeight;
-    context.strokeText(line, center, y);
-    context.fillText(line, center, y);
-  });
-  context.restore();
-}
-
-function getOpaqueArtworkBackground(lightColor) {
-  return /^#[0-9a-f]{6}/i.test(lightColor) ? lightColor.slice(0, 7) : '#ffffff';
-}
-
 function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
   const outlineWidth = Math.max(1.5, artSize * 0.065);
   const bufferSize = Math.ceil(artSize + outlineWidth * 6);
@@ -5431,7 +4715,7 @@ function drawQr(qrDefinition, options) {
   canvas.width = canvasSize;
   canvas.height = canvasSize;
   const frameMessageLayout = frameMessageText
-    ? fitFrameMessage(context, frameMessageText, frameMessageMaximumWidth, captionLineHeight)
+    ? fitFrameMessage(context, frameMessageText, frameMessageMaximumWidth, captionLineHeight, getFrameFont)
     : { font: getFrameFont(captionLineHeight), lines: [] };
   const frameMessageLines = frameMessageLayout.lines;
   const captionHeight = frameMessageLines.length && !frameMessageIsCentered
