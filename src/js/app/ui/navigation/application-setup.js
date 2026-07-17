@@ -1,7 +1,7 @@
 import { createNavigation } from './setup.js';
 
 export function createApplicationNavigation({ elements: e, render, updateMap, prepareDebug,
-  prepareStyle, state }) {
+  prepareStyle, prepareDownload, state }) {
   return createNavigation({
     elements: {
       tabs: e.tabButtons,
@@ -21,6 +21,7 @@ export function createApplicationNavigation({ elements: e, render, updateMap, pr
     updateMap,
     prepareDebug,
     prepareStyle,
+    prepareDownload,
     setActiveTab: state.setActiveTab,
     setActiveDebugSubtab: state.setActiveDebugSubtab,
   });

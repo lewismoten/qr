@@ -1,6 +1,5 @@
 import { initializeDialogs } from '../dialogs.js';
 import { bindApplicationEvents } from '../events.js';
-import { restoreLocationDownload } from '../download/location.js';
 
 export function startApplication({ document, window, elements, defaultChunkVersion,
   systems, runtime }) {
@@ -58,11 +57,14 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   systems.contentEncoding.emailCapacity.sync();
   systems.debug.outlines.sync();
   systems.navigation.activateContent('data');
-  systems.navigation.activateDownload('image');
   systems.navigation.activateDebug('encoding');
   systems.navigation.activateTab('content');
   systems.previewControls.setViewMode('fit', true);
-  restoreLocationDownload({ window, document });
+  if (window.location.hash.includes('download=1') && window.location.hash.includes('data=')) {
+    import('../download/location.js')
+      .then(({ restoreLocationDownload }) => restoreLocationDownload({ window, document }))
+      .catch(console.error);
+  }
   systems.preview.render();
   dialogs.syncFromHash();
 }

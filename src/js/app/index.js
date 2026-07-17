@@ -8,7 +8,7 @@ import { createContentDataSetup } from './ui/content/data-setup.js';
 import { createContentSections } from './ui/content/setup.js';
 import { getDebugColorElements } from './ui/debug/colors.js';
 import { createLazyDebugSetup } from './ui/debug/lazy-setup.js';
-import { createApplicationDownloadSetup } from './ui/download/application-setup.js';
+import { createLazyDownloadSetup } from './ui/runtime/lazy-download.js';
 import { getApplicationElements } from './ui/elements.js';
 import { createApplicationNavigation } from './ui/navigation/application-setup.js';
 import { createOutputSetup } from './ui/output/setup.js';
@@ -72,7 +72,7 @@ const contentSections = createContentSections({
   validatePrintableText,
 });
 
-const download = createApplicationDownloadSetup({
+const download = createLazyDownloadSetup({
   elements,
   bulk: { isMode: contentData.isBulkMode, getRowCount: contentData.getBulkRowCount,
     syncStatus: contentData.syncBulkStatus },
@@ -82,6 +82,7 @@ const download = createApplicationDownloadSetup({
   runtime: { activateImageTab: () => runtime.activateDownload('image'), render: runtime.render },
   maxNumberFrames: LIMITS.numberFrames,
   getPrintWidth: previewControls.getPrintWidth,
+  syncPrint: previewControls.syncPrint,
 });
 
 const contentEncoding = createContentEncodingSetup({
@@ -135,6 +136,7 @@ const navigation = createApplicationNavigation({
   updateMap: contentSections.geo.update,
   prepareDebug: debugSetup.load,
   prepareStyle: (name) => name === 'size' ? previewControls.loadSize() : styleSetup.load(name),
+  prepareDownload: download.load,
   state: { setActiveTab: runtime.setActiveTab,
     setActiveDebugSubtab: runtime.setActiveDebugSubtab },
 });

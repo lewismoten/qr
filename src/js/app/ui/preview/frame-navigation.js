@@ -15,7 +15,7 @@ export function createFrameNavigation({
   status,
   previousButton,
   nextButton,
-  onDownloadStateChange,
+  onStateChange,
 }) {
   const getFrameCount = () => {
     if (isBulkMode()) return Math.max(1, getBulkRowCount());
@@ -64,7 +64,7 @@ export function createFrameNavigation({
     nextButton.hidden = !show;
     previousButton.disabled = !show || current <= 1;
     nextButton.disabled = !show || current >= total;
-    onDownloadStateChange();
+    onStateChange();
   };
 
   return { getFrameCount, getCurrentFrame, setCurrentFrame, sync };
