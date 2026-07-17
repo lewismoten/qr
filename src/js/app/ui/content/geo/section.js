@@ -1,7 +1,6 @@
 import { serializeGeo } from '../../../content-formats.js';
-import { loadLeaflet } from './leaflet-loader.js';
 
-const DEFAULT_CENTER = [38.9182, -78.1944];
+const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
 
 export function parseCoordinate(value) {
   const parsed = Number.parseFloat(value.trim());
@@ -12,21 +11,9 @@ function formatCoordinate(value) {
   return value.toFixed(5);
 }
 
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[character]);
-}
-
 export function createGeoSection({ latitudeInput, longitudeInput, labelInput, mapElement, isActive, onChange }) {
   let map = null;
-  let marker = null;
-  let labelMarker = null;
-  let leafletRequest = null;
+  let mapRequest = null;
 
   const getCoordinates = () => {
     const latitude = parseCoordinate(latitudeInput.value);
@@ -39,67 +26,44 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
   });
 
   const ensureMap = () => {
-    const leaflet = globalThis.L;
-    if (map || !leaflet) return;
-
-    map = leaflet.map(mapElement, { zoomControl: true, attributionControl: true }).setView(DEFAULT_CENTER, 13);
-    leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    }).addTo(map);
-    marker = leaflet.marker([20, 0]).addTo(map);
-    labelMarker = leaflet.marker([20, 0], {
-      interactive: false,
-      keyboard: false,
-      opacity: 0,
-      icon: leaflet.divIcon({ className: 'geo-label-marker', html: '', iconSize: null }),
-    }).addTo(map);
-
-    map.on('click', ({ latlng }) => {
-      latitudeInput.value = formatCoordinate(latlng.lat);
-      longitudeInput.value = formatCoordinate(latlng.lng);
-      onChange();
-    });
+    if (map) return Promise.resolve(map);
+    if (!mapRequest) {
+      mapRequest = import('./slippy-map.js').then(({ createSlippyMap }) => {
+        map = createSlippyMap(mapElement, {
+          center: DEFAULT_CENTER,
+          zoom: 13,
+          onSelect({ latitude, longitude }) {
+            latitudeInput.value = formatCoordinate(latitude);
+            longitudeInput.value = formatCoordinate(longitude);
+            onChange();
+          },
+        });
+        return map;
+      });
+    }
+    return mapRequest;
   };
 
   const update = () => {
     if (!isActive()) return;
-    if (!globalThis.L) {
-      if (!leafletRequest) {
-        leafletRequest = loadLeaflet().then(() => {
-          leafletRequest = null;
-          mapElement.classList.remove('has-load-error');
-          update();
-        }).catch((error) => {
-          mapElement.classList.add('has-load-error');
-          mapElement.textContent = error.message;
-          console.error(error);
-        });
-      }
+    if (!map) {
+      ensureMap().then(update).catch((error) => {
+        mapElement.classList.add('has-load-error');
+        mapElement.textContent = 'Unable to initialize the map preview.';
+        console.error(error);
+      });
       return;
     }
-    ensureMap();
     const coordinates = getCoordinates();
     const label = labelInput.value.trim();
     if (!coordinates) {
-      marker?.setOpacity(0);
-      labelMarker?.setOpacity(0);
+      map.setMarker(null);
       map.setView(DEFAULT_CENTER, 13);
       return;
     }
 
-    const { latitude, longitude } = coordinates;
-    marker.setLatLng([latitude, longitude]).setOpacity(1);
-    marker.bindPopup(label || `${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`);
-    labelMarker.setLatLng([latitude, longitude]);
-    labelMarker.setOpacity(label ? 1 : 0);
-    labelMarker.setIcon(globalThis.L.divIcon({
-      className: 'geo-label-marker',
-      html: label ? `<span>${escapeHtml(label)}</span>` : '',
-      iconSize: null,
-    }));
-    map.setView([latitude, longitude], Math.max(15, map.getZoom()), { animate: false });
-    map.invalidateSize();
+    map.setMarker(coordinates, label);
+    map.setView(coordinates, Math.max(15, map.getZoom()));
   };
 
   return { buildPayload, getCoordinates, update };

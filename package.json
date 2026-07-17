@@ -15,7 +15,7 @@
     "favicon": "node scripts/generate-favicon.mjs",
     "serve": "node serve.mjs",
     "dev": "node serve.mjs",
-    "test": "node qr-native.test.js && node qr-native.parity.test.js && node bytes.test.js && node content-formats.test.js && node modes.test.js && node export-formats.test.js && node lzw.test.js",
+    "test": "node qr-native.test.js && node qr-native.parity.test.js && node bytes.test.js && node content-formats.test.js && node modes.test.js && node map.test.js && node export-formats.test.js && node lzw.test.js",
     "verify": "npm test && npm run build"
   },
   "devDependencies": {

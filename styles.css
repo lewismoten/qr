@@ -1273,33 +1273,118 @@ output {
 }
 
 .geo-map {
+  position: relative;
   min-height: 12rem;
   border-radius: 1rem;
   overflow: hidden;
   border: 1px solid rgba(19, 34, 53, 0.1);
-  background: #dbeafe;
+  background: #dbe4e8;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
-.leaflet-container {
-  font: inherit;
+.geo-map:focus-visible {
+  outline: 3px solid rgba(13, 148, 136, 0.55);
+  outline-offset: 2px;
 }
 
-.geo-label-marker {
-  background: transparent;
-  border: 0;
+.geo-map.is-dragging {
+  cursor: grabbing;
 }
 
-.geo-label-marker span {
-  display: inline-block;
+.slippy-map-tiles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.slippy-map-tile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  max-width: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.slippy-map-marker {
+  position: absolute;
+  z-index: 3;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 0.2rem solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: #e11d48;
+  box-shadow: 0 3px 8px rgba(19, 34, 53, 0.35);
+  pointer-events: none;
+  transform: translate(-50%, -100%) rotate(-45deg);
+}
+
+.slippy-map-label {
+  position: absolute;
+  z-index: 4;
   padding: 0.3rem 0.55rem;
   border-radius: 999px;
   background: rgba(19, 34, 53, 0.9);
   color: #fff;
   font-size: 0.74rem;
   font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
   white-space: nowrap;
   box-shadow: 0 10px 24px rgba(19, 34, 53, 0.18);
-  transform: translate(-50%, -280%);
+  transform: translate(-50%, calc(-100% - 2rem));
+}
+
+.slippy-map-controls {
+  position: absolute;
+  z-index: 5;
+  top: 0.55rem;
+  left: 0.55rem;
+  display: grid;
+  overflow: hidden;
+  border: 1px solid rgba(19, 34, 53, 0.2);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 5px 16px rgba(19, 34, 53, 0.16);
+}
+
+.slippy-map-control {
+  width: 2.35rem;
+  min-height: 2.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #132235;
+  font: 900 1.25rem/1 "Avenir Next", sans-serif;
+}
+
+.slippy-map-control + .slippy-map-control {
+  border-top: 1px solid rgba(19, 34, 53, 0.14);
+}
+
+.slippy-map-control:hover,
+.slippy-map-control:focus-visible {
+  background: #dff7f3;
+}
+
+.slippy-map-attribution {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: 0;
+  padding: 0.18rem 0.35rem;
+  border-radius: 0.35rem 0 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: #334155;
+  font-size: 0.58rem;
+  line-height: 1.2;
+}
+
+.slippy-map-attribution a {
+  color: inherit;
 }
 
 .info-chip {

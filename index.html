@@ -290,7 +290,7 @@
                     </div>
                   </div>
                   <div class="geo-map-card">
-                    <div id="geo-map" class="geo-map" aria-label="Map preview for geo coordinates"></div>
+                    <div id="geo-map" class="geo-map" aria-label="Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates."></div>
                   </div>
                 </fieldset>
 
@@ -1094,7 +1094,7 @@
 
           <section>
             <h2>Privacy and network use</h2>
-            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format lazy-loads Leaflet assets from a public CDN and requests map tiles from OpenStreetMap. Those services receive normal web request information such as an IP address and browser headers; they are not contacted unless Geo is opened.</p>
+            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format requests visible map tiles directly from OpenStreetMap. That service receives normal web request information such as an IP address, referrer and browser headers; it is not contacted unless Geo is opened.</p>
           </section>
         </div>
       </article>
@@ -1110,7 +1110,7 @@
           <button type="button" class="dialog-close" data-close-dialog aria-label="Close technology inventory">Close</button>
         </header>
         <div class="info-dialog-content">
-          <p class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, third-party software and network services used by this application.</p>
+          <p class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, development tools and network services used by this application.</p>
 
           <section>
             <h2>First-party QR implementation</h2>
@@ -1223,17 +1223,17 @@
                 <p>Animated GIF frames are encoded directly. MP4 export draws frames to a Canvas capture stream and records through <code>MediaRecorder</code>; it is offered only when the browser reports support for an MP4 MIME type, and the exact AVC codec and timing behavior depend on that browser.</p>
                 <nav aria-label="Animation and recording references"><a href="https://www.w3.org/TR/mediastream-recording/">MediaStream Recording</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.iana.org/assignments/media-types/media-types.xhtml#video">IANA video media types</a></nav>
               </article>
+              <article>
+                <div><h3>Raster tile map</h3><span class="version-badge">First-party + OSM</span></div>
+                <p>The Geo preview directly implements Web Mercator projection, visible-tile selection, longitude wrapping, pointer and keyboard panning, zoom controls, click-to-coordinate conversion, and marker/label placement. It requests only raster tiles intersecting the active viewport and does not bundle or load a third-party mapping library.</p>
+                <nav aria-label="Raster tile map references"><a href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">Slippy map tile coordinates</a><a href="https://operations.osmfoundation.org/policies/tiles/">OpenStreetMap tile policy</a><a href="https://www.openstreetmap.org/copyright">OpenStreetMap attribution</a></nav>
+              </article>
             </div>
           </section>
 
           <section>
-            <h2>Third-party software</h2>
+            <h2>Development and test software</h2>
             <div class="dependency-list">
-              <article>
-                <div><h3>Leaflet</h3><span class="version-badge">1.9.4</span></div>
-                <p>Provides the interactive map, zoom controls, click coordinates, marker and label used by the Geo format. It is the only third-party browser runtime library and is lazy-loaded from UNPKG only when Geo is opened.</p>
-                <nav aria-label="Leaflet links"><a href="https://leafletjs.com/">Website</a><a href="https://github.com/Leaflet/Leaflet/tree/v1.9.4">1.9.4 repository tag</a><a href="https://github.com/Leaflet/Leaflet/blob/v1.9.4/LICENSE">BSD 2-Clause license</a></nav>
-              </article>
               <article>
                 <div><h3>esbuild</h3><span class="version-badge">0.28.1 build-only</span></div>
                 <p>Bundles and minifies the modular JavaScript and CSS, creates source maps, splits lazy-loaded hosted chunks and emits the self-contained <code>file:</code> fallback. It is a development dependency under the MIT License and is not a browser runtime library or network request made by the deployed application.</p>
@@ -1257,18 +1257,13 @@
             <div class="dependency-list">
               <article>
                 <div><h3>OpenStreetMap</h3><span class="version-badge">Live data</span></div>
-                <p>Serves standard raster map tiles rendered from OpenStreetMap geographic data for the Geo preview. The underlying map database is licensed under ODbL; hosted tiles are also governed by the tile usage policy and include the required contributor attribution in the map.</p>
+                <p>Serves standard raster map tiles directly to the first-party Geo preview. The underlying geographic database is licensed under ODbL; hosted tiles are governed by the separate tile usage policy and include the required contributor attribution in the map.</p>
                 <nav aria-label="OpenStreetMap links"><a href="https://www.openstreetmap.org/">Website</a><a href="https://github.com/openstreetmap/openstreetmap-website">Website repository</a><a href="https://www.openstreetmap.org/copyright">Copyright and ODbL</a><a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a></nav>
-              </article>
-              <article>
-                <div><h3>UNPKG</h3><span class="version-badge">CDN service</span></div>
-                <p>Delivers the pinned Leaflet 1.9.4 JavaScript and stylesheet files when the Geo format is opened. It is not contacted during normal non-Geo use.</p>
-                <nav aria-label="UNPKG links"><a href="https://unpkg.com/">Website</a><a href="https://github.com/unpkg/unpkg">Repository</a><a href="https://github.com/unpkg/unpkg/blob/main/LICENSE">MIT license</a></nav>
               </article>
             </div>
           </section>
 
-          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. Leaflet is the only third-party runtime library; esbuild is build-only, node-qrcode is optional test-only, and no separate third-party package performs production QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
+          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. The deployed application has no third-party browser runtime library; esbuild is build-only, node-qrcode is optional test-only, and no separate package performs production QR generation, mapping or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
         </div>
       </article>
     </dialog>
