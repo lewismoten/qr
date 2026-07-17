@@ -1,8 +1,12 @@
 import { formatPhoneNumberForDisplay } from '../../../phone.js';
+import { serializePhone, serializeSms } from '../../../content-formats.js';
 
 export function createPhoneSection({
   buttons,
   inputs,
+  phoneInput,
+  smsInput,
+  smsBody,
   defaultFormat = 'usa',
   onChange,
 }) {
@@ -58,5 +62,24 @@ export function createPhoneSection({
     formatAll();
   };
 
-  return { initialize };
+  const buildPhonePayload = () => serializePhone(phoneInput.value);
+  const buildSmsPayload = () =>
+    !smsInput.value.trim() && !smsBody.value.trim()
+      ? ''
+      : serializeSms({ number: smsInput.value, message: smsBody.value });
+  const buildPhonePreview = () =>
+    serializePhone(phoneInput.value) || 'tel:[phone-number]';
+  const buildSmsPreview = () =>
+    serializeSms({
+      number: smsInput.value,
+      message: smsBody.value || '[message]',
+    }).replace('SMSTO::', 'SMSTO:[phone-number]:');
+
+  return {
+    initialize,
+    buildPhonePayload,
+    buildSmsPayload,
+    buildPhonePreview,
+    buildSmsPreview,
+  };
 }

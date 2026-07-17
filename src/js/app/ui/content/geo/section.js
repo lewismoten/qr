@@ -1,13 +1,9 @@
 import { serializeGeo } from '../../../content-formats.js';
 import { loadFeatureStylesheet } from '../../../../stylesheets.js';
 import { createLoadingIndicator } from '../../loading-indicator.js';
+import { parseCoordinate } from './coordinates.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
-
-export function parseCoordinate(value) {
-  const parsed = Number.parseFloat(value.trim());
-  return Number.isFinite(parsed) ? parsed : null;
-}
 
 function formatCoordinate(value) {
   return value.toFixed(5);
@@ -37,6 +33,12 @@ export function createGeoSection({
     serializeGeo({
       latitude: latitudeInput.value,
       longitude: longitudeInput.value,
+      label: labelInput.value,
+    });
+  const buildPreview = () =>
+    serializeGeo({
+      latitude: latitudeInput.value.trim() || '[latitude]',
+      longitude: longitudeInput.value.trim() || '[longitude]',
       label: labelInput.value,
     });
 
@@ -93,6 +95,6 @@ export function createGeoSection({
     map.setView(coordinates, Math.max(15, map.getZoom()));
   };
 
-  return { buildPayload, getCoordinates, update };
+  return { buildPayload, buildPreview, getCoordinates, update };
 }
 import { lookup } from '../../../../i18n/index.js';

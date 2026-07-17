@@ -4,6 +4,7 @@ import { validateBulkImport } from './validation.js';
 import { lookup } from '../../../../i18n/index.js';
 import { refreshFilePicker } from '../../file-picker.js';
 import { isAbortError, readCsvText, throwIfAborted } from './csv-reader.js';
+import { serializeBulkRow } from './payload.js';
 import {
   BULK_FORMAT_SCHEMAS,
   MAX_BULK_FILE_BYTES,
@@ -233,6 +234,12 @@ export function createBulkImportSection({
     getCurrentRow,
     getRowCount: () => rows.length,
     getError: () => parseError,
+    buildPayload: (options) =>
+      serializeBulkRow({
+        row: getCurrentRow(),
+        format: format.value,
+        ...options,
+      }),
     getValidationState: ({ rowNumber, limits }) =>
       validateBulkImport({
         parseError,

@@ -17,6 +17,15 @@ export function createVCardSection({
       email: email.value,
       url: website.value,
     });
+  const buildPreview = () =>
+    serializeVCard({
+      name: name.value.trim() || '[full-name]',
+      organization: organization.value.trim() || '[organization]',
+      title: title.value.trim() || '[title]',
+      phone: phone.value.trim() || '[phone-number]',
+      email: email.value.trim() || '[email]',
+      url: website.value.trim() || '[website]',
+    });
 
-  return { buildPayload };
+  return { buildPayload, buildPreview };
 }

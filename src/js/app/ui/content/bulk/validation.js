@@ -10,7 +10,7 @@ import {
   validateTelephoneValue,
   validateVCardTextValue,
 } from '../../../validation.js';
-import { parseCoordinate } from '../geo/section.js';
+import { parseCoordinate } from '../geo/coordinates.js';
 import { normalizeBulkWifiSecurity } from './payload.js';
 import { lookup } from '../../../../i18n/index.js';
 

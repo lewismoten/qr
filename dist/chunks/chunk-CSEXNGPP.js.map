@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/content/geo/coordinates.js"],
+  "sourcesContent": ["export function parseCoordinate(value) {\n  const parsed = Number.parseFloat(value.trim());\n  return Number.isFinite(parsed) ? parsed : null;\n}\n"],
+  "mappings": "AAAO,SAASA,EAAgBC,EAAO,CACrC,IAAMC,EAAS,OAAO,WAAWD,EAAM,KAAK,CAAC,EAC7C,OAAO,OAAO,SAASC,CAAM,EAAIA,EAAS,IAC5C",
+  "names": ["parseCoordinate", "value", "parsed"]
+}

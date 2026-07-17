@@ -24,6 +24,13 @@ export function createWifiSection({
       password: password.value,
       hidden: hidden.checked,
     });
+  const buildPreview = () =>
+    serializeWifi({
+      security: encryption.value || 'WPA',
+      ssid: ssid.value.trim() || '[network-name]',
+      password: password.value || '[password]',
+      hidden: hidden.checked,
+    });
 
   const maskPayload = (payload) =>
     revealSecrets.checked
@@ -35,6 +42,6 @@ export function createWifiSection({
     onChange();
   });
 
-  return { sync, buildPayload, maskPayload };
+  return { sync, buildPayload, buildPreview, maskPayload };
 }
 import { lookup } from '../../../../i18n/index.js';

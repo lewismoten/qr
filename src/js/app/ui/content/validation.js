@@ -1,4 +1,4 @@
-import { parseCoordinate } from './geo/section.js';
+import { parseCoordinate } from './geo/coordinates.js';
 import { lookup } from '../../../i18n/index.js';
 import {
   getWebsiteValidationState,

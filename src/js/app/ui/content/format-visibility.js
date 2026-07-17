@@ -3,10 +3,12 @@ export function createFormatVisibility({
   syncBulk,
   syncFile,
   syncEvent,
+  prepareFormat,
 }) {
   return function sync() {
     syncBulk();
     const format = e.format.value;
+    void prepareFormat(format).catch(console.error);
     e.fieldsets.forEach((fieldset) => {
       const active =
         !e.bulkEnabled.checked && fieldset.dataset.formatFields === format;

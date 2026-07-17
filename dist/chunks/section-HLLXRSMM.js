@@ -1,0 +1,2 @@
+import{g as e}from"./chunk-MN6TIUC4.js";function m({name:a,organization:l,title:i,phone:r,email:u,website:t}){return{buildPayload:()=>e({name:a.value,organization:l.value,title:i.value,phone:r.value,email:u.value,url:t.value}),buildPreview:()=>e({name:a.value.trim()||"[full-name]",organization:l.value.trim()||"[organization]",title:i.value.trim()||"[title]",phone:r.value.trim()||"[phone-number]",email:u.value.trim()||"[email]",url:t.value.trim()||"[website]"})}}export{m as createVCardSection};
+//# sourceMappingURL=section-HLLXRSMM.js.map

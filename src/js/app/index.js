@@ -77,18 +77,6 @@ const styleSetup = createStyleSetup({
   colorWithTransparency,
 });
 
-const setFormatVisibility = createFormatVisibility({
-  elements: {
-    format: elements.qrFormat,
-    fieldsets: elements.formatFieldsets,
-    bulkEnabled: elements.bulkEnabled,
-    secretToggle: elements.payloadRevealToggle,
-  },
-  syncBulk: contentData.syncBulkControls,
-  syncFile: contentData.syncFileModeVisibility,
-  syncEvent: runtime.syncEvent,
-});
-
 const contentSections = createContentSections({
   elements,
   runtime: {
@@ -100,6 +88,19 @@ const contentSections = createContentSections({
   limits: { numberFrames: LIMITS.numberFrames },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
+});
+
+const setFormatVisibility = createFormatVisibility({
+  elements: {
+    format: elements.qrFormat,
+    fieldsets: elements.formatFieldsets,
+    bulkEnabled: elements.bulkEnabled,
+    secretToggle: elements.payloadRevealToggle,
+  },
+  syncBulk: contentData.syncBulkControls,
+  syncFile: contentData.syncFileModeVisibility,
+  syncEvent: runtime.syncEvent,
+  prepareFormat: contentSections.ensureFormat,
 });
 
 const download = createLazyDownloadSetup({
@@ -133,6 +134,7 @@ const contentEncoding = createContentEncodingSetup({
   bulk: {
     isMode: contentData.isBulkMode,
     getRow: contentData.getBulkCurrentRow,
+    build: contentData.buildBulkPayload,
     getError: contentData.getBulkParseError,
     getSchema: contentData.getBulkSchema,
     getValidationState: contentData.getBulkValidationState,

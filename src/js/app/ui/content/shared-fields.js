@@ -34,11 +34,18 @@ export function createSharedFieldsSection({
     syncGroup(emailInputs, emailInputs.at(-1));
     syncGroup(messageInputs, messageInputs[0]);
   };
+  const buildEmailPreview = () =>
+    serializeEmail({
+      email: emailInputs[0].value.trim() || '[recipient@example.com]',
+      subject: emailSubject.value.trim() || '[subject]',
+      body: messageInputs.at(-1).value.trim() || '[message]',
+    });
 
   return {
     initialize,
     buildEmailPayload: () =>
       buildEmailPayloadWithBody(messageInputs.at(-1).value),
     buildEmailPayloadWithBody,
+    buildEmailPreview,
   };
 }

@@ -228,6 +228,8 @@ export function createContentDataSetup({
     getBulkCurrentRow: () => bulk?.getCurrentRow() ?? null,
     getBulkRowCount: () => bulk?.getRowCount() ?? 0,
     getBulkParseError: () => bulk?.getError() ?? '',
+    buildBulkPayload: (options) =>
+      ensureBulk().then((system) => system.buildPayload(options)),
     getBulkValidationState: (options) =>
       bulk?.getValidationState(options) ?? {
         error: lookup('bulk.loading', 'Bulk Import tools are loading.'),

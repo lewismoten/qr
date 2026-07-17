@@ -1,21 +1,16 @@
 import {
-  serializeEmail,
-  serializeGeo,
-  serializePhone,
-  serializeSms,
-  serializeVCard,
-  serializeWifi,
-} from '../../content-formats.js';
-import { normalizePhoneNumber } from '../../phone.js';
-import {
   encodeStreamPosition,
   getCompactFileExtension,
   getFileManifestFlag,
 } from './file/protocol.js';
 
-const valueOr = (value, fallback) => value.trim() || fallback;
-
-export function createContentPayload({ elements: e, bulk, builders, file }) {
+export function createContentPayload({
+  elements: e,
+  bulk,
+  builders,
+  previews,
+  file,
+}) {
   const build = async () => {
     if (bulk.isMode()) return bulk.build();
     switch (e.qrFormat.value) {
@@ -30,14 +25,9 @@ export function createContentPayload({ elements: e, bulk, builders, file }) {
       case 'email':
         return builders.email();
       case 'phone':
-        return serializePhone(e.phoneNumber.value);
+        return builders.phone();
       case 'sms':
-        return !e.smsNumber.value.trim() && !e.smsBody.value.trim()
-          ? ''
-          : serializeSms({
-              number: e.smsNumber.value,
-              message: e.smsBody.value,
-            });
+        return builders.sms();
       case 'event':
         return builders.event();
       case 'geo':
@@ -62,46 +52,21 @@ export function createContentPayload({ elements: e, bulk, builders, file }) {
       case 'text':
         return e.textInput.value || '[enter text]';
       case 'number':
-        return builders.number();
-      case 'wifi': {
-        const encryption = e.wifiEncryption.value || 'WPA';
-        return serializeWifi({
-          security: encryption,
-          ssid: valueOr(e.wifiSsid.value, '[network-name]'),
-          password: valueOr(e.wifiPassword.value, '[password]'),
-          hidden: e.wifiHidden.checked,
-        });
-      }
+        return previews.number();
+      case 'wifi':
+        return previews.wifi();
       case 'email':
-        return serializeEmail({
-          email: valueOr(e.emailTo.value, '[recipient@example.com]'),
-          subject: valueOr(e.emailSubject.value, '[subject]'),
-          body: valueOr(e.emailBody.value, '[message]'),
-        });
+        return previews.email();
       case 'phone':
-        return `tel:${normalizePhoneNumber(e.phoneNumber.value) || '[phone-number]'}`;
+        return previews.phone();
       case 'sms':
-        return serializeSms({
-          number: e.smsNumber.value,
-          message: valueOr(e.smsBody.value, '[message]'),
-        }).replace('SMSTO::', 'SMSTO:[phone-number]:');
+        return previews.sms();
       case 'event':
-        return builders.event();
+        return previews.event();
       case 'geo':
-        return serializeGeo({
-          latitude: valueOr(e.geoLatitude.value, '[latitude]'),
-          longitude: valueOr(e.geoLongitude.value, '[longitude]'),
-          label: e.geoQuery.value,
-        });
+        return previews.geo();
       case 'vcard':
-        return serializeVCard({
-          name: valueOr(e.vcardName.value, '[full-name]'),
-          organization: valueOr(e.vcardOrg.value, '[organization]'),
-          title: valueOr(e.vcardTitle.value, '[title]'),
-          phone: valueOr(e.vcardPhone.value, '[phone-number]'),
-          email: valueOr(e.vcardEmail.value, '[email]'),
-          url: valueOr(e.vcardUrl.value, '[website]'),
-        });
+        return previews.vcard();
       case 'file':
         return file.preview();
       default:

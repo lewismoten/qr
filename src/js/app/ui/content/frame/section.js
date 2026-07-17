@@ -90,7 +90,7 @@ export function createFrameSection(options) {
       case 'text':
         return shortText(row.text);
       case 'number':
-        return shorten(options.buildBulkText(row));
+        return shorten(`${row.prefix}${row.number}${row.suffix}`);
       case 'wifi':
         return row.ssid.trim()
           ? shorten(

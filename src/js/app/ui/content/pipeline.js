@@ -1,5 +1,4 @@
 import { parseBoolean } from '../../csv.js';
-import { serializeBulkRow } from './bulk/payload.js';
 import { createFrameSection } from './frame/section.js';
 import { createContentPayload, createFilePayloadPreview } from './payload.js';
 
@@ -12,10 +11,8 @@ export function createContentPipeline({
   runtime,
   alphanumericCharacters,
 }) {
-  const buildBulkText = (row = bulk.getRow()) =>
-    serializeBulkRow({
-      row,
-      format: e.format.value,
+  const buildBulkText = () =>
+    bulk.build({
       frameIndex: runtime.getFrameIndex(),
       alphanumericCharacters,
     });
@@ -23,7 +20,6 @@ export function createContentPipeline({
     format: e.format,
     isBulkMode: bulk.isMode,
     getBulkRow: bulk.getRow,
-    buildBulkText,
     parseBoolean,
     getNumberPayload: number.getPayload,
     getActiveFile: file.getActive,
@@ -84,6 +80,7 @@ export function createContentPipeline({
     },
     bulk: { isMode: bulk.isMode, build: buildBulkText },
     builders,
+    previews: builders.previews,
     file: {
       preview: createFilePayloadPreview({
         getFile: file.getActive,
