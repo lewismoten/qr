@@ -32,8 +32,6 @@
       crossorigin=""
     />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.tosjis.min.js"></script>
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -917,17 +915,6 @@
 
                   <section class="subtab-panel" data-subtab-panel="advanced" hidden>
                     <fieldset class="option-group">
-                      <legend>QR engine</legend>
-                      <label class="toggle-field">
-                        <input id="native-encoder-enabled" name="native-encoder-enabled" type="checkbox" />
-                        <span>Use experimental first-party encoder</span>
-                      </label>
-                      <p id="native-encoder-status" class="hint" aria-live="polite">
-                        Reference encoder active. Enable this to run the Phase 1 native encoder and compare matrices.
-                      </p>
-                    </fieldset>
-
-                    <fieldset class="option-group">
                       <legend>Raw options</legend>
                       <label for="options-json">Extra options JSON</label>
                       <textarea
@@ -937,8 +924,8 @@
                         spellcheck="false"
                       >{}</textarea>
                       <p class="hint">
-                        Merged last into the QRCode options object. The bundled Shift JIS helper is
-                        always restored after this merge so automatic and manual Kanji encoding remain available.
+                        Merged last into the first-party QR options object. Native Shift JIS conversion
+                        remains available after this merge for automatic and manual Kanji encoding.
                       </p>
                     </fieldset>
 
@@ -1112,7 +1099,7 @@
 
           <section>
             <h2>Privacy and network use</h2>
-            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Loading the application fetches QRCode and Leaflet assets from public CDNs. Opening the Geo format requests map tiles from OpenStreetMap, which receives normal web request information such as an IP address and browser headers.</p>
+            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Loading the application fetches Leaflet assets from a public CDN. Opening the Geo format requests map tiles from OpenStreetMap, which receives normal web request information such as an IP address and browser headers.</p>
           </section>
         </div>
       </article>
@@ -1134,11 +1121,6 @@
             <h2>Runtime libraries</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>QRCode / node-qrcode</h3><span class="version-badge">1.5.0</span></div>
-                <p>Creates QR segments, versions, masks, error-correction data and module matrices. Its companion Shift JIS build enables efficient Kanji segments.</p>
-                <nav aria-label="QRCode links"><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">Website</a><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a></nav>
-              </article>
-              <article>
                 <div><h3>Leaflet</h3><span class="version-badge">1.9.4</span></div>
                 <p>Provides the interactive map, zoom controls, click coordinates, marker and label used by the Geo format.</p>
                 <nav aria-label="Leaflet links"><a href="https://leafletjs.com/">Website</a><a href="https://github.com/Leaflet/Leaflet">Repository</a><a href="https://github.com/Leaflet/Leaflet/blob/main/LICENSE">BSD 2-Clause license</a></nav>
@@ -1155,11 +1137,6 @@
                 <nav aria-label="OpenStreetMap links"><a href="https://www.openstreetmap.org/">Website</a><a href="https://github.com/openstreetmap/openstreetmap-website">Website repository</a><a href="https://www.openstreetmap.org/copyright">Copyright and ODbL</a><a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a></nav>
               </article>
               <article>
-                <div><h3>jsDelivr</h3><span class="version-badge">CDN service</span></div>
-                <p>Delivers the pinned QRCode 1.5.0 browser bundle and matching Shift JIS helper.</p>
-                <nav aria-label="jsDelivr links"><a href="https://www.jsdelivr.com/">Website</a><a href="https://github.com/jsdelivr/jsdelivr">Repository</a><a href="https://github.com/jsdelivr/jsdelivr/blob/master/LICENSE">MIT license</a><a href="https://www.jsdelivr.com/terms">Terms</a></nav>
-              </article>
-              <article>
                 <div><h3>UNPKG</h3><span class="version-badge">CDN service</span></div>
                 <p>Delivers the pinned Leaflet 1.9.4 JavaScript and stylesheet files.</p>
                 <nav aria-label="UNPKG links"><a href="https://unpkg.com/">Website</a><a href="https://github.com/unpkg/unpkg">Repository</a><a href="https://github.com/unpkg/unpkg/blob/main/LICENSE">MIT license</a></nav>
@@ -1168,8 +1145,8 @@
           </section>
 
           <section>
-            <h2>Built without additional export libraries</h2>
-            <p>Canvas drawing, SVG path tracing, PNG/JPEG output, GIF encoding, ZIP packaging and PDF generation are implemented in this application. MP4 recording, SHA-256 hashing and gzip compression use browser APIs when available. Those browser capabilities are platform features rather than bundled third-party modules.</p>
+            <h2>Built-in QR generation and exports</h2>
+            <p>Segmentation, Shift JIS Kanji conversion, version selection, Reed-Solomon correction, masking and matrix placement are implemented directly by this application. Canvas drawing, SVG path tracing, PNG/JPEG output, GIF encoding, ZIP packaging and PDF generation are also first-party. MP4 recording, SHA-256 hashing and gzip compression use browser APIs when available.</p>
           </section>
         </div>
       </article>

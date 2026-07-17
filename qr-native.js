@@ -2,11 +2,12 @@
   'use strict';
 
   const ALPHANUMERIC = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
-  const MODE_BITS = { numeric: 0x1, alphanumeric: 0x2, byte: 0x4 };
+  const MODE_BITS = { numeric: 0x1, alphanumeric: 0x2, byte: 0x4, kanji: 0x8 };
   const COUNT_BITS = {
     numeric: [10, 12, 14],
     alphanumeric: [9, 11, 13],
     byte: [8, 16, 16],
+    kanji: [8, 10, 12],
   };
   const FORMAT_ECL_BITS = { L: 1, M: 0, Q: 3, H: 2 };
   const ECC_CODEWORDS_PER_BLOCK = {
@@ -59,7 +60,53 @@
   function detectMode(text) {
     if (/^[0-9]+$/.test(text)) return 'numeric';
     if ([...text].every((character) => ALPHANUMERIC.includes(character))) return 'alphanumeric';
+    if ([...text].every((character) => character.codePointAt(0) > 0x7f && getQrKanjiValue(character) !== null)) return 'kanji';
     return 'byte';
+  }
+
+  let shiftJisMap;
+
+  function getShiftJisMap() {
+    if (shiftJisMap) return shiftJisMap;
+    let decoder;
+    try {
+      decoder = new TextDecoder('shift_jis', { fatal: true });
+    } catch (error) {
+      throw new Error('Native Kanji mode requires browser Shift JIS decoding support.');
+    }
+
+    shiftJisMap = new Map();
+    const leadRanges = [[0x81, 0x9f], [0xe0, 0xeb]];
+    leadRanges.forEach(([firstLead, lastLead]) => {
+      for (let lead = firstLead; lead <= lastLead; lead += 1) {
+        for (let trail = 0x40; trail <= 0xfc; trail += 1) {
+          if (trail === 0x7f) continue;
+          try {
+            const character = decoder.decode(Uint8Array.of(lead, trail));
+            if ([...character].length === 1 && character !== '\ufffd' && !shiftJisMap.has(character)) {
+              shiftJisMap.set(character, (lead << 8) | trail);
+            }
+          } catch (error) {
+            // Unassigned Shift JIS byte pairs are not QR Kanji characters.
+          }
+        }
+      }
+    });
+    return shiftJisMap;
+  }
+
+  function toShiftJis(character) {
+    return getShiftJisMap().get(character);
+  }
+
+  function getQrKanjiValue(character) {
+    const shiftJis = toShiftJis(character);
+    if (!Number.isInteger(shiftJis)) return null;
+    let adjusted;
+    if (shiftJis >= 0x8140 && shiftJis <= 0x9ffc) adjusted = shiftJis - 0x8140;
+    else if (shiftJis >= 0xe040 && shiftJis <= 0xebbf) adjusted = shiftJis - 0xc140;
+    else return null;
+    return ((adjusted >>> 8) * 0xc0) + (adjusted & 0xff);
   }
 
   function makeSegment(data, requestedMode) {
@@ -69,6 +116,9 @@
     if (mode === 'numeric' && !/^[0-9]*$/.test(text)) throw new Error('Numeric mode only accepts digits 0-9.');
     if (mode === 'alphanumeric' && ![...text].every((character) => ALPHANUMERIC.includes(character))) {
       throw new Error('Alphanumeric mode contains unsupported characters.');
+    }
+    if (mode === 'kanji' && ![...text].every((character) => getQrKanjiValue(character) !== null)) {
+      throw new Error('Kanji mode contains characters outside the QR Shift JIS ranges.');
     }
 
     const payload = new BitBuffer();
@@ -85,10 +135,14 @@
         payload.append(ALPHANUMERIC.indexOf(text[index]) * 45 + ALPHANUMERIC.indexOf(text[index + 1]), 11);
       }
       if (text.length % 2) payload.append(ALPHANUMERIC.indexOf(text.at(-1)), 6);
-    } else {
+    } else if (mode === 'byte') {
       const bytes = new TextEncoder().encode(text);
       count = bytes.length;
       bytes.forEach((byte) => payload.append(byte, 8));
+    } else {
+      const characters = [...text];
+      count = characters.length;
+      characters.forEach((character) => payload.append(getQrKanjiValue(character), 13));
     }
 
     return {
@@ -99,6 +153,9 @@
       getBitsLength() {
         return this.bits.length;
       },
+      getLength() {
+        return this.characterCount;
+      },
     };
   }
 
@@ -107,6 +164,97 @@
       return payload.map((part) => makeSegment(part.data, typeof part.mode === 'string' ? part.mode : part.mode?.id));
     }
     return [makeSegment(payload)];
+  }
+
+  function getCharacterModes(character) {
+    const modes = [];
+    if (/^[0-9]$/.test(character)) modes.push('numeric');
+    if (ALPHANUMERIC.includes(character)) modes.push('alphanumeric');
+    if (character.codePointAt(0) > 0x7f && getQrKanjiValue(character) !== null) modes.push('kanji');
+    modes.push('byte');
+    return modes;
+  }
+
+  function getModeUnitCount(mode, character) {
+    return mode === 'byte' ? new TextEncoder().encode(character).length : 1;
+  }
+
+  function getIncrementalPayloadBits(mode, previousCount, unitCount) {
+    if (mode === 'numeric') return previousCount % 3 === 0 ? 4 : 3;
+    if (mode === 'alphanumeric') return previousCount % 2 === 0 ? 6 : 5;
+    if (mode === 'kanji') return 13;
+    return unitCount * 8;
+  }
+
+  function getOptimizationKey(mode, count) {
+    if (mode === 'numeric') return `${mode}:${count % 3}`;
+    if (mode === 'alphanumeric') return `${mode}:${count % 2}`;
+    return mode;
+  }
+
+  function optimizeSegments(text, version) {
+    const characters = [...String(text)];
+    if (!characters.length) return [makeSegment('', 'byte')];
+    let states = [];
+
+    characters.forEach((character) => {
+      const nextStates = new Map();
+      const availableModes = getCharacterModes(character);
+      const previousStates = states.length ? states : [null];
+      previousStates.forEach((previous) => {
+        availableModes.forEach((mode) => {
+          const unitCount = getModeUnitCount(mode, character);
+          const countBits = getCountBitLength(mode, version);
+          const maximumCount = 2 ** countBits - 1;
+          const candidates = [{ continuing: false, previousCount: 0 }];
+          if (previous?.mode === mode && previous.segmentCount + unitCount <= maximumCount) {
+            candidates.push({ continuing: true, previousCount: previous.segmentCount });
+          }
+
+          candidates.forEach(({ continuing, previousCount }) => {
+            const segmentCount = previousCount + unitCount;
+            const cost = (previous?.cost || 0) +
+              (continuing ? 0 : 4 + countBits) +
+              getIncrementalPayloadBits(mode, previousCount, unitCount);
+            const key = getOptimizationKey(mode, segmentCount);
+            const existing = nextStates.get(key);
+            const prefersSpecializedBoundary = existing && cost === existing.cost && !continuing && !existing.startsSegment;
+            if (!existing || cost < existing.cost || prefersSpecializedBoundary) {
+              nextStates.set(key, {
+                cost,
+                mode,
+                segmentCount,
+                character,
+                startsSegment: !continuing,
+                previous,
+              });
+            }
+          });
+        });
+      });
+      states = [...nextStates.values()];
+    });
+
+    const modePreference = { numeric: 0, alphanumeric: 1, kanji: 2, byte: 3 };
+    let current = states.reduce((best, state) =>
+      !best || state.cost < best.cost ||
+      (state.cost === best.cost && modePreference[state.mode] < modePreference[best.mode])
+        ? state
+        : best,
+    null);
+    const encodedCharacters = [];
+    while (current) {
+      encodedCharacters.push(current);
+      current = current.previous;
+    }
+    encodedCharacters.reverse();
+
+    const optimized = [];
+    encodedCharacters.forEach(({ character, mode, startsSegment }) => {
+      if (startsSegment || !optimized.length) optimized.push({ mode, data: character });
+      else optimized.at(-1).data += character;
+    });
+    return optimized.map(({ data, mode }) => makeSegment(data, mode));
   }
 
   function getRequiredBits(segments, version) {
@@ -134,6 +282,40 @@
         }
         return version;
       }
+    }
+    throw new Error('The content is too large for a version 40 QR Code.');
+  }
+
+  function selectVersionAndSegments(payload, errorLevel, requestedVersion) {
+    if (Array.isArray(payload)) {
+      const segments = normalizeSegments(payload);
+      return { segments, version: chooseVersion(segments, errorLevel, requestedVersion) };
+    }
+
+    const text = String(payload);
+    const optimizedByBucket = new Map();
+    const getOptimized = (version) => {
+      const bucketVersion = version <= 9 ? 1 : version <= 26 ? 10 : 27;
+      if (!optimizedByBucket.has(bucketVersion)) optimizedByBucket.set(bucketVersion, optimizeSegments(text, bucketVersion));
+      return optimizedByBucket.get(bucketVersion);
+    };
+    const fits = (version, segments) => getRequiredBits(segments, version) <= getDataCodewords(version, errorLevel) * 8;
+
+    if (requestedVersion !== undefined) {
+      if (!Number.isInteger(requestedVersion) || requestedVersion < 1 || requestedVersion > 40) {
+        throw new RangeError('QR version must be an integer from 1 through 40.');
+      }
+      const requestedSegments = getOptimized(requestedVersion);
+      if (fits(requestedVersion, requestedSegments)) return { segments: requestedSegments, version: requestedVersion };
+    }
+
+    for (let version = 1; version <= 40; version += 1) {
+      const segments = getOptimized(version);
+      if (!fits(version, segments)) continue;
+      if (requestedVersion !== undefined) {
+        throw new Error(`The chosen QR Code version cannot contain this amount of data. Minimum version required is: ${version}.`);
+      }
+      return { segments, version };
     }
     throw new Error('The content is too large for a version 40 QR Code.');
   }
@@ -425,8 +607,7 @@
   function create(payload, options = {}) {
     const errorLevel = String(options.errorCorrectionLevel || 'M').toUpperCase();
     if (!FORMAT_ECL_BITS.hasOwnProperty(errorLevel)) throw new Error(`Unknown error correction level: ${errorLevel}.`);
-    const segments = normalizeSegments(payload);
-    const version = chooseVersion(segments, errorLevel, options.version);
+    const { segments, version } = selectVersionAndSegments(payload, errorLevel, options.version);
     const data = makeDataCodewords(segments, version, errorLevel);
     const codewords = addErrorCorrection(data, version, errorLevel);
     const builder = new MatrixBuilder(version, errorLevel, codewords);
@@ -450,7 +631,8 @@
 
   const api = {
     create,
-    internals: { getDataCodewords, getRawDataModules, makeReedSolomonDivisor, getReedSolomonRemainder },
+    toSJIS: toShiftJis,
+    internals: { getDataCodewords, getRawDataModules, makeReedSolomonDivisor, getReedSolomonRemainder, optimizeSegments },
   };
   globalScope.NativeQRCode = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

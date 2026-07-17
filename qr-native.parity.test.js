@@ -17,6 +17,10 @@ context.window = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(referencePath, 'utf8'), context);
 const ReferenceQRCode = context.QRCode;
+const shiftJisReferencePath = process.env.QR_SHIFT_JIS_REFERENCE_BUNDLE || '/tmp/qrcode-1.5.0.tosjis.min.js';
+if (fs.existsSync(shiftJisReferencePath)) {
+  vm.runInContext(fs.readFileSync(shiftJisReferencePath, 'utf8'), context);
+}
 
 function moduleIsDark(definition, row, column) {
   return Boolean(
@@ -27,8 +31,11 @@ function moduleIsDark(definition, row, column) {
 }
 
 function assertParity(payload, options) {
+  const referenceOptions = typeof ReferenceQRCode.toSJIS === 'function'
+    ? { ...options, toSJISFunc: ReferenceQRCode.toSJIS }
+    : options;
   const nativeDefinition = NativeQRCode.create(payload, options);
-  const referenceDefinition = ReferenceQRCode.create(payload, options);
+  const referenceDefinition = ReferenceQRCode.create(payload, referenceOptions);
   assert.equal(nativeDefinition.version, referenceDefinition.version, 'version');
   assert.equal(nativeDefinition.maskPattern, referenceDefinition.maskPattern, 'mask');
   assert.equal(nativeDefinition.modules.size, referenceDefinition.modules.size, 'matrix size');
@@ -61,5 +68,17 @@ for (const errorCorrectionLevel of ['L', 'M', 'Q', 'H']) {
   assertParity(payload, options);
   comparisons += 1;
 });
+
+if (typeof ReferenceQRCode.toSJIS === 'function') {
+  [
+    'あかが',
+    'ABC123あかがXYZ789',
+    '1234567890hello1234567890',
+    'Hello, 世界',
+  ].forEach((payload) => {
+    assertParity(payload, { errorCorrectionLevel: 'M' });
+    comparisons += 1;
+  });
+}
 
 console.log(`Native QR reference parity passed for ${comparisons} matrices.`);

@@ -2,32 +2,29 @@
 
 Simple QR Code Builder
 
-## First-party QR encoder roadmap
+## First-party QR encoder
 
-QR matrix generation is being moved into `qr-native.js` in testable phases. The
-production path still uses the pinned QRCode 1.5.0 reference encoder by default.
-Under **Debug > Advanced**, enable **Use experimental first-party encoder** to
-render with the native implementation and compare its selected version, mask, and
-matrix against the reference implementation.
+QR generation now runs through the first-party `qr-native.js` implementation.
+It includes version-aware mixed segmentation, numeric, alphanumeric, UTF-8 byte
+and Shift JIS Kanji encoding, versions 1-40, all four error-correction levels,
+Reed-Solomon block generation and interleaving, functional patterns, data
+placement, all masks, and automatic mask scoring. No third-party QR runtime or
+QR CDN request is required.
 
-Phase 1 includes numeric, alphanumeric, and UTF-8 byte encoding, versions 1-40,
-all four error-correction levels, Reed-Solomon block generation and interleaving,
-functional patterns, data placement, all masks, and automatic mask scoring. Kanji,
-mixed-mode optimization, independent reference vectors, and removal of the CDN
-encoder remain later phases.
-
-Run the Phase 1 structural suite with:
+Run the structural, mode and capacity suite with:
 
 ```sh
 node qr-native.test.js
 ```
 
-For independent matrix parity, download the same pinned reference bundle used by
-the site and run the parity suite. The reference file stays outside the project:
+For independent matrix parity, download the former pinned reference bundles and
+run the parity suite. These development-only files stay outside the project:
 
 ```sh
 curl -fsSL https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js \
   -o /tmp/qrcode-1.5.0.min.js
+curl -fsSL https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.tosjis.min.js \
+  -o /tmp/qrcode-1.5.0.tosjis.min.js
 node qr-native.parity.test.js
 ```
 

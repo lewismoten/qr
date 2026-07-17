@@ -1,4 +1,5 @@
 const form = document.getElementById('qr-form');
+const qrEncoder = globalThis.NativeQRCode;
 const canvas = document.getElementById('qr-canvas');
 const qrPreviewViewport = document.getElementById('qr-preview-viewport');
 const previewViewControls = document.getElementById('preview-view-controls');
@@ -123,8 +124,6 @@ const downloadAllPdf = document.getElementById('download-all-pdf');
 const downloadActions = document.querySelectorAll('.download-actions');
 const downloadStatus = document.getElementById('download-status');
 const optionsJson = document.getElementById('options-json');
-const nativeEncoderEnabled = document.getElementById('native-encoder-enabled');
-const nativeEncoderStatus = document.getElementById('native-encoder-status');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
 const errorCorrectionValue = document.getElementById('error-correction-value');
@@ -2718,7 +2717,7 @@ function getFileCapacityBytes() {
 
     try {
       const qrPayload = buildPayload(payload);
-      QRCode.create(qrPayload, options);
+      qrEncoder.create(qrPayload, options);
       return true;
     } catch (error) {
       return false;
@@ -2769,7 +2768,7 @@ function getBlobUrlCapacityBytes(file = getActiveFile()) {
 
     try {
       const qrPayload = buildPayload(payload);
-      QRCode.create(qrPayload, options);
+      qrEncoder.create(qrPayload, options);
       return true;
     } catch (error) {
       return false;
@@ -2846,7 +2845,7 @@ function getChunkedFileCapacityInfo(file = getActiveFile()) {
   const canEncodeSingleFrame = () => {
     try {
       const payload = buildSingleFilePayloadTemplate(streamLength, { file });
-      QRCode.create(buildPayload(payload), capacityOptions);
+      qrEncoder.create(buildPayload(payload), capacityOptions);
       return true;
     } catch (error) {
       return false;
@@ -2860,7 +2859,7 @@ function getChunkedFileCapacityInfo(file = getActiveFile()) {
         offset: Math.max(0, streamLength - 1),
       });
       const qrPayload = buildPayload(payload);
-      QRCode.create(qrPayload, capacityOptions);
+      qrEncoder.create(qrPayload, capacityOptions);
       return true;
     } catch (error) {
       return false;
@@ -3688,9 +3687,6 @@ function buildOptions() {
   if (isChunkedFile) {
     mergedOptions.version = getConfiguredChunkVersion();
   }
-  if (typeof QRCode.toSJIS === 'function') {
-    mergedOptions.toSJISFunc = QRCode.toSJIS;
-  }
   return mergedOptions;
 }
 
@@ -3718,54 +3714,11 @@ function buildPayload(encodedText) {
   return [{ data: encodedText, mode }];
 }
 
-function compareQrDefinitions(nativeDefinition, referenceDefinition) {
-  const sizeMatches = nativeDefinition.modules.size === referenceDefinition.modules.size;
-  const versionMatches = nativeDefinition.version === referenceDefinition.version;
-  const maskMatches = nativeDefinition.maskPattern === referenceDefinition.maskPattern;
-  let differentModules = sizeMatches ? 0 : Infinity;
-  if (sizeMatches) {
-    for (let row = 0; row < nativeDefinition.modules.size; row += 1) {
-      for (let column = 0; column < nativeDefinition.modules.size; column += 1) {
-        if (Boolean(moduleIsDark(nativeDefinition, row, column)) !== Boolean(moduleIsDark(referenceDefinition, row, column))) {
-          differentModules += 1;
-        }
-      }
-    }
-  }
-  return { sizeMatches, versionMatches, maskMatches, differentModules };
-}
-
 function createQrDefinition(payload, options) {
-  if (!nativeEncoderEnabled.checked) {
-    nativeEncoderStatus.textContent = 'Reference encoder active. Enable the experimental encoder to compare matrices.';
-    nativeEncoderStatus.classList.remove('has-error', 'has-success');
-    return QRCode.create(payload, options);
-  }
-  if (typeof globalThis.NativeQRCode?.create !== 'function') {
+  if (typeof qrEncoder?.create !== 'function') {
     throw new Error('The first-party QR encoder did not load.');
   }
-
-  const payloadParts = Array.isArray(payload) ? payload : [];
-  const usesKanji = payloadParts.some((part) => {
-    const mode = typeof part.mode === 'string' ? part.mode : part.mode?.id;
-    return String(mode).toLowerCase() === 'kanji';
-  });
-  if (usesKanji) {
-    nativeEncoderStatus.classList.remove('has-error', 'has-success');
-    nativeEncoderStatus.textContent = 'Kanji is scheduled for a later native phase; this preview safely uses the reference encoder.';
-    return QRCode.create(payload, options);
-  }
-
-  const nativeDefinition = globalThis.NativeQRCode.create(payload, options);
-  const referenceDefinition = QRCode.create(payload, options);
-  const comparison = compareQrDefinitions(nativeDefinition, referenceDefinition);
-  const matches = comparison.versionMatches && comparison.maskMatches && comparison.differentModules === 0;
-  nativeEncoderStatus.classList.toggle('has-success', matches);
-  nativeEncoderStatus.classList.toggle('has-error', !matches);
-  nativeEncoderStatus.textContent = matches
-    ? `Native parity confirmed: V${nativeDefinition.version}, mask ${nativeDefinition.maskPattern}, every module matches.`
-    : `Native comparison: V${nativeDefinition.version} vs V${referenceDefinition.version}; mask ${nativeDefinition.maskPattern} vs ${referenceDefinition.maskPattern}; ${Number.isFinite(comparison.differentModules) ? comparison.differentModules : 'different-sized'} modules differ.`;
-  return nativeDefinition;
+  return qrEncoder.create(payload, options);
 }
 
 function updateOptionsPreview(options) {
@@ -3846,7 +3799,7 @@ function getEmailBodyCapacityInfo() {
     const testPayload = buildEmailPayloadWithBody('A'.repeat(length));
     try {
       const payload = buildPayload(testPayload);
-      QRCode.create(payload, options);
+      qrEncoder.create(payload, options);
       return true;
     } catch (error) {
       return false;
@@ -4503,7 +4456,7 @@ function getInvalidCharacters(text, mode) {
     [...text].forEach((char, index) => {
       let shiftJisValue;
       try {
-        shiftJisValue = QRCode.toSJIS(char);
+        shiftJisValue = qrEncoder.toSJIS(char);
       } catch (error) {
         shiftJisValue = undefined;
       }
@@ -4541,7 +4494,7 @@ function validateManualMode(encodedText) {
   }
 
   if (mode === 'kanji') {
-    if (typeof QRCode.toSJIS !== 'function') {
+    if (typeof qrEncoder.toSJIS !== 'function') {
       setValidationMessage('Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.');
       return false;
     }
@@ -6509,7 +6462,7 @@ function renderInvalidPreview(previewText, options, message) {
   delete previewOptions.version;
 
   try {
-    const qrDefinition = QRCode.create(safeText, previewOptions);
+    const qrDefinition = qrEncoder.create(safeText, previewOptions);
     drawQr(qrDefinition, previewOptions);
   } catch (error) {
     clearCanvas();
@@ -6576,6 +6529,31 @@ function syncMaskSelection() {
   });
 }
 
+function drawQrThumbnail(targetCanvas, qrDefinition, options) {
+  const context = targetCanvas.getContext('2d');
+  const margin = options.margin ?? 1;
+  const totalModules = qrDefinition.modules.size + margin * 2;
+  const moduleSize = Math.max(1, Math.floor(Math.min(targetCanvas.width, targetCanvas.height) / totalModules));
+  const drawSize = totalModules * moduleSize;
+  const offsetX = Math.floor((targetCanvas.width - drawSize) / 2);
+  const offsetY = Math.floor((targetCanvas.height - drawSize) / 2);
+  context.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+  context.fillStyle = options.color?.light || '#ffffff';
+  context.fillRect(offsetX, offsetY, drawSize, drawSize);
+  context.fillStyle = options.color?.dark || '#111827';
+  for (let row = 0; row < qrDefinition.modules.size; row += 1) {
+    for (let column = 0; column < qrDefinition.modules.size; column += 1) {
+      if (!moduleIsDark(qrDefinition, row, column)) continue;
+      context.fillRect(
+        offsetX + (column + margin) * moduleSize,
+        offsetY + (row + margin) * moduleSize,
+        moduleSize,
+        moduleSize
+      );
+    }
+  }
+}
+
 function renderMaskPreviews(encodedText) {
   ensureMaskButtons();
 
@@ -6588,18 +6566,13 @@ function renderMaskPreviews(encodedText) {
       return;
     }
 
-    const renderedCanvas = document.createElement('canvas');
-    QRCode.toCanvas(renderedCanvas, previewValue, buildMaskPreviewOptions(maskValue), (error) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const context = previewCanvas.getContext('2d');
-      context.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-      context.imageSmoothingEnabled = false;
-      context.drawImage(renderedCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
-    });
+    try {
+      const previewOptions = buildMaskPreviewOptions(maskValue);
+      const definition = qrEncoder.create(previewValue, previewOptions);
+      drawQrThumbnail(previewCanvas, definition, previewOptions);
+    } catch (error) {
+      console.error(error);
+    }
   });
 }
 
