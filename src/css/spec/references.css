@@ -1,0 +1,150 @@
+.process-list {
+  max-width: 54rem;
+  margin: 0 auto;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  list-style: none;
+}
+
+.process-list li {
+  padding: 0.8rem;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 1rem;
+  background: rgba(255, 253, 248, 0.78);
+  box-shadow: 0 10px 30px rgba(7, 24, 39, 0.06);
+}
+
+.process-list li > span {
+  width: 2.5rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: var(--ink-deep);
+  color: #5eead4;
+  font-weight: 900;
+}
+
+.process-list strong {
+  color: var(--ink-deep);
+}
+
+.process-list p {
+  margin: 0.15rem 0 0;
+  color: #52687a;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.reference-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.reference-links a {
+  min-height: 5rem;
+  padding: 0.9rem 2rem 0.9rem 0.9rem;
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 1rem;
+  background: rgba(255, 253, 248, 0.82);
+  text-decoration: none;
+}
+
+.external-link-indicator {
+  margin-inline-start: 0.3em;
+  display: inline-block;
+  color: #0d9488;
+  font-size: 0.78em;
+  font-weight: 1000;
+  line-height: 1;
+  vertical-align: 0.16em;
+}
+
+.reference-links .external-link-indicator {
+  margin: 0;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.8rem;
+  color: #0d9488;
+  font-size: 0.9rem;
+}
+
+.spec-footer .external-link-indicator {
+  color: #5eead4;
+}
+
+.reference-links a:hover,
+.reference-links a:focus-visible {
+  border-color: rgba(15, 118, 110, 0.5);
+  box-shadow: 0 12px 30px rgba(7, 24, 39, 0.08);
+}
+
+.reference-links strong {
+  color: #0f766e;
+}
+
+.reference-links span {
+  color: #627286;
+  font-size: 0.8rem;
+}
+
+.implementation-links {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.implementation-links a {
+  align-content: start;
+}
+
+.implementation-links code {
+  padding: 0;
+  background: transparent;
+}
+
+.implementation-warning {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 1rem;
+  background: rgba(255, 247, 224, 0.88);
+}
+
+.implementation-warning strong {
+  color: #8a4b08;
+}
+
+.implementation-warning p {
+  margin: 0.35rem 0 0;
+  color: #59451f;
+  line-height: 1.55;
+}
+
+.spec-footer {
+  width: min(calc(100% - 1.5rem), 76rem);
+  margin: 0 auto 0.75rem;
+  padding: 0.55rem 0.65rem 0.55rem 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 1rem;
+  background: #071827;
+  color: rgba(226, 242, 241, 0.72);
+}
+
+.spec-footer > span {
+  color: #5eead4;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

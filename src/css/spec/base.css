@@ -1,0 +1,97 @@
+:root {
+  color-scheme: light;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: #102238;
+  background: #eef4f2;
+  --ink: #102238;
+  --ink-deep: #071827;
+  --paper: #fffaf0;
+  --signal: #0d9488;
+  --signal-bright: #2dd4bf;
+  --flare: #f59e0b;
+  --line: rgba(16, 34, 56, 0.12);
+  --finder: #ef4444;
+  --alignment: #facc15;
+  --timing: #06b6d4;
+  --format: #8b5cf6;
+  --ec-level: #ec4899;
+  --mask: #2563eb;
+  --version: #10b981;
+  --dark-module: #4c1d95;
+  --mode: #0f766e;
+  --count: #f97316;
+  --data: #0ea5e9;
+  --terminator: #84cc16;
+  --padding: #cbd5e1;
+  --ec-words: #111827;
+  --remainder: #14b8a6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 18rem;
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 10% 4%,
+      rgba(245, 158, 11, 0.2),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 90% 14%,
+      rgba(45, 212, 191, 0.2),
+      transparent 30rem
+    ),
+    linear-gradient(180deg, #f8efe1, #edf5f3 35%, #e8f0f5);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, #000, transparent 72%);
+}
+
+.is-embedded body {
+  min-width: 0;
+}
+
+.is-embedded .spec-header,
+.is-embedded .spec-footer,
+.is-embedded .hero-actions {
+  display: none;
+}
+
+.is-embedded main {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.is-embedded .hero {
+  min-height: 0;
+}
+
+a {
+  color: inherit;
+}
+
+code {
+  padding: 0.08rem 0.3rem;
+  border-radius: 0.35rem;
+  background: rgba(15, 118, 110, 0.1);
+  color: #115e59;
+  font-size: 0.9em;
+}
