@@ -1,6 +1,6 @@
 import { createFrameNavigation } from '../preview/frame-navigation.js';
 
-export function createLazyDownloadSetup({ elements: e, bulk, file, number, runtime,
+export function createLazyDownloadSetup({ elements: e, bulk, file, number, runtime, taskProgress,
   maxNumberFrames, getPrintWidth, syncPrint }) {
   let controller = null;
   let request = null;
@@ -21,7 +21,7 @@ export function createLazyDownloadSetup({ elements: e, bulk, file, number, runti
       request = import('../download/application-setup.js')
         .then(({ createApplicationDownloadSetup }) => {
           controller = createApplicationDownloadSetup({
-            elements: e, frames, runtime, getPrintWidth, syncPrint,
+            elements: e, frames, runtime, getPrintWidth, syncPrint, taskProgress,
           });
           return controller;
         }).catch((error) => {

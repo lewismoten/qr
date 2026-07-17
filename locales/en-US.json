@@ -277,6 +277,7 @@
       "empty": "No CSV loaded.",
       "loaded": "{count} rows loaded. Showing {current} of {count}."
     },
+    "progress": { "title": "Processing CSV file", "reading": "Reading {name}...", "readingBytes": "Reading {current} of {total}...", "parsing": "Parsing CSV data...", "loaded": "Loaded {count} rows.", "canceled": "CSV processing canceled." },
     "csv": {
       "empty": "The CSV is empty.",
       "duplicateFields": "The first row contains duplicate field names.",
@@ -441,7 +442,7 @@
     "mp4EncodeError": "Unable to encode MP4.",
     "imageError": "Unable to create {type} image.",
     "progress": {
-      "working": "Export in progress", "titleGif": "Creating animated GIF", "titleMp4": "Creating MP4 animation",
+      "working": "Task in progress", "titleGif": "Creating animated GIF", "titleMp4": "Creating MP4 animation",
       "preparing": "Preparing animation...", "encodingFrame": "Encoding GIF frame {frame} of {total}...",
       "elapsed": "Elapsed", "remaining": "Estimated remaining", "completion": "Estimated completion",
       "estimating": "Estimating...", "seconds": "{count} seconds", "minutes": "{minutes} min {seconds} sec",

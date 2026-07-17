@@ -77,6 +77,7 @@ export function createTaskProgress(elements, now = () => performance.now(), {
 
     return {
       signal: controller.signal,
+      cancel: () => controller.abort(),
       update(fraction, message) {
         if (controller.signal.aborted || active?.controller !== controller) return;
         active.fraction = clamp(fraction);

@@ -1,5 +1,5 @@
 export function createApplicationDownloadSetup({ elements: e, frames, runtime,
-  getPrintWidth, syncPrint }) {
+  getPrintWidth, syncPrint, taskProgress }) {
   let active = false;
   let image = null;
   let documentSection = null;
@@ -74,13 +74,7 @@ export function createApplicationDownloadSetup({ elements: e, frames, runtime,
           currentPdfButton: e.downloadCurrentPdf, zipButton: e.downloadZip,
           allPdfButton: e.downloadAllPdf, gifButton: e.downloadAnimatedGif,
           mp4Button: e.downloadAnimationMp4, getPrintWidthInches: getPrintWidth,
-          progressElements: {
-            dialog: e.taskProgressDialog, title: e.taskProgressTitle,
-            phase: e.taskProgressPhase, meter: e.taskProgressMeter,
-            percent: e.taskProgressPercent, elapsed: e.taskProgressElapsed,
-            remaining: e.taskProgressRemaining, completion: e.taskProgressCompletion,
-            cancel: e.taskProgressCancel,
-          },
+          taskProgress,
           getFrameCount: frames.getFrameCount, getCurrentFrame: frames.getCurrentFrame,
           setCurrentFrame: frames.setCurrentFrame, syncFrameNavigation: frames.sync,
           render: () => runtime.render(),

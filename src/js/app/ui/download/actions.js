@@ -1,6 +1,5 @@
 import { getErrorText, lookup } from '../../../i18n/index.js';
 import { isAbortError, throwIfAborted } from '../../abort.js';
-import { createTaskProgress } from './progress.js';
 
 const MAX_ANIMATION_FRAMES = 200;
 let exportersPromise;
@@ -28,11 +27,10 @@ export function createDownloadActions({
   render,
   getAnimationTiming,
   formatAnimationDuration,
-  progressElements,
+  taskProgress,
 }) {
   const buttons = [currentButton, currentPdfButton, zipButton, allPdfButton, gifButton, mp4Button];
   const setDisabled = (disabled) => buttons.forEach((button) => { button.disabled = disabled; });
-  const taskProgress = createTaskProgress(progressElements);
   const getQuality = () => (Number.parseInt(qualityInput.value, 10) || 92) / 100;
   const makePdf = async (sourceCanvas) => {
     const { createPdfBlob } = await loadExporters();

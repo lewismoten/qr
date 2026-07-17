@@ -168,11 +168,13 @@ for (const id of ['phone-number', 'sms-number', 'event-title', 'geo-query', 'vca
 const scopedFormKeys = htmlKeys.filter((key) => /^(content|formats|fields|form|style|frame|wifi|common|downloadUi|debugUi|encoding)\./.test(key));
 const englishMessages = flattenMessages(JSON.parse(await readFile(new URL('locales/en-US.json', import.meta.url), 'utf8')));
 const runtimeDownloadKeys = Object.keys(englishMessages).filter((key) => key.startsWith('download.'));
+const bulkProgressKeys = Object.keys(englishMessages).filter((key) => key.startsWith('bulk.progress.'));
 for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
   const localeMessages = flattenMessages(JSON.parse(await readFile(new URL(`locales/${locale}.json`, import.meta.url), 'utf8')));
   const requiredKeys = locale === 'en-US' ? htmlKeys : scopedFormKeys;
   assert.deepEqual(requiredKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing form translations`);
   assert.deepEqual(runtimeDownloadKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing download status translations`);
+  assert.deepEqual(bulkProgressKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing CSV progress translations`);
 }
 
 assert.equal(validatePrintableText('ARTÍCULO-项目', { label: 'prefix', maxLength: 32 }), '');

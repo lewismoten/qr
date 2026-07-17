@@ -17,9 +17,17 @@ import { startApplication } from './ui/runtime/startup.js';
 import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
 import { createPreviewSetup } from './ui/preview/setup.js';
 import { createStyleSetup } from './ui/style/setup.js';
+import { createTaskProgress } from './ui/download/progress.js';
 import qrEncoder from '../qr/index.js';
 
 const elements = getApplicationElements(document);
+const taskProgress = createTaskProgress({
+  dialog: elements.taskProgressDialog, title: elements.taskProgressTitle,
+  phase: elements.taskProgressPhase, meter: elements.taskProgressMeter,
+  percent: elements.taskProgressPercent, elapsed: elements.taskProgressElapsed,
+  remaining: elements.taskProgressRemaining, completion: elements.taskProgressCompletion,
+  cancel: elements.taskProgressCancel,
+});
 const runtime = createRuntimeContext();
 const previewControls = createPreviewControlsSetup({
   elements,
@@ -33,6 +41,7 @@ const runtimeHelpers = createRuntimeHelpers({
 
 const contentData = createContentDataSetup({
   document, elements,
+  taskProgress,
   encoder: qrEncoder,
   protocol: FILE_PROTOCOL,
   runtime: {
@@ -72,6 +81,7 @@ const contentSections = createContentSections({
 
 const download = createLazyDownloadSetup({
   elements,
+  taskProgress,
   bulk: { isMode: contentData.isBulkMode, getRowCount: contentData.getBulkRowCount,
     syncStatus: contentData.syncBulkStatus },
   file: { getMode: contentData.getSelectedFileEncodingMode,

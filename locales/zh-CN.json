@@ -92,7 +92,7 @@
     "file": { "required": "尚不符合文件格式：请选择要编码的文件。" }
   },
   "common": { "auto": "自动", "autoLower": "自动", "none": "无", "preview": "预览", "noFileSelected": "未选择文件", "sequence": "第 {current} 个，共 {total} 个", "count": "{current} / {total}" },
-  "bulk": { "loading": "正在加载批量导入工具。", "warning": "批量导入第 {rowNumber} 行：{message}", "requiredValues": "必填值：{values}", "status": { "empty": "尚未加载 CSV。", "loaded": "已加载 {count} 行，正在显示第 {current} 行，共 {count} 行。" } },
+  "bulk": { "loading": "正在加载批量导入工具。", "warning": "批量导入第 {rowNumber} 行：{message}", "requiredValues": "必填值：{values}", "status": { "empty": "尚未加载 CSV。", "loaded": "已加载 {count} 行，正在显示第 {current} 行，共 {count} 行。" }, "progress": { "title": "正在处理 CSV 文件", "reading": "正在读取 {name}...", "readingBytes": "正在读取 {current}/{total}...", "parsing": "正在解析 CSV 数据...", "loaded": "已加载 {count} 行。", "canceled": "CSV 处理已取消。" } },
   "frame": { "message": "边框文字", "mode": "边框文字模式", "automaticShort": "自动简短值", "customMessage": "自定义文字", "noMessage": "无文字", "scanMore": "扫描了解更多", "placeCenter": "将文字置于二维码中心", "font": "字体", "sans": "无衬线", "round": "圆体", "serif": "衬线", "mono": "等宽", "monospace": "等宽字体", "messageColor": "文字颜色", "maximumLineHeight": "最大行高", "hint": "文字可嵌入二维码下方，居中时则使用紧凑的对比轮廓。自动模式使用简短且非敏感的网址、电话、邮箱、网络名、联系人或文件名。", "allDay": "全天", "wifi": "Wi-Fi {ssid}", "email": "发送邮件至 {email}", "call": "拨打 {phone}", "text": "发送短信至 {phone}", "location": "位置 {location}", "contact": "联系人 {contact}", "sequence": "第 {current} 个，共 {total} 个" },
   "encoding": {
     "invalidPositions": "{message} 位置：{positions}{suffix}。", "kanjiUnavailable": "由于 Shift JIS 转换器未加载，手动汉字模式不可用。",
@@ -126,7 +126,7 @@
     "renderingPdf": "正在渲染 PDF 帧 {frame}/{total}...", "layoutPdf": "正在排版 PDF 页面...", "pdfSheetReadyOne": "PDF 已准备好，{pages} 页包含 {total} 个二维码。", "pdfSheetReadyMany": "PDF 已准备好，{pages} 页包含 {total} 个二维码。",
     "animationLimit": "为保护浏览器内存，动画最多包含 {max} 张图像。", "durationMinimum": "请选择每张图像至少 10 毫秒的时长。", "gifDurationMaximum": "GIF 每张图像最长支持 10 分 55.35 秒。", "mp4DurationMinimum": "MP4 每张图像至少需要 16 毫秒。",
     "encodingGif": "正在编码动画 GIF...", "gifReady": "动画 GIF 已准备好，总时长 {duration}。", "recordingMp4": "正在实时录制 MP4，时长 {duration}...", "recordingFrame": "正在录制 MP4 帧 {frame}/{total}...", "mp4Ready": "MP4 已准备好。", "toolsError": "无法加载下载工具：{message}", "mp4EncoderUnavailable": "此浏览器不提供 MP4 编码器，请改用动画 GIF。", "mp4EncodeError": "无法编码 MP4。", "imageError": "无法创建 {type} 图像。",
-    "progress": { "working": "正在导出", "titleGif": "正在创建动画 GIF", "titleMp4": "正在创建 MP4 动画", "preparing": "正在准备动画...", "encodingFrame": "正在编码 GIF 帧 {frame}/{total}...", "elapsed": "已用时间", "remaining": "预计剩余", "completion": "预计完成时间", "estimating": "正在估算...", "seconds": "{count} 秒", "minutes": "{minutes} 分 {seconds} 秒", "now": "现在", "cancel": "取消", "canceling": "正在取消...", "completed": "已完成", "canceled": "动画导出已取消。" }
+    "progress": { "working": "任务进行中", "titleGif": "正在创建动画 GIF", "titleMp4": "正在创建 MP4 动画", "preparing": "正在准备动画...", "encodingFrame": "正在编码 GIF 帧 {frame}/{total}...", "elapsed": "已用时间", "remaining": "预计剩余", "completion": "预计完成时间", "estimating": "正在估算...", "seconds": "{count} 秒", "minutes": "{minutes} 分 {seconds} 秒", "now": "现在", "cancel": "取消", "canceling": "正在取消...", "completed": "已完成", "canceled": "动画导出已取消。" }
   },
   "qr": { "errors": {
     "modeUnsupported": "尚不支持此原生二维码模式：{mode}。", "numericCharacters": "数字模式只接受 0-9。", "alphanumericCharacters": "字母数字模式包含不支持的字符。",

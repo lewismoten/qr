@@ -1,8 +1,9 @@
 import { formatBytes } from '../../../bytes.js';
-import { parseCsv } from '../../../csv.js';
+import { parseCsvAsync } from '../../../csv.js';
 import { validateBulkImport } from './validation.js';
 import { lookup } from '../../../../i18n/index.js';
 import { refreshFilePicker } from '../../file-picker.js';
+import { isAbortError, throwIfAborted, waitFor } from '../../../abort.js';
 
 const MAX_ROWS = 10000;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -33,12 +34,14 @@ export function createBulkImportSection({
   status,
   clearButton,
   fileFormatButton,
+  taskProgress,
   onFormatFallback,
   onChange,
 }) {
   let rows = [];
   let parseError = '';
   let loadRequest = 0;
+  let activeTask = null;
 
   const getSchema = (formatName = format.value) => FORMAT_SCHEMAS[formatName] || null;
   const isMode = () => enabled.checked && Boolean(getSchema());
@@ -47,9 +50,15 @@ export function createBulkImportSection({
     return rows[index - 1] || null;
   };
 
-  const parse = (text) => {
+  const parse = async (text, task) => {
     const schema = getSchema();
-    const parsedRows = parseCsv(text);
+    const parsedRows = await parseCsvAsync(text, {
+      signal: task.signal,
+      onProgress: (current, total) => task.update(
+        0.55 + (total ? current / total : 1) * 0.4,
+        lookup('bulk.progress.parsing', 'Parsing CSV data...'),
+      ),
+    });
     if (!schema || parsedRows.length === 0) throw new Error(lookup('bulk.csv.empty', 'The CSV is empty.'));
     const headers = parsedRows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
     const namedHeaders = headers.filter(Boolean);
@@ -83,6 +92,8 @@ export function createBulkImportSection({
   };
 
   const clear = ({ preserveFileInput = false } = {}) => {
+    activeTask?.cancel();
+    activeTask = null;
     loadRequest += 1;
     rows = [];
     parseError = '';
@@ -95,6 +106,7 @@ export function createBulkImportSection({
   };
 
   const load = async () => {
+    activeTask?.cancel();
     const request = ++loadRequest;
     const file = fileInput.files?.[0];
     rows = [];
@@ -110,13 +122,28 @@ export function createBulkImportSection({
         size: formatBytes(file.size), maxSize: formatBytes(MAX_FILE_BYTES),
       });
     } else {
+      const task = taskProgress.start({
+        title: lookup('bulk.progress.title', 'Processing CSV file'),
+        phase: lookup('bulk.progress.reading', 'Reading {name}...', { name: file.name }),
+      });
+      activeTask = task;
+      let completed = false;
       try {
-        const parsedRows = parse(await file.text());
+        const text = await readCsvText(file, task);
+        throwIfAborted(task.signal);
+        const parsedRows = await parse(text, task);
         if (request !== loadRequest) return;
         rows = parsedRows;
+        task.update(1, lookup('bulk.progress.loaded', 'Loaded {count} rows.', { count: rows.length.toLocaleString() }));
+        completed = true;
       } catch (error) {
         if (request !== loadRequest) return;
-        parseError = error.message || lookup('bulk.csv.readError', 'Unable to read this CSV.');
+        parseError = isAbortError(error)
+          ? lookup('bulk.progress.canceled', 'CSV processing canceled.')
+          : error.message || lookup('bulk.csv.readError', 'Unable to read this CSV.');
+      } finally {
+        if (activeTask === task) activeTask = null;
+        task.finish({ completed });
       }
     }
     syncStatus();
@@ -167,4 +194,36 @@ export function createBulkImportSection({
     clear,
     load,
   };
+}
+
+async function readCsvText(file, task) {
+  if (!file.stream) {
+    const text = await file.text();
+    throwIfAborted(task.signal);
+    task.update(0.55, lookup('bulk.progress.parsing', 'Parsing CSV data...'));
+    return text;
+  }
+
+  const reader = file.stream().getReader();
+  const decoder = new TextDecoder();
+  let loaded = 0;
+  let text = '';
+  try {
+    while (true) {
+      throwIfAborted(task.signal);
+      const { done, value } = await reader.read();
+      if (done) break;
+      loaded += value.byteLength;
+      text += decoder.decode(value, { stream: true });
+      task.update((loaded / Math.max(file.size, 1)) * 0.55, lookup('bulk.progress.readingBytes', 'Reading {current} of {total}...', {
+        current: formatBytes(loaded), total: formatBytes(file.size),
+      }));
+      await waitFor(0, task.signal);
+    }
+    text += decoder.decode();
+    return text;
+  } finally {
+    if (task.signal.aborted) await reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
 }

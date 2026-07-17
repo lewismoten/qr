@@ -12,7 +12,7 @@ const EMPTY_CHUNK_INFO = Object.freeze({
   isSingleFrame: true,
 });
 
-export function createContentDataSetup({ document, elements: e, encoder, protocol, runtime }) {
+export function createContentDataSetup({ document, elements: e, encoder, protocol, runtime, taskProgress }) {
   let file = null;
   let bulk = null;
   let fileRequest = null;
@@ -73,6 +73,7 @@ export function createContentDataSetup({ document, elements: e, encoder, protoco
         status: e.bulkStatus,
         clearButton: e.bulkClear,
         fileFormatButton: document.querySelector('[data-choice-target="qr-format"][data-choice-value="file"]'),
+        taskProgress,
         onFormatFallback: runtime.syncChoices,
         onChange: runtime.render,
       });
