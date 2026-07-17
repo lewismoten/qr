@@ -56,6 +56,14 @@ import {
   classifyTraversalBits,
   summarizeCodewordRoles,
 } from './qr-stream.js';
+import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createDebugSubtabs } from './ui/debug/subtabs.js';
+import { createOutlineSelector } from './ui/debug/outline.js';
+import { createDownloadSubtabs } from './ui/download/subtabs.js';
+import { createPrimaryTabs } from './ui/navigation.js';
+import { createStyleSubtabs } from './ui/style/subtabs.js';
+import { createEyeShapeSection } from './ui/style/eyes/section.js';
+import { createModuleShapeSection } from './ui/style/modules/section.js';
 import { createZipBlob } from './zip.js';
 import { canvasToBlob } from './canvas-export.js';
 import {
@@ -1292,39 +1300,32 @@ function getFrameFont(size) {
   return fonts[frameFont.value] || fonts.sans;
 }
 
-function syncModuleShapeControls() {
-  const isCustom = moduleShape.value === 'custom';
-  moduleCustomControls.hidden = !isCustom;
-  moduleRoundingValue.textContent = `${moduleRounding.value}%`;
-  moduleInsetValue.textContent = `${moduleInset.value}%`;
-  moduleRotationValue.textContent = `${moduleRotation.value} degrees`;
-}
+const moduleShapeSection = createModuleShapeSection({
+  shape: moduleShape,
+  controls: moduleCustomControls,
+  rounding: moduleRounding,
+  roundingValue: moduleRoundingValue,
+  inset: moduleInset,
+  insetValue: moduleInsetValue,
+  rotation: moduleRotation,
+  rotationValue: moduleRotationValue,
+});
+const syncModuleShapeControls = moduleShapeSection.sync;
+const getCurrentModuleShapeOptions = moduleShapeSection.getOptions;
 
-function getCurrentModuleShapeOptions() {
-  return {
-    type: moduleShape.value,
-    rounding: readInteger(moduleRounding) ?? 25,
-    inset: readInteger(moduleInset) ?? 4,
-    rotation: readInteger(moduleRotation) ?? 0,
-  };
-}
-
-function syncEyeShapeControls() {
-  const imageFillSelected = gradientType.value === 'image';
-  eyeCustomControls.hidden = eyeShape.value !== 'custom';
-  eyeCustomColorsEnabled.disabled = imageFillSelected;
-  eyeColorControls.hidden = imageFillSelected || !eyeCustomColorsEnabled.checked;
-  eyeOuterRoundingValue.textContent = `${eyeOuterRounding.value}%`;
-  eyeCenterRoundingValue.textContent = `${eyeCenterRounding.value}%`;
-}
-
-function getCurrentEyeShapeOptions() {
-  return {
-    type: eyeShape.value,
-    outerRounding: readInteger(eyeOuterRounding) ?? 20,
-    centerRounding: readInteger(eyeCenterRounding) ?? 35,
-  };
-}
+const eyeShapeSection = createEyeShapeSection({
+  shape: eyeShape,
+  controls: eyeCustomControls,
+  outerRounding: eyeOuterRounding,
+  outerRoundingValue: eyeOuterRoundingValue,
+  centerRounding: eyeCenterRounding,
+  centerRoundingValue: eyeCenterRoundingValue,
+  customColorsEnabled: eyeCustomColorsEnabled,
+  colorControls: eyeColorControls,
+  isImageFill: () => gradientType.value === 'image',
+});
+const syncEyeShapeControls = eyeShapeSection.sync;
+const getCurrentEyeShapeOptions = eyeShapeSection.getOptions;
 
 function syncEmojiSelection() {
   emojiOptions.forEach((button) => {
@@ -5053,90 +5054,46 @@ function renderMaskPreviews(encodedText) {
   });
 }
 
-function activateTab(tabName) {
-  activeTabName = tabName;
-  tabButtons.forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.tab === tabName);
-  });
+const activateTab = createPrimaryTabs({
+  buttons: tabButtons,
+  panels: tabPanels,
+  onActivate(tabName) {
+    activeTabName = tabName;
+    if (tabName === 'content' && qrFormat.value === 'geo') {
+      window.requestAnimationFrame(updateGeoMap);
+    }
+    renderQr();
+  },
+});
 
-  tabPanels.forEach((panel) => {
-    const isActive = panel.dataset.tabPanel === tabName;
-    panel.classList.toggle('is-active', isActive);
-    panel.hidden = !isActive;
-  });
+const activateDebugSubtab = createDebugSubtabs({
+  buttons: debugSubtabButtons,
+  panels: debugSubtabPanels,
+  onActivate(subtabName) {
+    activeDebugSubtab = subtabName;
+    renderQr();
+  },
+});
 
-  if (tabName === 'content' && qrFormat.value === 'geo') {
-    window.requestAnimationFrame(() => {
-      updateGeoMap();
-    });
-  }
+const activateStyleSubtab = createStyleSubtabs({
+  buttons: styleSubtabButtons,
+  panels: styleSubtabPanels,
+});
 
-  renderQr();
-}
+const activateDownloadSubtab = createDownloadSubtabs({
+  buttons: downloadSubtabButtons,
+  panels: downloadSubtabPanels,
+});
 
-function activateDebugSubtab(subtabName) {
-  activeDebugSubtab = subtabName;
-
-  debugSubtabButtons.forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.subtab === subtabName);
-  });
-
-  debugSubtabPanels.forEach((panel) => {
-    const isActive = panel.dataset.subtabPanel === subtabName;
-    panel.classList.toggle('is-active', isActive);
-    panel.hidden = !isActive;
-  });
-
-  renderQr();
-}
-
-function activateStyleSubtab(subtabName) {
-  styleSubtabButtons.forEach((button) => {
-    const isActive = button.dataset.styleSubtab === subtabName;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-
-  styleSubtabPanels.forEach((panel) => {
-    const isActive = panel.dataset.styleSubtabPanel === subtabName;
-    panel.classList.toggle('is-active', isActive);
-    panel.hidden = !isActive;
-  });
-}
-
-function activateDownloadSubtab(subtabName) {
-  downloadSubtabButtons.forEach((button) => {
-    const isActive = button.dataset.downloadSubtab === subtabName;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-
-  downloadSubtabPanels.forEach((panel) => {
-    const isActive = panel.dataset.downloadSubtabPanel === subtabName;
-    panel.classList.toggle('is-active', isActive);
-    panel.hidden = !isActive;
-  });
-}
-
-function activateContentSubtab(subtabName) {
-  contentSubtabButtons.forEach((button) => {
-    const isActive = button.dataset.contentSubtab === subtabName;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-
-  contentSubtabPanels.forEach((panel) => {
-    const isActive = panel.dataset.contentSubtabPanel === subtabName;
-    panel.classList.toggle('is-active', isActive);
-    panel.hidden = !isActive;
-  });
-
-  if (subtabName === 'data' && qrFormat.value === 'geo') {
-    window.requestAnimationFrame(() => {
-      updateGeoMap();
-    });
-  }
-}
+const activateContentSubtab = createContentSubtabs({
+  buttons: contentSubtabButtons,
+  panels: contentSubtabPanels,
+  onActivate(subtabName) {
+    if (subtabName === 'data' && qrFormat.value === 'geo') {
+      window.requestAnimationFrame(updateGeoMap);
+    }
+  },
+});
 
 function syncChoiceButtons() {
   choiceButtons.forEach((button) => {
@@ -5149,13 +5106,15 @@ function syncChoiceButtons() {
   });
 }
 
-function syncDebugOutlineSelection() {
-  debugOutlineModeButtons.forEach((button) => {
-    const isActive = button.dataset.outlineMode === activeDebugOutlineMode;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-}
+const debugOutlineSelector = createOutlineSelector({
+  buttons: debugOutlineModeButtons,
+  defaultValue: activeDebugOutlineMode,
+  onChange(value) {
+    activeDebugOutlineMode = value;
+    renderQr();
+  },
+});
+const syncDebugOutlineSelection = debugOutlineSelector.sync;
 
 async function renderQr() {
   const requestId = ++renderRequest;
@@ -5715,44 +5674,6 @@ emailBody.addEventListener('input', () => {
   syncMessageValuesAcrossAll(emailBody);
   syncSmsLengthHint();
   syncEmailBodyLengthHint();
-});
-
-debugOutlineModeButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activeDebugOutlineMode = button.dataset.outlineMode || 'codewords';
-    syncDebugOutlineSelection();
-    renderQr();
-  });
-});
-
-tabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activateTab(button.dataset.tab);
-  });
-});
-
-debugSubtabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activateDebugSubtab(button.dataset.subtab || 'encoding');
-  });
-});
-
-styleSubtabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activateStyleSubtab(button.dataset.styleSubtab || 'size');
-  });
-});
-
-downloadSubtabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activateDownloadSubtab(button.dataset.downloadSubtab || 'image');
-  });
-});
-
-contentSubtabButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    activateContentSubtab(button.dataset.contentSubtab || 'data');
-  });
 });
 
 const infoDialogs = document.querySelectorAll('.info-dialog');
