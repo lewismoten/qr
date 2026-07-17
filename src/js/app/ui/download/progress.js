@@ -1,4 +1,5 @@
 import { lookup } from '../../../i18n/index.js';
+import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 const clamp = (value) => Math.min(1, Math.max(0, value));
 const SHOW_DELAY_MS = 400;
@@ -25,6 +26,7 @@ export function createTaskProgress(
     showDelay = SHOW_DELAY_MS,
     completionHold = COMPLETION_HOLD_MS,
     windowObject = globalThis.window,
+    ensureStyles = () => loadFeatureStylesheet('task-progress'),
   } = {},
 ) {
   let active = null;
@@ -71,6 +73,9 @@ export function createTaskProgress(
   });
 
   const start = ({ title, phase }) => {
+    const styleRequest = ensureStyles().catch((error) => {
+      console.error(error);
+    });
     active?.controller.abort();
     if (active?.showTimer) windowObject.clearTimeout(active.showTimer);
     if (active?.clockTimer) windowObject.clearInterval(active.clockTimer);
@@ -96,11 +101,13 @@ export function createTaskProgress(
     });
     elements.cancel.disabled = false;
     task.showTimer = windowObject.setTimeout(() => {
-      if (active !== task || task.finished) return;
-      task.visible = true;
-      if (!elements.dialog.open) elements.dialog.showModal();
-      renderTime();
-      task.clockTimer = windowObject.setInterval(renderTime, 500);
+      styleRequest.then(() => {
+        if (active !== task || task.finished) return;
+        task.visible = true;
+        if (!elements.dialog.open) elements.dialog.showModal();
+        renderTime();
+        task.clockTimer = windowObject.setInterval(renderTime, 500);
+      });
     }, showDelay);
 
     return {

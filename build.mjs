@@ -37,6 +37,14 @@ const builds = [
   },
   {
     ...shared,
+    entryPoints: {
+      'chunks/i18n-debug.min': 'src/css/components/i18n-debug.css',
+      'chunks/task-progress.min': 'src/css/components/task-progress.css',
+    },
+    outdir: 'dist',
+  },
+  {
+    ...shared,
     entryPoints: ['src/js/spec/main.js'],
     outfile: 'dist/spec.min.js',
     format: 'esm',
