@@ -1,4 +1,4 @@
-import { uint64Bytes } from '../../../bytes.js';
+import { hexToBytes, uint64Bytes } from '../../../bytes.js';
 
 export function buildManifestFields({ file, customMetadata, validationValue, fieldTypes }) {
   const encoder = new TextEncoder();
@@ -49,4 +49,73 @@ export function serializeManifest({
     offset += fieldHeaderBytes + field.value.length;
   });
   return manifest;
+}
+
+export function createFileManifestController({
+  cache,
+  includeManifest,
+  getCustomMetadata,
+  isCompressionEnabled,
+  protocol,
+}) {
+  const normalizeCustomMetadata = ({ validate = false } = {}) => {
+    const value = getCustomMetadata().trim();
+    if (!value) return '';
+
+    try {
+      return JSON.stringify(JSON.parse(value));
+    } catch (error) {
+      if (validate) throw new Error('Custom file metadata must be valid JSON.');
+      return value;
+    }
+  };
+
+  const getFields = (file, { validationValue = new Uint8Array(32) } = {}) =>
+    buildManifestFields({
+      file,
+      customMetadata: normalizeCustomMetadata(),
+      validationValue,
+      fieldTypes: protocol.fieldTypes,
+    });
+
+  const encode = (fields) =>
+    serializeManifest({
+      fields,
+      magic: protocol.magic,
+      version: protocol.version,
+      flags: isCompressionEnabled() ? protocol.flags.gzip : 0,
+      headerBytes: protocol.headerBytes,
+      fieldHeaderBytes: protocol.fieldHeaderBytes,
+    });
+
+  const getByteLength = (file) => {
+    if (!includeManifest()) return 0;
+    return getSerializedManifestLength(
+      getFields(file),
+      protocol.headerBytes,
+      protocol.fieldHeaderBytes,
+    );
+  };
+
+  const getManifest = async (transferBytes = null) => {
+    const file = cache.getFile();
+    if (!file) return null;
+    if (!includeManifest()) return new Uint8Array(0);
+
+    cache.ensureOwnership(file);
+    const settingsRevision = cache.getRevision();
+    if (cache.getManifest()) return cache.getManifest();
+
+    normalizeCustomMetadata({ validate: true });
+    const bytesToTransfer = transferBytes || (await cache.getTransferBytes());
+    const canonicalManifest = encode(getFields(file));
+    const validationValue = hexToBytes(
+      await cache.getIntegrityHash(canonicalManifest, bytesToTransfer),
+    );
+    const manifest = encode(getFields(file, { validationValue }));
+    if (cache.isCurrent(settingsRevision)) cache.setManifest(manifest);
+    return manifest;
+  };
+
+  return { getByteLength, getManifest, normalizeCustomMetadata };
 }

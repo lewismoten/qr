@@ -42,3 +42,67 @@ export function encodeStreamPosition(value, streamLength) {
   const width = Math.max(1, Math.max(0, streamLength).toString(10).length);
   return Math.max(0, value).toString(10).padStart(width, '0');
 }
+
+export function getFileManifestFlag(includeManifest) {
+  return includeManifest ? 'M' : '-';
+}
+
+export function getFileDownloadUrlPrefix(appUrl, file) {
+  const name = file?.name || 'file.bin';
+  const type = file?.type?.trim() || 'application/octet-stream';
+  return `${appUrl}#download=1&name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}&data=`;
+}
+
+export function buildSingleFileFrame({ data, file, includeManifest, prefix = 'FILE', version = '1' }) {
+  const parts = [prefix, version, 'S', getFileManifestFlag(includeManifest)];
+  if (!includeManifest) parts.push(getCompactFileExtension(file?.name));
+  parts.push(data);
+  return parts.join(':');
+}
+
+export function buildChunkFileFrame({
+  data,
+  file,
+  id,
+  offset,
+  streamLength,
+  includeManifest,
+  prefix = 'FILE',
+  version = '1',
+}) {
+  return [
+    prefix,
+    version,
+    'C',
+    getFileManifestFlag(includeManifest),
+    id,
+    getCompactFileExtension(file?.name),
+    encodeStreamPosition(offset, streamLength),
+    Math.max(0, streamLength).toString(10),
+    data,
+  ].join(':');
+}
+
+export function buildSingleFileFrameTemplate(byteCount, { file, includeManifest } = {}) {
+  return buildSingleFileFrame({
+    data: 'a'.repeat(getBase64UrlLength(byteCount)),
+    file: file ?? { name: 'file.bin' },
+    includeManifest,
+  });
+}
+
+export function buildChunkFileFrameTemplate(byteCount, {
+  file,
+  streamLength = 0,
+  offset = 0,
+  includeManifest,
+} = {}) {
+  return buildChunkFileFrame({
+    data: 'a'.repeat(getBase64UrlLength(byteCount)),
+    file: file ?? { name: 'file.bin' },
+    id: 'aaaaaaaaaaaaaaaaaaaaaa',
+    offset,
+    streamLength,
+    includeManifest,
+  });
+}

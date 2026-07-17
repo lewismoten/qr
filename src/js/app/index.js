@@ -1,4 +1,3 @@
-import { formatBytes, hexToBytes } from './bytes.js';
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { normalizePhoneNumber } from './phone.js';
@@ -36,20 +35,17 @@ import { validateBulkImport } from './ui/content/bulk/validation.js';
 import { createEventSection } from './ui/content/event/section.js';
 import {
   arrayBufferToBase64,
-  base64ToBase64Url,
   base64UrlToBase64,
   createCompactFileId,
   encodeStreamPosition,
-  getBase64UrlLength,
   getCompactFileExtension,
-  getFileDataUrlPrefix,
+  getFileManifestFlag,
 } from './ui/content/file/protocol.js';
-import {
-  buildManifestFields,
-  getSerializedManifestLength,
-  serializeManifest as encodeManifest,
-} from './ui/content/file/manifest.js';
-import { findMaximumEncodableBytes } from './ui/content/file/capacity.js';
+import { createFileManifestController } from './ui/content/file/manifest.js';
+import { createFileCapacityCalculator } from './ui/content/file/capacity.js';
+import { createFileCache } from './ui/content/file/cache.js';
+import { createFilePayloadBuilder } from './ui/content/file/payload.js';
+import { createFileSection } from './ui/content/file/section.js';
 import { createFrameSection } from './ui/content/frame/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
@@ -377,20 +373,8 @@ const MASK_LABELS = {
 };
 
 let renderRequest = 0;
-let cachedFile = null;
-let cachedFilePayload = '';
-let cachedFileArrayBuffer = null;
-let cachedFileBase64 = '';
-let cachedFileObjectUrl = '';
-let cachedFileId = '';
-let cachedFileHash = '';
-let cachedFileManifest = null;
-let cachedTransferBytes = null;
-let cachedChunkCapacityInfoKey = '';
-let cachedChunkCapacityInfoValue = null;
 let chunkSettingsRefreshTimer = 0;
 let chunkSettingsRefreshRequest = 0;
-let transferSettingsRevision = 0;
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
 const previewViewport = createPreviewViewport({
@@ -425,10 +409,8 @@ const MIN_PRINT_MODULE_INCHES = 0.02;
 const CALENDAR_TITLE_MAX_LENGTH = 120;
 const CALENDAR_LOCATION_MAX_LENGTH = 160;
 const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
-const FILE_FRAME_PREFIX = 'FILE';
 const FILE_PROTOCOL_VERSION = '1';
 const FILE_MANIFEST_MAGIC = 'FILE';
-const FILE_ID_FILLER = 'aaaaaaaaaaaaaaaaaaaaaa';
 const DEFAULT_CHUNK_AUTO_VERSION = 8;
 const FILE_MANIFEST_HEADER_BYTES = 10;
 const FILE_TLV_HEADER_BYTES = 3;
@@ -444,6 +426,76 @@ const FILE_MANIFEST_FIELDS = {
   validationValue: 6,
   customMetadata: 8,
 };
+const fileCache = createFileCache({
+  input: fileInput,
+  createId: createCompactFileId,
+  encodeBase64: arrayBufferToBase64,
+  isCompressionEnabled: isTransferCompressionEnabled,
+});
+const getActiveFile = fileCache.getFile;
+const ensureFileCacheOwnership = fileCache.ensureOwnership;
+const getTransferFileBytes = fileCache.getTransferBytes;
+const fileManifestController = createFileManifestController({
+  cache: fileCache,
+  includeManifest: () => fileIncludeManifest.checked,
+  getCustomMetadata: () => fileCustomMetadata.value,
+  isCompressionEnabled: isTransferCompressionEnabled,
+  protocol: {
+    version: FILE_PROTOCOL_VERSION,
+    magic: FILE_MANIFEST_MAGIC,
+    headerBytes: FILE_MANIFEST_HEADER_BYTES,
+    fieldHeaderBytes: FILE_TLV_HEADER_BYTES,
+    flags: FILE_MANIFEST_FLAGS,
+    fieldTypes: FILE_MANIFEST_FIELDS,
+  },
+});
+const getManifestByteLength = fileManifestController.getByteLength;
+const getActiveFileManifest = fileManifestController.getManifest;
+const fileCapacityCalculator = createFileCapacityCalculator({
+  encoder: qrEncoder,
+  cache: fileCache,
+  getOptions: buildOptions,
+  buildPayload,
+  getConfiguredVersion: getConfiguredChunkVersion,
+  isAutoVersion: () => versionAuto.checked,
+  getCurrentChunk: () => Number.parseInt(fileChunkIndex.value, 10) || 1,
+  includeManifest: () => fileIncludeManifest.checked,
+  isCompressionEnabled: isTransferCompressionEnabled,
+  getCustomMetadata: () => fileCustomMetadata.value.trim(),
+  getManualMode: getCurrentEncodingMode,
+  getManifestLength: getManifestByteLength,
+  getShareableAppUrl,
+});
+const invalidateChunkCapacityCache = fileCapacityCalculator.invalidate;
+const getFileCapacityBytes = fileCapacityCalculator.getDataUrlCapacity;
+const getBlobUrlCapacityBytes = fileCapacityCalculator.getDownloadUrlCapacity;
+const getChunkedFileCapacityInfo = fileCapacityCalculator.getChunkInfo;
+const fileSection = createFileSection({
+  format: qrFormat,
+  mode: fileEncodingMode,
+  input: fileInput,
+  capacityHint: fileCapacityHint,
+  clearButton: clearFileButton,
+  chunkControls: fileChunkControls,
+  chunkVersionAuto: fileChunkVersionAuto,
+  includeManifest: fileIncludeManifest,
+  compressTransfer: fileCompressTransfer,
+  customMetadata: fileCustomMetadata,
+  chunkIndex: fileChunkIndex,
+  cache: fileCache,
+  getDataUrlCapacity: getFileCapacityBytes,
+  getDownloadUrlCapacity: getBlobUrlCapacityBytes,
+  getChunkInfo: getChunkedFileCapacityInfo,
+  isCompressionEnabled: isTransferCompressionEnabled,
+  syncChunkVersionControls,
+  syncChunkLabel: syncFileChunkLabel,
+  syncNavigation: () => syncChunkPreviewNavigation(),
+  resetCache: resetCachedFileState,
+});
+const getSelectedFileEncodingMode = fileSection.getMode;
+const syncFileModeVisibility = fileSection.syncMode;
+const syncFileCapacityHint = fileSection.syncCapacity;
+const clearLoadedFile = fileSection.clear;
 const bulkImportSection = createBulkImportSection({
   enabled: bulkEnabled,
   format: qrFormat,
@@ -664,10 +716,6 @@ function syncDownloadControls() {
   syncAnimationDurationSummary();
 }
 
-function getSelectedFileEncodingMode() {
-  return fileEncodingMode.value || 'data';
-}
-
 function syncFileChunkLabel() {
   const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
   const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
@@ -691,37 +739,8 @@ function syncChunkVersionControls() {
   syncFileChunkVersionLabel();
 }
 
-function getChunkCapacityCacheKey(file, options, configuredChunkVersion, autoVersion) {
-  return JSON.stringify({
-    file: file
-      ? {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          lastModified: file.lastModified,
-        }
-      : null,
-    options,
-    configuredChunkVersion,
-    autoVersion,
-    includeManifest: fileIncludeManifest.checked,
-    compressTransfer: isTransferCompressionEnabled(),
-    customMetadata: fileCustomMetadata.value.trim(),
-    transferBytes: cachedTransferBytes?.length ?? null,
-    manualMode: getCurrentEncodingMode() || 'auto',
-  });
-}
-
-function invalidateChunkCapacityCache() {
-  cachedChunkCapacityInfoKey = '';
-  cachedChunkCapacityInfoValue = null;
-}
-
 function resetTransferDerivedState() {
-  transferSettingsRevision += 1;
-  cachedFileHash = '';
-  cachedFileManifest = null;
-  cachedTransferBytes = null;
+  fileCache.resetDerived();
   invalidateChunkCapacityCache();
 }
 
@@ -756,199 +775,9 @@ function scheduleChunkSettingsRefresh({ resetChunkIndex = false, delay = 160 } =
   }, delay);
 }
 
-function revokeCachedObjectUrl() {
-  if (cachedFileObjectUrl) {
-    URL.revokeObjectURL(cachedFileObjectUrl);
-    cachedFileObjectUrl = '';
-  }
-}
-
 function resetCachedFileState({ clearInput = false } = {}) {
-  transferSettingsRevision += 1;
-  revokeCachedObjectUrl();
-  cachedFile = null;
-  cachedFilePayload = '';
-  cachedFileArrayBuffer = null;
-  cachedFileBase64 = '';
-  cachedFileId = '';
-  cachedFileHash = '';
-  cachedFileManifest = null;
-  cachedTransferBytes = null;
+  fileCache.reset({ clearInput });
   invalidateChunkCapacityCache();
-  if (clearInput) {
-    fileInput.value = '';
-  }
-}
-
-function getActiveFile() {
-  return fileInput.files?.[0] ?? null;
-}
-
-function ensureFileCacheOwnership(file) {
-  if (cachedFile !== file) {
-    resetCachedFileState();
-    cachedFile = file;
-    cachedFileId = createCompactFileId();
-  }
-}
-
-async function getActiveFileBuffer() {
-  const file = getActiveFile();
-  if (!file) {
-    return null;
-  }
-
-  ensureFileCacheOwnership(file);
-
-  if (!cachedFileArrayBuffer) {
-    cachedFileArrayBuffer = await file.arrayBuffer();
-  }
-
-  return cachedFileArrayBuffer;
-}
-
-async function getActiveFileBase64() {
-  const buffer = await getActiveFileBuffer();
-  if (!buffer) {
-    return '';
-  }
-
-  if (!cachedFileBase64) {
-    cachedFileBase64 = arrayBufferToBase64(buffer);
-  }
-
-  return cachedFileBase64;
-}
-
-async function getTransferFileBytes() {
-  const settingsRevision = transferSettingsRevision;
-  const buffer = await getActiveFileBuffer();
-  if (!buffer) {
-    return null;
-  }
-
-  if (cachedTransferBytes) {
-    return cachedTransferBytes;
-  }
-
-  const originalBytes = new Uint8Array(buffer);
-  if (!isTransferCompressionEnabled()) {
-    cachedTransferBytes = originalBytes;
-    return cachedTransferBytes;
-  }
-
-  if (typeof CompressionStream !== 'function') {
-    throw new Error('Gzip transfer compression is not supported by this browser. Turn compression off to continue.');
-  }
-
-  const stream = new Blob([originalBytes]).stream().pipeThrough(new CompressionStream('gzip'));
-  const compressedBytes = new Uint8Array(await new Response(stream).arrayBuffer());
-  if (settingsRevision === transferSettingsRevision) {
-    cachedTransferBytes = compressedBytes;
-  }
-  return compressedBytes;
-}
-
-async function getTransferIntegrityHash(manifest, transferBytes) {
-  if (cachedFileHash) {
-    return cachedFileHash;
-  }
-
-  const settingsRevision = transferSettingsRevision;
-  const canonicalBytes = new Uint8Array(manifest.length + transferBytes.length);
-  canonicalBytes.set(manifest, 0);
-  canonicalBytes.set(transferBytes, manifest.length);
-  const digest = await crypto.subtle.digest('SHA-256', canonicalBytes);
-  const hash = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-  if (settingsRevision === transferSettingsRevision) {
-    cachedFileHash = hash;
-  }
-  return hash;
-}
-
-function getCustomMetadataText({ validate = false } = {}) {
-  const value = fileCustomMetadata.value.trim();
-  if (!value) {
-    return '';
-  }
-
-  try {
-    return JSON.stringify(JSON.parse(value));
-  } catch (error) {
-    if (validate) {
-      throw new Error('Custom file metadata must be valid JSON.');
-    }
-    return value;
-  }
-}
-
-function getManifestFields(file, { validationValue = new Uint8Array(32) } = {}) {
-  return buildManifestFields({
-    file,
-    customMetadata: getCustomMetadataText(),
-    validationValue,
-    fieldTypes: FILE_MANIFEST_FIELDS,
-  });
-}
-
-function getManifestByteLength(file) {
-  if (!fileIncludeManifest.checked) {
-    return 0;
-  }
-  return getSerializedManifestLength(
-    getManifestFields(file),
-    FILE_MANIFEST_HEADER_BYTES,
-    FILE_TLV_HEADER_BYTES,
-  );
-}
-
-function serializeManifest(fields) {
-  return encodeManifest({
-    fields,
-    magic: FILE_MANIFEST_MAGIC,
-    version: FILE_PROTOCOL_VERSION,
-    flags: isTransferCompressionEnabled() ? FILE_MANIFEST_FLAGS.gzip : 0,
-    headerBytes: FILE_MANIFEST_HEADER_BYTES,
-    fieldHeaderBytes: FILE_TLV_HEADER_BYTES,
-  });
-}
-
-async function getActiveFileManifest(transferBytes = null) {
-  const settingsRevision = transferSettingsRevision;
-  const file = getActiveFile();
-  if (!file) {
-    return null;
-  }
-
-  if (!fileIncludeManifest.checked) {
-    return new Uint8Array(0);
-  }
-
-  ensureFileCacheOwnership(file);
-  if (cachedFileManifest) {
-    return cachedFileManifest;
-  }
-
-  getCustomMetadataText({ validate: true });
-  const bytesToTransfer = transferBytes || (await getTransferFileBytes());
-  const canonicalManifest = serializeManifest(getManifestFields(file));
-  const validationValue = hexToBytes(await getTransferIntegrityHash(canonicalManifest, bytesToTransfer));
-  const manifest = serializeManifest(getManifestFields(file, { validationValue }));
-  if (settingsRevision === transferSettingsRevision) {
-    cachedFileManifest = manifest;
-  }
-  return manifest;
-}
-
-function getFileObjectUrlPayload(file = getActiveFile()) {
-  if (!file) {
-    return '';
-  }
-
-  ensureFileCacheOwnership(file);
-  return `${getShareableAppUrl()}#download=1&name=${encodeURIComponent(file.name)}&type=${encodeURIComponent(
-    file.type?.trim() || 'application/octet-stream'
-  )}&data=[base64url]`;
 }
 
 function syncSmsLengthHint() {
@@ -972,354 +801,17 @@ function setFormatVisibility() {
   syncCalendarEventControls();
 }
 
-async function readSelectedFile() {
-  const file = getActiveFile();
-  if (!file) {
-    resetCachedFileState();
-    return '';
-  }
-
-  ensureFileCacheOwnership(file);
-
-  if (cachedFilePayload) {
-    return cachedFilePayload;
-  }
-
-  const base64 = await getActiveFileBase64();
-  cachedFilePayload = `${getFileDataUrlPrefix(file)}${base64}`;
-  return cachedFilePayload;
-}
-
-function getFrameManifestFlag() {
-  return fileIncludeManifest.checked ? 'M' : '-';
-}
-
-function buildChunkProtocolPayloadTemplate(byteCount, { file, streamLength = 0, offset = 0 } = {}) {
-  const safeFile = file ?? { name: 'file.bin', type: 'application/octet-stream', size: 0, lastModified: 0 };
-  // Lowercase forces the same byte-mode capacity used by real base64url data.
-  const dataToken = 'a'.repeat(getBase64UrlLength(byteCount));
-  return [
-    FILE_FRAME_PREFIX,
-    FILE_PROTOCOL_VERSION,
-    'C',
-    getFrameManifestFlag(),
-    FILE_ID_FILLER,
-    getCompactFileExtension(safeFile.name),
-    encodeStreamPosition(offset, streamLength),
-    Math.max(0, streamLength).toString(10),
-    dataToken,
-  ].join(':');
-}
-
-function buildSingleFilePayloadTemplate(byteCount, { file } = {}) {
-  const safeFile = file ?? { name: 'file.bin' };
-  const parts = [
-    FILE_FRAME_PREFIX,
-    FILE_PROTOCOL_VERSION,
-    'S',
-    getFrameManifestFlag(),
-  ];
-  if (!fileIncludeManifest.checked) {
-    parts.push(getCompactFileExtension(safeFile.name));
-  }
-  parts.push('a'.repeat(getBase64UrlLength(byteCount)));
-  return parts.join(':');
-}
-
-function getFileCapacityBytes() {
-  let options;
-  try {
-    options = buildOptions();
-  } catch (error) {
-    return 0;
-  }
-
-  const prefix = getFileDataUrlPrefix(getActiveFile());
-
-  const canEncodeBytes = (byteCount) => {
-    const base64Length = Math.ceil(byteCount / 3) * 4;
-    const payload = `${prefix}${'A'.repeat(base64Length)}`;
-
-    try {
-      const qrPayload = buildPayload(payload);
-      qrEncoder.create(qrPayload, options);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  return findMaximumEncodableBytes(canEncodeBytes);
-}
-
-function getBlobUrlCapacityBytes(file = getActiveFile()) {
-  let options;
-  try {
-    options = buildOptions();
-  } catch (error) {
-    return 0;
-  }
-
-  const fileName = file?.name || 'file.bin';
-  const mimeType = file?.type?.trim() || 'application/octet-stream';
-  const prefix = `${getShareableAppUrl()}#download=1&name=${encodeURIComponent(fileName)}&type=${encodeURIComponent(
-    mimeType
-  )}&data=`;
-
-  const canEncodeBytes = (byteCount) => {
-    const base64Length = Math.ceil(byteCount / 3) * 4;
-    const payload = `${prefix}${base64ToBase64Url('A'.repeat(base64Length))}`;
-
-    try {
-      const qrPayload = buildPayload(payload);
-      qrEncoder.create(qrPayload, options);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  return findMaximumEncodableBytes(canEncodeBytes);
-}
-
-function getChunkedFileCapacityInfo(file = getActiveFile()) {
-  if (!file) {
-    return {
-      chunkCapacity: 0,
-      naturalChunkCapacity: 0,
-      configuredChunkVersion: getConfiguredChunkVersion(),
-      autoVersion: versionAuto.checked,
-      totalChunks: 1,
-      currentChunk: 1,
-    };
-  }
-
-  let options;
-  try {
-    options = buildOptions();
-  } catch (error) {
-    return {
-      chunkCapacity: 0,
-      naturalChunkCapacity: 0,
-      configuredChunkVersion: getConfiguredChunkVersion(),
-      autoVersion: versionAuto.checked,
-      totalChunks: 1,
-      currentChunk: 1,
-    };
-  }
-
-  const configuredChunkVersion = getConfiguredChunkVersion();
-  const autoVersion = versionAuto.checked;
-  const capacityOptions = {
-    ...options,
-    version: configuredChunkVersion,
-  };
-  const cacheKey = getChunkCapacityCacheKey(file, capacityOptions, configuredChunkVersion, autoVersion);
-  if (cachedChunkCapacityInfoKey === cacheKey && cachedChunkCapacityInfoValue) {
-    const cachedCurrentChunk = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, cachedChunkCapacityInfoValue.totalChunks);
-    return {
-      ...cachedChunkCapacityInfoValue,
-      currentChunk: cachedCurrentChunk,
-    };
-  }
-
-  const transferByteLength = cachedTransferBytes?.length ?? file.size;
-  const streamLength = transferByteLength + getManifestByteLength(file);
-  const canEncodeSingleFrame = () => {
-    try {
-      const payload = buildSingleFilePayloadTemplate(streamLength, { file });
-      qrEncoder.create(buildPayload(payload), capacityOptions);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-  const canEncodeBytes = (byteCount) => {
-    try {
-      const payload = buildChunkProtocolPayloadTemplate(byteCount, {
-        file,
-        streamLength,
-        offset: Math.max(0, streamLength - 1),
-      });
-      const qrPayload = buildPayload(payload);
-      qrEncoder.create(qrPayload, capacityOptions);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const isSingleFrame = canEncodeSingleFrame();
-  const chunkCapacity = isSingleFrame ? streamLength : findMaximumEncodableBytes(canEncodeBytes);
-  const naturalChunkCapacity = chunkCapacity;
-  const totalChunks = isSingleFrame ? 1 : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
-  const currentChunk = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, totalChunks);
-  const capacityInfo = {
-    chunkCapacity,
-    naturalChunkCapacity,
-    configuredChunkVersion,
-    autoVersion,
-    streamLength,
-    manifestLength: getManifestByteLength(file),
-    transferByteLength,
-    isSingleFrame,
-    totalChunks,
-    currentChunk,
-  };
-  cachedChunkCapacityInfoKey = cacheKey;
-  cachedChunkCapacityInfoValue = capacityInfo;
-  return capacityInfo;
-}
-
-function syncFileModeVisibility() {
-  const isChunked = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  fileChunkControls.hidden = !isChunked;
-  fileChunkControls.setAttribute('aria-hidden', String(!isChunked));
-
-  const { totalChunks, currentChunk } = getChunkedFileCapacityInfo();
-  fileChunkVersionAuto.disabled = !isChunked;
-  fileIncludeManifest.disabled = !isChunked;
-  fileCompressTransfer.disabled = !isChunked || !fileIncludeManifest.checked;
-  fileCustomMetadata.disabled = !isChunked || !fileIncludeManifest.checked;
-  fileChunkIndex.max = String(Math.max(totalChunks, 1));
-  fileChunkIndex.value = String(Math.min(currentChunk, totalChunks));
-  fileChunkIndex.disabled = !isChunked || totalChunks <= 1;
-  syncChunkVersionControls();
-  syncFileChunkLabel();
-  syncChunkPreviewNavigation();
-}
-
-function syncFileCapacityHint() {
-  const file = getActiveFile();
-  const loadedBytes = file?.size ?? 0;
-  const mode = getSelectedFileEncodingMode();
-
-  if (mode === 'blob') {
-    const maxBytes = getBlobUrlCapacityBytes(file);
-    const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
-    fileCapacityHint.textContent = file
-      ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of about ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.`
-      : 'Choose a file to generate a shareable download URL.';
-    clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
-    syncFileModeVisibility();
-    return;
-  }
-
-  if (mode === 'chunked') {
-    const { chunkCapacity, configuredChunkVersion, autoVersion, totalChunks, currentChunk, streamLength, manifestLength, transferByteLength } = getChunkedFileCapacityInfo(file);
-    const currentFrameBytes = Math.max(
-      0,
-      Math.min(chunkCapacity, streamLength - Math.max(0, currentChunk - 1) * Math.max(chunkCapacity, 1))
-    );
-    const limitText = autoVersion
-      ? `auto-selected uniform V${configuredChunkVersion}`
-      : `uniform V${configuredChunkVersion}`;
-
-    fileCapacityHint.textContent = file
-      ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}); ${isTransferCompressionEnabled() ? `gzip transfer is ${transferByteLength.toLocaleString()} B (${formatBytes(transferByteLength)})` : 'transfer compression is off'}, plus a ${manifestLength.toLocaleString()} B manifest. Frame ${currentChunk} of ${totalChunks} carries ${currentFrameBytes.toLocaleString()} B with ${limitText}; full frames use ${chunkCapacity.toLocaleString()} B (${formatBytes(chunkCapacity)}) of stream capacity.`
-      : 'Choose a file to split it into chunked QR payloads.';
-    clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
-    syncFileModeVisibility();
-    return;
-  }
-
-  const maxBytes = getFileCapacityBytes();
-  const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
-  fileCapacityHint.textContent = file
-    ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%).`
-    : 'Choose a file to embed it directly as a data URL.';
-  clearFileButton.disabled = !fileInput.files?.length && !cachedFilePayload;
-  syncFileModeVisibility();
-}
-
-function clearLoadedFile() {
-  resetCachedFileState({ clearInput: true });
-  fileChunkIndex.value = '1';
-  syncFileCapacityHint();
-}
-
-async function buildChunkedFilePayload() {
-  const file = getActiveFile();
-  if (!file) {
-    return '';
-  }
-
-  ensureFileCacheOwnership(file);
-
-  const settingsRevision = transferSettingsRevision;
-  const transferBytes = await getTransferFileBytes();
-  if (settingsRevision !== transferSettingsRevision) {
-    throw new DOMException('Transfer settings changed.', 'AbortError');
-  }
-  const manifestBytes = await getActiveFileManifest(transferBytes);
-  if (settingsRevision !== transferSettingsRevision) {
-    throw new DOMException('Transfer settings changed.', 'AbortError');
-  }
-  syncFileCapacityHint();
-  const { chunkCapacity, totalChunks, streamLength, isSingleFrame } = getChunkedFileCapacityInfo(file);
-  if (chunkCapacity <= 0) {
-    throw new Error('Unable to fit the current chunk protocol into this QR configuration.');
-  }
-
-  const chunkIndex = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, totalChunks);
-  const start = (chunkIndex - 1) * chunkCapacity;
-  const end = Math.min(start + chunkCapacity, streamLength);
-  const chunkBytes = new Uint8Array(end - start);
-  const manifestStart = Math.min(start, manifestBytes.length);
-  const manifestEnd = Math.min(end, manifestBytes.length);
-  if (manifestEnd > manifestStart) {
-    chunkBytes.set(manifestBytes.subarray(manifestStart, manifestEnd), 0);
-  }
-  const fileStart = Math.max(0, start - manifestBytes.length);
-  const fileEnd = Math.max(0, end - manifestBytes.length);
-  if (fileEnd > fileStart) {
-    chunkBytes.set(transferBytes.subarray(fileStart, fileEnd), Math.max(0, manifestBytes.length - start));
-  }
-  const compactExtension = getCompactFileExtension(file.name);
-  const chunkDataToken = base64ToBase64Url(arrayBufferToBase64(chunkBytes.buffer));
-  if (isSingleFrame) {
-    const parts = [
-      FILE_FRAME_PREFIX,
-      FILE_PROTOCOL_VERSION,
-      'S',
-      getFrameManifestFlag(),
-    ];
-    if (!fileIncludeManifest.checked) {
-      parts.push(compactExtension);
-    }
-    parts.push(chunkDataToken);
-    return parts.join(':');
-  }
-
-  return [
-    FILE_FRAME_PREFIX,
-    FILE_PROTOCOL_VERSION,
-    'C',
-    getFrameManifestFlag(),
-    cachedFileId || createCompactFileId(),
-    compactExtension,
-    encodeStreamPosition(start, streamLength),
-    streamLength.toString(10),
-    chunkDataToken,
-  ].join(':');
-}
-
-async function buildFilePayload() {
-  const file = getActiveFile();
-  if (!file) {
-    return '';
-  }
-
-  switch (getSelectedFileEncodingMode()) {
-    case 'blob':
-      return `${getFileObjectUrlPayload(file).replace('[base64url]', base64ToBase64Url(await getActiveFileBase64()))}`;
-    case 'chunked':
-      return buildChunkedFilePayload();
-    case 'data':
-    default:
-      return readSelectedFile();
-  }
-}
+const filePayloadBuilder = createFilePayloadBuilder({
+  cache: fileCache,
+  getMode: getSelectedFileEncodingMode,
+  getShareableAppUrl,
+  includeManifest: () => fileIncludeManifest.checked,
+  chunkIndex: fileChunkIndex,
+  getManifest: getActiveFileManifest,
+  getCapacityInfo: getChunkedFileCapacityInfo,
+  syncCapacity: syncFileCapacityHint,
+});
+const buildFilePayload = filePayloadBuilder.build;
 
 function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
@@ -1696,7 +1188,7 @@ function buildEncodedPreviewTemplate() {
             : `FILE:1:S:-:${getCompactFileExtension(file.name)}:[base64url-data]`;
         }
         const offset = Math.max(0, currentChunk - 1) * chunkCapacity;
-        return `FILE:1:C:${getFrameManifestFlag()}:[base64url-id]:${getCompactFileExtension(file.name)}:${encodeStreamPosition(offset, streamLength)}:${streamLength.toString(10)}:[base64url-data]`;
+        return `FILE:1:C:${getFileManifestFlag(fileIncludeManifest.checked)}:[base64url-id]:${getCompactFileExtension(file.name)}:${encodeStreamPosition(offset, streamLength)}:${streamLength.toString(10)}:[base64url-data]`;
       }
 
       return `[data URL for ${file.name}]`;
