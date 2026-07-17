@@ -2,15 +2,9 @@ import { formatBytes, hexToBytes } from './bytes.js';
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { normalizePhoneNumber } from './phone.js';
-import {
-  createCalendarEventId,
-  serializeCalendarEvent,
-} from './calendar.js';
 import { getSupportedMp4MimeType } from './mp4.js';
 import {
   getWebsiteValidationState,
-  isValidBulkDate,
-  isValidBulkTime,
   validateCalendarText,
   validateEmailValue,
   validateGeoLabel,
@@ -37,6 +31,8 @@ import {
 } from './qr-regions.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
+import { serializeBulkRow } from './ui/content/bulk/payload.js';
+import { validateBulkImport } from './ui/content/bulk/validation.js';
 import { createEventSection } from './ui/content/event/section.js';
 import {
   arrayBufferToBase64,
@@ -85,6 +81,7 @@ import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
 import { drawCenterArtwork } from './ui/style/art/drawing.js';
+import { createImageInputController } from './ui/style/art/image-input.js';
 import {
   createQrImageLayer,
   createQrModuleFill,
@@ -395,12 +392,6 @@ let cachedTransferBytes = null;
 let cachedChunkCapacityInfoKey = '';
 let cachedChunkCapacityInfoValue = null;
 let chunkSettingsRefreshTimer = 0;
-let centerLogoImage = null;
-let centerLogoObjectUrl = '';
-let centerLogoLoadRequest = 0;
-let imageFillImage = null;
-let imageFillObjectUrl = '';
-let imageFillLoadRequest = 0;
 let chunkSettingsRefreshRequest = 0;
 let transferSettingsRevision = 0;
 let renderedQrWidth = null;
@@ -1539,6 +1530,7 @@ const sharedFieldsSection = createSharedFieldsSection({
 const buildEmailPayload = sharedFieldsSection.buildEmailPayload;
 const buildEmailPayloadWithBody = sharedFieldsSection.buildEmailPayloadWithBody;
 
+let imageFillController = null;
 const colorSection = createColorSection({
   darkColor: colorDark,
   lightColor: colorLight,
@@ -1556,13 +1548,29 @@ const colorSection = createColorSection({
   gradientEndTransparencyValue: colorGradientEndTransparencyValue,
   imageFillControls,
   imageFillClear,
-  hasImageFill: () => Boolean(imageFillImage),
+  hasImageFill: () => Boolean(imageFillController?.getImage()),
   colorWithTransparency,
 });
 const formatColorTransparency = colorSection.formatTransparency;
 const syncGradientControls = colorSection.sync;
 const getCurrentGradientOptions = colorSection.getGradientOptions;
 const applyRecommendedImageContrast = colorSection.applyRecommendedImageContrast;
+
+imageFillController = createImageInputController({
+  input: imageFillInput,
+  clearButton: imageFillClear,
+  onUpdate(image) {
+    if (image) applyRecommendedImageContrast();
+    syncGradientControls();
+    renderQr();
+  },
+});
+
+const centerLogoController = createImageInputController({
+  input: centerLogoInput,
+  clearButton: centerLogoClear,
+  onUpdate: renderQr,
+});
 
 const vcardSection = createVCardSection({
   name: vcardName,
@@ -1574,76 +1582,13 @@ const vcardSection = createVCardSection({
 });
 const buildVCardPayload = vcardSection.buildPayload;
 
-function normalizeBulkWifiSecurity(value) {
-  const normalized = String(value).trim().toLowerCase();
-  if (['wpa', 'wpa2', 'wpa3', 'wpa/2/3'].includes(normalized)) return 'WPA';
-  if (normalized === 'wep') return 'WEP';
-  if (['open', 'none', 'nopass'].includes(normalized)) return 'nopass';
-  return '';
-}
-
 function buildBulkEncodedText(row = getBulkCurrentRow()) {
-  if (!row) return '';
-
-  switch (qrFormat.value) {
-    case 'url':
-      return row.url.trim();
-    case 'text':
-      return row.text;
-    case 'number': {
-      const raw = `${row.prefix}${row.number}${row.suffix}`;
-      const uppercase = raw.toUpperCase();
-      return [...uppercase].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character)) ? uppercase : raw;
-    }
-    case 'wifi': {
-      const security = normalizeBulkWifiSecurity(row.security) || row.security.trim();
-      const segments = [`T:${security}`, `S:${escapeWifiValue(row.ssid.trim())}`];
-      if (security !== 'nopass') segments.push(`P:${escapeWifiValue(row.password)}`);
-      if (parseBulkBoolean(row.hidden)) segments.push('H:true');
-      return `WIFI:${segments.join(';')};;`;
-    }
-    case 'email': {
-      const params = new URLSearchParams();
-      if (row.subject.trim()) params.set('subject', row.subject.trim());
-      if (row.body.trim()) params.set('body', row.body.trim());
-      return `mailto:${row.email.trim()}${params.toString() ? `?${params}` : ''}`;
-    }
-    case 'phone':
-      return normalizePhoneNumber(row.phone) ? `tel:${normalizePhoneNumber(row.phone)}` : '';
-    case 'sms':
-      return `SMSTO:${normalizePhoneNumber(row.phone)}:${row.message}`;
-    case 'event':
-      return serializeCalendarEvent(
-        {
-          title: row.title,
-          allDay: Boolean(parseBulkBoolean(row.all_day)),
-          startDate: row.start_date.trim(),
-          startTime: row.start_time.trim(),
-          endDate: row.end_date.trim(),
-          endTime: row.end_time.trim(),
-          location: row.location,
-          description: row.description,
-          url: row.url,
-        },
-        createCalendarEventId(getCurrentFrameIndex())
-      );
-    case 'geo': {
-      const coordinates = `${row.latitude.trim()},${row.longitude.trim()}`;
-      return row.label.trim() ? `geo:${coordinates}?q=${encodeURIComponent(row.label.trim())}` : `geo:${coordinates}`;
-    }
-    case 'vcard': {
-      const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${row.name.trim()}`];
-      if (row.organization.trim()) lines.push(`ORG:${row.organization.trim()}`);
-      if (row.title.trim()) lines.push(`TITLE:${row.title.trim()}`);
-      if (row.phone.trim()) lines.push(`TEL:${row.phone.trim()}`);
-      if (row.email.trim()) lines.push(`EMAIL:${row.email.trim()}`);
-      if (row.url.trim()) lines.push(`URL:${row.url.trim()}`);
-      lines.push('END:VCARD');
-      return lines.join('\n');
-    }
-    default:
-      return '';
-  }
+  return serializeBulkRow({
+    row,
+    format: qrFormat.value,
+    frameIndex: getCurrentFrameIndex(),
+    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+  });
 }
 
 const frameSection = createFrameSection({
@@ -2024,107 +1969,22 @@ function syncEmailBodyLengthHint() {
 }
 
 function getBulkValidationState() {
-  const parseError = getBulkParseError();
-  if (parseError) {
-    return { error: `Not valid for Bulk Import yet: ${parseError}`, warning: '' };
-  }
-  if (!bulkFileInput.files?.[0]) {
-    return { error: 'Not valid for Bulk Import yet: choose a CSV file.', warning: '' };
-  }
-  const row = getBulkCurrentRow();
-  if (!row) {
-    return { error: 'Not valid for Bulk Import yet: the CSV needs at least one data row.', warning: '' };
-  }
-
-  const rowNumber = getCurrentFrameIndex() + 1;
-  const fail = (message) => ({ error: `Not valid for Bulk Import row ${rowNumber}: ${message}`, warning: '' });
-  const schema = getBulkSchema();
-  for (const field of schema.required) {
-    if (!row[field].trim()) return fail(`${field} is required.`);
-  }
-
-  if (qrFormat.value === 'url') {
-    const state = getWebsiteValidationState(row.url, { required: true, contextLabel: 'URL' });
-    if (state.error) return fail(state.error.replace(/^Not valid for URL format yet:\s*/, ''));
-    return state.warning ? { error: '', warning: `Bulk Import row ${rowNumber}: ${state.warning}` } : state;
-  }
-  if (qrFormat.value === 'text') {
-    if (!row.text.trim()) return fail('text is required.');
-  }
-  if (qrFormat.value === 'number') {
-    if (!/^-?\d+$/.test(row.number.trim())) return fail('number must be a whole number.');
-    for (const field of ['prefix', 'suffix']) {
-      const error = validatePrintableText(row[field], { label: field, maxLength: 32 });
-      if (error) return fail(error);
-    }
-  }
-  if (qrFormat.value === 'wifi') {
-    if (!normalizeBulkWifiSecurity(row.security)) return fail('security must be WPA, WEP, or open.');
-    if (parseBulkBoolean(row.hidden) === null) return fail('hidden must be true/false, yes/no, or 1/0.');
-  }
-  if (qrFormat.value === 'email') {
-    const emailError = validateEmailValue(row.email, { label: 'email address' });
-    if (emailError) return fail(emailError.replace(/^Not valid for Email format yet:\s*/, ''));
-    const subjectError = validatePrintableText(row.subject, { label: 'subject', maxLength: EMAIL_SUBJECT_MAX_LENGTH });
-    if (subjectError) return fail(subjectError);
-    const bodyError = validatePrintableText(row.body, { label: 'body', maxLength: MODE_CAPACITY.byte.L });
-    if (bodyError) return fail(bodyError);
-  }
-  if (qrFormat.value === 'phone' || qrFormat.value === 'sms') {
-    const phoneError = validateTelephoneValue(row.phone);
-    if (phoneError) return fail(phoneError.replace(/^Not valid for Phone format yet:\s*/, ''));
-    if (qrFormat.value === 'sms') {
-      const messageError = validatePrintableText(row.message, { label: 'message', maxLength: SMS_MAX_LENGTH });
-      if (messageError) return fail(messageError);
-    }
-  }
-  if (qrFormat.value === 'event') {
-    const allDay = parseBulkBoolean(row.all_day);
-    if (allDay === null) return fail('all_day must be true/false, yes/no, or 1/0.');
-    const titleError = validateCalendarText(row.title, { required: true, label: 'title', maxLength: CALENDAR_TITLE_MAX_LENGTH });
-    if (titleError) return fail(titleError.replace(/^Not valid for Event format yet:\s*/, ''));
-    if (!isValidBulkDate(row.start_date) || !isValidBulkDate(row.end_date)) {
-      return fail('start_date and end_date must be real dates using YYYY-MM-DD.');
-    }
-    if (!allDay && (!isValidBulkTime(row.start_time) || !isValidBulkTime(row.end_time))) {
-      return fail('start_time and end_time must be real 24-hour times using HH:MM unless all_day is true.');
-    }
-    const start = `${row.start_date}T${allDay ? '00:00' : row.start_time}`;
-    const end = `${row.end_date}T${allDay ? '00:00' : row.end_time}`;
-    if ((allDay && end < start) || (!allDay && end <= start)) return fail('the event end must be after its start.');
-    const locationError = validateCalendarText(row.location, { label: 'location', maxLength: CALENDAR_LOCATION_MAX_LENGTH });
-    if (locationError) return fail(locationError.replace(/^Not valid for Event format yet:\s*/, ''));
-    const descriptionError = validateCalendarText(row.description, { label: 'description', maxLength: CALENDAR_DESCRIPTION_MAX_LENGTH, multiline: true });
-    if (descriptionError) return fail(descriptionError.replace(/^Not valid for Event format yet:\s*/, ''));
-    const urlState = getWebsiteValidationState(row.url, { contextLabel: 'Event' });
-    if (urlState.error) return fail(urlState.error.replace(/^Not valid for Event format yet:\s*/, ''));
-    if (urlState.warning) return { error: '', warning: `Bulk Import row ${rowNumber}: ${urlState.warning}` };
-  }
-  if (qrFormat.value === 'geo') {
-    const latitude = parseCoordinate(row.latitude);
-    const longitude = parseCoordinate(row.longitude);
-    if (latitude === null || latitude < -90 || latitude > 90) return fail('latitude must be a number between -90 and 90.');
-    if (longitude === null || longitude < -180 || longitude > 180) return fail('longitude must be a number between -180 and 180.');
-    const labelError = validateGeoLabel(row.label);
-    if (labelError) return fail(labelError.replace(/^Not valid for Geo format yet:\s*/, ''));
-  }
-  if (qrFormat.value === 'vcard') {
-    for (const [field, label, required] of [
-      ['name', 'full name', true], ['organization', 'organization', false], ['title', 'title', false],
-    ]) {
-      const error = validateVCardTextValue(row[field], { required, label });
-      if (error) return fail(error.replace(/^Not valid for vCard format yet:\s*/, ''));
-    }
-    const phoneError = validateTelephoneValue(row.phone, { required: false });
-    if (phoneError) return fail(phoneError.replace(/^Not valid for Phone format yet:\s*/, ''));
-    const emailError = validateEmailValue(row.email, { required: false });
-    if (emailError) return fail(emailError.replace(/^Not valid for Email format yet:\s*/, ''));
-    const websiteState = getWebsiteValidationState(row.url, { contextLabel: 'vCard' });
-    if (websiteState.error) return fail(websiteState.error.replace(/^Not valid for vCard format yet:\s*/, ''));
-    if (websiteState.warning) return { error: '', warning: `Bulk Import row ${rowNumber}: ${websiteState.warning}` };
-  }
-
-  return { error: '', warning: '' };
+  return validateBulkImport({
+    parseError: getBulkParseError(),
+    hasFile: Boolean(bulkFileInput.files?.[0]),
+    row: getBulkCurrentRow(),
+    rowNumber: getCurrentFrameIndex() + 1,
+    schema: getBulkSchema(),
+    format: qrFormat.value,
+    limits: {
+      emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
+      byteCapacity: MODE_CAPACITY.byte.L,
+      sms: SMS_MAX_LENGTH,
+      calendarTitle: CALENDAR_TITLE_MAX_LENGTH,
+      calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
+      calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH,
+    },
+  });
 }
 
 function getFormatValidationState() {
@@ -2721,6 +2581,7 @@ function drawQr(qrDefinition, options) {
   const eyeShapeOptions = getCurrentEyeShapeOptions();
   const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
   const gradientOptions = getCurrentGradientOptions();
+  const imageFillImage = imageFillController.getImage();
   const imageFillActive = !debugActive && gradientOptions.type === 'image' && imageFillImage;
   const customEyeColorsActive = !debugActive && !imageFillActive && eyeCustomColorsEnabled.checked;
   const lightAlpha = getColorAlpha(options.color.light);
@@ -2889,7 +2750,7 @@ function drawQr(qrDefinition, options) {
 
   drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, {
     mode: centerArtMode.value,
-    logo: centerLogoImage,
+    logo: centerLogoController.getImage(),
     emoji: centerEmoji.value.trim(),
     pixelArt: pixelArtEditor.getState(),
     sizePercent: readInteger(centerArtSize) ?? 20,
@@ -3373,105 +3234,6 @@ emojiOptions.forEach((button) => {
 
 imageFillRecommended.addEventListener('click', () => {
   applyRecommendedImageContrast();
-  renderQr();
-});
-
-imageFillInput.addEventListener('change', () => {
-  const loadRequest = ++imageFillLoadRequest;
-  if (imageFillObjectUrl) {
-    URL.revokeObjectURL(imageFillObjectUrl);
-    imageFillObjectUrl = '';
-  }
-  imageFillImage = null;
-  const [file] = imageFillInput.files || [];
-  if (!file || !file.type.startsWith('image/')) {
-    syncGradientControls();
-    renderQr();
-    return;
-  }
-
-  imageFillObjectUrl = URL.createObjectURL(file);
-  const image = new Image();
-  image.onload = () => {
-    if (loadRequest !== imageFillLoadRequest) {
-      return;
-    }
-    imageFillImage = image;
-    URL.revokeObjectURL(imageFillObjectUrl);
-    imageFillObjectUrl = '';
-    applyRecommendedImageContrast();
-    syncGradientControls();
-    renderQr();
-  };
-  image.onerror = () => {
-    if (loadRequest !== imageFillLoadRequest) {
-      return;
-    }
-    imageFillImage = null;
-    URL.revokeObjectURL(imageFillObjectUrl);
-    imageFillObjectUrl = '';
-    syncGradientControls();
-    renderQr();
-  };
-  image.src = imageFillObjectUrl;
-});
-
-imageFillClear.addEventListener('click', () => {
-  imageFillLoadRequest += 1;
-  if (imageFillObjectUrl) {
-    URL.revokeObjectURL(imageFillObjectUrl);
-    imageFillObjectUrl = '';
-  }
-  imageFillImage = null;
-  imageFillInput.value = '';
-  syncGradientControls();
-  renderQr();
-});
-
-centerLogoInput.addEventListener('change', () => {
-  const loadRequest = ++centerLogoLoadRequest;
-  if (centerLogoObjectUrl) {
-    URL.revokeObjectURL(centerLogoObjectUrl);
-    centerLogoObjectUrl = '';
-  }
-  centerLogoImage = null;
-  const [file] = centerLogoInput.files || [];
-  if (!file || !file.type.startsWith('image/')) {
-    renderQr();
-    return;
-  }
-
-  centerLogoObjectUrl = URL.createObjectURL(file);
-  const image = new Image();
-  image.onload = () => {
-    if (loadRequest !== centerLogoLoadRequest) {
-      return;
-    }
-    centerLogoImage = image;
-    URL.revokeObjectURL(centerLogoObjectUrl);
-    centerLogoObjectUrl = '';
-    renderQr();
-  };
-  image.onerror = () => {
-    if (loadRequest !== centerLogoLoadRequest) {
-      return;
-    }
-    centerLogoImage = null;
-    URL.revokeObjectURL(centerLogoObjectUrl);
-    centerLogoObjectUrl = '';
-    renderQr();
-  };
-  image.src = centerLogoObjectUrl;
-});
-
-centerLogoClear.addEventListener('click', () => {
-  centerLogoLoadRequest += 1;
-  if (centerLogoObjectUrl) {
-    URL.revokeObjectURL(centerLogoObjectUrl);
-    centerLogoObjectUrl = '';
-  }
-  centerLogoImage = null;
-  centerLogoInput.value = '';
   renderQr();
 });
 
