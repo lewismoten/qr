@@ -15,7 +15,7 @@ export function createContentSections({ elements: e, runtime, limits, alphanumer
   });
   const geo = createGeoSection({
     latitudeInput: e.geoLatitude, longitudeInput: e.geoLongitude, labelInput: e.geoQuery,
-    mapElement: e.geoMapElement, isActive: () => e.format.value === 'geo',
+    mapElement: e.geoMapElement, isActive: () => e.qrFormat.value === 'geo',
     onChange: () => runtime.render(),
   });
   const phone = createPhoneSection({
