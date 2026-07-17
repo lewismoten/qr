@@ -1,3 +1,5 @@
+import { serializeGeo } from '../../../content-formats.js';
+
 const DEFAULT_CENTER = [38.9182, -78.1944];
 
 export function parseCoordinate(value) {
@@ -30,11 +32,9 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
     return latitude === null || longitude === null ? null : { latitude, longitude };
   };
 
-  const buildPayload = () => {
-    const coordinates = `${latitudeInput.value.trim()},${longitudeInput.value.trim()}`;
-    const label = labelInput.value.trim();
-    return label ? `geo:${coordinates}?q=${encodeURIComponent(label)}` : `geo:${coordinates}`;
-  };
+  const buildPayload = () => serializeGeo({
+    latitude: latitudeInput.value, longitude: longitudeInput.value, label: labelInput.value,
+  });
 
   const ensureMap = () => {
     const leaflet = globalThis.L;

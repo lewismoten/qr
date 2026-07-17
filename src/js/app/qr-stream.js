@@ -1,9 +1,6 @@
 import { getRawDataModules } from '../qr/capacity.js';
 import { COUNT_BITS } from '../qr/constants.js';
-
-function normalizeModeName(mode) {
-  return typeof mode === 'string' ? mode : mode?.id || mode?.name || 'byte';
-}
+import { normalizeModeName } from './modes.js';
 
 function getCharCountBits(mode, version) {
   const bucket = version <= 9 ? 0 : version <= 26 ? 1 : 2;
@@ -184,4 +181,3 @@ export function buildEncodingUnitGroups(qrDefinition, traversal) {
 
   return groups;
 }
-

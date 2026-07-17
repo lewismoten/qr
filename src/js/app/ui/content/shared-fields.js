@@ -1,3 +1,5 @@
+import { serializeEmail } from '../../content-formats.js';
+
 export function createSharedFieldsSection({ emailInputs, messageInputs, emailSubject, onMessageChange }) {
   const syncGroup = (inputs, source) => {
     inputs.forEach((input) => {
@@ -15,13 +17,9 @@ export function createSharedFieldsSection({ emailInputs, messageInputs, emailSub
     });
   });
 
-  const buildEmailPayloadWithBody = (body) => {
-    const params = new URLSearchParams();
-    if (emailSubject.value.trim()) params.set('subject', emailSubject.value.trim());
-    if (body.trim()) params.set('body', body.trim());
-    const suffix = params.toString() ? `?${params.toString()}` : '';
-    return `mailto:${emailInputs[0].value.trim()}${suffix}`;
-  };
+  const buildEmailPayloadWithBody = (body) => serializeEmail({
+    email: emailInputs[0].value, subject: emailSubject.value, body,
+  });
 
   const initialize = () => {
     syncGroup(emailInputs, emailInputs.at(-1));

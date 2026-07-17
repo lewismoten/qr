@@ -1,10 +1,4 @@
-function normalizeModeName(segmentMode) {
-  if (!segmentMode) return 'byte';
-  if (typeof segmentMode === 'string') return segmentMode.toLowerCase();
-  if (typeof segmentMode.id === 'string') return segmentMode.id.toLowerCase();
-  if (typeof segmentMode.name === 'string') return segmentMode.name.toLowerCase();
-  return 'byte';
-}
+import { normalizeModeName } from '../../modes.js';
 
 function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
   if (mode === 'byte') return [];

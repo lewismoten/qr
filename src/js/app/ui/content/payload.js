@@ -1,6 +1,7 @@
+import { serializeEmail, serializeGeo, serializePhone, serializeSms, serializeVCard,
+  serializeWifi } from '../../content-formats.js';
 import { normalizePhoneNumber } from '../../phone.js';
 import { encodeStreamPosition, getCompactFileExtension, getFileManifestFlag } from './file/protocol.js';
-import { escapeWifiValue } from './wifi/section.js';
 
 const valueOr = (value, fallback) => value.trim() || fallback;
 
@@ -13,14 +14,11 @@ export function createContentPayload({ elements: e, bulk, builders, file }) {
       case 'number': return builders.number();
       case 'wifi': return builders.wifi();
       case 'email': return builders.email();
-      case 'phone': {
-        const number = normalizePhoneNumber(e.phoneNumber.value);
-        return number ? `tel:${number}` : '';
-      }
+      case 'phone': return serializePhone(e.phoneNumber.value);
       case 'sms':
         return !e.smsNumber.value.trim() && !e.smsBody.value.trim()
           ? ''
-          : `SMSTO:${normalizePhoneNumber(e.smsNumber.value)}:${e.smsBody.value}`;
+          : serializeSms({ number: e.smsNumber.value, message: e.smsBody.value });
       case 'event': return builders.event();
       case 'geo': return e.geoLatitude.value.trim() && e.geoLongitude.value.trim() ? builders.geo() : '';
       case 'vcard': return builders.vcard();
@@ -37,34 +35,25 @@ export function createContentPayload({ elements: e, bulk, builders, file }) {
       case 'number': return builders.number();
       case 'wifi': {
         const encryption = e.wifiEncryption.value || 'WPA';
-        const segments = [`T:${encryption}`, `S:${escapeWifiValue(valueOr(e.wifiSsid.value, '[network-name]'))}`];
-        if (encryption !== 'nopass') segments.push(`P:${escapeWifiValue(valueOr(e.wifiPassword.value, '[password]'))}`);
-        if (e.wifiHidden.checked) segments.push('H:true');
-        return `WIFI:${segments.join(';')};;`;
+        return serializeWifi({ security: encryption,
+          ssid: valueOr(e.wifiSsid.value, '[network-name]'),
+          password: valueOr(e.wifiPassword.value, '[password]'), hidden: e.wifiHidden.checked });
       }
-      case 'email': {
-        const params = new URLSearchParams();
-        params.set('subject', valueOr(e.emailSubject.value, '[subject]'));
-        params.set('body', valueOr(e.emailBody.value, '[message]'));
-        return `mailto:${valueOr(e.emailTo.value, '[recipient@example.com]')}?${params}`;
-      }
+      case 'email': return serializeEmail({ email: valueOr(e.emailTo.value, '[recipient@example.com]'),
+        subject: valueOr(e.emailSubject.value, '[subject]'),
+        body: valueOr(e.emailBody.value, '[message]') });
       case 'phone': return `tel:${normalizePhoneNumber(e.phoneNumber.value) || '[phone-number]'}`;
-      case 'sms': return `SMSTO:${normalizePhoneNumber(e.smsNumber.value) || '[phone-number]'}:${valueOr(e.smsBody.value, '[message]')}`;
+      case 'sms': return serializeSms({ number: e.smsNumber.value,
+        message: valueOr(e.smsBody.value, '[message]') })
+        .replace('SMSTO::', 'SMSTO:[phone-number]:');
       case 'event': return builders.event();
-      case 'geo': {
-        const coordinates = `${valueOr(e.geoLatitude.value, '[latitude]')},${valueOr(e.geoLongitude.value, '[longitude]')}`;
-        return e.geoQuery.value.trim() ? `geo:${coordinates}?q=${encodeURIComponent(e.geoQuery.value.trim())}` : `geo:${coordinates}`;
-      }
-      case 'vcard': return [
-        'BEGIN:VCARD', 'VERSION:3.0',
-        `FN:${valueOr(e.vcardName.value, '[full-name]')}`,
-        `ORG:${valueOr(e.vcardOrg.value, '[organization]')}`,
-        `TITLE:${valueOr(e.vcardTitle.value, '[title]')}`,
-        `TEL:${valueOr(e.vcardPhone.value, '[phone-number]')}`,
-        `EMAIL:${valueOr(e.vcardEmail.value, '[email]')}`,
-        `URL:${valueOr(e.vcardUrl.value, '[website]')}`,
-        'END:VCARD',
-      ].join('\n');
+      case 'geo': return serializeGeo({ latitude: valueOr(e.geoLatitude.value, '[latitude]'),
+        longitude: valueOr(e.geoLongitude.value, '[longitude]'), label: e.geoQuery.value });
+      case 'vcard': return serializeVCard({ name: valueOr(e.vcardName.value, '[full-name]'),
+        organization: valueOr(e.vcardOrg.value, '[organization]'),
+        title: valueOr(e.vcardTitle.value, '[title]'),
+        phone: valueOr(e.vcardPhone.value, '[phone-number]'),
+        email: valueOr(e.vcardEmail.value, '[email]'), url: valueOr(e.vcardUrl.value, '[website]') });
       case 'file': return file.preview();
       default: return '';
     }

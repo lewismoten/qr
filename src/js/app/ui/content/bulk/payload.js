@@ -1,7 +1,7 @@
 import { createCalendarEventId, serializeCalendarEvent } from '../../../calendar.js';
+import { serializeEmail, serializeGeo, serializePhone, serializeSms, serializeVCard,
+  serializeWifi } from '../../../content-formats.js';
 import { parseBoolean } from '../../../csv.js';
-import { normalizePhoneNumber } from '../../../phone.js';
-import { escapeWifiValue } from '../wifi/section.js';
 
 export function normalizeBulkWifiSecurity(value) {
   const normalized = String(value).trim().toLowerCase();
@@ -26,23 +26,13 @@ export function serializeBulkRow({ row, format, frameIndex, alphanumericCharacte
     }
     case 'wifi': {
       const security = normalizeBulkWifiSecurity(row.security) || row.security.trim();
-      const segments = [`T:${security}`, `S:${escapeWifiValue(row.ssid.trim())}`];
-      if (security !== 'nopass') segments.push(`P:${escapeWifiValue(row.password)}`);
-      if (parseBoolean(row.hidden)) segments.push('H:true');
-      return `WIFI:${segments.join(';')};;`;
+      return serializeWifi({ security, ssid: row.ssid, password: row.password,
+        hidden: parseBoolean(row.hidden) });
     }
-    case 'email': {
-      const params = new URLSearchParams();
-      if (row.subject.trim()) params.set('subject', row.subject.trim());
-      if (row.body.trim()) params.set('body', row.body.trim());
-      return `mailto:${row.email.trim()}${params.toString() ? `?${params}` : ''}`;
-    }
-    case 'phone': {
-      const phone = normalizePhoneNumber(row.phone);
-      return phone ? `tel:${phone}` : '';
-    }
+    case 'email': return serializeEmail({ email: row.email, subject: row.subject, body: row.body });
+    case 'phone': return serializePhone(row.phone);
     case 'sms':
-      return `SMSTO:${normalizePhoneNumber(row.phone)}:${row.message}`;
+      return serializeSms({ number: row.phone, message: row.message });
     case 'event':
       return serializeCalendarEvent(
         {
@@ -58,20 +48,10 @@ export function serializeBulkRow({ row, format, frameIndex, alphanumericCharacte
         },
         createCalendarEventId(frameIndex),
       );
-    case 'geo': {
-      const coordinates = `${row.latitude.trim()},${row.longitude.trim()}`;
-      return row.label.trim() ? `geo:${coordinates}?q=${encodeURIComponent(row.label.trim())}` : `geo:${coordinates}`;
-    }
-    case 'vcard': {
-      const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${row.name.trim()}`];
-      if (row.organization.trim()) lines.push(`ORG:${row.organization.trim()}`);
-      if (row.title.trim()) lines.push(`TITLE:${row.title.trim()}`);
-      if (row.phone.trim()) lines.push(`TEL:${row.phone.trim()}`);
-      if (row.email.trim()) lines.push(`EMAIL:${row.email.trim()}`);
-      if (row.url.trim()) lines.push(`URL:${row.url.trim()}`);
-      lines.push('END:VCARD');
-      return lines.join('\n');
-    }
+    case 'geo': return serializeGeo({ latitude: row.latitude, longitude: row.longitude,
+      label: row.label });
+    case 'vcard': return serializeVCard({ name: row.name, organization: row.organization,
+      title: row.title, phone: row.phone, email: row.email, url: row.url });
     default:
       return '';
   }

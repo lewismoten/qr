@@ -1,6 +1,4 @@
-export function escapeWifiValue(value) {
-  return value.replace(/([\\;,:"])/g, '\\$1');
-}
+import { serializeWifi } from '../../../content-formats.js';
 
 export function createWifiSection({ ssid, password, encryption, hidden, revealSecrets, onChange }) {
   const sync = () => {
@@ -10,12 +8,10 @@ export function createWifiSection({ ssid, password, encryption, hidden, revealSe
     password.placeholder = open ? 'Not used for open networks' : 'Password';
   };
 
-  const buildPayload = () => {
-    const segments = [`T:${encryption.value}`, `S:${escapeWifiValue(ssid.value.trim())}`];
-    if (encryption.value !== 'nopass') segments.push(`P:${escapeWifiValue(password.value)}`);
-    if (hidden.checked) segments.push('H:true');
-    return `WIFI:${segments.join(';')};;`;
-  };
+  const buildPayload = () => serializeWifi({
+    security: encryption.value, ssid: ssid.value, password: password.value,
+    hidden: hidden.checked,
+  });
 
   const maskPayload = (payload) => revealSecrets.checked
     ? payload
