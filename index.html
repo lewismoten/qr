@@ -1052,7 +1052,7 @@
         <p>QR Code Generator</p>
         <nav aria-label="Site information">
           <a href="#about" data-dialog-target="about">About</a>
-          <a href="#third-party" data-dialog-target="third-party">Third-party software</a>
+          <a href="#third-party" data-dialog-target="third-party">Technology &amp; licenses</a>
         </nav>
       </footer>
     </main>
@@ -1109,16 +1109,69 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header">
           <div>
-            <p class="info-kicker">Open source inventory</p>
-            <h1 id="third-party-title">Third-party software and services</h1>
+            <p class="info-kicker">Technology inventory</p>
+            <h1 id="third-party-title">Technology, standards and licenses</h1>
           </div>
-          <button type="button" class="dialog-close" data-close-dialog aria-label="Close third-party software">Close</button>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close technology inventory">Close</button>
         </header>
         <div class="info-dialog-content">
-          <p class="info-lead">The runtime dependency list is intentionally short. Versions below match the files loaded by this page.</p>
+          <p class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, third-party software and network services used by this application.</p>
 
           <section>
-            <h2>Runtime libraries</h2>
+            <h2>First-party QR implementation</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>Native QR encoder</h3><span class="version-badge">First-party</span></div>
+                <p>Implements mixed-mode segmentation, Numeric, Alphanumeric, UTF-8 Byte and Shift JIS Kanji data, versions 1-40, Reed-Solomon correction, interleaving, functional patterns, masking and matrix placement. The implementation is local; the QR symbol itself follows ISO/IEC 18004.</p>
+                <nav aria-label="Native QR encoder references"><a href="https://www.iso.org/standard/83389.html">ISO/IEC 18004:2024</a><a href="https://www.qrcode.com/en/about/standards.html">DENSO QR standards</a><a href="https://www.qrcode.com/en/patent.html">Patent and trademark policy</a><a href="https://encoding.spec.whatwg.org/">WHATWG Encoding</a></nav>
+              </article>
+              <article>
+                <div><h3>QR debugger and renderer</h3><span class="version-badge">First-party</span></div>
+                <p>Draws styled modules, finder eyes, paths, codeword boundaries, metadata regions and unmasked data directly to Canvas. DENSO WAVE states that its patent rights are not exercised against standardized QR Codes; QR Code is also a registered trademark of DENSO WAVE.</p>
+                <nav aria-label="QR renderer references"><a href="https://html.spec.whatwg.org/multipage/canvas.html">HTML Canvas</a><a href="https://www.qrcode.com/en/about/standards.html">QR standards history</a><a href="https://www.qrcode.com/en/patent.html">DENSO patent policy</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Built-in export formats</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>Raster and vector images</h3><span class="version-badge">First-party + Canvas</span></div>
+                <p>PNG, JPEG and still GIF output is assembled from the application canvas. SVG export traces modules, artwork and text into paths rather than relying on an SVG generation library.</p>
+                <nav aria-label="Image format references"><a href="https://www.w3.org/TR/png-3/">PNG specification</a><a href="https://jpeg.org/jpeg/">JPEG information</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.w3.org/TR/SVG2/">SVG 2</a></nav>
+              </article>
+              <article>
+                <div><h3>PDF and ZIP writers</h3><span class="version-badge">First-party</span></div>
+                <p>PDF pages and multi-image ZIP archives are serialized directly by this application, including sheet layout, image resources, central-directory records and checksums.</p>
+                <nav aria-label="Document and archive references"><a href="https://www.iso.org/standard/75839.html">ISO 32000-2 PDF</a><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Browser platform features</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>Files, URLs and downloads</h3><span class="version-badge">Web platform</span></div>
+                <p>File selection, Blob storage, object URLs, data URLs and client-side downloads use browser APIs. The custom FILE chunk protocol and its manifest are first-party application formats.</p>
+                <nav aria-label="File and URL API references"><a href="https://www.w3.org/TR/FileAPI/">File API</a><a href="https://url.spec.whatwg.org/">URL Standard</a><a href="https://html.spec.whatwg.org/multipage/links.html#downloading-resources">HTML downloads</a></nav>
+              </article>
+              <article>
+                <div><h3>Integrity and compression</h3><span class="version-badge">Web platform</span></div>
+                <p>SHA-256 verification uses Web Crypto. Optional gzip transfer compression uses Compression Streams when the browser provides it; the underlying formats follow FIPS 180-4 and RFC 1952.</p>
+                <nav aria-label="Integrity and compression references"><a href="https://www.w3.org/TR/WebCryptoAPI/">Web Cryptography API</a><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4</a><a href="https://compression.spec.whatwg.org/">Compression Streams</a><a href="https://www.rfc-editor.org/rfc/rfc1952">RFC 1952 gzip</a></nav>
+              </article>
+              <article>
+                <div><h3>Animation and media recording</h3><span class="version-badge">First-party + Web API</span></div>
+                <p>Animated GIF frames are encoded directly. MP4 export uses MediaRecorder and therefore depends on the codecs and media container support exposed by the current browser.</p>
+                <nav aria-label="Animation and recording references"><a href="https://www.w3.org/TR/mediastream-recording/">MediaStream Recording</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.iana.org/assignments/media-types/media-types.xhtml#video">IANA video media types</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Third-party runtime library</h2>
             <div class="dependency-list">
               <article>
                 <div><h3>Leaflet</h3><span class="version-badge">1.9.4</span></div>
@@ -1144,10 +1197,7 @@
             </div>
           </section>
 
-          <section>
-            <h2>Built-in QR generation and exports</h2>
-            <p>Segmentation, Shift JIS Kanji conversion, version selection, Reed-Solomon correction, masking and matrix placement are implemented directly by this application. Canvas drawing, SVG path tracing, PNG/JPEG output, GIF encoding, ZIP packaging and PDF generation are also first-party. MP4 recording, SHA-256 hashing and gzip compression use browser APIs when available.</p>
-          </section>
+          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the formats and platform technologies listed above. No separate third-party runtime package is used for QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed.</p>
         </div>
       </article>
     </dialog>
