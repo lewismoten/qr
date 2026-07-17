@@ -2,8 +2,38 @@ import { createInvalidPreviewRenderer } from './invalid.js';
 import { createRenderController } from './render.js';
 import { createQrRenderer } from './qr-renderer.js';
 
-export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, content,
-  debug, style, helpers, actions, runtime }) {
+export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, systems,
+  helpers, actions, runtime }) {
+  const content = {
+    getFrameMessage: systems.content.pipeline.frame.getMessage,
+    getFrameFont: systems.content.pipeline.frame.getFont,
+    buildText: systems.content.pipeline.payload.build,
+    buildOptions: systems.content.qr.buildOptions,
+    buildPreview: systems.content.pipeline.payload.preview,
+    updateTextPreview: systems.content.updateTextPreview,
+    updateOptionsPreview: systems.content.updateOptionsPreview,
+    getValidation: systems.content.validation,
+    buildPayload: systems.content.qr.buildPayload,
+    createDefinition: systems.content.qr.createDefinition,
+  };
+  const debug = {
+    setup: systems.debug,
+    isOverlayActive: runtime.isDebugOverlayActive,
+    getCodewordStyle: systems.debug.styles.getCodewordStyle,
+    getModuleContrastColor: systems.debug.styles.getModuleContrastColor,
+    getOutlineMode: runtime.getOutlineMode,
+    setValidation: systems.debug.diagnostics.setValidation,
+    updateSummary: systems.debug.diagnostics.updateSummary,
+    validateMode: systems.debug.diagnostics.validateManualMode,
+  };
+  const style = {
+    getModuleOptions: systems.style.modules.getOptions,
+    getEyeOptions: systems.style.eyes.getOptions,
+    getGradientOptions: systems.style.colors.getGradientOptions,
+    imageFill: systems.style.imageFill,
+    centerLogo: systems.style.centerLogo,
+    pixelEditor: systems.style.pixelEditor,
+  };
   const drawQr = createQrRenderer({
     canvas: e.canvas,
     qrWidth: e.qrWidth,
@@ -37,8 +67,8 @@ export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, co
     centerLogoController: style.centerLogo,
     pixelArtEditor: style.pixelEditor,
     readInteger: helpers.readInteger,
-    schedulePreviewViewportSync: runtime.scheduleViewportSync,
-    setRenderMetrics: runtime.setRenderMetrics,
+    schedulePreviewViewportSync: systems.previewControls.scheduleViewportSync,
+    setRenderMetrics: systems.previewControls.setRenderMetrics,
     getActiveDebugOutlineMode: debug.getOutlineMode,
   });
 
@@ -50,7 +80,7 @@ export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, co
   });
   const masks = debug.setup.masks;
   const controller = createRenderController({
-    syncOutputs: actions.syncOutputs,
+    syncOutputs: systems.output.sync,
     syncFormat: actions.syncFormat,
     updateMap: actions.updateMap,
     buildText: content.buildText,
@@ -69,7 +99,7 @@ export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, co
     buildPayload: content.buildPayload,
     createDefinition: content.createDefinition,
     drawQr,
-    syncDownloads: actions.syncDownloads,
+    syncDownloads: systems.download.syncControls,
     showBuildError(error, options) {
       e.encodedPreview.textContent = error.message;
       e.encodedPreview.classList.add('has-error');

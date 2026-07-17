@@ -1,4 +1,18 @@
-export function createOutputSetup({ elements: e, actions, getErrorLevel, smsMaxLength }) {
+export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxLength }) {
+  const actions = {
+    syncSizeLabels: systems.previewControls.syncLabels,
+    formatColorTransparency: systems.style.colors.formatTransparency,
+    syncGradientControls: systems.style.colors.sync,
+    syncNumberSequenceControls: systems.contentSections.number.sync,
+    getCurrentFrameMessage: systems.contentEncoding.pipeline.frame.getMessage,
+    syncModuleShapeControls: systems.style.modules.sync,
+    syncEyeShapeControls: systems.style.eyes.sync,
+    syncCenterArtworkControls: systems.style.artwork.sync,
+    syncChunkPreviewNavigation: systems.download.syncNavigation,
+    syncPrintWidthControls: systems.previewControls.syncPrint,
+    syncEmailBodyLengthHint: systems.contentEncoding.emailCapacity.sync,
+    syncFileCapacityHint: systems.contentData.syncFileCapacityHint,
+  };
   function formatVersion() {
     e.qrVersionValue.textContent = e.versionAuto.checked ? 'Auto' : e.qrVersion.value;
   }
