@@ -1,7 +1,36 @@
 {
   "navigation": { "content": "Contenido", "style": "Estilo", "download": "Descargar", "debug": "Depurar" },
-  "content": { "data": "Datos", "format": "Formato", "frame": "Marco" },
-  "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono" },
+  "content": { "data": "Datos", "format": "Formato", "frame": "Marco", "tools": "Herramientas de contenido" },
+  "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono", "text": "Texto", "number": "Número", "numberRange": "Rango numérico", "wifi": "Wi-Fi", "calendarEvent": "Evento de calendario", "geo": "Geo", "file": "Archivo" },
+  "form": {
+    "format": { "payloadFormat": "Formato de contenido", "qrFormat": "Formato QR", "bulkImport": "Importación masiva" },
+    "data": {
+      "bulkFileUnavailable": "El formato Archivo no está disponible en la importación masiva. Usa el formato Archivo para datos binarios.",
+      "bulkHeaders": "La primera fila debe contener estos nombres de campo:", "chooseCsv": "Elegir un archivo CSV", "clearCsv": "Borrar CSV",
+      "urlContent": "Contenido URL", "textContent": "Contenido de texto", "textPayload": "Texto codificado", "enterText": "Escribe cualquier texto",
+      "numberSeries": "Serie numérica", "start": "Inicio", "end": "Fin", "step": "Paso", "prefixOptional": "Prefijo (opcional)",
+      "suffixOptional": "Sufijo (opcional)", "currentValue": "Valor actual", "networkName": "Nombre de red", "networkPlaceholder": "Mi Wi-Fi",
+      "security": "Seguridad", "wifiSecurity": "Seguridad Wi-Fi", "wpa": "WPA/2/3", "wpaLong": "WPA/WPA2/WPA3", "wep": "WEP", "open": "Abierta", "hiddenNetwork": "Red oculta", "to": "Para",
+      "subjectOptional": "Asunto (opcional)", "bodyOptional": "Cuerpo (opcional)", "phoneFormat": "Formato del número de teléfono",
+      "smsPhoneFormat": "Formato del número SMS", "usa": "EE. UU.", "international": "Internacional", "e164": "E.164", "digits": "Dígitos", "textMessage": "Mensaje de texto",
+      "allDayEvent": "Evento de todo el día", "startDate": "Fecha de inicio", "startTime": "Hora de inicio", "endDate": "Fecha de fin",
+      "endTime": "Hora de fin", "locationOptional": "Ubicación (opcional)", "descriptionOptional": "Descripción (opcional)",
+      "websiteOptional": "Sitio web (opcional)", "eventTimeHint": "Los eventos con hora usan la zona horaria local del escáner. En eventos de todo el día, la fecha final es el último día incluido.",
+      "latitude": "Latitud", "longitude": "Longitud", "label": "Etiqueta", "mapLabel": "Vista previa del mapa. Arrastra para mover, usa los controles para ampliar o haz clic para elegir coordenadas.",
+      "website": "Sitio web", "transport": "Transporte", "fileTransportMode": "Modo de transporte de archivo", "blobUrl": "URL Blob",
+      "chunked": "Fragmentado", "dataUrl": "URL de datos", "chunkedProtocol": "Protocolo fragmentado", "chooseFile": "Elegir un archivo",
+      "autoPickVersion": "Elegir versión automáticamente", "chunkVersionTarget": "Versión objetivo del fragmento", "includeManifest": "Incluir manifiesto",
+      "compressTransfer": "Comprimir para transferir (gzip)", "customMetadata": "Metadatos personalizados (JSON opcional)", "chunk": "Fragmento", "clearFile": "Borrar archivo"
+    }
+  },
+  "style": {
+    "tools": "Herramientas de estilo", "tabs": { "size": "Tamaño", "modules": "Módulos", "colors": "Colores", "art": "Arte" },
+    "size": { "legend": "Tamaño y margen", "targetWidth": "Ancho objetivo", "fromScale": "Calcular el tamaño solo con la escala del módulo", "minimumPixels": "Píxeles mínimos por módulo", "margin": "Margen" },
+    "modules": { "legend": "Módulos y ojos de esquina", "shape": "Forma del módulo", "cornerRounding": "Redondeo de esquinas", "spacing": "Espaciado", "rotation": "Rotación", "eyes": "Ojos de esquina", "outerRounding": "Redondeo exterior", "centerRounding": "Redondeo central", "hint": "Los módulos decorativos pueden reducir la fiabilidad del escaneo. Prueba el código al tamaño previsto." },
+    "colors": { "legend": "Colores y rellenos", "dark": "Oscuro", "light": "Claro", "transparency": "Transparencia", "customEyes": "Usar colores personalizados en los ojos", "eyeOuter": "Anillo exterior del ojo", "eyeCenter": "Centro del ojo", "moduleFill": "Relleno del módulo", "gradientEnd": "Final del degradado", "direction": "Dirección", "fillImage": "Imagen de relleno personalizada", "recommendedContrast": "Aplicar contraste recomendado", "clearImage": "Borrar imagen", "imageHint": "Recomendado: negro sobre módulos oscuros al 25% y blanco sobre módulos claros al 75%." },
+    "art": { "legend": "Arte central", "useFrameMessage": "Usar el mensaje del marco como arte central", "type": "Tipo de arte central", "logo": "Logotipo", "emoji": "Emoji", "pixelArt": "Pixel art", "size": "Tamaño del arte", "logoImage": "Imagen del logotipo", "clearLogo": "Borrar logotipo", "quickPicks": "Selección rápida", "canvasWidth": "Ancho del lienzo", "customColor": "Color personalizado", "clear": "Borrar", "matchShape": "Usar la forma de los módulos QR", "paintHint": "Elige un color o Transparente y toca o arrastra sobre el lienzo.", "icons": { "link": "Enlace", "phone": "Teléfono", "envelope": "Sobre", "location": "Marcador de ubicación", "home": "Inicio", "cart": "Carrito", "gift": "Regalo", "star": "Estrella", "heart": "Corazón", "check": "Marca de verificación", "rocket": "Cohete", "bulb": "Bombilla", "globe": "Globo", "camera": "Cámara", "music": "Música", "coffee": "Café", "key": "Llave", "lock": "Candado", "signal": "Barras de señal", "book": "Libro", "calendar": "Calendario", "ticket": "Entrada", "food": "Comida", "smile": "Sonrisa" } },
+    "values": { "square": "Cuadrado", "rounded": "Redondeado", "dots": "Puntos", "diamond": "Rombo", "custom": "Personalizado", "default": "Predeterminado", "defaultModules": "Módulos predeterminados", "circle": "Círculo", "solid": "Sólido", "linear": "Lineal", "radial": "Radial", "image": "Imagen", "customImage": "Imagen personalizada" }
+  },
   "fields": {
     "title": "título", "location": "ubicación", "description": "descripción", "recipientEmail": "correo del destinatario",
     "fullName": "nombre completo", "organization": "organización", "vcardPhone": "teléfono de vCard",
@@ -57,7 +86,7 @@
     "requiredValues": "Valores obligatorios: {values}",
     "status": { "empty": "No se ha cargado ningún CSV.", "loaded": "{count} filas cargadas. Mostrando {current} de {count}." }
   },
-  "frame": { "allDay": "Todo el día", "wifi": "Wi-Fi {ssid}", "email": "Correo {email}", "call": "Llamar a {phone}", "text": "Enviar SMS a {phone}", "location": "Ubicación {location}", "contact": "Contacto {contact}", "sequence": "{current} de {total}" },
+  "frame": { "message": "Mensaje del marco", "mode": "Modo del mensaje del marco", "automaticShort": "Valor corto automático", "customMessage": "Mensaje personalizado", "noMessage": "Sin mensaje", "scanMore": "Escanea para saber más", "placeCenter": "Colocar el mensaje en el centro del QR", "font": "Fuente", "sans": "Sans", "round": "Redonda", "serif": "Serif", "mono": "Mono", "monospace": "Monoespaciada", "messageColor": "Color del mensaje", "maximumLineHeight": "Altura máxima de línea", "hint": "El mensaje se integra debajo del QR o recibe un contorno de contraste al centrarse. Automático usa una URL, teléfono, correo, red, contacto o archivo breve y no secreto.", "allDay": "Todo el día", "wifi": "Wi-Fi {ssid}", "email": "Correo {email}", "call": "Llamar a {phone}", "text": "Enviar SMS a {phone}", "location": "Ubicación {location}", "contact": "Contacto {contact}", "sequence": "{current} de {total}" },
   "encoding": {
     "invalidPositions": "{message} Posiciones: {positions}{suffix}.", "kanjiUnavailable": "El modo Kanji manual no está disponible porque no se cargó el conversor Shift JIS.",
     "incompatible": "Incompatible con el modo {mode}. Caracteres no válidos: {characters}.", "waiting": "Esperando", "mixedSummary": "Mixto ({modes})", "unused": "{bytes} B ({percent}%)",
@@ -77,6 +106,11 @@
   },
   "map": { "zoomControls": "Controles de zoom del mapa", "zoomIn": "Acercar", "zoomOut": "Alejar", "attribution": "© colaboradores de OpenStreetMap", "loadError": "No se pudo iniciar la vista previa del mapa." },
   "wifi": { "openPassword": "No se usa en redes abiertas", "password": "Contraseña" },
+  "art": {
+    "protectOutline": "Proteger con un contorno claro", "protectBackground": "Proteger con un fondo claro",
+    "editorLabel": "Editor de pixel art de {width} por {height}", "pixelLabel": "Píxel {number}",
+    "colors": { "eraser": "Transparente / borrador", "black": "Negro", "blue": "Azul", "green": "Verde", "cyan": "Cian", "red": "Rojo", "magenta": "Magenta", "brown": "Marrón", "lightGray": "Gris claro", "darkGray": "Gris oscuro", "brightBlue": "Azul brillante", "brightGreen": "Verde brillante", "brightCyan": "Cian brillante", "brightRed": "Rojo brillante", "brightMagenta": "Magenta brillante", "yellow": "Amarillo", "white": "Blanco" }
+  },
   "units": { "pixels": "{value} px", "degrees": "{value} grados", "dimensions": "{width} x {height}", "percent": "{value}%" },
   "download": {
     "creating": "Creando {format}...", "ready": "Descarga lista.", "error": "No se pudo crear la descarga.",

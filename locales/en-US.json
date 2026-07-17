@@ -8,7 +8,8 @@
   "content": {
     "data": "Data",
     "format": "Format",
-    "frame": "Frame"
+    "frame": "Frame",
+    "tools": "Content tools"
   },
   "formats": {
     "url": "URL",
@@ -16,7 +17,123 @@
     "vcard": "vCard",
     "sms": "SMS",
     "email": "Email",
-    "phone": "Phone"
+    "phone": "Phone",
+    "text": "Text",
+    "number": "Number",
+    "numberRange": "Number range",
+    "wifi": "Wi-Fi",
+    "calendarEvent": "Calendar event",
+    "geo": "Geo",
+    "file": "File"
+  },
+  "form": {
+    "format": {
+      "payloadFormat": "Payload format",
+      "qrFormat": "QR format",
+      "bulkImport": "Bulk Import"
+    },
+    "data": {
+      "bulkFileUnavailable": "File format is unavailable in Bulk Import. Use the dedicated File format for binary data.",
+      "bulkHeaders": "The first row must contain these field names:",
+      "chooseCsv": "Choose a CSV file",
+      "clearCsv": "Clear CSV",
+      "urlContent": "URL content",
+      "textContent": "Text content",
+      "textPayload": "Text payload",
+      "enterText": "Enter any text",
+      "numberSeries": "Number series",
+      "start": "Start",
+      "end": "End",
+      "step": "Step",
+      "prefixOptional": "Prefix (optional)",
+      "suffixOptional": "Suffix (optional)",
+      "currentValue": "Current value",
+      "networkName": "Network name",
+      "networkPlaceholder": "My Wi-Fi",
+      "security": "Security",
+      "wifiSecurity": "Wi-Fi security",
+      "wpa": "WPA/2/3",
+      "wpaLong": "WPA/WPA2/WPA3",
+      "wep": "WEP",
+      "open": "Open",
+      "hiddenNetwork": "Hidden network",
+      "to": "To",
+      "subjectOptional": "Subject (optional)",
+      "bodyOptional": "Body (optional)",
+      "phoneFormat": "Phone number format",
+      "smsPhoneFormat": "SMS phone number format",
+      "usa": "USA",
+      "international": "Intl",
+      "e164": "E.164",
+      "digits": "Digits",
+      "textMessage": "Text message",
+      "allDayEvent": "All-day event",
+      "startDate": "Start date",
+      "startTime": "Start time",
+      "endDate": "End date",
+      "endTime": "End time",
+      "locationOptional": "Location (optional)",
+      "descriptionOptional": "Description (optional)",
+      "websiteOptional": "Website (optional)",
+      "eventTimeHint": "Timed events use the scanner's local time zone. For all-day events, the selected end date is treated as the last included day.",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "label": "Label",
+      "mapLabel": "Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates.",
+      "website": "Website",
+      "transport": "Transport",
+      "fileTransportMode": "File transport mode",
+      "blobUrl": "Blob URL",
+      "chunked": "Chunked",
+      "dataUrl": "Data URL",
+      "chunkedProtocol": "Chunked protocol",
+      "chooseFile": "Choose a file",
+      "autoPickVersion": "Auto-pick version",
+      "chunkVersionTarget": "Chunk version target",
+      "includeManifest": "Include manifest",
+      "compressTransfer": "Compress for transfer (gzip)",
+      "customMetadata": "Custom metadata (optional JSON)",
+      "chunk": "Chunk",
+      "clearFile": "Clear file"
+    }
+  },
+  "style": {
+    "tools": "Style tools",
+    "tabs": { "size": "Size", "modules": "Modules", "colors": "Colors", "art": "Art" },
+    "size": {
+      "legend": "Size & margin", "targetWidth": "Target width", "fromScale": "Size entirely from module scale",
+      "minimumPixels": "Minimum pixels per module", "margin": "Margin"
+    },
+    "modules": {
+      "legend": "Modules & corner eyes", "shape": "Module shape", "cornerRounding": "Corner rounding",
+      "spacing": "Spacing", "rotation": "Rotation", "eyes": "Corner eyes", "outerRounding": "Outer rounding",
+      "centerRounding": "Center rounding", "hint": "Decorative modules can reduce scanning reliability. Test the finished code at its intended size."
+    },
+    "colors": {
+      "legend": "Colors & fills", "dark": "Dark", "light": "Light", "transparency": "Transparency",
+      "customEyes": "Use custom corner eye colors", "eyeOuter": "Eye outer ring", "eyeCenter": "Eye center",
+      "moduleFill": "Module fill", "gradientEnd": "Gradient end", "direction": "Direction",
+      "fillImage": "Custom fill image", "recommendedContrast": "Apply recommended contrast", "clearImage": "Clear image",
+      "imageHint": "Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity."
+    },
+    "art": {
+      "legend": "Center artwork", "useFrameMessage": "Use frame message as center artwork", "type": "Center artwork type",
+      "logo": "Logo", "emoji": "Emoji", "pixelArt": "Pixel art", "size": "Artwork size", "logoImage": "Logo image",
+      "clearLogo": "Clear logo", "quickPicks": "Quick picks", "canvasWidth": "Canvas width", "customColor": "Custom color",
+      "clear": "Clear", "matchShape": "Match the QR module shape",
+      "paintHint": "Choose a color or Transparent, then tap or drag across the canvas.",
+      "icons": {
+        "link": "Link", "phone": "Phone", "envelope": "Envelope", "location": "Location pin", "home": "Home", "cart": "Shopping cart",
+        "gift": "Gift", "star": "Star", "heart": "Heart", "check": "Check mark", "rocket": "Rocket", "bulb": "Light bulb",
+        "globe": "Globe", "camera": "Camera", "music": "Music", "coffee": "Coffee", "key": "Key", "lock": "Lock",
+        "signal": "Signal bars", "book": "Book", "calendar": "Calendar", "ticket": "Ticket", "food": "Food", "smile": "Smile"
+      }
+    },
+    "values": {
+      "square": "Square", "rounded": "Rounded", "dots": "Dots", "diamond": "Diamond", "custom": "Custom",
+      "default": "Default", "defaultModules": "Default modules", "circle": "Circle", "solid": "Solid",
+      "linear": "Linear", "radial": "Radial", "image": "Image", "customImage": "Custom image"
+    }
   },
   "fields": {
     "title": "title",
@@ -181,6 +298,22 @@
     }
   },
   "frame": {
+    "message": "Frame message",
+    "mode": "Frame message mode",
+    "automaticShort": "Automatic short value",
+    "customMessage": "Custom message",
+    "noMessage": "No message",
+    "scanMore": "Scan to learn more",
+    "placeCenter": "Place message in the QR center",
+    "font": "Font",
+    "sans": "Sans",
+    "round": "Round",
+    "serif": "Serif",
+    "mono": "Mono",
+    "monospace": "Monospace",
+    "messageColor": "Message color",
+    "maximumLineHeight": "Maximum line height",
+    "hint": "The message is embedded below the QR or given a tight contrasting outline when centered. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.",
     "allDay": "All day",
     "wifi": "Wi-Fi {ssid}",
     "email": "Email {email}",

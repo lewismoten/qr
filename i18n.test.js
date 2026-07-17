@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import {
   getActiveLocale,
   getAvailableLocales,
@@ -123,5 +124,22 @@ assert.deepEqual(getAvailableLocales(), [
   { code: 'de-DE', flag: '🏳️', name: undefined, nativeName: undefined },
   { code: 'en-US', flag: '🏳️', name: undefined, nativeName: undefined },
 ]);
+
+const flattenMessages = (value, prefix = '', result = {}) => {
+  Object.entries(value).forEach(([name, child]) => {
+    const key = prefix ? `${prefix}.${name}` : name;
+    if (child && typeof child === 'object' && !Array.isArray(child)) flattenMessages(child, key, result);
+    else result[key] = child;
+  });
+  return result;
+};
+const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
+const htmlKeys = [...new Set([...html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)].map((match) => match[1]))];
+const scopedFormKeys = htmlKeys.filter((key) => /^(content|formats|fields|form|style|frame|wifi|common)\./.test(key));
+for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
+  const localeMessages = flattenMessages(JSON.parse(await readFile(new URL(`locales/${locale}.json`, import.meta.url), 'utf8')));
+  const requiredKeys = locale === 'en-US' ? htmlKeys : scopedFormKeys;
+  assert.deepEqual(requiredKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing form translations`);
+}
 
 console.log('Language lookup and locale fallback tests passed.');

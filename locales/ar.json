@@ -1,7 +1,31 @@
 {
   "navigation": { "content": "المحتوى", "style": "النمط", "download": "تنزيل", "debug": "التصحيح" },
-  "content": { "data": "البيانات", "format": "التنسيق", "frame": "الإطار" },
-  "formats": { "url": "رابط", "event": "حدث", "vcard": "بطاقة اتصال", "sms": "رسالة نصية", "email": "بريد إلكتروني", "phone": "هاتف" },
+  "content": { "data": "البيانات", "format": "التنسيق", "frame": "الإطار", "tools": "أدوات المحتوى" },
+  "formats": { "url": "رابط", "event": "حدث", "vcard": "بطاقة اتصال", "sms": "رسالة نصية", "email": "بريد إلكتروني", "phone": "هاتف", "text": "نص", "number": "رقم", "numberRange": "نطاق أرقام", "wifi": "واي فاي", "calendarEvent": "حدث تقويم", "geo": "موقع جغرافي", "file": "ملف" },
+  "form": {
+    "format": { "payloadFormat": "تنسيق المحتوى", "qrFormat": "تنسيق QR", "bulkImport": "استيراد مجمع" },
+    "data": {
+      "bulkFileUnavailable": "تنسيق الملف غير متاح في الاستيراد المجمع. استخدم تنسيق الملف المخصص للبيانات الثنائية.", "bulkHeaders": "يجب أن يحتوي الصف الأول على أسماء الحقول التالية:",
+      "chooseCsv": "اختر ملف CSV", "clearCsv": "مسح CSV", "urlContent": "محتوى الرابط", "textContent": "محتوى نصي", "textPayload": "النص المراد ترميزه", "enterText": "أدخل أي نص",
+      "numberSeries": "سلسلة أرقام", "start": "البداية", "end": "النهاية", "step": "الخطوة", "prefixOptional": "بادئة (اختياري)", "suffixOptional": "لاحقة (اختياري)", "currentValue": "القيمة الحالية",
+      "networkName": "اسم الشبكة", "networkPlaceholder": "شبكة واي فاي", "security": "الأمان", "wifiSecurity": "أمان واي فاي", "wpa": "WPA/2/3", "wpaLong": "WPA/WPA2/WPA3", "wep": "WEP", "open": "مفتوحة", "hiddenNetwork": "شبكة مخفية",
+      "to": "إلى", "subjectOptional": "الموضوع (اختياري)", "bodyOptional": "النص (اختياري)", "phoneFormat": "تنسيق رقم الهاتف", "smsPhoneFormat": "تنسيق رقم الرسائل النصية",
+      "usa": "الولايات المتحدة", "international": "دولي", "e164": "E.164", "digits": "أرقام", "textMessage": "رسالة نصية", "allDayEvent": "حدث طوال اليوم", "startDate": "تاريخ البدء", "startTime": "وقت البدء",
+      "endDate": "تاريخ الانتهاء", "endTime": "وقت الانتهاء", "locationOptional": "الموقع (اختياري)", "descriptionOptional": "الوصف (اختياري)", "websiteOptional": "الموقع الإلكتروني (اختياري)",
+      "eventTimeHint": "تستخدم الأحداث المحددة بوقت المنطقة الزمنية المحلية للماسح. في أحداث اليوم الكامل، يكون تاريخ الانتهاء المحدد آخر يوم مشمول.", "latitude": "خط العرض", "longitude": "خط الطول", "label": "التسمية",
+      "mapLabel": "معاينة خريطة تفاعلية. اسحب للتحريك، واستخدم عناصر التكبير، أو انقر لاختيار الإحداثيات.", "website": "الموقع الإلكتروني", "transport": "النقل", "fileTransportMode": "وضع نقل الملف",
+      "blobUrl": "رابط Blob", "chunked": "مجزأ", "dataUrl": "رابط بيانات", "chunkedProtocol": "بروتوكول مجزأ", "chooseFile": "اختر ملفًا", "autoPickVersion": "اختيار الإصدار تلقائيًا",
+      "chunkVersionTarget": "إصدار الأجزاء المستهدف", "includeManifest": "تضمين البيان", "compressTransfer": "ضغط للنقل (gzip)", "customMetadata": "بيانات وصفية مخصصة (JSON اختياري)", "chunk": "الجزء", "clearFile": "مسح الملف"
+    }
+  },
+  "style": {
+    "tools": "أدوات النمط", "tabs": { "size": "الحجم", "modules": "الوحدات", "colors": "الألوان", "art": "الرسم" },
+    "size": { "legend": "الحجم والهامش", "targetWidth": "العرض المستهدف", "fromScale": "تحديد الحجم بالكامل من مقياس الوحدة", "minimumPixels": "الحد الأدنى للبكسلات لكل وحدة", "margin": "الهامش" },
+    "modules": { "legend": "الوحدات وعيون الزوايا", "shape": "شكل الوحدة", "cornerRounding": "تدوير الزوايا", "spacing": "التباعد", "rotation": "الدوران", "eyes": "عيون الزوايا", "outerRounding": "التدوير الخارجي", "centerRounding": "تدوير المركز", "hint": "قد تقلل الوحدات الزخرفية موثوقية المسح. اختبر الرمز بالحجم المقصود." },
+    "colors": { "legend": "الألوان والتعبئة", "dark": "داكن", "light": "فاتح", "transparency": "الشفافية", "customEyes": "استخدام ألوان مخصصة لعيون الزوايا", "eyeOuter": "الحلقة الخارجية للعين", "eyeCenter": "مركز العين", "moduleFill": "تعبئة الوحدة", "gradientEnd": "نهاية التدرج", "direction": "الاتجاه", "fillImage": "صورة تعبئة مخصصة", "recommendedContrast": "تطبيق التباين الموصى به", "clearImage": "مسح الصورة", "imageHint": "موصى به: أسود فوق الوحدات الداكنة بشفافية 25% وأبيض فوق الوحدات الفاتحة بشفافية 75%." },
+    "art": { "legend": "الرسم المركزي", "useFrameMessage": "استخدام رسالة الإطار كرسم مركزي", "type": "نوع الرسم المركزي", "logo": "شعار", "emoji": "رمز تعبيري", "pixelArt": "رسم بكسل", "size": "حجم الرسم", "logoImage": "صورة الشعار", "clearLogo": "مسح الشعار", "quickPicks": "اختيارات سريعة", "canvasWidth": "عرض اللوحة", "customColor": "لون مخصص", "clear": "مسح", "matchShape": "مطابقة شكل وحدة QR", "paintHint": "اختر لونًا أو شفافًا، ثم انقر أو اسحب على اللوحة.", "icons": { "link": "رابط", "phone": "هاتف", "envelope": "مغلف", "location": "دبوس موقع", "home": "الرئيسية", "cart": "عربة تسوق", "gift": "هدية", "star": "نجمة", "heart": "قلب", "check": "علامة صح", "rocket": "صاروخ", "bulb": "مصباح", "globe": "كرة أرضية", "camera": "كاميرا", "music": "موسيقى", "coffee": "قهوة", "key": "مفتاح", "lock": "قفل", "signal": "أشرطة الإشارة", "book": "كتاب", "calendar": "تقويم", "ticket": "تذكرة", "food": "طعام", "smile": "ابتسامة" } },
+    "values": { "square": "مربع", "rounded": "مستدير", "dots": "نقاط", "diamond": "ماسي", "custom": "مخصص", "default": "افتراضي", "defaultModules": "وحدات افتراضية", "circle": "دائرة", "solid": "مصمت", "linear": "خطي", "radial": "شعاعي", "image": "صورة", "customImage": "صورة مخصصة" }
+  },
   "fields": {
     "title": "العنوان", "location": "الموقع", "description": "الوصف", "recipientEmail": "بريد المستلم", "fullName": "الاسم الكامل",
     "organization": "المؤسسة", "vcardPhone": "هاتف بطاقة الاتصال", "vcardEmail": "بريد بطاقة الاتصال", "smsPhone": "رقم الرسائل النصية",
@@ -43,7 +67,7 @@
   },
   "common": { "auto": "تلقائي", "autoLower": "تلقائي", "none": "لا شيء", "preview": "معاينة", "sequence": "{current} من {total}", "count": "{current} / {total}" },
   "bulk": { "loading": "جارٍ تحميل أدوات الاستيراد المجمع.", "warning": "صف الاستيراد {rowNumber}: ‏{message}", "requiredValues": "القيم المطلوبة: {values}", "status": { "empty": "لم يتم تحميل CSV.", "loaded": "تم تحميل {count} صفوف. عرض {current} من {count}." } },
-  "frame": { "allDay": "طوال اليوم", "wifi": "واي فاي {ssid}", "email": "راسل {email}", "call": "اتصل بـ {phone}", "text": "أرسل إلى {phone}", "location": "الموقع {location}", "contact": "جهة الاتصال {contact}", "sequence": "{current} من {total}" },
+  "frame": { "message": "رسالة الإطار", "mode": "وضع رسالة الإطار", "automaticShort": "قيمة قصيرة تلقائية", "customMessage": "رسالة مخصصة", "noMessage": "بلا رسالة", "scanMore": "امسح لمعرفة المزيد", "placeCenter": "وضع الرسالة في مركز QR", "font": "الخط", "sans": "بلا زوائد", "round": "مستدير", "serif": "بزوائد", "mono": "أحادي", "monospace": "أحادي المسافة", "messageColor": "لون الرسالة", "maximumLineHeight": "أقصى ارتفاع للسطر", "hint": "تُدمج الرسالة أسفل QR أو تُحاط بحد متباين عند توسيطها. يستخدم الوضع التلقائي رابطًا أو هاتفًا أو بريدًا أو شبكة أو جهة اتصال أو اسم ملف موجزًا وغير سري.", "allDay": "طوال اليوم", "wifi": "واي فاي {ssid}", "email": "راسل {email}", "call": "اتصل بـ {phone}", "text": "أرسل إلى {phone}", "location": "الموقع {location}", "contact": "جهة الاتصال {contact}", "sequence": "{current} من {total}" },
   "encoding": {
     "invalidPositions": "{message} المواضع: {positions}{suffix}.", "kanjiUnavailable": "وضع كانجي اليدوي غير متاح لأن محول Shift JIS لم يُحمّل.",
     "incompatible": "غير متوافق مع وضع {mode}. الأحرف غير الصالحة: {characters}.", "waiting": "انتظار", "mixedSummary": "مختلط ({modes})", "unused": "{bytes} بايت ({percent}%)",
@@ -61,6 +85,11 @@
   },
   "map": { "zoomControls": "عناصر تكبير الخريطة", "zoomIn": "تكبير", "zoomOut": "تصغير", "attribution": "© مساهمو OpenStreetMap", "loadError": "تعذر تهيئة معاينة الخريطة." },
   "wifi": { "openPassword": "غير مستخدمة للشبكات المفتوحة", "password": "كلمة المرور" },
+  "art": {
+    "protectOutline": "حماية بحد فاتح", "protectBackground": "حماية بخلفية فاتحة",
+    "editorLabel": "محرر رسم بكسل {width} في {height}", "pixelLabel": "بكسل {number}",
+    "colors": { "eraser": "شفاف / ممحاة", "black": "أسود", "blue": "أزرق", "green": "أخضر", "cyan": "سماوي", "red": "أحمر", "magenta": "أرجواني", "brown": "بني", "lightGray": "رمادي فاتح", "darkGray": "رمادي داكن", "brightBlue": "أزرق ساطع", "brightGreen": "أخضر ساطع", "brightCyan": "سماوي ساطع", "brightRed": "أحمر ساطع", "brightMagenta": "أرجواني ساطع", "yellow": "أصفر", "white": "أبيض" }
+  },
   "units": { "pixels": "{value} بكسل", "degrees": "{value} درجة", "dimensions": "{width} × {height}", "percent": "{value}%" },
   "download": {
     "creating": "جارٍ إنشاء {format}...", "ready": "التنزيل جاهز.", "error": "تعذر إنشاء التنزيل.", "creatingPdf": "جارٍ إنشاء PDF...", "pdfReady": "ملف PDF جاهز.",

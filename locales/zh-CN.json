@@ -1,7 +1,31 @@
 {
   "navigation": { "content": "内容", "style": "样式", "download": "下载", "debug": "调试" },
-  "content": { "data": "数据", "format": "格式", "frame": "边框" },
-  "formats": { "url": "网址", "event": "日历事件", "vcard": "电子名片", "sms": "短信", "email": "电子邮件", "phone": "电话" },
+  "content": { "data": "数据", "format": "格式", "frame": "边框", "tools": "内容工具" },
+  "formats": { "url": "网址", "event": "日历事件", "vcard": "电子名片", "sms": "短信", "email": "电子邮件", "phone": "电话", "text": "文本", "number": "数字", "numberRange": "数字范围", "wifi": "Wi-Fi", "calendarEvent": "日历事件", "geo": "地理位置", "file": "文件" },
+  "form": {
+    "format": { "payloadFormat": "内容格式", "qrFormat": "二维码格式", "bulkImport": "批量导入" },
+    "data": {
+      "bulkFileUnavailable": "批量导入不支持文件格式。请使用专用文件格式处理二进制数据。", "bulkHeaders": "第一行必须包含以下字段名：",
+      "chooseCsv": "选择 CSV 文件", "clearCsv": "清除 CSV", "urlContent": "网址内容", "textContent": "文本内容", "textPayload": "编码文本", "enterText": "输入任意文本",
+      "numberSeries": "数字序列", "start": "开始", "end": "结束", "step": "步长", "prefixOptional": "前缀（可选）", "suffixOptional": "后缀（可选）", "currentValue": "当前值",
+      "networkName": "网络名称", "networkPlaceholder": "我的 Wi-Fi", "security": "安全性", "wifiSecurity": "Wi-Fi 安全性", "wpa": "WPA/2/3", "wpaLong": "WPA/WPA2/WPA3", "wep": "WEP", "open": "开放", "hiddenNetwork": "隐藏网络",
+      "to": "收件人", "subjectOptional": "主题（可选）", "bodyOptional": "正文（可选）", "phoneFormat": "电话号码格式", "smsPhoneFormat": "短信电话号码格式",
+      "usa": "美国", "international": "国际", "e164": "E.164", "digits": "纯数字", "textMessage": "短信内容", "allDayEvent": "全天事件", "startDate": "开始日期", "startTime": "开始时间",
+      "endDate": "结束日期", "endTime": "结束时间", "locationOptional": "地点（可选）", "descriptionOptional": "说明（可选）", "websiteOptional": "网站（可选）",
+      "eventTimeHint": "定时事件使用扫描设备的本地时区。对于全天事件，所选结束日期是最后包含的一天。", "latitude": "纬度", "longitude": "经度", "label": "标签",
+      "mapLabel": "交互式地图预览。拖动平移，使用控件缩放，或点击选择坐标。", "website": "网站", "transport": "传输方式", "fileTransportMode": "文件传输模式",
+      "blobUrl": "Blob 网址", "chunked": "分块", "dataUrl": "数据网址", "chunkedProtocol": "分块协议", "chooseFile": "选择文件", "autoPickVersion": "自动选择版本",
+      "chunkVersionTarget": "分块目标版本", "includeManifest": "包含清单", "compressTransfer": "压缩传输（gzip）", "customMetadata": "自定义元数据（可选 JSON）", "chunk": "分块", "clearFile": "清除文件"
+    }
+  },
+  "style": {
+    "tools": "样式工具", "tabs": { "size": "尺寸", "modules": "模块", "colors": "颜色", "art": "图案" },
+    "size": { "legend": "尺寸和边距", "targetWidth": "目标宽度", "fromScale": "完全按模块比例确定尺寸", "minimumPixels": "每个模块的最小像素数", "margin": "边距" },
+    "modules": { "legend": "模块和定位眼", "shape": "模块形状", "cornerRounding": "圆角", "spacing": "间距", "rotation": "旋转", "eyes": "定位眼", "outerRounding": "外环圆角", "centerRounding": "中心圆角", "hint": "装饰性模块可能降低扫描可靠性。请按实际使用尺寸测试成品。" },
+    "colors": { "legend": "颜色和填充", "dark": "深色", "light": "浅色", "transparency": "透明度", "customEyes": "使用自定义定位眼颜色", "eyeOuter": "定位眼外环", "eyeCenter": "定位眼中心", "moduleFill": "模块填充", "gradientEnd": "渐变结束色", "direction": "方向", "fillImage": "自定义填充图像", "recommendedContrast": "应用推荐对比度", "clearImage": "清除图像", "imageHint": "推荐：深色模块叠加 25% 黑色，浅色模块叠加 75% 白色。" },
+    "art": { "legend": "中心图案", "useFrameMessage": "将边框文字用作中心图案", "type": "中心图案类型", "logo": "标志", "emoji": "表情符号", "pixelArt": "像素画", "size": "图案尺寸", "logoImage": "标志图像", "clearLogo": "清除标志", "quickPicks": "快速选择", "canvasWidth": "画布宽度", "customColor": "自定义颜色", "clear": "清除", "matchShape": "匹配二维码模块形状", "paintHint": "选择颜色或透明色，然后在画布上点击或拖动。", "icons": { "link": "链接", "phone": "电话", "envelope": "信封", "location": "位置标记", "home": "主页", "cart": "购物车", "gift": "礼物", "star": "星星", "heart": "爱心", "check": "对勾", "rocket": "火箭", "bulb": "灯泡", "globe": "地球", "camera": "相机", "music": "音乐", "coffee": "咖啡", "key": "钥匙", "lock": "锁", "signal": "信号条", "book": "书", "calendar": "日历", "ticket": "票券", "food": "食物", "smile": "笑脸" } },
+    "values": { "square": "方形", "rounded": "圆角", "dots": "圆点", "diamond": "菱形", "custom": "自定义", "default": "默认", "defaultModules": "默认模块", "circle": "圆形", "solid": "纯色", "linear": "线性", "radial": "径向", "image": "图像", "customImage": "自定义图像" }
+  },
   "fields": {
     "title": "标题", "location": "地点", "description": "说明", "recipientEmail": "收件人邮箱", "fullName": "姓名",
     "organization": "组织", "vcardPhone": "名片电话号码", "vcardEmail": "名片邮箱", "smsPhone": "短信电话号码",
@@ -44,7 +68,7 @@
   },
   "common": { "auto": "自动", "autoLower": "自动", "none": "无", "preview": "预览", "sequence": "第 {current} 个，共 {total} 个", "count": "{current} / {total}" },
   "bulk": { "loading": "正在加载批量导入工具。", "warning": "批量导入第 {rowNumber} 行：{message}", "requiredValues": "必填值：{values}", "status": { "empty": "尚未加载 CSV。", "loaded": "已加载 {count} 行，正在显示第 {current} 行，共 {count} 行。" } },
-  "frame": { "allDay": "全天", "wifi": "Wi-Fi {ssid}", "email": "发送邮件至 {email}", "call": "拨打 {phone}", "text": "发送短信至 {phone}", "location": "位置 {location}", "contact": "联系人 {contact}", "sequence": "第 {current} 个，共 {total} 个" },
+  "frame": { "message": "边框文字", "mode": "边框文字模式", "automaticShort": "自动简短值", "customMessage": "自定义文字", "noMessage": "无文字", "scanMore": "扫描了解更多", "placeCenter": "将文字置于二维码中心", "font": "字体", "sans": "无衬线", "round": "圆体", "serif": "衬线", "mono": "等宽", "monospace": "等宽字体", "messageColor": "文字颜色", "maximumLineHeight": "最大行高", "hint": "文字可嵌入二维码下方，居中时则使用紧凑的对比轮廓。自动模式使用简短且非敏感的网址、电话、邮箱、网络名、联系人或文件名。", "allDay": "全天", "wifi": "Wi-Fi {ssid}", "email": "发送邮件至 {email}", "call": "拨打 {phone}", "text": "发送短信至 {phone}", "location": "位置 {location}", "contact": "联系人 {contact}", "sequence": "第 {current} 个，共 {total} 个" },
   "encoding": {
     "invalidPositions": "{message} 位置：{positions}{suffix}。", "kanjiUnavailable": "由于 Shift JIS 转换器未加载，手动汉字模式不可用。",
     "incompatible": "与{mode}模式不兼容。无效字符：{characters}。", "waiting": "等待中", "mixedSummary": "混合（{modes}）", "unused": "{bytes} B（{percent}%）",
@@ -62,6 +86,11 @@
   },
   "map": { "zoomControls": "地图缩放控件", "zoomIn": "放大", "zoomOut": "缩小", "attribution": "© OpenStreetMap 贡献者", "loadError": "无法初始化地图预览。" },
   "wifi": { "openPassword": "开放网络不使用密码", "password": "密码" },
+  "art": {
+    "protectOutline": "使用浅色轮廓保护", "protectBackground": "使用浅色背景保护",
+    "editorLabel": "{width} × {height} 像素画编辑器", "pixelLabel": "像素 {number}",
+    "colors": { "eraser": "透明 / 橡皮擦", "black": "黑色", "blue": "蓝色", "green": "绿色", "cyan": "青色", "red": "红色", "magenta": "品红", "brown": "棕色", "lightGray": "浅灰", "darkGray": "深灰", "brightBlue": "亮蓝", "brightGreen": "亮绿", "brightCyan": "亮青", "brightRed": "亮红", "brightMagenta": "亮品红", "yellow": "黄色", "white": "白色" }
+  },
   "units": { "pixels": "{value} px", "degrees": "{value} 度", "dimensions": "{width} x {height}", "percent": "{value}%" },
   "download": {
     "creating": "正在创建 {format}...", "ready": "下载已准备好。", "error": "无法创建下载。", "creatingPdf": "正在创建 PDF...", "pdfReady": "PDF 已准备好。",

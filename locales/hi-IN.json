@@ -1,7 +1,31 @@
 {
   "navigation": { "content": "सामग्री", "style": "शैली", "download": "डाउनलोड", "debug": "डीबग" },
-  "content": { "data": "डेटा", "format": "प्रारूप", "frame": "फ़्रेम" },
-  "formats": { "url": "यूआरएल", "event": "कार्यक्रम", "vcard": "वीकार्ड", "sms": "एसएमएस", "email": "ईमेल", "phone": "फ़ोन" },
+  "content": { "data": "डेटा", "format": "प्रारूप", "frame": "फ़्रेम", "tools": "सामग्री उपकरण" },
+  "formats": { "url": "यूआरएल", "event": "कार्यक्रम", "vcard": "वीकार्ड", "sms": "एसएमएस", "email": "ईमेल", "phone": "फ़ोन", "text": "पाठ", "number": "संख्या", "numberRange": "संख्या सीमा", "wifi": "वाई-फ़ाई", "calendarEvent": "कैलेंडर कार्यक्रम", "geo": "भौगोलिक स्थान", "file": "फ़ाइल" },
+  "form": {
+    "format": { "payloadFormat": "सामग्री प्रारूप", "qrFormat": "क्यूआर प्रारूप", "bulkImport": "बल्क आयात" },
+    "data": {
+      "bulkFileUnavailable": "बल्क आयात में फ़ाइल प्रारूप उपलब्ध नहीं है। बाइनरी डेटा के लिए अलग फ़ाइल प्रारूप का उपयोग करें।", "bulkHeaders": "पहली पंक्ति में ये फ़ील्ड नाम होने चाहिए:",
+      "chooseCsv": "CSV फ़ाइल चुनें", "clearCsv": "CSV साफ़ करें", "urlContent": "यूआरएल सामग्री", "textContent": "पाठ सामग्री", "textPayload": "एन्कोड किया जाने वाला पाठ", "enterText": "कोई भी पाठ लिखें",
+      "numberSeries": "संख्या शृंखला", "start": "आरंभ", "end": "अंत", "step": "चरण", "prefixOptional": "उपसर्ग (वैकल्पिक)", "suffixOptional": "प्रत्यय (वैकल्पिक)", "currentValue": "वर्तमान मान",
+      "networkName": "नेटवर्क नाम", "networkPlaceholder": "मेरा वाई-फ़ाई", "security": "सुरक्षा", "wifiSecurity": "वाई-फ़ाई सुरक्षा", "wpa": "WPA/2/3", "wpaLong": "WPA/WPA2/WPA3", "wep": "WEP", "open": "खुला", "hiddenNetwork": "छिपा नेटवर्क",
+      "to": "प्रति", "subjectOptional": "विषय (वैकल्पिक)", "bodyOptional": "संदेश (वैकल्पिक)", "phoneFormat": "फ़ोन नंबर प्रारूप", "smsPhoneFormat": "एसएमएस फ़ोन नंबर प्रारूप",
+      "usa": "अमेरिका", "international": "अंतरराष्ट्रीय", "e164": "E.164", "digits": "अंक", "textMessage": "पाठ संदेश", "allDayEvent": "पूरे दिन का कार्यक्रम", "startDate": "आरंभ तिथि", "startTime": "आरंभ समय",
+      "endDate": "समाप्ति तिथि", "endTime": "समाप्ति समय", "locationOptional": "स्थान (वैकल्पिक)", "descriptionOptional": "विवरण (वैकल्पिक)", "websiteOptional": "वेबसाइट (वैकल्पिक)",
+      "eventTimeHint": "समय वाले कार्यक्रम स्कैनर के स्थानीय समय क्षेत्र का उपयोग करते हैं। पूरे दिन के कार्यक्रम में चुनी गई समाप्ति तिथि अंतिम शामिल दिन होती है।", "latitude": "अक्षांश", "longitude": "देशांतर", "label": "लेबल",
+      "mapLabel": "इंटरैक्टिव मानचित्र पूर्वावलोकन। खिसकाने के लिए खींचें, ज़ूम नियंत्रण उपयोग करें या निर्देशांक चुनने के लिए क्लिक करें।", "website": "वेबसाइट", "transport": "परिवहन", "fileTransportMode": "फ़ाइल परिवहन मोड",
+      "blobUrl": "ब्लॉब यूआरएल", "chunked": "खंडित", "dataUrl": "डेटा यूआरएल", "chunkedProtocol": "खंडित प्रोटोकॉल", "chooseFile": "फ़ाइल चुनें", "autoPickVersion": "संस्करण स्वतः चुनें",
+      "chunkVersionTarget": "खंड संस्करण लक्ष्य", "includeManifest": "मैनिफ़ेस्ट शामिल करें", "compressTransfer": "स्थानांतरण के लिए संपीड़ित करें (gzip)", "customMetadata": "कस्टम मेटाडेटा (वैकल्पिक JSON)", "chunk": "खंड", "clearFile": "फ़ाइल साफ़ करें"
+    }
+  },
+  "style": {
+    "tools": "शैली उपकरण", "tabs": { "size": "आकार", "modules": "मॉड्यूल", "colors": "रंग", "art": "कला" },
+    "size": { "legend": "आकार और मार्जिन", "targetWidth": "लक्षित चौड़ाई", "fromScale": "केवल मॉड्यूल स्केल से आकार तय करें", "minimumPixels": "प्रति मॉड्यूल न्यूनतम पिक्सेल", "margin": "मार्जिन" },
+    "modules": { "legend": "मॉड्यूल और कोने की आँखें", "shape": "मॉड्यूल आकार", "cornerRounding": "कोनों की गोलाई", "spacing": "अंतर", "rotation": "घुमाव", "eyes": "कोने की आँखें", "outerRounding": "बाहरी गोलाई", "centerRounding": "केंद्र की गोलाई", "hint": "सजावटी मॉड्यूल स्कैन की विश्वसनीयता घटा सकते हैं। तैयार कोड को उसके उपयोग वाले आकार पर जाँचें।" },
+    "colors": { "legend": "रंग और भराव", "dark": "गहरा", "light": "हल्का", "transparency": "पारदर्शिता", "customEyes": "कोने की आँखों के लिए कस्टम रंग", "eyeOuter": "आँख की बाहरी रिंग", "eyeCenter": "आँख का केंद्र", "moduleFill": "मॉड्यूल भराव", "gradientEnd": "ग्रेडिएंट का अंत", "direction": "दिशा", "fillImage": "कस्टम भराव छवि", "recommendedContrast": "अनुशंसित कंट्रास्ट लगाएँ", "clearImage": "छवि साफ़ करें", "imageHint": "अनुशंसित: गहरे मॉड्यूल पर 25% काला और हल्के मॉड्यूल पर 75% सफ़ेद।" },
+    "art": { "legend": "केंद्र कला", "useFrameMessage": "फ़्रेम संदेश को केंद्र कला बनाएँ", "type": "केंद्र कला प्रकार", "logo": "लोगो", "emoji": "इमोजी", "pixelArt": "पिक्सेल कला", "size": "कला का आकार", "logoImage": "लोगो छवि", "clearLogo": "लोगो साफ़ करें", "quickPicks": "त्वरित विकल्प", "canvasWidth": "कैनवास चौड़ाई", "customColor": "कस्टम रंग", "clear": "साफ़ करें", "matchShape": "क्यूआर मॉड्यूल आकार से मिलाएँ", "paintHint": "रंग या पारदर्शी चुनें, फिर कैनवास पर टैप करें या खींचें।", "icons": { "link": "लिंक", "phone": "फ़ोन", "envelope": "लिफ़ाफ़ा", "location": "स्थान पिन", "home": "घर", "cart": "खरीदारी गाड़ी", "gift": "उपहार", "star": "तारा", "heart": "दिल", "check": "सही का निशान", "rocket": "रॉकेट", "bulb": "बल्ब", "globe": "ग्लोब", "camera": "कैमरा", "music": "संगीत", "coffee": "कॉफ़ी", "key": "चाबी", "lock": "ताला", "signal": "सिग्नल बार", "book": "किताब", "calendar": "कैलेंडर", "ticket": "टिकट", "food": "भोजन", "smile": "मुस्कान" } },
+    "values": { "square": "वर्ग", "rounded": "गोल", "dots": "बिंदु", "diamond": "हीरा", "custom": "कस्टम", "default": "डिफ़ॉल्ट", "defaultModules": "डिफ़ॉल्ट मॉड्यूल", "circle": "वृत्त", "solid": "ठोस", "linear": "रेखीय", "radial": "रेडियल", "image": "छवि", "customImage": "कस्टम छवि" }
+  },
   "fields": {
     "title": "शीर्षक", "location": "स्थान", "description": "विवरण", "recipientEmail": "प्राप्तकर्ता का ईमेल", "fullName": "पूरा नाम",
     "organization": "संगठन", "vcardPhone": "वीकार्ड फ़ोन नंबर", "vcardEmail": "वीकार्ड ईमेल", "smsPhone": "एसएमएस फ़ोन नंबर",
@@ -45,7 +69,7 @@
   },
   "common": { "auto": "स्वचालित", "autoLower": "स्वचालित", "none": "कोई नहीं", "preview": "पूर्वावलोकन", "sequence": "{total} में से {current}", "count": "{current} / {total}" },
   "bulk": { "loading": "बल्क आयात उपकरण लोड हो रहे हैं।", "warning": "बल्क आयात पंक्ति {rowNumber}: {message}", "requiredValues": "आवश्यक मान: {values}", "status": { "empty": "कोई CSV लोड नहीं है।", "loaded": "{count} पंक्तियाँ लोड हुईं। {count} में से {current} दिखाई जा रही है।" } },
-  "frame": { "allDay": "पूरा दिन", "wifi": "वाई-फ़ाई {ssid}", "email": "ईमेल {email}", "call": "{phone} पर कॉल करें", "text": "{phone} पर संदेश भेजें", "location": "स्थान {location}", "contact": "संपर्क {contact}", "sequence": "{total} में से {current}" },
+  "frame": { "message": "फ़्रेम संदेश", "mode": "फ़्रेम संदेश मोड", "automaticShort": "स्वचालित छोटा मान", "customMessage": "कस्टम संदेश", "noMessage": "कोई संदेश नहीं", "scanMore": "अधिक जानने के लिए स्कैन करें", "placeCenter": "संदेश को क्यूआर केंद्र में रखें", "font": "फ़ॉन्ट", "sans": "सैन्स", "round": "गोल", "serif": "सेरिफ़", "mono": "मोनो", "monospace": "मोनोस्पेस", "messageColor": "संदेश का रंग", "maximumLineHeight": "अधिकतम पंक्ति ऊँचाई", "hint": "संदेश क्यूआर के नीचे जुड़ता है या केंद्र में होने पर विपरीत रूपरेखा पाता है। स्वचालित मोड छोटा और गैर-गोपनीय यूआरएल, फ़ोन, ईमेल, नेटवर्क, संपर्क या फ़ाइल नाम उपयोग करता है।", "allDay": "पूरा दिन", "wifi": "वाई-फ़ाई {ssid}", "email": "ईमेल {email}", "call": "{phone} पर कॉल करें", "text": "{phone} पर संदेश भेजें", "location": "स्थान {location}", "contact": "संपर्क {contact}", "sequence": "{total} में से {current}" },
   "encoding": {
     "invalidPositions": "{message} स्थान: {positions}{suffix}।", "kanjiUnavailable": "Shift JIS परिवर्तक लोड न होने के कारण मैनुअल कांजी मोड उपलब्ध नहीं है।",
     "incompatible": "{mode} मोड के अनुकूल नहीं। अमान्य अक्षर: {characters}।", "waiting": "प्रतीक्षा", "mixedSummary": "मिश्रित ({modes})", "unused": "{bytes} B ({percent}%)",
@@ -63,6 +87,11 @@
   },
   "map": { "zoomControls": "मानचित्र ज़ूम नियंत्रण", "zoomIn": "ज़ूम इन", "zoomOut": "ज़ूम आउट", "attribution": "© OpenStreetMap योगदानकर्ता", "loadError": "मानचित्र पूर्वावलोकन आरंभ नहीं हो सका।" },
   "wifi": { "openPassword": "खुले नेटवर्क के लिए उपयोग नहीं होता", "password": "पासवर्ड" },
+  "art": {
+    "protectOutline": "हल्की रूपरेखा से सुरक्षित करें", "protectBackground": "हल्की पृष्ठभूमि से सुरक्षित करें",
+    "editorLabel": "{width} गुणा {height} पिक्सेल कला संपादक", "pixelLabel": "पिक्सेल {number}",
+    "colors": { "eraser": "पारदर्शी / रबड़", "black": "काला", "blue": "नीला", "green": "हरा", "cyan": "सियान", "red": "लाल", "magenta": "मैजेंटा", "brown": "भूरा", "lightGray": "हल्का धूसर", "darkGray": "गहरा धूसर", "brightBlue": "चमकीला नीला", "brightGreen": "चमकीला हरा", "brightCyan": "चमकीला सियान", "brightRed": "चमकीला लाल", "brightMagenta": "चमकीला मैजेंटा", "yellow": "पीला", "white": "सफ़ेद" }
+  },
   "units": { "pixels": "{value} px", "degrees": "{value} डिग्री", "dimensions": "{width} x {height}", "percent": "{value}%" },
   "download": {
     "creating": "{format} बनाया जा रहा है...", "ready": "डाउनलोड तैयार है।", "error": "डाउनलोड नहीं बनाया जा सका।", "creatingPdf": "PDF बनाया जा रहा है...",

@@ -63,7 +63,7 @@
           <div class="tab-panels">
             <section class="tab-panel is-active" data-tab-panel="content">
               <div class="panel-card compact-stack">
-                <nav class="subtab-bar content-subtab-bar" aria-label="Content tools">
+                <nav class="subtab-bar content-subtab-bar" aria-label="Content tools" data-i18n-aria-label="content.tools">
                   <button type="button" class="subtab-button content-subtab-button is-active" data-content-subtab="data" data-i18n="content.data">Data</button>
                   <button type="button" class="subtab-button content-subtab-button" data-content-subtab="format" data-i18n="content.format">Format</button>
                   <button type="button" class="subtab-button content-subtab-button" data-content-subtab="frame" data-i18n="content.frame">Frame</button>
@@ -72,281 +72,281 @@
                 <div class="subtab-panels content-subtab-panels">
                 <section class="subtab-panel content-subtab-panel" data-content-subtab-panel="format" hidden>
                 <fieldset class="option-group">
-                  <legend class="sr-only">Payload format</legend>
+                  <legend class="sr-only" data-i18n="form.format.payloadFormat">Payload format</legend>
 
-                  <label for="qr-format">QR format</label>
-                  <div id="qr-format-buttons" class="choice-grid" role="radiogroup" aria-label="QR format">
-                    <button type="button" class="choice-button is-active" data-choice-target="qr-format" data-choice-value="url" aria-pressed="true">URL</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="text" aria-pressed="false">Text</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="number" aria-pressed="false">Number</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="wifi" aria-pressed="false">Wi-Fi</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="email" aria-pressed="false">Email</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="phone" aria-pressed="false">Phone</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="sms" aria-pressed="false">SMS</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="event" aria-pressed="false">Event</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="geo" aria-pressed="false">Geo</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="vcard" aria-pressed="false">vCard</button>
-                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="file" aria-pressed="false">File</button>
+                  <label for="qr-format" data-i18n="form.format.qrFormat">QR format</label>
+                  <div id="qr-format-buttons" class="choice-grid" role="radiogroup" aria-label="QR format" data-i18n-aria-label="form.format.qrFormat">
+                    <button type="button" class="choice-button is-active" data-choice-target="qr-format" data-choice-value="url" aria-pressed="true" data-i18n="formats.url">URL</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="text" aria-pressed="false" data-i18n="formats.text">Text</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="number" aria-pressed="false" data-i18n="formats.number">Number</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="wifi" aria-pressed="false" data-i18n="formats.wifi">Wi-Fi</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="email" aria-pressed="false" data-i18n="formats.email">Email</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="phone" aria-pressed="false" data-i18n="formats.phone">Phone</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="sms" aria-pressed="false" data-i18n="formats.sms">SMS</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="event" aria-pressed="false" data-i18n="formats.event">Event</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="geo" aria-pressed="false" data-i18n="formats.geo">Geo</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="vcard" aria-pressed="false" data-i18n="formats.vcard">vCard</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="file" aria-pressed="false" data-i18n="formats.file">File</button>
                   </div>
                   <select id="qr-format" name="qr-format" class="sr-only" aria-hidden="true" tabindex="-1">
-                    <option value="url" selected>URL</option>
-                    <option value="text">Text</option>
-                    <option value="number">Number range</option>
-                    <option value="wifi">Wi-Fi</option>
-                    <option value="email">Email</option>
-                    <option value="phone">Phone</option>
-                    <option value="sms">SMS</option>
-                    <option value="event">Calendar event</option>
-                    <option value="geo">Geo</option>
-                    <option value="vcard">vCard</option>
-                    <option value="file">File</option>
+                    <option value="url" selected data-i18n="formats.url">URL</option>
+                    <option value="text" data-i18n="formats.text">Text</option>
+                    <option value="number" data-i18n="formats.numberRange">Number range</option>
+                    <option value="wifi" data-i18n="formats.wifi">Wi-Fi</option>
+                    <option value="email" data-i18n="formats.email">Email</option>
+                    <option value="phone" data-i18n="formats.phone">Phone</option>
+                    <option value="sms" data-i18n="formats.sms">SMS</option>
+                    <option value="event" data-i18n="formats.calendarEvent">Calendar event</option>
+                    <option value="geo" data-i18n="formats.geo">Geo</option>
+                    <option value="vcard" data-i18n="formats.vcard">vCard</option>
+                    <option value="file" data-i18n="formats.file">File</option>
                   </select>
                   <label class="toggle-field bulk-toggle">
                     <input id="bulk-enabled" name="bulk-enabled" type="checkbox" />
-                    <span>Bulk Import</span>
+                    <span data-i18n="form.format.bulkImport">Bulk Import</span>
                   </label>
                 </fieldset>
                 </section>
 
                 <section class="subtab-panel content-subtab-panel is-active" data-content-subtab-panel="data">
                 <fieldset id="bulk-fields" class="option-group bulk-fields" hidden>
-                  <legend>Bulk Import</legend>
-                  <p class="hint">File format is unavailable in Bulk Import. Use the dedicated File format for binary data.</p>
-                  <p class="hint">The first row must contain these field names:</p>
+                  <legend data-i18n="form.format.bulkImport">Bulk Import</legend>
+                  <p class="hint" data-i18n="form.data.bulkFileUnavailable">File format is unavailable in Bulk Import. Use the dedicated File format for binary data.</p>
+                  <p class="hint" data-i18n="form.data.bulkHeaders">The first row must contain these field names:</p>
                   <code id="bulk-expected-fields" class="bulk-expected-fields">url</code>
                   <p id="bulk-required-fields" class="hint">Required values: url</p>
-                  <label for="bulk-file-input">Choose a CSV file</label>
+                  <label for="bulk-file-input" data-i18n="form.data.chooseCsv">Choose a CSV file</label>
                   <input id="bulk-file-input" name="bulk-file-input" type="file" accept=".csv,text/csv" />
                   <input id="bulk-row-index" name="bulk-row-index" type="hidden" value="1" />
                   <div class="file-status-row">
                     <p id="bulk-status" class="hint file-capacity-hint">No CSV loaded.</p>
-                    <button id="bulk-clear" type="button" class="secondary-button" disabled>Clear CSV</button>
+                    <button id="bulk-clear" type="button" class="secondary-button" disabled data-i18n="form.data.clearCsv">Clear CSV</button>
                   </div>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="url">
-                  <legend class="sr-only">URL content</legend>
-                  <label for="url-input">URL</label>
+                  <legend class="sr-only" data-i18n="form.data.urlContent">URL content</legend>
+                  <label for="url-input" data-i18n="formats.url">URL</label>
                   <input id="url-input" name="url-input" type="url" inputmode="url" autocomplete="url" />
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="text" hidden>
-                  <legend class="sr-only">Text content</legend>
-                  <label class="sr-only" for="text-input">Text payload</label>
-                  <textarea id="text-input" name="text-input" rows="4" placeholder="Enter any text"></textarea>
+                  <legend class="sr-only" data-i18n="form.data.textContent">Text content</legend>
+                  <label class="sr-only" for="text-input" data-i18n="form.data.textPayload">Text payload</label>
+                  <textarea id="text-input" name="text-input" rows="4" placeholder="Enter any text" data-i18n-placeholder="form.data.enterText"></textarea>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="number" hidden>
-                  <legend>Number series</legend>
+                  <legend data-i18n="form.data.numberSeries">Number series</legend>
                   <div class="number-range-grid">
                     <div>
-                      <label for="number-start">Start</label>
+                      <label for="number-start" data-i18n="form.data.start">Start</label>
                       <input id="number-start" name="number-start" type="number" inputmode="numeric" step="1" value="1" />
                     </div>
                     <div>
-                      <label for="number-end">End</label>
+                      <label for="number-end" data-i18n="form.data.end">End</label>
                       <input id="number-end" name="number-end" type="number" inputmode="numeric" step="1" value="8" />
                     </div>
                     <div>
-                      <label for="number-step">Step</label>
+                      <label for="number-step" data-i18n="form.data.step">Step</label>
                       <input id="number-step" name="number-step" type="number" inputmode="numeric" min="1" step="1" value="1" />
                     </div>
                   </div>
                   <div class="number-affix-grid">
                     <div>
-                      <label for="number-prefix">Prefix (optional)</label>
+                      <label for="number-prefix" data-i18n="form.data.prefixOptional">Prefix (optional)</label>
                       <input id="number-prefix" name="number-prefix" type="text" maxlength="32" placeholder="ITEM-" />
                     </div>
                     <div>
-                      <label for="number-suffix">Suffix (optional)</label>
+                      <label for="number-suffix" data-i18n="form.data.suffixOptional">Suffix (optional)</label>
                       <input id="number-suffix" name="number-suffix" type="text" maxlength="32" placeholder="-A" />
                     </div>
                   </div>
                   <label class="slider-field" for="number-sequence-index">
-                    <span>Current value</span>
+                    <span data-i18n="form.data.currentValue">Current value</span>
                     <output id="number-sequence-value" for="number-sequence-index">1 / 8 - 1</output>
                   </label>
                   <input id="number-sequence-index" name="number-sequence-index" type="range" min="1" max="8" step="1" value="1" />
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="wifi" hidden>
-                  <legend>Wi-Fi</legend>
-                  <label for="wifi-ssid">Network name</label>
-                  <input id="wifi-ssid" name="wifi-ssid" type="text" placeholder="My Wi-Fi" />
-                  <label for="wifi-password">Password</label>
+                  <legend data-i18n="formats.wifi">Wi-Fi</legend>
+                  <label for="wifi-ssid" data-i18n="form.data.networkName">Network name</label>
+                  <input id="wifi-ssid" name="wifi-ssid" type="text" placeholder="My Wi-Fi" data-i18n-placeholder="form.data.networkPlaceholder" />
+                  <label for="wifi-password" data-i18n="wifi.password">Password</label>
                   <input
                     id="wifi-password"
                     name="wifi-password"
                     type="password"
                     autocomplete="current-password"
-                    placeholder="Password"
+                    placeholder="Password" data-i18n-placeholder="wifi.password"
                   />
-                  <label for="wifi-encryption">Security</label>
-                  <div id="wifi-encryption-buttons" class="choice-grid choice-grid-compact wifi-security-grid" role="radiogroup" aria-label="Wi-Fi security">
-                    <button type="button" class="choice-button is-active" data-choice-target="wifi-encryption" data-choice-value="WPA" aria-pressed="true">WPA/2/3</button>
-                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="WEP" aria-pressed="false">WEP</button>
-                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="nopass" aria-pressed="false">Open</button>
+                  <label for="wifi-encryption" data-i18n="form.data.security">Security</label>
+                  <div id="wifi-encryption-buttons" class="choice-grid choice-grid-compact wifi-security-grid" role="radiogroup" aria-label="Wi-Fi security" data-i18n-aria-label="form.data.wifiSecurity">
+                    <button type="button" class="choice-button is-active" data-choice-target="wifi-encryption" data-choice-value="WPA" aria-pressed="true" data-i18n="form.data.wpa">WPA/2/3</button>
+                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="WEP" aria-pressed="false" data-i18n="form.data.wep">WEP</button>
+                    <button type="button" class="choice-button" data-choice-target="wifi-encryption" data-choice-value="nopass" aria-pressed="false" data-i18n="form.data.open">Open</button>
                   </div>
                   <select id="wifi-encryption" name="wifi-encryption" class="sr-only" aria-hidden="true" tabindex="-1">
-                    <option value="WPA">WPA/WPA2/WPA3</option>
-                    <option value="WEP">WEP</option>
-                    <option value="nopass">Open</option>
+                    <option value="WPA" data-i18n="form.data.wpaLong">WPA/WPA2/WPA3</option>
+                    <option value="WEP" data-i18n="form.data.wep">WEP</option>
+                    <option value="nopass" data-i18n="form.data.open">Open</option>
                   </select>
                   <label class="toggle-field">
                     <input id="wifi-hidden" name="wifi-hidden" type="checkbox" />
-                    <span>Hidden network</span>
+                    <span data-i18n="form.data.hiddenNetwork">Hidden network</span>
                   </label>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="email" hidden>
-                  <legend>Email</legend>
-                  <label for="email-to">To</label>
+                  <legend data-i18n="formats.email">Email</legend>
+                  <label for="email-to" data-i18n="form.data.to">To</label>
                   <input id="email-to" name="email-to" type="email" placeholder="name@example.com" />
-                  <label for="email-subject">Subject (optional)</label>
-                  <input id="email-subject" name="email-subject" type="text" placeholder="Subject" />
-                  <label for="email-body">Body (optional)</label>
-                  <textarea id="email-body" name="email-body" rows="3" placeholder="Message"></textarea>
+                  <label for="email-subject" data-i18n="form.data.subjectOptional">Subject (optional)</label>
+                  <input id="email-subject" name="email-subject" type="text" placeholder="Subject" data-i18n-placeholder="fields.subject" />
+                  <label for="email-body" data-i18n="form.data.bodyOptional">Body (optional)</label>
+                  <textarea id="email-body" name="email-body" rows="3" placeholder="Message" data-i18n-placeholder="fields.message"></textarea>
                   <p id="email-body-length-hint" class="hint">0 / 0</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="phone" hidden>
-                  <legend>Phone</legend>
-                  <label for="phone-number">Phone number</label>
+                  <legend data-i18n="formats.phone">Phone</legend>
+                  <label for="phone-number" data-i18n="fields.telephoneNumber">Phone number</label>
                   <input id="phone-number" name="phone-number" type="tel" placeholder="+15551234567" value="+15305394775" />
-                  <label>Format</label>
-                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="Phone number format">
-                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true">USA</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false">Intl</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false">E.164</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false">Digits</button>
+                  <label data-i18n="content.format">Format</label>
+                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="Phone number format" data-i18n-aria-label="form.data.phoneFormat">
+                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true" data-i18n="form.data.usa">USA</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false" data-i18n="form.data.international">Intl</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false" data-i18n="form.data.e164">E.164</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false" data-i18n="form.data.digits">Digits</button>
                   </div>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="sms" hidden>
-                  <legend>SMS</legend>
-                  <label for="sms-number">Phone number</label>
+                  <legend data-i18n="formats.sms">SMS</legend>
+                  <label for="sms-number" data-i18n="fields.telephoneNumber">Phone number</label>
                   <input id="sms-number" name="sms-number" type="tel" placeholder="+15551234567" value="+15305394775" />
-                  <label>Format</label>
-                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="SMS phone number format">
-                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true">USA</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false">Intl</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false">E.164</button>
-                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false">Digits</button>
+                  <label data-i18n="content.format">Format</label>
+                  <div class="choice-grid choice-grid-compact phone-format-grid" role="group" aria-label="SMS phone number format" data-i18n-aria-label="form.data.smsPhoneFormat">
+                    <button type="button" class="choice-button phone-format-button is-active" data-phone-format="usa" aria-pressed="true" data-i18n="form.data.usa">USA</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="international" aria-pressed="false" data-i18n="form.data.international">Intl</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="e164" aria-pressed="false" data-i18n="form.data.e164">E.164</button>
+                    <button type="button" class="choice-button phone-format-button" data-phone-format="digits" aria-pressed="false" data-i18n="form.data.digits">Digits</button>
                   </div>
-                  <label for="sms-body">Message</label>
-                  <textarea id="sms-body" name="sms-body" rows="3" placeholder="Text message"></textarea>
+                  <label for="sms-body" data-i18n="fields.message">Message</label>
+                  <textarea id="sms-body" name="sms-body" rows="3" placeholder="Text message" data-i18n-placeholder="form.data.textMessage"></textarea>
                   <p id="sms-length-hint" class="hint">0 / 160</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="event" hidden>
-                  <legend>Calendar event</legend>
-                  <label for="event-title">Title</label>
+                  <legend data-i18n="formats.calendarEvent">Calendar event</legend>
+                  <label for="event-title" data-i18n="fields.title">Title</label>
                   <input id="event-title" name="event-title" type="text" maxlength="120" value="New event" />
                   <label class="toggle-field">
                     <input id="event-all-day" name="event-all-day" type="checkbox" />
-                    <span>All-day event</span>
+                    <span data-i18n="form.data.allDayEvent">All-day event</span>
                   </label>
                   <div class="event-date-grid">
                     <div>
-                      <label for="event-start-date">Start date</label>
+                      <label for="event-start-date" data-i18n="form.data.startDate">Start date</label>
                       <input id="event-start-date" name="event-start-date" type="date" />
                     </div>
                     <div class="event-time-field">
-                      <label for="event-start-time">Start time</label>
+                      <label for="event-start-time" data-i18n="form.data.startTime">Start time</label>
                       <input id="event-start-time" name="event-start-time" type="time" step="60" />
                     </div>
                     <div>
-                      <label for="event-end-date">End date</label>
+                      <label for="event-end-date" data-i18n="form.data.endDate">End date</label>
                       <input id="event-end-date" name="event-end-date" type="date" />
                     </div>
                     <div class="event-time-field">
-                      <label for="event-end-time">End time</label>
+                      <label for="event-end-time" data-i18n="form.data.endTime">End time</label>
                       <input id="event-end-time" name="event-end-time" type="time" step="60" />
                     </div>
                   </div>
-                  <label for="event-location">Location (optional)</label>
+                  <label for="event-location" data-i18n="form.data.locationOptional">Location (optional)</label>
                   <input id="event-location" name="event-location" type="text" maxlength="160" />
-                  <label for="event-description">Description (optional)</label>
+                  <label for="event-description" data-i18n="form.data.descriptionOptional">Description (optional)</label>
                   <textarea id="event-description" name="event-description" rows="3" maxlength="500"></textarea>
-                  <label for="event-url">Website (optional)</label>
+                  <label for="event-url" data-i18n="form.data.websiteOptional">Website (optional)</label>
                   <input id="event-url" name="event-url" type="url" inputmode="url" placeholder="https://example.com/event" />
-                  <p class="hint">Timed events use the scanner's local time zone. For all-day events, the selected end date is treated as the last included day.</p>
+                  <p class="hint" data-i18n="form.data.eventTimeHint">Timed events use the scanner's local time zone. For all-day events, the selected end date is treated as the last included day.</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="geo" hidden>
-                  <legend>Geo</legend>
+                  <legend data-i18n="formats.geo">Geo</legend>
                   <div class="geo-row">
                     <div class="geo-field">
-                      <label for="geo-latitude">Latitude</label>
+                      <label for="geo-latitude" data-i18n="form.data.latitude">Latitude</label>
                       <input id="geo-latitude" name="geo-latitude" type="text" value="38.9182" />
                     </div>
                     <div class="geo-field">
-                      <label for="geo-longitude">Longitude</label>
+                      <label for="geo-longitude" data-i18n="form.data.longitude">Longitude</label>
                       <input id="geo-longitude" name="geo-longitude" type="text" value="-78.1944" />
                     </div>
                     <div class="geo-field geo-label-field">
-                      <label for="geo-query">Label</label>
+                      <label for="geo-query" data-i18n="form.data.label">Label</label>
                       <input id="geo-query" name="geo-query" type="text" value="Front Royal, VA" />
                     </div>
                   </div>
                   <div class="geo-map-card">
-                    <div id="geo-map" class="geo-map" aria-label="Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates."></div>
+                    <div id="geo-map" class="geo-map" aria-label="Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates." data-i18n-aria-label="form.data.mapLabel"></div>
                   </div>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="vcard" hidden>
-                  <legend>vCard</legend>
-                  <label for="vcard-name">Full name</label>
+                  <legend data-i18n="formats.vcard">vCard</legend>
+                  <label for="vcard-name" data-i18n="fields.fullName">Full name</label>
                   <input id="vcard-name" name="vcard-name" type="text" autocomplete="name" placeholder="Taylor Example" value="Lewis Moten III" />
-                  <label for="vcard-org">Organization</label>
+                  <label for="vcard-org" data-i18n="fields.organization">Organization</label>
                   <input id="vcard-org" name="vcard-org" type="text" autocomplete="organization" placeholder="OpenAI" value="LewisMoten.com" />
-                  <label for="vcard-title">Title</label>
+                  <label for="vcard-title" data-i18n="fields.title">Title</label>
                   <input id="vcard-title" name="vcard-title" type="text" autocomplete="organization-title" placeholder="Engineer" value="Owner" />
-                  <label for="vcard-phone">Phone</label>
+                  <label for="vcard-phone" data-i18n="formats.phone">Phone</label>
                   <input id="vcard-phone" name="vcard-phone" type="tel" autocomplete="tel" placeholder="+15551234567" value="+15305394775" />
-                  <label for="vcard-email">Email</label>
+                  <label for="vcard-email" data-i18n="formats.email">Email</label>
                   <input id="vcard-email" name="vcard-email" type="email" autocomplete="email" placeholder="name@example.com" value="lewismoten@gmail.com" />
-                  <label for="vcard-url">Website</label>
+                  <label for="vcard-url" data-i18n="form.data.website">Website</label>
                   <input id="vcard-url" name="vcard-url" type="url" autocomplete="url" placeholder="https://example.com" value="https://lewismoten.com" />
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="file" hidden>
-                  <legend>File</legend>
-                  <label for="file-encoding-mode">Transport</label>
-                  <div id="file-encoding-mode-buttons" class="choice-grid choice-grid-compact file-mode-grid" role="radiogroup" aria-label="File transport mode">
-                    <button type="button" class="choice-button is-active" data-choice-target="file-encoding-mode" data-choice-value="data" aria-pressed="true">Data</button>
-                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="blob" aria-pressed="false">Blob URL</button>
-                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="chunked" aria-pressed="false">Chunked</button>
+                  <legend data-i18n="formats.file">File</legend>
+                  <label for="file-encoding-mode" data-i18n="form.data.transport">Transport</label>
+                  <div id="file-encoding-mode-buttons" class="choice-grid choice-grid-compact file-mode-grid" role="radiogroup" aria-label="File transport mode" data-i18n-aria-label="form.data.fileTransportMode">
+                    <button type="button" class="choice-button is-active" data-choice-target="file-encoding-mode" data-choice-value="data" aria-pressed="true" data-i18n="content.data">Data</button>
+                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="blob" aria-pressed="false" data-i18n="form.data.blobUrl">Blob URL</button>
+                    <button type="button" class="choice-button" data-choice-target="file-encoding-mode" data-choice-value="chunked" aria-pressed="false" data-i18n="form.data.chunked">Chunked</button>
                   </div>
                   <select id="file-encoding-mode" name="file-encoding-mode" class="sr-only" aria-hidden="true" tabindex="-1">
-                    <option value="data">Data URL</option>
-                    <option value="blob">Blob URL</option>
-                    <option value="chunked">Chunked protocol</option>
+                    <option value="data" data-i18n="form.data.dataUrl">Data URL</option>
+                    <option value="blob" data-i18n="form.data.blobUrl">Blob URL</option>
+                    <option value="chunked" data-i18n="form.data.chunkedProtocol">Chunked protocol</option>
                   </select>
-                  <label for="file-input">Choose a file</label>
+                  <label for="file-input" data-i18n="form.data.chooseFile">Choose a file</label>
                   <input id="file-input" name="file-input" type="file" />
                   <div id="file-chunk-controls" class="chunk-controls" hidden>
                     <label class="toggle-field">
                       <input id="file-chunk-version-auto" name="file-chunk-version-auto" type="checkbox" checked />
-                      <span>Auto-pick version</span>
+                      <span data-i18n="form.data.autoPickVersion">Auto-pick version</span>
                     </label>
                     <label class="slider-field" for="file-chunk-version">
-                      <span>Chunk version target</span>
+                      <span data-i18n="form.data.chunkVersionTarget">Chunk version target</span>
                       <output id="file-chunk-version-value" for="file-chunk-version">V8</output>
                     </label>
                     <input id="file-chunk-version" name="file-chunk-version" type="range" min="1" max="40" step="1" value="8" />
                     <label class="toggle-field">
                       <input id="file-include-manifest" name="file-include-manifest" type="checkbox" checked />
-                      <span>Include manifest</span>
+                      <span data-i18n="form.data.includeManifest">Include manifest</span>
                     </label>
                     <label class="toggle-field">
                       <input id="file-compress-transfer" name="file-compress-transfer" type="checkbox" checked />
-                      <span>Compress for transfer (gzip)</span>
+                      <span data-i18n="form.data.compressTransfer">Compress for transfer (gzip)</span>
                     </label>
-                    <label for="file-custom-metadata">Custom metadata (optional JSON)</label>
+                    <label for="file-custom-metadata" data-i18n="form.data.customMetadata">Custom metadata (optional JSON)</label>
                     <textarea id="file-custom-metadata" name="file-custom-metadata" rows="3" placeholder='{"collection":"scavenger-hunt"}'></textarea>
                     <label class="slider-field" for="file-chunk-index">
-                      <span>Chunk</span>
+                      <span data-i18n="form.data.chunk">Chunk</span>
                       <output id="file-chunk-index-value" for="file-chunk-index">1 / 1</output>
                     </label>
                     <input id="file-chunk-index" name="file-chunk-index" type="range" min="1" max="1" step="1" value="1" />
@@ -354,7 +354,7 @@
                   </div>
                   <div class="file-status-row">
                     <p id="file-capacity-hint" class="hint file-capacity-hint">Loaded 0 B of 0 B max (0%).</p>
-                    <button id="clear-file-button" type="button" class="secondary-button" disabled>Clear file</button>
+                    <button id="clear-file-button" type="button" class="secondary-button" disabled data-i18n="form.data.clearFile">Clear file</button>
                   </div>
                 </fieldset>
 
@@ -364,50 +364,50 @@
 
                 <section class="subtab-panel content-subtab-panel" data-content-subtab-panel="frame" hidden>
                   <fieldset class="option-group">
-                    <legend>Frame message</legend>
-                    <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode">
-                      <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true">Auto</button>
-                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false">Custom</button>
-                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false">None</button>
+                    <legend data-i18n="frame.message">Frame message</legend>
+                    <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode" data-i18n-aria-label="frame.mode">
+                      <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true" data-i18n="common.auto">Auto</button>
+                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false" data-i18n="style.values.custom">Custom</button>
+                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false" data-i18n="common.none">None</button>
                     </div>
-                    <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode">
-                      <option value="auto" selected>Automatic short value</option>
-                      <option value="custom">Custom message</option>
-                      <option value="none">No message</option>
+                    <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode" data-i18n-aria-label="frame.mode">
+                      <option value="auto" selected data-i18n="frame.automaticShort">Automatic short value</option>
+                      <option value="custom" data-i18n="frame.customMessage">Custom message</option>
+                      <option value="none" data-i18n="frame.noMessage">No message</option>
                     </select>
                     <div id="custom-frame-message-field" class="custom-frame-message-field" hidden>
-                      <label for="custom-frame-message">Custom message</label>
-                      <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" />
+                      <label for="custom-frame-message" data-i18n="frame.customMessage">Custom message</label>
+                      <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" data-i18n-placeholder="frame.scanMore" />
                     </div>
                     <label class="toggle-field">
                       <input id="frame-message-center" name="frame-message-center" type="checkbox" />
-                      <span>Place message in the QR center</span>
+                      <span data-i18n="frame.placeCenter">Place message in the QR center</span>
                     </label>
                     <div class="frame-type-controls">
-                      <span class="control-label">Font</span>
-                      <div class="choice-grid frame-font-grid" role="group" aria-label="Frame message font">
-                        <button type="button" class="choice-button frame-font-sans is-active" data-choice-target="frame-font" data-choice-value="sans" aria-pressed="true">Sans</button>
-                        <button type="button" class="choice-button frame-font-rounded" data-choice-target="frame-font" data-choice-value="rounded" aria-pressed="false">Round</button>
-                        <button type="button" class="choice-button frame-font-serif" data-choice-target="frame-font" data-choice-value="serif" aria-pressed="false">Serif</button>
-                        <button type="button" class="choice-button frame-font-mono" data-choice-target="frame-font" data-choice-value="mono" aria-pressed="false">Mono</button>
+                      <span class="control-label" data-i18n="frame.font">Font</span>
+                      <div class="choice-grid frame-font-grid" role="group" aria-label="Frame message font" data-i18n-aria-label="frame.font">
+                        <button type="button" class="choice-button frame-font-sans is-active" data-choice-target="frame-font" data-choice-value="sans" aria-pressed="true" data-i18n="frame.sans">Sans</button>
+                        <button type="button" class="choice-button frame-font-rounded" data-choice-target="frame-font" data-choice-value="rounded" aria-pressed="false" data-i18n="frame.round">Round</button>
+                        <button type="button" class="choice-button frame-font-serif" data-choice-target="frame-font" data-choice-value="serif" aria-pressed="false" data-i18n="frame.serif">Serif</button>
+                        <button type="button" class="choice-button frame-font-mono" data-choice-target="frame-font" data-choice-value="mono" aria-pressed="false" data-i18n="frame.mono">Mono</button>
                       </div>
-                      <select id="frame-font" name="frame-font" class="sr-only" aria-label="Frame message font">
-                        <option value="sans" selected>Sans</option>
-                        <option value="rounded">Rounded</option>
-                        <option value="serif">Serif</option>
-                        <option value="mono">Monospace</option>
+                      <select id="frame-font" name="frame-font" class="sr-only" aria-label="Frame message font" data-i18n-aria-label="frame.font">
+                        <option value="sans" selected data-i18n="frame.sans">Sans</option>
+                        <option value="rounded" data-i18n="style.values.rounded">Rounded</option>
+                        <option value="serif" data-i18n="frame.serif">Serif</option>
+                        <option value="mono" data-i18n="frame.monospace">Monospace</option>
                       </select>
                       <div class="frame-color-field">
-                        <label for="frame-message-color">Message color</label>
+                        <label for="frame-message-color" data-i18n="frame.messageColor">Message color</label>
                         <input id="frame-message-color" name="frame-message-color" type="color" value="#132235" />
                       </div>
                       <label class="slider-field" for="frame-line-height">
-                        <span>Maximum line height</span>
+                        <span data-i18n="frame.maximumLineHeight">Maximum line height</span>
                         <output id="frame-line-height-value" for="frame-line-height">18 px</output>
                       </label>
                       <input id="frame-line-height" name="frame-line-height" type="range" min="10" max="48" step="1" value="18" />
                     </div>
-                    <p class="hint">The message is embedded below the QR or given a tight contrasting outline when centered. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
+                    <p class="hint" data-i18n="frame.hint">The message is embedded below the QR or given a tight contrasting outline when centered. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
                   </fieldset>
                 </section>
                 </div>
@@ -416,37 +416,37 @@
 
             <section class="tab-panel" data-tab-panel="style" hidden>
               <div class="panel-card compact-stack">
-                <nav class="subtab-bar style-subtab-bar" aria-label="Style tools">
-                  <button type="button" class="subtab-button style-subtab-button is-active" data-style-subtab="size">Size</button>
-                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="modules">Modules</button>
-                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="colors">Colors</button>
-                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="artwork">Art</button>
+                <nav class="subtab-bar style-subtab-bar" aria-label="Style tools" data-i18n-aria-label="style.tools">
+                  <button type="button" class="subtab-button style-subtab-button is-active" data-style-subtab="size" data-i18n="style.tabs.size">Size</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="modules" data-i18n="style.tabs.modules">Modules</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="colors" data-i18n="style.tabs.colors">Colors</button>
+                  <button type="button" class="subtab-button style-subtab-button" data-style-subtab="artwork" data-i18n="style.tabs.art">Art</button>
                 </nav>
 
                 <div class="subtab-panels style-subtab-panels">
                 <section class="subtab-panel style-subtab-panel is-active" data-style-subtab-panel="size">
                 <fieldset class="option-group">
-                  <legend>Size &amp; margin</legend>
+                  <legend data-i18n="style.size.legend">Size &amp; margin</legend>
 
                   <label class="slider-field" for="qr-width">
-                    <span>Target width</span>
+                    <span data-i18n="style.size.targetWidth">Target width</span>
                     <output id="qr-width-value" for="qr-width">320 px target</output>
                   </label>
                   <input id="qr-width" name="qr-width" type="range" min="64" max="2048" step="64" value="320" />
 
                   <label class="toggle-field">
                     <input id="qr-width-auto" name="qr-width-auto" type="checkbox" />
-                    <span>Size entirely from module scale</span>
+                    <span data-i18n="style.size.fromScale">Size entirely from module scale</span>
                   </label>
 
                   <label class="slider-field" for="qr-scale">
-                    <span>Minimum pixels per module</span>
+                    <span data-i18n="style.size.minimumPixels">Minimum pixels per module</span>
                     <output id="qr-scale-value" for="qr-scale">4</output>
                   </label>
                   <input id="qr-scale" name="qr-scale" type="range" min="1" max="12" step="1" value="4" />
 
                   <label class="slider-field" for="qr-margin">
-                    <span>Margin</span>
+                    <span data-i18n="style.size.margin">Margin</span>
                     <output id="qr-margin-value" for="qr-margin">1</output>
                   </label>
                   <input id="qr-margin" name="qr-margin" type="range" min="0" max="12" step="1" value="1" />
@@ -455,102 +455,102 @@
 
                 <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="modules" hidden>
                 <fieldset class="option-group">
-                  <legend>Modules &amp; corner eyes</legend>
+                  <legend data-i18n="style.modules.legend">Modules &amp; corner eyes</legend>
 
                   <div class="module-shape-field">
-                    <span class="field-label" id="module-shape-label">Module shape</span>
+                    <span class="field-label" id="module-shape-label" data-i18n="style.modules.shape">Module shape</span>
                     <div class="choice-grid module-shape-grid" role="group" aria-labelledby="module-shape-label">
-                      <button type="button" class="choice-button module-shape-button is-active" data-choice-target="module-shape" data-choice-value="square" aria-pressed="true"><span class="module-shape-icon shape-square" aria-hidden="true"></span>Square</button>
-                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="rounded" aria-pressed="false"><span class="module-shape-icon shape-rounded" aria-hidden="true"></span>Rounded</button>
-                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="dots" aria-pressed="false"><span class="module-shape-icon shape-dots" aria-hidden="true"></span>Dots</button>
-                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="diamond" aria-pressed="false"><span class="module-shape-icon shape-diamond" aria-hidden="true"></span>Diamond</button>
-                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="custom" aria-pressed="false"><span class="module-shape-icon shape-custom" aria-hidden="true"></span>Custom</button>
+                      <button type="button" class="choice-button module-shape-button is-active" data-choice-target="module-shape" data-choice-value="square" aria-pressed="true"><span class="module-shape-icon shape-square" aria-hidden="true"></span><span data-i18n="style.values.square">Square</span></button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="rounded" aria-pressed="false"><span class="module-shape-icon shape-rounded" aria-hidden="true"></span><span data-i18n="style.values.rounded">Rounded</span></button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="dots" aria-pressed="false"><span class="module-shape-icon shape-dots" aria-hidden="true"></span><span data-i18n="style.values.dots">Dots</span></button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="diamond" aria-pressed="false"><span class="module-shape-icon shape-diamond" aria-hidden="true"></span><span data-i18n="style.values.diamond">Diamond</span></button>
+                      <button type="button" class="choice-button module-shape-button" data-choice-target="module-shape" data-choice-value="custom" aria-pressed="false"><span class="module-shape-icon shape-custom" aria-hidden="true"></span><span data-i18n="style.values.custom">Custom</span></button>
                     </div>
                     <select id="module-shape" name="module-shape" class="sr-only" aria-labelledby="module-shape-label">
-                      <option value="square" selected>Square</option>
-                      <option value="rounded">Rounded</option>
-                      <option value="dots">Dots</option>
-                      <option value="diamond">Diamond</option>
-                      <option value="custom">Custom</option>
+                      <option value="square" selected data-i18n="style.values.square">Square</option>
+                      <option value="rounded" data-i18n="style.values.rounded">Rounded</option>
+                      <option value="dots" data-i18n="style.values.dots">Dots</option>
+                      <option value="diamond" data-i18n="style.values.diamond">Diamond</option>
+                      <option value="custom" data-i18n="style.values.custom">Custom</option>
                     </select>
                   </div>
 
                   <div id="module-custom-controls" class="module-custom-controls" hidden>
                     <label class="slider-field" for="module-rounding">
-                      <span>Corner rounding</span>
+                      <span data-i18n="style.modules.cornerRounding">Corner rounding</span>
                       <output id="module-rounding-value" for="module-rounding">25%</output>
                     </label>
                     <input id="module-rounding" name="module-rounding" type="range" min="0" max="50" step="1" value="25" />
 
                     <label class="slider-field" for="module-inset">
-                      <span>Spacing</span>
+                      <span data-i18n="style.modules.spacing">Spacing</span>
                       <output id="module-inset-value" for="module-inset">4%</output>
                     </label>
                     <input id="module-inset" name="module-inset" type="range" min="0" max="30" step="1" value="4" />
 
                     <label class="slider-field" for="module-rotation">
-                      <span>Rotation</span>
+                      <span data-i18n="style.modules.rotation">Rotation</span>
                       <output id="module-rotation-value" for="module-rotation">0 degrees</output>
                     </label>
                     <input id="module-rotation" name="module-rotation" type="range" min="-45" max="45" step="1" value="0" />
                   </div>
 
                   <div class="eye-shape-field">
-                    <span class="field-label" id="eye-shape-label">Corner eyes</span>
+                    <span class="field-label" id="eye-shape-label" data-i18n="style.modules.eyes">Corner eyes</span>
                     <div class="choice-grid eye-shape-grid" role="group" aria-labelledby="eye-shape-label">
-                      <button type="button" class="choice-button is-active" data-choice-target="eye-shape" data-choice-value="default" aria-pressed="true">Default</button>
-                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="square" aria-pressed="false">Square</button>
-                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="rounded" aria-pressed="false">Rounded</button>
-                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="circle" aria-pressed="false">Circle</button>
-                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="custom" aria-pressed="false">Custom</button>
+                      <button type="button" class="choice-button is-active" data-choice-target="eye-shape" data-choice-value="default" aria-pressed="true" data-i18n="style.values.default">Default</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="square" aria-pressed="false" data-i18n="style.values.square">Square</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="rounded" aria-pressed="false" data-i18n="style.values.rounded">Rounded</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="circle" aria-pressed="false" data-i18n="style.values.circle">Circle</button>
+                      <button type="button" class="choice-button" data-choice-target="eye-shape" data-choice-value="custom" aria-pressed="false" data-i18n="style.values.custom">Custom</button>
                     </div>
                     <select id="eye-shape" name="eye-shape" class="sr-only" aria-labelledby="eye-shape-label">
-                      <option value="default" selected>Default modules</option>
-                      <option value="square">Square</option>
-                      <option value="rounded">Rounded</option>
-                      <option value="circle">Circle</option>
-                      <option value="custom">Custom</option>
+                      <option value="default" selected data-i18n="style.values.defaultModules">Default modules</option>
+                      <option value="square" data-i18n="style.values.square">Square</option>
+                      <option value="rounded" data-i18n="style.values.rounded">Rounded</option>
+                      <option value="circle" data-i18n="style.values.circle">Circle</option>
+                      <option value="custom" data-i18n="style.values.custom">Custom</option>
                     </select>
                   </div>
 
                   <div id="eye-custom-controls" class="module-custom-controls" hidden>
                     <label class="slider-field" for="eye-outer-rounding">
-                      <span>Outer rounding</span>
+                      <span data-i18n="style.modules.outerRounding">Outer rounding</span>
                       <output id="eye-outer-rounding-value" for="eye-outer-rounding">20%</output>
                     </label>
                     <input id="eye-outer-rounding" name="eye-outer-rounding" type="range" min="0" max="50" step="1" value="20" />
 
                     <label class="slider-field" for="eye-center-rounding">
-                      <span>Center rounding</span>
+                      <span data-i18n="style.modules.centerRounding">Center rounding</span>
                       <output id="eye-center-rounding-value" for="eye-center-rounding">35%</output>
                     </label>
                     <input id="eye-center-rounding" name="eye-center-rounding" type="range" min="0" max="50" step="1" value="35" />
                   </div>
 
-                  <p class="hint module-shape-hint">Decorative modules can reduce scanning reliability. Test the finished code at its intended size.</p>
+                  <p class="hint module-shape-hint" data-i18n="style.modules.hint">Decorative modules can reduce scanning reliability. Test the finished code at its intended size.</p>
                 </fieldset>
                 </section>
 
                 <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="colors" hidden>
                 <fieldset class="option-group">
-                  <legend>Colors &amp; fills</legend>
+                  <legend data-i18n="style.colors.legend">Colors &amp; fills</legend>
 
                   <div class="color-grid">
                     <div class="color-field">
-                      <label for="color-dark">Dark</label>
+                      <label for="color-dark" data-i18n="style.colors.dark">Dark</label>
                       <input id="color-dark" name="color-dark" type="color" value="#111827" />
                       <label class="slider-field color-transparency-label" for="color-dark-transparency">
-                        <span>Transparency</span>
+                        <span data-i18n="style.colors.transparency">Transparency</span>
                         <output id="color-dark-transparency-value" for="color-dark-transparency">0%</output>
                       </label>
                       <input id="color-dark-transparency" name="color-dark-transparency" type="range" min="0" max="100" step="1" value="0" />
                     </div>
 
                     <div class="color-field">
-                      <label for="color-light">Light</label>
+                      <label for="color-light" data-i18n="style.colors.light">Light</label>
                       <input id="color-light" name="color-light" type="color" value="#ffffff" />
                       <label class="slider-field color-transparency-label" for="color-light-transparency">
-                        <span>Transparency</span>
+                        <span data-i18n="style.colors.transparency">Transparency</span>
                         <output id="color-light-transparency-value" for="color-light-transparency">0%</output>
                       </label>
                       <input id="color-light-transparency" name="color-light-transparency" type="range" min="0" max="100" step="1" value="0" />
@@ -559,41 +559,41 @@
 
                   <label class="toggle-field">
                     <input id="eye-custom-colors-enabled" name="eye-custom-colors-enabled" type="checkbox" />
-                    <span>Use custom corner eye colors</span>
+                    <span data-i18n="style.colors.customEyes">Use custom corner eye colors</span>
                   </label>
                   <div id="eye-color-controls" class="color-grid eye-color-controls" hidden>
                     <div class="color-field">
-                      <label for="eye-outer-color">Eye outer ring</label>
+                      <label for="eye-outer-color" data-i18n="style.colors.eyeOuter">Eye outer ring</label>
                       <input id="eye-outer-color" name="eye-outer-color" type="color" value="#0f766e" />
                     </div>
                     <div class="color-field">
-                      <label for="eye-center-color">Eye center</label>
+                      <label for="eye-center-color" data-i18n="style.colors.eyeCenter">Eye center</label>
                       <input id="eye-center-color" name="eye-center-color" type="color" value="#111827" />
                     </div>
                   </div>
 
                   <div class="gradient-field">
-                    <span class="field-label" id="gradient-type-label">Module fill</span>
+                    <span class="field-label" id="gradient-type-label" data-i18n="style.colors.moduleFill">Module fill</span>
                     <div class="choice-grid gradient-type-grid" role="group" aria-labelledby="gradient-type-label">
-                      <button type="button" class="choice-button is-active" data-choice-target="gradient-type" data-choice-value="solid" aria-pressed="true">Solid</button>
-                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="linear" aria-pressed="false">Linear</button>
-                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="radial" aria-pressed="false">Radial</button>
-                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="image" aria-pressed="false">Image</button>
+                      <button type="button" class="choice-button is-active" data-choice-target="gradient-type" data-choice-value="solid" aria-pressed="true" data-i18n="style.values.solid">Solid</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="linear" aria-pressed="false" data-i18n="style.values.linear">Linear</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="radial" aria-pressed="false" data-i18n="style.values.radial">Radial</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="image" aria-pressed="false" data-i18n="style.values.image">Image</button>
                     </div>
                     <select id="gradient-type" name="gradient-type" class="sr-only" aria-labelledby="gradient-type-label">
-                      <option value="solid" selected>Solid</option>
-                      <option value="linear">Linear</option>
-                      <option value="radial">Radial</option>
-                      <option value="image">Custom image</option>
+                      <option value="solid" selected data-i18n="style.values.solid">Solid</option>
+                      <option value="linear" data-i18n="style.values.linear">Linear</option>
+                      <option value="radial" data-i18n="style.values.radial">Radial</option>
+                      <option value="image" data-i18n="style.values.customImage">Custom image</option>
                     </select>
                   </div>
 
                   <div id="gradient-controls" class="gradient-controls" hidden>
                     <div class="color-field gradient-end-color">
-                      <label for="color-gradient-end">Gradient end</label>
+                      <label for="color-gradient-end" data-i18n="style.colors.gradientEnd">Gradient end</label>
                       <input id="color-gradient-end" name="color-gradient-end" type="color" value="#0f766e" />
                       <label class="slider-field color-transparency-label" for="color-gradient-end-transparency">
-                        <span>Transparency</span>
+                        <span data-i18n="style.colors.transparency">Transparency</span>
                         <output id="color-gradient-end-transparency-value" for="color-gradient-end-transparency">0%</output>
                       </label>
                       <input id="color-gradient-end-transparency" name="color-gradient-end-transparency" type="range" min="0" max="100" step="1" value="0" />
@@ -601,7 +601,7 @@
 
                     <div id="gradient-angle-controls" class="gradient-angle-controls">
                       <label class="slider-field" for="gradient-angle">
-                        <span>Direction</span>
+                        <span data-i18n="style.colors.direction">Direction</span>
                         <output id="gradient-angle-value" for="gradient-angle">0 degrees</output>
                       </label>
                       <input id="gradient-angle" name="gradient-angle" type="range" min="0" max="360" step="1" value="0" />
@@ -609,40 +609,40 @@
                   </div>
 
                   <div id="image-fill-controls" class="image-fill-controls" hidden>
-                    <label for="image-fill-input">Custom fill image</label>
+                    <label for="image-fill-input" data-i18n="style.colors.fillImage">Custom fill image</label>
                     <input id="image-fill-input" name="image-fill-input" type="file" accept="image/*" />
                     <div class="image-fill-actions">
-                      <button id="image-fill-recommended" type="button" class="secondary-button">Apply recommended contrast</button>
-                      <button id="image-fill-clear" type="button" class="secondary-button" disabled>Clear image</button>
+                      <button id="image-fill-recommended" type="button" class="secondary-button" data-i18n="style.colors.recommendedContrast">Apply recommended contrast</button>
+                      <button id="image-fill-clear" type="button" class="secondary-button" disabled data-i18n="style.colors.clearImage">Clear image</button>
                     </div>
-                    <p class="hint">Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity.</p>
+                    <p class="hint" data-i18n="style.colors.imageHint">Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity.</p>
                   </div>
                 </fieldset>
                 </section>
 
                 <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="artwork" hidden>
                 <fieldset class="option-group">
-                  <legend>Center artwork</legend>
+                  <legend data-i18n="style.art.legend">Center artwork</legend>
                   <label class="toggle-field">
                     <input id="frame-message-center-art" name="frame-message-center-art" type="checkbox" />
-                    <span>Use frame message as center artwork</span>
+                    <span data-i18n="style.art.useFrameMessage">Use frame message as center artwork</span>
                   </label>
-                  <div class="choice-grid center-art-mode-grid" role="group" aria-label="Center artwork type">
-                    <button type="button" class="choice-button is-active" data-choice-target="center-art-mode" data-choice-value="none" aria-pressed="true">None</button>
-                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="logo" aria-pressed="false">Logo</button>
-                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="emoji" aria-pressed="false">Emoji</button>
-                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="pixel" aria-pressed="false">Pixel art</button>
+                  <div class="choice-grid center-art-mode-grid" role="group" aria-label="Center artwork type" data-i18n-aria-label="style.art.type">
+                    <button type="button" class="choice-button is-active" data-choice-target="center-art-mode" data-choice-value="none" aria-pressed="true" data-i18n="common.none">None</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="logo" aria-pressed="false" data-i18n="style.art.logo">Logo</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="emoji" aria-pressed="false" data-i18n="style.art.emoji">Emoji</button>
+                    <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="pixel" aria-pressed="false" data-i18n="style.art.pixelArt">Pixel art</button>
                   </div>
                   <select id="center-art-mode" name="center-art-mode" class="sr-only" aria-label="Center artwork type">
-                    <option value="none" selected>None</option>
-                    <option value="logo">Logo</option>
-                    <option value="emoji">Emoji</option>
-                    <option value="pixel">Pixel art</option>
+                    <option value="none" selected data-i18n="common.none">None</option>
+                    <option value="logo" data-i18n="style.art.logo">Logo</option>
+                    <option value="emoji" data-i18n="style.art.emoji">Emoji</option>
+                    <option value="pixel" data-i18n="style.art.pixelArt">Pixel art</option>
                   </select>
 
                   <div id="center-art-controls" class="center-art-controls" hidden>
                     <label class="slider-field" for="center-art-size">
-                      <span>Artwork size</span>
+                      <span data-i18n="style.art.size">Artwork size</span>
                       <output id="center-art-size-value" for="center-art-size">20%</output>
                     </label>
                     <input id="center-art-size" name="center-art-size" type="range" min="10" max="30" step="1" value="20" />
@@ -652,61 +652,61 @@
                     </label>
 
                     <div id="center-logo-controls" class="center-art-mode-controls" hidden>
-                      <label for="center-logo-input">Logo image</label>
+                      <label for="center-logo-input" data-i18n="style.art.logoImage">Logo image</label>
                       <input id="center-logo-input" name="center-logo-input" type="file" accept="image/*" />
-                      <button id="center-logo-clear" type="button" class="secondary-button">Clear logo</button>
+                      <button id="center-logo-clear" type="button" class="secondary-button" data-i18n="style.art.clearLogo">Clear logo</button>
                     </div>
 
                     <div id="center-emoji-controls" class="center-art-mode-controls" hidden>
-                      <label for="center-emoji">Emoji</label>
+                      <label for="center-emoji" data-i18n="style.art.emoji">Emoji</label>
                       <input id="center-emoji" name="center-emoji" type="text" maxlength="8" value="&#128279;" aria-describedby="emoji-picker-label" />
-                      <span id="emoji-picker-label" class="field-label">Quick picks</span>
+                      <span id="emoji-picker-label" class="field-label" data-i18n="style.art.quickPicks">Quick picks</span>
                       <div id="emoji-picker" class="emoji-picker" role="group" aria-labelledby="emoji-picker-label">
-                        <button type="button" class="emoji-option" data-emoji="&#128279;" aria-label="Link">&#128279;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128241;" aria-label="Phone">&#128241;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#9993;&#65039;" aria-label="Envelope">&#9993;&#65039;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128205;" aria-label="Location pin">&#128205;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127968;" aria-label="Home">&#127968;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128722;" aria-label="Shopping cart">&#128722;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127873;" aria-label="Gift">&#127873;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#11088;" aria-label="Star">&#11088;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#10084;&#65039;" aria-label="Heart">&#10084;&#65039;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#9989;" aria-label="Check mark">&#9989;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128640;" aria-label="Rocket">&#128640;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128161;" aria-label="Light bulb">&#128161;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127760;" aria-label="Globe">&#127760;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128247;" aria-label="Camera">&#128247;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127925;" aria-label="Music">&#127925;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#9749;" aria-label="Coffee">&#9749;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128273;" aria-label="Key">&#128273;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128274;" aria-label="Lock">&#128274;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128246;" aria-label="Signal bars">&#128246;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128214;" aria-label="Book">&#128214;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128197;" aria-label="Calendar">&#128197;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127915;" aria-label="Ticket">&#127915;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#127828;" aria-label="Food">&#127828;</button>
-                        <button type="button" class="emoji-option" data-emoji="&#128522;" aria-label="Smile">&#128522;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128279;" aria-label="Link" data-i18n-aria-label="style.art.icons.link">&#128279;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128241;" aria-label="Phone" data-i18n-aria-label="style.art.icons.phone">&#128241;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9993;&#65039;" aria-label="Envelope" data-i18n-aria-label="style.art.icons.envelope">&#9993;&#65039;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128205;" aria-label="Location pin" data-i18n-aria-label="style.art.icons.location">&#128205;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127968;" aria-label="Home" data-i18n-aria-label="style.art.icons.home">&#127968;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128722;" aria-label="Shopping cart" data-i18n-aria-label="style.art.icons.cart">&#128722;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127873;" aria-label="Gift" data-i18n-aria-label="style.art.icons.gift">&#127873;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#11088;" aria-label="Star" data-i18n-aria-label="style.art.icons.star">&#11088;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#10084;&#65039;" aria-label="Heart" data-i18n-aria-label="style.art.icons.heart">&#10084;&#65039;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9989;" aria-label="Check mark" data-i18n-aria-label="style.art.icons.check">&#9989;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128640;" aria-label="Rocket" data-i18n-aria-label="style.art.icons.rocket">&#128640;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128161;" aria-label="Light bulb" data-i18n-aria-label="style.art.icons.bulb">&#128161;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127760;" aria-label="Globe" data-i18n-aria-label="style.art.icons.globe">&#127760;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128247;" aria-label="Camera" data-i18n-aria-label="style.art.icons.camera">&#128247;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127925;" aria-label="Music" data-i18n-aria-label="style.art.icons.music">&#127925;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#9749;" aria-label="Coffee" data-i18n-aria-label="style.art.icons.coffee">&#9749;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128273;" aria-label="Key" data-i18n-aria-label="style.art.icons.key">&#128273;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128274;" aria-label="Lock" data-i18n-aria-label="style.art.icons.lock">&#128274;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128246;" aria-label="Signal bars" data-i18n-aria-label="style.art.icons.signal">&#128246;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128214;" aria-label="Book" data-i18n-aria-label="style.art.icons.book">&#128214;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128197;" aria-label="Calendar" data-i18n-aria-label="style.art.icons.calendar">&#128197;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127915;" aria-label="Ticket" data-i18n-aria-label="style.art.icons.ticket">&#127915;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#127828;" aria-label="Food" data-i18n-aria-label="style.art.icons.food">&#127828;</button>
+                        <button type="button" class="emoji-option" data-emoji="&#128522;" aria-label="Smile" data-i18n-aria-label="style.art.icons.smile">&#128522;</button>
                       </div>
                     </div>
 
                     <div id="center-pixel-controls" class="center-art-mode-controls" hidden>
                       <label class="slider-field" for="pixel-art-size">
-                        <span>Canvas width</span>
+                        <span data-i18n="style.art.canvasWidth">Canvas width</span>
                         <output id="pixel-art-size-value" for="pixel-art-size">16 x 16</output>
                       </label>
                       <input id="pixel-art-size" name="pixel-art-size" type="range" min="8" max="32" step="2" value="16" />
                       <div class="pixel-art-toolbar">
-                        <label for="pixel-art-color">Custom color</label>
+                        <label for="pixel-art-color" data-i18n="style.art.customColor">Custom color</label>
                         <input id="pixel-art-color" name="pixel-art-color" type="color" value="#111827" />
-                        <button id="pixel-art-clear" type="button" class="secondary-button">Clear</button>
+                        <button id="pixel-art-clear" type="button" class="secondary-button" data-i18n="style.art.clear">Clear</button>
                       </div>
                       <div id="pixel-art-palette" class="pixel-art-palette" role="group" aria-label="EGA paint colors"></div>
                       <label class="toggle-field">
                         <input id="pixel-art-match-module-shape" name="pixel-art-match-module-shape" type="checkbox" />
-                        <span>Match the QR module shape</span>
+                        <span data-i18n="style.art.matchShape">Match the QR module shape</span>
                       </label>
                       <div id="pixel-art-grid" class="pixel-art-grid" role="grid" aria-label="16 by 16 pixel art editor"></div>
-                      <p class="hint">Choose a color or Transparent, then tap or drag across the canvas.</p>
+                      <p class="hint" data-i18n="style.art.paintHint">Choose a color or Transparent, then tap or drag across the canvas.</p>
                     </div>
                   </div>
                 </fieldset>
