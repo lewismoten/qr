@@ -173,7 +173,13 @@
                   <label for="wifi-ssid">Network name</label>
                   <input id="wifi-ssid" name="wifi-ssid" type="text" placeholder="My Wi-Fi" />
                   <label for="wifi-password">Password</label>
-                  <input id="wifi-password" name="wifi-password" type="password" placeholder="Password" />
+                  <input
+                    id="wifi-password"
+                    name="wifi-password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Password"
+                  />
                   <label for="wifi-encryption">Security</label>
                   <div id="wifi-encryption-buttons" class="choice-grid choice-grid-compact wifi-security-grid" role="radiogroup" aria-label="Wi-Fi security">
                     <button type="button" class="choice-button is-active" data-choice-target="wifi-encryption" data-choice-value="WPA" aria-pressed="true">WPA/2/3</button>
