@@ -1,19 +1,11 @@
-import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
+import { colorWithTransparency, getContrastingHex } from './colors.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { getSupportedMp4MimeType } from './mp4.js';
 import { validatePrintableText } from './validation.js';
 import {
-  drawCenteredFrameMessage,
-  drawFrameMessage,
-  fitFrameMessage,
-} from './frame-text.js';
-import {
   getAlignmentPatternCenters,
-  getFinderPatternPart,
-  getModuleCategory,
   isAlignmentRegion,
   isDarkModuleRegion,
-  isFinderPattern,
   isFinderRegion,
   isFormatRegion,
   isTimingRegion,
@@ -46,18 +38,12 @@ import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createMaskSelector } from './ui/debug/mask-selector.js';
 import { createEncodingDiagnostics } from './ui/debug/encoding.js';
 import { createDebugStyles } from './ui/debug/styles.js';
-import {
-  drawCodewordOutlines,
-  drawHighlightedBoundaries,
-  getActiveOutlineGroups,
-} from './ui/debug/boundaries.js';
+import { getActiveOutlineGroups } from './ui/debug/boundaries.js';
 import {
   buildDebugOverlayModel,
   getDebugCategory,
   moduleIsDark,
-  moduleIsDarkForPreview,
 } from './ui/debug/model.js';
-import { drawCodewordPaths, drawStreamFieldStarts } from './ui/debug/paths.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
 import { createAnimationSection } from './ui/download/animation/section.js';
@@ -65,234 +51,52 @@ import { createDownloadActions } from './ui/download/actions.js';
 import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { bindApplicationEvents } from './ui/events.js';
+import { getApplicationElements } from './ui/elements.js';
 import { createPrimaryTabs } from './ui/navigation.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
 import { createRenderController } from './ui/preview/render.js';
+import { createQrRenderer } from './ui/preview/qr-renderer.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
-import { drawCenterArtwork } from './ui/style/art/drawing.js';
 import { createImageInputController } from './ui/style/art/image-input.js';
-import {
-  createQrImageLayer,
-  createQrModuleFill,
-  drawFinderEyes,
-  drawQrModule,
-} from './ui/style/drawing/shapes.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
 import qrEncoder from '../qr/index.js';
 
-const form = document.getElementById('qr-form');
-const canvas = document.getElementById('qr-canvas');
-const qrPreviewViewport = document.getElementById('qr-preview-viewport');
-const previewViewControls = document.getElementById('preview-view-controls');
-const previewViewFit = document.getElementById('preview-view-fit');
-const previewViewActual = document.getElementById('preview-view-actual');
-const chunkPreviewNav = document.getElementById('chunk-preview-nav');
-const chunkPreviewPrev = document.getElementById('chunk-preview-prev');
-const chunkPreviewNext = document.getElementById('chunk-preview-next');
-const chunkPreviewStatus = document.getElementById('chunk-preview-status');
-
-const optionsPreview = document.getElementById('options-preview');
-const encodedPreview = document.getElementById('encoded-preview');
-const payloadRevealSecrets = document.getElementById('payload-reveal-secrets');
-const payloadRevealToggle = document.getElementById('payload-reveal-toggle');
-const qrFormat = document.getElementById('qr-format');
-const bulkEnabled = document.getElementById('bulk-enabled');
-const bulkFields = document.getElementById('bulk-fields');
-const bulkExpectedFields = document.getElementById('bulk-expected-fields');
-const bulkRequiredFields = document.getElementById('bulk-required-fields');
-const bulkFileInput = document.getElementById('bulk-file-input');
-const bulkRowIndex = document.getElementById('bulk-row-index');
-const bulkStatus = document.getElementById('bulk-status');
-const bulkClear = document.getElementById('bulk-clear');
-const choiceButtons = document.querySelectorAll('.choice-button');
-const formatFieldsets = document.querySelectorAll('.format-fields');
-const qrVersion = document.getElementById('qr-version');
-const qrVersionValue = document.getElementById('qr-version-value');
-const versionAuto = document.getElementById('version-auto');
-const maskPattern = document.getElementById('mask-pattern');
-const maskGrid = document.getElementById('mask-grid');
-const qrWidth = document.getElementById('qr-width');
-const qrWidthValue = document.getElementById('qr-width-value');
-const qrWidthAuto = document.getElementById('qr-width-auto');
-const qrScale = document.getElementById('qr-scale');
-const qrScaleValue = document.getElementById('qr-scale-value');
-const qrMargin = document.getElementById('qr-margin');
-const qrMarginValue = document.getElementById('qr-margin-value');
-const colorDark = document.getElementById('color-dark');
-const colorLight = document.getElementById('color-light');
-const colorDarkTransparency = document.getElementById('color-dark-transparency');
-const colorDarkTransparencyValue = document.getElementById('color-dark-transparency-value');
-const colorLightTransparency = document.getElementById('color-light-transparency');
-const colorLightTransparencyValue = document.getElementById('color-light-transparency-value');
-const gradientType = document.getElementById('gradient-type');
-const gradientControls = document.getElementById('gradient-controls');
-const gradientAngleControls = document.getElementById('gradient-angle-controls');
-const gradientAngle = document.getElementById('gradient-angle');
-const gradientAngleValue = document.getElementById('gradient-angle-value');
-const colorGradientEnd = document.getElementById('color-gradient-end');
-const colorGradientEndTransparency = document.getElementById('color-gradient-end-transparency');
-const colorGradientEndTransparencyValue = document.getElementById('color-gradient-end-transparency-value');
-const imageFillControls = document.getElementById('image-fill-controls');
-const imageFillInput = document.getElementById('image-fill-input');
-const imageFillRecommended = document.getElementById('image-fill-recommended');
-const imageFillClear = document.getElementById('image-fill-clear');
-const frameMessageMode = document.getElementById('frame-message-mode');
-const customFrameMessageField = document.getElementById('custom-frame-message-field');
-const customFrameMessage = document.getElementById('custom-frame-message');
-const frameMessageCenter = document.getElementById('frame-message-center');
-const frameMessageCenterArt = document.getElementById('frame-message-center-art');
-const frameFont = document.getElementById('frame-font');
-const frameMessageColor = document.getElementById('frame-message-color');
-const frameLineHeight = document.getElementById('frame-line-height');
-const frameLineHeightValue = document.getElementById('frame-line-height-value');
-const moduleShape = document.getElementById('module-shape');
-const moduleCustomControls = document.getElementById('module-custom-controls');
-const moduleRounding = document.getElementById('module-rounding');
-const moduleRoundingValue = document.getElementById('module-rounding-value');
-const moduleInset = document.getElementById('module-inset');
-const moduleInsetValue = document.getElementById('module-inset-value');
-const moduleRotation = document.getElementById('module-rotation');
-const moduleRotationValue = document.getElementById('module-rotation-value');
-const eyeShape = document.getElementById('eye-shape');
-const eyeCustomControls = document.getElementById('eye-custom-controls');
-const eyeOuterRounding = document.getElementById('eye-outer-rounding');
-const eyeOuterRoundingValue = document.getElementById('eye-outer-rounding-value');
-const eyeCenterRounding = document.getElementById('eye-center-rounding');
-const eyeCenterRoundingValue = document.getElementById('eye-center-rounding-value');
-const eyeCustomColorsEnabled = document.getElementById('eye-custom-colors-enabled');
-const eyeColorControls = document.getElementById('eye-color-controls');
-const eyeOuterColor = document.getElementById('eye-outer-color');
-const eyeCenterColor = document.getElementById('eye-center-color');
-const centerArtMode = document.getElementById('center-art-mode');
-const centerArtControls = document.getElementById('center-art-controls');
-const centerArtSize = document.getElementById('center-art-size');
-const centerArtSizeValue = document.getElementById('center-art-size-value');
-const centerArtBackground = document.getElementById('center-art-background');
-const centerArtBackgroundLabel = document.getElementById('center-art-background-label');
-const centerLogoControls = document.getElementById('center-logo-controls');
-const centerLogoInput = document.getElementById('center-logo-input');
-const centerLogoClear = document.getElementById('center-logo-clear');
-const centerEmojiControls = document.getElementById('center-emoji-controls');
-const centerEmoji = document.getElementById('center-emoji');
-const emojiOptions = document.querySelectorAll('.emoji-option');
-const centerPixelControls = document.getElementById('center-pixel-controls');
-const pixelArtColor = document.getElementById('pixel-art-color');
-const pixelArtClear = document.getElementById('pixel-art-clear');
-const pixelArtPalette = document.getElementById('pixel-art-palette');
-const pixelArtMatchModuleShape = document.getElementById('pixel-art-match-module-shape');
-const pixelArtSizeInput = document.getElementById('pixel-art-size');
-const pixelArtSizeValue = document.getElementById('pixel-art-size-value');
-const pixelArtGrid = document.getElementById('pixel-art-grid');
-const downloadFormat = document.getElementById('download-format');
-const downloadQualityControls = document.getElementById('download-quality-controls');
-const downloadQuality = document.getElementById('download-quality');
-const downloadQualityValue = document.getElementById('download-quality-value');
-const printWidthAuto = document.getElementById('print-width-auto');
-const printWidth = document.getElementById('print-width');
-const printWidthValue = document.getElementById('print-width-value');
-const downloadCurrent = document.getElementById('download-current');
-const downloadCurrentPdf = document.getElementById('download-current-pdf');
-const downloadZip = document.getElementById('download-zip');
-const downloadAllPdf = document.getElementById('download-all-pdf');
-const downloadActions = document.querySelectorAll('.download-actions');
-const downloadStatus = document.getElementById('download-status');
-const optionsJson = document.getElementById('options-json');
-const errorCorrection = document.getElementById('error-correction');
-const errorCorrectionLabel = document.getElementById('error-correction-label');
-const errorCorrectionValue = document.getElementById('error-correction-value');
-const errorCorrectionHelp = document.getElementById('error-correction-help');
-const modeAuto = document.getElementById('mode-auto');
-const encodingMode = document.getElementById('encoding-mode');
-const encodingModeButtons = document.querySelectorAll('.encoding-mode-button');
-const detectedMode = document.getElementById('detected-mode');
-const segmentSummary = document.getElementById('segment-summary');
-const versionSummary = document.getElementById('version-summary');
-const capacitySummary = document.getElementById('capacity-summary');
-const unusedSummary = document.getElementById('unused-summary');
-const modeValidation = document.getElementById('mode-validation');
-const formatValidation = document.getElementById('format-validation');
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabPanels = document.querySelectorAll('.tab-panel');
-const debugSubtabButtons = document.querySelectorAll('[data-tab-panel="debug"] .subtab-button');
-const debugSubtabPanels = document.querySelectorAll('[data-tab-panel="debug"] .subtab-panel');
-const styleSubtabButtons = document.querySelectorAll('.style-subtab-button');
-const styleSubtabPanels = document.querySelectorAll('.style-subtab-panel');
-const downloadSubtabButtons = document.querySelectorAll('.download-subtab-button');
-const downloadSubtabPanels = document.querySelectorAll('.download-subtab-panel');
-const downloadSubtabBar = document.querySelector('.download-subtab-bar');
-const downloadAnimationTab = document.getElementById('download-animation-tab');
-const animationTimingMode = document.getElementById('animation-timing-mode');
-const animationMinutes = document.getElementById('animation-minutes');
-const animationSeconds = document.getElementById('animation-seconds');
-const animationMilliseconds = document.getElementById('animation-milliseconds');
-const animationDurationSummary = document.getElementById('animation-duration-summary');
-const downloadAnimatedGif = document.getElementById('download-animated-gif');
-const downloadAnimationMp4 = document.getElementById('download-animation-mp4');
-const contentSubtabButtons = document.querySelectorAll('.content-subtab-button');
-const contentSubtabPanels = document.querySelectorAll('.content-subtab-panel');
-const debugEnabled = document.getElementById('debug-enabled');
-const debugUnmask = document.getElementById('debug-unmask');
-const debugOutlineModeButtons = document.querySelectorAll('.outline-mode-button');
-
-const urlInput = document.getElementById('url-input');
-const textInput = document.getElementById('text-input');
-const numberStart = document.getElementById('number-start');
-const numberEnd = document.getElementById('number-end');
-const numberStep = document.getElementById('number-step');
-const numberPrefix = document.getElementById('number-prefix');
-const numberSuffix = document.getElementById('number-suffix');
-const numberSequenceIndex = document.getElementById('number-sequence-index');
-const numberSequenceValue = document.getElementById('number-sequence-value');
-const wifiSsid = document.getElementById('wifi-ssid');
-const wifiPassword = document.getElementById('wifi-password');
-const wifiEncryption = document.getElementById('wifi-encryption');
-const wifiHidden = document.getElementById('wifi-hidden');
-const emailTo = document.getElementById('email-to');
-const emailSubject = document.getElementById('email-subject');
-const emailBody = document.getElementById('email-body');
-const emailBodyLengthHint = document.getElementById('email-body-length-hint');
-const phoneNumber = document.getElementById('phone-number');
-const phoneFormatButtons = document.querySelectorAll('.phone-format-button');
-const smsNumber = document.getElementById('sms-number');
-const smsBody = document.getElementById('sms-body');
-const smsLengthHint = document.getElementById('sms-length-hint');
-const eventTitle = document.getElementById('event-title');
-const eventAllDay = document.getElementById('event-all-day');
-const eventStartDate = document.getElementById('event-start-date');
-const eventStartTime = document.getElementById('event-start-time');
-const eventEndDate = document.getElementById('event-end-date');
-const eventEndTime = document.getElementById('event-end-time');
-const eventLocation = document.getElementById('event-location');
-const eventDescription = document.getElementById('event-description');
-const eventUrl = document.getElementById('event-url');
-const eventTimeFields = document.querySelectorAll('.event-time-field');
-const geoLatitude = document.getElementById('geo-latitude');
-const geoLongitude = document.getElementById('geo-longitude');
-const geoQuery = document.getElementById('geo-query');
-const geoMapElement = document.getElementById('geo-map');
-const vcardName = document.getElementById('vcard-name');
-const vcardOrg = document.getElementById('vcard-org');
-const vcardTitle = document.getElementById('vcard-title');
-const vcardPhone = document.getElementById('vcard-phone');
-const vcardEmail = document.getElementById('vcard-email');
-const vcardUrl = document.getElementById('vcard-url');
-const fileInput = document.getElementById('file-input');
-const fileEncodingMode = document.getElementById('file-encoding-mode');
-const fileChunkControls = document.getElementById('file-chunk-controls');
-const fileChunkVersionAuto = document.getElementById('file-chunk-version-auto');
-const fileChunkVersion = document.getElementById('file-chunk-version');
-const fileChunkVersionValue = document.getElementById('file-chunk-version-value');
-const fileIncludeManifest = document.getElementById('file-include-manifest');
-const fileCompressTransfer = document.getElementById('file-compress-transfer');
-const fileCustomMetadata = document.getElementById('file-custom-metadata');
-const fileChunkIndex = document.getElementById('file-chunk-index');
-const fileChunkIndexValue = document.getElementById('file-chunk-index-value');
-const fileCapacityHint = document.getElementById('file-capacity-hint');
-const clearFileButton = document.getElementById('clear-file-button');
+const {
+  form, canvas, qrPreviewViewport, previewViewControls, previewViewFit, previewViewActual, chunkPreviewNav,
+  chunkPreviewPrev, chunkPreviewNext, chunkPreviewStatus, optionsPreview, encodedPreview, payloadRevealSecrets, payloadRevealToggle,
+  qrFormat, bulkEnabled, bulkFields, bulkExpectedFields, bulkRequiredFields, bulkFileInput, bulkRowIndex,
+  bulkStatus, bulkClear, choiceButtons, formatFieldsets, qrVersion, qrVersionValue, versionAuto,
+  maskPattern, maskGrid, qrWidth, qrWidthValue, qrWidthAuto, qrScale, qrScaleValue,
+  qrMargin, qrMarginValue, colorDark, colorLight, colorDarkTransparency, colorDarkTransparencyValue, colorLightTransparency,
+  colorLightTransparencyValue, gradientType, gradientControls, gradientAngleControls, gradientAngle, gradientAngleValue, colorGradientEnd,
+  colorGradientEndTransparency, colorGradientEndTransparencyValue, imageFillControls, imageFillInput, imageFillRecommended, imageFillClear, frameMessageMode,
+  customFrameMessageField, customFrameMessage, frameMessageCenter, frameMessageCenterArt, frameFont, frameMessageColor, frameLineHeight,
+  frameLineHeightValue, moduleShape, moduleCustomControls, moduleRounding, moduleRoundingValue, moduleInset, moduleInsetValue,
+  moduleRotation, moduleRotationValue, eyeShape, eyeCustomControls, eyeOuterRounding, eyeOuterRoundingValue, eyeCenterRounding,
+  eyeCenterRoundingValue, eyeCustomColorsEnabled, eyeColorControls, eyeOuterColor, eyeCenterColor, centerArtMode, centerArtControls,
+  centerArtSize, centerArtSizeValue, centerArtBackground, centerArtBackgroundLabel, centerLogoControls, centerLogoInput, centerLogoClear,
+  centerEmojiControls, centerEmoji, emojiOptions, centerPixelControls, pixelArtColor, pixelArtClear, pixelArtPalette,
+  pixelArtMatchModuleShape, pixelArtSizeInput, pixelArtSizeValue, pixelArtGrid, downloadFormat, downloadQualityControls, downloadQuality,
+  downloadQualityValue, printWidthAuto, printWidth, printWidthValue, downloadCurrent, downloadCurrentPdf, downloadZip,
+  downloadAllPdf, downloadActions, downloadStatus, optionsJson, errorCorrection, errorCorrectionLabel, errorCorrectionValue,
+  errorCorrectionHelp, modeAuto, encodingMode, encodingModeButtons, detectedMode, segmentSummary, versionSummary,
+  capacitySummary, unusedSummary, modeValidation, formatValidation, tabButtons, tabPanels, debugSubtabButtons,
+  debugSubtabPanels, styleSubtabButtons, styleSubtabPanels, downloadSubtabButtons, downloadSubtabPanels, downloadSubtabBar, downloadAnimationTab,
+  animationTimingMode, animationMinutes, animationSeconds, animationMilliseconds, animationDurationSummary, downloadAnimatedGif, downloadAnimationMp4,
+  contentSubtabButtons, contentSubtabPanels, debugEnabled, debugUnmask, debugOutlineModeButtons, urlInput, textInput,
+  numberStart, numberEnd, numberStep, numberPrefix, numberSuffix, numberSequenceIndex, numberSequenceValue,
+  wifiSsid, wifiPassword, wifiEncryption, wifiHidden, emailTo, emailSubject, emailBody,
+  emailBodyLengthHint, phoneNumber, phoneFormatButtons, smsNumber, smsBody, smsLengthHint, eventTitle,
+  eventAllDay, eventStartDate, eventStartTime, eventEndDate, eventEndTime, eventLocation, eventDescription,
+  eventUrl, eventTimeFields, geoLatitude, geoLongitude, geoQuery, geoMapElement, vcardName,
+  vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl, fileInput, fileEncodingMode,
+  fileChunkControls, fileChunkVersionAuto, fileChunkVersion, fileChunkVersionValue, fileIncludeManifest, fileCompressTransfer, fileCustomMetadata,
+  fileChunkIndex, fileChunkIndexValue, fileCapacityHint, clearFileButton,
+} = getApplicationElements(document);
 
 const debugColors = {
   data: document.getElementById('debug-data-color'),
@@ -1342,259 +1146,18 @@ const getModuleContrastColor = debugStyles.getModuleContrastColor;
 
 
 
-function drawQr(qrDefinition, options) {
-  const marginModules = options.margin ?? 4;
-  const moduleCount = qrDefinition.modules.size;
-  const totalModules = moduleCount + marginModules * 2;
-  const minimumModuleScale = Math.max(1, options.scale ?? 4);
-  const minimumCanvasSize = totalModules * minimumModuleScale;
-  const maximumModuleScale = Math.max(minimumModuleScale, Math.floor(MAX_QR_TARGET_WIDTH / totalModules));
-  qrWidth.min = String(minimumCanvasSize);
-  qrWidth.max = String(totalModules * maximumModuleScale);
-  qrWidth.step = String(totalModules);
-  const requestedCanvasSize = typeof options.width === 'number' ? options.width : minimumCanvasSize;
-  const renderedModuleScale = Math.min(
-    maximumModuleScale,
-    Math.max(minimumModuleScale, Math.round(requestedCanvasSize / totalModules))
-  );
-  const canvasSize = totalModules * renderedModuleScale;
-  if (!qrWidthAuto.checked) {
-    qrWidth.value = String(canvasSize);
-  }
-  renderedQrWidth = canvasSize;
-  renderedQrModuleScale = renderedModuleScale;
-  formatWidthLabel();
-  const cornerRadius = Math.max(0, Math.min(16, ((canvasSize - 128) / 192) * 16));
-  canvas.style.setProperty('--qr-corner-radius', `${cornerRadius.toFixed(2)}px`);
-  const cellSize = canvasSize / totalModules;
-  const context = canvas.getContext('2d');
-  const frameMessageText = getCurrentFrameMessage();
-  const frameMessageIsCentered = frameMessageCenter.checked;
-  const captionLineHeight = Number.parseInt(frameLineHeight.value, 10) || 18;
-  const captionPadding = Math.max(7, Math.min(14, canvasSize * 0.035));
-  const qrDrawSize = moduleCount * cellSize;
-  const frameMessageMaximumWidth = frameMessageIsCentered
-    ? Math.max(20, qrDrawSize * 0.56)
-    : Math.max(20, canvasSize - captionPadding * 2);
-  canvas.width = canvasSize;
-  canvas.height = canvasSize;
-  const frameMessageLayout = frameMessageText
-    ? fitFrameMessage(context, frameMessageText, frameMessageMaximumWidth, captionLineHeight, getFrameFont)
-    : { font: getFrameFont(captionLineHeight), lines: [] };
-  const frameMessageLines = frameMessageLayout.lines;
-  const captionHeight = frameMessageLines.length && !frameMessageIsCentered
-    ? Math.ceil(frameMessageLines.length * captionLineHeight + captionPadding * 2)
-    : 0;
-  const debugActive = isDebugOverlayActive();
-  const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
-  const moduleShapeOptions = getCurrentModuleShapeOptions();
-  const eyeShapeOptions = getCurrentEyeShapeOptions();
-  const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
-  const gradientOptions = getCurrentGradientOptions();
-  const imageFillImage = imageFillController.getImage();
-  const imageFillActive = !debugActive && gradientOptions.type === 'image' && imageFillImage;
-  const customEyeColorsActive = !debugActive && !imageFillActive && eyeCustomColorsEnabled.checked;
-  const lightAlpha = getColorAlpha(options.color.light);
-  const gradientHasTransparency =
-    (gradientOptions.type === 'linear' || gradientOptions.type === 'radial') &&
-    getColorAlpha(gradientOptions.endColor) < 1;
-  const hasTransparency =
-    !imageFillActive && (getColorAlpha(options.color.dark) < 1 || gradientHasTransparency || lightAlpha < 1);
-  const transparentLight = lightAlpha === 0;
-
-  canvas.height = canvasSize + captionHeight;
-  canvas.classList.toggle('has-transparency', hasTransparency);
-
-  const backgroundColor = options.color.light;
-  const quietColor = options.color.light;
-  let imageFillLayer = null;
-
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  if (imageFillActive) {
-    context.fillStyle = colorLight.value;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    imageFillLayer = createQrImageLayer(
-      context,
-      imageFillImage,
-      marginModules * cellSize,
-      moduleCount * cellSize
-    );
-    context.drawImage(imageFillLayer.layer, 0, 0);
-    context.fillStyle = options.color.light;
-    context.fillRect(
-      marginModules * cellSize,
-      marginModules * cellSize,
-      moduleCount * cellSize,
-      moduleCount * cellSize
-    );
-  } else if (!transparentLight) {
-    context.fillStyle = quietColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    context.fillStyle = backgroundColor;
-    context.fillRect(
-      marginModules * cellSize,
-      marginModules * cellSize,
-      moduleCount * cellSize,
-      moduleCount * cellSize
-    );
-  }
-
-  const moduleFillStyle = createQrModuleFill(
-    context,
-    options.color.dark,
-    gradientOptions,
-    marginModules,
-    moduleCount,
-    cellSize
-  );
-  const eyeOuterFillStyle = customEyeColorsActive ? eyeOuterColor.value : moduleFillStyle;
-  const eyeCenterFillStyle = customEyeColorsActive ? eyeCenterColor.value : moduleFillStyle;
-
-  if (debugActive) {
-    for (let row = 0; row < moduleCount; row += 1) {
-      for (let column = 0; column < moduleCount; column += 1) {
-        const category = getDebugCategory(row, column, qrDefinition, debugModel, 'overlay');
-        context.fillStyle = hexToRgba(debugColors[category].value, 0.5);
-        context.fillRect(
-          (column + marginModules) * cellSize,
-          (row + marginModules) * cellSize,
-          Math.ceil(cellSize),
-          Math.ceil(cellSize)
-        );
-      }
-    }
-  }
-
-  for (let row = 0; row < moduleCount; row += 1) {
-    for (let column = 0; column < moduleCount; column += 1) {
-      if (!moduleIsDarkForPreview(qrDefinition, row, column, debugActive, debugUnmask.checked)) {
-        continue;
-      }
-      if (customEyesActive && isFinderPattern(moduleCount, row, column)) {
-        continue;
-      }
-
-      const category = debugActive
-        ? getDebugCategory(row, column, qrDefinition, debugModel, 'overlay')
-        : getModuleCategory(qrDefinition, row, column);
-      let fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : moduleFillStyle;
-      if (customEyeColorsActive) {
-        const eyePart = getFinderPatternPart(moduleCount, row, column);
-        if (eyePart === 'outer') {
-          fillStyle = eyeOuterFillStyle;
-        } else if (eyePart === 'center') {
-          fillStyle = eyeCenterFillStyle;
-        }
-      }
-      if (imageFillActive) {
-        context.fillStyle = imageFillLayer.pattern;
-        drawQrModule(
-          context,
-          (column + marginModules) * cellSize,
-          (row + marginModules) * cellSize,
-          cellSize,
-          moduleShapeOptions
-        );
-      }
-      context.fillStyle = fillStyle;
-      drawQrModule(
-        context,
-        (column + marginModules) * cellSize,
-        (row + marginModules) * cellSize,
-        cellSize,
-        moduleShapeOptions
-      );
-    }
-  }
-
-  if (customEyesActive) {
-    drawFinderEyes(
-      context,
-      moduleCount,
-      marginModules,
-      cellSize,
-      eyeShapeOptions,
-      eyeOuterFillStyle,
-      eyeCenterFillStyle,
-      options.color.light,
-      transparentLight,
-      imageFillActive
-        ? {
-            pattern: imageFillLayer.pattern,
-            darkFillStyle: options.color.dark,
-            lightFillStyle: options.color.light,
-          }
-        : null
-    );
-  }
-
-  if (debugActive) {
-    drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize, debugColors);
-    drawCodewordOutlines(
-      context,
-      debugModel,
-      marginModules,
-      cellSize,
-      activeDebugOutlineMode,
-      getCodewordStyle,
-    );
-    drawCodewordPaths(
-      context,
-      qrDefinition,
-      debugModel,
-      marginModules,
-      cellSize,
-      activeDebugOutlineMode,
-      getModuleContrastColor,
-    );
-    drawStreamFieldStarts(
-      context,
-      debugModel,
-      marginModules,
-      cellSize,
-      activeDebugOutlineMode,
-      debugColors,
-    );
-  }
-
-  drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, {
-    mode: centerArtMode.value,
-    logo: centerLogoController.getImage(),
-    emoji: centerEmoji.value.trim(),
-    pixelArt: pixelArtEditor.getState(),
-    sizePercent: readInteger(centerArtSize) ?? 20,
-    protectBackground: centerArtBackground.checked,
-    lightColor: options.color.light,
-    matchModuleShape: pixelArtMatchModuleShape.checked && moduleShape.value !== 'square',
-    moduleShape: getCurrentModuleShapeOptions(),
-  });
-
-  if (frameMessageIsCentered) {
-    drawCenteredFrameMessage(
-      context,
-      frameMessageLines,
-      frameMessageLayout.font,
-      captionLineHeight,
-      marginModules * cellSize + qrDrawSize / 2,
-      frameMessageColor.value,
-      options.color.light,
-      cellSize
-    );
-  } else {
-    drawFrameMessage(
-      context,
-      frameMessageLines,
-      canvasSize,
-      captionHeight,
-      frameMessageLayout.font,
-      captionLineHeight,
-      frameMessageColor.value
-    );
-  }
-
-  schedulePreviewViewportSync();
-}
+const drawQr = createQrRenderer({
+  canvas, qrWidth, qrWidthAuto, colorLight, eyeCustomColorsEnabled, eyeOuterColor,
+  eyeCenterColor, debugColors, debugUnmask, centerArtMode, centerEmoji, centerArtSize,
+  centerArtBackground, pixelArtMatchModuleShape, moduleShape, frameMessageCenter,
+  frameLineHeight, frameMessageColor, maxTargetWidth: MAX_QR_TARGET_WIDTH,
+  formatWidthLabel, getCurrentFrameMessage, getFrameFont, isDebugOverlayActive,
+  getCurrentModuleShapeOptions, getCurrentEyeShapeOptions, getCurrentGradientOptions,
+  imageFillController, getCodewordStyle, getModuleContrastColor, centerLogoController,
+  pixelArtEditor, readInteger, schedulePreviewViewportSync,
+  setRenderMetrics(width, scale) { renderedQrWidth = width; renderedQrModuleScale = scale; },
+  getActiveDebugOutlineMode: () => activeDebugOutlineMode,
+});
 
 const renderInvalidPreview = createInvalidPreviewRenderer({
   canvas,
