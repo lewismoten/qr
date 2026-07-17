@@ -45,13 +45,19 @@ export function initializeHelpPopovers({ document = globalThis.document, window 
       trigger.setAttribute('aria-expanded', 'true');
     });
     popover.addEventListener('focusout', (event) => {
-      if (!popover.contains(event.relatedTarget)) close(popover);
+      if (popover.contains(event.relatedTarget)) return;
+      close(popover, { dismissed: true });
+      window.setTimeout(() => {
+        if (!popover.matches(':focus-within') && !popover.matches(':hover')) {
+          popover.classList.remove('is-dismissed');
+        }
+      }, 0);
     });
   });
 
   document.addEventListener('pointerdown', (event) => {
     popovers.forEach((popover) => {
-      if (!popover.contains(event.target)) close(popover);
+      if (!popover.contains(event.target)) close(popover, { dismissed: true });
     });
   });
   document.addEventListener('keydown', (event) => {
