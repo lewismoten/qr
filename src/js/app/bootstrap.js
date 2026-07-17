@@ -29,6 +29,8 @@ import {
   isVersionRegion,
 } from './qr-regions.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createContentPayload, createFilePayloadPreview } from './ui/content/payload.js';
+import { createFormatValidator } from './ui/content/validation.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { serializeBulkRow } from './ui/content/bulk/payload.js';
 import { validateBulkImport } from './ui/content/bulk/validation.js';
@@ -1062,141 +1064,14 @@ const getCurrentFrameMessage = frameSection.getMessage;
 const setFrameMessageCenter = frameSection.setCentered;
 const getFrameFont = frameSection.getFont;
 
-async function buildEncodedText() {
-  if (isBulkMode()) {
-    return buildBulkEncodedText();
-  }
-  switch (qrFormat.value) {
-    case 'url':
-      return urlInput.value.trim();
-    case 'text':
-      return textInput.value;
-    case 'number':
-      return getNumberPayload();
-    case 'wifi':
-      return buildWifiPayload();
-    case 'email':
-      return buildEmailPayload();
-    case 'phone':
-      return normalizePhoneNumber(phoneNumber.value) ? `tel:${normalizePhoneNumber(phoneNumber.value)}` : '';
-    case 'sms':
-      if (!smsNumber.value.trim() && !smsBody.value.trim()) {
-        return '';
-      }
-      return `SMSTO:${normalizePhoneNumber(smsNumber.value)}:${smsBody.value}`;
-    case 'event':
-      return buildCalendarEventPayload();
-    case 'geo':
-      if (!geoLatitude.value.trim() || !geoLongitude.value.trim()) {
-        return '';
-      }
-      return buildGeoPayload();
-    case 'vcard':
-      return buildVCardPayload();
-    case 'file':
-      return buildFilePayload();
-    default:
-      return '';
-  }
-}
-
-function buildEncodedPreviewTemplate() {
-  if (isBulkMode()) {
-    return buildBulkEncodedText() || `[CSV row for ${qrFormat.value}]`;
-  }
-  switch (qrFormat.value) {
-    case 'url':
-      return urlInput.value || '[enter a full https:// URL]';
-    case 'text':
-      return textInput.value || '[enter text]';
-    case 'number':
-      return getNumberPayload();
-    case 'wifi': {
-      const encryption = wifiEncryption.value || 'WPA';
-      const ssid = escapeWifiValue(placeholderValue(wifiSsid.value, '[network-name]'));
-      const password =
-        encryption === 'nopass'
-          ? ''
-          : escapeWifiValue(placeholderValue(wifiPassword.value, '[password]'));
-      const segments = [`T:${encryption}`, `S:${ssid}`];
-      if (encryption !== 'nopass') {
-        segments.push(`P:${password}`);
-      }
-      if (wifiHidden.checked) {
-        segments.push('H:true');
-      }
-      return `WIFI:${segments.join(';')};;`;
-    }
-    case 'email': {
-      const to = placeholderValue(emailTo.value, '[recipient@example.com]');
-      const params = new URLSearchParams();
-      params.set('subject', placeholderValue(emailSubject.value, '[subject]'));
-      params.set('body', placeholderValue(emailBody.value, '[message]'));
-      return `mailto:${to}?${params.toString()}`;
-    }
-    case 'phone':
-      return `tel:${normalizePhoneNumber(phoneNumber.value) || '[phone-number]'}`;
-    case 'sms':
-      return `SMSTO:${normalizePhoneNumber(smsNumber.value) || '[phone-number]'}:${placeholderValue(
-        smsBody.value,
-        '[message]'
-      )}`;
-    case 'event':
-      return buildCalendarEventPayload();
-    case 'geo': {
-      const latitude = placeholderValue(geoLatitude.value, '[latitude]');
-      const longitude = placeholderValue(geoLongitude.value, '[longitude]');
-      const query = geoQuery.value.trim();
-      return query
-        ? `geo:${latitude},${longitude}?q=${encodeURIComponent(query)}`
-        : `geo:${latitude},${longitude}`;
-    }
-    case 'vcard': {
-      const lines = [
-        'BEGIN:VCARD',
-        'VERSION:3.0',
-        `FN:${placeholderValue(vcardName.value, '[full-name]')}`,
-        `ORG:${placeholderValue(vcardOrg.value, '[organization]')}`,
-        `TITLE:${placeholderValue(vcardTitle.value, '[title]')}`,
-        `TEL:${placeholderValue(vcardPhone.value, '[phone-number]')}`,
-        `EMAIL:${placeholderValue(vcardEmail.value, '[email]')}`,
-        `URL:${placeholderValue(vcardUrl.value, '[website]')}`,
-        'END:VCARD',
-      ];
-      return lines.join('\n');
-    }
-    case 'file': {
-      const file = getActiveFile();
-      const mode = getSelectedFileEncodingMode();
-      if (!file) {
-        return mode === 'chunked'
-          ? 'FILE:1:S:M:[base64url-data]'
-          : mode === 'blob'
-            ? '[shareable download URL]'
-            : '[data URL for a selected file]';
-      }
-
-      if (mode === 'blob') {
-        return `[shareable download URL for ${file.name}]`;
-      }
-
-      if (mode === 'chunked') {
-        const { chunkCapacity, currentChunk, streamLength, isSingleFrame } = getChunkedFileCapacityInfo(file);
-        if (isSingleFrame) {
-          return fileIncludeManifest.checked
-            ? 'FILE:1:S:M:[base64url-data]'
-            : `FILE:1:S:-:${getCompactFileExtension(file.name)}:[base64url-data]`;
-        }
-        const offset = Math.max(0, currentChunk - 1) * chunkCapacity;
-        return `FILE:1:C:${getFileManifestFlag(fileIncludeManifest.checked)}:[base64url-id]:${getCompactFileExtension(file.name)}:${encodeStreamPosition(offset, streamLength)}:${streamLength.toString(10)}:[base64url-data]`;
-      }
-
-      return `[data URL for ${file.name}]`;
-    }
-    default:
-      return '';
-  }
-}
+const contentPayload = createContentPayload({
+  elements: { qrFormat, urlInput, textInput, phoneNumber, smsNumber, smsBody, wifiEncryption, wifiSsid, wifiPassword, wifiHidden, emailTo, emailSubject, emailBody, geoLatitude, geoLongitude, geoQuery, vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl },
+  bulk: { isMode: isBulkMode, build: buildBulkEncodedText },
+  builders: { number: getNumberPayload, wifi: buildWifiPayload, email: buildEmailPayload, event: buildCalendarEventPayload, geo: buildGeoPayload, vcard: buildVCardPayload, file: buildFilePayload },
+  file: { preview: createFilePayloadPreview({ getFile: getActiveFile, getMode: getSelectedFileEncodingMode, getCapacity: getChunkedFileCapacityInfo, includeManifest: fileIncludeManifest }) },
+});
+const buildEncodedText = contentPayload.build;
+const buildEncodedPreviewTemplate = contentPayload.preview;
 
 function buildOptions() {
   const selectedErrorLevel = getSelectedErrorLevel();
@@ -1390,291 +1265,37 @@ function syncEmailBodyLengthHint() {
   emailBodyLengthHint.textContent = `${current} / ${max}`;
 }
 
-function getBulkValidationState() {
-  return validateBulkImport({
-    parseError: getBulkParseError(),
-    hasFile: Boolean(bulkFileInput.files?.[0]),
-    row: getBulkCurrentRow(),
-    rowNumber: getCurrentFrameIndex() + 1,
-    schema: getBulkSchema(),
-    format: qrFormat.value,
-    limits: {
-      emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
-      byteCapacity: MODE_CAPACITY.byte.L,
-      sms: SMS_MAX_LENGTH,
-      calendarTitle: CALENDAR_TITLE_MAX_LENGTH,
-      calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
-      calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH,
-    },
-  });
-}
-
-function getFormatValidationState() {
-  if (isBulkMode()) {
-    return getBulkValidationState();
-  }
-  if (qrFormat.value === 'url') {
-    return getWebsiteValidationState(urlInput.value, {
-      required: true,
-      contextLabel: 'URL',
-    });
-  }
-
-  if (qrFormat.value === 'number') {
-    const numberValidation = numberSection.getValidationState();
-    if (numberValidation.error || numberValidation.warning) return numberValidation;
-  }
-
-  if (qrFormat.value === 'event') {
-    const titleValidation = validateCalendarText(eventTitle.value, {
-      required: true,
-      label: 'title',
-      maxLength: CALENDAR_TITLE_MAX_LENGTH,
-    });
-    if (titleValidation) {
-      return { error: titleValidation, warning: '' };
-    }
-
-    if (!eventStartDate.value) {
-      return { error: 'Not valid for Event format yet: start date is required.', warning: '' };
-    }
-    if (!eventEndDate.value) {
-      return { error: 'Not valid for Event format yet: end date is required.', warning: '' };
-    }
-
-    if (eventAllDay.checked) {
-      if (eventEndDate.value < eventStartDate.value) {
-        return { error: 'Not valid for Event format yet: end date cannot be before start date.', warning: '' };
-      }
-    } else {
-      if (!eventStartTime.value) {
-        return { error: 'Not valid for Event format yet: start time is required.', warning: '' };
-      }
-      if (!eventEndTime.value) {
-        return { error: 'Not valid for Event format yet: end time is required.', warning: '' };
-      }
-      const startValue = `${eventStartDate.value}T${eventStartTime.value}`;
-      const endValue = `${eventEndDate.value}T${eventEndTime.value}`;
-      if (endValue <= startValue) {
-        return { error: 'Not valid for Event format yet: end must be after start.', warning: '' };
-      }
-    }
-
-    const locationValidation = validateCalendarText(eventLocation.value, {
-      label: 'location',
-      maxLength: CALENDAR_LOCATION_MAX_LENGTH,
-    });
-    if (locationValidation) {
-      return { error: locationValidation, warning: '' };
-    }
-
-    const descriptionValidation = validateCalendarText(eventDescription.value, {
-      label: 'description',
-      maxLength: CALENDAR_DESCRIPTION_MAX_LENGTH,
-      multiline: true,
-    });
-    if (descriptionValidation) {
-      return { error: descriptionValidation, warning: '' };
-    }
-
-    const websiteValidation = getWebsiteValidationState(eventUrl.value, {
-      contextLabel: 'Event',
-    });
-    if (websiteValidation.error || websiteValidation.warning) {
-      return websiteValidation;
-    }
-
-    return { error: '', warning: '' };
-  }
-
-  if (qrFormat.value === 'file') {
-    const file = getActiveFile();
-    if (!file) {
-      return {
-        error: 'Not valid for File format yet: choose a file to encode.',
-        warning: '',
-      };
-    }
-
-    if (getSelectedFileEncodingMode() === 'blob') {
-      return {
-        error: '',
-        warning: 'Warning for File format: this shareable download URL embeds the file bytes directly, so larger files will hit QR capacity quickly.',
-      };
-    }
-
-    if (getSelectedFileEncodingMode() === 'chunked') {
-      const { totalChunks } = getChunkedFileCapacityInfo(file);
-      return {
-        error: '',
-        warning:
-          totalChunks > 1
-            ? `Warning for File format: this compact FILE stream is split across ${totalChunks} QR codes. Each scan needs the same file ID plus every chunk to reconstruct the file.`
-            : '',
-      };
-    }
-
-    return { error: '', warning: '' };
-  }
-
-  if (qrFormat.value === 'email') {
-    const emailValidationMessage = validateEmailValue(emailTo.value, {
-      label: 'recipient email address',
-    });
-    if (emailValidationMessage) {
-      return {
-        error: emailValidationMessage,
-        warning: '',
-      };
-    }
-
-    const subjectValidationMessage = validatePrintableText(emailSubject.value, {
-      label: 'Not valid for Email format yet: subject',
-      maxLength: EMAIL_SUBJECT_MAX_LENGTH,
-    });
-    if (subjectValidationMessage) {
-      return {
-        error: subjectValidationMessage,
-        warning: '',
-      };
-    }
-
-    const emailBodyValidationMessage = validatePrintableText(emailBody.value, {
-      label: 'Not valid for Email format yet: body',
-      maxLength: Math.max(getEmailBodyCapacityInfo().max, 0),
-    });
-    if (emailBodyValidationMessage) {
-      return {
-        error: emailBodyValidationMessage,
-        warning: '',
-      };
-    }
-
-    const { current, max } = getEmailBodyCapacityInfo();
-    if (current > max) {
-      return {
-        error: `Not valid for Email format yet: body exceeds the current QR capacity (${current} / ${max}).`,
-        warning: '',
-      };
-    }
-
-    return {
-      error: '',
-      warning: '',
-    };
-  }
-
-  if (qrFormat.value === 'phone') {
-    return {
-      error: validateTelephoneValue(phoneNumber.value),
-      warning: '',
-    };
-  }
-
-  if (qrFormat.value === 'sms') {
-    const phoneValidationMessage = validateTelephoneValue(smsNumber.value, {
-      label: 'SMS phone number',
-    });
-    if (phoneValidationMessage) {
-      return {
-        error: phoneValidationMessage.replace('Phone format', 'SMS format'),
-        warning: '',
-      };
-    }
-
-    if (smsBody.value.length > 160) {
-      return {
-        error: `Not valid for SMS format yet: message should stay at ${SMS_MAX_LENGTH} characters or fewer for broad SMS compatibility.`,
-        warning: '',
-      };
-    }
-  }
-
-  if (qrFormat.value === 'geo') {
-    const latitudeText = geoLatitude.value.trim();
-    const longitudeText = geoLongitude.value.trim();
-
-    if (!latitudeText) {
-      return { error: 'Not valid for Geo format yet: latitude is required.', warning: '' };
-    }
-
-    if (!longitudeText) {
-      return { error: 'Not valid for Geo format yet: longitude is required.', warning: '' };
-    }
-
-    const latitude = parseCoordinate(latitudeText);
-    if (latitude === null) {
-      return { error: 'Not valid for Geo format yet: latitude must be a valid number.', warning: '' };
-    }
-
-    const longitude = parseCoordinate(longitudeText);
-    if (longitude === null) {
-      return { error: 'Not valid for Geo format yet: longitude must be a valid number.', warning: '' };
-    }
-
-    if (latitude < -90 || latitude > 90) {
-      return { error: 'Not valid for Geo format yet: latitude must be between -90 and 90.', warning: '' };
-    }
-
-    if (longitude < -180 || longitude > 180) {
-      return { error: 'Not valid for Geo format yet: longitude must be between -180 and 180.', warning: '' };
-    }
-
-    const labelValidationMessage = validateGeoLabel(geoQuery.value);
-    if (labelValidationMessage) {
-      return { error: labelValidationMessage, warning: '' };
-    }
-  }
-
-  if (qrFormat.value === 'vcard') {
-    const nameValidationMessage = validateVCardTextValue(vcardName.value, {
-      required: true,
-      label: 'full name',
-    });
-    if (nameValidationMessage) {
-      return { error: nameValidationMessage, warning: '' };
-    }
-
-    const organizationValidationMessage = validateVCardTextValue(vcardOrg.value, {
-      label: 'organization',
-    });
-    if (organizationValidationMessage) {
-      return { error: organizationValidationMessage, warning: '' };
-    }
-
-    const titleValidationMessage = validateVCardTextValue(vcardTitle.value, {
-      label: 'title',
-    });
-    if (titleValidationMessage) {
-      return { error: titleValidationMessage, warning: '' };
-    }
-
-    const phoneValidationMessage = validateTelephoneValue(vcardPhone.value, {
-      required: false,
-      label: 'vCard phone number',
-    });
-    if (phoneValidationMessage) {
-      return { error: phoneValidationMessage.replace('Phone format', 'vCard format'), warning: '' };
-    }
-
-    const emailValidationMessage = validateEmailValue(vcardEmail.value, {
-      required: false,
-      label: 'vCard email address',
-    });
-    if (emailValidationMessage) {
-      return { error: emailValidationMessage.replace('Email format', 'vCard format'), warning: '' };
-    }
-
-    const websiteValidationState = getWebsiteValidationState(vcardUrl.value, {
-      contextLabel: 'vCard',
-    });
-    if (websiteValidationState.error || websiteValidationState.warning) {
-      return websiteValidationState;
-    }
-  }
-
-  return { error: '', warning: '' };
-}
+const getFormatValidationState = createFormatValidator({
+  elements: {
+    qrFormat, bulkFileInput, urlInput, emailTo, emailSubject, emailBody,
+    phoneNumber, smsNumber, smsBody, geoLatitude, geoLongitude, geoQuery,
+    vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl,
+    eventTitle, eventAllDay, eventStartDate, eventStartTime, eventEndDate,
+    eventEndTime, eventLocation, eventDescription, eventUrl,
+  },
+  bulk: {
+    isMode: isBulkMode,
+    getError: getBulkParseError,
+    getRow: getBulkCurrentRow,
+    getFrameIndex: getCurrentFrameIndex,
+    getSchema: getBulkSchema,
+  },
+  numberSection,
+  file: {
+    getActive: getActiveFile,
+    getMode: getSelectedFileEncodingMode,
+    getCapacity: getChunkedFileCapacityInfo,
+  },
+  getEmailCapacity: getEmailBodyCapacityInfo,
+  limits: {
+    emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
+    byteCapacity: MODE_CAPACITY.byte.L,
+    sms: SMS_MAX_LENGTH,
+    calendarTitle: CALENDAR_TITLE_MAX_LENGTH,
+    calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
+    calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH,
+  },
+});
 
 const encodingDiagnostics = createEncodingDiagnostics({
   encoder: qrEncoder,
