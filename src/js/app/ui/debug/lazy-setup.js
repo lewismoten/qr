@@ -4,52 +4,77 @@ function moduleIsDark(qrDefinition, row, column) {
 }
 
 export function createLazyDebugSetup(options) {
-  let implementation = null;
-  let loading = null;
-  const call = (group, method, fallback) => (...args) => {
-    const handler = implementation?.[group]?.[method];
-    return handler ? handler(...args) : fallback?.(...args);
+  const requests = new Map();
+  const colorElements = {};
+  let diagnostics = null;
+  let masks = null;
+  let overlay = null;
+
+  const loadOnce = (name, loader) => {
+    if (!requests.has(name)) {
+      requests.set(name, loader().catch((error) => {
+        requests.delete(name);
+        throw error;
+      }));
+    }
+    return requests.get(name);
   };
-  const facade = {
+  const loadEncoding = () => loadOnce('encoding', () => import('./encoding-setup.js')
+    .then(({ createDebugEncodingSetup }) => {
+      diagnostics = createDebugEncodingSetup(options);
+      return diagnostics;
+    }));
+  const loadMask = () => loadOnce('mask', () => import('./mask-setup.js')
+    .then(({ createDebugMaskSetup }) => {
+      masks = createDebugMaskSetup({
+        ...options,
+        render: options.runtime.render,
+      });
+      return masks;
+    }));
+  const loadOverlay = () => loadOnce('overlay', () => import('./overlay-setup.js')
+    .then(({ createDebugOverlaySetup }) => {
+      overlay = createDebugOverlaySetup({
+        elements: options.elements,
+        colorElements,
+        runtime: options.runtime,
+      });
+      return overlay;
+    }));
+
+  return {
+    colors: colorElements,
     diagnostics: {
-      setValidation: call('diagnostics', 'setValidation'),
-      validateManualMode: call('diagnostics', 'validateManualMode', () => true),
-      updateSummary: call('diagnostics', 'updateSummary'),
+      setValidation: (...args) => diagnostics?.setValidation(...args),
+      validateManualMode: (...args) => diagnostics?.validateManualMode(...args) ?? true,
+      updateSummary: (...args) => diagnostics?.updateSummary(...args),
     },
     styles: {
-      getCodewordStyle: call('styles', 'getCodewordStyle', () => ({
+      getCodewordStyle: (...args) => overlay?.styles.getCodewordStyle(...args) ?? ({
         color: '#0ea5e9', strokeColor: '#ffffff', opacity: 0.7,
-      })),
-      getModuleContrastColor: call('styles', 'getModuleContrastColor', () => '#ffffff'),
+      }),
+      getModuleContrastColor: (...args) => overlay?.styles.getModuleContrastColor(...args) ?? '#ffffff',
     },
     masks: {
-      ensure: call('masks', 'ensure'),
-      sync: call('masks', 'sync'),
-      renderPreviews: call('masks', 'renderPreviews'),
+      ensure: (...args) => masks?.ensure(...args),
+      sync: (...args) => masks?.sync(...args),
+      renderPreviews: (...args) => masks?.renderPreviews(...args),
     },
-    outlines: { sync: call('outlines', 'sync') },
+    outlines: { sync: (...args) => overlay?.outlines.sync(...args) },
     renderer: {
-      buildModel: call('renderer', 'buildModel', () => null),
-      getCategory: call('renderer', 'getCategory', () => 'data'),
-      moduleIsDark: call('renderer', 'moduleIsDark', moduleIsDark),
-      drawBoundaries: call('renderer', 'drawBoundaries'),
-      drawOutlines: call('renderer', 'drawOutlines'),
-      drawPaths: call('renderer', 'drawPaths'),
-      drawFieldStarts: call('renderer', 'drawFieldStarts'),
+      buildModel: (...args) => overlay?.renderer.buildModel(...args) ?? null,
+      getCategory: (...args) => overlay?.renderer.getCategory(...args) ?? 'data',
+      moduleIsDark: (...args) => overlay?.renderer.moduleIsDark(...args) ?? moduleIsDark(...args),
+      drawBoundaries: (...args) => overlay?.renderer.drawBoundaries(...args),
+      drawOutlines: (...args) => overlay?.renderer.drawOutlines(...args),
+      drawPaths: (...args) => overlay?.renderer.drawPaths(...args),
+      drawFieldStarts: (...args) => overlay?.renderer.drawFieldStarts(...args),
     },
-    load() {
-      if (implementation) return Promise.resolve(implementation);
-      if (!loading) {
-        loading = import('./runtime.js').then(({ createDebugRuntime }) => {
-          implementation = createDebugRuntime(options);
-          implementation.outlines.sync();
-          implementation.masks.ensure();
-          implementation.masks.sync();
-          return implementation;
-        });
-      }
-      return loading;
+    load(name = 'encoding') {
+      if (name === 'encoding') return loadEncoding();
+      if (name === 'mask') return loadMask();
+      if (name === 'overlay') return loadOverlay();
+      return Promise.resolve();
     },
   };
-  return facade;
 }

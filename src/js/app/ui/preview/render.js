@@ -20,7 +20,6 @@ export function createRenderController(deps) {
     if (requestId !== request) return;
 
     deps.updateTextPreview(encodedText);
-    deps.updateOptionsPreview(options);
     deps.syncMask();
     deps.renderMasks(encodedText);
     const validation = deps.getValidation();

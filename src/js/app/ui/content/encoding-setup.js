@@ -35,7 +35,7 @@ export function createContentEncodingSetup({ e, encoder, bulk, file, sections, r
       colorDarkTransparency: e.colorDarkTransparency, colorLight: e.colorLight,
       colorLightTransparency: e.colorLightTransparency, qrWidthAuto: e.qrWidthAuto,
       qrWidth: e.qrWidth, qrFormat: e.qrFormat, versionAuto: e.versionAuto,
-      qrVersion: e.qrVersion, maskPattern: e.maskPattern, optionsJson: e.optionsJson,
+      qrVersion: e.qrVersion, maskPattern: e.maskPattern,
       modeAuto: e.modeAuto },
     encoder,
     helpers: { getErrorLevel: helpers.getErrorLevel, readInteger: helpers.readInteger,
@@ -67,12 +67,13 @@ export function createContentEncodingSetup({ e, encoder, bulk, file, sections, r
     getEmailCapacity: emailCapacity.getInfo,
     limits: config.validationLimits,
   });
-  const updateOptionsPreview = (options) => { e.optionsPreview.textContent = JSON.stringify(options, null, 2); };
   const updateTextPreview = (text) => {
+    const debugState = runtime.getDebugState();
+    if (debugState.tab !== 'debug' || debugState.subtab !== 'payload') return;
     const preview = text || pipeline.payload.preview();
     e.encodedPreview.textContent = e.qrFormat.value === 'wifi'
       ? sections.wifi.maskPayload(preview)
       : preview;
   };
-  return { pipeline, qr, emailCapacity, validation, updateOptionsPreview, updateTextPreview };
+  return { pipeline, qr, emailCapacity, validation, updateTextPreview };
 }

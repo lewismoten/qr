@@ -8,6 +8,8 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
   prepareDownload, setActiveTab, setActiveDebugSubtab }) {
   let activeStyleSubtab = 'size';
   let activeDownloadSubtab = 'image';
+  let activeDebugSubtab = 'encoding';
+  const loadDebug = (name) => Promise.resolve(prepareDebug?.(name)).then(render).catch(console.error);
   const loadStyle = (name) => Promise.resolve(prepareStyle?.(name)).then(render).catch(console.error);
   const loadDownload = (name) => Promise.resolve(prepareDownload?.(name)).then(render).catch(console.error);
   const activateTab = createPrimaryTabs({
@@ -16,7 +18,7 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
     onActivate(name) {
       setActiveTab(name);
       if (name === 'debug') {
-        Promise.resolve(prepareDebug?.()).then(render).catch(console.error);
+        loadDebug(activeDebugSubtab);
         return;
       }
       if (name === 'style') {
@@ -39,8 +41,9 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
     defaultValue: 'encoding',
     setAriaPressed: false,
     onActivate(name) {
+      activeDebugSubtab = name;
       setActiveDebugSubtab(name);
-      render();
+      loadDebug(name);
     },
   });
   const activateStyle = createStyleSubtabs({

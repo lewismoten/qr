@@ -44,8 +44,6 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   elements.urlInput.value = runtime.getDefaultUrl();
   systems.output.sync();
   systems.syncFormat();
-  systems.preview.ensureMaskButtons();
-  systems.preview.syncMaskSelection();
   systems.navigation.syncChoices();
   systems.contentSections.wifi.sync();
   systems.contentSections.phone.initialize();
@@ -55,9 +53,7 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   systems.contentSections.shared.initialize();
   systems.output.syncSmsLength();
   systems.contentEncoding.emailCapacity.sync();
-  systems.debug.outlines.sync();
   systems.navigation.activateContent('data');
-  systems.navigation.activateDebug('encoding');
   systems.navigation.activateTab('content');
   systems.previewControls.setViewMode('fit', true);
   if (window.location.hash.includes('download=1') && window.location.hash.includes('data=')) {

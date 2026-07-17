@@ -6,7 +6,6 @@ import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createContentDataSetup } from './ui/content/data-setup.js';
 import { createContentSections } from './ui/content/setup.js';
-import { getDebugColorElements } from './ui/debug/colors.js';
 import { createLazyDebugSetup } from './ui/debug/lazy-setup.js';
 import { createLazyDownloadSetup } from './ui/runtime/lazy-download.js';
 import { getApplicationElements } from './ui/elements.js';
@@ -21,7 +20,6 @@ import { createStyleSetup } from './ui/style/setup.js';
 import qrEncoder from '../qr/index.js';
 
 const elements = getApplicationElements(document);
-const debugColors = getDebugColorElements(document);
 const runtime = createRuntimeContext();
 const previewControls = createPreviewControlsSetup({
   elements,
@@ -97,7 +95,8 @@ const contentEncoding = createContentEncodingSetup({
     buildPayload: contentData.file.payload.build },
   sections: contentSections,
   runtime: { getFrameIndex: download.getCurrentFrame,
-    syncChoices: runtime.syncChoices, syncArtwork: styleSetup.artwork.sync },
+    syncChoices: runtime.syncChoices, syncArtwork: styleSetup.artwork.sync,
+    getDebugState: runtime.getDebugState },
   helpers: { getErrorLevel: runtimeHelpers.getErrorLevel, readInteger: runtimeHelpers.readInteger,
     colorWithTransparency, getEncodingMode: runtimeHelpers.getEncodingMode },
   config: {
@@ -123,7 +122,6 @@ const debugSetup = createLazyDebugSetup({
   config: { modeLabels: MODE_LABELS, modeCapacity: MODE_CAPACITY,
     alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES,
     maskLabels: MASK_LABELS },
-  colors: debugColors,
   getCurrentMode: runtimeHelpers.getEncodingMode,
   getErrorLevel: runtimeHelpers.getErrorLevel,
   isBulkMode: contentData.isBulkMode,
@@ -144,7 +142,7 @@ const navigation = createApplicationNavigation({
 const preview = createPreviewSetup({
   e: elements,
   encoder: qrEncoder,
-  debugColors,
+  debugColors: debugSetup.colors,
   maxTargetWidth: LIMITS.qrTargetWidth,
   systems: { content: contentEncoding, debug: debugSetup, style: styleSetup,
     output, download, previewControls },

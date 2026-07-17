@@ -820,7 +820,6 @@
                 <nav class="subtab-bar debug-subtab-bar" aria-label="Debug tools">
                   <button type="button" class="subtab-button is-active" data-subtab="encoding">Encoding</button>
                   <button type="button" class="subtab-button" data-subtab="mask">Mask</button>
-                  <button type="button" class="subtab-button" data-subtab="advanced">Advanced</button>
                   <button type="button" class="subtab-button" data-subtab="payload">Payload</button>
                   <button type="button" class="subtab-button" data-subtab="overlay">Overlay</button>
                 </nav>
@@ -906,28 +905,6 @@
                       <legend>Mask pattern</legend>
                       <input id="mask-pattern" name="mask-pattern" type="hidden" value="" />
                       <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices"></div>
-                    </fieldset>
-                  </section>
-
-                  <section class="subtab-panel" data-subtab-panel="advanced" hidden>
-                    <fieldset class="option-group">
-                      <legend>Raw options</legend>
-                      <label for="options-json">Extra options JSON</label>
-                      <textarea
-                        id="options-json"
-                        name="options-json"
-                        rows="6"
-                        spellcheck="false"
-                      >{}</textarea>
-                      <p class="hint">
-                        Merged last into the first-party QR options object. Native Shift JIS conversion
-                        remains available after this merge for automatic and manual Kanji encoding.
-                      </p>
-                    </fieldset>
-
-                    <fieldset class="option-group">
-                      <legend>Preview options</legend>
-                      <pre id="options-preview"></pre>
                     </fieldset>
                   </section>
 

@@ -17,8 +17,7 @@ export function createQrConfiguration({ elements: e, encoder, helpers, alphanume
     if (version !== undefined) base.version = version;
     const mask = helpers.readInteger(e.maskPattern);
     if (mask !== undefined) base.maskPattern = mask;
-    const extra = e.optionsJson.value.trim() ? JSON.parse(e.optionsJson.value) : {};
-    const options = { ...base, ...extra, color: { ...base.color, ...(extra.color || {}) } };
+    const options = base;
     if (chunked) options.version = helpers.getChunkVersion();
     return options;
   };
