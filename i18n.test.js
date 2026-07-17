@@ -65,6 +65,26 @@ assert.equal(getErrorText({
 }), 'La version minimale est 9.');
 
 await initializeLanguage({
+  locale: 'en-GB',
+  baseUrl,
+  fetcher: createFetcher({
+    'manifest.json': { defaultLocale: 'en-US', locales: ['en-US', 'en-GB'] },
+    'en-US.json': {
+      navigation: { content: 'Content' },
+      fields: { organization: 'organization', title: 'title' },
+    },
+    'en-GB.json': {
+      extends: 'en-US',
+      fields: { organization: 'organisation' },
+    },
+  }),
+});
+assert.equal(getActiveLocale(), 'en-GB');
+assert.equal(lookup('navigation.content', 'Fallback'), 'Content');
+assert.equal(lookup('fields.organization', 'Fallback'), 'organisation');
+assert.equal(lookup('fields.title', 'Fallback'), 'title');
+
+await initializeLanguage({
   locale: 'en-US',
   languages: ['de-DE'],
   baseUrl,

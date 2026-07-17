@@ -55,6 +55,43 @@ async function fetchJson(fetcher, url) {
   return response.json();
 }
 
+function isMessageObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function mergeMessages(parent, child) {
+  const merged = { ...parent };
+  for (const [key, value] of Object.entries(child)) {
+    if (key === 'extends') continue;
+    merged[key] = isMessageObject(value) && isMessageObject(parent[key])
+      ? mergeMessages(parent[key], value)
+      : value;
+  }
+  return merged;
+}
+
+function createLocaleLoader(fetcher, baseUrl) {
+  const cache = new Map();
+  const load = (locale, ancestors = []) => {
+    const normalized = canonicalizeLocale(locale);
+    if (!normalized) return Promise.reject(new Error('Invalid parent locale.'));
+    if (ancestors.includes(normalized)) {
+      return Promise.reject(new Error(`Circular locale inheritance: ${[...ancestors, normalized].join(' -> ')}`));
+    }
+    if (cache.has(normalized)) return cache.get(normalized);
+
+    const request = fetchJson(fetcher, new URL(`${normalized}.json`, baseUrl)).then(async (resource) => {
+      if (!isMessageObject(resource)) throw new Error(`Invalid language resource: ${normalized}`);
+      const parentLocale = canonicalizeLocale(resource.extends);
+      const parent = parentLocale ? await load(parentLocale, [...ancestors, normalized]) : {};
+      return mergeMessages(parent, resource);
+    });
+    cache.set(normalized, request);
+    return request;
+  };
+  return load;
+}
+
 function findMessage(key) {
   if (typeof key !== 'string' || !key.trim()) return undefined;
   return key.split('.').reduce((value, part) => (
@@ -125,11 +162,11 @@ export function initializeLanguage({
     const fallback = canonicalizeLocale(manifest.defaultLocale) || DEFAULT_LOCALE;
     const selected = selectLocale(locale ? [locale] : languages, localeCodes, fallback);
     const attempts = [...new Set([selected, fallback, DEFAULT_LOCALE])];
+    const loadLocale = createLocaleLoader(fetcher, baseUrl);
 
     for (const locale of attempts) {
       try {
-        const loadedMessages = await fetchJson(fetcher, new URL(`${locale}.json`, baseUrl));
-        if (!loadedMessages || typeof loadedMessages !== 'object' || Array.isArray(loadedMessages)) continue;
+        const loadedMessages = await loadLocale(locale);
         activeLocale = locale;
         messages = Object.freeze(loadedMessages);
         return { locale, loaded: true };

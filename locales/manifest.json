@@ -2,6 +2,7 @@
   "defaultLocale": "en-US",
   "locales": [
     { "code": "en-US", "flag": "🇺🇸" },
+    { "code": "en-GB", "flag": "🇬🇧" },
     { "code": "zh-CN", "flag": "🇨🇳" },
     { "code": "hi-IN", "flag": "🇮🇳" },
     { "code": "es", "flag": "🇪🇸" },

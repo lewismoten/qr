@@ -40,6 +40,26 @@ Run the QR encoder tests and a production build together with:
 npm run verify
 ```
 
+## Locales
+
+Locale files live in `locales` and are listed in `locales/manifest.json`. A locale
+can inherit another locale by adding an `extends` property. Only values that differ
+from the parent need to be stored:
+
+```json
+{
+  "extends": "en-US",
+  "fields": {
+    "organization": "organisation"
+  }
+}
+```
+
+Parent and child objects are merged recursively, with child values taking
+precedence. Inheritance can contain multiple levels; circular inheritance is
+rejected and the normal default-locale fallback is used instead. Placeholder tags
+such as `{count}` must remain unchanged in translated values.
+
 ## First-party QR encoder
 
 QR generation now runs through the first-party implementation in
