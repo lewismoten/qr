@@ -35,6 +35,18 @@ const builds = [
     entryPoints: ['src/css/main.css'],
     outfile: 'dist/app.min.css',
   },
+  {
+    ...shared,
+    entryPoints: ['src/js/spec/main.js'],
+    outfile: 'dist/spec.min.js',
+    format: 'esm',
+    platform: 'browser',
+  },
+  {
+    ...shared,
+    entryPoints: ['src/css/spec.css'],
+    outfile: 'dist/spec.min.css',
+  },
 ];
 
 if (!watch) await rm('dist/chunks', { recursive: true, force: true });
