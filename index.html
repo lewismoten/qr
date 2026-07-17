@@ -826,26 +826,39 @@
 
                 <div class="subtab-panels">
                   <section class="subtab-panel is-active" data-subtab-panel="encoding">
-                    <fieldset class="option-group">
+                    <fieldset class="option-group encoding-control-group">
                       <legend>Error correction</legend>
+                      <span class="help-popover section-help-popover">
+                        <button type="button" class="help-popover-trigger" aria-label="About error correction" aria-describedby="error-correction-help-content">?</button>
+                        <span id="error-correction-help-content" class="help-popover-content" role="tooltip">
+                          <strong>Damage recovery</strong>
+                          <span id="error-correction-help">Balances capacity and resilience, with recovery for about 15% of damaged or covered area.</span>
+                        </span>
+                      </span>
 
                       <label class="slider-field" for="error-correction">
                         <span id="error-correction-label">Medium</span>
-                        <output id="error-correction-value" for="error-correction">M</output>
                       </label>
                       <input id="error-correction" name="error-correction" type="range" min="0" max="3" step="1" value="1" />
-                      <p class="hint" id="error-correction-help">Can still scan if roughly 15% of the symbol area is obscured or damaged.</p>
                     </fieldset>
 
-                    <fieldset class="option-group">
+                    <fieldset class="option-group encoding-control-group encoding-mode-group">
                       <legend>Input mode</legend>
+                      <span class="help-popover section-help-popover">
+                        <button type="button" class="help-popover-trigger" aria-label="About input modes" aria-describedby="input-mode-help-content">?</button>
+                        <span id="input-mode-help-content" class="help-popover-content" role="tooltip">
+                          <strong>Encoding modes</strong>
+                          <span><strong>Auto-detect:</strong> Chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.</span>
+                          <span><strong>Manual:</strong> Forces the selected mode and flags incompatible characters.</span>
+                        </span>
+                      </span>
 
-                      <label class="toggle-field">
+                      <label class="toggle-field encoding-auto-toggle">
                         <input id="mode-auto" name="mode-auto" type="checkbox" checked />
                         <span>Auto-detect (excludes Kanji)</span>
                       </label>
 
-                      <span class="field-label" id="encoding-mode-label">Manual mode</span>
+                      <span class="field-label" id="encoding-mode-label">Manual</span>
                       <div class="choice-grid encoding-mode-grid" role="group" aria-labelledby="encoding-mode-label">
                         <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="numeric" aria-pressed="true">Numeric</button>
                         <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="alphanumeric" aria-pressed="false">A-Z / 0-9</button>
@@ -859,37 +872,24 @@
                         <option value="kanji">Kanji</option>
                       </select>
 
-                      <div class="info-grid">
-                        <div class="info-chip">
-                          <span class="info-label">Chosen mode</span>
-                          <strong id="detected-mode">Auto</strong>
-                        </div>
-                        <div class="info-chip">
-                          <span class="info-label">Segments</span>
-                          <strong id="segment-summary">0</strong>
-                        </div>
-                        <div class="info-chip">
-                          <span class="info-label">Version</span>
-                          <strong id="version-summary">Auto</strong>
-                        </div>
-                        <div class="info-chip">
-                          <span class="info-label">Capacity</span>
-                          <strong id="capacity-summary">-</strong>
-                        </div>
+                      <div class="encoding-mode-summary">
+                        <span class="info-label">Mode</span>
+                        <strong id="detected-mode">Auto</strong>
                       </div>
                       <div id="mode-validation" class="validation-message" hidden></div>
                     </fieldset>
 
-                    <fieldset class="option-group">
+                    <fieldset class="option-group encoding-control-group encoding-version-group">
                       <legend>Version</legend>
 
-                      <label class="toggle-field">
-                        <input id="version-auto" name="version-auto" type="checkbox" checked />
-                        <span>Auto-pick version</span>
+                      <label class="toggle-field version-auto-row">
+                        <input id="version-auto" name="version-auto" type="checkbox" checked aria-label="Auto-pick QR version" />
+                        <span>Auto</span>
+                        <span class="version-current">Version: <strong id="version-summary">Auto</strong></span>
                       </label>
 
                       <label class="slider-field" for="qr-version">
-                        <span>Version</span>
+                        <span>Target</span>
                         <output id="qr-version-value" for="qr-version">Auto</output>
                       </label>
                       <input id="qr-version" name="qr-version" type="range" min="1" max="40" step="1" value="8" />
@@ -935,6 +935,10 @@
                           <input id="debug-unmask" name="debug-unmask" type="checkbox" aria-label="Show unmasked data modules" />
                           <span>Unmask</span>
                         </label>
+                        <div class="info-chip">
+                          <span class="info-label">Segments</span>
+                          <strong id="segment-summary">0</strong>
+                        </div>
                         <div class="info-chip">
                           <span class="info-label" aria-label="Unused capacity">Unused</span>
                           <strong id="unused-summary">-</strong>

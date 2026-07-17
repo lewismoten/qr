@@ -6,11 +6,10 @@ export function createDebugEncodingSetup({ elements: e, config, encoder,
   return createEncodingDiagnostics({
     encoder,
     modeLabels: config.modeLabels,
-    modeCapacity: config.modeCapacity,
     alphanumericCharacters: config.alphanumericCharacters,
     elements: {
       detectedMode: e.detectedMode, segmentSummary: e.segmentSummary,
-      versionSummary: e.versionSummary, capacitySummary: e.capacitySummary,
+      versionSummary: e.versionSummary,
       unusedSummary: e.unusedSummary, modeValidation: e.modeValidation,
       formatValidation: e.formatValidation, encodedPreview: e.encodedPreview,
       bulkFields: e.bulkFields,

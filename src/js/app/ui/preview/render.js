@@ -23,8 +23,12 @@ export function createRenderController(deps) {
     deps.syncMask();
     deps.renderMasks(encodedText);
     const validation = deps.getValidation();
+    deps.setValidation(
+      validation.error || validation.warning,
+      [],
+      validation.warning && !validation.error ? 'warning' : 'error',
+    );
     if (validation.error) {
-      deps.setValidation(validation.error);
       deps.renderInvalid(encodedText || deps.buildPreview(), options, validation.error);
       deps.updateSummary(null, options);
       return;
@@ -47,7 +51,6 @@ export function createRenderController(deps) {
     try {
       const definition = deps.createDefinition(deps.buildPayload(encodedText), options);
       deps.updateSummary(definition, options);
-      deps.setValidation(validation.warning, [], validation.warning ? 'warning' : 'error');
       deps.drawQr(definition, options);
       deps.syncDownloads();
     } catch (error) {

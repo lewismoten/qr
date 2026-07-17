@@ -20,7 +20,6 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxL
   function formatErrorCorrection() {
     const selected = getErrorLevel();
     e.errorCorrectionLabel.textContent = selected.label;
-    e.errorCorrectionValue.textContent = selected.value;
     e.errorCorrectionHelp.textContent = selected.detail;
   }
 

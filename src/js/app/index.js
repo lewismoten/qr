@@ -119,7 +119,7 @@ const output = createOutputSetup({
 const debugSetup = createLazyDebugSetup({
   elements,
   encoder: qrEncoder,
-  config: { modeLabels: MODE_LABELS, modeCapacity: MODE_CAPACITY,
+  config: { modeLabels: MODE_LABELS,
     alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES,
     maskLabels: MASK_LABELS },
   getCurrentMode: runtimeHelpers.getEncodingMode,
