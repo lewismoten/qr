@@ -1,3 +1,3 @@
-/* Add future component styles as imports here; esbuild emits one deployable stylesheet. */
+/* Shared app CSS; feature styles are emitted as lazy chunks. */
 @import '../../styles.css';
 @import './components/language-picker.css';
