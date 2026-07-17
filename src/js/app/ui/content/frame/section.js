@@ -22,6 +22,11 @@ function shortText(value) {
   return shorten(domain ? domain[1].replace(/\/$/, '') : normalized);
 }
 
+function joinMessageLines(first, second) {
+  if (first && second) return `${first}\n${second}`;
+  return first || second || '';
+}
+
 function formatDate(value, includeYear = true) {
   const [year, month, day] = value.split('-').map(Number);
   if (!year || !month || !day) return '';
@@ -59,13 +64,13 @@ export function createFrameSection(options) {
         ? `${schedule} | ${startTime} - ${endTime}`
         : `${formatDate(event.startDate.value, !sameYear)} ${startTime} - ${endDate} ${endTime}`;
     }
-    return [shorten(event.title.value, 80), shorten(schedule, 80)].filter(Boolean).join('\n');
+    return joinMessageLines(shorten(event.title.value, 80), shorten(schedule, 80));
   };
 
-  const getBulkMessage = () => {
+  const getBulkMessage = (format) => {
     const row = options.getBulkRow();
     if (!row) return '';
-    switch (options.format.value) {
+    switch (format) {
       case 'url': return shortText(row.url);
       case 'text': return shortText(row.text);
       case 'number': return shorten(options.buildBulkText(row));
@@ -76,7 +81,7 @@ export function createFrameSection(options) {
       case 'event': {
         const dates = row.start_date === row.end_date ? row.start_date : `${row.start_date} - ${row.end_date}`;
         const times = options.parseBoolean(row.all_day) ? 'All day' : `${row.start_time} - ${row.end_time}`;
-        return [shorten(row.title, 80), shorten(`${dates} | ${times}`, 80)].filter(Boolean).join('\n');
+        return joinMessageLines(shorten(row.title, 80), shorten(`${dates} | ${times}`, 80));
       }
       case 'geo': return shorten(`Location ${row.label.trim() || `${row.latitude}, ${row.longitude}`}`);
       case 'vcard': return shorten(`Contact ${row.name || row.organization || row.email}`);
@@ -94,9 +99,10 @@ export function createFrameSection(options) {
   };
 
   const getAutomaticMessage = () => {
-    if (options.isBulkMode()) return getBulkMessage();
+    const format = options.format.value;
+    if (options.isBulkMode()) return getBulkMessage(format);
     const { values } = options;
-    switch (options.format.value) {
+    switch (format) {
       case 'url': return shortText(values.url.value);
       case 'text': return shortText(values.text.value);
       case 'number': return shorten(options.getNumberPayload());
@@ -137,5 +143,6 @@ export function createFrameSection(options) {
     mono: `700 ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
   })[options.font.value] || `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`;
 
-  return { getMessage, setCentered, getFont };
+  const sync = () => { options.customField.hidden = options.mode.value !== 'custom'; };
+  return { getMessage, setCentered, getFont, sync };
 }

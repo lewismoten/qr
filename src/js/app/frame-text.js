@@ -1,8 +1,12 @@
 export function fitCanvasText(context, text, maximumWidth) {
-  let fitted = text;
-  while (fitted && context.measureText(`${fitted}...`).width > maximumWidth) {
-    fitted = fitted.slice(0, -1).trimEnd();
+  let low = 0;
+  let high = text.length + 1;
+  while (low + 1 < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (context.measureText(`${text.slice(0, middle).trimEnd()}...`).width <= maximumWidth) low = middle;
+    else high = middle;
   }
+  const fitted = text.slice(0, low).trimEnd();
   return fitted ? `${fitted}...` : '...';
 }
 
@@ -37,11 +41,14 @@ export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 
   }
 
   while (remaining && lines.length < maximumLines) {
-    let length = 1;
-    while (length <= remaining.length && context.measureText(remaining.slice(0, length)).width <= maximumWidth) {
-      length += 1;
+    let low = 0;
+    let high = remaining.length + 1;
+    while (low + 1 < high) {
+      const middle = Math.floor((low + high) / 2);
+      if (context.measureText(remaining.slice(0, middle)).width <= maximumWidth) low = middle;
+      else high = middle;
     }
-    length = Math.max(1, length - 1);
+    let length = Math.max(1, low);
 
     if (length < remaining.length) {
       const wordBoundary = remaining.lastIndexOf(' ', length);
@@ -73,8 +80,7 @@ export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 
 
 export function fitFrameMessage(context, message, maximumWidth, maximumLineHeight, getFont) {
   const maximumFontSize = Math.ceil(maximumLineHeight * 2.5);
-
-  for (let fontSize = maximumFontSize; fontSize >= 4; fontSize -= 1) {
+  const trySize = (fontSize) => {
     const font = getFont(fontSize);
     context.font = font;
     const metrics = context.measureText('Mg');
@@ -82,15 +88,28 @@ export function fitFrameMessage(context, message, maximumWidth, maximumLineHeigh
       metrics.actualBoundingBoxAscent !== undefined && metrics.actualBoundingBoxDescent !== undefined
         ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
         : fontSize;
-    if (measuredHeight > maximumLineHeight) {
-      continue;
-    }
+    if (measuredHeight > maximumLineHeight) return null;
 
     const lines = wrapFrameMessage(context, message, maximumWidth, 2, false);
     if (lines && lines.every((line) => context.measureText(line).width <= maximumWidth)) {
       return { font, lines };
     }
+    return null;
+  };
+  let low = 4;
+  let high = maximumFontSize;
+  let fitted = null;
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const candidate = trySize(middle);
+    if (candidate) {
+      fitted = candidate;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
   }
+  if (fitted) return fitted;
 
   const font = getFont(4);
   context.font = font;
@@ -141,4 +160,3 @@ export function drawCenteredFrameMessage(context, messageLines, font, lineHeight
 export function getOpaqueArtworkBackground(lightColor) {
   return /^#[0-9a-f]{6}/i.test(lightColor) ? lightColor.slice(0, 7) : '#ffffff';
 }
-

@@ -4,7 +4,7 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxL
     formatColorTransparency: systems.style.colors.formatTransparency,
     syncGradientControls: systems.style.colors.sync,
     syncNumberSequenceControls: systems.contentSections.number.sync,
-    getCurrentFrameMessage: systems.contentEncoding.pipeline.frame.getMessage,
+    syncFrameMessageControls: systems.contentEncoding.pipeline.frame.sync,
     syncModuleShapeControls: systems.style.modules.sync,
     syncEyeShapeControls: systems.style.eyes.sync,
     syncCenterArtworkControls: systems.style.artwork.sync,
@@ -33,7 +33,7 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxL
     actions.formatColorTransparency();
     actions.syncGradientControls();
     actions.syncNumberSequenceControls();
-    actions.getCurrentFrameMessage();
+    actions.syncFrameMessageControls();
     e.frameMessageCenterArt.checked = e.frameMessageCenter.checked;
     e.frameLineHeightValue.textContent = `${e.frameLineHeight.value} px`;
     actions.syncModuleShapeControls();
