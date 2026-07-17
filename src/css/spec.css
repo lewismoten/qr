@@ -863,13 +863,37 @@ h1 {
 
 .reference-links a {
   min-height: 5rem;
-  padding: 0.9rem;
+  padding: 0.9rem 2rem 0.9rem 0.9rem;
+  position: relative;
   display: grid;
   gap: 0.25rem;
   border: 1px solid rgba(15, 118, 110, 0.16);
   border-radius: 1rem;
   background: rgba(255, 253, 248, 0.82);
   text-decoration: none;
+}
+
+.external-link-indicator {
+  margin-inline-start: 0.3em;
+  display: inline-block;
+  color: #0d9488;
+  font-size: 0.78em;
+  font-weight: 1000;
+  line-height: 1;
+  vertical-align: 0.16em;
+}
+
+.reference-links .external-link-indicator {
+  margin: 0;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.8rem;
+  color: #0d9488;
+  font-size: 0.9rem;
+}
+
+.spec-footer .external-link-indicator {
+  color: #5eead4;
 }
 
 .reference-links a:hover,

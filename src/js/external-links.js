@@ -16,6 +16,15 @@ function prepareExternalLink(link) {
   relations.add('noopener');
   relations.add('noreferrer');
   link.setAttribute('rel', [...relations].join(' '));
+
+  link.classList.add('external-link');
+  if (!link.querySelector(':scope > .external-link-indicator')) {
+    const indicator = document.createElement('span');
+    indicator.className = 'external-link-indicator';
+    indicator.setAttribute('aria-hidden', 'true');
+    indicator.textContent = '\u2197';
+    link.append(indicator);
+  }
 }
 
 function prepareLinks(root) {
