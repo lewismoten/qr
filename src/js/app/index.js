@@ -57,12 +57,19 @@ import {
 import { createContentSubtabs } from './ui/content/subtabs.js';
 import { createEventSection } from './ui/content/event/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
+import { createNumberSection } from './ui/content/number/section.js';
 import { createPhoneSection } from './ui/content/phone/section.js';
+import { createSharedFieldsSection } from './ui/content/shared-fields.js';
+import { createVCardSection } from './ui/content/vcard/section.js';
+import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
+import { initializeDialogs } from './ui/dialogs.js';
 import { createPrimaryTabs } from './ui/navigation.js';
+import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
+import { createColorSection } from './ui/style/colors/section.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
 import { createZipBlob } from './zip.js';
@@ -85,14 +92,6 @@ const chunkPreviewPrev = document.getElementById('chunk-preview-prev');
 const chunkPreviewNext = document.getElementById('chunk-preview-next');
 const chunkPreviewStatus = document.getElementById('chunk-preview-status');
 
-let previewViewMode = 'fit';
-let previewPanX = 0;
-let previewPanY = 0;
-let previewPanPointer = null;
-let previewPanStartX = 0;
-let previewPanStartY = 0;
-let previewPanOriginX = 0;
-let previewPanOriginY = 0;
 const optionsPreview = document.getElementById('options-preview');
 const encodedPreview = document.getElementById('encoded-preview');
 const payloadRevealSecrets = document.getElementById('payload-reveal-secrets');
@@ -416,6 +415,16 @@ let chunkSettingsRefreshRequest = 0;
 let transferSettingsRevision = 0;
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
+const previewViewport = createPreviewViewport({
+  viewport: qrPreviewViewport,
+  canvas,
+  controls: previewViewControls,
+  fitButton: previewViewFit,
+  actualButton: previewViewActual,
+  getRenderMetrics: () => ({ renderedWidth: renderedQrWidth, moduleScale: renderedQrModuleScale }),
+});
+const setPreviewViewMode = previewViewport.setMode;
+const schedulePreviewViewportSync = previewViewport.scheduleSync;
 let activeTabName = 'content';
 let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
@@ -626,89 +635,6 @@ function getShareableAppUrl() {
 function clearCanvas() {
   const context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function getPreviewPanBounds() {
-  return {
-    x: Math.max(0, (canvas.width - qrPreviewViewport.clientWidth) / 2),
-    y: Math.max(0, (canvas.height - qrPreviewViewport.clientHeight) / 2),
-  };
-}
-
-function applyPreviewPan() {
-  const bounds = getPreviewPanBounds();
-  previewPanX = Math.max(-bounds.x, Math.min(bounds.x, previewPanX));
-  previewPanY = Math.max(-bounds.y, Math.min(bounds.y, previewPanY));
-  const centeredLeft = (qrPreviewViewport.clientWidth - canvas.width) / 2;
-  const centeredTop = (qrPreviewViewport.clientHeight - canvas.height) / 2;
-  qrPreviewViewport.style.setProperty('--qr-preview-left', `${Math.round(centeredLeft + previewPanX)}px`);
-  qrPreviewViewport.style.setProperty('--qr-preview-top', `${Math.round(centeredTop + previewPanY)}px`);
-}
-
-function setPreviewViewMode(mode, resetPan = false) {
-  previewViewMode = mode === 'actual' ? 'actual' : 'fit';
-  if (resetPan) {
-    previewPanX = 0;
-    previewPanY = 0;
-  }
-
-  const actualSize = previewViewMode === 'actual';
-  qrPreviewViewport.classList.toggle('is-actual', actualSize);
-  qrPreviewViewport.classList.toggle('is-fit', !actualSize);
-  previewViewFit.classList.toggle('is-active', !actualSize);
-  previewViewActual.classList.toggle('is-active', actualSize);
-  previewViewFit.setAttribute('aria-pressed', String(!actualSize));
-  previewViewActual.setAttribute('aria-pressed', String(actualSize));
-  applyPreviewPan();
-}
-
-let previewViewportSyncRequest = 0;
-
-function syncFitPreviewSize() {
-  const availableWidth = qrPreviewViewport.clientWidth;
-  const availableHeight = qrPreviewViewport.clientHeight;
-  const fitRatio = Math.min(1, availableWidth / canvas.width, availableHeight / canvas.height);
-  let fitWidth = canvas.width;
-  let fitHeight = canvas.height;
-
-  if (fitRatio < 1 && renderedQrWidth && renderedQrModuleScale) {
-    const totalModules = Math.round(renderedQrWidth / renderedQrModuleScale);
-    const fittedModuleScale = Math.floor(renderedQrModuleScale * fitRatio);
-    if (fittedModuleScale >= 1) {
-      fitWidth = totalModules * fittedModuleScale;
-      fitHeight = Math.round(canvas.height * (fitWidth / canvas.width));
-    } else {
-      fitWidth = Math.max(1, Math.floor(canvas.width * fitRatio));
-      fitHeight = Math.max(1, Math.floor(canvas.height * fitRatio));
-    }
-  }
-
-  qrPreviewViewport.style.setProperty('--qr-fit-width', `${fitWidth}px`);
-  qrPreviewViewport.style.setProperty('--qr-fit-height', `${fitHeight}px`);
-}
-
-function schedulePreviewViewportSync() {
-  cancelAnimationFrame(previewViewportSyncRequest);
-  previewViewportSyncRequest = requestAnimationFrame(() => {
-    syncFitPreviewSize();
-    const isOversized =
-      canvas.width > qrPreviewViewport.clientWidth || canvas.height > qrPreviewViewport.clientHeight;
-    previewViewControls.classList.toggle('is-hidden', !isOversized);
-    previewViewControls.setAttribute('aria-hidden', String(!isOversized));
-    applyPreviewPan();
-  });
-}
-
-function stopPreviewPan(event) {
-  if (previewPanPointer !== event.pointerId) {
-    return;
-  }
-
-  previewPanPointer = null;
-  qrPreviewViewport.classList.remove('is-dragging');
-  if (qrPreviewViewport.hasPointerCapture(event.pointerId)) {
-    qrPreviewViewport.releasePointerCapture(event.pointerId);
-  }
 }
 
 function getPdfQuality() {
@@ -948,10 +874,6 @@ function readInteger(inputElement) {
   return Number.isNaN(parsed) ? undefined : parsed;
 }
 
-function escapeWifiValue(value) {
-  return value.replace(/([\\;,:"])/g, '\\$1');
-}
-
 function getSelectedErrorLevel() {
   return ERROR_LEVELS[Number.parseInt(errorCorrection.value, 10)] ?? ERROR_LEVELS[1];
 }
@@ -1005,29 +927,6 @@ function formatMarginLabel() {
   qrMarginValue.textContent = qrMargin.value;
 }
 
-function formatColorTransparency() {
-  colorDarkTransparencyValue.textContent = `${colorDarkTransparency.value}%`;
-  colorLightTransparencyValue.textContent = `${colorLightTransparency.value}%`;
-  colorGradientEndTransparencyValue.textContent = `${colorGradientEndTransparency.value}%`;
-}
-
-function syncGradientControls() {
-  const isGradient = gradientType.value === 'linear' || gradientType.value === 'radial';
-  gradientControls.hidden = !isGradient;
-  gradientAngleControls.hidden = gradientType.value !== 'linear';
-  imageFillControls.hidden = gradientType.value !== 'image';
-  imageFillClear.disabled = !imageFillImage;
-  gradientAngleValue.textContent = `${gradientAngle.value} degrees`;
-}
-
-function getCurrentGradientOptions() {
-  return {
-    type: gradientType.value,
-    angle: readInteger(gradientAngle) ?? 0,
-    endColor: colorWithTransparency(colorGradientEnd.value.trim() || '#0f766e', colorGradientEndTransparency),
-  };
-}
-
 function shortenFrameValue(value, maximumLength = 64) {
   const normalized = String(value || '').replace(/\s+/g, ' ').trim();
   if (normalized.length <= maximumLength) {
@@ -1055,49 +954,6 @@ function getShortTextFrameValue(value) {
 
   const domainLikeValue = normalized.match(/^(?:https?:\/\/)?(?:www\.)?([^\s?#]+)(?:[?#].*)?$/i);
   return shortenFrameValue(domainLikeValue ? domainLikeValue[1].replace(/\/$/, '') : normalized);
-}
-
-function readNumberSeriesInteger(input) {
-  const value = Number(input.value);
-  return Number.isSafeInteger(value) ? value : null;
-}
-
-function getNumberSequenceInfo() {
-  const start = readNumberSeriesInteger(numberStart);
-  const end = readNumberSeriesInteger(numberEnd);
-  const step = readNumberSeriesInteger(numberStep);
-  if (start === null || end === null || step === null || step <= 0) {
-    return { start, end, step, total: 1, current: 1, value: start ?? 0 };
-  }
-
-  const total = Math.floor(Math.abs(end - start) / step) + 1;
-  const current = Math.min(total, Math.max(1, Number.parseInt(numberSequenceIndex.value, 10) || 1));
-  const direction = end >= start ? 1 : -1;
-  return {
-    start,
-    end,
-    step,
-    total,
-    current,
-    value: start + direction * (current - 1) * step,
-  };
-}
-
-function getNumberPayload() {
-  const { value } = getNumberSequenceInfo();
-  const rawPayload = `${numberPrefix.value}${value}${numberSuffix.value}`;
-  const uppercasePayload = rawPayload.toUpperCase();
-  return [...uppercasePayload].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character))
-    ? uppercasePayload
-    : rawPayload;
-}
-
-function syncNumberSequenceControls() {
-  const { total, current, value } = getNumberSequenceInfo();
-  const safeTotal = Math.min(Math.max(total, 1), NUMBER_SERIES_MAX_FRAMES);
-  numberSequenceIndex.max = String(safeTotal);
-  numberSequenceIndex.value = String(Math.min(current, safeTotal));
-  numberSequenceValue.textContent = `${numberSequenceIndex.value} / ${safeTotal} - ${value}`;
 }
 
 function getAutomaticNumberFrameMessage() {
@@ -1936,13 +1792,6 @@ function syncSmsLengthHint() {
   smsLengthHint.textContent = `${smsBody.value.length} / ${SMS_MAX_LENGTH}`;
 }
 
-function syncWifiSecurityState() {
-  const isOpenNetwork = wifiEncryption.value === 'nopass';
-  wifiPassword.disabled = isOpenNetwork;
-  wifiPassword.setAttribute('aria-disabled', String(isOpenNetwork));
-  wifiPassword.placeholder = isOpenNetwork ? 'Not used for open networks' : 'Password';
-}
-
 function setFormatVisibility() {
   syncBulkControls();
   const activeFormat = qrFormat.value;
@@ -2397,67 +2246,8 @@ async function buildFilePayload() {
   }
 }
 
-function buildWifiPayload() {
-  const encryption = wifiEncryption.value;
-  const segments = [
-    `T:${encryption}`,
-    `S:${escapeWifiValue(wifiSsid.value.trim())}`,
-  ];
-
-  if (encryption !== 'nopass') {
-    segments.push(`P:${escapeWifiValue(wifiPassword.value)}`);
-  }
-
-  if (wifiHidden.checked) {
-    segments.push('H:true');
-  }
-
-  return `WIFI:${segments.join(';')};;`;
-}
-
-function maskWifiPayload(payload) {
-  if (payloadRevealSecrets.checked) {
-    return payload;
-  }
-
-  return payload.replace(/P:([^;]*)/, 'P:[hidden-password]');
-}
-
 function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
-}
-
-function syncEmailValuesAcrossAll(sourceInput) {
-  [emailTo, vcardEmail].forEach((inputElement) => {
-    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
-      inputElement.value = sourceInput.value;
-    }
-  });
-}
-
-function syncMessageValuesAcrossAll(sourceInput) {
-  [textInput, smsBody, emailBody].forEach((inputElement) => {
-    if (inputElement !== sourceInput && inputElement.value !== sourceInput.value) {
-      inputElement.value = sourceInput.value;
-    }
-  });
-}
-
-function buildEmailPayload() {
-  return buildEmailPayloadWithBody(emailBody.value);
-}
-
-function buildEmailPayloadWithBody(bodyValue) {
-  const params = new URLSearchParams();
-  if (emailSubject.value.trim()) {
-    params.set('subject', emailSubject.value.trim());
-  }
-  if (bodyValue.trim()) {
-    params.set('body', bodyValue.trim());
-  }
-
-  const suffix = params.toString() ? `?${params.toString()}` : '';
-  return `mailto:${emailTo.value.trim()}${suffix}`;
 }
 
 const eventSection = createEventSection({
@@ -2493,32 +2283,83 @@ const phoneSection = createPhoneSection({
   onChange: renderQr,
 });
 
-function buildVCardPayload() {
-  const lines = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `FN:${vcardName.value.trim()}`,
-  ];
+const numberSection = createNumberSection({
+  startInput: numberStart,
+  endInput: numberEnd,
+  stepInput: numberStep,
+  prefixInput: numberPrefix,
+  suffixInput: numberSuffix,
+  indexInput: numberSequenceIndex,
+  statusElement: numberSequenceValue,
+  maxFrames: NUMBER_SERIES_MAX_FRAMES,
+  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+  validatePrintableText,
+});
+const getNumberSequenceInfo = numberSection.getSequenceInfo;
+const getNumberPayload = numberSection.getPayload;
+const syncNumberSequenceControls = numberSection.sync;
 
-  if (vcardOrg.value.trim()) {
-    lines.push(`ORG:${vcardOrg.value.trim()}`);
-  }
-  if (vcardTitle.value.trim()) {
-    lines.push(`TITLE:${vcardTitle.value.trim()}`);
-  }
-  if (vcardPhone.value.trim()) {
-    lines.push(`TEL:${vcardPhone.value.trim()}`);
-  }
-  if (vcardEmail.value.trim()) {
-    lines.push(`EMAIL:${vcardEmail.value.trim()}`);
-  }
-  if (vcardUrl.value.trim()) {
-    lines.push(`URL:${vcardUrl.value.trim()}`);
-  }
+const wifiSection = createWifiSection({
+  ssid: wifiSsid,
+  password: wifiPassword,
+  encryption: wifiEncryption,
+  hidden: wifiHidden,
+  revealSecrets: payloadRevealSecrets,
+  onChange() {
+    syncChoiceButtons();
+    renderQr();
+  },
+});
+const syncWifiSecurityState = wifiSection.sync;
+const buildWifiPayload = wifiSection.buildPayload;
+const maskWifiPayload = wifiSection.maskPayload;
 
-  lines.push('END:VCARD');
-  return lines.join('\n');
-}
+const sharedFieldsSection = createSharedFieldsSection({
+  emailInputs: [emailTo, vcardEmail],
+  messageInputs: [textInput, smsBody, emailBody],
+  emailSubject,
+  onMessageChange() {
+    syncSmsLengthHint();
+    syncEmailBodyLengthHint();
+  },
+});
+const buildEmailPayload = sharedFieldsSection.buildEmailPayload;
+const buildEmailPayloadWithBody = sharedFieldsSection.buildEmailPayloadWithBody;
+
+const colorSection = createColorSection({
+  darkColor: colorDark,
+  lightColor: colorLight,
+  darkTransparency: colorDarkTransparency,
+  darkTransparencyValue: colorDarkTransparencyValue,
+  lightTransparency: colorLightTransparency,
+  lightTransparencyValue: colorLightTransparencyValue,
+  gradientType,
+  gradientControls,
+  gradientAngleControls,
+  gradientAngle,
+  gradientAngleValue,
+  gradientEndColor: colorGradientEnd,
+  gradientEndTransparency: colorGradientEndTransparency,
+  gradientEndTransparencyValue: colorGradientEndTransparencyValue,
+  imageFillControls,
+  imageFillClear,
+  hasImageFill: () => Boolean(imageFillImage),
+  colorWithTransparency,
+});
+const formatColorTransparency = colorSection.formatTransparency;
+const syncGradientControls = colorSection.sync;
+const getCurrentGradientOptions = colorSection.getGradientOptions;
+const applyRecommendedImageContrast = colorSection.applyRecommendedImageContrast;
+
+const vcardSection = createVCardSection({
+  name: vcardName,
+  organization: vcardOrg,
+  title: vcardTitle,
+  phone: vcardPhone,
+  email: vcardEmail,
+  website: vcardUrl,
+});
+const buildVCardPayload = vcardSection.buildPayload;
 
 function normalizeBulkWifiSecurity(value) {
   const normalized = String(value).trim().toLowerCase();
@@ -3035,39 +2876,8 @@ function getFormatValidationState() {
   }
 
   if (qrFormat.value === 'number') {
-    const start = readNumberSeriesInteger(numberStart);
-    const end = readNumberSeriesInteger(numberEnd);
-    const step = readNumberSeriesInteger(numberStep);
-    if (start === null) {
-      return { error: 'Not valid for Number format yet: start must be a whole number.', warning: '' };
-    }
-    if (end === null) {
-      return { error: 'Not valid for Number format yet: end must be a whole number.', warning: '' };
-    }
-    if (step === null || step <= 0) {
-      return { error: 'Not valid for Number format yet: step must be a positive whole number.', warning: '' };
-    }
-    const { total } = getNumberSequenceInfo();
-    if (total > NUMBER_SERIES_MAX_FRAMES) {
-      return {
-        error: `Not valid for Number format yet: the range creates ${total.toLocaleString()} QR codes; limit it to ${NUMBER_SERIES_MAX_FRAMES.toLocaleString()} or fewer.`,
-        warning: '',
-      };
-    }
-    const prefixValidation = validatePrintableText(numberPrefix.value, {
-      label: 'Not valid for Number format yet: prefix',
-      maxLength: 32,
-    });
-    if (prefixValidation) {
-      return { error: prefixValidation, warning: '' };
-    }
-    const suffixValidation = validatePrintableText(numberSuffix.value, {
-      label: 'Not valid for Number format yet: suffix',
-      maxLength: 32,
-    });
-    if (suffixValidation) {
-      return { error: suffixValidation, warning: '' };
-    }
+    const numberValidation = numberSection.getValidationState();
+    if (numberValidation.error || numberValidation.warning) return numberValidation;
   }
 
   if (qrFormat.value === 'event') {
@@ -5125,12 +4935,6 @@ qrFormat.addEventListener('change', () => {
   renderQr();
 });
 
-wifiEncryption.addEventListener('change', () => {
-  syncChoiceButtons();
-  syncWifiSecurityState();
-  renderQr();
-});
-
 frameMessageCenter.addEventListener('input', () => {
   setFrameMessageCenter(frameMessageCenter.checked);
 });
@@ -5228,14 +5032,6 @@ pixelArtColor.addEventListener('input', () => {
 pixelArtSizeInput.addEventListener('input', () => {
   resizePixelArt(Number.parseInt(pixelArtSizeInput.value, 10) || 16);
 });
-
-function applyRecommendedImageContrast() {
-  colorDark.value = '#000000';
-  colorDarkTransparency.value = '75';
-  colorLight.value = '#ffffff';
-  colorLightTransparency.value = '25';
-  formatColorTransparency();
-}
 
 imageFillRecommended.addEventListener('click', () => {
   applyRecommendedImageContrast();
@@ -5454,125 +5250,7 @@ qrVersion.addEventListener('input', () => {
   syncChunkVersionControls();
 });
 
-emailTo.addEventListener('input', () => {
-  syncEmailValuesAcrossAll(emailTo);
-});
-
-vcardEmail.addEventListener('input', () => {
-  syncEmailValuesAcrossAll(vcardEmail);
-});
-
-textInput.addEventListener('input', () => {
-  syncMessageValuesAcrossAll(textInput);
-  syncSmsLengthHint();
-  syncEmailBodyLengthHint();
-});
-
-smsBody.addEventListener('input', () => {
-  syncMessageValuesAcrossAll(smsBody);
-  syncSmsLengthHint();
-  syncEmailBodyLengthHint();
-});
-
-emailBody.addEventListener('input', () => {
-  syncMessageValuesAcrossAll(emailBody);
-  syncSmsLengthHint();
-  syncEmailBodyLengthHint();
-});
-
-const infoDialogs = document.querySelectorAll('.info-dialog');
-
-function syncInfoDialogFromHash() {
-  const targetId = window.location.hash.slice(1);
-  const targetDialog = [...infoDialogs].find((dialog) => dialog.id === targetId);
-
-  infoDialogs.forEach((dialog) => {
-    if (dialog !== targetDialog && dialog.open) {
-      dialog.close();
-    }
-  });
-
-  if (targetDialog && !targetDialog.open) {
-    targetDialog.showModal();
-  }
-}
-
-document.querySelectorAll('[data-dialog-target]').forEach((link) => {
-  link.addEventListener('click', () => {
-    if (window.location.hash === link.getAttribute('href')) {
-      window.requestAnimationFrame(syncInfoDialogFromHash);
-    }
-  });
-});
-
-document.querySelectorAll('[data-close-dialog]').forEach((button) => {
-  button.addEventListener('click', () => {
-    button.closest('dialog')?.close();
-  });
-});
-
-infoDialogs.forEach((dialog) => {
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) {
-      dialog.close();
-    }
-  });
-
-  dialog.addEventListener('close', () => {
-    if (window.location.hash === `#${dialog.id}`) {
-      history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
-    }
-  });
-});
-
-window.addEventListener('hashchange', syncInfoDialogFromHash);
-
-previewViewFit.addEventListener('click', () => {
-  setPreviewViewMode('fit');
-});
-
-previewViewActual.addEventListener('click', () => {
-  setPreviewViewMode('actual', true);
-});
-
-qrPreviewViewport.addEventListener('pointerdown', (event) => {
-  if (previewViewMode !== 'actual' || (event.button !== undefined && event.button !== 0)) {
-    return;
-  }
-
-  const bounds = getPreviewPanBounds();
-  if (bounds.x === 0 && bounds.y === 0) {
-    return;
-  }
-
-  previewPanPointer = event.pointerId;
-  previewPanStartX = event.clientX;
-  previewPanStartY = event.clientY;
-  previewPanOriginX = previewPanX;
-  previewPanOriginY = previewPanY;
-  qrPreviewViewport.classList.add('is-dragging');
-  qrPreviewViewport.setPointerCapture(event.pointerId);
-  event.preventDefault();
-});
-
-qrPreviewViewport.addEventListener('pointermove', (event) => {
-  if (previewPanPointer !== event.pointerId) {
-    return;
-  }
-
-  previewPanX = previewPanOriginX + event.clientX - previewPanStartX;
-  previewPanY = previewPanOriginY + event.clientY - previewPanStartY;
-  applyPreviewPan();
-});
-
-qrPreviewViewport.addEventListener('pointerup', stopPreviewPan);
-qrPreviewViewport.addEventListener('pointercancel', stopPreviewPan);
-
-if ('ResizeObserver' in window) {
-  new ResizeObserver(schedulePreviewViewportSync).observe(qrPreviewViewport);
-} else {
-  window.addEventListener('resize', schedulePreviewViewportSync);
-}
+const dialogs = initializeDialogs({ document, window });
 
 ensurePixelArtPalette();
 ensurePixelArtGrid();
@@ -5589,8 +5267,7 @@ phoneSection.initialize();
 syncFileCapacityHint();
 syncChunkVersionControls();
 syncFileChunkLabel();
-syncEmailValuesAcrossAll(vcardEmail);
-syncMessageValuesAcrossAll(textInput);
+sharedFieldsSection.initialize();
 syncSmsLengthHint();
 syncEmailBodyLengthHint();
 syncDebugOutlineSelection();
@@ -5602,4 +5279,4 @@ activateTab('content');
 setPreviewViewMode('fit', true);
 triggerDownloadFromLocationPayload();
 renderQr();
-syncInfoDialogFromHash();
+dialogs.syncFromHash();
