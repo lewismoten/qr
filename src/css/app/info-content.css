@@ -1,0 +1,203 @@
+.info-dialog::backdrop {
+  background: rgba(7, 24, 39, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+.info-dialog[open] {
+  animation: info-dialog-in 180ms ease-out;
+}
+
+.info-dialog-shell {
+  max-height: calc(100dvh - 1.25rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(45, 212, 191, 0.18),
+      transparent 22rem
+    ),
+    radial-gradient(
+      circle at 0 100%,
+      rgba(245, 158, 11, 0.12),
+      transparent 20rem
+    ),
+    #fffaf0;
+}
+
+.info-dialog-header {
+  padding: 1rem 1rem 0.9rem 1.15rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(19, 34, 53, 0.1);
+  background: rgba(255, 250, 240, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.info-dialog-header h1 {
+  margin: 0.15rem 0 0;
+  color: #071827;
+  font-family: "DIN Alternate", "Avenir Next", sans-serif;
+  font-size: clamp(1.45rem, 4vw, 2.35rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.info-kicker {
+  margin: 0;
+  color: #0f766e;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.dialog-close {
+  min-width: 3.25rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 0.8rem;
+  background: #ffffff;
+  box-shadow: 0 7px 16px rgba(7, 24, 39, 0.08);
+  color: #0f615c;
+  font: inherit;
+  font-weight: 900;
+}
+
+.info-dialog-content {
+  padding: 1.15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.info-dialog-content section + section {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(19, 34, 53, 0.1);
+}
+
+.info-dialog-content h2 {
+  margin: 0 0 0.65rem;
+  color: #0b4f4a;
+  font-family: "DIN Alternate", "Avenir Next", sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.info-dialog-content h3,
+.info-dialog-content p {
+  margin-top: 0;
+}
+
+.info-dialog-content p {
+  color: #42566a;
+  line-height: 1.62;
+}
+
+.info-lead {
+  color: #132235 !important;
+  font-size: 1.04rem;
+  font-weight: 650;
+}
+
+.fact-grid,
+.dependency-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.fact-grid article,
+.dependency-list > article {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(7, 24, 39, 0.06);
+}
+
+.fact-grid strong,
+.fact-grid span {
+  display: block;
+}
+
+.fact-grid strong {
+  margin-bottom: 0.3rem;
+  color: #0f766e;
+  font-size: 0.98rem;
+}
+
+.fact-grid span {
+  color: #52687a;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.dependency-list > article > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.dependency-list h3 {
+  margin-bottom: 0.4rem;
+  color: #132235;
+  font-size: 1rem;
+}
+
+.dependency-list p {
+  margin-bottom: 0.75rem;
+  font-size: 0.86rem;
+  line-height: 1.48;
+}
+
+.dependency-list nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+}
+
+.dependency-list a {
+  color: #0f766e;
+  font-size: 0.78rem;
+}
+
+.version-badge {
+  flex: 0 0 auto;
+  padding: 0.22rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f615c;
+  font-size: 0.68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.inventory-note {
+  margin: 0.9rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 1rem;
+  background: rgba(255, 247, 224, 0.86);
+  color: #59451f !important;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.inventory-note strong {
+  color: #8a4b08;
+}
+
+@keyframes info-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}

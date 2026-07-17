@@ -1,0 +1,75 @@
+@media (min-width: 720px) {
+  .app-shell {
+    padding: 1rem 1rem calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  .app-layout {
+    height: max(0px, calc(100dvh - 6.75rem - env(safe-area-inset-bottom)));
+    gap: 1rem;
+  }
+
+  .preview-frame {
+    min-height: 24rem;
+  }
+
+  #qr-canvas {
+    max-height: none;
+  }
+
+  .qr-preview-viewport {
+    height: min(60vh, 32rem);
+  }
+
+  .tab-bar {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .subtab-bar {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .tab-button {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 1080px) {
+  .app-layout {
+    grid-template-columns: minmax(20rem, 34rem) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "preview tabs"
+      "preview panels";
+    align-items: stretch;
+  }
+
+  .preview-card {
+    grid-area: preview;
+    min-height: max(
+      0px,
+      calc(100dvh - 6.75rem - env(safe-area-inset-bottom))
+    );
+  }
+
+  .tab-navigation-card {
+    grid-area: tabs;
+  }
+
+  .tab-panel-shell {
+    grid-area: panels;
+    min-height: 0;
+  }
+
+  .preview-frame {
+    min-height: 100%;
+  }
+
+  .chunk-preview-nav {
+    align-self: stretch;
+  }
+
+  .qr-preview-viewport {
+    height: 100%;
+  }
+}

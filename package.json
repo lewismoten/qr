@@ -18,7 +18,7 @@
     "lint": "npm run lint:format && npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:json && npm run lint:markdown && npm run lint:web-metadata",
     "lint:format": "prettier --check \"src/js/**/*.js\" \"scripts/**/*.mjs\" \"tests/**/*.js\" \"*.mjs\" \"eslint.config.js\"",
     "lint:js": "eslint .",
-    "lint:css": "stylelint \"styles.css\" \"src/css/**/*.css\"",
+    "lint:css": "stylelint \"styles.css\" \"src/css/**/*.css\" && node scripts/lint-css-limits.mjs",
     "lint:html": "htmlhint \"*.html\"",
     "lint:json": "node scripts/lint-json.mjs",
     "lint:markdown": "markdownlint-cli2 \"README.md\"",
