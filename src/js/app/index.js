@@ -1,6 +1,6 @@
 import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './bytes.js';
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
-import { parseBoolean as parseBulkBoolean, parseCsv } from './csv.js';
+import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { normalizePhoneNumber } from './phone.js';
 import {
   createCalendarEventId,
@@ -55,6 +55,7 @@ import {
   summarizeCodewordRoles,
 } from './qr-stream.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { createEventSection } from './ui/content/event/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
@@ -65,11 +66,14 @@ import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
+import { createAnimationSection } from './ui/download/animation/section.js';
+import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { createPrimaryTabs } from './ui/navigation.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
+import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
 import { createZipBlob } from './zip.js';
@@ -381,36 +385,12 @@ let cachedTransferBytes = null;
 let cachedChunkCapacityInfoKey = '';
 let cachedChunkCapacityInfoValue = null;
 let chunkSettingsRefreshTimer = 0;
-const EGA_COLORS = [
-  ['Black', '#000000'],
-  ['Blue', '#0000aa'],
-  ['Green', '#00aa00'],
-  ['Cyan', '#00aaaa'],
-  ['Red', '#aa0000'],
-  ['Magenta', '#aa00aa'],
-  ['Brown', '#aa5500'],
-  ['Light gray', '#aaaaaa'],
-  ['Dark gray', '#555555'],
-  ['Bright blue', '#5555ff'],
-  ['Bright green', '#55ff55'],
-  ['Bright cyan', '#55ffff'],
-  ['Bright red', '#ff5555'],
-  ['Bright magenta', '#ff55ff'],
-  ['Yellow', '#ffff55'],
-  ['White', '#ffffff'],
-];
 let centerLogoImage = null;
 let centerLogoObjectUrl = '';
 let centerLogoLoadRequest = 0;
 let imageFillImage = null;
 let imageFillObjectUrl = '';
 let imageFillLoadRequest = 0;
-let pixelArtSize = 16;
-let pixelArtPixels = Array(pixelArtSize * pixelArtSize).fill(null);
-let activePixelPaintColor = '#000000';
-let pixelPaintValue = null;
-let pixelPainting = false;
-let pixelRenderFrame = 0;
 let chunkSettingsRefreshRequest = 0;
 let transferSettingsRevision = 0;
 let renderedQrWidth = null;
@@ -425,29 +405,21 @@ const previewViewport = createPreviewViewport({
 });
 const setPreviewViewMode = previewViewport.setMode;
 const schedulePreviewViewportSync = previewViewport.scheduleSync;
+const pixelArtEditor = createPixelArtEditor({
+  paletteElement: pixelArtPalette,
+  customColorInput: pixelArtColor,
+  clearButton: pixelArtClear,
+  grid: pixelArtGrid,
+  sizeInput: pixelArtSizeInput,
+  sizeValue: pixelArtSizeValue,
+  onChange: renderQr,
+});
 let activeTabName = 'content';
 let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
 const SMS_MAX_LENGTH = 160;
 const EMAIL_SUBJECT_MAX_LENGTH = 120;
 const NUMBER_SERIES_MAX_FRAMES = 10000;
-const BULK_MAX_ROWS = 10000;
-const BULK_MAX_FILE_BYTES = 5 * 1024 * 1024;
-const BULK_FORMAT_SCHEMAS = {
-  url: { fields: ['url'], required: ['url'] },
-  text: { fields: ['text'], required: ['text'] },
-  number: { fields: ['number', 'prefix', 'suffix'], required: ['number'] },
-  wifi: { fields: ['ssid', 'password', 'security', 'hidden'], required: ['ssid', 'security'] },
-  email: { fields: ['email', 'subject', 'body'], required: ['email'] },
-  phone: { fields: ['phone'], required: ['phone'] },
-  sms: { fields: ['phone', 'message'], required: ['phone'] },
-  event: {
-    fields: ['title', 'all_day', 'start_date', 'start_time', 'end_date', 'end_time', 'location', 'description', 'url'],
-    required: ['title', 'start_date', 'end_date'],
-  },
-  geo: { fields: ['latitude', 'longitude', 'label'], required: ['latitude', 'longitude'] },
-  vcard: { fields: ['name', 'organization', 'title', 'phone', 'email', 'url'], required: ['name'] },
-};
 const MAX_QR_TARGET_WIDTH = 2048;
 const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
 const PRINT_PIXELS_PER_INCH = 192;
@@ -475,10 +447,29 @@ const FILE_MANIFEST_FIELDS = {
   validationValue: 6,
   customMetadata: 8,
 };
-let bulkRows = [];
-let bulkHeaders = [];
-let bulkParseError = '';
-let bulkLoadRequest = 0;
+const bulkImportSection = createBulkImportSection({
+  enabled: bulkEnabled,
+  format: qrFormat,
+  fields: bulkFields,
+  expectedFields: bulkExpectedFields,
+  requiredFields: bulkRequiredFields,
+  fileInput: bulkFileInput,
+  rowIndex: bulkRowIndex,
+  status: bulkStatus,
+  clearButton: bulkClear,
+  fileFormatButton: document.querySelector('[data-choice-target="qr-format"][data-choice-value="file"]'),
+  onFormatFallback: syncChoiceButtons,
+  onChange: renderQr,
+});
+const getBulkSchema = bulkImportSection.getSchema;
+const isBulkMode = bulkImportSection.isMode;
+const getBulkCurrentRow = bulkImportSection.getCurrentRow;
+const getBulkRowCount = bulkImportSection.getRowCount;
+const getBulkParseError = bulkImportSection.getError;
+const syncBulkStatus = bulkImportSection.syncStatus;
+const syncBulkControls = bulkImportSection.syncControls;
+const clearBulkData = bulkImportSection.clear;
+const loadBulkFile = bulkImportSection.load;
 
 function isDebugOverlayActive() {
   return (activeTabName === 'debug' && activeDebugSubtab === 'overlay') || debugEnabled.checked;
@@ -490,138 +481,6 @@ function getDefaultUrlValue() {
   }
 
   return window.location.href;
-}
-
-function getBulkSchema(format = qrFormat.value) {
-  return BULK_FORMAT_SCHEMAS[format] || null;
-}
-
-function isBulkMode() {
-  return bulkEnabled.checked && Boolean(getBulkSchema());
-}
-
-function getBulkCurrentRow() {
-  const index = Math.min(bulkRows.length, Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1));
-  return bulkRows[index - 1] || null;
-}
-
-function parseBulkCsv(text) {
-  const schema = getBulkSchema();
-  const parsedRows = parseCsv(text);
-  if (!schema || parsedRows.length === 0) {
-    throw new Error('The CSV is empty.');
-  }
-
-  const headers = parsedRows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
-  const namedHeaders = headers.filter(Boolean);
-  if (new Set(namedHeaders).size !== namedHeaders.length) {
-    throw new Error('The first row contains duplicate field names.');
-  }
-
-  const missingHeaders = schema.fields.filter((field) => !namedHeaders.includes(field));
-  if (missingHeaders.length) {
-    throw new Error(`The first row is missing: ${missingHeaders.join(', ')}.`);
-  }
-
-  const dataRows = parsedRows.slice(1).filter((cells) => cells.some((cell) => cell.trim()));
-  if (dataRows.length > BULK_MAX_ROWS) {
-    throw new Error(`Bulk imports are limited to ${BULK_MAX_ROWS.toLocaleString()} data rows.`);
-  }
-  if (!dataRows.length) {
-    throw new Error('The CSV has a header row but no data rows.');
-  }
-
-  return {
-    headers: namedHeaders,
-    rows: dataRows.map((cells) =>
-      Object.fromEntries(headers.flatMap((header, index) => (header ? [[header, cells[index] ?? '']] : [])))
-    ),
-  };
-}
-
-function syncBulkStatus() {
-  const file = bulkFileInput.files?.[0];
-  bulkClear.disabled = !file && !bulkRows.length && !bulkParseError;
-  if (bulkParseError) {
-    bulkStatus.textContent = bulkParseError;
-    bulkStatus.classList.add('has-error');
-    return;
-  }
-  bulkStatus.classList.remove('has-error');
-  if (!bulkRows.length) {
-    bulkStatus.textContent = 'No CSV loaded.';
-    return;
-  }
-  const current = Math.min(bulkRows.length, Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1));
-  bulkStatus.textContent = `${bulkRows.length.toLocaleString()} rows loaded. Showing ${current.toLocaleString()} of ${bulkRows.length.toLocaleString()}.`;
-}
-
-function clearBulkData({ preserveFileInput = false } = {}) {
-  bulkLoadRequest += 1;
-  bulkRows = [];
-  bulkHeaders = [];
-  bulkParseError = '';
-  bulkRowIndex.value = '1';
-  if (!preserveFileInput) {
-    bulkFileInput.value = '';
-  }
-  syncBulkStatus();
-}
-
-async function loadBulkFile() {
-  const request = ++bulkLoadRequest;
-  const file = bulkFileInput.files?.[0];
-  bulkRows = [];
-  bulkHeaders = [];
-  bulkParseError = '';
-  bulkRowIndex.value = '1';
-
-  if (!file) {
-    syncBulkStatus();
-    renderQr();
-    return;
-  }
-  if (file.size > BULK_MAX_FILE_BYTES) {
-    bulkParseError = `The CSV is ${formatBytes(file.size)}; Bulk Import CSV files are limited to ${formatBytes(BULK_MAX_FILE_BYTES)}.`;
-    syncBulkStatus();
-    renderQr();
-    return;
-  }
-
-  try {
-    const parsed = parseBulkCsv(await file.text());
-    if (request !== bulkLoadRequest) {
-      return;
-    }
-    bulkHeaders = parsed.headers;
-    bulkRows = parsed.rows;
-  } catch (error) {
-    if (request !== bulkLoadRequest) {
-      return;
-    }
-    bulkParseError = error.message || 'Unable to read this CSV.';
-  }
-  syncBulkStatus();
-  renderQr();
-}
-
-function syncBulkControls() {
-  const schema = getBulkSchema();
-  const bulk = bulkEnabled.checked;
-  const fileFormatButton = document.querySelector('[data-choice-target="qr-format"][data-choice-value="file"]');
-
-  if (bulk && !schema) {
-    qrFormat.value = 'url';
-    syncChoiceButtons();
-  }
-  const activeSchema = getBulkSchema();
-  bulkFields.hidden = !bulk;
-  bulkFields.setAttribute('aria-hidden', String(!bulk));
-  bulkExpectedFields.textContent = activeSchema?.fields.join(', ') || '';
-  bulkRequiredFields.textContent = `Required values: ${activeSchema?.required.join(', ') || 'none'}`;
-  fileFormatButton.disabled = bulk;
-  fileFormatButton.setAttribute('aria-disabled', String(bulk));
-  syncBulkStatus();
 }
 
 function getShareableAppUrl() {
@@ -1176,129 +1035,8 @@ function syncCenterArtworkControls() {
   centerArtSizeValue.textContent = `${centerArtSize.value}%`;
   centerArtBackgroundLabel.textContent =
     mode === 'emoji' ? 'Protect with a light outline' : 'Protect with a light background';
-  pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
+  pixelArtEditor.syncSizeLabel();
   syncEmojiSelection();
-}
-
-function syncPixelArtCell(cell) {
-  const index = Number.parseInt(cell.dataset.pixelIndex, 10);
-  const color = pixelArtPixels[index];
-  cell.classList.toggle('is-painted', Boolean(color));
-  if (color) {
-    cell.style.setProperty('--pixel-color', color);
-  } else {
-    cell.style.removeProperty('--pixel-color');
-  }
-  cell.setAttribute('aria-pressed', String(Boolean(color)));
-}
-
-function syncPixelArtGrid() {
-  pixelArtGrid.querySelectorAll('.pixel-art-cell').forEach(syncPixelArtCell);
-}
-
-function syncPixelArtPalette() {
-  pixelArtPalette.querySelectorAll('.pixel-palette-button').forEach((button) => {
-    const color = button.dataset.pixelColor || null;
-    const isActive = color === activePixelPaintColor;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-  pixelArtColor.classList.toggle(
-    'is-active',
-    Boolean(activePixelPaintColor) && !EGA_COLORS.some(([, color]) => color === activePixelPaintColor)
-  );
-}
-
-function ensurePixelArtPalette() {
-  if (pixelArtPalette.childElementCount) {
-    return;
-  }
-
-  const paletteEntries = [['Transparent / eraser', null], ...EGA_COLORS];
-  const fragment = document.createDocumentFragment();
-  paletteEntries.forEach(([label, color]) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `pixel-palette-button${color ? '' : ' is-eraser'}`;
-    button.dataset.pixelColor = color || '';
-    button.title = label;
-    button.setAttribute('aria-label', label);
-    button.setAttribute('aria-pressed', 'false');
-    if (color) {
-      button.style.setProperty('--palette-color', color);
-    }
-    fragment.append(button);
-  });
-  pixelArtPalette.append(fragment);
-  syncPixelArtPalette();
-}
-
-function schedulePixelArtRender() {
-  if (pixelRenderFrame) {
-    return;
-  }
-  pixelRenderFrame = window.requestAnimationFrame(() => {
-    pixelRenderFrame = 0;
-    renderQr();
-  });
-}
-
-function paintPixelArtCell(cell) {
-  if (!cell?.classList.contains('pixel-art-cell')) {
-    return;
-  }
-  const index = Number.parseInt(cell.dataset.pixelIndex, 10);
-  if (!Number.isInteger(index) || pixelArtPixels[index] === pixelPaintValue) {
-    return;
-  }
-  pixelArtPixels[index] = pixelPaintValue;
-  syncPixelArtCell(cell);
-  schedulePixelArtRender();
-}
-
-function ensurePixelArtGrid() {
-  if (pixelArtGrid.childElementCount) {
-    return;
-  }
-  pixelArtGrid.style.setProperty('--pixel-grid-size', String(pixelArtSize));
-  pixelArtGrid.setAttribute('aria-label', `${pixelArtSize} by ${pixelArtSize} pixel art editor`);
-  const fragment = document.createDocumentFragment();
-  for (let index = 0; index < pixelArtSize * pixelArtSize; index += 1) {
-    const cell = document.createElement('button');
-    cell.type = 'button';
-    cell.className = 'pixel-art-cell';
-    cell.dataset.pixelIndex = String(index);
-    cell.setAttribute('role', 'gridcell');
-    cell.setAttribute('aria-label', `Pixel ${index + 1}`);
-    cell.setAttribute('aria-pressed', 'false');
-    fragment.append(cell);
-  }
-  pixelArtGrid.append(fragment);
-}
-
-function resizePixelArt(nextSize) {
-  const normalizedSize = Math.min(32, Math.max(8, nextSize - (nextSize % 2)));
-  if (normalizedSize === pixelArtSize) {
-    return;
-  }
-
-  const previousSize = pixelArtSize;
-  const previousPixels = pixelArtPixels;
-  const resizedPixels = Array(normalizedSize * normalizedSize).fill(null);
-  for (let row = 0; row < normalizedSize; row += 1) {
-    for (let column = 0; column < normalizedSize; column += 1) {
-      const sourceRow = Math.min(previousSize - 1, Math.floor((row * previousSize) / normalizedSize));
-      const sourceColumn = Math.min(previousSize - 1, Math.floor((column * previousSize) / normalizedSize));
-      resizedPixels[row * normalizedSize + column] = previousPixels[sourceRow * previousSize + sourceColumn];
-    }
-  }
-
-  pixelArtSize = normalizedSize;
-  pixelArtPixels = resizedPixels;
-  pixelArtGrid.replaceChildren();
-  ensurePixelArtGrid();
-  syncPixelArtGrid();
-  pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
 }
 
 function formatVersionLabel() {
@@ -1339,43 +1077,6 @@ function syncOutputs() {
   syncFileCapacityHint();
 }
 
-function getDownloadFrameCount() {
-  if (isBulkMode()) {
-    return Math.max(1, bulkRows.length);
-  }
-  if (qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked') {
-    return Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
-  }
-  if (qrFormat.value === 'number') {
-    const total = getNumberSequenceInfo().total;
-    return total <= NUMBER_SERIES_MAX_FRAMES ? total : 1;
-  }
-  return 1;
-}
-
-function getCurrentFrameIndex() {
-  if (isBulkMode()) {
-    return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
-  }
-  const input = qrFormat.value === 'number' ? numberSequenceIndex : fileChunkIndex;
-  return Math.max(1, Number.parseInt(input.value, 10) || 1);
-}
-
-function setCurrentFrameIndex(frame) {
-  if (isBulkMode()) {
-    bulkRowIndex.value = String(Math.min(Math.max(1, frame), Math.max(1, bulkRows.length)));
-    syncBulkStatus();
-    return;
-  }
-  if (qrFormat.value === 'number') {
-    numberSequenceIndex.value = String(frame);
-    syncNumberSequenceControls();
-    return;
-  }
-  fileChunkIndex.value = String(frame);
-  syncFileChunkLabel();
-}
-
 function syncDownloadControls() {
   const isJpg = downloadFormat.value === 'jpg';
   downloadQualityControls.hidden = !isJpg;
@@ -1397,35 +1098,6 @@ function syncDownloadControls() {
     downloadAllPdf.textContent = `Download all ${frameCount} as PDF`;
   }
   syncAnimationDurationSummary();
-}
-
-function getAnimationTiming(frameCount = getDownloadFrameCount()) {
-  const minutes = Math.min(60, Math.max(0, Number.parseInt(animationMinutes.value, 10) || 0));
-  const seconds = Math.min(59, Math.max(0, Number.parseInt(animationSeconds.value, 10) || 0));
-  const milliseconds = Math.min(999, Math.max(0, Number.parseInt(animationMilliseconds.value, 10) || 0));
-  const enteredDurationMs = minutes * 60000 + seconds * 1000 + milliseconds;
-  const perFrameMs = animationTimingMode.value === 'total' ? enteredDurationMs / Math.max(1, frameCount) : enteredDurationMs;
-  const totalDurationMs = perFrameMs * Math.max(1, frameCount);
-  return { enteredDurationMs, perFrameMs, totalDurationMs };
-}
-
-function formatAnimationDuration(milliseconds) {
-  if (milliseconds >= 60000) {
-    const minutes = Math.floor(milliseconds / 60000);
-    const seconds = ((milliseconds % 60000) / 1000).toFixed(3).padStart(6, '0');
-    return `${minutes}:${seconds}`;
-  }
-  return `${(milliseconds / 1000).toFixed(3)} seconds`;
-}
-
-function syncAnimationDurationSummary() {
-  const frameCount = getDownloadFrameCount();
-  const { perFrameMs, totalDurationMs } = getAnimationTiming(frameCount);
-  animationDurationSummary.textContent = `${formatAnimationDuration(perFrameMs)} per image - ${formatAnimationDuration(totalDurationMs)} total.`;
-  const mp4Supported = Boolean(getSupportedMp4MimeType());
-  downloadAnimationMp4.title = mp4Supported
-    ? 'Download an MP4 animation'
-    : 'MP4 encoding is not available in this browser; animated GIF remains available.';
 }
 
 function getSelectedFileEncodingMode() {
@@ -1453,24 +1125,6 @@ function syncChunkVersionControls() {
   const isChunked = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
   fileChunkVersion.disabled = !isChunked || fileChunkVersionAuto.checked;
   syncFileChunkVersionLabel();
-}
-
-function syncChunkPreviewNavigation() {
-  const isBulk = isBulkMode();
-  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  const isNumberSeries = qrFormat.value === 'number';
-  const total = getDownloadFrameCount();
-  const current = Math.min(getCurrentFrameIndex(), total);
-  const shouldShowNavigation = (isBulk || isChunkedFile || isNumberSeries) && total > 1;
-
-  chunkPreviewNav.classList.toggle('has-navigation', shouldShowNavigation);
-  chunkPreviewStatus.hidden = !shouldShowNavigation;
-  chunkPreviewStatus.textContent = `${current} of ${total}`;
-  chunkPreviewPrev.hidden = !shouldShowNavigation;
-  chunkPreviewNext.hidden = !shouldShowNavigation;
-  chunkPreviewPrev.disabled = !shouldShowNavigation || current <= 1;
-  chunkPreviewNext.disabled = !shouldShowNavigation || current >= total;
-  syncDownloadControls();
 }
 
 function getChunkCapacityCacheKey(file, options, configuredChunkVersion, autoVersion) {
@@ -2299,6 +1953,44 @@ const getNumberSequenceInfo = numberSection.getSequenceInfo;
 const getNumberPayload = numberSection.getPayload;
 const syncNumberSequenceControls = numberSection.sync;
 
+const frameNavigation = createFrameNavigation({
+  format: qrFormat,
+  isBulkMode,
+  getBulkRowCount,
+  bulkRowIndex,
+  syncBulkStatus,
+  getFileEncodingMode: getSelectedFileEncodingMode,
+  fileChunkIndex,
+  syncFileChunkLabel,
+  numberSequenceIndex,
+  getNumberSequenceInfo,
+  syncNumberSequenceControls,
+  maxNumberFrames: NUMBER_SERIES_MAX_FRAMES,
+  navigation: chunkPreviewNav,
+  status: chunkPreviewStatus,
+  previousButton: chunkPreviewPrev,
+  nextButton: chunkPreviewNext,
+  onDownloadStateChange: syncDownloadControls,
+});
+const getDownloadFrameCount = frameNavigation.getFrameCount;
+const getCurrentFrameIndex = frameNavigation.getCurrentFrame;
+const setCurrentFrameIndex = frameNavigation.setCurrentFrame;
+const syncChunkPreviewNavigation = frameNavigation.sync;
+
+const animationSection = createAnimationSection({
+  timingMode: animationTimingMode,
+  minutesInput: animationMinutes,
+  secondsInput: animationSeconds,
+  millisecondsInput: animationMilliseconds,
+  summary: animationDurationSummary,
+  mp4Button: downloadAnimationMp4,
+  getFrameCount: getDownloadFrameCount,
+  getSupportedMp4MimeType,
+});
+const getAnimationTiming = animationSection.getTiming;
+const formatAnimationDuration = animationSection.formatDuration;
+const syncAnimationDurationSummary = animationSection.sync;
+
 const wifiSection = createWifiSection({
   ssid: wifiSsid,
   password: wifiPassword,
@@ -2762,8 +2454,9 @@ function syncEmailBodyLengthHint() {
 }
 
 function getBulkValidationState() {
-  if (bulkParseError) {
-    return { error: `Not valid for Bulk Import yet: ${bulkParseError}`, warning: '' };
+  const parseError = getBulkParseError();
+  if (parseError) {
+    return { error: `Not valid for Bulk Import yet: ${parseError}`, warning: '' };
   }
   if (!bulkFileInput.files?.[0]) {
     return { error: 'Not valid for Bulk Import yet: choose a CSV file.', warning: '' };
@@ -4263,7 +3956,8 @@ function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
 function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
   const mode = centerArtMode.value;
   const emoji = centerEmoji.value.trim();
-  const hasPixelArt = pixelArtPixels.some(Boolean);
+  const pixelArt = pixelArtEditor.getState();
+  const hasPixelArt = pixelArt.pixels.some(Boolean);
   const hasArtwork =
     (mode === 'logo' && centerLogoImage) ||
     (mode === 'emoji' && emoji) ||
@@ -4308,18 +4002,18 @@ function drawCenterArtwork(context, qrStart, qrSize, lightColor) {
       context.fillText(emoji, center, center + artSize * 0.04);
     }
   } else if (mode === 'pixel') {
-    const pixelSize = artSize / pixelArtSize;
+    const pixelSize = artSize / pixelArt.size;
     const artX = center - artSize / 2;
     const artY = center - artSize / 2;
     const matchModuleShape = pixelArtMatchModuleShape.checked && moduleShape.value !== 'square';
     const pixelShapeOptions = getCurrentModuleShapeOptions();
     context.imageSmoothingEnabled = false;
-    pixelArtPixels.forEach((color, index) => {
+    pixelArt.pixels.forEach((color, index) => {
       if (!color) {
         return;
       }
-      const row = Math.floor(index / pixelArtSize);
-      const column = index % pixelArtSize;
+      const row = Math.floor(index / pixelArt.size);
+      const column = index % pixelArt.size;
       const left = Math.round(artX + column * pixelSize);
       const top = Math.round(artY + row * pixelSize);
       const right = Math.round(artX + (column + 1) * pixelSize);
@@ -4916,13 +4610,6 @@ clearFileButton.addEventListener('click', () => {
   renderQr();
 });
 
-bulkFileInput.addEventListener('change', loadBulkFile);
-
-bulkClear.addEventListener('click', () => {
-  clearBulkData();
-  renderQr();
-});
-
 qrFormat.addEventListener('change', () => {
   setFormatVisibility();
   syncChoiceButtons();
@@ -5013,24 +4700,6 @@ emojiOptions.forEach((button) => {
     syncEmojiSelection();
     renderQr();
   });
-});
-
-pixelArtPalette.addEventListener('click', (event) => {
-  const button = event.target.closest('.pixel-palette-button');
-  if (!button) {
-    return;
-  }
-  activePixelPaintColor = button.dataset.pixelColor || null;
-  syncPixelArtPalette();
-});
-
-pixelArtColor.addEventListener('input', () => {
-  activePixelPaintColor = pixelArtColor.value;
-  syncPixelArtPalette();
-});
-
-pixelArtSizeInput.addEventListener('input', () => {
-  resizePixelArt(Number.parseInt(pixelArtSizeInput.value, 10) || 16);
 });
 
 imageFillRecommended.addEventListener('click', () => {
@@ -5137,54 +4806,6 @@ centerLogoClear.addEventListener('click', () => {
   renderQr();
 });
 
-pixelArtGrid.addEventListener('pointerdown', (event) => {
-  const cell = event.target.closest('.pixel-art-cell');
-  if (!cell) {
-    return;
-  }
-  event.preventDefault();
-  pixelPainting = true;
-  pixelPaintValue = activePixelPaintColor;
-  paintPixelArtCell(cell);
-});
-
-pixelArtGrid.addEventListener('pointermove', (event) => {
-  if (!pixelPainting) {
-    return;
-  }
-  event.preventDefault();
-  const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest('.pixel-art-cell');
-  if (cell && pixelArtGrid.contains(cell)) {
-    paintPixelArtCell(cell);
-  }
-});
-
-pixelArtGrid.addEventListener('click', (event) => {
-  if (event.detail !== 0) {
-    return;
-  }
-  const cell = event.target.closest('.pixel-art-cell');
-  if (!cell) {
-    return;
-  }
-  pixelPaintValue = activePixelPaintColor;
-  paintPixelArtCell(cell);
-});
-
-window.addEventListener('pointerup', () => {
-  pixelPainting = false;
-});
-
-window.addEventListener('pointercancel', () => {
-  pixelPainting = false;
-});
-
-pixelArtClear.addEventListener('click', () => {
-  pixelArtPixels = Array(pixelArtSize * pixelArtSize).fill(null);
-  syncPixelArtGrid();
-  renderQr();
-});
-
 downloadCurrent.addEventListener('click', downloadCurrentCanvas);
 downloadCurrentPdf.addEventListener('click', downloadCurrentPdfDocument);
 downloadZip.addEventListener('click', downloadAllFramesAsZip);
@@ -5252,9 +4873,7 @@ qrVersion.addEventListener('input', () => {
 
 const dialogs = initializeDialogs({ document, window });
 
-ensurePixelArtPalette();
-ensurePixelArtGrid();
-syncPixelArtGrid();
+pixelArtEditor.initialize();
 initializeCalendarEventDefaults();
 urlInput.value = getDefaultUrlValue();
 syncOutputs();
