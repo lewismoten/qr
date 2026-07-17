@@ -12,6 +12,7 @@ import {
   isVersionRegion,
 } from './qr-regions.js';
 import { createContentSubtabs } from './ui/content/subtabs.js';
+import { createEmailCapacity } from './ui/content/email/capacity.js';
 import { createContentPayload, createFilePayloadPreview } from './ui/content/payload.js';
 import { createFormatValidator } from './ui/content/validation.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
@@ -19,7 +20,6 @@ import { serializeBulkRow } from './ui/content/bulk/payload.js';
 import { createEventSection } from './ui/content/event/section.js';
 import {
   arrayBufferToBase64,
-  base64UrlToBase64,
   createCompactFileId,
 } from './ui/content/file/protocol.js';
 import { createFileManifestController } from './ui/content/file/manifest.js';
@@ -46,6 +46,8 @@ import {
 } from './ui/debug/model.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
+import { restoreLocationDownload } from './ui/download/location.js';
+import { createQrConfiguration } from './ui/encoding/configuration.js';
 import { createAnimationSection } from './ui/download/animation/section.js';
 import { createDownloadActions } from './ui/download/actions.js';
 import { createFrameNavigation } from './ui/download/frames.js';
@@ -57,6 +59,7 @@ import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
 import { createRenderController } from './ui/preview/render.js';
 import { createQrRenderer } from './ui/preview/qr-renderer.js';
+import { createPreviewSizeControls } from './ui/preview/size.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
@@ -358,50 +361,19 @@ function getCurrentEncodingMode() {
   return modeAuto.checked ? undefined : encodingMode.value;
 }
 
-function getAutomaticPrintWidthInches(sourceCanvas = canvas) {
-  const pixelWidth = sourceCanvas.width || renderedQrWidth || Number.parseInt(qrWidth.value, 10) || 320;
-  const moduleScale = renderedQrModuleScale || Number.parseInt(qrScale.value, 10) || 4;
-  const totalModules = Math.max(1, Math.round(pixelWidth / moduleScale));
-  return Math.min(7, Math.max(0.5, pixelWidth / PRINT_PIXELS_PER_INCH, totalModules * MIN_PRINT_MODULE_INCHES));
-}
-
-function getPrintWidthInches(sourceCanvas = canvas) {
-  return printWidthAuto.checked
-    ? getAutomaticPrintWidthInches(sourceCanvas)
-    : Math.min(7, Math.max(0.5, Number.parseFloat(printWidth.value) || 1.65));
-}
-
-function syncPrintWidthControls() {
-  const automaticWidth = getAutomaticPrintWidthInches();
-  if (printWidthAuto.checked) {
-    printWidth.value = automaticWidth.toFixed(2);
-  }
-  printWidth.disabled = printWidthAuto.checked;
-  const selectedWidth = getPrintWidthInches();
-  const totalModules = Math.max(1, Math.round((renderedQrWidth || canvas.width || 320) / (renderedQrModuleScale || 4)));
-  const moduleWidth = selectedWidth / totalModules;
-  printWidthValue.textContent = `${selectedWidth.toFixed(2)} in${printWidthAuto.checked ? ' auto' : ''} - ${(moduleWidth * 25.4).toFixed(2)} mm/module`;
-}
-
-function formatWidthLabel() {
-  const minimumWidth = Number.parseInt(qrWidth.min, 10) || 1;
-  if (qrWidthAuto.checked) {
-    const width = renderedQrWidth ?? minimumWidth;
-    qrWidthValue.textContent = `${width} px · ${renderedQrModuleScale ?? qrScale.value} px/module · ${(width / PRINT_PIXELS_PER_INCH).toFixed(2)} in at ${PRINT_PIXELS_PER_INCH} ppi`;
-    return;
-  }
-
-  const targetWidth = Number.parseInt(qrWidth.value, 10) || minimumWidth;
-  qrWidthValue.textContent = `${targetWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module · ${(targetWidth / PRINT_PIXELS_PER_INCH).toFixed(2)} in at ${PRINT_PIXELS_PER_INCH} ppi`;
-}
-
-function formatScaleLabel() {
-  qrScaleValue.textContent = qrScale.value;
-}
-
-function formatMarginLabel() {
-  qrMarginValue.textContent = qrMargin.value;
-}
+const previewSizeControls = createPreviewSizeControls({
+  canvas,
+  elements: { width: qrWidth, widthValue: qrWidthValue, widthAuto: qrWidthAuto,
+    scale: qrScale, scaleValue: qrScaleValue, margin: qrMargin, marginValue: qrMarginValue,
+    printAuto: printWidthAuto, printWidth, printValue: printWidthValue },
+  getMetrics: () => ({ width: renderedQrWidth, scale: renderedQrModuleScale }),
+  pixelsPerInch: PRINT_PIXELS_PER_INCH,
+  minPrintModuleInches: MIN_PRINT_MODULE_INCHES,
+});
+const getPrintWidthInches = previewSizeControls.getPrintWidth;
+const syncPrintWidthControls = previewSizeControls.syncPrint;
+const formatWidthLabel = previewSizeControls.formatWidth;
+const syncSizeLabels = previewSizeControls.syncLabels;
 
 const moduleShapeSection = createModuleShapeSection({
   shape: moduleShape,
@@ -463,9 +435,7 @@ function formatErrorCorrection() {
 }
 
 function syncOutputs() {
-  formatWidthLabel();
-  formatScaleLabel();
-  formatMarginLabel();
+  syncSizeLabels();
   formatColorTransparency();
   syncGradientControls();
   syncNumberSequenceControls();
@@ -867,83 +837,19 @@ const contentPayload = createContentPayload({
 const buildEncodedText = contentPayload.build;
 const buildEncodedPreviewTemplate = contentPayload.preview;
 
-function buildOptions() {
-  const selectedErrorLevel = getSelectedErrorLevel();
-  const baseOptions = {
-    errorCorrectionLevel: selectedErrorLevel.value,
-    margin: readInteger(qrMargin) ?? 1,
-    scale: readInteger(qrScale) ?? 4,
-    color: {
-      dark: colorWithTransparency(colorDark.value.trim() || '#111827', colorDarkTransparency),
-      light: colorWithTransparency(colorLight.value.trim() || '#ffffff', colorLightTransparency),
-    },
-  };
-
-  if (!qrWidthAuto.checked) {
-    baseOptions.width = readInteger(qrWidth) ?? 320;
-  }
-
-  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  const version = isChunkedFile ? getConfiguredChunkVersion() : versionAuto.checked ? undefined : readInteger(qrVersion);
-  if (version !== undefined) {
-    baseOptions.version = version;
-  }
-
-  const mask = readInteger(maskPattern);
-  if (mask !== undefined) {
-    baseOptions.maskPattern = mask;
-  }
-
-  let extraOptions = {};
-  const rawOptions = optionsJson.value.trim();
-  if (rawOptions) {
-    extraOptions = JSON.parse(rawOptions);
-  }
-
-  const mergedOptions = {
-    ...baseOptions,
-    ...extraOptions,
-    color: {
-      ...baseOptions.color,
-      ...(extraOptions.color || {}),
-    },
-  };
-  if (isChunkedFile) {
-    mergedOptions.version = getConfiguredChunkVersion();
-  }
-  return mergedOptions;
-}
-
-function buildPayload(encodedText) {
-  const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  if (isChunkedFile && encodedText.trim()) {
-    // FILE frames contain arbitrary base64url, so byte mode keeps capacity deterministic.
-    return [{ data: encodedText, mode: 'byte' }];
-  }
-
-  if (qrFormat.value === 'number' && modeAuto.checked && encodedText.trim()) {
-    const mode = /^\d+$/.test(encodedText)
-      ? 'numeric'
-      : [...encodedText].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character))
-        ? 'alphanumeric'
-        : 'byte';
-    return [{ data: encodedText, mode }];
-  }
-
-  const mode = getCurrentEncodingMode();
-  if (!mode || !encodedText.trim()) {
-    return encodedText;
-  }
-
-  return [{ data: encodedText, mode }];
-}
-
-function createQrDefinition(payload, options) {
-  if (typeof qrEncoder?.create !== 'function') {
-    throw new Error('The first-party QR encoder did not load.');
-  }
-  return qrEncoder.create(payload, options);
-}
+const qrConfiguration = createQrConfiguration({
+  elements: { qrMargin, qrScale, colorDark, colorDarkTransparency, colorLight,
+    colorLightTransparency, qrWidthAuto, qrWidth, qrFormat, versionAuto, qrVersion,
+    maskPattern, optionsJson, modeAuto },
+  encoder: qrEncoder,
+  helpers: { getErrorLevel: getSelectedErrorLevel, readInteger, colorWithTransparency,
+    getFileMode: getSelectedFileEncodingMode, getChunkVersion: getConfiguredChunkVersion,
+    getEncodingMode: getCurrentEncodingMode },
+  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+});
+const buildOptions = qrConfiguration.buildOptions;
+const buildPayload = qrConfiguration.buildPayload;
+const createQrDefinition = qrConfiguration.createDefinition;
 
 function updateOptionsPreview(options) {
   optionsPreview.textContent = JSON.stringify(options, null, 2);
@@ -959,105 +865,16 @@ function getEncodedPreviewText(encodedText) {
   return previewText;
 }
 
-function decodeDownloadPayloadFromLocation() {
-  const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
-  if (!hash) {
-    return null;
-  }
-
-  const params = new URLSearchParams(hash);
-  if (params.get('download') !== '1') {
-    return null;
-  }
-
-  const name = params.get('name') || 'download.bin';
-  const mimeType = params.get('type') || 'application/octet-stream';
-  const data = params.get('data') || '';
-  if (!data) {
-    return null;
-  }
-
-  return { name, mimeType, data };
-}
-
-function triggerDownloadFromLocationPayload() {
-  const payload = decodeDownloadPayloadFromLocation();
-  if (!payload) {
-    return;
-  }
-
-  try {
-    const binary = atob(base64UrlToBase64(payload.data));
-    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-    const blob = new Blob([bytes], { type: payload.mimeType });
-    const downloadUrl = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = downloadUrl;
-    anchor.download = payload.name;
-    anchor.rel = 'noopener';
-    anchor.style.display = 'none';
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-  } catch (error) {
-    console.error('Unable to restore downloadable file from the QR URL.', error);
-  }
-}
-
 function updateEncodedPreview(encodedText) {
   encodedPreview.textContent = getEncodedPreviewText(encodedText);
 }
 
-function getEmailBodyCapacityInfo() {
-  const currentLength = emailBody.value.length;
-
-  let options;
-  try {
-    options = buildOptions();
-  } catch (error) {
-    return { current: currentLength, max: 0 };
-  }
-
-  const canEncodeLength = (length) => {
-    const testPayload = buildEmailPayloadWithBody('A'.repeat(length));
-    try {
-      const payload = buildPayload(testPayload);
-      qrEncoder.create(payload, options);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  if (!canEncodeLength(0)) {
-    return { current: currentLength, max: 0 };
-  }
-
-  let low = 0;
-  let high = Math.max(currentLength, 32);
-
-  while (high < 8192 && canEncodeLength(high)) {
-    low = high;
-    high *= 2;
-  }
-
-  while (low + 1 < high) {
-    const middle = Math.floor((low + high) / 2);
-    if (canEncodeLength(middle)) {
-      low = middle;
-    } else {
-      high = middle;
-    }
-  }
-
-  return { current: currentLength, max: low };
-}
-
-function syncEmailBodyLengthHint() {
-  const { current, max } = getEmailBodyCapacityInfo();
-  emailBodyLengthHint.textContent = `${current} / ${max}`;
-}
+const emailCapacity = createEmailCapacity({
+  body: emailBody, hint: emailBodyLengthHint, encoder: qrEncoder,
+  buildOptions, buildPayload, buildEmail: buildEmailPayloadWithBody,
+});
+const getEmailBodyCapacityInfo = emailCapacity.getInfo;
+const syncEmailBodyLengthHint = emailCapacity.sync;
 
 const getFormatValidationState = createFormatValidator({
   elements: {
@@ -1328,6 +1145,6 @@ activateDownloadSubtab('image');
 activateDebugSubtab('encoding');
 activateTab('content');
 setPreviewViewMode('fit', true);
-triggerDownloadFromLocationPayload();
+  restoreLocationDownload({ window, document });
 renderQr();
 dialogs.syncFromHash();
