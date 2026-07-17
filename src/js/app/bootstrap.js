@@ -12,6 +12,7 @@ import { createApplicationDownloadSetup } from './ui/download/application-setup.
 import { getApplicationElements } from './ui/elements.js';
 import { createApplicationNavigation } from './ui/navigation/application-setup.js';
 import { createOutputSetup } from './ui/output/setup.js';
+import { createRuntimeContext } from './ui/runtime/context.js';
 import { createRuntimeHelpers } from './ui/runtime/helpers.js';
 import { startApplication } from './ui/runtime/startup.js';
 import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
@@ -21,18 +22,15 @@ import qrEncoder from '../qr/index.js';
 
 const elements = getApplicationElements(document);
 const debugColors = getDebugColorElements(document);
-let cancelRenderRequest = () => {};
+const runtime = createRuntimeContext();
 const previewControls = createPreviewControlsSetup({
   elements,
   pixelsPerInch: LIMITS.printPixelsPerInch,
   minPrintModuleInches: LIMITS.minPrintModuleInches,
 });
-let activeTabName = 'content';
-let activeDebugSubtab = 'encoding';
-let activeDebugOutlineMode = 'codewords';
 const runtimeHelpers = createRuntimeHelpers({
   window, canvas: elements.canvas, errorLevels: ERROR_LEVELS, controls: elements,
-  getDebugState: () => ({ tab: activeTabName, subtab: activeDebugSubtab }),
+  getDebugState: runtime.getDebugState,
 });
 
 const contentData = createContentDataSetup({
@@ -40,20 +38,20 @@ const contentData = createContentDataSetup({
   encoder: qrEncoder,
   protocol: FILE_PROTOCOL,
   runtime: {
-    buildOptions: () => contentEncoding.qr.buildOptions(),
-    buildPayload: (text) => contentEncoding.qr.buildPayload(text),
+    buildOptions: runtime.buildOptions,
+    buildPayload: runtime.buildPayload,
     getEncodingMode: runtimeHelpers.getEncodingMode,
     getShareableAppUrl: runtimeHelpers.getShareableUrl,
-    syncNavigation: () => download.syncNavigation(),
-    cancelRender: () => cancelRenderRequest(),
-    render: () => preview.render(),
-    syncChoices: () => navigation.syncChoices(),
+    syncNavigation: runtime.syncNavigation,
+    cancelRender: runtime.cancelRender,
+    render: runtime.render,
+    syncChoices: runtime.syncChoices,
   },
 });
 
 const styleSetup = createStyleSetup({
   elements,
-  render: () => preview.render(),
+  render: runtime.render,
   colorWithTransparency,
 });
 
@@ -62,14 +60,13 @@ const setFormatVisibility = createFormatVisibility({
     bulkEnabled: elements.bulkEnabled, secretToggle: elements.payloadRevealToggle },
   syncBulk: contentData.syncBulkControls,
   syncFile: contentData.syncFileModeVisibility,
-  syncEvent: () => contentSections.event.sync(),
+  syncEvent: runtime.syncEvent,
 });
 
 const contentSections = createContentSections({
   elements,
-  runtime: { render: () => preview.render(), syncChoices: () => navigation.syncChoices(),
-    syncSmsLength: () => output.syncSmsLength(),
-    syncEmailLength: () => contentEncoding.emailCapacity.sync() },
+  runtime: { render: runtime.render, syncChoices: runtime.syncChoices,
+    syncSmsLength: runtime.syncSmsLength, syncEmailLength: runtime.syncEmailLength },
   limits: { numberFrames: LIMITS.numberFrames },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
@@ -82,8 +79,7 @@ const download = createApplicationDownloadSetup({
   file: { getMode: contentData.getSelectedFileEncodingMode,
     syncChunkLabel: contentData.file.settings.syncChunkLabel },
   number: { getInfo: contentSections.number.getSequenceInfo, sync: contentSections.number.sync },
-  runtime: { activateImageTab: () => navigation.activateDownload('image'),
-    render: () => preview.render() },
+  runtime: { activateImageTab: () => runtime.activateDownload('image'), render: runtime.render },
   maxNumberFrames: LIMITS.numberFrames,
   getPrintWidth: previewControls.getPrintWidth,
 });
@@ -99,7 +95,7 @@ const contentEncoding = createContentEncodingSetup({
     buildPayload: contentData.file.payload.build },
   sections: contentSections,
   runtime: { getFrameIndex: download.getCurrentFrame,
-    syncChoices: () => navigation.syncChoices(), syncArtwork: styleSetup.artwork.sync },
+    syncChoices: runtime.syncChoices, syncArtwork: styleSetup.artwork.sync },
   helpers: { getErrorLevel: runtimeHelpers.getErrorLevel, readInteger: runtimeHelpers.readInteger,
     colorWithTransparency, getEncodingMode: runtimeHelpers.getEncodingMode },
   config: {
@@ -129,15 +125,15 @@ const debugSetup = createApplicationDebugSetup({
   getCurrentMode: runtimeHelpers.getEncodingMode,
   getErrorLevel: runtimeHelpers.getErrorLevel,
   isBulkMode: contentData.isBulkMode,
-  runtime: { render: () => preview.render(), getOutlineMode: () => activeDebugOutlineMode,
-    setOutlineMode: (value) => { activeDebugOutlineMode = value; } },
+  runtime: { render: runtime.render, getOutlineMode: runtime.getOutlineMode,
+    setOutlineMode: runtime.setOutlineMode },
 });
 const navigation = createApplicationNavigation({
   elements,
-  render: () => preview.render(),
+  render: runtime.render,
   updateMap: contentSections.geo.update,
-  state: { setActiveTab: (name) => { activeTabName = name; },
-    setActiveDebugSubtab: (name) => { activeDebugSubtab = name; } },
+  state: { setActiveTab: runtime.setActiveTab,
+    setActiveDebugSubtab: runtime.setActiveDebugSubtab },
 });
 
 const preview = createPreviewSetup({
@@ -151,9 +147,9 @@ const preview = createPreviewSetup({
     readInteger: runtimeHelpers.readInteger, clearCanvas: runtimeHelpers.clearCanvas },
   actions: { syncFormat: setFormatVisibility, updateMap: contentSections.geo.update },
   runtime: { isDebugOverlayActive: runtimeHelpers.isDebugOverlayActive,
-    getOutlineMode: () => activeDebugOutlineMode },
+    getOutlineMode: runtime.getOutlineMode },
 });
-cancelRenderRequest = preview.cancel;
+runtime.connect({ contentEncoding, contentSections, download, navigation, output, preview });
 
 startApplication({
   document, window, elements, defaultChunkVersion: FILE_PROTOCOL.defaultChunkVersion,
