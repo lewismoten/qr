@@ -60,6 +60,10 @@ precedence. Inheritance can contain multiple levels; circular inheritance is
 rejected and the normal default-locale fallback is used instead. Placeholder tags
 such as `{count}` must remain unchanged in translated values.
 
+The `en-XA` pseudo-locale sets `"$debug": true`. In this mode every translated
+value is replaced by its lookup key, making missing or incorrectly assigned keys
+visible throughout the interface, including lazy-loaded panels.
+
 ## First-party QR encoder
 
 QR generation now runs through the first-party implementation in

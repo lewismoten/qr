@@ -3,6 +3,7 @@
   "locales": [
     { "code": "en-US", "flag": "🇺🇸" },
     { "code": "en-GB", "flag": "🇬🇧" },
+    { "code": "en-XA", "flag": "🐞", "name": "Debug", "nativeName": "Translation keys" },
     { "code": "zh-CN", "flag": "🇨🇳" },
     { "code": "hi-IN", "flag": "🇮🇳" },
     { "code": "es", "flag": "🇪🇸" },

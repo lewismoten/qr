@@ -64,9 +64,9 @@ export function setupLanguagePicker({
     language: () => getLanguageName(activeLocale, activeLocale),
   }));
   grid.replaceChildren();
-  locales.forEach(({ code, flag }) => {
-    const translatedName = getLanguageName(code, activeLocale);
-    const nativeName = getLanguageName(code, code);
+  locales.forEach(({ code, flag, name, nativeName: configuredNativeName }) => {
+    const translatedName = name || getLanguageName(code, activeLocale);
+    const nativeName = configuredNativeName || getLanguageName(code, code);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'language-option';

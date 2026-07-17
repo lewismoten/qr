@@ -85,6 +85,30 @@ assert.equal(lookup('fields.organization', 'Fallback'), 'organisation');
 assert.equal(lookup('fields.title', 'Fallback'), 'title');
 
 await initializeLanguage({
+  locale: 'en-XA',
+  baseUrl,
+  fetcher: createFetcher({
+    'manifest.json': {
+      defaultLocale: 'en-US',
+      locales: [
+        { code: 'en-US', flag: '🇺🇸' },
+        { code: 'en-XA', flag: '🐞', name: 'Debug', nativeName: 'Translation keys' },
+      ],
+    },
+    'en-XA.json': { $debug: true },
+  }),
+});
+assert.equal(getActiveLocale(), 'en-XA');
+assert.equal(lookup('navigation.content', 'Content'), 'navigation.content');
+assert.equal(lookup('common.sequence', '{current} of {total}', { current: 1, total: 4 }), 'common.sequence');
+assert.deepEqual(getAvailableLocales()[1], {
+  code: 'en-XA',
+  flag: '🐞',
+  name: 'Debug',
+  nativeName: 'Translation keys',
+});
+
+await initializeLanguage({
   locale: 'en-US',
   languages: ['de-DE'],
   baseUrl,
@@ -96,8 +120,8 @@ await initializeLanguage({
 assert.equal(getActiveLocale(), 'en-US');
 assert.equal(lookup('navigation.content', 'Fallback'), 'Content');
 assert.deepEqual(getAvailableLocales(), [
-  { code: 'de-DE', flag: '🏳️' },
-  { code: 'en-US', flag: '🏳️' },
+  { code: 'de-DE', flag: '🏳️', name: undefined, nativeName: undefined },
+  { code: 'en-US', flag: '🏳️', name: undefined, nativeName: undefined },
 ]);
 
 console.log('Language lookup and locale fallback tests passed.');

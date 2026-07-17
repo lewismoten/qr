@@ -3,6 +3,7 @@ const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title'];
 
 let activeLocale = DEFAULT_LOCALE;
 let messages = Object.freeze({});
+let debugLanguage = false;
 let availableLocales = Object.freeze([{ code: DEFAULT_LOCALE, flag: '🇺🇸' }]);
 let languageReady = Promise.resolve({ locale: activeLocale, loaded: false });
 
@@ -28,7 +29,12 @@ function normalizeLocaleEntries(locales) {
     const source = typeof entry === 'string' ? { code: entry } : entry;
     const code = canonicalizeLocale(source?.code);
     if (!code || normalized.some((locale) => locale.code === code)) continue;
-    normalized.push(Object.freeze({ code, flag: String(source.flag || '🏳️') }));
+    normalized.push(Object.freeze({
+      code,
+      flag: String(source.flag || '🏳️'),
+      name: typeof source.name === 'string' ? source.name : undefined,
+      nativeName: typeof source.nativeName === 'string' ? source.nativeName : undefined,
+    }));
   }
   return normalized;
 }
@@ -117,6 +123,7 @@ function interpolate(text, options, key) {
 }
 
 export function lookup(key, defaultText = '', options) {
+  if (debugLanguage && typeof key === 'string' && key) return key;
   const value = findMessage(key);
   return interpolate(typeof value === 'string' ? value : defaultText, options, key);
 }
@@ -168,6 +175,7 @@ export function initializeLanguage({
       try {
         const loadedMessages = await loadLocale(locale);
         activeLocale = locale;
+        debugLanguage = loadedMessages.$debug === true;
         messages = Object.freeze(loadedMessages);
         return { locale, loaded: true };
       } catch {
@@ -175,6 +183,7 @@ export function initializeLanguage({
       }
     }
     activeLocale = fallback;
+    debugLanguage = false;
     messages = Object.freeze({});
     return { locale: activeLocale, loaded: false };
   })();
