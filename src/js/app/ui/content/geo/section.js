@@ -1,4 +1,5 @@
 import { serializeGeo } from '../../../content-formats.js';
+import { loadLeaflet } from './leaflet-loader.js';
 
 const DEFAULT_CENTER = [38.9182, -78.1944];
 
@@ -25,6 +26,7 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
   let map = null;
   let marker = null;
   let labelMarker = null;
+  let leafletRequest = null;
 
   const getCoordinates = () => {
     const latitude = parseCoordinate(latitudeInput.value);
@@ -61,7 +63,21 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
   };
 
   const update = () => {
-    if (!isActive() || !globalThis.L) return;
+    if (!isActive()) return;
+    if (!globalThis.L) {
+      if (!leafletRequest) {
+        leafletRequest = loadLeaflet().then(() => {
+          leafletRequest = null;
+          mapElement.classList.remove('has-load-error');
+          update();
+        }).catch((error) => {
+          mapElement.classList.add('has-load-error');
+          mapElement.textContent = error.message;
+          console.error(error);
+        });
+      }
+      return;
+    }
     ensureMap();
     const coordinates = getCoordinates();
     const label = labelInput.value.trim();

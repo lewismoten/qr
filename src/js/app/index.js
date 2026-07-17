@@ -6,8 +6,8 @@ import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createContentDataSetup } from './ui/content/data-setup.js';
 import { createContentSections } from './ui/content/setup.js';
-import { createApplicationDebugSetup } from './ui/debug/application-setup.js';
 import { getDebugColorElements } from './ui/debug/colors.js';
+import { createLazyDebugSetup } from './ui/debug/lazy-setup.js';
 import { createApplicationDownloadSetup } from './ui/download/application-setup.js';
 import { getApplicationElements } from './ui/elements.js';
 import { createApplicationNavigation } from './ui/navigation/application-setup.js';
@@ -115,7 +115,7 @@ const output = createOutputSetup({
   smsMaxLength: LIMITS.sms,
 });
 
-const debugSetup = createApplicationDebugSetup({
+const debugSetup = createLazyDebugSetup({
   elements,
   encoder: qrEncoder,
   config: { modeLabels: MODE_LABELS, modeCapacity: MODE_CAPACITY,
@@ -132,6 +132,7 @@ const navigation = createApplicationNavigation({
   elements,
   render: runtime.render,
   updateMap: contentSections.geo.update,
+  prepareDebug: debugSetup.load,
   state: { setActiveTab: runtime.setActiveTab,
     setActiveDebugSubtab: runtime.setActiveDebugSubtab },
 });

@@ -1,13 +1,5 @@
 import { createAnimationStage, drawAnimationStageFrame } from './gif.js';
-
-export function getSupportedMp4MimeType() {
-  if (typeof MediaRecorder === 'undefined') {
-    return '';
-  }
-  return ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1', 'video/mp4'].find((type) =>
-    MediaRecorder.isTypeSupported(type)
-  ) || '';
-}
+import { getSupportedMp4MimeType } from './media-support.js';
 
 export async function createAnimatedMp4Blob(frames, frameDurationMs, onProgress) {
   const mimeType = getSupportedMp4MimeType();
@@ -47,4 +39,3 @@ export async function createAnimatedMp4Blob(frames, frameDurationMs, onProgress)
     stream.getTracks().forEach((track) => track.stop());
   }
 }
-

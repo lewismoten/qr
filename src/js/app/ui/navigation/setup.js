@@ -1,22 +1,31 @@
 import { createContentSubtabs } from '../content/subtabs.js';
-import { createDebugSubtabs } from '../debug/subtabs.js';
 import { createDownloadSubtabs } from '../download/subtabs.js';
 import { createStyleSubtabs } from '../style/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
+import { createTabSet } from '../tab-set.js';
 
-export function createNavigation({ elements: e, format, render, updateMap, setActiveTab, setActiveDebugSubtab }) {
+export function createNavigation({ elements: e, format, render, updateMap, prepareDebug,
+  setActiveTab, setActiveDebugSubtab }) {
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,
     onActivate(name) {
       setActiveTab(name);
+      if (name === 'debug') {
+        Promise.resolve(prepareDebug?.()).then(render).catch(console.error);
+        return;
+      }
       if (name === 'content' && format.value === 'geo') window.requestAnimationFrame(updateMap);
       render();
     },
   });
-  const activateDebug = createDebugSubtabs({
+  const activateDebug = createTabSet({
     buttons: e.debugTabs,
     panels: e.debugPanels,
+    buttonData: 'subtab',
+    panelData: 'subtabPanel',
+    defaultValue: 'encoding',
+    setAriaPressed: false,
     onActivate(name) {
       setActiveDebugSubtab(name);
       render();

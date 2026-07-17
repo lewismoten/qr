@@ -1,16 +1,9 @@
-import { canvasToBlob } from '../../canvas-export.js';
-import { cloneCanvas, createAnimatedGifBlob, createGifBlob } from '../../gif.js';
-import { createAnimatedMp4Blob } from '../../mp4.js';
-import {
-  capturePdfFrame,
-  createPdfBlob,
-  createPdfSheetBlob,
-  getPdfSheetLayout,
-} from '../../pdf.js';
-import { createSvgBlob } from '../../svg.js';
-import { createZipBlob } from '../../zip.js';
-
 const MAX_ANIMATION_FRAMES = 200;
+let exportersPromise;
+const loadExporters = () => {
+  exportersPromise ??= import('./exporters.js');
+  return exportersPromise;
+};
 
 export function createDownloadActions({
   canvas,
@@ -35,13 +28,16 @@ export function createDownloadActions({
   const buttons = [currentButton, currentPdfButton, zipButton, allPdfButton, gifButton, mp4Button];
   const setDisabled = (disabled) => buttons.forEach((button) => { button.disabled = disabled; });
   const getQuality = () => (Number.parseInt(qualityInput.value, 10) || 92) / 100;
-  const makePdf = (sourceCanvas) => createPdfBlob(sourceCanvas, getQuality(), getPrintWidthInches(sourceCanvas));
-  const capturePdf = (sourceCanvas) => capturePdfFrame(
-    sourceCanvas,
-    getQuality(),
-    getPrintWidthInches(sourceCanvas),
-  );
+  const makePdf = async (sourceCanvas) => {
+    const { createPdfBlob } = await loadExporters();
+    return createPdfBlob(sourceCanvas, getQuality(), getPrintWidthInches(sourceCanvas));
+  };
+  const capturePdf = async (sourceCanvas) => {
+    const { capturePdfFrame } = await loadExporters();
+    return capturePdfFrame(sourceCanvas, getQuality(), getPrintWidthInches(sourceCanvas));
+  };
   const exportCanvas = async (sourceCanvas, format) => {
+    const { canvasToBlob, createGifBlob, createSvgBlob } = await loadExporters();
     if (format === 'jpg') return canvasToBlob(sourceCanvas, 'image/jpeg', getQuality(), true);
     if (format === 'gif') return createGifBlob(sourceCanvas);
     if (format === 'svg') return createSvgBlob(sourceCanvas);
@@ -115,6 +111,7 @@ export function createDownloadActions({
         });
       }
       status.textContent = 'Building ZIP...';
+      const { createZipBlob } = await loadExporters();
       triggerDownload(await createZipBlob(files), `qr-codes-${total}.zip`);
       status.textContent = `ZIP ready with ${total} files.`;
     } catch (error) {
@@ -141,6 +138,7 @@ export function createDownloadActions({
         frames.push(await capturePdf(canvas));
       }
       status.textContent = 'Laying out PDF pages...';
+      const { createPdfSheetBlob, getPdfSheetLayout } = await loadExporters();
       const { framesPerPage } = getPdfSheetLayout(frames);
       triggerDownload(createPdfSheetBlob(frames), `qr-codes-${total}.pdf`);
       const pages = Math.ceil(total / framesPerPage);
@@ -155,6 +153,7 @@ export function createDownloadActions({
   };
 
   const captureAnimationFrames = async (total) => {
+    const { cloneCanvas } = await loadExporters();
     const originalFrame = getCurrentFrame();
     const frames = [];
     try {
@@ -196,10 +195,12 @@ export function createDownloadActions({
     try {
       const frames = await captureAnimationFrames(total);
       if (format === 'gif') {
+        const { createAnimatedGifBlob } = await loadExporters();
         status.textContent = 'Encoding animated GIF...';
         triggerDownload(createAnimatedGifBlob(frames, perFrameMs), `qr-animation-${total}.gif`);
         status.textContent = `Animated GIF ready - ${formatAnimationDuration(totalDurationMs)} total.`;
       } else {
+        const { createAnimatedMp4Blob } = await loadExporters();
         status.textContent = `Recording MP4 in real time - ${formatAnimationDuration(totalDurationMs)}...`;
         const blob = await createAnimatedMp4Blob(frames, perFrameMs, (frame, count) => {
           status.textContent = `Recording MP4 frame ${frame} of ${count}...`;

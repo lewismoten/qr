@@ -25,18 +25,7 @@
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
     </script>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
     <link rel="stylesheet" href="dist/app.min.css" />
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
   </head>
   <body>
     <main class="app-shell">
@@ -1249,6 +1238,11 @@
       </article>
     </dialog>
 
-    <script src="dist/app.min.js"></script>
+    <script>
+      const appScript = document.createElement('script');
+      appScript.src = location.protocol === 'file:' ? 'dist/app.file.js' : 'dist/app.min.js';
+      if (location.protocol !== 'file:') appScript.type = 'module';
+      document.body.append(appScript);
+    </script>
   </body>
 </html>

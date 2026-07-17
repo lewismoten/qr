@@ -1,4 +1,4 @@
-import { getSupportedMp4MimeType } from '../../mp4.js';
+import { getSupportedMp4MimeType } from '../../media-support.js';
 import { createDownloadActions } from './actions.js';
 import { createAnimationSection } from './animation/section.js';
 import { createFrameNavigation } from './frames.js';

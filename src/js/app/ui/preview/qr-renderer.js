@@ -1,9 +1,6 @@
 import { getColorAlpha, hexToRgba } from '../../colors.js';
 import { drawCenteredFrameMessage, drawFrameMessage, fitFrameMessage } from '../../frame-text.js';
 import { getFinderPatternPart, getModuleCategory, isFinderPattern } from '../../qr-regions.js';
-import { drawCodewordOutlines, drawHighlightedBoundaries } from '../debug/boundaries.js';
-import { buildDebugOverlayModel, getDebugCategory, moduleIsDarkForPreview } from '../debug/model.js';
-import { drawCodewordPaths, drawStreamFieldStarts } from '../debug/paths.js';
 import { drawCenterArtwork } from '../style/art/drawing.js';
 import { createQrImageLayer, createQrModuleFill, drawFinderEyes, drawQrModule } from '../style/drawing/shapes.js';
 
@@ -17,7 +14,7 @@ export function createQrRenderer(deps) {
     getCurrentModuleShapeOptions, getCurrentEyeShapeOptions, getCurrentGradientOptions,
     imageFillController, getCodewordStyle, getModuleContrastColor, centerLogoController,
     pixelArtEditor, readInteger, schedulePreviewViewportSync, setRenderMetrics,
-    getActiveDebugOutlineMode,
+    getActiveDebugOutlineMode, debugRenderer,
   } = deps;
 
 return function drawQr(qrDefinition, options) {
@@ -63,7 +60,7 @@ return function drawQr(qrDefinition, options) {
     ? Math.ceil(frameMessageLines.length * captionLineHeight + captionPadding * 2)
     : 0;
   const debugActive = isDebugOverlayActive();
-  const debugModel = debugActive ? buildDebugOverlayModel(qrDefinition, options) : null;
+  const debugModel = debugActive ? debugRenderer.buildModel(qrDefinition, options) : null;
   const moduleShapeOptions = getCurrentModuleShapeOptions();
   const eyeShapeOptions = getCurrentEyeShapeOptions();
   const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
@@ -131,7 +128,7 @@ return function drawQr(qrDefinition, options) {
   if (debugActive) {
     for (let row = 0; row < moduleCount; row += 1) {
       for (let column = 0; column < moduleCount; column += 1) {
-        const category = getDebugCategory(row, column, qrDefinition, debugModel, 'overlay');
+        const category = debugRenderer.getCategory(row, column, qrDefinition, debugModel, 'overlay');
         context.fillStyle = hexToRgba(debugColors[category].value, 0.5);
         context.fillRect(
           (column + marginModules) * cellSize,
@@ -145,7 +142,7 @@ return function drawQr(qrDefinition, options) {
 
   for (let row = 0; row < moduleCount; row += 1) {
     for (let column = 0; column < moduleCount; column += 1) {
-      if (!moduleIsDarkForPreview(qrDefinition, row, column, debugActive, debugUnmask.checked)) {
+      if (!debugRenderer.moduleIsDark(qrDefinition, row, column, debugActive, debugUnmask.checked)) {
         continue;
       }
       if (customEyesActive && isFinderPattern(moduleCount, row, column)) {
@@ -153,7 +150,7 @@ return function drawQr(qrDefinition, options) {
       }
 
       const category = debugActive
-        ? getDebugCategory(row, column, qrDefinition, debugModel, 'overlay')
+        ? debugRenderer.getCategory(row, column, qrDefinition, debugModel, 'overlay')
         : getModuleCategory(qrDefinition, row, column);
       let fillStyle = debugActive ? hexToRgba(debugColors[category].value, 1) : moduleFillStyle;
       if (customEyeColorsActive) {
@@ -207,8 +204,8 @@ return function drawQr(qrDefinition, options) {
   }
 
   if (debugActive) {
-    drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize, debugColors);
-    drawCodewordOutlines(
+    debugRenderer.drawBoundaries(context, qrDefinition, debugModel, marginModules, cellSize, debugColors);
+    debugRenderer.drawOutlines(
       context,
       debugModel,
       marginModules,
@@ -216,7 +213,7 @@ return function drawQr(qrDefinition, options) {
       getActiveDebugOutlineMode(),
       getCodewordStyle,
     );
-    drawCodewordPaths(
+    debugRenderer.drawPaths(
       context,
       qrDefinition,
       debugModel,
@@ -225,7 +222,7 @@ return function drawQr(qrDefinition, options) {
       getActiveDebugOutlineMode(),
       getModuleContrastColor,
     );
-    drawStreamFieldStarts(
+    debugRenderer.drawFieldStarts(
       context,
       debugModel,
       marginModules,

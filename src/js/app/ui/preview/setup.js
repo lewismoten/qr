@@ -70,6 +70,7 @@ export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, sy
     schedulePreviewViewportSync: systems.previewControls.scheduleViewportSync,
     setRenderMetrics: systems.previewControls.setRenderMetrics,
     getActiveDebugOutlineMode: debug.getOutlineMode,
+    debugRenderer: systems.debug.renderer,
   });
 
   const renderInvalid = createInvalidPreviewRenderer({
