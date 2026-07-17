@@ -20,6 +20,7 @@
         "@type": "WebApplication",
         "name": "QR Code Generator",
         "url": "https://qr.lewismoten.com/",
+        "sameAs": "https://git.lewismoten.com/lewismoten/qr",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any modern web browser",
         "description": "A browser-based QR code generator, designer, batch exporter and developer visualization tool.",
@@ -1046,6 +1047,7 @@
           <a href="#about" data-dialog-target="about">About</a>
           <a href="spec.html">QR spec</a>
           <a href="#third-party" data-dialog-target="third-party">Technology</a>
+          <a href="https://git.lewismoten.com/lewismoten/qr">Source</a>
         </nav>
       </footer>
     </main>
@@ -1113,6 +1115,11 @@
           <section>
             <h2>First-party QR implementation</h2>
             <div class="dependency-list">
+              <article>
+                <div><h3>Project source</h3><span class="version-badge">Canonical repository</span></div>
+                <p>The first-party application and QR encoder source is hosted by Lewis Moten at <code>git.lewismoten.com</code>. The browser URL is intended for reading the project; the <code>.git</code> URL is the canonical HTTPS clone endpoint.</p>
+                <nav aria-label="Project source links"><a href="https://git.lewismoten.com/lewismoten/qr">Browse repository</a><a href="https://git.lewismoten.com/lewismoten/qr.git">HTTPS clone URL</a></nav>
+              </article>
               <article>
                 <div><h3>Native QR encoder</h3><span class="version-badge">First-party</span></div>
                 <p>Implements mixed-mode segmentation, Numeric, Alphanumeric, UTF-8 Byte and Shift JIS Kanji data, versions 1-40, Reed-Solomon correction, interleaving, functional patterns, masking and matrix placement. The implementation is local; the QR symbol itself follows ISO/IEC 18004.</p>

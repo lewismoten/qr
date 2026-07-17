@@ -2,6 +2,16 @@
 
 Simple QR Code Builder
 
+## Source
+
+Browse the canonical repository at
+[git.lewismoten.com/lewismoten/qr](https://git.lewismoten.com/lewismoten/qr),
+or clone it directly:
+
+```sh
+git clone https://git.lewismoten.com/lewismoten/qr.git
+```
+
 ## Build
 
 Install the pinned development dependency and build the deployable assets:

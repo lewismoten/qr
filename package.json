@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Browser-based QR code generator, designer, exporter, and debugger",
+  "homepage": "https://qr.lewismoten.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://git.lewismoten.com/lewismoten/qr.git"
+  },
   "scripts": {
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
