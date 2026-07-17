@@ -3,7 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Code Generator</title>
+    <title>Free QR Code Generator, Designer and Debugger</title>
+    <meta name="description" content="Create, customize, inspect and download QR codes for URLs, Wi-Fi, contacts, messages, locations, files and number sequences. Includes advanced styling, batch export and developer overlays." />
+    <meta name="keywords" content="QR code generator, free QR code maker, custom QR code, QR code designer, Wi-Fi QR code, vCard QR code, file QR code, QR code debugger, QR code SVG, batch QR codes" />
+    <meta name="application-name" content="QR Code Generator" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://qr.lewismoten.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Free QR Code Generator, Designer and Debugger" />
+    <meta property="og:description" content="Generate polished, downloadable QR codes with advanced formatting, styling, file transport and visual debugging tools." />
+    <meta property="og:url" content="https://qr.lewismoten.com/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "QR Code Generator",
+        "url": "https://qr.lewismoten.com/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any modern web browser",
+        "description": "A browser-based QR code generator, designer, batch exporter and developer visualization tool.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -20,12 +41,19 @@
   </head>
   <body>
     <main class="app-shell">
+      <h1 class="sr-only">Free QR Code Generator, Designer and Debugger</h1>
       <form id="qr-form" class="app-layout">
         <section class="preview-card" aria-live="polite">
           <div class="preview-frame">
+            <div id="preview-view-controls" class="preview-view-controls is-hidden" role="group" aria-label="QR preview size" aria-hidden="true">
+              <button id="preview-view-fit" type="button" class="preview-view-button is-active" aria-pressed="true">Fit</button>
+              <button id="preview-view-actual" type="button" class="preview-view-button" aria-pressed="false">Actual size</button>
+            </div>
             <div id="chunk-preview-nav" class="chunk-preview-nav">
               <button id="chunk-preview-prev" type="button" class="chunk-nav-button" aria-label="Previous QR code">‹</button>
-              <canvas id="qr-canvas" width="320" height="320"></canvas>
+              <div id="qr-preview-viewport" class="qr-preview-viewport is-fit">
+                <canvas id="qr-canvas" width="320" height="320"></canvas>
+              </div>
               <button id="chunk-preview-next" type="button" class="chunk-nav-button" aria-label="Next QR code">›</button>
             </div>
             <p id="chunk-preview-status" class="chunk-preview-status" hidden>1 of 1</p>
@@ -36,6 +64,7 @@
           <nav class="tab-bar" aria-label="QR controls">
             <button type="button" class="tab-button is-active" data-tab="content">Content</button>
             <button type="button" class="tab-button" data-tab="style">Style</button>
+            <button type="button" class="tab-button" data-tab="download">Download</button>
             <button type="button" class="tab-button" data-tab="debug">Debug</button>
           </nav>
         </section>
@@ -57,7 +86,9 @@
 
                   <label for="qr-format">QR format</label>
                   <div id="qr-format-buttons" class="choice-grid" role="radiogroup" aria-label="QR format">
-                    <button type="button" class="choice-button is-active" data-choice-target="qr-format" data-choice-value="text" aria-pressed="true">Text / URL</button>
+                    <button type="button" class="choice-button is-active" data-choice-target="qr-format" data-choice-value="url" aria-pressed="true">URL</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="text" aria-pressed="false">Text</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="number" aria-pressed="false">Number</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="wifi" aria-pressed="false">Wi-Fi</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="email" aria-pressed="false">Email</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="phone" aria-pressed="false">Phone</button>
@@ -67,7 +98,9 @@
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="file" aria-pressed="false">File</button>
                   </div>
                   <select id="qr-format" name="qr-format" class="sr-only" aria-hidden="true" tabindex="-1">
+                    <option value="url" selected>URL</option>
                     <option value="text">Text</option>
+                    <option value="number">Number range</option>
                     <option value="wifi">Wi-Fi</option>
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
@@ -80,10 +113,49 @@
                 </section>
 
                 <section class="subtab-panel content-subtab-panel is-active" data-content-subtab-panel="data">
+                <fieldset class="option-group format-fields" data-format-fields="url">
+                  <legend class="sr-only">URL content</legend>
+                  <label for="url-input">URL</label>
+                  <input id="url-input" name="url-input" type="url" inputmode="url" autocomplete="url" />
+                </fieldset>
+
                 <fieldset class="option-group format-fields" data-format-fields="text" hidden>
-                  <legend class="sr-only">Text or URL content</legend>
-                  <label class="sr-only" for="text-input">Text or URL payload</label>
-                  <textarea id="text-input" name="text-input" rows="4" placeholder="Paste text or a URL"></textarea>
+                  <legend class="sr-only">Text content</legend>
+                  <label class="sr-only" for="text-input">Text payload</label>
+                  <textarea id="text-input" name="text-input" rows="4" placeholder="Enter any text"></textarea>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="number" hidden>
+                  <legend>Number series</legend>
+                  <div class="number-range-grid">
+                    <div>
+                      <label for="number-start">Start</label>
+                      <input id="number-start" name="number-start" type="number" inputmode="numeric" step="1" value="1" />
+                    </div>
+                    <div>
+                      <label for="number-end">End</label>
+                      <input id="number-end" name="number-end" type="number" inputmode="numeric" step="1" value="8" />
+                    </div>
+                    <div>
+                      <label for="number-step">Step</label>
+                      <input id="number-step" name="number-step" type="number" inputmode="numeric" min="1" step="1" value="1" />
+                    </div>
+                  </div>
+                  <div class="number-affix-grid">
+                    <div>
+                      <label for="number-prefix">Prefix (optional)</label>
+                      <input id="number-prefix" name="number-prefix" type="text" maxlength="32" placeholder="ITEM-" />
+                    </div>
+                    <div>
+                      <label for="number-suffix">Suffix (optional)</label>
+                      <input id="number-suffix" name="number-suffix" type="text" maxlength="32" placeholder="-A" />
+                    </div>
+                  </div>
+                  <label class="slider-field" for="number-sequence-index">
+                    <span>Current value</span>
+                    <output id="number-sequence-value" for="number-sequence-index">1 / 8 - 1</output>
+                  </label>
+                  <input id="number-sequence-index" name="number-sequence-index" type="range" min="1" max="8" step="1" value="1" />
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="wifi" hidden>
@@ -255,7 +327,35 @@
                       <label for="custom-frame-message">Custom message</label>
                       <input id="custom-frame-message" name="custom-frame-message" type="text" maxlength="80" placeholder="Scan to learn more" />
                     </div>
-                    <p class="hint">The message is embedded below the QR in the exported image. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
+                    <label class="toggle-field">
+                      <input id="frame-message-center" name="frame-message-center" type="checkbox" />
+                      <span>Place message in the QR center</span>
+                    </label>
+                    <div class="frame-type-controls">
+                      <span class="control-label">Font</span>
+                      <div class="choice-grid frame-font-grid" role="group" aria-label="Frame message font">
+                        <button type="button" class="choice-button frame-font-sans is-active" data-choice-target="frame-font" data-choice-value="sans" aria-pressed="true">Sans</button>
+                        <button type="button" class="choice-button frame-font-rounded" data-choice-target="frame-font" data-choice-value="rounded" aria-pressed="false">Round</button>
+                        <button type="button" class="choice-button frame-font-serif" data-choice-target="frame-font" data-choice-value="serif" aria-pressed="false">Serif</button>
+                        <button type="button" class="choice-button frame-font-mono" data-choice-target="frame-font" data-choice-value="mono" aria-pressed="false">Mono</button>
+                      </div>
+                      <select id="frame-font" name="frame-font" class="sr-only" aria-label="Frame message font">
+                        <option value="sans" selected>Sans</option>
+                        <option value="rounded">Rounded</option>
+                        <option value="serif">Serif</option>
+                        <option value="mono">Monospace</option>
+                      </select>
+                      <div class="frame-color-field">
+                        <label for="frame-message-color">Message color</label>
+                        <input id="frame-message-color" name="frame-message-color" type="color" value="#132235" />
+                      </div>
+                      <label class="slider-field" for="frame-line-height">
+                        <span>Maximum line height</span>
+                        <output id="frame-line-height-value" for="frame-line-height">18 px</output>
+                      </label>
+                      <input id="frame-line-height" name="frame-line-height" type="range" min="10" max="48" step="1" value="18" />
+                    </div>
+                    <p class="hint">The message is embedded below the QR or given a tight contrasting outline when centered. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.</p>
                   </fieldset>
                 </section>
                 </div>
@@ -280,7 +380,7 @@
                     <span>Target width</span>
                     <output id="qr-width-value" for="qr-width">320 px target</output>
                   </label>
-                  <input id="qr-width" name="qr-width" type="range" min="64" max="640" step="64" value="320" />
+                  <input id="qr-width" name="qr-width" type="range" min="64" max="2048" step="64" value="320" />
 
                   <label class="toggle-field">
                     <input id="qr-width-auto" name="qr-width-auto" type="checkbox" />
@@ -421,16 +521,18 @@
                   </div>
 
                   <div class="gradient-field">
-                    <span class="field-label" id="gradient-type-label">Dark color fill</span>
+                    <span class="field-label" id="gradient-type-label">Module fill</span>
                     <div class="choice-grid gradient-type-grid" role="group" aria-labelledby="gradient-type-label">
                       <button type="button" class="choice-button is-active" data-choice-target="gradient-type" data-choice-value="solid" aria-pressed="true">Solid</button>
                       <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="linear" aria-pressed="false">Linear</button>
                       <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="radial" aria-pressed="false">Radial</button>
+                      <button type="button" class="choice-button" data-choice-target="gradient-type" data-choice-value="image" aria-pressed="false">Image</button>
                     </div>
                     <select id="gradient-type" name="gradient-type" class="sr-only" aria-labelledby="gradient-type-label">
                       <option value="solid" selected>Solid</option>
                       <option value="linear">Linear</option>
                       <option value="radial">Radial</option>
+                      <option value="image">Custom image</option>
                     </select>
                   </div>
 
@@ -453,12 +555,26 @@
                       <input id="gradient-angle" name="gradient-angle" type="range" min="0" max="360" step="1" value="0" />
                     </div>
                   </div>
+
+                  <div id="image-fill-controls" class="image-fill-controls" hidden>
+                    <label for="image-fill-input">Custom fill image</label>
+                    <input id="image-fill-input" name="image-fill-input" type="file" accept="image/*" />
+                    <div class="image-fill-actions">
+                      <button id="image-fill-recommended" type="button" class="secondary-button">Apply recommended contrast</button>
+                      <button id="image-fill-clear" type="button" class="secondary-button" disabled>Clear image</button>
+                    </div>
+                    <p class="hint">Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity.</p>
+                  </div>
                 </fieldset>
                 </section>
 
                 <section class="subtab-panel style-subtab-panel" data-style-subtab-panel="artwork" hidden>
                 <fieldset class="option-group">
                   <legend>Center artwork</legend>
+                  <label class="toggle-field">
+                    <input id="frame-message-center-art" name="frame-message-center-art" type="checkbox" />
+                    <span>Use frame message as center artwork</span>
+                  </label>
                   <div class="choice-grid center-art-mode-grid" role="group" aria-label="Center artwork type">
                     <button type="button" class="choice-button is-active" data-choice-target="center-art-mode" data-choice-value="none" aria-pressed="true">None</button>
                     <button type="button" class="choice-button" data-choice-target="center-art-mode" data-choice-value="logo" aria-pressed="false">Logo</button>
@@ -547,6 +663,107 @@
               </div>
             </section>
 
+            <section class="tab-panel" data-tab-panel="download" hidden>
+              <div class="panel-card compact-stack">
+                <nav class="subtab-bar download-subtab-bar" aria-label="Download type">
+                  <button type="button" class="subtab-button download-subtab-button is-active" data-download-subtab="image" aria-pressed="true">Image</button>
+                  <button type="button" class="subtab-button download-subtab-button" data-download-subtab="document" aria-pressed="false">Document</button>
+                  <button id="download-animation-tab" type="button" class="subtab-button download-subtab-button" data-download-subtab="animation" aria-pressed="false" hidden>Animation</button>
+                </nav>
+
+                <div class="subtab-panels download-subtab-panels">
+                  <section class="subtab-panel download-subtab-panel is-active" data-download-subtab-panel="image">
+                    <fieldset class="option-group">
+                      <legend>Export image</legend>
+                      <div class="choice-grid download-format-grid" role="group" aria-label="Image format">
+                        <button type="button" class="choice-button is-active" data-choice-target="download-format" data-choice-value="png" aria-pressed="true">PNG</button>
+                        <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="jpg" aria-pressed="false">JPG</button>
+                        <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="gif" aria-pressed="false">GIF</button>
+                        <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="svg" aria-pressed="false">SVG</button>
+                      </div>
+                      <select id="download-format" name="download-format" class="sr-only" aria-label="Image format">
+                        <option value="png" selected>PNG</option>
+                        <option value="jpg">JPG</option>
+                        <option value="gif">GIF</option>
+                        <option value="svg">SVG</option>
+                      </select>
+
+                      <div id="download-quality-controls" hidden>
+                        <label class="slider-field" for="download-quality">
+                          <span>JPG quality</span>
+                          <output id="download-quality-value" for="download-quality">92%</output>
+                        </label>
+                        <input id="download-quality" name="download-quality" type="range" min="40" max="100" step="1" value="92" />
+                      </div>
+
+                      <div class="download-actions">
+                        <button id="download-current" type="button" class="download-button">Download current image</button>
+                        <button id="download-zip" type="button" class="secondary-button" hidden>Download all as ZIP</button>
+                      </div>
+                      <p class="hint">SVG traces the complete canvas into paths only, including frame text.</p>
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel download-subtab-panel" data-download-subtab-panel="document" hidden>
+                    <fieldset class="option-group">
+                      <legend>PDF document</legend>
+                      <label class="toggle-field">
+                        <input id="print-width-auto" name="print-width-auto" type="checkbox" checked />
+                        <span>Auto-size printed QR from pixels and version</span>
+                      </label>
+                      <label class="slider-field" for="print-width">
+                        <span>Printed width</span>
+                        <output id="print-width-value" for="print-width">1.67 in auto</output>
+                      </label>
+                      <input id="print-width" name="print-width" type="range" min="0.5" max="7" step="0.05" value="1.65" disabled />
+
+                      <div class="download-actions document-download-actions">
+                        <button id="download-current-pdf" type="button" class="download-button">Download current as PDF</button>
+                        <button id="download-all-pdf" type="button" class="secondary-button" hidden>Download all as PDF</button>
+                      </div>
+                      <p class="hint">Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows.</p>
+                    </fieldset>
+                  </section>
+
+                  <section class="subtab-panel download-subtab-panel" data-download-subtab-panel="animation" hidden>
+                    <fieldset class="option-group">
+                      <legend>Animation timing</legend>
+                      <div class="choice-grid animation-timing-mode-grid" role="group" aria-label="Animation timing mode">
+                        <button type="button" class="choice-button is-active" data-choice-target="animation-timing-mode" data-choice-value="per-frame" aria-pressed="true">Per image</button>
+                        <button type="button" class="choice-button" data-choice-target="animation-timing-mode" data-choice-value="total" aria-pressed="false">Total duration</button>
+                      </div>
+                      <select id="animation-timing-mode" name="animation-timing-mode" class="sr-only" aria-label="Animation timing mode">
+                        <option value="per-frame" selected>Per image</option>
+                        <option value="total">Total duration</option>
+                      </select>
+
+                      <div class="animation-duration-grid">
+                        <div>
+                          <label for="animation-minutes">Minutes</label>
+                          <input id="animation-minutes" name="animation-minutes" type="number" inputmode="numeric" min="0" max="60" step="1" value="0" />
+                        </div>
+                        <div>
+                          <label for="animation-seconds">Seconds</label>
+                          <input id="animation-seconds" name="animation-seconds" type="number" inputmode="numeric" min="0" max="59" step="1" value="1" />
+                        </div>
+                        <div>
+                          <label for="animation-milliseconds">Milliseconds</label>
+                          <input id="animation-milliseconds" name="animation-milliseconds" type="number" inputmode="numeric" min="0" max="999" step="1" value="0" />
+                        </div>
+                      </div>
+                      <p id="animation-duration-summary" class="hint">1.000 seconds per image - 8.000 seconds total.</p>
+                      <div class="download-actions animation-download-actions">
+                        <button id="download-animated-gif" type="button" class="download-button">Download animated GIF</button>
+                        <button id="download-animation-mp4" type="button" class="secondary-button">Download MP4</button>
+                      </div>
+                      <p class="hint">GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time.</p>
+                    </fieldset>
+                  </section>
+                </div>
+                <p id="download-status" class="hint download-status" aria-live="polite"></p>
+              </div>
+            </section>
+
             <section class="tab-panel" data-tab-panel="debug" hidden>
               <div class="panel-card compact-stack">
                 <nav class="subtab-bar debug-subtab-bar" aria-label="Debug tools">
@@ -578,8 +795,14 @@
                         <span>Auto-detect best encoding mode</span>
                       </label>
 
-                      <label for="encoding-mode">Manual mode</label>
-                      <select id="encoding-mode" name="encoding-mode">
+                      <span class="field-label" id="encoding-mode-label">Manual mode</span>
+                      <div class="choice-grid encoding-mode-grid" role="group" aria-labelledby="encoding-mode-label">
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="numeric" aria-pressed="true">Numeric</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="alphanumeric" aria-pressed="false">A-Z / 0-9</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="byte" aria-pressed="false">Byte</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="kanji" aria-pressed="false">Kanji</button>
+                      </div>
+                      <select id="encoding-mode" name="encoding-mode" class="sr-only" aria-labelledby="encoding-mode-label">
                         <option value="numeric">Numeric</option>
                         <option value="alphanumeric">Alphanumeric</option>
                         <option value="byte">Byte / Binary</option>
@@ -675,6 +898,11 @@
                         <input id="debug-enabled" name="debug-enabled" type="checkbox" />
                         <span>Keep overlays on in other tabs</span>
                       </label>
+                      <label class="toggle-field">
+                        <input id="debug-unmask" name="debug-unmask" type="checkbox" />
+                        <span>Show unmasked data modules</span>
+                      </label>
+                      <p class="hint">Reverses the selected mask for the debug preview only. Functional patterns and format information remain unchanged.</p>
                       <fieldset class="option-group">
                         <legend>Outline grouping</legend>
                         <div class="debug-outline-control" role="group" aria-label="Outline grouping">
@@ -760,7 +988,120 @@
           </div>
         </section>
       </form>
+
+      <footer class="site-footer">
+        <p>QR Code Generator</p>
+        <nav aria-label="Site information">
+          <a href="#about" data-dialog-target="about">About</a>
+          <a href="#third-party" data-dialog-target="third-party">Third-party software</a>
+        </nav>
+      </footer>
     </main>
+
+    <dialog id="about" class="info-dialog" aria-labelledby="about-title">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker">Inside the matrix</p>
+            <h1 id="about-title">About the QR Code Generator</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close About">Close</button>
+        </header>
+        <div class="info-dialog-content">
+          <p class="info-lead">This free, browser-based QR code generator is built for quick everyday codes and unusually deep inspection. Paste a URL and leave, or control encoding, version, masks, artwork, print size, file chunks and the path of individual bits.</p>
+
+          <section>
+            <h2>What you can create</h2>
+            <p>Generate QR codes for websites, plain text, number sequences, Wi-Fi credentials, email, phone calls, SMS messages, geographic coordinates, vCards and small files. Batch controls can produce numbered sets or a random-order series of file chunks, while frame captions make printed codes easier to identify.</p>
+            <p>Style modules, finder eyes, gradients, transparency, background images, logos, emoji and pixel art. Export the current code as PNG, JPEG, GIF, SVG or PDF; export multi-code projects as ZIP, PDF sheets, animated GIF or MP4.</p>
+          </section>
+
+          <section>
+            <h2>How QR codes work</h2>
+            <div class="fact-grid">
+              <article><strong>40 versions</strong><span>Version 1 is 21 by 21 modules. Every version adds four modules per side, ending at 177 by 177 for version 40.</span></article>
+              <article><strong>Four data modes</strong><span>Numeric, alphanumeric, byte and Kanji modes trade character flexibility for storage efficiency. Automatic segmentation usually creates the shortest stream.</span></article>
+              <article><strong>Four recovery levels</strong><span>L, M, Q and H add increasing Reed-Solomon redundancy. Rough damage-recovery targets are about 7%, 15%, 25% and 30%, with higher recovery reducing payload capacity.</span></article>
+              <article><strong>Eight masks</strong><span>A required mask breaks up scanner-hostile patterns. Auto evaluates every mask and chooses the lowest penalty score; Debug can reveal the unmasked data.</span></article>
+            </div>
+            <p>The three finder patterns establish position. Timing and alignment patterns correct sampling and distortion. Format information records error correction and mask choice, while version information appears in versions 7 and higher. The remaining path carries mode and character-count headers, payload bits, terminator and padding, error-correction codewords and occasional remainder bits.</p>
+          </section>
+
+          <section>
+            <h2>Design without losing reliability</h2>
+            <p>Scanners need contrast, a clear quiet zone and recognizable functional patterns. Rounded modules, gradients and center artwork can work well, but every customization spends part of the code's scanning tolerance. Use stronger error correction for artwork, avoid covering finder patterns, print modules large enough for the expected distance and test the final physical result with several devices.</p>
+          </section>
+
+          <section>
+            <h2>Developer and file tools</h2>
+            <p>The Debug workspace separates functional regions, metadata, payload, padding, error correction and remainder bits with configurable colors. It can outline codewords or stream bytes, trace read paths, show metadata order and reverse the selected mask for a raw-data view.</p>
+            <p>File transport supports data URLs, browser blob URLs and a documented <code>FILE:1</code> chunk protocol. Chunked transfers use a compact identifier, byte offsets, optional gzip compression, metadata and SHA-256 verification so frames can be collected out of order and checked before assembly. Blob URLs only work in the browser session that created them; ordinary phone cameras generally need an HTTPS link or a compatible receiving app for file workflows.</p>
+          </section>
+
+          <section>
+            <h2>Privacy and network use</h2>
+            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Loading the application fetches QRCode and Leaflet assets from public CDNs. Opening the Geo format requests map tiles from OpenStreetMap, which receives normal web request information such as an IP address and browser headers.</p>
+          </section>
+        </div>
+      </article>
+    </dialog>
+
+    <dialog id="third-party" class="info-dialog" aria-labelledby="third-party-title">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker">Open source inventory</p>
+            <h1 id="third-party-title">Third-party software and services</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close third-party software">Close</button>
+        </header>
+        <div class="info-dialog-content">
+          <p class="info-lead">The runtime dependency list is intentionally short. Versions below match the files loaded by this page.</p>
+
+          <section>
+            <h2>Runtime libraries</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>QRCode / node-qrcode</h3><span class="version-badge">1.5.0</span></div>
+                <p>Creates QR segments, versions, masks, error-correction data and module matrices.</p>
+                <nav aria-label="QRCode links"><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">Website</a><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a></nav>
+              </article>
+              <article>
+                <div><h3>Leaflet</h3><span class="version-badge">1.9.4</span></div>
+                <p>Provides the interactive map, zoom controls, click coordinates, marker and label used by the Geo format.</p>
+                <nav aria-label="Leaflet links"><a href="https://leafletjs.com/">Website</a><a href="https://github.com/Leaflet/Leaflet">Repository</a><a href="https://github.com/Leaflet/Leaflet/blob/main/LICENSE">BSD 2-Clause license</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Data and delivery services</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>OpenStreetMap</h3><span class="version-badge">Live data</span></div>
+                <p>Supplies geographic data and standard raster map tiles for the Geo preview. Map data is licensed under ODbL; hosted tiles are also governed by the tile usage policy.</p>
+                <nav aria-label="OpenStreetMap links"><a href="https://www.openstreetmap.org/">Website</a><a href="https://github.com/openstreetmap/openstreetmap-website">Website repository</a><a href="https://www.openstreetmap.org/copyright">Copyright and ODbL</a><a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a></nav>
+              </article>
+              <article>
+                <div><h3>jsDelivr</h3><span class="version-badge">CDN service</span></div>
+                <p>Delivers the pinned QRCode 1.5.0 browser bundle.</p>
+                <nav aria-label="jsDelivr links"><a href="https://www.jsdelivr.com/">Website</a><a href="https://github.com/jsdelivr/jsdelivr">Repository</a><a href="https://github.com/jsdelivr/jsdelivr/blob/master/LICENSE">MIT license</a><a href="https://www.jsdelivr.com/terms">Terms</a></nav>
+              </article>
+              <article>
+                <div><h3>UNPKG</h3><span class="version-badge">CDN service</span></div>
+                <p>Delivers the pinned Leaflet 1.9.4 JavaScript and stylesheet files.</p>
+                <nav aria-label="UNPKG links"><a href="https://unpkg.com/">Website</a><a href="https://github.com/unpkg/unpkg">Repository</a><a href="https://github.com/unpkg/unpkg/blob/main/LICENSE">MIT license</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Built without additional export libraries</h2>
+            <p>Canvas drawing, SVG path tracing, PNG/JPEG output, GIF encoding, ZIP packaging and PDF generation are implemented in this application. MP4 recording, SHA-256 hashing and gzip compression use browser APIs when available. Those browser capabilities are platform features rather than bundled third-party modules.</p>
+          </section>
+        </div>
+      </article>
+    </dialog>
 
     <script src="script.js"></script>
   </body>

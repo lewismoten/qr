@@ -1,9 +1,22 @@
 const form = document.getElementById('qr-form');
 const canvas = document.getElementById('qr-canvas');
+const qrPreviewViewport = document.getElementById('qr-preview-viewport');
+const previewViewControls = document.getElementById('preview-view-controls');
+const previewViewFit = document.getElementById('preview-view-fit');
+const previewViewActual = document.getElementById('preview-view-actual');
 const chunkPreviewNav = document.getElementById('chunk-preview-nav');
 const chunkPreviewPrev = document.getElementById('chunk-preview-prev');
 const chunkPreviewNext = document.getElementById('chunk-preview-next');
 const chunkPreviewStatus = document.getElementById('chunk-preview-status');
+
+let previewViewMode = 'fit';
+let previewPanX = 0;
+let previewPanY = 0;
+let previewPanPointer = null;
+let previewPanStartX = 0;
+let previewPanStartY = 0;
+let previewPanOriginX = 0;
+let previewPanOriginY = 0;
 const optionsPreview = document.getElementById('options-preview');
 const encodedPreview = document.getElementById('encoded-preview');
 const payloadRevealSecrets = document.getElementById('payload-reveal-secrets');
@@ -37,9 +50,19 @@ const gradientAngleValue = document.getElementById('gradient-angle-value');
 const colorGradientEnd = document.getElementById('color-gradient-end');
 const colorGradientEndTransparency = document.getElementById('color-gradient-end-transparency');
 const colorGradientEndTransparencyValue = document.getElementById('color-gradient-end-transparency-value');
+const imageFillControls = document.getElementById('image-fill-controls');
+const imageFillInput = document.getElementById('image-fill-input');
+const imageFillRecommended = document.getElementById('image-fill-recommended');
+const imageFillClear = document.getElementById('image-fill-clear');
 const frameMessageMode = document.getElementById('frame-message-mode');
 const customFrameMessageField = document.getElementById('custom-frame-message-field');
 const customFrameMessage = document.getElementById('custom-frame-message');
+const frameMessageCenter = document.getElementById('frame-message-center');
+const frameMessageCenterArt = document.getElementById('frame-message-center-art');
+const frameFont = document.getElementById('frame-font');
+const frameMessageColor = document.getElementById('frame-message-color');
+const frameLineHeight = document.getElementById('frame-line-height');
+const frameLineHeightValue = document.getElementById('frame-line-height-value');
 const moduleShape = document.getElementById('module-shape');
 const moduleCustomControls = document.getElementById('module-custom-controls');
 const moduleRounding = document.getElementById('module-rounding');
@@ -78,6 +101,19 @@ const pixelArtMatchModuleShape = document.getElementById('pixel-art-match-module
 const pixelArtSizeInput = document.getElementById('pixel-art-size');
 const pixelArtSizeValue = document.getElementById('pixel-art-size-value');
 const pixelArtGrid = document.getElementById('pixel-art-grid');
+const downloadFormat = document.getElementById('download-format');
+const downloadQualityControls = document.getElementById('download-quality-controls');
+const downloadQuality = document.getElementById('download-quality');
+const downloadQualityValue = document.getElementById('download-quality-value');
+const printWidthAuto = document.getElementById('print-width-auto');
+const printWidth = document.getElementById('print-width');
+const printWidthValue = document.getElementById('print-width-value');
+const downloadCurrent = document.getElementById('download-current');
+const downloadCurrentPdf = document.getElementById('download-current-pdf');
+const downloadZip = document.getElementById('download-zip');
+const downloadAllPdf = document.getElementById('download-all-pdf');
+const downloadActions = document.querySelectorAll('.download-actions');
+const downloadStatus = document.getElementById('download-status');
 const optionsJson = document.getElementById('options-json');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
@@ -85,6 +121,7 @@ const errorCorrectionValue = document.getElementById('error-correction-value');
 const errorCorrectionHelp = document.getElementById('error-correction-help');
 const modeAuto = document.getElementById('mode-auto');
 const encodingMode = document.getElementById('encoding-mode');
+const encodingModeButtons = document.querySelectorAll('.encoding-mode-button');
 const detectedMode = document.getElementById('detected-mode');
 const segmentSummary = document.getElementById('segment-summary');
 const versionSummary = document.getElementById('version-summary');
@@ -98,12 +135,32 @@ const debugSubtabButtons = document.querySelectorAll('[data-tab-panel="debug"] .
 const debugSubtabPanels = document.querySelectorAll('[data-tab-panel="debug"] .subtab-panel');
 const styleSubtabButtons = document.querySelectorAll('.style-subtab-button');
 const styleSubtabPanels = document.querySelectorAll('.style-subtab-panel');
+const downloadSubtabButtons = document.querySelectorAll('.download-subtab-button');
+const downloadSubtabPanels = document.querySelectorAll('.download-subtab-panel');
+const downloadSubtabBar = document.querySelector('.download-subtab-bar');
+const downloadAnimationTab = document.getElementById('download-animation-tab');
+const animationTimingMode = document.getElementById('animation-timing-mode');
+const animationMinutes = document.getElementById('animation-minutes');
+const animationSeconds = document.getElementById('animation-seconds');
+const animationMilliseconds = document.getElementById('animation-milliseconds');
+const animationDurationSummary = document.getElementById('animation-duration-summary');
+const downloadAnimatedGif = document.getElementById('download-animated-gif');
+const downloadAnimationMp4 = document.getElementById('download-animation-mp4');
 const contentSubtabButtons = document.querySelectorAll('.content-subtab-button');
 const contentSubtabPanels = document.querySelectorAll('.content-subtab-panel');
 const debugEnabled = document.getElementById('debug-enabled');
+const debugUnmask = document.getElementById('debug-unmask');
 const debugOutlineModeButtons = document.querySelectorAll('.outline-mode-button');
 
+const urlInput = document.getElementById('url-input');
 const textInput = document.getElementById('text-input');
+const numberStart = document.getElementById('number-start');
+const numberEnd = document.getElementById('number-end');
+const numberStep = document.getElementById('number-step');
+const numberPrefix = document.getElementById('number-prefix');
+const numberSuffix = document.getElementById('number-suffix');
+const numberSequenceIndex = document.getElementById('number-sequence-index');
+const numberSequenceValue = document.getElementById('number-sequence-value');
 const wifiSsid = document.getElementById('wifi-ssid');
 const wifiPassword = document.getElementById('wifi-password');
 const wifiEncryption = document.getElementById('wifi-encryption');
@@ -287,6 +344,9 @@ const EGA_COLORS = [
 let centerLogoImage = null;
 let centerLogoObjectUrl = '';
 let centerLogoLoadRequest = 0;
+let imageFillImage = null;
+let imageFillObjectUrl = '';
+let imageFillLoadRequest = 0;
 let pixelArtSize = 16;
 let pixelArtPixels = Array(pixelArtSize * pixelArtSize).fill(null);
 let activePixelPaintColor = '#000000';
@@ -307,6 +367,12 @@ let activeDebugOutlineMode = 'codewords';
 let activePhoneFormat = 'usa';
 const SMS_MAX_LENGTH = 160;
 const EMAIL_SUBJECT_MAX_LENGTH = 120;
+const NUMBER_SERIES_MAX_FRAMES = 10000;
+const MAX_QR_TARGET_WIDTH = 2048;
+const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+const PRINT_PIXELS_PER_INCH = 192;
+const MIN_PRINT_MODULE_INCHES = 0.02;
+const ANIMATION_MAX_FRAMES = 200;
 const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
@@ -379,6 +445,868 @@ function clearCanvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function getPreviewPanBounds() {
+  return {
+    x: Math.max(0, (canvas.width - qrPreviewViewport.clientWidth) / 2),
+    y: Math.max(0, (canvas.height - qrPreviewViewport.clientHeight) / 2),
+  };
+}
+
+function applyPreviewPan() {
+  const bounds = getPreviewPanBounds();
+  previewPanX = Math.max(-bounds.x, Math.min(bounds.x, previewPanX));
+  previewPanY = Math.max(-bounds.y, Math.min(bounds.y, previewPanY));
+  const centeredLeft = (qrPreviewViewport.clientWidth - canvas.width) / 2;
+  const centeredTop = (qrPreviewViewport.clientHeight - canvas.height) / 2;
+  qrPreviewViewport.style.setProperty('--qr-preview-left', `${Math.round(centeredLeft + previewPanX)}px`);
+  qrPreviewViewport.style.setProperty('--qr-preview-top', `${Math.round(centeredTop + previewPanY)}px`);
+}
+
+function setPreviewViewMode(mode, resetPan = false) {
+  previewViewMode = mode === 'actual' ? 'actual' : 'fit';
+  if (resetPan) {
+    previewPanX = 0;
+    previewPanY = 0;
+  }
+
+  const actualSize = previewViewMode === 'actual';
+  qrPreviewViewport.classList.toggle('is-actual', actualSize);
+  qrPreviewViewport.classList.toggle('is-fit', !actualSize);
+  previewViewFit.classList.toggle('is-active', !actualSize);
+  previewViewActual.classList.toggle('is-active', actualSize);
+  previewViewFit.setAttribute('aria-pressed', String(!actualSize));
+  previewViewActual.setAttribute('aria-pressed', String(actualSize));
+  applyPreviewPan();
+}
+
+let previewViewportSyncRequest = 0;
+
+function syncFitPreviewSize() {
+  const availableWidth = qrPreviewViewport.clientWidth;
+  const availableHeight = qrPreviewViewport.clientHeight;
+  const fitRatio = Math.min(1, availableWidth / canvas.width, availableHeight / canvas.height);
+  let fitWidth = canvas.width;
+  let fitHeight = canvas.height;
+
+  if (fitRatio < 1 && renderedQrWidth && renderedQrModuleScale) {
+    const totalModules = Math.round(renderedQrWidth / renderedQrModuleScale);
+    const fittedModuleScale = Math.floor(renderedQrModuleScale * fitRatio);
+    if (fittedModuleScale >= 1) {
+      fitWidth = totalModules * fittedModuleScale;
+      fitHeight = Math.round(canvas.height * (fitWidth / canvas.width));
+    } else {
+      fitWidth = Math.max(1, Math.floor(canvas.width * fitRatio));
+      fitHeight = Math.max(1, Math.floor(canvas.height * fitRatio));
+    }
+  }
+
+  qrPreviewViewport.style.setProperty('--qr-fit-width', `${fitWidth}px`);
+  qrPreviewViewport.style.setProperty('--qr-fit-height', `${fitHeight}px`);
+}
+
+function schedulePreviewViewportSync() {
+  cancelAnimationFrame(previewViewportSyncRequest);
+  previewViewportSyncRequest = requestAnimationFrame(() => {
+    syncFitPreviewSize();
+    const isOversized =
+      canvas.width > qrPreviewViewport.clientWidth || canvas.height > qrPreviewViewport.clientHeight;
+    previewViewControls.classList.toggle('is-hidden', !isOversized);
+    previewViewControls.setAttribute('aria-hidden', String(!isOversized));
+    applyPreviewPan();
+  });
+}
+
+function stopPreviewPan(event) {
+  if (previewPanPointer !== event.pointerId) {
+    return;
+  }
+
+  previewPanPointer = null;
+  qrPreviewViewport.classList.remove('is-dragging');
+  if (qrPreviewViewport.hasPointerCapture(event.pointerId)) {
+    qrPreviewViewport.releasePointerCapture(event.pointerId);
+  }
+}
+
+function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
+  return new Promise((resolve, reject) => {
+    let exportCanvas = sourceCanvas;
+    if (flatten) {
+      exportCanvas = document.createElement('canvas');
+      exportCanvas.width = sourceCanvas.width;
+      exportCanvas.height = sourceCanvas.height;
+      const context = exportCanvas.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      context.drawImage(sourceCanvas, 0, 0);
+    }
+    exportCanvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error(`Unable to create ${type} image.`));
+      }
+    }, type, quality);
+  });
+}
+
+function concatBytes(parts) {
+  const length = parts.reduce((total, part) => total + part.length, 0);
+  const result = new Uint8Array(length);
+  let offset = 0;
+  parts.forEach((part) => {
+    result.set(part, offset);
+    offset += part.length;
+  });
+  return result;
+}
+
+function textBytes(value) {
+  return new TextEncoder().encode(value);
+}
+
+async function createPdfBlob(sourceCanvas) {
+  const jpegBlob = await canvasToBlob(
+    sourceCanvas,
+    'image/jpeg',
+    (Number.parseInt(downloadQuality.value, 10) || 92) / 100,
+    true
+  );
+  const jpeg = new Uint8Array(await jpegBlob.arrayBuffer());
+  const pixelWidth = sourceCanvas.width;
+  const pixelHeight = sourceCanvas.height;
+  const width = getPrintWidthInches(sourceCanvas) * 72;
+  const height = width * (pixelHeight / pixelWidth);
+  const content = `q\n${width.toFixed(3)} 0 0 ${height.toFixed(3)} 0 0 cm\n/Im0 Do\nQ\n`;
+  const objects = [
+    textBytes('<< /Type /Catalog /Pages 2 0 R >>'),
+    textBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
+    textBytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(3)} ${height.toFixed(3)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`),
+    concatBytes([
+      textBytes(`<< /Type /XObject /Subtype /Image /Width ${pixelWidth} /Height ${pixelHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`),
+      jpeg,
+      textBytes('\nendstream'),
+    ]),
+    textBytes(`<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`),
+  ];
+  return createPdfDocumentBlob(objects);
+}
+
+function createPdfDocumentBlob(objects) {
+  const parts = [textBytes('%PDF-1.4\n')];
+  const offsets = [0];
+  let length = parts[0].length;
+  objects.forEach((object, index) => {
+    offsets.push(length);
+    const part = concatBytes([textBytes(`${index + 1} 0 obj\n`), object, textBytes('\nendobj\n')]);
+    parts.push(part);
+    length += part.length;
+  });
+  const xrefOffset = length;
+  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    xref += `${String(offset).padStart(10, '0')} 00000 n \n`;
+  });
+  xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  parts.push(textBytes(xref));
+  return new Blob(parts, { type: 'application/pdf' });
+}
+
+async function capturePdfFrame(sourceCanvas) {
+  const jpegBlob = await canvasToBlob(
+    sourceCanvas,
+    'image/jpeg',
+    (Number.parseInt(downloadQuality.value, 10) || 92) / 100,
+    true
+  );
+  return {
+    width: sourceCanvas.width,
+    height: sourceCanvas.height,
+    printWidthInches: getPrintWidthInches(sourceCanvas),
+    jpeg: new Uint8Array(await jpegBlob.arrayBuffer()),
+  };
+}
+
+function getPdfSheetLayout(frames) {
+  const pageWidth = 612;
+  const pageHeight = 792;
+  const margin = 36;
+  const gap = 10;
+  const printableWidth = pageWidth - margin * 2;
+  const printableHeight = pageHeight - margin * 2;
+  const printWidth = Math.min(
+    printableWidth,
+    Math.max(...frames.map((frame) => (frame.printWidthInches || 1.65) * 72))
+  );
+  const maximumAspectRatio = Math.max(...frames.map((frame) => frame.height / frame.width));
+  const printHeight = printWidth * maximumAspectRatio;
+  const columns = Math.max(1, Math.floor((printableWidth + gap) / (printWidth + gap)));
+  const rows = Math.max(1, Math.floor((printableHeight + gap) / (printHeight + gap)));
+  const framesPerPage = columns * rows;
+  const cellWidth = (pageWidth - margin * 2 - gap * (columns - 1)) / columns;
+  const cellHeight = (pageHeight - margin * 2 - gap * (rows - 1)) / rows;
+  return { pageWidth, pageHeight, margin, gap, columns, rows, framesPerPage, cellWidth, cellHeight, printWidth };
+}
+
+function createPdfSheetBlob(frames) {
+  const { pageWidth, pageHeight, margin, gap, columns, framesPerPage, cellWidth, cellHeight, printWidth } =
+    getPdfSheetLayout(frames);
+  const objects = [null, null];
+  const pageReferences = [];
+  const reserveObject = () => {
+    objects.push(null);
+    return objects.length;
+  };
+  const setObject = (reference, value) => {
+    objects[reference - 1] = value;
+  };
+
+  for (let pageStart = 0; pageStart < frames.length; pageStart += framesPerPage) {
+    const pageFrames = frames.slice(pageStart, pageStart + framesPerPage);
+    const pageReference = reserveObject();
+    const contentReference = reserveObject();
+    const imageReferences = pageFrames.map(() => reserveObject());
+    const resources = [];
+    const commands = [];
+
+    pageFrames.forEach((frame, index) => {
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      const scale = Math.min(printWidth / frame.width, cellWidth / frame.width, cellHeight / frame.height);
+      const drawWidth = frame.width * scale;
+      const drawHeight = frame.height * scale;
+      const x = margin + column * (cellWidth + gap) + (cellWidth - drawWidth) / 2;
+      const cellBottom = pageHeight - margin - (row + 1) * cellHeight - row * gap;
+      const y = cellBottom + (cellHeight - drawHeight) / 2;
+      const imageName = `Im${index + 1}`;
+      resources.push(`/${imageName} ${imageReferences[index]} 0 R`);
+      commands.push(`q\n${drawWidth.toFixed(3)} 0 0 ${drawHeight.toFixed(3)} ${x.toFixed(3)} ${y.toFixed(3)} cm\n/${imageName} Do\nQ\n`);
+      setObject(
+        imageReferences[index],
+        concatBytes([
+          textBytes(`<< /Type /XObject /Subtype /Image /Width ${frame.width} /Height ${frame.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${frame.jpeg.length} >>\nstream\n`),
+          frame.jpeg,
+          textBytes('\nendstream'),
+        ])
+      );
+    });
+
+    const content = commands.join('');
+    setObject(
+      pageReference,
+      textBytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << ${resources.join(' ')} >> >> /Contents ${contentReference} 0 R >>`)
+    );
+    setObject(contentReference, textBytes(`<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`));
+    pageReferences.push(pageReference);
+  }
+
+  objects[0] = textBytes('<< /Type /Catalog /Pages 2 0 R >>');
+  objects[1] = textBytes(`<< /Type /Pages /Kids [${pageReferences.map((reference) => `${reference} 0 R`).join(' ')}] /Count ${pageReferences.length} >>`);
+  return createPdfDocumentBlob(objects);
+}
+
+function pushUint16(bytes, value) {
+  bytes.push(value & 255, (value >>> 8) & 255);
+}
+
+function pushUint32(bytes, value) {
+  bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+}
+
+function createGifBlob(sourceCanvas) {
+  const context = sourceCanvas.getContext('2d');
+  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
+  const indexes = new Uint8Array(sourceCanvas.width * sourceCanvas.height);
+  const levels = [0, 51, 102, 153, 204, 255];
+  const palette = new Uint8Array(256 * 3);
+  for (let r = 0; r < 6; r += 1) {
+    for (let g = 0; g < 6; g += 1) {
+      for (let b = 0; b < 6; b += 1) {
+        const index = 1 + r * 36 + g * 6 + b;
+        palette[index * 3] = levels[r];
+        palette[index * 3 + 1] = levels[g];
+        palette[index * 3 + 2] = levels[b];
+      }
+    }
+  }
+  for (let index = 0; index < indexes.length; index += 1) {
+    const pixel = index * 4;
+    if (pixels[pixel + 3] < 128) {
+      indexes[index] = 0;
+      continue;
+    }
+    const r = Math.round(pixels[pixel] / 51);
+    const g = Math.round(pixels[pixel + 1] / 51);
+    const b = Math.round(pixels[pixel + 2] / 51);
+    indexes[index] = 1 + r * 36 + g * 6 + b;
+  }
+
+  const codes = [256];
+  let literalCount = 0;
+  indexes.forEach((index) => {
+    codes.push(index);
+    literalCount += 1;
+    if (literalCount === 200) {
+      codes.push(256);
+      literalCount = 0;
+    }
+  });
+  codes.push(257);
+  const packed = [];
+  let accumulator = 0;
+  let bitCount = 0;
+  codes.forEach((code) => {
+    accumulator |= code << bitCount;
+    bitCount += 9;
+    while (bitCount >= 8) {
+      packed.push(accumulator & 255);
+      accumulator >>>= 8;
+      bitCount -= 8;
+    }
+  });
+  if (bitCount) {
+    packed.push(accumulator & 255);
+  }
+
+  const bytes = [...textBytes('GIF89a')];
+  pushUint16(bytes, sourceCanvas.width);
+  pushUint16(bytes, sourceCanvas.height);
+  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xf9, 4, 1, 0, 0, 0, 0, 0x2c);
+  pushUint16(bytes, 0);
+  pushUint16(bytes, 0);
+  pushUint16(bytes, sourceCanvas.width);
+  pushUint16(bytes, sourceCanvas.height);
+  bytes.push(0, 8);
+  for (let offset = 0; offset < packed.length; offset += 255) {
+    const block = packed.slice(offset, offset + 255);
+    bytes.push(block.length, ...block);
+  }
+  bytes.push(0, 0x3b);
+  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
+}
+
+function cloneCanvas(sourceCanvas) {
+  const copy = document.createElement('canvas');
+  copy.width = sourceCanvas.width;
+  copy.height = sourceCanvas.height;
+  copy.getContext('2d').drawImage(sourceCanvas, 0, 0);
+  return copy;
+}
+
+function createAnimationStage(frames) {
+  const stage = document.createElement('canvas');
+  stage.width = Math.max(...frames.map((frame) => frame.width));
+  stage.height = Math.max(...frames.map((frame) => frame.height));
+  return stage;
+}
+
+function drawAnimationStageFrame(stage, frame, flatten = false) {
+  const context = stage.getContext('2d');
+  context.clearRect(0, 0, stage.width, stage.height);
+  if (flatten) {
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, stage.width, stage.height);
+  }
+  context.drawImage(frame, (stage.width - frame.width) / 2, (stage.height - frame.height) / 2);
+}
+
+function getGifPaletteAndIndexes(stage) {
+  const levels = [0, 51, 102, 153, 204, 255];
+  const palette = new Uint8Array(256 * 3);
+  for (let red = 0; red < 6; red += 1) {
+    for (let green = 0; green < 6; green += 1) {
+      for (let blue = 0; blue < 6; blue += 1) {
+        const index = 1 + red * 36 + green * 6 + blue;
+        palette[index * 3] = levels[red];
+        palette[index * 3 + 1] = levels[green];
+        palette[index * 3 + 2] = levels[blue];
+      }
+    }
+  }
+
+  const pixels = stage.getContext('2d').getImageData(0, 0, stage.width, stage.height).data;
+  const indexes = new Uint8Array(stage.width * stage.height);
+  for (let index = 0; index < indexes.length; index += 1) {
+    const pixel = index * 4;
+    if (pixels[pixel + 3] < 128) {
+      indexes[index] = 0;
+      continue;
+    }
+    const red = Math.round(pixels[pixel] / 51);
+    const green = Math.round(pixels[pixel + 1] / 51);
+    const blue = Math.round(pixels[pixel + 2] / 51);
+    indexes[index] = 1 + red * 36 + green * 6 + blue;
+  }
+  return { palette, indexes };
+}
+
+function packGifIndexes(indexes) {
+  const codes = [256];
+  let literalCount = 0;
+  indexes.forEach((index) => {
+    codes.push(index);
+    literalCount += 1;
+    if (literalCount === 200) {
+      codes.push(256);
+      literalCount = 0;
+    }
+  });
+  codes.push(257);
+
+  const packed = [];
+  let accumulator = 0;
+  let bitCount = 0;
+  codes.forEach((code) => {
+    accumulator |= code << bitCount;
+    bitCount += 9;
+    while (bitCount >= 8) {
+      packed.push(accumulator & 255);
+      accumulator >>>= 8;
+      bitCount -= 8;
+    }
+  });
+  if (bitCount) {
+    packed.push(accumulator & 255);
+  }
+  return packed;
+}
+
+function createAnimatedGifBlob(frames, frameDurationMs) {
+  const stage = createAnimationStage(frames);
+  drawAnimationStageFrame(stage, frames[0]);
+  const { palette } = getGifPaletteAndIndexes(stage);
+  const delay = Math.max(1, Math.min(65535, Math.round(frameDurationMs / 10)));
+  const bytes = [...textBytes('GIF89a')];
+  pushUint16(bytes, stage.width);
+  pushUint16(bytes, stage.height);
+  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xff, 0x0b, ...textBytes('NETSCAPE2.0'), 3, 1, 0, 0, 0);
+
+  frames.forEach((frame) => {
+    drawAnimationStageFrame(stage, frame);
+    const { indexes } = getGifPaletteAndIndexes(stage);
+    const packed = packGifIndexes(indexes);
+    bytes.push(0x21, 0xf9, 4, 9);
+    pushUint16(bytes, delay);
+    bytes.push(0, 0, 0x2c);
+    pushUint16(bytes, 0);
+    pushUint16(bytes, 0);
+    pushUint16(bytes, stage.width);
+    pushUint16(bytes, stage.height);
+    bytes.push(0, 8);
+    for (let offset = 0; offset < packed.length; offset += 255) {
+      const block = packed.slice(offset, offset + 255);
+      bytes.push(block.length, ...block);
+    }
+    bytes.push(0);
+  });
+  bytes.push(0x3b);
+  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
+}
+
+function getSupportedMp4MimeType() {
+  if (typeof MediaRecorder === 'undefined') {
+    return '';
+  }
+  return ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1', 'video/mp4'].find((type) =>
+    MediaRecorder.isTypeSupported(type)
+  ) || '';
+}
+
+async function createAnimatedMp4Blob(frames, frameDurationMs, onProgress) {
+  const mimeType = getSupportedMp4MimeType();
+  if (!mimeType) {
+    throw new Error('This browser does not provide an MP4 encoder. Animated GIF is available instead.');
+  }
+
+  const stage = createAnimationStage(frames);
+  drawAnimationStageFrame(stage, frames[0], true);
+  const frameRate = Math.min(60, Math.max(1, Math.ceil(1000 / Math.max(16, frameDurationMs))));
+  const stream = stage.captureStream(frameRate);
+  try {
+    const recorder = new MediaRecorder(stream, { mimeType });
+    const chunks = [];
+    recorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size) {
+        chunks.push(event.data);
+      }
+    });
+    const stopped = new Promise((resolve, reject) => {
+      recorder.addEventListener('stop', resolve, { once: true });
+      recorder.addEventListener('error', () => reject(recorder.error || new Error('Unable to encode MP4.')), {
+        once: true,
+      });
+    });
+
+    recorder.start(1000);
+    for (let index = 0; index < frames.length; index += 1) {
+      drawAnimationStageFrame(stage, frames[index], true);
+      onProgress?.(index + 1, frames.length);
+      await new Promise((resolve) => window.setTimeout(resolve, frameDurationMs));
+    }
+    recorder.stop();
+    await stopped;
+    return new Blob(chunks, { type: mimeType });
+  } finally {
+    stream.getTracks().forEach((track) => track.stop());
+  }
+}
+
+async function createSvgBlob(sourceCanvas) {
+  const context = sourceCanvas.getContext('2d');
+  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
+  const pathsByColor = new Map();
+  let activeRuns = new Map();
+
+  const appendRectangle = ({ x, y, width, height, color }) => {
+    if (!pathsByColor.has(color)) {
+      pathsByColor.set(color, []);
+    }
+    pathsByColor.get(color).push(`M${x} ${y}h${width}v${height}h-${width}z`);
+  };
+
+  for (let y = 0; y < sourceCanvas.height; y += 1) {
+    const nextRuns = new Map();
+    let x = 0;
+    while (x < sourceCanvas.width) {
+      const offset = (y * sourceCanvas.width + x) * 4;
+      const red = pixels[offset];
+      const green = pixels[offset + 1];
+      const blue = pixels[offset + 2];
+      const alpha = pixels[offset + 3];
+      if (alpha === 0) {
+        x += 1;
+        continue;
+      }
+
+      let end = x + 1;
+      while (end < sourceCanvas.width) {
+        const nextOffset = (y * sourceCanvas.width + end) * 4;
+        if (
+          pixels[nextOffset] !== red ||
+          pixels[nextOffset + 1] !== green ||
+          pixels[nextOffset + 2] !== blue ||
+          pixels[nextOffset + 3] !== alpha
+        ) {
+          break;
+        }
+        end += 1;
+      }
+
+      const color = `${red},${green},${blue},${alpha}`;
+      const runKey = `${x},${end - x},${color}`;
+      const previous = activeRuns.get(runKey);
+      if (previous) {
+        previous.height += 1;
+        nextRuns.set(runKey, previous);
+        activeRuns.delete(runKey);
+      } else {
+        nextRuns.set(runKey, { x, y, width: end - x, height: 1, color });
+      }
+      x = end;
+    }
+    activeRuns.forEach(appendRectangle);
+    activeRuns = nextRuns;
+  }
+  activeRuns.forEach(appendRectangle);
+
+  const parts = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${sourceCanvas.width}" height="${sourceCanvas.height}" viewBox="0 0 ${sourceCanvas.width} ${sourceCanvas.height}" shape-rendering="crispEdges">`,
+  ];
+  pathsByColor.forEach((paths, color) => {
+    const [red, green, blue, alpha] = color.split(',').map(Number);
+    const hex = `#${[red, green, blue].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+    const opacity = alpha < 255 ? ` fill-opacity="${(alpha / 255).toFixed(4)}"` : '';
+    parts.push(`<path fill="${hex}"${opacity} d="${paths.join('')}"/>`);
+  });
+  parts.push('</svg>');
+  return new Blob(parts, { type: 'image/svg+xml' });
+}
+
+async function exportCanvas(sourceCanvas, format) {
+  if (format === 'jpg') {
+    return canvasToBlob(sourceCanvas, 'image/jpeg', (Number.parseInt(downloadQuality.value, 10) || 92) / 100, true);
+  }
+  if (format === 'gif') {
+    return createGifBlob(sourceCanvas);
+  }
+  if (format === 'svg') {
+    return createSvgBlob(sourceCanvas);
+  }
+  if (format === 'pdf') {
+    return createPdfBlob(sourceCanvas);
+  }
+  return canvasToBlob(sourceCanvas, 'image/png');
+}
+
+const CRC_TABLE = Array.from({ length: 256 }, (_, value) => {
+  let crc = value;
+  for (let bit = 0; bit < 8; bit += 1) {
+    crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
+  }
+  return crc >>> 0;
+});
+
+function getCrc32(bytes) {
+  let crc = 0xffffffff;
+  bytes.forEach((byte) => {
+    crc = CRC_TABLE[(crc ^ byte) & 255] ^ (crc >>> 8);
+  });
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+async function createZipBlob(files) {
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  for (const file of files) {
+    const name = textBytes(file.name);
+    const data = new Uint8Array(await file.blob.arrayBuffer());
+    const crc = getCrc32(data);
+    const local = [];
+    pushUint32(local, 0x04034b50);
+    pushUint16(local, 20);
+    pushUint16(local, 0x0800);
+    pushUint16(local, 0);
+    pushUint16(local, 0);
+    pushUint16(local, 0);
+    pushUint32(local, crc);
+    pushUint32(local, data.length);
+    pushUint32(local, data.length);
+    pushUint16(local, name.length);
+    pushUint16(local, 0);
+    const localPart = concatBytes([new Uint8Array(local), name, data]);
+    localParts.push(localPart);
+
+    const central = [];
+    pushUint32(central, 0x02014b50);
+    pushUint16(central, 20);
+    pushUint16(central, 20);
+    pushUint16(central, 0x0800);
+    pushUint16(central, 0);
+    pushUint16(central, 0);
+    pushUint16(central, 0);
+    pushUint32(central, crc);
+    pushUint32(central, data.length);
+    pushUint32(central, data.length);
+    pushUint16(central, name.length);
+    pushUint16(central, 0);
+    pushUint16(central, 0);
+    pushUint16(central, 0);
+    pushUint16(central, 0);
+    pushUint32(central, 0);
+    pushUint32(central, offset);
+    centralParts.push(concatBytes([new Uint8Array(central), name]));
+    offset += localPart.length;
+  }
+  const centralDirectory = concatBytes(centralParts);
+  const end = [];
+  pushUint32(end, 0x06054b50);
+  pushUint16(end, 0);
+  pushUint16(end, 0);
+  pushUint16(end, files.length);
+  pushUint16(end, files.length);
+  pushUint32(end, centralDirectory.length);
+  pushUint32(end, offset);
+  pushUint16(end, 0);
+  return new Blob([...localParts, centralDirectory, new Uint8Array(end)], { type: 'application/zip' });
+}
+
+function triggerBlobDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function getExportExtension(format) {
+  return format === 'jpeg' ? 'jpg' : format;
+}
+
+async function downloadCurrentCanvas() {
+  const format = downloadFormat.value;
+  setAnimationExportButtonsDisabled(true);
+  downloadStatus.textContent = `Creating ${format.toUpperCase()}...`;
+  try {
+    const blob = await exportCanvas(canvas, format);
+    const frameCount = getDownloadFrameCount();
+    const frame = getCurrentFrameIndex();
+    const suffix = frameCount > 1 ? `-${String(frame).padStart(String(frameCount).length, '0')}` : '';
+    triggerBlobDownload(blob, `qr-code${suffix}.${getExportExtension(format)}`);
+    downloadStatus.textContent = 'Download ready.';
+  } catch (error) {
+    downloadStatus.textContent = error.message || 'Unable to create download.';
+    console.error(error);
+  } finally {
+    setAnimationExportButtonsDisabled(false);
+  }
+}
+
+async function downloadCurrentPdfDocument() {
+  setAnimationExportButtonsDisabled(true);
+  downloadStatus.textContent = 'Creating PDF...';
+  try {
+    const frameCount = getDownloadFrameCount();
+    const frame = getCurrentFrameIndex();
+    const suffix = frameCount > 1 ? `-${String(frame).padStart(String(frameCount).length, '0')}` : '';
+    triggerBlobDownload(await createPdfBlob(canvas), `qr-code${suffix}.pdf`);
+    downloadStatus.textContent = 'PDF ready.';
+  } catch (error) {
+    downloadStatus.textContent = error.message || 'Unable to create PDF.';
+    console.error(error);
+  } finally {
+    setAnimationExportButtonsDisabled(false);
+  }
+}
+
+async function downloadAllFramesAsZip() {
+  const total = getDownloadFrameCount();
+  if (total <= 1) {
+    return;
+  }
+  const originalFrame = getCurrentFrameIndex();
+  const format = downloadFormat.value;
+  const extension = getExportExtension(format);
+  const width = String(total).length;
+  const files = [];
+  setAnimationExportButtonsDisabled(true);
+  try {
+    for (let frame = 1; frame <= total; frame += 1) {
+      downloadStatus.textContent = `Rendering ${frame} of ${total}...`;
+      setCurrentFrameIndex(frame);
+      syncChunkPreviewNavigation();
+      await renderQr();
+      files.push({
+        name: `qr-code-${String(frame).padStart(width, '0')}.${extension}`,
+        blob: await exportCanvas(canvas, format),
+      });
+    }
+    downloadStatus.textContent = 'Building ZIP...';
+    const zip = await createZipBlob(files);
+    triggerBlobDownload(zip, `qr-codes-${total}.zip`);
+    downloadStatus.textContent = `ZIP ready with ${total} files.`;
+  } catch (error) {
+    downloadStatus.textContent = error.message || 'Unable to create ZIP.';
+    console.error(error);
+  } finally {
+    setCurrentFrameIndex(originalFrame);
+    syncChunkPreviewNavigation();
+    await renderQr();
+    setAnimationExportButtonsDisabled(false);
+  }
+}
+
+async function downloadAllFramesAsPdf() {
+  const total = getDownloadFrameCount();
+  if (total <= 1) {
+    return;
+  }
+
+  const originalFrame = getCurrentFrameIndex();
+  const frames = [];
+  setAnimationExportButtonsDisabled(true);
+  try {
+    for (let frame = 1; frame <= total; frame += 1) {
+      downloadStatus.textContent = `Rendering PDF frame ${frame} of ${total}...`;
+      setCurrentFrameIndex(frame);
+      syncChunkPreviewNavigation();
+      await renderQr();
+      frames.push(await capturePdfFrame(canvas));
+    }
+    downloadStatus.textContent = 'Laying out PDF pages...';
+    const { framesPerPage } = getPdfSheetLayout(frames);
+    triggerBlobDownload(createPdfSheetBlob(frames), `qr-codes-${total}.pdf`);
+    const pages = Math.ceil(total / framesPerPage);
+    downloadStatus.textContent = `PDF ready with ${total} QR codes on ${pages} ${pages === 1 ? 'page' : 'pages'}.`;
+  } catch (error) {
+    downloadStatus.textContent = error.message || 'Unable to create PDF.';
+    console.error(error);
+  } finally {
+    setCurrentFrameIndex(originalFrame);
+    syncChunkPreviewNavigation();
+    await renderQr();
+    setAnimationExportButtonsDisabled(false);
+  }
+}
+
+function setAnimationExportButtonsDisabled(disabled) {
+  downloadCurrent.disabled = disabled;
+  downloadCurrentPdf.disabled = disabled;
+  downloadZip.disabled = disabled;
+  downloadAllPdf.disabled = disabled;
+  downloadAnimatedGif.disabled = disabled;
+  downloadAnimationMp4.disabled = disabled;
+}
+
+async function captureAllAnimationFrames(total) {
+  const originalFrame = getCurrentFrameIndex();
+  const frames = [];
+  try {
+    for (let frame = 1; frame <= total; frame += 1) {
+      downloadStatus.textContent = `Capturing animation frame ${frame} of ${total}...`;
+      setCurrentFrameIndex(frame);
+      syncChunkPreviewNavigation();
+      await renderQr();
+      frames.push(cloneCanvas(canvas));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    }
+    return frames;
+  } finally {
+    setCurrentFrameIndex(originalFrame);
+    syncChunkPreviewNavigation();
+    await renderQr();
+  }
+}
+
+async function downloadAnimation(format) {
+  const total = getDownloadFrameCount();
+  if (total <= 1) {
+    return;
+  }
+  if (total > ANIMATION_MAX_FRAMES) {
+    downloadStatus.textContent = `Animation is limited to ${ANIMATION_MAX_FRAMES} images to protect browser memory.`;
+    return;
+  }
+
+  const { enteredDurationMs, perFrameMs, totalDurationMs } = getAnimationTiming(total);
+  if (enteredDurationMs <= 0 || perFrameMs < 10) {
+    downloadStatus.textContent = 'Choose a duration that provides at least 10 milliseconds per image.';
+    return;
+  }
+  if (format === 'gif' && perFrameMs > 655350) {
+    downloadStatus.textContent = 'GIF supports at most 10 minutes 55.35 seconds per image.';
+    return;
+  }
+  if (format === 'mp4' && perFrameMs < 16) {
+    downloadStatus.textContent = 'MP4 needs at least 16 milliseconds per image.';
+    return;
+  }
+
+  setAnimationExportButtonsDisabled(true);
+  try {
+    const frames = await captureAllAnimationFrames(total);
+    if (format === 'gif') {
+      downloadStatus.textContent = 'Encoding animated GIF...';
+      triggerBlobDownload(createAnimatedGifBlob(frames, perFrameMs), `qr-animation-${total}.gif`);
+      downloadStatus.textContent = `Animated GIF ready - ${formatAnimationDuration(totalDurationMs)} total.`;
+      return;
+    }
+
+    downloadStatus.textContent = `Recording MP4 in real time - ${formatAnimationDuration(totalDurationMs)}...`;
+    const blob = await createAnimatedMp4Blob(frames, perFrameMs, (frame, frameTotal) => {
+      downloadStatus.textContent = `Recording MP4 frame ${frame} of ${frameTotal}...`;
+    });
+    triggerBlobDownload(blob, `qr-animation-${total}.mp4`);
+    downloadStatus.textContent = 'MP4 ready.';
+  } catch (error) {
+    downloadStatus.textContent = error.message || `Unable to create ${format.toUpperCase()} animation.`;
+    console.error(error);
+  } finally {
+    setAnimationExportButtonsDisabled(false);
+  }
+}
+
 function readInteger(inputElement) {
   if (!inputElement?.value.trim()) {
     return undefined;
@@ -400,15 +1328,41 @@ function getCurrentEncodingMode() {
   return modeAuto.checked ? undefined : encodingMode.value;
 }
 
+function getAutomaticPrintWidthInches(sourceCanvas = canvas) {
+  const pixelWidth = sourceCanvas.width || renderedQrWidth || Number.parseInt(qrWidth.value, 10) || 320;
+  const moduleScale = renderedQrModuleScale || Number.parseInt(qrScale.value, 10) || 4;
+  const totalModules = Math.max(1, Math.round(pixelWidth / moduleScale));
+  return Math.min(7, Math.max(0.5, pixelWidth / PRINT_PIXELS_PER_INCH, totalModules * MIN_PRINT_MODULE_INCHES));
+}
+
+function getPrintWidthInches(sourceCanvas = canvas) {
+  return printWidthAuto.checked
+    ? getAutomaticPrintWidthInches(sourceCanvas)
+    : Math.min(7, Math.max(0.5, Number.parseFloat(printWidth.value) || 1.65));
+}
+
+function syncPrintWidthControls() {
+  const automaticWidth = getAutomaticPrintWidthInches();
+  if (printWidthAuto.checked) {
+    printWidth.value = automaticWidth.toFixed(2);
+  }
+  printWidth.disabled = printWidthAuto.checked;
+  const selectedWidth = getPrintWidthInches();
+  const totalModules = Math.max(1, Math.round((renderedQrWidth || canvas.width || 320) / (renderedQrModuleScale || 4)));
+  const moduleWidth = selectedWidth / totalModules;
+  printWidthValue.textContent = `${selectedWidth.toFixed(2)} in${printWidthAuto.checked ? ' auto' : ''} - ${(moduleWidth * 25.4).toFixed(2)} mm/module`;
+}
+
 function formatWidthLabel() {
   const minimumWidth = Number.parseInt(qrWidth.min, 10) || 1;
   if (qrWidthAuto.checked) {
-    qrWidthValue.textContent = `${renderedQrWidth ?? minimumWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module`;
+    const width = renderedQrWidth ?? minimumWidth;
+    qrWidthValue.textContent = `${width} px · ${renderedQrModuleScale ?? qrScale.value} px/module · ${(width / PRINT_PIXELS_PER_INCH).toFixed(2)} in at ${PRINT_PIXELS_PER_INCH} ppi`;
     return;
   }
 
   const targetWidth = Number.parseInt(qrWidth.value, 10) || minimumWidth;
-  qrWidthValue.textContent = `${targetWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module`;
+  qrWidthValue.textContent = `${targetWidth} px · ${renderedQrModuleScale ?? qrScale.value} px/module · ${(targetWidth / PRINT_PIXELS_PER_INCH).toFixed(2)} in at ${PRINT_PIXELS_PER_INCH} ppi`;
 }
 
 function formatScaleLabel() {
@@ -426,9 +1380,11 @@ function formatColorTransparency() {
 }
 
 function syncGradientControls() {
-  const isGradient = gradientType.value !== 'solid';
+  const isGradient = gradientType.value === 'linear' || gradientType.value === 'radial';
   gradientControls.hidden = !isGradient;
   gradientAngleControls.hidden = gradientType.value !== 'linear';
+  imageFillControls.hidden = gradientType.value !== 'image';
+  imageFillClear.disabled = !imageFillImage;
   gradientAngleValue.textContent = `${gradientAngle.value} degrees`;
 }
 
@@ -469,26 +1425,95 @@ function getShortTextFrameValue(value) {
   return shortenFrameValue(domainLikeValue ? domainLikeValue[1].replace(/\/$/, '') : normalized);
 }
 
+function readNumberSeriesInteger(input) {
+  const value = Number(input.value);
+  return Number.isSafeInteger(value) ? value : null;
+}
+
+function getNumberSequenceInfo() {
+  const start = readNumberSeriesInteger(numberStart);
+  const end = readNumberSeriesInteger(numberEnd);
+  const step = readNumberSeriesInteger(numberStep);
+  if (start === null || end === null || step === null || step <= 0) {
+    return { start, end, step, total: 1, current: 1, value: start ?? 0 };
+  }
+
+  const total = Math.floor(Math.abs(end - start) / step) + 1;
+  const current = Math.min(total, Math.max(1, Number.parseInt(numberSequenceIndex.value, 10) || 1));
+  const direction = end >= start ? 1 : -1;
+  return {
+    start,
+    end,
+    step,
+    total,
+    current,
+    value: start + direction * (current - 1) * step,
+  };
+}
+
+function getNumberPayload() {
+  const { value } = getNumberSequenceInfo();
+  const rawPayload = `${numberPrefix.value}${value}${numberSuffix.value}`;
+  const uppercasePayload = rawPayload.toUpperCase();
+  return [...uppercasePayload].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character))
+    ? uppercasePayload
+    : rawPayload;
+}
+
+function syncNumberSequenceControls() {
+  const { total, current, value } = getNumberSequenceInfo();
+  const safeTotal = Math.min(Math.max(total, 1), NUMBER_SERIES_MAX_FRAMES);
+  numberSequenceIndex.max = String(safeTotal);
+  numberSequenceIndex.value = String(Math.min(current, safeTotal));
+  numberSequenceValue.textContent = `${numberSequenceIndex.value} / ${safeTotal} - ${value}`;
+}
+
+function getAutomaticNumberFrameMessage() {
+  return shortenFrameValue(getNumberPayload());
+}
+
+function getAutomaticFileFrameMessage() {
+  const fileName = getActiveFile()?.name || '';
+  if (!fileName || getSelectedFileEncodingMode() !== 'chunked') {
+    return shortenFrameValue(fileName);
+  }
+
+  const total = Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
+  const current = Math.min(total, Math.max(1, Number.parseInt(fileChunkIndex.value, 10) || 1));
+  const sequence = ` ${current} of ${total}`;
+  const shortenedName = shortenFrameValue(fileName, Math.max(8, 64 - sequence.length));
+  return `${shortenedName}${sequence}`;
+}
+
 function getAutomaticFrameMessage() {
   switch (qrFormat.value) {
+    case 'url':
+      return getShortTextFrameValue(urlInput.value);
     case 'text':
       return getShortTextFrameValue(textInput.value);
+    case 'number':
+      return getAutomaticNumberFrameMessage();
     case 'wifi':
-      return shortenFrameValue(wifiSsid.value);
+      return wifiSsid.value ? shortenFrameValue(`Wi-Fi ${wifiSsid.value}`) : '';
     case 'email':
-      return shortenFrameValue(emailTo.value);
+      return emailTo.value ? shortenFrameValue(`Email ${emailTo.value}`) : '';
     case 'phone':
-      return shortenFrameValue(phoneNumber.value);
+      return phoneNumber.value ? shortenFrameValue(`Call ${phoneNumber.value}`) : '';
     case 'sms':
-      return shortenFrameValue(smsNumber.value);
+      return smsNumber.value ? shortenFrameValue(`Text ${smsNumber.value}`) : '';
     case 'geo':
-      return shortenFrameValue(
-        geoQuery.value || (geoLatitude.value && geoLongitude.value ? `${geoLatitude.value}, ${geoLongitude.value}` : '')
-      );
+      {
+        const location =
+          geoQuery.value || (geoLatitude.value && geoLongitude.value ? `${geoLatitude.value}, ${geoLongitude.value}` : '');
+        return location ? shortenFrameValue(`Location ${location}`) : '';
+      }
     case 'vcard':
-      return shortenFrameValue(vcardName.value || vcardOrg.value || vcardEmail.value);
+      {
+        const contact = vcardName.value || vcardOrg.value || vcardEmail.value;
+        return contact ? shortenFrameValue(`Contact ${contact}`) : '';
+      }
     case 'file':
-      return shortenFrameValue(getActiveFile()?.name || '');
+      return getAutomaticFileFrameMessage();
     default:
       return '';
   }
@@ -505,6 +1530,26 @@ function getCurrentFrameMessage() {
         ? shortenFrameValue(customFrameMessage.value, 80)
         : getAutomaticFrameMessage()
   );
+}
+
+function setFrameMessageCenter(enabled) {
+  frameMessageCenter.checked = enabled;
+  frameMessageCenterArt.checked = enabled;
+  if (enabled && centerArtMode.value !== 'none') {
+    centerArtMode.value = 'none';
+    syncChoiceButtons();
+    syncCenterArtworkControls();
+  }
+}
+
+function getFrameFont(size) {
+  const fonts = {
+    sans: `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`,
+    rounded: `800 ${size}px "Arial Rounded MT Bold", "Trebuchet MS", sans-serif`,
+    serif: `700 ${size}px Georgia, "Times New Roman", serif`,
+    mono: `700 ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
+  };
+  return fonts[frameFont.value] || fonts.sans;
 }
 
 function syncModuleShapeControls() {
@@ -525,8 +1570,10 @@ function getCurrentModuleShapeOptions() {
 }
 
 function syncEyeShapeControls() {
+  const imageFillSelected = gradientType.value === 'image';
   eyeCustomControls.hidden = eyeShape.value !== 'custom';
-  eyeColorControls.hidden = !eyeCustomColorsEnabled.checked;
+  eyeCustomColorsEnabled.disabled = imageFillSelected;
+  eyeColorControls.hidden = imageFillSelected || !eyeCustomColorsEnabled.checked;
   eyeOuterRoundingValue.textContent = `${eyeOuterRounding.value}%`;
   eyeCenterRoundingValue.textContent = `${eyeCenterRounding.value}%`;
 }
@@ -715,16 +1762,103 @@ function syncOutputs() {
   formatMarginLabel();
   formatColorTransparency();
   syncGradientControls();
+  syncNumberSequenceControls();
   getCurrentFrameMessage();
+  frameMessageCenterArt.checked = frameMessageCenter.checked;
+  frameLineHeightValue.textContent = `${frameLineHeight.value} px`;
   syncModuleShapeControls();
   syncEyeShapeControls();
   syncCenterArtworkControls();
+  syncChunkPreviewNavigation();
+  syncPrintWidthControls();
   formatVersionLabel();
   formatErrorCorrection();
   qrVersion.disabled = versionAuto.checked;
   encodingMode.disabled = modeAuto.checked;
+  encodingModeButtons.forEach((button) => {
+    button.disabled = modeAuto.checked;
+    button.setAttribute('aria-disabled', String(modeAuto.checked));
+  });
   syncEmailBodyLengthHint();
   syncFileCapacityHint();
+}
+
+function getDownloadFrameCount() {
+  if (qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked') {
+    return Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
+  }
+  if (qrFormat.value === 'number') {
+    const total = getNumberSequenceInfo().total;
+    return total <= NUMBER_SERIES_MAX_FRAMES ? total : 1;
+  }
+  return 1;
+}
+
+function getCurrentFrameIndex() {
+  const input = qrFormat.value === 'number' ? numberSequenceIndex : fileChunkIndex;
+  return Math.max(1, Number.parseInt(input.value, 10) || 1);
+}
+
+function setCurrentFrameIndex(frame) {
+  if (qrFormat.value === 'number') {
+    numberSequenceIndex.value = String(frame);
+    syncNumberSequenceControls();
+    return;
+  }
+  fileChunkIndex.value = String(frame);
+  syncFileChunkLabel();
+}
+
+function syncDownloadControls() {
+  const isJpg = downloadFormat.value === 'jpg';
+  downloadQualityControls.hidden = !isJpg;
+  downloadQualityValue.textContent = `${downloadQuality.value}%`;
+  const frameCount = getDownloadFrameCount();
+  const hasAnimation = frameCount > 1;
+  downloadZip.hidden = frameCount <= 1;
+  downloadAllPdf.hidden = frameCount <= 1;
+  downloadAnimationTab.hidden = !hasAnimation;
+  downloadSubtabBar.classList.toggle('has-animation', hasAnimation);
+  if (!hasAnimation && downloadAnimationTab.classList.contains('is-active')) {
+    activateDownloadSubtab('image');
+  }
+  downloadActions.forEach((actions) => {
+    actions.classList.toggle('has-multiple', frameCount > 1);
+  });
+  if (frameCount > 1) {
+    downloadZip.textContent = `Download all ${frameCount} as ZIP`;
+    downloadAllPdf.textContent = `Download all ${frameCount} as PDF`;
+  }
+  syncAnimationDurationSummary();
+}
+
+function getAnimationTiming(frameCount = getDownloadFrameCount()) {
+  const minutes = Math.min(60, Math.max(0, Number.parseInt(animationMinutes.value, 10) || 0));
+  const seconds = Math.min(59, Math.max(0, Number.parseInt(animationSeconds.value, 10) || 0));
+  const milliseconds = Math.min(999, Math.max(0, Number.parseInt(animationMilliseconds.value, 10) || 0));
+  const enteredDurationMs = minutes * 60000 + seconds * 1000 + milliseconds;
+  const perFrameMs = animationTimingMode.value === 'total' ? enteredDurationMs / Math.max(1, frameCount) : enteredDurationMs;
+  const totalDurationMs = perFrameMs * Math.max(1, frameCount);
+  return { enteredDurationMs, perFrameMs, totalDurationMs };
+}
+
+function formatAnimationDuration(milliseconds) {
+  if (milliseconds >= 60000) {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = ((milliseconds % 60000) / 1000).toFixed(3).padStart(6, '0');
+    return `${minutes}:${seconds}`;
+  }
+  return `${(milliseconds / 1000).toFixed(3)} seconds`;
+}
+
+function syncAnimationDurationSummary() {
+  const frameCount = getDownloadFrameCount();
+  const { perFrameMs, totalDurationMs } = getAnimationTiming(frameCount);
+  animationDurationSummary.textContent = `${formatAnimationDuration(perFrameMs)} per image - ${formatAnimationDuration(totalDurationMs)} total.`;
+  const mp4Supported = Boolean(getSupportedMp4MimeType());
+  downloadAnimationMp4.title = mp4Supported
+    ? 'Download an MP4 animation'
+    : 'MP4 encoding is not available in this browser; animated GIF remains available.';
 }
 
 function formatBytes(bytes) {
@@ -774,9 +1908,10 @@ function syncChunkVersionControls() {
 
 function syncChunkPreviewNavigation() {
   const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
-  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
-  const current = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, total);
-  const shouldShowNavigation = isChunkedFile && total > 1;
+  const isNumberSeries = qrFormat.value === 'number';
+  const total = getDownloadFrameCount();
+  const current = Math.min(getCurrentFrameIndex(), total);
+  const shouldShowNavigation = (isChunkedFile || isNumberSeries) && total > 1;
 
   chunkPreviewNav.classList.toggle('has-navigation', shouldShowNavigation);
   chunkPreviewStatus.hidden = !shouldShowNavigation;
@@ -785,6 +1920,7 @@ function syncChunkPreviewNavigation() {
   chunkPreviewNext.hidden = !shouldShowNavigation;
   chunkPreviewPrev.disabled = !shouldShowNavigation || current <= 1;
   chunkPreviewNext.disabled = !shouldShowNavigation || current >= total;
+  syncDownloadControls();
 }
 
 function getChunkCapacityCacheKey(file, options, configuredChunkVersion, autoVersion) {
@@ -1744,9 +2880,9 @@ function ensureGeoMap() {
     attributionControl: true,
   }).setView([38.9182, -78.1944], 13);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
   }).addTo(geoMap);
 
   geoMarker = L.marker([20, 0]).addTo(geoMap);
@@ -1849,8 +2985,12 @@ function buildVCardPayload() {
 
 async function buildEncodedText() {
   switch (qrFormat.value) {
+    case 'url':
+      return urlInput.value.trim();
     case 'text':
       return textInput.value;
+    case 'number':
+      return getNumberPayload();
     case 'wifi':
       return buildWifiPayload();
     case 'email':
@@ -1878,8 +3018,12 @@ async function buildEncodedText() {
 
 function buildEncodedPreviewTemplate() {
   switch (qrFormat.value) {
+    case 'url':
+      return urlInput.value || '[enter a full https:// URL]';
     case 'text':
-      return textInput.value || '[enter text or a URL]';
+      return textInput.value || '[enter text]';
+    case 'number':
+      return getNumberPayload();
     case 'wifi': {
       const encryption = wifiEncryption.value || 'WPA';
       const ssid = escapeWifiValue(placeholderValue(wifiSsid.value, '[network-name]'));
@@ -2017,6 +3161,15 @@ function buildPayload(encodedText) {
   if (isChunkedFile && encodedText.trim()) {
     // FILE frames contain arbitrary base64url, so byte mode keeps capacity deterministic.
     return [{ data: encodedText, mode: 'byte' }];
+  }
+
+  if (qrFormat.value === 'number' && modeAuto.checked && encodedText.trim()) {
+    const mode = /^\d+$/.test(encodedText)
+      ? 'numeric'
+      : [...encodedText].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character))
+        ? 'alphanumeric'
+        : 'byte';
+    return [{ data: encodedText, mode }];
   }
 
   const mode = getCurrentEncodingMode();
@@ -2273,6 +3426,49 @@ function getWebsiteValidationState(value, { required = false, contextLabel = 'vC
 }
 
 function getFormatValidationState() {
+  if (qrFormat.value === 'url') {
+    return getWebsiteValidationState(urlInput.value, {
+      required: true,
+      contextLabel: 'URL',
+    });
+  }
+
+  if (qrFormat.value === 'number') {
+    const start = readNumberSeriesInteger(numberStart);
+    const end = readNumberSeriesInteger(numberEnd);
+    const step = readNumberSeriesInteger(numberStep);
+    if (start === null) {
+      return { error: 'Not valid for Number format yet: start must be a whole number.', warning: '' };
+    }
+    if (end === null) {
+      return { error: 'Not valid for Number format yet: end must be a whole number.', warning: '' };
+    }
+    if (step === null || step <= 0) {
+      return { error: 'Not valid for Number format yet: step must be a positive whole number.', warning: '' };
+    }
+    const { total } = getNumberSequenceInfo();
+    if (total > NUMBER_SERIES_MAX_FRAMES) {
+      return {
+        error: `Not valid for Number format yet: the range creates ${total.toLocaleString()} QR codes; limit it to ${NUMBER_SERIES_MAX_FRAMES.toLocaleString()} or fewer.`,
+        warning: '',
+      };
+    }
+    const prefixValidation = validatePrintableText(numberPrefix.value, {
+      label: 'Not valid for Number format yet: prefix',
+      maxLength: 32,
+    });
+    if (prefixValidation) {
+      return { error: prefixValidation, warning: '' };
+    }
+    const suffixValidation = validatePrintableText(numberSuffix.value, {
+      label: 'Not valid for Number format yet: suffix',
+      maxLength: 32,
+    });
+    if (suffixValidation) {
+      return { error: suffixValidation, warning: '' };
+    }
+  }
+
   if (qrFormat.value === 'file') {
     const file = getActiveFile();
     if (!file) {
@@ -2629,6 +3825,38 @@ function moduleIsDark(qrDefinition, row, column) {
     return qrDefinition.modules.get(row, column);
   }
   return Boolean(qrDefinition.modules.data[row * qrDefinition.modules.size + column]);
+}
+
+function isMaskedModule(mask, row, column) {
+  switch (mask) {
+    case 0:
+      return (row + column) % 2 === 0;
+    case 1:
+      return row % 2 === 0;
+    case 2:
+      return column % 3 === 0;
+    case 3:
+      return (row + column) % 3 === 0;
+    case 4:
+      return (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0;
+    case 5:
+      return ((row * column) % 2) + ((row * column) % 3) === 0;
+    case 6:
+      return (((row * column) % 2) + ((row * column) % 3)) % 2 === 0;
+    case 7:
+      return (((row + column) % 2) + ((row * column) % 3)) % 2 === 0;
+    default:
+      return false;
+  }
+}
+
+function moduleIsDarkForPreview(qrDefinition, row, column, debugActive) {
+  const dark = moduleIsDark(qrDefinition, row, column);
+  if (!debugActive || !debugUnmask.checked || isFunctionModule(qrDefinition, row, column)) {
+    return dark;
+  }
+
+  return isMaskedModule(qrDefinition.maskPattern, row, column) ? !dark : dark;
 }
 
 function getAlignmentPatternCenters(version) {
@@ -3653,8 +4881,9 @@ function drawQrModule(context, x, y, cellSize, shapeOptions) {
   context.translate(centerX, centerY);
   context.rotate((geometry.rotation * Math.PI) / 180);
   addRoundedRectPath(context, -size / 2, -size / 2, size, size, radius);
-  context.fill();
   context.restore();
+  // Build transformed geometry first, then fill in QR coordinates so gradients stay global.
+  context.fill();
 }
 
 function getEyeShapeGeometry(eyeOptions) {
@@ -3681,6 +4910,11 @@ function fillEyeShape(context, x, y, size, rounding, fillStyle) {
   context.fill();
 }
 
+function fillImageEyeShape(context, x, y, size, rounding, imagePattern, overlayFillStyle) {
+  fillEyeShape(context, x, y, size, rounding, imagePattern);
+  fillEyeShape(context, x, y, size, rounding, overlayFillStyle);
+}
+
 function drawFinderEyes(
   context,
   moduleCount,
@@ -3690,7 +4924,8 @@ function drawFinderEyes(
   outerFillStyle,
   centerFillStyle,
   lightColor,
-  transparentLight
+  transparentLight,
+  imageFillOptions = null
 ) {
   const geometry = getEyeShapeGeometry(eyeOptions);
   if (!geometry) {
@@ -3706,6 +4941,37 @@ function drawFinderEyes(
   origins.forEach(([row, column]) => {
     const x = (column + marginModules) * cellSize;
     const y = (row + marginModules) * cellSize;
+    if (imageFillOptions) {
+      fillImageEyeShape(
+        context,
+        x,
+        y,
+        cellSize * 7,
+        geometry.outerRounding,
+        imageFillOptions.pattern,
+        imageFillOptions.darkFillStyle
+      );
+      fillImageEyeShape(
+        context,
+        x + cellSize,
+        y + cellSize,
+        cellSize * 5,
+        geometry.outerRounding,
+        imageFillOptions.pattern,
+        imageFillOptions.lightFillStyle
+      );
+      fillImageEyeShape(
+        context,
+        x + cellSize * 2,
+        y + cellSize * 2,
+        cellSize * 3,
+        geometry.centerRounding,
+        imageFillOptions.pattern,
+        imageFillOptions.darkFillStyle
+      );
+      return;
+    }
+
     fillEyeShape(context, x, y, cellSize * 7, geometry.outerRounding, outerFillStyle);
 
     context.save();
@@ -3727,8 +4993,29 @@ function drawFinderEyes(
   });
 }
 
+function drawImageCover(context, image, x, y, width, height) {
+  const imageWidth = image.naturalWidth || image.width;
+  const imageHeight = image.naturalHeight || image.height;
+  const scale = Math.max(width / imageWidth, height / imageHeight);
+  const drawWidth = imageWidth * scale;
+  const drawHeight = imageHeight * scale;
+  context.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
+}
+
+function createQrImageLayer(context, image, qrStart, qrSize) {
+  const layer = document.createElement('canvas');
+  layer.width = context.canvas.width;
+  layer.height = context.canvas.height;
+  const layerContext = layer.getContext('2d');
+  drawImageCover(layerContext, image, qrStart, qrStart, qrSize, qrSize);
+  return {
+    layer,
+    pattern: context.createPattern(layer, 'no-repeat'),
+  };
+}
+
 function createQrModuleFill(context, startColor, gradientOptions, marginModules, moduleCount, cellSize) {
-  if (gradientOptions.type === 'solid') {
+  if (gradientOptions.type === 'solid' || gradientOptions.type === 'image') {
     return startColor;
   }
 
@@ -3765,9 +5052,19 @@ function fitCanvasText(context, text, maximumWidth) {
   return fitted ? `${fitted}...` : '...';
 }
 
-function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2) {
+function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2, truncate = true) {
   let remaining = message.replace(/\s+/g, ' ').trim();
   const lines = [];
+  const emailBreak = maximumLines >= 2 ? remaining.match(/^(.*?)(@[^\s@]+)$/) : null;
+  if (emailBreak && emailBreak[1].trim()) {
+    const emailLines = [emailBreak[1].trim(), emailBreak[2]];
+    if (emailLines.every((line) => context.measureText(line).width <= maximumWidth)) {
+      return emailLines;
+    }
+    if (!truncate) {
+      return null;
+    }
+  }
 
   while (remaining && lines.length < maximumLines) {
     let length = 1;
@@ -3788,35 +5085,85 @@ function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2) {
     lines.push(line);
   }
 
+  if (!remaining && lines.length === 2 && !message.trim().includes(' ')) {
+    const combined = lines.join('');
+    const midpoint = Math.ceil(combined.length / 2);
+    lines[0] = combined.slice(0, midpoint);
+    lines[1] = combined.slice(midpoint);
+  }
+
+  if (remaining && !truncate) {
+    return null;
+  }
   if (remaining && lines.length) {
     lines[lines.length - 1] = fitCanvasText(context, lines[lines.length - 1], maximumWidth);
   }
   return lines;
 }
 
-function drawFrameMessage(context, messageLines, canvasSize, captionHeight, fontSize, lineHeight, transparentLight, textColor) {
+function fitFrameMessage(context, message, maximumWidth, maximumLineHeight) {
+  const maximumFontSize = Math.ceil(maximumLineHeight * 2.5);
+
+  for (let fontSize = maximumFontSize; fontSize >= 4; fontSize -= 1) {
+    const font = getFrameFont(fontSize);
+    context.font = font;
+    const metrics = context.measureText('Mg');
+    const measuredHeight =
+      metrics.actualBoundingBoxAscent !== undefined && metrics.actualBoundingBoxDescent !== undefined
+        ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+        : fontSize;
+    if (measuredHeight > maximumLineHeight) {
+      continue;
+    }
+
+    const lines = wrapFrameMessage(context, message, maximumWidth, 2, false);
+    if (lines && lines.every((line) => context.measureText(line).width <= maximumWidth)) {
+      return { font, lines };
+    }
+  }
+
+  const font = getFrameFont(4);
+  context.font = font;
+  return { font, lines: wrapFrameMessage(context, message, maximumWidth) };
+}
+
+function drawFrameMessage(context, messageLines, canvasSize, captionHeight, font, lineHeight, textColor) {
   if (!messageLines.length || captionHeight <= 0) {
     return;
   }
 
   context.save();
-  if (!transparentLight) {
-    context.strokeStyle = 'rgba(19, 34, 53, 0.12)';
-    context.lineWidth = 1;
-    context.beginPath();
-    context.moveTo(canvasSize * 0.12, canvasSize + 0.5);
-    context.lineTo(canvasSize * 0.88, canvasSize + 0.5);
-    context.stroke();
-  }
-
   context.fillStyle = textColor;
-  context.font = `800 ${fontSize}px "Avenir Next", "Segoe UI", sans-serif`;
+  context.font = font;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   const blockHeight = messageLines.length * lineHeight;
   const firstLineY = canvasSize + (captionHeight - blockHeight) / 2 + lineHeight / 2;
   messageLines.forEach((line, index) => {
     context.fillText(line, canvasSize / 2, firstLineY + index * lineHeight);
+  });
+  context.restore();
+}
+
+function drawCenteredFrameMessage(context, messageLines, font, lineHeight, center, textColor, lightColor, cellSize) {
+  if (!messageLines.length) {
+    return;
+  }
+
+  context.save();
+  context.font = font;
+  context.strokeStyle = getOpaqueArtworkBackground(lightColor);
+  context.lineWidth = Math.max(2, cellSize * 0.8);
+  context.lineJoin = 'round';
+  context.miterLimit = 2;
+  context.fillStyle = textColor;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  const firstLineY = center - ((messageLines.length - 1) * lineHeight) / 2;
+  messageLines.forEach((line, index) => {
+    const y = firstLineY + index * lineHeight;
+    context.strokeText(line, center, y);
+    context.fillText(line, center, y);
   });
   context.restore();
 }
@@ -3957,7 +5304,7 @@ function drawQr(qrDefinition, options) {
   const totalModules = moduleCount + marginModules * 2;
   const minimumModuleScale = Math.max(1, options.scale ?? 4);
   const minimumCanvasSize = totalModules * minimumModuleScale;
-  const maximumModuleScale = Math.max(minimumModuleScale, Math.floor(640 / totalModules));
+  const maximumModuleScale = Math.max(minimumModuleScale, Math.floor(MAX_QR_TARGET_WIDTH / totalModules));
   qrWidth.min = String(minimumCanvasSize);
   qrWidth.max = String(totalModules * maximumModuleScale);
   qrWidth.step = String(totalModules);
@@ -3978,16 +5325,20 @@ function drawQr(qrDefinition, options) {
   const cellSize = canvasSize / totalModules;
   const context = canvas.getContext('2d');
   const frameMessageText = getCurrentFrameMessage();
-  const captionFontSize = Math.max(10, Math.min(18, canvasSize * 0.05));
-  const captionLineHeight = captionFontSize * 1.25;
+  const frameMessageIsCentered = frameMessageCenter.checked;
+  const captionLineHeight = Number.parseInt(frameLineHeight.value, 10) || 18;
   const captionPadding = Math.max(7, Math.min(14, canvasSize * 0.035));
+  const qrDrawSize = moduleCount * cellSize;
+  const frameMessageMaximumWidth = frameMessageIsCentered
+    ? Math.max(20, qrDrawSize * 0.56)
+    : Math.max(20, canvasSize - captionPadding * 2);
   canvas.width = canvasSize;
   canvas.height = canvasSize;
-  context.font = `800 ${captionFontSize}px "Avenir Next", "Segoe UI", sans-serif`;
-  const frameMessageLines = frameMessageText
-    ? wrapFrameMessage(context, frameMessageText, Math.max(20, canvasSize - captionPadding * 2))
-    : [];
-  const captionHeight = frameMessageLines.length
+  const frameMessageLayout = frameMessageText
+    ? fitFrameMessage(context, frameMessageText, frameMessageMaximumWidth, captionLineHeight)
+    : { font: getFrameFont(captionLineHeight), lines: [] };
+  const frameMessageLines = frameMessageLayout.lines;
+  const captionHeight = frameMessageLines.length && !frameMessageIsCentered
     ? Math.ceil(frameMessageLines.length * captionLineHeight + captionPadding * 2)
     : 0;
   const debugActive = isDebugOverlayActive();
@@ -3995,11 +5346,15 @@ function drawQr(qrDefinition, options) {
   const moduleShapeOptions = getCurrentModuleShapeOptions();
   const eyeShapeOptions = getCurrentEyeShapeOptions();
   const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
-  const customEyeColorsActive = !debugActive && eyeCustomColorsEnabled.checked;
   const gradientOptions = getCurrentGradientOptions();
+  const imageFillActive = !debugActive && gradientOptions.type === 'image' && imageFillImage;
+  const customEyeColorsActive = !debugActive && !imageFillActive && eyeCustomColorsEnabled.checked;
   const lightAlpha = getColorAlpha(options.color.light);
-  const gradientHasTransparency = gradientOptions.type !== 'solid' && getColorAlpha(gradientOptions.endColor) < 1;
-  const hasTransparency = getColorAlpha(options.color.dark) < 1 || gradientHasTransparency || lightAlpha < 1;
+  const gradientHasTransparency =
+    (gradientOptions.type === 'linear' || gradientOptions.type === 'radial') &&
+    getColorAlpha(gradientOptions.endColor) < 1;
+  const hasTransparency =
+    !imageFillActive && (getColorAlpha(options.color.dark) < 1 || gradientHasTransparency || lightAlpha < 1);
   const transparentLight = lightAlpha === 0;
 
   canvas.height = canvasSize + captionHeight;
@@ -4007,9 +5362,27 @@ function drawQr(qrDefinition, options) {
 
   const backgroundColor = options.color.light;
   const quietColor = options.color.light;
+  let imageFillLayer = null;
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-  if (!transparentLight) {
+  if (imageFillActive) {
+    context.fillStyle = colorLight.value;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    imageFillLayer = createQrImageLayer(
+      context,
+      imageFillImage,
+      marginModules * cellSize,
+      moduleCount * cellSize
+    );
+    context.drawImage(imageFillLayer.layer, 0, 0);
+    context.fillStyle = options.color.light;
+    context.fillRect(
+      marginModules * cellSize,
+      marginModules * cellSize,
+      moduleCount * cellSize,
+      moduleCount * cellSize
+    );
+  } else if (!transparentLight) {
     context.fillStyle = quietColor;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -4050,7 +5423,7 @@ function drawQr(qrDefinition, options) {
 
   for (let row = 0; row < moduleCount; row += 1) {
     for (let column = 0; column < moduleCount; column += 1) {
-      if (!moduleIsDark(qrDefinition, row, column)) {
+      if (!moduleIsDarkForPreview(qrDefinition, row, column, debugActive)) {
         continue;
       }
       if (customEyesActive && isFinderPattern(moduleCount, row, column)) {
@@ -4068,6 +5441,16 @@ function drawQr(qrDefinition, options) {
         } else if (eyePart === 'center') {
           fillStyle = eyeCenterFillStyle;
         }
+      }
+      if (imageFillActive) {
+        context.fillStyle = imageFillLayer.pattern;
+        drawQrModule(
+          context,
+          (column + marginModules) * cellSize,
+          (row + marginModules) * cellSize,
+          cellSize,
+          moduleShapeOptions
+        );
       }
       context.fillStyle = fillStyle;
       drawQrModule(
@@ -4090,7 +5473,14 @@ function drawQr(qrDefinition, options) {
       eyeOuterFillStyle,
       eyeCenterFillStyle,
       options.color.light,
-      transparentLight
+      transparentLight,
+      imageFillActive
+        ? {
+            pattern: imageFillLayer.pattern,
+            darkFillStyle: options.color.dark,
+            lightFillStyle: options.color.light,
+          }
+        : null
     );
   }
 
@@ -4102,19 +5492,30 @@ function drawQr(qrDefinition, options) {
 
   drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, options.color.light);
 
-  const frameTextColor = /^#[0-9a-f]{6}/i.test(options.color.dark)
-    ? options.color.dark.slice(0, 7)
-    : '#132235';
-  drawFrameMessage(
-    context,
-    frameMessageLines,
-    canvasSize,
-    captionHeight,
-    captionFontSize,
-    captionLineHeight,
-    transparentLight,
-    frameTextColor
-  );
+  if (frameMessageIsCentered) {
+    drawCenteredFrameMessage(
+      context,
+      frameMessageLines,
+      frameMessageLayout.font,
+      captionLineHeight,
+      marginModules * cellSize + qrDrawSize / 2,
+      frameMessageColor.value,
+      options.color.light,
+      cellSize
+    );
+  } else {
+    drawFrameMessage(
+      context,
+      frameMessageLines,
+      canvasSize,
+      captionHeight,
+      frameMessageLayout.font,
+      captionLineHeight,
+      frameMessageColor.value
+    );
+  }
+
+  schedulePreviewViewportSync();
 }
 
 function drawInvalidOverlay(message) {
@@ -4181,8 +5582,8 @@ function createMaskButton(maskValue) {
     preview.textContent = 'Auto';
   } else {
     const thumbnail = document.createElement('canvas');
-    thumbnail.width = 72;
-    thumbnail.height = 72;
+    thumbnail.width = 96;
+    thumbnail.height = 96;
     thumbnail.className = 'mask-canvas';
     preview.appendChild(thumbnail);
   }
@@ -4236,10 +5637,17 @@ function renderMaskPreviews(encodedText) {
       return;
     }
 
-    QRCode.toCanvas(previewCanvas, previewValue, buildMaskPreviewOptions(maskValue), (error) => {
+    const renderedCanvas = document.createElement('canvas');
+    QRCode.toCanvas(renderedCanvas, previewValue, buildMaskPreviewOptions(maskValue), (error) => {
       if (error) {
         console.error(error);
+        return;
       }
+
+      const context = previewCanvas.getContext('2d');
+      context.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      context.imageSmoothingEnabled = false;
+      context.drawImage(renderedCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
     });
   });
 }
@@ -4290,6 +5698,20 @@ function activateStyleSubtab(subtabName) {
 
   styleSubtabPanels.forEach((panel) => {
     const isActive = panel.dataset.styleSubtabPanel === subtabName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+}
+
+function activateDownloadSubtab(subtabName) {
+  downloadSubtabButtons.forEach((button) => {
+    const isActive = button.dataset.downloadSubtab === subtabName;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+
+  downloadSubtabPanels.forEach((panel) => {
+    const isActive = panel.dataset.downloadSubtabPanel === subtabName;
     panel.classList.toggle('is-active', isActive);
     panel.hidden = !isActive;
   });
@@ -4396,6 +5818,7 @@ async function renderQr() {
     updateEncodingSummary(qrDefinition, options);
     setValidationMessage(formatValidationState.warning, [], formatValidationState.warning ? 'warning' : 'error');
     drawQr(qrDefinition, options);
+    syncDownloadControls();
   } catch (error) {
     setValidationMessage(error.message || 'Unable to encode this content.');
     renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, error.message || 'Unable to encode this content.');
@@ -4409,6 +5832,14 @@ form.addEventListener('submit', (event) => {
 });
 
 form.addEventListener('input', (event) => {
+  if ([animationMinutes, animationSeconds, animationMilliseconds].includes(event.target)) {
+    syncAnimationDurationSummary();
+    return;
+  }
+  if (event.target === downloadQuality) {
+    syncDownloadControls();
+    return;
+  }
   if (event.target === fileIncludeManifest || event.target === fileCompressTransfer || event.target === fileCustomMetadata) {
     resetTransferDerivedState();
     scheduleChunkSettingsRefresh({ resetChunkIndex: true });
@@ -4464,6 +5895,14 @@ wifiEncryption.addEventListener('change', () => {
   renderQr();
 });
 
+frameMessageCenter.addEventListener('input', () => {
+  setFrameMessageCenter(frameMessageCenter.checked);
+});
+
+frameMessageCenterArt.addEventListener('input', () => {
+  setFrameMessageCenter(frameMessageCenterArt.checked);
+});
+
 choiceButtons.forEach((button) => {
   button.addEventListener('click', () => {
     const targetId = button.dataset.choiceTarget;
@@ -4486,6 +5925,9 @@ choiceButtons.forEach((button) => {
       syncEyeShapeControls();
     }
     if (target === centerArtMode) {
+      if (choiceValue !== 'none') {
+        setFrameMessageCenter(false);
+      }
       syncCenterArtworkControls();
     }
     if (target === wifiEncryption) {
@@ -4495,6 +5937,16 @@ choiceButtons.forEach((button) => {
     if (target === qrFormat) {
       setFormatVisibility();
       activateContentSubtab('data');
+    }
+
+    if (target === downloadFormat) {
+      syncDownloadControls();
+      return;
+    }
+
+    if (target === animationTimingMode) {
+      syncAnimationDurationSummary();
+      return;
     }
 
     if (target === fileEncodingMode) {
@@ -4535,6 +5987,71 @@ pixelArtColor.addEventListener('input', () => {
 
 pixelArtSizeInput.addEventListener('input', () => {
   resizePixelArt(Number.parseInt(pixelArtSizeInput.value, 10) || 16);
+});
+
+function applyRecommendedImageContrast() {
+  colorDark.value = '#000000';
+  colorDarkTransparency.value = '75';
+  colorLight.value = '#ffffff';
+  colorLightTransparency.value = '25';
+  formatColorTransparency();
+}
+
+imageFillRecommended.addEventListener('click', () => {
+  applyRecommendedImageContrast();
+  renderQr();
+});
+
+imageFillInput.addEventListener('change', () => {
+  const loadRequest = ++imageFillLoadRequest;
+  if (imageFillObjectUrl) {
+    URL.revokeObjectURL(imageFillObjectUrl);
+    imageFillObjectUrl = '';
+  }
+  imageFillImage = null;
+  const [file] = imageFillInput.files || [];
+  if (!file || !file.type.startsWith('image/')) {
+    syncGradientControls();
+    renderQr();
+    return;
+  }
+
+  imageFillObjectUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.onload = () => {
+    if (loadRequest !== imageFillLoadRequest) {
+      return;
+    }
+    imageFillImage = image;
+    URL.revokeObjectURL(imageFillObjectUrl);
+    imageFillObjectUrl = '';
+    applyRecommendedImageContrast();
+    syncGradientControls();
+    renderQr();
+  };
+  image.onerror = () => {
+    if (loadRequest !== imageFillLoadRequest) {
+      return;
+    }
+    imageFillImage = null;
+    URL.revokeObjectURL(imageFillObjectUrl);
+    imageFillObjectUrl = '';
+    syncGradientControls();
+    renderQr();
+  };
+  image.src = imageFillObjectUrl;
+});
+
+imageFillClear.addEventListener('click', () => {
+  imageFillLoadRequest += 1;
+  if (imageFillObjectUrl) {
+    URL.revokeObjectURL(imageFillObjectUrl);
+    imageFillObjectUrl = '';
+  }
+  imageFillImage = null;
+  imageFillInput.value = '';
+  syncGradientControls();
+  renderQr();
 });
 
 centerLogoInput.addEventListener('change', () => {
@@ -4632,6 +6149,13 @@ pixelArtClear.addEventListener('click', () => {
   renderQr();
 });
 
+downloadCurrent.addEventListener('click', downloadCurrentCanvas);
+downloadCurrentPdf.addEventListener('click', downloadCurrentPdfDocument);
+downloadZip.addEventListener('click', downloadAllFramesAsZip);
+downloadAllPdf.addEventListener('click', downloadAllFramesAsPdf);
+downloadAnimatedGif.addEventListener('click', () => downloadAnimation('gif'));
+downloadAnimationMp4.addEventListener('click', () => downloadAnimation('mp4'));
+
 fileChunkIndex.addEventListener('input', () => {
   invalidateChunkCapacityCache();
   syncFileCapacityHint();
@@ -4639,26 +6163,24 @@ fileChunkIndex.addEventListener('input', () => {
 });
 
 chunkPreviewPrev.addEventListener('click', () => {
-  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
+  const current = getCurrentFrameIndex();
   if (current <= 1) {
     return;
   }
 
-  fileChunkIndex.value = String(current - 1);
-  syncFileChunkLabel();
+  setCurrentFrameIndex(current - 1);
   syncChunkPreviewNavigation();
   renderQr();
 });
 
 chunkPreviewNext.addEventListener('click', () => {
-  const current = Number.parseInt(fileChunkIndex.value, 10) || 1;
-  const total = Number.parseInt(fileChunkIndex.max, 10) || 1;
+  const current = getCurrentFrameIndex();
+  const total = getDownloadFrameCount();
   if (current >= total) {
     return;
   }
 
-  fileChunkIndex.value = String(current + 1);
-  syncFileChunkLabel();
+  setCurrentFrameIndex(current + 1);
   syncChunkPreviewNavigation();
   renderQr();
 });
@@ -4792,17 +6314,117 @@ styleSubtabButtons.forEach((button) => {
   });
 });
 
+downloadSubtabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    activateDownloadSubtab(button.dataset.downloadSubtab || 'image');
+  });
+});
+
 contentSubtabButtons.forEach((button) => {
   button.addEventListener('click', () => {
     activateContentSubtab(button.dataset.contentSubtab || 'data');
   });
 });
 
+const infoDialogs = document.querySelectorAll('.info-dialog');
+
+function syncInfoDialogFromHash() {
+  const targetId = window.location.hash.slice(1);
+  const targetDialog = [...infoDialogs].find((dialog) => dialog.id === targetId);
+
+  infoDialogs.forEach((dialog) => {
+    if (dialog !== targetDialog && dialog.open) {
+      dialog.close();
+    }
+  });
+
+  if (targetDialog && !targetDialog.open) {
+    targetDialog.showModal();
+  }
+}
+
+document.querySelectorAll('[data-dialog-target]').forEach((link) => {
+  link.addEventListener('click', () => {
+    if (window.location.hash === link.getAttribute('href')) {
+      window.requestAnimationFrame(syncInfoDialogFromHash);
+    }
+  });
+});
+
+document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+  button.addEventListener('click', () => {
+    button.closest('dialog')?.close();
+  });
+});
+
+infoDialogs.forEach((dialog) => {
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+
+  dialog.addEventListener('close', () => {
+    if (window.location.hash === `#${dialog.id}`) {
+      history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    }
+  });
+});
+
+window.addEventListener('hashchange', syncInfoDialogFromHash);
+
+previewViewFit.addEventListener('click', () => {
+  setPreviewViewMode('fit');
+});
+
+previewViewActual.addEventListener('click', () => {
+  setPreviewViewMode('actual', true);
+});
+
+qrPreviewViewport.addEventListener('pointerdown', (event) => {
+  if (previewViewMode !== 'actual' || (event.button !== undefined && event.button !== 0)) {
+    return;
+  }
+
+  const bounds = getPreviewPanBounds();
+  if (bounds.x === 0 && bounds.y === 0) {
+    return;
+  }
+
+  previewPanPointer = event.pointerId;
+  previewPanStartX = event.clientX;
+  previewPanStartY = event.clientY;
+  previewPanOriginX = previewPanX;
+  previewPanOriginY = previewPanY;
+  qrPreviewViewport.classList.add('is-dragging');
+  qrPreviewViewport.setPointerCapture(event.pointerId);
+  event.preventDefault();
+});
+
+qrPreviewViewport.addEventListener('pointermove', (event) => {
+  if (previewPanPointer !== event.pointerId) {
+    return;
+  }
+
+  previewPanX = previewPanOriginX + event.clientX - previewPanStartX;
+  previewPanY = previewPanOriginY + event.clientY - previewPanStartY;
+  applyPreviewPan();
+});
+
+qrPreviewViewport.addEventListener('pointerup', stopPreviewPan);
+qrPreviewViewport.addEventListener('pointercancel', stopPreviewPan);
+
+if ('ResizeObserver' in window) {
+  new ResizeObserver(schedulePreviewViewportSync).observe(qrPreviewViewport);
+} else {
+  window.addEventListener('resize', schedulePreviewViewportSync);
+}
+
 ensurePixelArtPalette();
 ensurePixelArtGrid();
 syncPixelArtGrid();
+urlInput.value = getDefaultUrlValue();
 syncOutputs();
-textInput.value = getDefaultUrlValue();
 setFormatVisibility();
 ensureMaskButtons();
 syncMaskSelection();
@@ -4823,7 +6445,10 @@ syncEmailBodyLengthHint();
 syncDebugOutlineSelection();
 activateContentSubtab('data');
 activateStyleSubtab('size');
+activateDownloadSubtab('image');
 activateDebugSubtab('encoding');
 activateTab('content');
+setPreviewViewMode('fit', true);
 triggerDownloadFromLocationPayload();
 renderQr();
+syncInfoDialogFromHash();
