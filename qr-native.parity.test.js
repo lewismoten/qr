@@ -1,9 +1,7 @@
-'use strict';
-
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const vm = require('node:vm');
-const NativeQRCode = require('./qr-native.js');
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import NativeQRCode from './src/js/qr/index.js';
 
 const referencePath = process.env.QR_REFERENCE_BUNDLE || '/tmp/qrcode-1.5.0.min.js';
 if (!fs.existsSync(referencePath)) {

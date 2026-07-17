@@ -1,7 +1,5 @@
-'use strict';
-
-const assert = require('node:assert/strict');
-const NativeQRCode = require('./qr-native.js');
+import assert from 'node:assert/strict';
+import NativeQRCode from './src/js/qr/index.js';
 
 function matrixSignature(definition) {
   return Buffer.from(definition.modules.data).toString('base64');

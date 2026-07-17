@@ -1,3 +1,8 @@
+import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './bytes.js';
+import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
+import { parseBoolean as parseBulkBoolean, parseCsv } from './csv.js';
+import { formatPhoneNumberForDisplay, normalizePhoneNumber } from './phone.js';
+
 const form = document.getElementById('qr-form');
 const qrEncoder = globalThis.NativeQRCode;
 const canvas = document.getElementById('qr-canvas');
@@ -466,71 +471,6 @@ function getBulkCurrentRow() {
   return bulkRows[index - 1] || null;
 }
 
-function parseBulkBoolean(value, { allowBlank = true } = {}) {
-  const normalized = String(value ?? '').trim().toLowerCase();
-  if (!normalized && allowBlank) {
-    return false;
-  }
-  if (['true', '1', 'yes', 'y'].includes(normalized)) {
-    return true;
-  }
-  if (['false', '0', 'no', 'n'].includes(normalized)) {
-    return false;
-  }
-  return null;
-}
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let value = '';
-  let quoted = false;
-
-  for (let index = 0; index < text.length; index += 1) {
-    const character = text[index];
-    if (quoted) {
-      if (character === '"' && text[index + 1] === '"') {
-        value += '"';
-        index += 1;
-      } else if (character === '"') {
-        quoted = false;
-      } else {
-        value += character;
-      }
-      continue;
-    }
-
-    if (character === '"' && value === '') {
-      quoted = true;
-    } else if (character === ',') {
-      row.push(value);
-      value = '';
-    } else if (character === '\n' || character === '\r') {
-      if (character === '\r' && text[index + 1] === '\n') {
-        index += 1;
-      }
-      row.push(value);
-      rows.push(row);
-      row = [];
-      value = '';
-    } else {
-      value += character;
-    }
-  }
-
-  if (quoted) {
-    throw new Error('The CSV contains an unclosed quoted value.');
-  }
-  if (value || row.length) {
-    row.push(value);
-    rows.push(row);
-  }
-  while (rows.length && rows.at(-1).every((cell) => !cell.trim())) {
-    rows.pop();
-  }
-  return rows;
-}
-
 function parseBulkCsv(text) {
   const schema = getBulkSchema();
   const parsedRows = parseCsv(text);
@@ -790,21 +730,6 @@ function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
       }
     }, type, quality);
   });
-}
-
-function concatBytes(parts) {
-  const length = parts.reduce((total, part) => total + part.length, 0);
-  const result = new Uint8Array(length);
-  let offset = 0;
-  parts.forEach((part) => {
-    result.set(part, offset);
-    offset += part.length;
-  });
-  return result;
-}
-
-function textBytes(value) {
-  return new TextEncoder().encode(value);
 }
 
 async function createPdfBlob(sourceCanvas) {
@@ -2062,23 +1987,6 @@ function resizePixelArt(nextSize) {
   pixelArtSizeValue.textContent = `${pixelArtSize} x ${pixelArtSize}`;
 }
 
-function colorWithTransparency(color, transparencyInput) {
-  const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : '#000000';
-  const transparency = Math.min(100, Math.max(0, Number.parseInt(transparencyInput.value, 10) || 0));
-  const alpha = Math.round(255 * (1 - transparency / 100));
-  return `${normalizedColor}${alpha.toString(16).padStart(2, '0')}`;
-}
-
-function getColorAlpha(color) {
-  if (color === 'transparent') {
-    return 0;
-  }
-  if (/^#[0-9a-f]{8}$/i.test(color)) {
-    return Number.parseInt(color.slice(7, 9), 16) / 255;
-  }
-  return 1;
-}
-
 function formatVersionLabel() {
   qrVersionValue.textContent = versionAuto.checked ? 'Auto' : qrVersion.value;
 }
@@ -2204,24 +2112,6 @@ function syncAnimationDurationSummary() {
   downloadAnimationMp4.title = mp4Supported
     ? 'Download an MP4 animation'
     : 'MP4 encoding is not available in this browser; animated GIF remains available.';
-}
-
-function formatBytes(bytes) {
-  if (!Number.isFinite(bytes) || bytes <= 0) {
-    return '0 B';
-  }
-
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let value = bytes;
-  let unitIndex = 0;
-
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-
-  const decimals = value >= 10 || unitIndex === 0 ? 0 : 1;
-  return `${value.toFixed(decimals)} ${units[unitIndex]}`;
 }
 
 function getSelectedFileEncodingMode() {
@@ -2472,14 +2362,6 @@ async function getTransferIntegrityHash(manifest, transferBytes) {
   return hash;
 }
 
-function hexToBytes(hex) {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let index = 0; index < bytes.length; index += 1) {
-    bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
-  }
-  return bytes;
-}
-
 function getCustomMetadataText({ validate = false } = {}) {
   const value = fileCustomMetadata.value.trim();
   if (!value) {
@@ -2494,12 +2376,6 @@ function getCustomMetadataText({ validate = false } = {}) {
     }
     return value;
   }
-}
-
-function uint64Bytes(value) {
-  const bytes = new Uint8Array(8);
-  new DataView(bytes.buffer).setBigUint64(0, BigInt(Math.max(0, value || 0)), false);
-  return bytes;
 }
 
 function createManifestField(type, value) {
@@ -3091,61 +2967,6 @@ function maskWifiPayload(payload) {
 
 function placeholderValue(value, placeholder) {
   return value.trim() || placeholder;
-}
-
-function normalizePhoneNumber(value) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return '';
-  }
-
-  const digits = trimmed.replace(/\D/g, '');
-  if (!digits) {
-    return '';
-  }
-
-  if (trimmed.startsWith('+')) {
-    return `+${digits}`;
-  }
-
-  if (digits.length === 10) {
-    return `+1${digits}`;
-  }
-
-  if (digits.length === 11 && digits.startsWith('1')) {
-    return `+${digits}`;
-  }
-
-  return `+${digits}`;
-}
-
-function formatPhoneNumberForDisplay(value, format) {
-  const normalized = normalizePhoneNumber(value);
-  if (!normalized) {
-    return value.trim();
-  }
-
-  const digits = normalized.replace(/\D/g, '');
-  if (digits.length === 11 && digits.startsWith('1')) {
-    const local = digits.slice(1);
-    const area = local.slice(0, 3);
-    const prefix = local.slice(3, 6);
-    const line = local.slice(6, 10);
-
-    if (format === 'usa') {
-      return `(${area}) ${prefix}-${line}`;
-    }
-
-    if (format === 'international') {
-      return `+1 ${area}-${prefix}-${line}`;
-    }
-  }
-
-  if (format === 'digits') {
-    return digits;
-  }
-
-  return normalized;
 }
 
 function applyPhoneFormatToInput(inputElement) {
@@ -5164,46 +4985,6 @@ function getModuleCategory(qrDefinition, row, column) {
     return 'alignment';
   }
   return 'data';
-}
-
-function hexToRgba(hex, alpha) {
-  const normalized = hex.replace('#', '');
-  const value =
-    normalized.length === 3
-      ? normalized
-          .split('')
-          .map((part) => part + part)
-          .join('')
-      : normalized;
-
-  const red = Number.parseInt(value.slice(0, 2), 16);
-  const green = Number.parseInt(value.slice(2, 4), 16);
-  const blue = Number.parseInt(value.slice(4, 6), 16);
-
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-}
-
-function hexToRgb(hex) {
-  const normalized = hex.replace('#', '');
-  const value =
-    normalized.length === 3
-      ? normalized
-          .split('')
-          .map((part) => part + part)
-          .join('')
-      : normalized;
-
-  return {
-    red: Number.parseInt(value.slice(0, 2), 16),
-    green: Number.parseInt(value.slice(2, 4), 16),
-    blue: Number.parseInt(value.slice(4, 6), 16),
-  };
-}
-
-function getContrastingHex(hex) {
-  const { red, green, blue } = hexToRgb(hex);
-  const luminance = (red * 299 + green * 587 + blue * 114) / 1000;
-  return luminance > 140 ? '#111827' : '#ffffff';
 }
 
 function getDebugCategory(row, column, qrDefinition, debugModel, purpose = 'overlay') {

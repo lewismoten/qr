@@ -12,10 +12,11 @@ npm run build
 ```
 
 The JavaScript entry point is `src/js/main.js` and the CSS entry point is
-`src/css/main.css`. Add feature modules or component styles through those entry
-points. The build emits minified `dist/app.min.js` and `dist/app.min.css` files,
-plus external source maps for each. `index.html` references only these compiled
-assets.
+`src/css/main.css`. Browser code is organized under `src/js/app` and the native
+encoder under `src/js/qr`; add feature modules or component styles through
+those entry points. The build emits minified `dist/app.min.js` and
+`dist/app.min.css` files, plus external source maps for each. `index.html`
+references only these compiled assets.
 
 During development, rebuild automatically when JavaScript or CSS changes:
 
@@ -31,7 +32,8 @@ npm run verify
 
 ## First-party QR encoder
 
-QR generation now runs through the first-party `qr-native.js` implementation.
+QR generation now runs through the first-party implementation in
+`src/js/qr`.
 It includes version-aware mixed segmentation, numeric, alphanumeric, UTF-8 byte
 and Shift JIS Kanji encoding, versions 1-40, all four error-correction levels,
 Reed-Solomon block generation and interleaving, functional patterns, data
