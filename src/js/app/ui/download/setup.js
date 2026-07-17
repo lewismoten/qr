@@ -1,7 +1,7 @@
 import { getSupportedMp4MimeType } from '../../media-support.js';
-import { createDownloadActions } from './actions.js';
 import { createAnimationSection } from './animation/section.js';
 import { createFrameNavigation } from './frames.js';
+import { setupLazyDownloadActions } from './lazy-actions.js';
 
 export function createDownloadSetup({ elements: e, bulk, file, number, runtime, maxNumberFrames, getPrintWidth }) {
   const frames = createFrameNavigation({
@@ -20,7 +20,7 @@ export function createDownloadSetup({ elements: e, bulk, file, number, runtime, 
     summary: e.animationSummary, mp4Button: e.animationMp4,
     getFrameCount: frames.getFrameCount, getSupportedMp4MimeType,
   });
-  createDownloadActions({
+  setupLazyDownloadActions({
     canvas: e.canvas, formatInput: e.downloadFormat, qualityInput: e.downloadQuality,
     status: e.downloadStatus, currentButton: e.downloadCurrent,
     currentPdfButton: e.downloadCurrentPdf, zipButton: e.downloadZip,

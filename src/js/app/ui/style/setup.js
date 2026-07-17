@@ -1,15 +1,18 @@
 import { createArtworkControls } from './art/controls.js';
 import { createImageInputController } from './art/image-input.js';
-import { createPixelArtEditor } from './art/pixel-editor.js';
+import { createLazyPixelArtEditor } from './art/lazy-pixel-editor.js';
 import { createColorSection } from './colors/section.js';
 import { createEyeShapeSection } from './eyes/section.js';
 import { createModuleShapeSection } from './modules/section.js';
 
 export function createStyleSetup({ elements: e, render, colorWithTransparency }) {
-  const pixelEditor = createPixelArtEditor({
+  const pixelEditor = createLazyPixelArtEditor({
     paletteElement: e.pixelArtPalette, customColorInput: e.pixelArtColor,
     clearButton: e.pixelArtClear, grid: e.pixelArtGrid, sizeInput: e.pixelArtSizeInput,
     sizeValue: e.pixelArtSizeValue, onChange: render,
+  }, {
+    isActive: () => e.centerArtMode.value === 'pixel',
+    onReady: render,
   });
   const modules = createModuleShapeSection({
     shape: e.moduleShape, controls: e.moduleCustomControls, rounding: e.moduleRounding,

@@ -49,8 +49,8 @@ export function createContentEncodingSetup({ e, encoder, bulk, file, sections, r
     buildEmail: sections.shared.buildEmailPayloadWithBody,
   });
   const validation = createFormatValidator({
-    elements: { qrFormat: e.qrFormat, bulkFileInput: e.bulkFileInput,
-      urlInput: e.urlInput, emailTo: e.emailTo, emailSubject: e.emailSubject,
+    elements: { qrFormat: e.qrFormat, urlInput: e.urlInput,
+      emailTo: e.emailTo, emailSubject: e.emailSubject,
       emailBody: e.emailBody, phoneNumber: e.phoneNumber, smsNumber: e.smsNumber,
       smsBody: e.smsBody, geoLatitude: e.geoLatitude, geoLongitude: e.geoLongitude,
       geoQuery: e.geoQuery, vcardName: e.vcardName, vcardOrg: e.vcardOrg,
@@ -60,8 +60,8 @@ export function createContentEncodingSetup({ e, encoder, bulk, file, sections, r
       eventEndDate: e.eventEndDate, eventEndTime: e.eventEndTime,
       eventLocation: e.eventLocation, eventDescription: e.eventDescription,
       eventUrl: e.eventUrl },
-    bulk: { isMode: bulk.isMode, getError: bulk.getError, getRow: bulk.getRow,
-      getFrameIndex: runtime.getFrameIndex, getSchema: bulk.getSchema },
+    bulk: { isMode: bulk.isMode, getFrameIndex: runtime.getFrameIndex,
+      getValidationState: bulk.getValidationState },
     numberSection: sections.number,
     file: { getActive: file.getActive, getMode: file.getMode, getCapacity: file.getCapacity },
     getEmailCapacity: emailCapacity.getInfo,

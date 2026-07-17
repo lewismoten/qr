@@ -1,5 +1,6 @@
 import { formatBytes } from '../../../bytes.js';
 import { parseCsv } from '../../../csv.js';
+import { validateBulkImport } from './validation.js';
 
 const MAX_ROWS = 10000;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -141,6 +142,15 @@ export function createBulkImportSection({
     getCurrentRow,
     getRowCount: () => rows.length,
     getError: () => parseError,
+    getValidationState: ({ rowNumber, limits }) => validateBulkImport({
+      parseError,
+      hasFile: Boolean(fileInput.files?.[0]),
+      row: getCurrentRow(),
+      rowNumber,
+      schema: getSchema(),
+      format: format.value,
+      limits,
+    }),
     syncStatus,
     syncControls,
     clear,

@@ -1,4 +1,3 @@
-import { validateBulkImport } from './bulk/validation.js';
 import { parseCoordinate } from './geo/section.js';
 import {
   getWebsiteValidationState,
@@ -107,13 +106,8 @@ function validateVCard(e) {
 }
 
 export function createFormatValidator({ elements: e, bulk, numberSection, file, getEmailCapacity, limits }) {
-  const getBulkState = () => validateBulkImport({
-    parseError: bulk.getError(),
-    hasFile: Boolean(e.bulkFileInput.files?.[0]),
-    row: bulk.getRow(),
+  const getBulkState = () => bulk.getValidationState({
     rowNumber: bulk.getFrameIndex() + 1,
-    schema: bulk.getSchema(),
-    format: e.qrFormat.value,
     limits,
   });
 
