@@ -112,10 +112,29 @@
                     <option value="vcard">vCard</option>
                     <option value="file">File</option>
                   </select>
+                  <label class="toggle-field bulk-toggle">
+                    <input id="bulk-enabled" name="bulk-enabled" type="checkbox" />
+                    <span>Bulk Import</span>
+                  </label>
                 </fieldset>
                 </section>
 
                 <section class="subtab-panel content-subtab-panel is-active" data-content-subtab-panel="data">
+                <fieldset id="bulk-fields" class="option-group bulk-fields" hidden>
+                  <legend>Bulk Import</legend>
+                  <p class="hint">File format is unavailable in Bulk Import. Use the dedicated File format for binary data.</p>
+                  <p class="hint">The first row must contain these field names:</p>
+                  <code id="bulk-expected-fields" class="bulk-expected-fields">url</code>
+                  <p id="bulk-required-fields" class="hint">Required values: url</p>
+                  <label for="bulk-file-input">Choose a CSV file</label>
+                  <input id="bulk-file-input" name="bulk-file-input" type="file" accept=".csv,text/csv" />
+                  <input id="bulk-row-index" name="bulk-row-index" type="hidden" value="1" />
+                  <div class="file-status-row">
+                    <p id="bulk-status" class="hint file-capacity-hint">No CSV loaded.</p>
+                    <button id="bulk-clear" type="button" class="secondary-button" disabled>Clear CSV</button>
+                  </div>
+                </fieldset>
+
                 <fieldset class="option-group format-fields" data-format-fields="url">
                   <legend class="sr-only">URL content</legend>
                   <label for="url-input">URL</label>

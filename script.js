@@ -22,6 +22,14 @@ const encodedPreview = document.getElementById('encoded-preview');
 const payloadRevealSecrets = document.getElementById('payload-reveal-secrets');
 const payloadRevealToggle = document.getElementById('payload-reveal-toggle');
 const qrFormat = document.getElementById('qr-format');
+const bulkEnabled = document.getElementById('bulk-enabled');
+const bulkFields = document.getElementById('bulk-fields');
+const bulkExpectedFields = document.getElementById('bulk-expected-fields');
+const bulkRequiredFields = document.getElementById('bulk-required-fields');
+const bulkFileInput = document.getElementById('bulk-file-input');
+const bulkRowIndex = document.getElementById('bulk-row-index');
+const bulkStatus = document.getElementById('bulk-status');
+const bulkClear = document.getElementById('bulk-clear');
 const choiceButtons = document.querySelectorAll('.choice-button');
 const formatFieldsets = document.querySelectorAll('.format-fields');
 const qrVersion = document.getElementById('qr-version');
@@ -378,6 +386,23 @@ let activePhoneFormat = 'usa';
 const SMS_MAX_LENGTH = 160;
 const EMAIL_SUBJECT_MAX_LENGTH = 120;
 const NUMBER_SERIES_MAX_FRAMES = 10000;
+const BULK_MAX_ROWS = 10000;
+const BULK_MAX_FILE_BYTES = 5 * 1024 * 1024;
+const BULK_FORMAT_SCHEMAS = {
+  url: { fields: ['url'], required: ['url'] },
+  text: { fields: ['text'], required: ['text'] },
+  number: { fields: ['number', 'prefix', 'suffix'], required: ['number'] },
+  wifi: { fields: ['ssid', 'password', 'security', 'hidden'], required: ['ssid', 'security'] },
+  email: { fields: ['email', 'subject', 'body'], required: ['email'] },
+  phone: { fields: ['phone'], required: ['phone'] },
+  sms: { fields: ['phone', 'message'], required: ['phone'] },
+  event: {
+    fields: ['title', 'all_day', 'start_date', 'start_time', 'end_date', 'end_time', 'location', 'description', 'url'],
+    required: ['title', 'start_date', 'end_date'],
+  },
+  geo: { fields: ['latitude', 'longitude', 'label'], required: ['latitude', 'longitude'] },
+  vcard: { fields: ['name', 'organization', 'title', 'phone', 'email', 'url'], required: ['name'] },
+};
 const MAX_QR_TARGET_WIDTH = 2048;
 const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
 const PRINT_PIXELS_PER_INCH = 192;
@@ -410,6 +435,10 @@ const FILE_MANIFEST_FIELDS = {
 };
 const calendarEventUid = `${typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}@qr.lewismoten.com`;
 const calendarEventTimestamp = new Date();
+let bulkRows = [];
+let bulkHeaders = [];
+let bulkParseError = '';
+let bulkLoadRequest = 0;
 
 function isDebugOverlayActive() {
   return (activeTabName === 'debug' && activeDebugSubtab === 'overlay') || debugEnabled.checked;
@@ -421,6 +450,203 @@ function getDefaultUrlValue() {
   }
 
   return window.location.href;
+}
+
+function getBulkSchema(format = qrFormat.value) {
+  return BULK_FORMAT_SCHEMAS[format] || null;
+}
+
+function isBulkMode() {
+  return bulkEnabled.checked && Boolean(getBulkSchema());
+}
+
+function getBulkCurrentRow() {
+  const index = Math.min(bulkRows.length, Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1));
+  return bulkRows[index - 1] || null;
+}
+
+function parseBulkBoolean(value, { allowBlank = true } = {}) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (!normalized && allowBlank) {
+    return false;
+  }
+  if (['true', '1', 'yes', 'y'].includes(normalized)) {
+    return true;
+  }
+  if (['false', '0', 'no', 'n'].includes(normalized)) {
+    return false;
+  }
+  return null;
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (quoted) {
+      if (character === '"' && text[index + 1] === '"') {
+        value += '"';
+        index += 1;
+      } else if (character === '"') {
+        quoted = false;
+      } else {
+        value += character;
+      }
+      continue;
+    }
+
+    if (character === '"' && value === '') {
+      quoted = true;
+    } else if (character === ',') {
+      row.push(value);
+      value = '';
+    } else if (character === '\n' || character === '\r') {
+      if (character === '\r' && text[index + 1] === '\n') {
+        index += 1;
+      }
+      row.push(value);
+      rows.push(row);
+      row = [];
+      value = '';
+    } else {
+      value += character;
+    }
+  }
+
+  if (quoted) {
+    throw new Error('The CSV contains an unclosed quoted value.');
+  }
+  if (value || row.length) {
+    row.push(value);
+    rows.push(row);
+  }
+  while (rows.length && rows.at(-1).every((cell) => !cell.trim())) {
+    rows.pop();
+  }
+  return rows;
+}
+
+function parseBulkCsv(text) {
+  const schema = getBulkSchema();
+  const parsedRows = parseCsv(text);
+  if (!schema || parsedRows.length === 0) {
+    throw new Error('The CSV is empty.');
+  }
+
+  const headers = parsedRows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
+  const namedHeaders = headers.filter(Boolean);
+  if (new Set(namedHeaders).size !== namedHeaders.length) {
+    throw new Error('The first row contains duplicate field names.');
+  }
+
+  const missingHeaders = schema.fields.filter((field) => !namedHeaders.includes(field));
+  if (missingHeaders.length) {
+    throw new Error(`The first row is missing: ${missingHeaders.join(', ')}.`);
+  }
+
+  const dataRows = parsedRows.slice(1).filter((cells) => cells.some((cell) => cell.trim()));
+  if (dataRows.length > BULK_MAX_ROWS) {
+    throw new Error(`Bulk imports are limited to ${BULK_MAX_ROWS.toLocaleString()} data rows.`);
+  }
+  if (!dataRows.length) {
+    throw new Error('The CSV has a header row but no data rows.');
+  }
+
+  return {
+    headers: namedHeaders,
+    rows: dataRows.map((cells) =>
+      Object.fromEntries(headers.flatMap((header, index) => (header ? [[header, cells[index] ?? '']] : [])))
+    ),
+  };
+}
+
+function syncBulkStatus() {
+  const file = bulkFileInput.files?.[0];
+  bulkClear.disabled = !file && !bulkRows.length && !bulkParseError;
+  if (bulkParseError) {
+    bulkStatus.textContent = bulkParseError;
+    bulkStatus.classList.add('has-error');
+    return;
+  }
+  bulkStatus.classList.remove('has-error');
+  if (!bulkRows.length) {
+    bulkStatus.textContent = 'No CSV loaded.';
+    return;
+  }
+  const current = Math.min(bulkRows.length, Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1));
+  bulkStatus.textContent = `${bulkRows.length.toLocaleString()} rows loaded. Showing ${current.toLocaleString()} of ${bulkRows.length.toLocaleString()}.`;
+}
+
+function clearBulkData({ preserveFileInput = false } = {}) {
+  bulkLoadRequest += 1;
+  bulkRows = [];
+  bulkHeaders = [];
+  bulkParseError = '';
+  bulkRowIndex.value = '1';
+  if (!preserveFileInput) {
+    bulkFileInput.value = '';
+  }
+  syncBulkStatus();
+}
+
+async function loadBulkFile() {
+  const request = ++bulkLoadRequest;
+  const file = bulkFileInput.files?.[0];
+  bulkRows = [];
+  bulkHeaders = [];
+  bulkParseError = '';
+  bulkRowIndex.value = '1';
+
+  if (!file) {
+    syncBulkStatus();
+    renderQr();
+    return;
+  }
+  if (file.size > BULK_MAX_FILE_BYTES) {
+    bulkParseError = `The CSV is ${formatBytes(file.size)}; Bulk Import CSV files are limited to ${formatBytes(BULK_MAX_FILE_BYTES)}.`;
+    syncBulkStatus();
+    renderQr();
+    return;
+  }
+
+  try {
+    const parsed = parseBulkCsv(await file.text());
+    if (request !== bulkLoadRequest) {
+      return;
+    }
+    bulkHeaders = parsed.headers;
+    bulkRows = parsed.rows;
+  } catch (error) {
+    if (request !== bulkLoadRequest) {
+      return;
+    }
+    bulkParseError = error.message || 'Unable to read this CSV.';
+  }
+  syncBulkStatus();
+  renderQr();
+}
+
+function syncBulkControls() {
+  const schema = getBulkSchema();
+  const bulk = bulkEnabled.checked;
+  const fileFormatButton = document.querySelector('[data-choice-target="qr-format"][data-choice-value="file"]');
+
+  if (bulk && !schema) {
+    qrFormat.value = 'url';
+    syncChoiceButtons();
+  }
+  const activeSchema = getBulkSchema();
+  bulkFields.hidden = !bulk;
+  bulkFields.setAttribute('aria-hidden', String(!bulk));
+  bulkExpectedFields.textContent = activeSchema?.fields.join(', ') || '';
+  bulkRequiredFields.textContent = `Required values: ${activeSchema?.required.join(', ') || 'none'}`;
+  fileFormatButton.disabled = bulk;
+  fileFormatButton.setAttribute('aria-disabled', String(bulk));
+  syncBulkStatus();
 }
 
 function getShareableAppUrl() {
@@ -1564,7 +1790,33 @@ function getAutomaticCalendarFrameMessage() {
   return [title, shortenFrameValue(cleanSchedule, 80)].filter(Boolean).join('\n');
 }
 
+function getAutomaticBulkFrameMessage() {
+  const row = getBulkCurrentRow();
+  if (!row) return '';
+  switch (qrFormat.value) {
+    case 'url': return getShortTextFrameValue(row.url);
+    case 'text': return getShortTextFrameValue(row.text);
+    case 'number': return shortenFrameValue(buildBulkEncodedText(row));
+    case 'wifi': return row.ssid.trim() ? shortenFrameValue(`Wi-Fi ${row.ssid.trim()}`) : '';
+    case 'email': return row.email.trim() ? shortenFrameValue(`Email ${row.email.trim()}`) : '';
+    case 'phone': return row.phone.trim() ? shortenFrameValue(`Call ${row.phone.trim()}`) : '';
+    case 'sms': return row.phone.trim() ? shortenFrameValue(`Text ${row.phone.trim()}`) : '';
+    case 'event': {
+      const title = shortenFrameValue(row.title, 80);
+      const dates = row.start_date === row.end_date ? row.start_date : `${row.start_date} - ${row.end_date}`;
+      const times = parseBulkBoolean(row.all_day) ? 'All day' : `${row.start_time} - ${row.end_time}`;
+      return [title, shortenFrameValue(`${dates} | ${times}`, 80)].filter(Boolean).join('\n');
+    }
+    case 'geo': return shortenFrameValue(`Location ${row.label.trim() || `${row.latitude}, ${row.longitude}`}`);
+    case 'vcard': return shortenFrameValue(`Contact ${row.name || row.organization || row.email}`);
+    default: return '';
+  }
+}
+
 function getAutomaticFrameMessage() {
+  if (isBulkMode()) {
+    return getAutomaticBulkFrameMessage();
+  }
   switch (qrFormat.value) {
     case 'url':
       return getShortTextFrameValue(urlInput.value);
@@ -1865,6 +2117,9 @@ function syncOutputs() {
 }
 
 function getDownloadFrameCount() {
+  if (isBulkMode()) {
+    return Math.max(1, bulkRows.length);
+  }
   if (qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked') {
     return Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
   }
@@ -1876,11 +2131,19 @@ function getDownloadFrameCount() {
 }
 
 function getCurrentFrameIndex() {
+  if (isBulkMode()) {
+    return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
+  }
   const input = qrFormat.value === 'number' ? numberSequenceIndex : fileChunkIndex;
   return Math.max(1, Number.parseInt(input.value, 10) || 1);
 }
 
 function setCurrentFrameIndex(frame) {
+  if (isBulkMode()) {
+    bulkRowIndex.value = String(Math.min(Math.max(1, frame), Math.max(1, bulkRows.length)));
+    syncBulkStatus();
+    return;
+  }
   if (qrFormat.value === 'number') {
     numberSequenceIndex.value = String(frame);
     syncNumberSequenceControls();
@@ -1988,11 +2251,12 @@ function syncChunkVersionControls() {
 }
 
 function syncChunkPreviewNavigation() {
+  const isBulk = isBulkMode();
   const isChunkedFile = qrFormat.value === 'file' && getSelectedFileEncodingMode() === 'chunked';
   const isNumberSeries = qrFormat.value === 'number';
   const total = getDownloadFrameCount();
   const current = Math.min(getCurrentFrameIndex(), total);
-  const shouldShowNavigation = (isChunkedFile || isNumberSeries) && total > 1;
+  const shouldShowNavigation = (isBulk || isChunkedFile || isNumberSeries) && total > 1;
 
   chunkPreviewNav.classList.toggle('has-navigation', shouldShowNavigation);
   chunkPreviewStatus.hidden = !shouldShowNavigation;
@@ -2345,9 +2609,10 @@ function syncWifiSecurityState() {
 }
 
 function setFormatVisibility() {
+  syncBulkControls();
   const activeFormat = qrFormat.value;
   formatFieldsets.forEach((fieldset) => {
-    const isActive = fieldset.dataset.formatFields === activeFormat;
+    const isActive = !bulkEnabled.checked && fieldset.dataset.formatFields === activeFormat;
     fieldset.hidden = !isActive;
     fieldset.classList.toggle('is-active', isActive);
     fieldset.setAttribute('aria-hidden', String(!isActive));
@@ -3001,37 +3266,51 @@ function syncCalendarEventControls() {
   eventTimeFields.forEach((field) => field.classList.toggle('is-disabled', allDay));
 }
 
-function buildCalendarEventPayload() {
+function buildCalendarEventPayloadFromValues(values, uid = calendarEventUid) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Lewis Moten//QR Code Generator//EN',
     'BEGIN:VEVENT',
-    `UID:${calendarEventUid}`,
+    `UID:${uid}`,
     `DTSTAMP:${formatCalendarUtcDateTime(calendarEventTimestamp)}`,
-    `SUMMARY:${escapeCalendarText(eventTitle.value.trim())}`,
+    `SUMMARY:${escapeCalendarText(values.title.trim())}`,
   ];
 
-  if (eventAllDay.checked) {
-    lines.push(`DTSTART;VALUE=DATE:${formatCalendarDate(eventStartDate.value)}`);
-    lines.push(`DTEND;VALUE=DATE:${formatCalendarDate(addCalendarDays(eventEndDate.value, 1))}`);
+  if (values.allDay) {
+    lines.push(`DTSTART;VALUE=DATE:${formatCalendarDate(values.startDate)}`);
+    lines.push(`DTEND;VALUE=DATE:${formatCalendarDate(addCalendarDays(values.endDate, 1))}`);
   } else {
-    lines.push(`DTSTART:${formatCalendarDateTime(eventStartDate.value, eventStartTime.value)}`);
-    lines.push(`DTEND:${formatCalendarDateTime(eventEndDate.value, eventEndTime.value)}`);
+    lines.push(`DTSTART:${formatCalendarDateTime(values.startDate, values.startTime)}`);
+    lines.push(`DTEND:${formatCalendarDateTime(values.endDate, values.endTime)}`);
   }
 
-  if (eventLocation.value.trim()) {
-    lines.push(`LOCATION:${escapeCalendarText(eventLocation.value.trim())}`);
+  if (values.location.trim()) {
+    lines.push(`LOCATION:${escapeCalendarText(values.location.trim())}`);
   }
-  if (eventDescription.value.trim()) {
-    lines.push(`DESCRIPTION:${escapeCalendarText(eventDescription.value.trim())}`);
+  if (values.description.trim()) {
+    lines.push(`DESCRIPTION:${escapeCalendarText(values.description.trim())}`);
   }
-  if (eventUrl.value.trim()) {
-    lines.push(`URL:${eventUrl.value.trim()}`);
+  if (values.url.trim()) {
+    lines.push(`URL:${values.url.trim()}`);
   }
 
   lines.push('END:VEVENT', 'END:VCALENDAR');
   return lines.join('\r\n');
+}
+
+function buildCalendarEventPayload() {
+  return buildCalendarEventPayloadFromValues({
+    title: eventTitle.value,
+    allDay: eventAllDay.checked,
+    startDate: eventStartDate.value,
+    startTime: eventStartTime.value,
+    endDate: eventEndDate.value,
+    endTime: eventEndTime.value,
+    location: eventLocation.value,
+    description: eventDescription.value,
+    url: eventUrl.value,
+  });
 }
 
 function buildGeoPayload() {
@@ -3155,7 +3434,82 @@ function buildVCardPayload() {
   return lines.join('\n');
 }
 
+function normalizeBulkWifiSecurity(value) {
+  const normalized = String(value).trim().toLowerCase();
+  if (['wpa', 'wpa2', 'wpa3', 'wpa/2/3'].includes(normalized)) return 'WPA';
+  if (normalized === 'wep') return 'WEP';
+  if (['open', 'none', 'nopass'].includes(normalized)) return 'nopass';
+  return '';
+}
+
+function buildBulkEncodedText(row = getBulkCurrentRow()) {
+  if (!row) return '';
+
+  switch (qrFormat.value) {
+    case 'url':
+      return row.url.trim();
+    case 'text':
+      return row.text;
+    case 'number': {
+      const raw = `${row.prefix}${row.number}${row.suffix}`;
+      const uppercase = raw.toUpperCase();
+      return [...uppercase].every((character) => QR_ALPHANUMERIC_CHARACTERS.includes(character)) ? uppercase : raw;
+    }
+    case 'wifi': {
+      const security = normalizeBulkWifiSecurity(row.security) || row.security.trim();
+      const segments = [`T:${security}`, `S:${escapeWifiValue(row.ssid.trim())}`];
+      if (security !== 'nopass') segments.push(`P:${escapeWifiValue(row.password)}`);
+      if (parseBulkBoolean(row.hidden)) segments.push('H:true');
+      return `WIFI:${segments.join(';')};;`;
+    }
+    case 'email': {
+      const params = new URLSearchParams();
+      if (row.subject.trim()) params.set('subject', row.subject.trim());
+      if (row.body.trim()) params.set('body', row.body.trim());
+      return `mailto:${row.email.trim()}${params.toString() ? `?${params}` : ''}`;
+    }
+    case 'phone':
+      return normalizePhoneNumber(row.phone) ? `tel:${normalizePhoneNumber(row.phone)}` : '';
+    case 'sms':
+      return `SMSTO:${normalizePhoneNumber(row.phone)}:${row.message}`;
+    case 'event':
+      return buildCalendarEventPayloadFromValues(
+        {
+          title: row.title,
+          allDay: Boolean(parseBulkBoolean(row.all_day)),
+          startDate: row.start_date.trim(),
+          startTime: row.start_time.trim(),
+          endDate: row.end_date.trim(),
+          endTime: row.end_time.trim(),
+          location: row.location,
+          description: row.description,
+          url: row.url,
+        },
+        `${calendarEventUid.replace('@qr.lewismoten.com', '')}-${getCurrentFrameIndex()}@qr.lewismoten.com`
+      );
+    case 'geo': {
+      const coordinates = `${row.latitude.trim()},${row.longitude.trim()}`;
+      return row.label.trim() ? `geo:${coordinates}?q=${encodeURIComponent(row.label.trim())}` : `geo:${coordinates}`;
+    }
+    case 'vcard': {
+      const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${row.name.trim()}`];
+      if (row.organization.trim()) lines.push(`ORG:${row.organization.trim()}`);
+      if (row.title.trim()) lines.push(`TITLE:${row.title.trim()}`);
+      if (row.phone.trim()) lines.push(`TEL:${row.phone.trim()}`);
+      if (row.email.trim()) lines.push(`EMAIL:${row.email.trim()}`);
+      if (row.url.trim()) lines.push(`URL:${row.url.trim()}`);
+      lines.push('END:VCARD');
+      return lines.join('\n');
+    }
+    default:
+      return '';
+  }
+}
+
 async function buildEncodedText() {
+  if (isBulkMode()) {
+    return buildBulkEncodedText();
+  }
   switch (qrFormat.value) {
     case 'url':
       return urlInput.value.trim();
@@ -3191,6 +3545,9 @@ async function buildEncodedText() {
 }
 
 function buildEncodedPreviewTemplate() {
+  if (isBulkMode()) {
+    return buildBulkEncodedText() || `[CSV row for ${qrFormat.value}]`;
+  }
   switch (qrFormat.value) {
     case 'url':
       return urlInput.value || '[enter a full https:// URL]';
@@ -3622,7 +3979,130 @@ function validateCalendarText(value, { required = false, label, maxLength, multi
   return '';
 }
 
+function isValidBulkDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+function isValidBulkTime(value) {
+  if (!/^\d{2}:\d{2}$/.test(value)) {
+    return false;
+  }
+  const [hour, minute] = value.split(':').map(Number);
+  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
+}
+
+function getBulkValidationState() {
+  if (bulkParseError) {
+    return { error: `Not valid for Bulk Import yet: ${bulkParseError}`, warning: '' };
+  }
+  if (!bulkFileInput.files?.[0]) {
+    return { error: 'Not valid for Bulk Import yet: choose a CSV file.', warning: '' };
+  }
+  const row = getBulkCurrentRow();
+  if (!row) {
+    return { error: 'Not valid for Bulk Import yet: the CSV needs at least one data row.', warning: '' };
+  }
+
+  const rowNumber = getCurrentFrameIndex() + 1;
+  const fail = (message) => ({ error: `Not valid for Bulk Import row ${rowNumber}: ${message}`, warning: '' });
+  const schema = getBulkSchema();
+  for (const field of schema.required) {
+    if (!row[field].trim()) return fail(`${field} is required.`);
+  }
+
+  if (qrFormat.value === 'url') {
+    const state = getWebsiteValidationState(row.url, { required: true, contextLabel: 'URL' });
+    if (state.error) return fail(state.error.replace(/^Not valid for URL format yet:\s*/, ''));
+    return state.warning ? { error: '', warning: `Bulk Import row ${rowNumber}: ${state.warning}` } : state;
+  }
+  if (qrFormat.value === 'text') {
+    if (!row.text.trim()) return fail('text is required.');
+  }
+  if (qrFormat.value === 'number') {
+    if (!/^-?\d+$/.test(row.number.trim())) return fail('number must be a whole number.');
+    for (const field of ['prefix', 'suffix']) {
+      const error = validatePrintableText(row[field], { label: field, maxLength: 32 });
+      if (error) return fail(error);
+    }
+  }
+  if (qrFormat.value === 'wifi') {
+    if (!normalizeBulkWifiSecurity(row.security)) return fail('security must be WPA, WEP, or open.');
+    if (parseBulkBoolean(row.hidden) === null) return fail('hidden must be true/false, yes/no, or 1/0.');
+  }
+  if (qrFormat.value === 'email') {
+    const emailError = validateEmailValue(row.email, { label: 'email address' });
+    if (emailError) return fail(emailError.replace(/^Not valid for Email format yet:\s*/, ''));
+    const subjectError = validatePrintableText(row.subject, { label: 'subject', maxLength: EMAIL_SUBJECT_MAX_LENGTH });
+    if (subjectError) return fail(subjectError);
+    const bodyError = validatePrintableText(row.body, { label: 'body', maxLength: MODE_CAPACITY.byte.L });
+    if (bodyError) return fail(bodyError);
+  }
+  if (qrFormat.value === 'phone' || qrFormat.value === 'sms') {
+    const phoneError = validateTelephoneValue(row.phone);
+    if (phoneError) return fail(phoneError.replace(/^Not valid for Phone format yet:\s*/, ''));
+    if (qrFormat.value === 'sms') {
+      const messageError = validatePrintableText(row.message, { label: 'message', maxLength: SMS_MAX_LENGTH });
+      if (messageError) return fail(messageError);
+    }
+  }
+  if (qrFormat.value === 'event') {
+    const allDay = parseBulkBoolean(row.all_day);
+    if (allDay === null) return fail('all_day must be true/false, yes/no, or 1/0.');
+    const titleError = validateCalendarText(row.title, { required: true, label: 'title', maxLength: CALENDAR_TITLE_MAX_LENGTH });
+    if (titleError) return fail(titleError.replace(/^Not valid for Event format yet:\s*/, ''));
+    if (!isValidBulkDate(row.start_date) || !isValidBulkDate(row.end_date)) {
+      return fail('start_date and end_date must be real dates using YYYY-MM-DD.');
+    }
+    if (!allDay && (!isValidBulkTime(row.start_time) || !isValidBulkTime(row.end_time))) {
+      return fail('start_time and end_time must be real 24-hour times using HH:MM unless all_day is true.');
+    }
+    const start = `${row.start_date}T${allDay ? '00:00' : row.start_time}`;
+    const end = `${row.end_date}T${allDay ? '00:00' : row.end_time}`;
+    if ((allDay && end < start) || (!allDay && end <= start)) return fail('the event end must be after its start.');
+    const locationError = validateCalendarText(row.location, { label: 'location', maxLength: CALENDAR_LOCATION_MAX_LENGTH });
+    if (locationError) return fail(locationError.replace(/^Not valid for Event format yet:\s*/, ''));
+    const descriptionError = validateCalendarText(row.description, { label: 'description', maxLength: CALENDAR_DESCRIPTION_MAX_LENGTH, multiline: true });
+    if (descriptionError) return fail(descriptionError.replace(/^Not valid for Event format yet:\s*/, ''));
+    const urlState = getWebsiteValidationState(row.url, { contextLabel: 'Event' });
+    if (urlState.error) return fail(urlState.error.replace(/^Not valid for Event format yet:\s*/, ''));
+    if (urlState.warning) return { error: '', warning: `Bulk Import row ${rowNumber}: ${urlState.warning}` };
+  }
+  if (qrFormat.value === 'geo') {
+    const latitude = parseCoordinate(row.latitude);
+    const longitude = parseCoordinate(row.longitude);
+    if (latitude === null || latitude < -90 || latitude > 90) return fail('latitude must be a number between -90 and 90.');
+    if (longitude === null || longitude < -180 || longitude > 180) return fail('longitude must be a number between -180 and 180.');
+    const labelError = validateGeoLabel(row.label);
+    if (labelError) return fail(labelError.replace(/^Not valid for Geo format yet:\s*/, ''));
+  }
+  if (qrFormat.value === 'vcard') {
+    for (const [field, label, required] of [
+      ['name', 'full name', true], ['organization', 'organization', false], ['title', 'title', false],
+    ]) {
+      const error = validateVCardTextValue(row[field], { required, label });
+      if (error) return fail(error.replace(/^Not valid for vCard format yet:\s*/, ''));
+    }
+    const phoneError = validateTelephoneValue(row.phone, { required: false });
+    if (phoneError) return fail(phoneError.replace(/^Not valid for Phone format yet:\s*/, ''));
+    const emailError = validateEmailValue(row.email, { required: false });
+    if (emailError) return fail(emailError.replace(/^Not valid for Email format yet:\s*/, ''));
+    const websiteState = getWebsiteValidationState(row.url, { contextLabel: 'vCard' });
+    if (websiteState.error) return fail(websiteState.error.replace(/^Not valid for vCard format yet:\s*/, ''));
+    if (websiteState.warning) return { error: '', warning: `Bulk Import row ${rowNumber}: ${websiteState.warning}` };
+  }
+
+  return { error: '', warning: '' };
+}
+
 function getFormatValidationState() {
+  if (isBulkMode()) {
+    return getBulkValidationState();
+  }
   if (qrFormat.value === 'url') {
     return getWebsiteValidationState(urlInput.value, {
       required: true,
@@ -3945,6 +4425,8 @@ function setValidationMessage(message, invalidIndexes = [], level = 'error') {
   const activeFieldset = document.querySelector(`.format-fields[data-format-fields="${qrFormat.value}"]`);
   activeFieldset?.classList.toggle('has-error', Boolean(message) && level === 'error');
   activeFieldset?.classList.toggle('has-warning', Boolean(message) && level === 'warning');
+  bulkFields.classList.toggle('has-error', isBulkMode() && Boolean(message) && level === 'error');
+  bulkFields.classList.toggle('has-warning', isBulkMode() && Boolean(message) && level === 'warning');
 
   if (!message) {
     return;
@@ -6249,6 +6731,19 @@ form.addEventListener('submit', (event) => {
 });
 
 form.addEventListener('input', (event) => {
+  if (event.target === bulkEnabled) {
+    setFormatVisibility();
+    activateContentSubtab('data');
+    if (bulkEnabled.checked && bulkFileInput.files?.[0]) {
+      loadBulkFile();
+    } else {
+      renderQr();
+    }
+    return;
+  }
+  if (event.target === bulkFileInput) {
+    return;
+  }
   if ([animationMinutes, animationSeconds, animationMilliseconds].includes(event.target)) {
     syncAnimationDurationSummary();
     return;
@@ -6298,11 +6793,22 @@ clearFileButton.addEventListener('click', () => {
   renderQr();
 });
 
+bulkFileInput.addEventListener('change', loadBulkFile);
+
+bulkClear.addEventListener('click', () => {
+  clearBulkData();
+  renderQr();
+});
+
 qrFormat.addEventListener('change', () => {
   setFormatVisibility();
   syncChoiceButtons();
   syncWifiSecurityState();
   activateContentSubtab('data');
+  if (isBulkMode() && bulkFileInput.files?.[0]) {
+    loadBulkFile();
+    return;
+  }
   renderQr();
 });
 
@@ -6354,6 +6860,10 @@ choiceButtons.forEach((button) => {
     if (target === qrFormat) {
       setFormatVisibility();
       activateContentSubtab('data');
+      if (isBulkMode() && bulkFileInput.files?.[0]) {
+        loadBulkFile();
+        return;
+      }
     }
 
     if (target === downloadFormat) {
