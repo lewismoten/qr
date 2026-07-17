@@ -2,6 +2,33 @@
 
 Simple QR Code Builder
 
+## Build
+
+Install the pinned development dependency and build the deployable assets:
+
+```sh
+npm install
+npm run build
+```
+
+The JavaScript entry point is `src/js/main.js` and the CSS entry point is
+`src/css/main.css`. Add feature modules or component styles through those entry
+points. The build emits minified `dist/app.min.js` and `dist/app.min.css` files,
+plus external source maps for each. `index.html` references only these compiled
+assets.
+
+During development, rebuild automatically when JavaScript or CSS changes:
+
+```sh
+npm run build:watch
+```
+
+Run the QR encoder tests and a production build together with:
+
+```sh
+npm run verify
+```
+
 ## First-party QR encoder
 
 QR generation now runs through the first-party `qr-native.js` implementation.
