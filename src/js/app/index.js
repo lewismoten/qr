@@ -6,13 +6,7 @@ import {
   createCalendarEventId,
   serializeCalendarEvent,
 } from './calendar.js';
-import {
-  cloneCanvas,
-  createAnimatedGifBlob,
-  createGifBlob,
-} from './gif.js';
-import { createAnimatedMp4Blob, getSupportedMp4MimeType } from './mp4.js';
-import { createSvgBlob } from './svg.js';
+import { getSupportedMp4MimeType } from './mp4.js';
 import {
   getWebsiteValidationState,
   isValidBulkDate,
@@ -57,6 +51,7 @@ import {
 import { createContentSubtabs } from './ui/content/subtabs.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { createEventSection } from './ui/content/event/section.js';
+import { createFrameSection } from './ui/content/frame/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
 import { createPhoneSection } from './ui/content/phone/section.js';
@@ -67,6 +62,7 @@ import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createOutlineSelector } from './ui/debug/outline.js';
 import { createDownloadSubtabs } from './ui/download/subtabs.js';
 import { createAnimationSection } from './ui/download/animation/section.js';
+import { createDownloadActions } from './ui/download/actions.js';
 import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { createPrimaryTabs } from './ui/navigation.js';
@@ -76,13 +72,6 @@ import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
 import { createEyeShapeSection } from './ui/style/eyes/section.js';
 import { createModuleShapeSection } from './ui/style/modules/section.js';
-import { createZipBlob } from './zip.js';
-import { canvasToBlob } from './canvas-export.js';
-import {
-  capturePdfFrame as encodePdfFrame,
-  createPdfBlob as encodePdfBlob,
-  createPdfSheetBlob,
-} from './pdf.js';
 import qrEncoder from '../qr/index.js';
 
 const form = document.getElementById('qr-form');
@@ -424,7 +413,6 @@ const MAX_QR_TARGET_WIDTH = 2048;
 const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
 const PRINT_PIXELS_PER_INCH = 192;
 const MIN_PRINT_MODULE_INCHES = 0.02;
-const ANIMATION_MAX_FRAMES = 200;
 const CALENDAR_TITLE_MAX_LENGTH = 120;
 const CALENDAR_LOCATION_MAX_LENGTH = 160;
 const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
@@ -496,234 +484,6 @@ function clearCanvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function getPdfQuality() {
-  return (Number.parseInt(downloadQuality.value, 10) || 92) / 100;
-}
-
-function createPdfBlob(sourceCanvas) {
-  return encodePdfBlob(sourceCanvas, getPdfQuality(), getPrintWidthInches(sourceCanvas));
-}
-
-function capturePdfFrame(sourceCanvas) {
-  return encodePdfFrame(sourceCanvas, getPdfQuality(), getPrintWidthInches(sourceCanvas));
-}
-
-function pushUint32(bytes, value) {
-  bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
-}
-
-async function exportCanvas(sourceCanvas, format) {
-  if (format === 'jpg') {
-    return canvasToBlob(sourceCanvas, 'image/jpeg', (Number.parseInt(downloadQuality.value, 10) || 92) / 100, true);
-  }
-  if (format === 'gif') {
-    return createGifBlob(sourceCanvas);
-  }
-  if (format === 'svg') {
-    return createSvgBlob(sourceCanvas);
-  }
-  if (format === 'pdf') {
-    return createPdfBlob(sourceCanvas);
-  }
-  return canvasToBlob(sourceCanvas, 'image/png');
-}
-
-function triggerBlobDownload(blob, name) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = name;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-function getExportExtension(format) {
-  return format === 'jpeg' ? 'jpg' : format;
-}
-
-async function downloadCurrentCanvas() {
-  const format = downloadFormat.value;
-  setAnimationExportButtonsDisabled(true);
-  downloadStatus.textContent = `Creating ${format.toUpperCase()}...`;
-  try {
-    const blob = await exportCanvas(canvas, format);
-    const frameCount = getDownloadFrameCount();
-    const frame = getCurrentFrameIndex();
-    const suffix = frameCount > 1 ? `-${String(frame).padStart(String(frameCount).length, '0')}` : '';
-    triggerBlobDownload(blob, `qr-code${suffix}.${getExportExtension(format)}`);
-    downloadStatus.textContent = 'Download ready.';
-  } catch (error) {
-    downloadStatus.textContent = error.message || 'Unable to create download.';
-    console.error(error);
-  } finally {
-    setAnimationExportButtonsDisabled(false);
-  }
-}
-
-async function downloadCurrentPdfDocument() {
-  setAnimationExportButtonsDisabled(true);
-  downloadStatus.textContent = 'Creating PDF...';
-  try {
-    const frameCount = getDownloadFrameCount();
-    const frame = getCurrentFrameIndex();
-    const suffix = frameCount > 1 ? `-${String(frame).padStart(String(frameCount).length, '0')}` : '';
-    triggerBlobDownload(await createPdfBlob(canvas), `qr-code${suffix}.pdf`);
-    downloadStatus.textContent = 'PDF ready.';
-  } catch (error) {
-    downloadStatus.textContent = error.message || 'Unable to create PDF.';
-    console.error(error);
-  } finally {
-    setAnimationExportButtonsDisabled(false);
-  }
-}
-
-async function downloadAllFramesAsZip() {
-  const total = getDownloadFrameCount();
-  if (total <= 1) {
-    return;
-  }
-  const originalFrame = getCurrentFrameIndex();
-  const format = downloadFormat.value;
-  const extension = getExportExtension(format);
-  const width = String(total).length;
-  const files = [];
-  setAnimationExportButtonsDisabled(true);
-  try {
-    for (let frame = 1; frame <= total; frame += 1) {
-      downloadStatus.textContent = `Rendering ${frame} of ${total}...`;
-      setCurrentFrameIndex(frame);
-      syncChunkPreviewNavigation();
-      await renderQr();
-      files.push({
-        name: `qr-code-${String(frame).padStart(width, '0')}.${extension}`,
-        blob: await exportCanvas(canvas, format),
-      });
-    }
-    downloadStatus.textContent = 'Building ZIP...';
-    const zip = await createZipBlob(files);
-    triggerBlobDownload(zip, `qr-codes-${total}.zip`);
-    downloadStatus.textContent = `ZIP ready with ${total} files.`;
-  } catch (error) {
-    downloadStatus.textContent = error.message || 'Unable to create ZIP.';
-    console.error(error);
-  } finally {
-    setCurrentFrameIndex(originalFrame);
-    syncChunkPreviewNavigation();
-    await renderQr();
-    setAnimationExportButtonsDisabled(false);
-  }
-}
-
-async function downloadAllFramesAsPdf() {
-  const total = getDownloadFrameCount();
-  if (total <= 1) {
-    return;
-  }
-
-  const originalFrame = getCurrentFrameIndex();
-  const frames = [];
-  setAnimationExportButtonsDisabled(true);
-  try {
-    for (let frame = 1; frame <= total; frame += 1) {
-      downloadStatus.textContent = `Rendering PDF frame ${frame} of ${total}...`;
-      setCurrentFrameIndex(frame);
-      syncChunkPreviewNavigation();
-      await renderQr();
-      frames.push(await capturePdfFrame(canvas));
-    }
-    downloadStatus.textContent = 'Laying out PDF pages...';
-    const { framesPerPage } = getPdfSheetLayout(frames);
-    triggerBlobDownload(createPdfSheetBlob(frames), `qr-codes-${total}.pdf`);
-    const pages = Math.ceil(total / framesPerPage);
-    downloadStatus.textContent = `PDF ready with ${total} QR codes on ${pages} ${pages === 1 ? 'page' : 'pages'}.`;
-  } catch (error) {
-    downloadStatus.textContent = error.message || 'Unable to create PDF.';
-    console.error(error);
-  } finally {
-    setCurrentFrameIndex(originalFrame);
-    syncChunkPreviewNavigation();
-    await renderQr();
-    setAnimationExportButtonsDisabled(false);
-  }
-}
-
-function setAnimationExportButtonsDisabled(disabled) {
-  downloadCurrent.disabled = disabled;
-  downloadCurrentPdf.disabled = disabled;
-  downloadZip.disabled = disabled;
-  downloadAllPdf.disabled = disabled;
-  downloadAnimatedGif.disabled = disabled;
-  downloadAnimationMp4.disabled = disabled;
-}
-
-async function captureAllAnimationFrames(total) {
-  const originalFrame = getCurrentFrameIndex();
-  const frames = [];
-  try {
-    for (let frame = 1; frame <= total; frame += 1) {
-      downloadStatus.textContent = `Capturing animation frame ${frame} of ${total}...`;
-      setCurrentFrameIndex(frame);
-      syncChunkPreviewNavigation();
-      await renderQr();
-      frames.push(cloneCanvas(canvas));
-      await new Promise((resolve) => window.setTimeout(resolve, 0));
-    }
-    return frames;
-  } finally {
-    setCurrentFrameIndex(originalFrame);
-    syncChunkPreviewNavigation();
-    await renderQr();
-  }
-}
-
-async function downloadAnimation(format) {
-  const total = getDownloadFrameCount();
-  if (total <= 1) {
-    return;
-  }
-  if (total > ANIMATION_MAX_FRAMES) {
-    downloadStatus.textContent = `Animation is limited to ${ANIMATION_MAX_FRAMES} images to protect browser memory.`;
-    return;
-  }
-
-  const { enteredDurationMs, perFrameMs, totalDurationMs } = getAnimationTiming(total);
-  if (enteredDurationMs <= 0 || perFrameMs < 10) {
-    downloadStatus.textContent = 'Choose a duration that provides at least 10 milliseconds per image.';
-    return;
-  }
-  if (format === 'gif' && perFrameMs > 655350) {
-    downloadStatus.textContent = 'GIF supports at most 10 minutes 55.35 seconds per image.';
-    return;
-  }
-  if (format === 'mp4' && perFrameMs < 16) {
-    downloadStatus.textContent = 'MP4 needs at least 16 milliseconds per image.';
-    return;
-  }
-
-  setAnimationExportButtonsDisabled(true);
-  try {
-    const frames = await captureAllAnimationFrames(total);
-    if (format === 'gif') {
-      downloadStatus.textContent = 'Encoding animated GIF...';
-      triggerBlobDownload(createAnimatedGifBlob(frames, perFrameMs), `qr-animation-${total}.gif`);
-      downloadStatus.textContent = `Animated GIF ready - ${formatAnimationDuration(totalDurationMs)} total.`;
-      return;
-    }
-
-    downloadStatus.textContent = `Recording MP4 in real time - ${formatAnimationDuration(totalDurationMs)}...`;
-    const blob = await createAnimatedMp4Blob(frames, perFrameMs, (frame, frameTotal) => {
-      downloadStatus.textContent = `Recording MP4 frame ${frame} of ${frameTotal}...`;
-    });
-    triggerBlobDownload(blob, `qr-animation-${total}.mp4`);
-    downloadStatus.textContent = 'MP4 ready.';
-  } catch (error) {
-    downloadStatus.textContent = error.message || `Unable to create ${format.toUpperCase()} animation.`;
-    console.error(error);
-  } finally {
-    setAnimationExportButtonsDisabled(false);
-  }
-}
-
 function readInteger(inputElement) {
   if (!inputElement?.value.trim()) {
     return undefined;
@@ -784,211 +544,6 @@ function formatScaleLabel() {
 
 function formatMarginLabel() {
   qrMarginValue.textContent = qrMargin.value;
-}
-
-function shortenFrameValue(value, maximumLength = 64) {
-  const normalized = String(value || '').replace(/\s+/g, ' ').trim();
-  if (normalized.length <= maximumLength) {
-    return normalized;
-  }
-  return `${normalized.slice(0, Math.max(0, maximumLength - 3)).trimEnd()}...`;
-}
-
-function getShortTextFrameValue(value) {
-  const normalized = String(value || '').trim();
-  if (!normalized) {
-    return '';
-  }
-
-  try {
-    const url = new URL(normalized);
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      const host = url.host.replace(/^www\./i, '');
-      const path = url.pathname === '/' ? '' : url.pathname.replace(/\/$/, '');
-      return shortenFrameValue(`${host}${path}`);
-    }
-  } catch (error) {
-    // Plain text and incomplete URLs fall through to a compact text label.
-  }
-
-  const domainLikeValue = normalized.match(/^(?:https?:\/\/)?(?:www\.)?([^\s?#]+)(?:[?#].*)?$/i);
-  return shortenFrameValue(domainLikeValue ? domainLikeValue[1].replace(/\/$/, '') : normalized);
-}
-
-function getAutomaticNumberFrameMessage() {
-  return shortenFrameValue(getNumberPayload());
-}
-
-function getAutomaticFileFrameMessage() {
-  const fileName = getActiveFile()?.name || '';
-  if (!fileName || getSelectedFileEncodingMode() !== 'chunked') {
-    return shortenFrameValue(fileName);
-  }
-
-  const total = Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
-  const current = Math.min(total, Math.max(1, Number.parseInt(fileChunkIndex.value, 10) || 1));
-  const sequence = ` ${current} of ${total}`;
-  const shortenedName = shortenFrameValue(fileName, Math.max(8, 64 - sequence.length));
-  return `${shortenedName}${sequence}`;
-}
-
-function parseCalendarFrameDate(value) {
-  const [year, month, day] = value.split('-').map(Number);
-  if (!year || !month || !day) {
-    return null;
-  }
-  return new Date(year, month - 1, day, 12);
-}
-
-function formatCalendarFrameDate(value, includeYear = true) {
-  const date = parseCalendarFrameDate(value);
-  if (!date) {
-    return '';
-  }
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    ...(includeYear ? { year: 'numeric' } : {}),
-  }).format(date);
-}
-
-function formatCalendarFrameTime(value) {
-  if (!value) {
-    return '';
-  }
-  const [hour, minute] = value.split(':').map(Number);
-  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
-    return '';
-  }
-  const date = new Date(2000, 0, 1, hour, minute);
-  return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date);
-}
-
-function getAutomaticCalendarFrameMessage() {
-  const startDate = formatCalendarFrameDate(eventStartDate.value);
-  if (!startDate || !eventEndDate.value) {
-    return shortenFrameValue(eventTitle.value, 80);
-  }
-  const sameDate = eventStartDate.value === eventEndDate.value;
-  const sameYear = eventStartDate.value.slice(0, 4) === eventEndDate.value.slice(0, 4);
-  const endDate = sameDate
-    ? ''
-    : formatCalendarFrameDate(eventEndDate.value);
-  let schedule = sameDate ? startDate : `${formatCalendarFrameDate(eventStartDate.value, !sameYear)} - ${endDate}`;
-
-  if (eventAllDay.checked) {
-    schedule = `${schedule} | All day`;
-  } else {
-    const startTime = formatCalendarFrameTime(eventStartTime.value);
-    const endTime = formatCalendarFrameTime(eventEndTime.value);
-    if (sameDate) {
-      schedule = `${schedule} | ${startTime} - ${endTime}`;
-    } else {
-      schedule = `${formatCalendarFrameDate(eventStartDate.value, !sameYear)} ${startTime} - ${endDate} ${endTime}`;
-    }
-  }
-
-  const cleanSchedule = schedule.replace(/\s+/g, ' ').trim();
-  const title = shortenFrameValue(eventTitle.value, 80);
-  return [title, shortenFrameValue(cleanSchedule, 80)].filter(Boolean).join('\n');
-}
-
-function getAutomaticBulkFrameMessage() {
-  const row = getBulkCurrentRow();
-  if (!row) return '';
-  switch (qrFormat.value) {
-    case 'url': return getShortTextFrameValue(row.url);
-    case 'text': return getShortTextFrameValue(row.text);
-    case 'number': return shortenFrameValue(buildBulkEncodedText(row));
-    case 'wifi': return row.ssid.trim() ? shortenFrameValue(`Wi-Fi ${row.ssid.trim()}`) : '';
-    case 'email': return row.email.trim() ? shortenFrameValue(`Email ${row.email.trim()}`) : '';
-    case 'phone': return row.phone.trim() ? shortenFrameValue(`Call ${row.phone.trim()}`) : '';
-    case 'sms': return row.phone.trim() ? shortenFrameValue(`Text ${row.phone.trim()}`) : '';
-    case 'event': {
-      const title = shortenFrameValue(row.title, 80);
-      const dates = row.start_date === row.end_date ? row.start_date : `${row.start_date} - ${row.end_date}`;
-      const times = parseBulkBoolean(row.all_day) ? 'All day' : `${row.start_time} - ${row.end_time}`;
-      return [title, shortenFrameValue(`${dates} | ${times}`, 80)].filter(Boolean).join('\n');
-    }
-    case 'geo': return shortenFrameValue(`Location ${row.label.trim() || `${row.latitude}, ${row.longitude}`}`);
-    case 'vcard': return shortenFrameValue(`Contact ${row.name || row.organization || row.email}`);
-    default: return '';
-  }
-}
-
-function getAutomaticFrameMessage() {
-  if (isBulkMode()) {
-    return getAutomaticBulkFrameMessage();
-  }
-  switch (qrFormat.value) {
-    case 'url':
-      return getShortTextFrameValue(urlInput.value);
-    case 'text':
-      return getShortTextFrameValue(textInput.value);
-    case 'number':
-      return getAutomaticNumberFrameMessage();
-    case 'wifi':
-      return wifiSsid.value ? shortenFrameValue(`Wi-Fi ${wifiSsid.value}`) : '';
-    case 'email':
-      return emailTo.value ? shortenFrameValue(`Email ${emailTo.value}`) : '';
-    case 'phone':
-      return phoneNumber.value ? shortenFrameValue(`Call ${phoneNumber.value}`) : '';
-    case 'sms':
-      return smsNumber.value ? shortenFrameValue(`Text ${smsNumber.value}`) : '';
-    case 'event':
-      return getAutomaticCalendarFrameMessage();
-    case 'geo':
-      {
-        const location =
-          geoQuery.value || (geoLatitude.value && geoLongitude.value ? `${geoLatitude.value}, ${geoLongitude.value}` : '');
-        return location ? shortenFrameValue(`Location ${location}`) : '';
-      }
-    case 'vcard':
-      {
-        const contact = vcardName.value || vcardOrg.value || vcardEmail.value;
-        return contact ? shortenFrameValue(`Contact ${contact}`) : '';
-      }
-    case 'file':
-      return getAutomaticFileFrameMessage();
-    default:
-      return '';
-  }
-}
-
-function getCurrentFrameMessage() {
-  const isCustom = frameMessageMode.value === 'custom';
-  customFrameMessageField.hidden = !isCustom;
-
-  return (
-    frameMessageMode.value === 'none'
-      ? ''
-      : isCustom
-        ? shortenFrameValue(customFrameMessage.value, 80)
-        : getAutomaticFrameMessage()
-  );
-}
-
-function setFrameMessageCenter(enabled) {
-  frameMessageCenter.checked = enabled;
-  frameMessageCenterArt.checked = enabled;
-  if (enabled && centerArtMode.value !== 'none') {
-    centerArtMode.value = 'none';
-    syncChoiceButtons();
-    syncCenterArtworkControls();
-  }
-}
-
-function getFrameFont(size) {
-  const fonts = {
-    sans: `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`,
-    rounded: `800 ${size}px "Arial Rounded MT Bold", "Trebuchet MS", sans-serif`,
-    serif: `700 ${size}px Georgia, "Times New Roman", serif`,
-    mono: `700 ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
-  };
-  return fonts[frameFont.value] || fonts.sans;
 }
 
 const moduleShapeSection = createModuleShapeSection({
@@ -1991,6 +1546,27 @@ const getAnimationTiming = animationSection.getTiming;
 const formatAnimationDuration = animationSection.formatDuration;
 const syncAnimationDurationSummary = animationSection.sync;
 
+createDownloadActions({
+  canvas,
+  formatInput: downloadFormat,
+  qualityInput: downloadQuality,
+  status: downloadStatus,
+  currentButton: downloadCurrent,
+  currentPdfButton: downloadCurrentPdf,
+  zipButton: downloadZip,
+  allPdfButton: downloadAllPdf,
+  gifButton: downloadAnimatedGif,
+  mp4Button: downloadAnimationMp4,
+  getPrintWidthInches,
+  getFrameCount: getDownloadFrameCount,
+  getCurrentFrame: getCurrentFrameIndex,
+  setCurrentFrame: setCurrentFrameIndex,
+  syncFrameNavigation: syncChunkPreviewNavigation,
+  render: renderQr,
+  getAnimationTiming,
+  formatAnimationDuration,
+});
+
 const wifiSection = createWifiSection({
   ssid: wifiSsid,
   password: wifiPassword,
@@ -2124,6 +1700,55 @@ function buildBulkEncodedText(row = getBulkCurrentRow()) {
       return '';
   }
 }
+
+const frameSection = createFrameSection({
+  format: qrFormat,
+  isBulkMode,
+  getBulkRow: getBulkCurrentRow,
+  buildBulkText: buildBulkEncodedText,
+  parseBoolean: parseBulkBoolean,
+  getNumberPayload,
+  getActiveFile,
+  getFileMode: getSelectedFileEncodingMode,
+  fileIndex: fileChunkIndex,
+  mode: frameMessageMode,
+  customField: customFrameMessageField,
+  customMessage: customFrameMessage,
+  centerCheckbox: frameMessageCenter,
+  artCenterCheckbox: frameMessageCenterArt,
+  artMode: centerArtMode,
+  font: frameFont,
+  values: {
+    url: urlInput,
+    text: textInput,
+    wifi: wifiSsid,
+    email: emailTo,
+    phone: phoneNumber,
+    sms: smsNumber,
+    geoLabel: geoQuery,
+    latitude: geoLatitude,
+    longitude: geoLongitude,
+    vcardName,
+    vcardOrg,
+    vcardEmail,
+  },
+  event: {
+    title: eventTitle,
+    allDay: eventAllDay,
+    startDate: eventStartDate,
+    startTime: eventStartTime,
+    endDate: eventEndDate,
+    endTime: eventEndTime,
+  },
+  onDisableArtwork() {
+    centerArtMode.value = 'none';
+    syncChoiceButtons();
+    syncCenterArtworkControls();
+  },
+});
+const getCurrentFrameMessage = frameSection.getMessage;
+const setFrameMessageCenter = frameSection.setCentered;
+const getFrameFont = frameSection.getFont;
 
 async function buildEncodedText() {
   if (isBulkMode()) {
@@ -4805,13 +4430,6 @@ centerLogoClear.addEventListener('click', () => {
   centerLogoInput.value = '';
   renderQr();
 });
-
-downloadCurrent.addEventListener('click', downloadCurrentCanvas);
-downloadCurrentPdf.addEventListener('click', downloadCurrentPdfDocument);
-downloadZip.addEventListener('click', downloadAllFramesAsZip);
-downloadAllPdf.addEventListener('click', downloadAllFramesAsPdf);
-downloadAnimatedGif.addEventListener('click', () => downloadAnimation('gif'));
-downloadAnimationMp4.addEventListener('click', () => downloadAnimation('mp4'));
 
 fileChunkIndex.addEventListener('input', () => {
   invalidateChunkCapacityCache();

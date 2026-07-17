@@ -63,7 +63,7 @@ export async function capturePdfFrame(sourceCanvas, quality, printWidthInches) {
   };
 }
 
-function getPdfSheetLayout(frames) {
+export function getPdfSheetLayout(frames) {
   const pageWidth = 612;
   const pageHeight = 792;
   const margin = 36;
@@ -140,4 +140,3 @@ export function createPdfSheetBlob(frames) {
   objects[1] = textBytes(`<< /Type /Pages /Kids [${pageReferences.map((reference) => `${reference} 0 R`).join(' ')}] /Count ${pageReferences.length} >>`);
   return createPdfDocumentBlob(objects);
 }
-
