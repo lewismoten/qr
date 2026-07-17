@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/js/app/ui/download/image/section.js"],
-  "sourcesContent": ["export function createDownloadImageSection({ format, qualityControls, quality,\n  qualityValue, zip, getFrameCount }) {\n  const sync = () => {\n    qualityControls.hidden = format.value !== 'jpg';\n    qualityValue.textContent = `${quality.value}%`;\n    const count = getFrameCount();\n    zip.hidden = count <= 1;\n    if (count > 1) zip.textContent = `Download all ${count} as ZIP`;\n  };\n  return { sync };\n}\n"],
-  "mappings": "AAAO,SAASA,EAA2B,CAAE,OAAAC,EAAQ,gBAAAC,EAAiB,QAAAC,EACpE,aAAAC,EAAc,IAAAC,EAAK,cAAAC,CAAc,EAAG,CAQpC,MAAO,CAAE,KAPI,IAAM,CACjBJ,EAAgB,OAASD,EAAO,QAAU,MAC1CG,EAAa,YAAc,GAAGD,EAAQ,KAAK,IAC3C,IAAMI,EAAQD,EAAc,EAC5BD,EAAI,OAASE,GAAS,EAClBA,EAAQ,IAAGF,EAAI,YAAc,gBAAgBE,CAAK,UACxD,CACc,CAChB",
-  "names": ["createDownloadImageSection", "format", "qualityControls", "quality", "qualityValue", "zip", "getFrameCount", "count"]
-}

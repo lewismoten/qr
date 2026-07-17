@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createLazyPixelArtEditor(options, { isActive, onReady }) {
   let editor = null;
   let request = null;
@@ -5,7 +7,7 @@ export function createLazyPixelArtEditor(options, { isActive, onReady }) {
   const getSize = () => Number.parseInt(options.sizeInput.value, 10) || 16;
   const syncFallbackLabel = () => {
     const size = getSize();
-    options.sizeValue.textContent = `${size} x ${size}`;
+    options.sizeValue.textContent = lookup('units.dimensions', '{width} x {height}', { width: size, height: size });
   };
   const load = () => {
     if (editor) return Promise.resolve(editor);

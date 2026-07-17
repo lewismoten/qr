@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/download/image/section.js"],
+  "sourcesContent": ["import { lookup } from '../../../../i18n/index.js';\n\nexport function createDownloadImageSection({ format, qualityControls, quality,\n  qualityValue, zip, getFrameCount }) {\n  const sync = () => {\n    qualityControls.hidden = format.value !== 'jpg';\n    qualityValue.textContent = lookup('units.percent', '{value}%', { value: quality.value });\n    const count = getFrameCount();\n    zip.hidden = count <= 1;\n    if (count > 1) zip.textContent = lookup('download.allZip', 'Download all {count} as ZIP', { count });\n  };\n  return { sync };\n}\n"],
+  "mappings": "wCAEO,SAASA,EAA2B,CAAE,OAAAC,EAAQ,gBAAAC,EAAiB,QAAAC,EACpE,aAAAC,EAAc,IAAAC,EAAK,cAAAC,CAAc,EAAG,CAQpC,MAAO,CAAE,KAPI,IAAM,CACjBJ,EAAgB,OAASD,EAAO,QAAU,MAC1CG,EAAa,YAAcG,EAAO,gBAAiB,WAAY,CAAE,MAAOJ,EAAQ,KAAM,CAAC,EACvF,IAAMK,EAAQF,EAAc,EAC5BD,EAAI,OAASG,GAAS,EAClBA,EAAQ,IAAGH,EAAI,YAAcE,EAAO,kBAAmB,8BAA+B,CAAE,MAAAC,CAAM,CAAC,EACrG,CACc,CAChB",
+  "names": ["createDownloadImageSection", "format", "qualityControls", "quality", "qualityValue", "zip", "getFrameCount", "lookup", "count"]
+}

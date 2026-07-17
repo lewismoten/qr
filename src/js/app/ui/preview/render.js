@@ -1,3 +1,5 @@
+import { getErrorText, lookup } from '../../../i18n/index.js';
+
 export function createRenderController(deps) {
   let request = 0;
 
@@ -36,7 +38,7 @@ export function createRenderController(deps) {
 
     const modeValid = deps.validateMode(encodedText);
     if (!encodedText.trim()) {
-      const message = 'Not valid yet: content is required.';
+      const message = lookup('validation.contentRequired', 'Not valid yet: content is required.');
       deps.setValidation(message);
       deps.renderInvalid(deps.buildPreview(), options, message);
       deps.updateSummary(null, options);
@@ -55,7 +57,7 @@ export function createRenderController(deps) {
       deps.drawQr(definition, options);
       deps.syncDownloads();
     } catch (error) {
-      const message = error.message || 'Unable to encode this content.';
+      const message = getErrorText(error, lookup('preview.encodeError', 'Unable to encode this content.'));
       deps.setValidation(message);
       deps.renderInvalid(encodedText || deps.buildPreview(), options, message);
       deps.updateSummary(null, options);

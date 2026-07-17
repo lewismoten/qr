@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxLength }) {
   const actions = {
     syncSizeLabels: systems.previewControls.syncLabels,
@@ -14,17 +16,19 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxL
     syncFileCapacityHint: systems.contentData.syncFileCapacityHint,
   };
   function formatVersion() {
-    e.qrVersionValue.textContent = e.versionAuto.checked ? 'Auto' : e.qrVersion.value;
+    e.qrVersionValue.textContent = e.versionAuto.checked ? lookup('common.auto', 'Auto') : e.qrVersion.value;
   }
 
   function formatErrorCorrection() {
     const selected = getErrorLevel();
-    e.errorCorrectionLabel.textContent = selected.label;
-    e.errorCorrectionHelp.textContent = selected.detail;
+    e.errorCorrectionLabel.textContent = lookup(`errorCorrection.${selected.value}.label`, selected.label);
+    e.errorCorrectionHelp.textContent = lookup(`errorCorrection.${selected.value}.detail`, selected.detail);
   }
 
   function syncSmsLength() {
-    e.smsLengthHint.textContent = `${e.smsBody.value.length} / ${smsMaxLength}`;
+    e.smsLengthHint.textContent = lookup('common.count', '{current} / {total}', {
+      current: e.smsBody.value.length, total: smsMaxLength,
+    });
   }
 
   function sync() {
@@ -34,7 +38,7 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel, smsMaxL
     actions.syncNumberSequenceControls();
     actions.syncFrameMessageControls();
     e.frameMessageCenterArt.checked = e.frameMessageCenter.checked;
-    e.frameLineHeightValue.textContent = `${e.frameLineHeight.value} px`;
+    e.frameLineHeightValue.textContent = lookup('units.pixels', '{value} px', { value: e.frameLineHeight.value });
     actions.syncModuleShapeControls();
     actions.syncEyeShapeControls();
     actions.syncCenterArtworkControls();

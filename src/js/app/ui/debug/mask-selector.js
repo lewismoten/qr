@@ -1,5 +1,6 @@
 import { isMaskActive } from '../../../qr/mask.js';
 import { isFunctionModule } from '../../qr-regions.js';
+import { lookup } from '../../../i18n/index.js';
 
 const MASK_BLUE = '#2563eb';
 
@@ -64,10 +65,10 @@ export function createMaskSelector({ grid, input, values, encoder, moduleIsDark,
     if (maskValue === '') {
       preview.classList.add('mask-preview-auto');
       const autoTitle = document.createElement('span');
-      autoTitle.textContent = 'Auto';
+      autoTitle.textContent = lookup('common.auto', 'Auto');
       const autoValue = document.createElement('span');
       autoValue.className = 'mask-auto-value';
-      autoValue.textContent = 'Mask -';
+      autoValue.textContent = lookup('mask.value', 'Mask {value}', { value: '-' });
       preview.append(autoTitle, autoValue);
     } else {
       const thumbnail = document.createElement('canvas');
@@ -79,7 +80,9 @@ export function createMaskSelector({ grid, input, values, encoder, moduleIsDark,
 
     const label = document.createElement('span');
     label.className = 'mask-label';
-    label.textContent = maskValue === '' ? 'Best fit' : `Mask ${maskValue}`;
+    label.textContent = maskValue === ''
+      ? lookup('mask.bestFit', 'Best fit')
+      : lookup('mask.value', 'Mask {value}', { value: maskValue });
     button.append(preview, label);
     button.addEventListener('click', () => {
       input.value = maskValue;
@@ -97,7 +100,7 @@ export function createMaskSelector({ grid, input, values, encoder, moduleIsDark,
   const updateAutoMask = (definition) => {
     const value = grid.querySelector('.mask-auto-value');
     if (value && Number.isInteger(definition?.maskPattern)) {
-      value.textContent = `Mask ${definition.maskPattern}`;
+      value.textContent = lookup('mask.value', 'Mask {value}', { value: definition.maskPattern });
     }
   };
 
@@ -107,7 +110,7 @@ export function createMaskSelector({ grid, input, values, encoder, moduleIsDark,
       if (input.value === '') updateAutoMask(appliedDefinition);
       return;
     }
-    const previewValue = encodedText.trim() || 'Preview';
+    const previewValue = encodedText.trim() || lookup('common.preview', 'Preview');
     try {
       updateAutoMask(encoder.create(previewValue, buildOptions('')));
     } catch (error) {

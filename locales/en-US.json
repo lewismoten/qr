@@ -10,11 +10,282 @@
     "format": "Format",
     "frame": "Frame"
   },
+  "formats": {
+    "url": "URL",
+    "event": "Event",
+    "vcard": "vCard",
+    "sms": "SMS",
+    "email": "Email",
+    "phone": "Phone"
+  },
+  "fields": {
+    "title": "title",
+    "location": "location",
+    "description": "description",
+    "recipientEmail": "recipient email address",
+    "fullName": "full name",
+    "organization": "organization",
+    "vcardPhone": "vCard phone number",
+    "vcardEmail": "vCard email address",
+    "smsPhone": "SMS phone number",
+    "emailAddress": "email address",
+    "telephoneNumber": "telephone number",
+    "subject": "subject",
+    "body": "body",
+    "message": "message",
+    "prefix": "prefix",
+    "suffix": "suffix"
+  },
   "footer": {
     "name": "QR Code Generator",
     "about": "About",
     "specification": "QR spec",
     "technology": "Technology",
     "source": "Source"
+  },
+  "validation": {
+    "contentRequired": "Not valid yet: content is required.",
+    "email": {
+      "required": "Not valid for {context} format yet: {label} is required.",
+      "invalid": "Not valid for {context} format yet: {label} must be valid.",
+      "length": "Not valid for {context} format yet: {label} should stay within 254 characters.",
+      "subjectLabel": "Not valid for Email format yet: subject",
+      "bodyLabel": "Not valid for Email format yet: body",
+      "capacity": "Not valid for Email format yet: body exceeds the current QR capacity ({current} / {max})."
+    },
+    "text": {
+      "length": "{label} should stay within {maxLength} characters.",
+      "printable": "{label} can only use printable characters."
+    },
+    "phone": {
+      "required": "Not valid for {context} format yet: {label} is required.",
+      "characters": "Not valid for {context} format yet: {label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.",
+      "plus": "Not valid for {context} format yet: {label} can only use + at the beginning.",
+      "length": "Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits."
+    },
+    "geo": {
+      "labelLength": "Not valid for Geo format yet: label should stay within 80 characters.",
+      "labelCharacters": "Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.",
+      "latitudeRequired": "Not valid for Geo format yet: latitude is required.",
+      "longitudeRequired": "Not valid for Geo format yet: longitude is required.",
+      "latitudeNumber": "Not valid for Geo format yet: latitude must be a valid number.",
+      "longitudeNumber": "Not valid for Geo format yet: longitude must be a valid number.",
+      "latitudeRange": "Not valid for Geo format yet: latitude must be between -90 and 90.",
+      "longitudeRange": "Not valid for Geo format yet: longitude must be between -180 and 180."
+    },
+    "vcard": {
+      "required": "Not valid for vCard format yet: {label} is required.",
+      "length": "Not valid for vCard format yet: {label} should stay within {maxLength} characters.",
+      "characters": "Not valid for vCard format yet: {label} can only use letters, numbers, spaces, and common punctuation."
+    },
+    "website": {
+      "required": "Not valid for {context} format yet: website is required.",
+      "length": "Not valid for {context} format yet: website should stay within 2048 characters.",
+      "protocolRequired": "Not valid for {context} format yet: website must include a full protocol such as https://.",
+      "protocol": "Not valid for {context} format yet: website should start with https:// or http://.",
+      "insecure": "Warning for {context} format: website uses http://. https:// is strongly recommended."
+    },
+    "event": {
+      "required": "Not valid for Event format yet: {label} is required.",
+      "length": "Not valid for Event format yet: {label} should stay within {maxLength} characters.",
+      "characters": "Not valid for Event format yet: {label} contains unsupported control characters.",
+      "startDate": "Not valid for Event format yet: start date is required.",
+      "endDate": "Not valid for Event format yet: end date is required.",
+      "dateOrder": "Not valid for Event format yet: end date cannot be before start date.",
+      "startTime": "Not valid for Event format yet: start time is required.",
+      "endTime": "Not valid for Event format yet: end time is required.",
+      "timeOrder": "Not valid for Event format yet: end must be after start."
+    },
+    "sms": {
+      "length": "Not valid for SMS format yet: message should stay at {maxLength} characters or fewer for broad SMS compatibility."
+    },
+    "file": {
+      "required": "Not valid for File format yet: choose a file to encode.",
+      "embeddedWarning": "Warning for File format: this shareable download URL embeds the file bytes directly, so larger files will hit QR capacity quickly.",
+      "chunksWarning": "Warning for File format: this compact FILE stream is split across {totalChunks} QR codes. Each scan needs the same file ID plus every chunk to reconstruct the file."
+    },
+    "number": {
+      "start": "Not valid for Number format yet: start must be a whole number.",
+      "end": "Not valid for Number format yet: end must be a whole number.",
+      "step": "Not valid for Number format yet: step must be a positive whole number.",
+      "range": "Not valid for Number format yet: the range creates {total} QR codes; limit it to {maxFrames} or fewer.",
+      "fieldLabel": "Not valid for Number format yet: {label}"
+    }
+  },
+  "common": {
+    "auto": "Auto",
+    "autoLower": "auto",
+    "none": "none",
+    "preview": "Preview",
+    "sequence": "{current} of {total}",
+    "count": "{current} / {total}"
+  },
+  "bulk": {
+    "loading": "Bulk Import tools are loading.",
+    "warning": "Bulk Import row {rowNumber}: {message}",
+    "requiredValues": "Required values: {values}",
+    "status": {
+      "empty": "No CSV loaded.",
+      "loaded": "{count} rows loaded. Showing {current} of {count}."
+    },
+    "csv": {
+      "empty": "The CSV is empty.",
+      "duplicateFields": "The first row contains duplicate field names.",
+      "missingFields": "The first row is missing: {fields}.",
+      "rowLimit": "Bulk imports are limited to {maxRows} data rows.",
+      "noRows": "The CSV has a header row but no data rows.",
+      "fileSize": "The CSV is {size}; Bulk Import CSV files are limited to {maxSize}.",
+      "readError": "Unable to read this CSV.",
+      "unclosedQuote": "The CSV contains an unclosed quoted value."
+    },
+    "validation": {
+      "parse": "Not valid for Bulk Import yet: {message}",
+      "fileRequired": "Not valid for Bulk Import yet: choose a CSV file.",
+      "rowRequired": "Not valid for Bulk Import yet: the CSV needs at least one data row.",
+      "row": "Not valid for Bulk Import row {rowNumber}: {message}",
+      "fieldRequired": "{field} is required.",
+      "textRequired": "text is required.",
+      "wholeNumber": "number must be a whole number.",
+      "security": "security must be WPA, WEP, or open.",
+      "booleanHidden": "hidden must be true/false, yes/no, or 1/0.",
+      "booleanAllDay": "all_day must be true/false, yes/no, or 1/0.",
+      "dates": "start_date and end_date must be real dates using YYYY-MM-DD.",
+      "times": "start_time and end_time must be real 24-hour times using HH:MM unless all_day is true.",
+      "eventOrder": "the event end must be after its start.",
+      "latitude": "latitude must be a number between -90 and 90.",
+      "longitude": "longitude must be a number between -180 and 180."
+    }
+  },
+  "file": {
+    "compressionUnsupported": "Gzip transfer compression is not supported by this browser. Turn compression off to continue.",
+    "chunkFitError": "Unable to fit the current chunk protocol into this QR configuration.",
+    "manifestFieldLimit": "Manifest field {type} exceeds the 65,535-byte limit.",
+    "metadataJson": "Custom file metadata must be valid JSON.",
+    "capacity": {
+      "download": "Loaded {loadedBytes} B ({loadedSize}) of about {maxBytes} B ({maxSize}) max ({percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.",
+      "chooseDownload": "Choose a file to generate a shareable download URL.",
+      "autoVersion": "auto-selected uniform V{version}",
+      "version": "uniform V{version}",
+      "gzip": "gzip transfer is {bytes} B ({size})",
+      "noCompression": "transfer compression is off",
+      "chunked": "Loaded {loadedBytes} B ({loadedSize}); {transfer}, plus a {manifestBytes} B manifest. Frame {current} of {total} carries {frameBytes} B with {limit}; full frames use {capacityBytes} B ({capacitySize}) of stream capacity.",
+      "chooseChunked": "Choose a file to split it into chunked QR payloads.",
+      "data": "Loaded {loadedBytes} B ({loadedSize}) of {maxBytes} B ({maxSize}) max ({percent}%).",
+      "chooseData": "Choose a file to embed it directly as a data URL."
+    }
+  },
+  "frame": {
+    "allDay": "All day",
+    "wifi": "Wi-Fi {ssid}",
+    "email": "Email {email}",
+    "call": "Call {phone}",
+    "text": "Text {phone}",
+    "location": "Location {location}",
+    "contact": "Contact {contact}",
+    "sequence": "{current} of {total}"
+  },
+  "number": {
+    "status": "{current} / {total} - {value}"
+  },
+  "encoding": {
+    "invalidPositions": "{message} Positions: {positions}{suffix}.",
+    "kanjiUnavailable": "Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.",
+    "incompatible": "Incompatible with {mode} mode. Invalid characters: {characters}.",
+    "waiting": "Waiting",
+    "mixedSummary": "Mixed ({modes})",
+    "unused": "{bytes} B ({percent}%)",
+    "modes": {
+      "numeric": "Numeric",
+      "alphanumeric": "Alphanumeric",
+      "byte": "Byte / Binary",
+      "kanji": "Kanji",
+      "mixed": "Mixed"
+    }
+  },
+  "mask": {
+    "value": "Mask {value}",
+    "bestFit": "Best fit"
+  },
+  "preview": {
+    "invalid": "Invalid",
+    "invalidPayload": "Invalid preview",
+    "buildError": "Unable to build QR content.",
+    "encodeError": "Unable to encode this content.",
+    "encoderError": "The first-party QR encoder did not load.",
+    "printSize": "{inches} in{automatic} - {millimeters} mm/module",
+    "width": "{width} px · {scale} px/module · {inches} in at {ppi} ppi"
+  },
+  "errorCorrection": {
+    "L": { "label": "Low", "detail": "Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered." },
+    "M": { "label": "Medium", "detail": "Balances capacity and resilience, with recovery for about 15% of damaged or covered area." },
+    "Q": { "label": "Quartile", "detail": "Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion." },
+    "H": { "label": "High", "detail": "Uses the most correction data, so the code can often survive about 30% of its area being obscured." }
+  },
+  "map": {
+    "zoomControls": "Map zoom controls",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "attribution": "© OpenStreetMap contributors",
+    "loadError": "Unable to initialize the map preview."
+  },
+  "wifi": {
+    "openPassword": "Not used for open networks",
+    "password": "Password"
+  },
+  "art": {
+    "protectOutline": "Protect with a light outline",
+    "protectBackground": "Protect with a light background",
+    "editorLabel": "{width} by {height} pixel art editor",
+    "pixelLabel": "Pixel {number}",
+    "colors": {
+      "eraser": "Transparent / eraser", "black": "Black", "blue": "Blue", "green": "Green",
+      "cyan": "Cyan", "red": "Red", "magenta": "Magenta", "brown": "Brown",
+      "lightGray": "Light gray", "darkGray": "Dark gray", "brightBlue": "Bright blue",
+      "brightGreen": "Bright green", "brightCyan": "Bright cyan", "brightRed": "Bright red",
+      "brightMagenta": "Bright magenta", "yellow": "Yellow", "white": "White"
+    }
+  },
+  "units": {
+    "pixels": "{value} px",
+    "degrees": "{value} degrees",
+    "dimensions": "{width} x {height}",
+    "percent": "{value}%"
+  },
+  "download": {
+    "creating": "Creating {format}...", "ready": "Download ready.", "error": "Unable to create download.",
+    "creatingPdf": "Creating PDF...", "pdfReady": "PDF ready.", "pdfError": "Unable to create PDF.",
+    "rendering": "Rendering {frame} of {total}...", "buildingZip": "Building ZIP...",
+    "zipReady": "ZIP ready with {total} files.", "zipError": "Unable to create ZIP.",
+    "renderingPdf": "Rendering PDF frame {frame} of {total}...", "layoutPdf": "Laying out PDF pages...",
+    "pdfSheetReadyOne": "PDF ready with {total} QR codes on {pages} page.",
+    "pdfSheetReadyMany": "PDF ready with {total} QR codes on {pages} pages.",
+    "capturingFrame": "Capturing animation frame {frame} of {total}...",
+    "animationLimit": "Animation is limited to {max} images to protect browser memory.",
+    "durationMinimum": "Choose a duration that provides at least 10 milliseconds per image.",
+    "gifDurationMaximum": "GIF supports at most 10 minutes 55.35 seconds per image.",
+    "mp4DurationMinimum": "MP4 needs at least 16 milliseconds per image.",
+    "encodingGif": "Encoding animated GIF...", "gifReady": "Animated GIF ready - {duration} total.",
+    "recordingMp4": "Recording MP4 in real time - {duration}...",
+    "recordingFrame": "Recording MP4 frame {frame} of {total}...", "mp4Ready": "MP4 ready.",
+    "animationError": "Unable to create {format} animation.", "seconds": "{seconds} seconds",
+    "durationSummary": "{perImage} per image - {total} total.", "mp4Title": "Download an MP4 animation",
+    "mp4Unavailable": "MP4 encoding is not available in this browser; animated GIF remains available.",
+    "allZip": "Download all {count} as ZIP", "allPdf": "Download all {count} as PDF",
+    "toolsError": "Download tools could not be loaded: {message}",
+    "mp4EncoderUnavailable": "This browser does not provide an MP4 encoder. Animated GIF is available instead.",
+    "mp4EncodeError": "Unable to encode MP4.",
+    "imageError": "Unable to create {type} image."
+  },
+  "qr": {
+    "errors": {
+      "modeUnsupported": "Native QR mode is not supported yet: {mode}.",
+      "numericCharacters": "Numeric mode only accepts digits 0-9.",
+      "alphanumericCharacters": "Alphanumeric mode contains unsupported characters.",
+      "kanjiCharacters": "Kanji mode contains characters outside the QR Shift JIS ranges.",
+      "kanjiUnsupported": "Native Kanji mode requires browser Shift JIS decoding support.",
+      "versionRange": "QR version must be an integer from 1 through 40.",
+      "minimumVersion": "The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.",
+      "tooLarge": "The content is too large for a version 40 QR Code."
+    }
   }
 }

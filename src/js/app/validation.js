@@ -1,19 +1,23 @@
+import { lookup } from '../i18n/index.js';
+
 const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
 
-export function validateEmailValue(value, { required = true, label = 'email address' } = {}) {
+export function validateEmailValue(value, { required = true, label, contextLabel } = {}) {
+  const resolvedLabel = label ?? lookup('fields.emailAddress', 'email address');
+  const resolvedContext = contextLabel ?? lookup('formats.email', 'Email');
   const trimmed = value.trim();
   if (!trimmed) {
-    return required ? `Not valid for Email format yet: ${label} is required.` : '';
+    return required ? lookup('validation.email.required', 'Not valid for {context} format yet: {label} is required.', { context: resolvedContext, label: resolvedLabel }) : '';
   }
 
   if (!EMAIL_PATTERN.test(trimmed)) {
-    return `Not valid for Email format yet: ${label} must be valid.`;
+    return lookup('validation.email.invalid', 'Not valid for {context} format yet: {label} must be valid.', { context: resolvedContext, label: resolvedLabel });
   }
 
   if (trimmed.length > 254) {
-    return `Not valid for Email format yet: ${label} should stay within 254 characters.`;
+    return lookup('validation.email.length', 'Not valid for {context} format yet: {label} should stay within 254 characters.', { context: resolvedContext, label: resolvedLabel });
   }
 
   return '';
@@ -22,35 +26,37 @@ export function validateEmailValue(value, { required = true, label = 'email addr
 export function validatePrintableText(value, { label, maxLength }) {
   const trimmedLength = value.length;
   if (trimmedLength > maxLength) {
-    return `${label} should stay within ${maxLength} characters.`;
+    return lookup('validation.text.length', '{label} should stay within {maxLength} characters.', { label, maxLength });
   }
 
   if (!PRINTABLE_TEXT_PATTERN.test(value)) {
-    return `${label} can only use printable characters.`;
+    return lookup('validation.text.printable', '{label} can only use printable characters.', { label });
   }
 
   return '';
 }
 
-export function validateTelephoneValue(value, { required = true, label = 'telephone number' } = {}) {
+export function validateTelephoneValue(value, { required = true, label, contextLabel } = {}) {
+  const resolvedLabel = label ?? lookup('fields.telephoneNumber', 'telephone number');
+  const resolvedContext = contextLabel ?? lookup('formats.phone', 'Phone');
   const trimmed = value.trim();
   if (!trimmed) {
-    return required ? `Not valid for Phone format yet: ${label} is required.` : '';
+    return required ? lookup('validation.phone.required', 'Not valid for {context} format yet: {label} is required.', { context: resolvedContext, label: resolvedLabel }) : '';
   }
 
   const allowedPattern = /^\+?[\d\s().-]+$/;
   if (!allowedPattern.test(trimmed)) {
-    return `Not valid for Phone format yet: ${label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.`;
+    return lookup('validation.phone.characters', 'Not valid for {context} format yet: {label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.', { context: resolvedContext, label: resolvedLabel });
   }
 
   const plusCount = [...trimmed].filter((character) => character === '+').length;
   if (plusCount > 1 || (plusCount === 1 && !trimmed.startsWith('+'))) {
-    return `Not valid for Phone format yet: ${label} can only use + at the beginning.`;
+    return lookup('validation.phone.plus', 'Not valid for {context} format yet: {label} can only use + at the beginning.', { context: resolvedContext, label: resolvedLabel });
   }
 
   const digits = trimmed.replace(/\D/g, '');
   if (digits.length < 10 || digits.length > 15) {
-    return `Not valid for Phone format yet: ${label} should contain a reasonable length of 10 to 15 digits.`;
+    return lookup('validation.phone.length', 'Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits.', { context: resolvedContext, label: resolvedLabel });
   }
 
   return '';
@@ -63,12 +69,12 @@ export function validateGeoLabel(value) {
   }
 
   if (trimmed.length > 80) {
-    return 'Not valid for Geo format yet: label should stay within 80 characters.';
+    return lookup('validation.geo.labelLength', 'Not valid for Geo format yet: label should stay within 80 characters.');
   }
 
   const allowedPattern = /^[A-Za-z0-9 .,&#()'/:+-]*$/;
   if (!allowedPattern.test(trimmed)) {
-    return 'Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.';
+    return lookup('validation.geo.labelCharacters', 'Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.');
   }
 
   return '';
@@ -77,32 +83,33 @@ export function validateGeoLabel(value) {
 export function validateVCardTextValue(value, { required = false, label, maxLength = 80 } = {}) {
   const trimmed = value.trim();
   if (!trimmed) {
-    return required ? `Not valid for vCard format yet: ${label} is required.` : '';
+    return required ? lookup('validation.vcard.required', 'Not valid for vCard format yet: {label} is required.', { label }) : '';
   }
 
   if (trimmed.length > maxLength) {
-    return `Not valid for vCard format yet: ${label} should stay within ${maxLength} characters.`;
+    return lookup('validation.vcard.length', 'Not valid for vCard format yet: {label} should stay within {maxLength} characters.', { label, maxLength });
   }
 
   if (!VCARD_TEXT_PATTERN.test(trimmed)) {
-    return `Not valid for vCard format yet: ${label} can only use letters, numbers, spaces, and common punctuation.`;
+    return lookup('validation.vcard.characters', 'Not valid for vCard format yet: {label} can only use letters, numbers, spaces, and common punctuation.', { label });
   }
 
   return '';
 }
 
-export function getWebsiteValidationState(value, { required = false, contextLabel = 'vCard' } = {}) {
+export function getWebsiteValidationState(value, { required = false, contextLabel } = {}) {
+  const resolvedContext = contextLabel ?? lookup('formats.vcard', 'vCard');
   const trimmed = value.trim();
   if (!trimmed) {
     return {
-      error: required ? `Not valid for ${contextLabel} format yet: website is required.` : '',
+      error: required ? lookup('validation.website.required', 'Not valid for {context} format yet: website is required.', { context: resolvedContext }) : '',
       warning: '',
     };
   }
 
   if (trimmed.length > 2048) {
     return {
-      error: `Not valid for ${contextLabel} format yet: website should stay within 2048 characters.`,
+      error: lookup('validation.website.length', 'Not valid for {context} format yet: website should stay within 2048 characters.', { context: resolvedContext }),
       warning: '',
     };
   }
@@ -112,14 +119,14 @@ export function getWebsiteValidationState(value, { required = false, contextLabe
     parsedUrl = new URL(trimmed);
   } catch (error) {
     return {
-      error: `Not valid for ${contextLabel} format yet: website must include a full protocol such as https://.`,
+      error: lookup('validation.website.protocolRequired', 'Not valid for {context} format yet: website must include a full protocol such as https://.', { context: resolvedContext }),
       warning: '',
     };
   }
 
   if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
     return {
-      error: `Not valid for ${contextLabel} format yet: website should start with https:// or http://.`,
+      error: lookup('validation.website.protocol', 'Not valid for {context} format yet: website should start with https:// or http://.', { context: resolvedContext }),
       warning: '',
     };
   }
@@ -128,7 +135,7 @@ export function getWebsiteValidationState(value, { required = false, contextLabe
     error: '',
     warning:
       parsedUrl.protocol === 'http:'
-        ? `Warning for ${contextLabel} format: website uses http://. https:// is strongly recommended.`
+        ? lookup('validation.website.insecure', 'Warning for {context} format: website uses http://. https:// is strongly recommended.', { context: resolvedContext })
         : '',
   };
 }
@@ -136,17 +143,17 @@ export function getWebsiteValidationState(value, { required = false, contextLabe
 export function validateCalendarText(value, { required = false, label, maxLength, multiline = false }) {
   const trimmed = value.trim();
   if (!trimmed) {
-    return required ? `Not valid for Event format yet: ${label} is required.` : '';
+    return required ? lookup('validation.event.required', 'Not valid for Event format yet: {label} is required.', { label }) : '';
   }
   if (value.length > maxLength) {
-    return `Not valid for Event format yet: ${label} should stay within ${maxLength} characters.`;
+    return lookup('validation.event.length', 'Not valid for Event format yet: {label} should stay within {maxLength} characters.', { label, maxLength });
   }
 
   const invalidControlPattern = multiline
     ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/
     : /[\x00-\x1f\x7f]/;
   if (invalidControlPattern.test(value)) {
-    return `Not valid for Event format yet: ${label} contains unsupported control characters.`;
+    return lookup('validation.event.characters', 'Not valid for Event format yet: {label} contains unsupported control characters.', { label });
   }
   return '';
 }

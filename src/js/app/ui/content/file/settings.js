@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createFileSettings({ elements: e, cache, capacity, getMode, cancelRender, render, syncCapacity, defaultVersion }) {
   let timer = 0;
   let request = 0;
@@ -8,7 +10,9 @@ export function createFileSettings({ elements: e, cache, capacity, getMode, canc
   const syncChunkLabel = () => {
     const current = Number.parseInt(e.chunkIndex.value, 10) || 1;
     const total = Number.parseInt(e.chunkIndex.max, 10) || 1;
-    e.chunkIndexValue.textContent = `${Math.min(current, total)} / ${total}`;
+    e.chunkIndexValue.textContent = lookup('common.count', '{current} / {total}', {
+      current: Math.min(current, total), total,
+    });
   };
   const syncVersion = () => {
     e.chunkVersionAuto.checked = e.versionAuto.checked;

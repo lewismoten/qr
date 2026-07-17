@@ -1,4 +1,5 @@
 import { normalizeModeName } from '../../modes.js';
+import { lookup } from '../../../i18n/index.js';
 
 function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
   if (mode === 'byte') return [];
@@ -38,6 +39,7 @@ export function createEncodingDiagnostics({
   isBulkMode,
   buildDebugModel,
 }) {
+  const getModeLabel = (mode) => lookup(`encoding.modes.${mode}`, modeLabels[mode] ?? mode);
   const validationStates = {
     format: { message: '', level: 'error' },
     mode: { message: '', level: 'error' },
@@ -73,7 +75,9 @@ export function createEncodingDiagnostics({
     if (!message || !invalidIndexes.length) return;
     const shown = invalidIndexes.slice(0, 20).map((index) => index + 1).join(', ');
     const suffix = invalidIndexes.length > 20 ? ', ...' : '';
-    modeValidation.textContent = `${message} Positions: ${shown}${suffix}.`;
+    modeValidation.textContent = lookup('encoding.invalidPositions', '{message} Positions: {positions}{suffix}.', {
+      message, positions: shown, suffix,
+    });
   };
 
   const validateManualMode = (encodedText) => {
@@ -83,7 +87,7 @@ export function createEncodingDiagnostics({
       return true;
     }
     if (mode === 'kanji' && typeof encoder.toSJIS !== 'function') {
-      setModeValidation('Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.');
+      setModeValidation(lookup('encoding.kanjiUnavailable', 'Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.'));
       return false;
     }
 
@@ -94,7 +98,9 @@ export function createEncodingDiagnostics({
     }
     const characters = [...new Set(invalid.map(({ char }) => JSON.stringify(char)))].join(', ');
     setModeValidation(
-      `Incompatible with ${modeLabels[mode]} mode. Invalid characters: ${characters}.`,
+      lookup('encoding.incompatible', 'Incompatible with {mode} mode. Invalid characters: {characters}.', {
+        mode: getModeLabel(mode), characters,
+      }),
       invalid.map(({ index }) => index),
     );
     return false;
@@ -103,9 +109,9 @@ export function createEncodingDiagnostics({
   const updateSummary = (qrDefinition, options) => {
     const { detectedMode, segmentSummary, versionSummary, unusedSummary } = elements;
     if (!qrDefinition) {
-      detectedMode.textContent = 'Waiting';
+      detectedMode.textContent = lookup('encoding.waiting', 'Waiting');
       segmentSummary.textContent = '0';
-      versionSummary.textContent = 'Auto';
+      versionSummary.textContent = lookup('common.auto', 'Auto');
       unusedSummary.textContent = '-';
       return;
     }
@@ -116,8 +122,8 @@ export function createEncodingDiagnostics({
     const correctionLevel = options.errorCorrectionLevel;
     const version = qrDefinition.version;
     detectedMode.textContent = primaryMode === 'mixed'
-      ? `Mixed (${uniqueModes.map((mode) => modeLabels[mode] ?? mode).join(', ')})`
-      : modeLabels[primaryMode] ?? primaryMode;
+      ? lookup('encoding.mixedSummary', 'Mixed ({modes})', { modes: uniqueModes.map(getModeLabel).join(', ') })
+      : getModeLabel(primaryMode);
     segmentSummary.textContent = String(qrDefinition.segments.length);
     versionSummary.textContent = `V${version}`;
 
@@ -129,7 +135,9 @@ export function createEncodingDiagnostics({
     const unusedPercent = dataCodewords > 0 ? Math.round((unusedBits / (dataCodewords * 8)) * 100) : 0;
     const unusedBytes = unusedBits / 8;
     const unusedByteLabel = Number.isInteger(unusedBytes) ? `${unusedBytes}` : unusedBytes.toFixed(1);
-    unusedSummary.textContent = `${unusedByteLabel} B (${unusedPercent}%)`;
+    unusedSummary.textContent = lookup('encoding.unused', '{bytes} B ({percent}%)', {
+      bytes: unusedByteLabel, percent: unusedPercent,
+    });
   };
 
   return { setValidation: setFormatValidation, validateManualMode, updateSummary };

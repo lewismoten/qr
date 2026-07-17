@@ -1,4 +1,5 @@
 import { hexToBytes, uint64Bytes } from '../../../bytes.js';
+import { lookup } from '../../../../i18n/index.js';
 
 export function buildManifestFields({ file, customMetadata, validationValue, fieldTypes }) {
   const encoder = new TextEncoder();
@@ -41,7 +42,7 @@ export function serializeManifest({
   let offset = headerBytes;
   fields.forEach((field) => {
     if (field.value.length > 0xffff) {
-      throw new Error(`Manifest field ${field.type} exceeds the 65,535-byte limit.`);
+      throw new Error(lookup('file.manifestFieldLimit', 'Manifest field {type} exceeds the 65,535-byte limit.', { type: field.type }));
     }
     manifest[offset] = field.type;
     view.setUint16(offset + 1, field.value.length, false);
@@ -65,7 +66,7 @@ export function createFileManifestController({
     try {
       return JSON.stringify(JSON.parse(value));
     } catch (error) {
-      if (validate) throw new Error('Custom file metadata must be valid JSON.');
+      if (validate) throw new Error(lookup('file.metadataJson', 'Custom file metadata must be valid JSON.'));
       return value;
     }
   };

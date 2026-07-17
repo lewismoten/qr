@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 const EMPTY_CHUNK_INFO = Object.freeze({
   totalChunks: 1,
   currentChunk: 1,
@@ -171,7 +173,7 @@ export function createContentDataSetup({ document, elements: e, encoder, protoco
     getBulkRowCount: () => bulk?.getRowCount() ?? 0,
     getBulkParseError: () => bulk?.getError() ?? '',
     getBulkValidationState: (options) => bulk?.getValidationState(options) ?? {
-      error: 'Bulk Import tools are loading.',
+      error: lookup('bulk.loading', 'Bulk Import tools are loading.'),
       warning: '',
     },
     syncBulkStatus: () => { if (bulk) bulk.syncStatus(); },

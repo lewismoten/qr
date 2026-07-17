@@ -1,3 +1,5 @@
+import { lookup } from '../i18n/index.js';
+
 export function parseBoolean(value, { allowBlank = true } = {}) {
   const normalized = String(value ?? '').trim().toLowerCase();
   if (!normalized && allowBlank) return false;
@@ -42,7 +44,7 @@ export function parseCsv(text) {
     }
   }
 
-  if (quoted) throw new Error('The CSV contains an unclosed quoted value.');
+  if (quoted) throw new Error(lookup('bulk.csv.unclosedQuote', 'The CSV contains an unclosed quoted value.'));
   if (value || row.length) {
     row.push(value);
     rows.push(row);

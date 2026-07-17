@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function createInvalidPreviewRenderer({ canvas, encoder, drawQr, clearCanvas }) {
   const drawOverlay = (message) => {
     const context = canvas.getContext('2d');
@@ -11,7 +13,7 @@ export function createInvalidPreviewRenderer({ canvas, encoder, drawQr, clearCan
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.font = `800 ${Math.max(18, width * 0.07)}px "Avenir Next", "Segoe UI", sans-serif`;
-    context.fillText('Invalid', width / 2, height / 2 - 8);
+    context.fillText(lookup('preview.invalid', 'Invalid'), width / 2, height / 2 - 8);
     if (message) {
       context.font = `600 ${Math.max(10, width * 0.027)}px "Avenir Next", "Segoe UI", sans-serif`;
       context.fillText(message.slice(0, 80), width / 2, height / 2 + 16);
@@ -27,7 +29,7 @@ export function createInvalidPreviewRenderer({ canvas, encoder, drawQr, clearCan
     };
     delete previewOptions.version;
     try {
-      const definition = encoder.create(previewText?.trim() || 'Invalid preview', previewOptions);
+      const definition = encoder.create(previewText?.trim() || lookup('preview.invalidPayload', 'Invalid preview'), previewOptions);
       drawQr(definition, previewOptions);
     } catch (error) {
       clearCanvas();

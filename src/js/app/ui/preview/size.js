@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function createPreviewSizeControls({ canvas, elements: e, getMetrics, pixelsPerInch, minPrintModuleInches }) {
   const getAutomaticPrintWidth = (source = canvas) => {
     const metrics = getMetrics();
@@ -16,14 +18,19 @@ export function createPreviewSizeControls({ canvas, elements: e, getMetrics, pix
     const selected = getPrintWidth();
     const metrics = getMetrics();
     const totalModules = Math.max(1, Math.round((metrics.width || canvas.width || 320) / (metrics.scale || 4)));
-    e.printValue.textContent = `${selected.toFixed(2)} in${e.printAuto.checked ? ' auto' : ''} - ${((selected / totalModules) * 25.4).toFixed(2)} mm/module`;
+    e.printValue.textContent = lookup('preview.printSize', '{inches} in{automatic} - {millimeters} mm/module', {
+      inches: selected.toFixed(2), automatic: e.printAuto.checked ? ` ${lookup('common.autoLower', 'auto')}` : '',
+      millimeters: ((selected / totalModules) * 25.4).toFixed(2),
+    });
   };
   const formatWidth = () => {
     const minimum = Number.parseInt(e.width.min, 10) || 1;
     const metrics = getMetrics();
     const width = e.widthAuto.checked ? (metrics.width ?? minimum) : (Number.parseInt(e.width.value, 10) || minimum);
     const scale = metrics.scale ?? e.scale.value;
-    e.widthValue.textContent = `${width} px · ${scale} px/module · ${(width / pixelsPerInch).toFixed(2)} in at ${pixelsPerInch} ppi`;
+    e.widthValue.textContent = lookup('preview.width', '{width} px · {scale} px/module · {inches} in at {ppi} ppi', {
+      width, scale, inches: (width / pixelsPerInch).toFixed(2), ppi: pixelsPerInch,
+    });
   };
   const syncLabels = () => {
     formatWidth();

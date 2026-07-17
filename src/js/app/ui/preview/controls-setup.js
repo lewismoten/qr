@@ -1,4 +1,5 @@
 import { createPreviewViewport } from './viewport.js';
+import { lookup } from '../../../i18n/index.js';
 
 export function createPreviewControlsSetup({ elements: e, pixelsPerInch, minPrintModuleInches }) {
   let renderedWidth = null;
@@ -49,7 +50,10 @@ export function createPreviewControlsSetup({ elements: e, pixelsPerInch, minPrin
     const totalModules = Math.max(1, Math.round(
       (renderedWidth || e.canvas.width || 320) / (moduleScale || 4),
     ));
-    e.printWidthValue.textContent = `${selected.toFixed(2)} in${e.printWidthAuto.checked ? ' auto' : ''} - ${((selected / totalModules) * 25.4).toFixed(2)} mm/module`;
+    e.printWidthValue.textContent = lookup('preview.printSize', '{inches} in{automatic} - {millimeters} mm/module', {
+      inches: selected.toFixed(2), automatic: e.printWidthAuto.checked ? ` ${lookup('common.autoLower', 'auto')}` : '',
+      millimeters: ((selected / totalModules) * 25.4).toFixed(2),
+    });
   };
   const loadSize = () => {
     if (size) return Promise.resolve(size);

@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 const TILE_SIZE = 256;
 const MIN_ZOOM = 0;
 const MAX_ZOOM = 19;
@@ -49,16 +51,22 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   const tileLayer = createElement('div', 'slippy-map-tiles', { 'aria-hidden': 'true' });
   const marker = createElement('div', 'slippy-map-marker', { 'aria-hidden': 'true' });
   const label = createElement('div', 'slippy-map-label');
-  const controls = createElement('div', 'slippy-map-controls', { 'aria-label': 'Map zoom controls' });
-  const zoomIn = createElement('button', 'slippy-map-control', { type: 'button', 'aria-label': 'Zoom in' });
-  const zoomOut = createElement('button', 'slippy-map-control', { type: 'button', 'aria-label': 'Zoom out' });
+  const controls = createElement('div', 'slippy-map-controls', {
+    'aria-label': lookup('map.zoomControls', 'Map zoom controls'),
+  });
+  const zoomIn = createElement('button', 'slippy-map-control', {
+    type: 'button', 'aria-label': lookup('map.zoomIn', 'Zoom in'),
+  });
+  const zoomOut = createElement('button', 'slippy-map-control', {
+    type: 'button', 'aria-label': lookup('map.zoomOut', 'Zoom out'),
+  });
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
   controls.append(zoomIn, zoomOut);
   const attribution = createElement('div', 'slippy-map-attribution');
   const attributionLink = document.createElement('a');
   attributionLink.href = 'https://www.openstreetmap.org/copyright';
-  attributionLink.textContent = '© OpenStreetMap contributors';
+  attributionLink.textContent = lookup('map.attribution', '© OpenStreetMap contributors');
   attribution.appendChild(attributionLink);
   container.append(tileLayer, marker, label, controls, attribution);
 

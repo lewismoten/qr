@@ -1,3 +1,5 @@
+import { createQrError } from './error.js';
+
 let shiftJisMap;
 
 function getShiftJisMap() {
@@ -6,7 +8,7 @@ function getShiftJisMap() {
   try {
     decoder = new TextDecoder('shift_jis', { fatal: true });
   } catch (error) {
-    throw new Error('Native Kanji mode requires browser Shift JIS decoding support.');
+    throw createQrError('kanjiUnsupported', 'Native Kanji mode requires browser Shift JIS decoding support.');
   }
 
   shiftJisMap = new Map();

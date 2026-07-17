@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createEmailCapacity({ body, hint, encoder, buildOptions, buildPayload, buildEmail,
   isActive }) {
   let cachedKey = '';
@@ -55,7 +57,7 @@ export function createEmailCapacity({ body, hint, encoder, buildOptions, buildPa
   const sync = () => {
     if (!isActive()) return;
     const { current, max } = getInfo();
-    hint.textContent = `${current} / ${max}`;
+    hint.textContent = lookup('common.count', '{current} / {total}', { current, total: max });
   };
   return { getInfo, sync };
 }

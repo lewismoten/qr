@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createFileCache({ input, createId, encodeBase64, isCompressionEnabled }) {
   let owner = null;
   let payload = '';
@@ -70,7 +72,7 @@ export function createFileCache({ input, createId, encodeBase64, isCompressionEn
       return originalBytes;
     }
     if (typeof CompressionStream !== 'function') {
-      throw new Error('Gzip transfer compression is not supported by this browser. Turn compression off to continue.');
+      throw new Error(lookup('file.compressionUnsupported', 'Gzip transfer compression is not supported by this browser. Turn compression off to continue.'));
     }
 
     const stream = new Blob([originalBytes]).stream().pipeThrough(new CompressionStream('gzip'));

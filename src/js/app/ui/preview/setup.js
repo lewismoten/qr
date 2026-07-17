@@ -1,6 +1,7 @@
 import { createInvalidPreviewRenderer } from './invalid.js';
 import { createRenderController } from './render.js';
 import { createQrRenderer } from './qr-renderer.js';
+import { getErrorText, lookup } from '../../../i18n/index.js';
 
 export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, systems,
   helpers, actions, runtime }) {
@@ -100,10 +101,11 @@ export function createPreviewSetup({ e, encoder, debugColors, maxTargetWidth, sy
     drawQr,
     syncDownloads: systems.download.syncControls,
     showBuildError(error, options) {
-      e.encodedPreview.textContent = error.message;
+      const message = getErrorText(error, lookup('preview.buildError', 'Unable to build QR content.'));
+      e.encodedPreview.textContent = message;
       e.encodedPreview.classList.add('has-error');
-      renderInvalid(content.buildPreview(), options, error.message);
-      debug.setValidation(error.message || 'Unable to build QR content.');
+      renderInvalid(content.buildPreview(), options, message);
+      debug.setValidation(message);
       console.error(error);
     },
   });

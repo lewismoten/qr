@@ -1,9 +1,11 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createModuleShapeSection({ shape, controls, rounding, roundingValue, inset, insetValue, rotation, rotationValue }) {
   const sync = () => {
     controls.hidden = shape.value !== 'custom';
-    roundingValue.textContent = `${rounding.value}%`;
-    insetValue.textContent = `${inset.value}%`;
-    rotationValue.textContent = `${rotation.value} degrees`;
+    roundingValue.textContent = lookup('units.percent', '{value}%', { value: rounding.value });
+    insetValue.textContent = lookup('units.percent', '{value}%', { value: inset.value });
+    rotationValue.textContent = lookup('units.degrees', '{value} degrees', { value: rotation.value });
   };
 
   const getOptions = () => ({

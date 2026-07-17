@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createArtworkControls({ elements: e, pixelEditor }) {
   const syncEmoji = () => e.emojiOptions.forEach((button) => {
     const active = button.dataset.emoji === e.emoji.value;
@@ -10,10 +12,10 @@ export function createArtworkControls({ elements: e, pixelEditor }) {
     e.logoControls.hidden = mode !== 'logo';
     e.emojiControls.hidden = mode !== 'emoji';
     e.pixelControls.hidden = mode !== 'pixel';
-    e.sizeValue.textContent = `${e.size.value}%`;
+    e.sizeValue.textContent = lookup('units.percent', '{value}%', { value: e.size.value });
     e.backgroundLabel.textContent = mode === 'emoji'
-      ? 'Protect with a light outline'
-      : 'Protect with a light background';
+      ? lookup('art.protectOutline', 'Protect with a light outline')
+      : lookup('art.protectBackground', 'Protect with a light background');
     pixelEditor.syncSizeLabel();
     syncEmoji();
   };

@@ -5,7 +5,9 @@ export function createWifiSection({ ssid, password, encryption, hidden, revealSe
     const open = encryption.value === 'nopass';
     password.disabled = open;
     password.setAttribute('aria-disabled', String(open));
-    password.placeholder = open ? 'Not used for open networks' : 'Password';
+    password.placeholder = open
+      ? lookup('wifi.openPassword', 'Not used for open networks')
+      : lookup('wifi.password', 'Password');
   };
 
   const buildPayload = () => serializeWifi({
@@ -24,3 +26,4 @@ export function createWifiSection({ ssid, password, encryption, hidden, revealSe
 
   return { sync, buildPayload, maskPayload };
 }
+import { lookup } from '../../../../i18n/index.js';

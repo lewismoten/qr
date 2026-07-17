@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function createQrConfiguration({ elements: e, encoder, helpers, alphanumericCharacters }) {
   const buildOptions = () => {
     const base = {
@@ -38,7 +40,7 @@ export function createQrConfiguration({ elements: e, encoder, helpers, alphanume
   };
 
   const createDefinition = (payload, options) => {
-    if (typeof encoder?.create !== 'function') throw new Error('The first-party QR encoder did not load.');
+    if (typeof encoder?.create !== 'function') throw new Error(lookup('preview.encoderError', 'The first-party QR encoder did not load.'));
     return encoder.create(payload, options);
   };
 

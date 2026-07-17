@@ -1,3 +1,5 @@
+import { getErrorText, lookup } from '../../../i18n/index.js';
+
 const MAX_ANIMATION_FRAMES = 200;
 let exportersPromise;
 const loadExporters = () => {
@@ -65,12 +67,12 @@ export function createDownloadActions({
   const downloadCurrent = async () => {
     const format = formatInput.value;
     setDisabled(true);
-    status.textContent = `Creating ${format.toUpperCase()}...`;
+    status.textContent = lookup('download.creating', 'Creating {format}...', { format: format.toUpperCase() });
     try {
       triggerDownload(await exportCanvas(canvas, format), `qr-code${getSuffix()}.${format}`);
-      status.textContent = 'Download ready.';
+      status.textContent = lookup('download.ready', 'Download ready.');
     } catch (error) {
-      status.textContent = error.message || 'Unable to create download.';
+      status.textContent = getErrorText(error, lookup('download.error', 'Unable to create download.'));
       console.error(error);
     } finally {
       setDisabled(false);
@@ -79,12 +81,12 @@ export function createDownloadActions({
 
   const downloadCurrentPdf = async () => {
     setDisabled(true);
-    status.textContent = 'Creating PDF...';
+    status.textContent = lookup('download.creatingPdf', 'Creating PDF...');
     try {
       triggerDownload(await makePdf(canvas), `qr-code${getSuffix()}.pdf`);
-      status.textContent = 'PDF ready.';
+      status.textContent = lookup('download.pdfReady', 'PDF ready.');
     } catch (error) {
-      status.textContent = error.message || 'Unable to create PDF.';
+      status.textContent = getErrorText(error, lookup('download.pdfError', 'Unable to create PDF.'));
       console.error(error);
     } finally {
       setDisabled(false);
@@ -101,7 +103,7 @@ export function createDownloadActions({
     setDisabled(true);
     try {
       for (let frame = 1; frame <= total; frame += 1) {
-        status.textContent = `Rendering ${frame} of ${total}...`;
+        status.textContent = lookup('download.rendering', 'Rendering {frame} of {total}...', { frame, total });
         setCurrentFrame(frame);
         syncFrameNavigation();
         await render();
@@ -110,12 +112,12 @@ export function createDownloadActions({
           blob: await exportCanvas(canvas, format),
         });
       }
-      status.textContent = 'Building ZIP...';
+      status.textContent = lookup('download.buildingZip', 'Building ZIP...');
       const { createZipBlob } = await loadExporters();
       triggerDownload(await createZipBlob(files), `qr-codes-${total}.zip`);
-      status.textContent = `ZIP ready with ${total} files.`;
+      status.textContent = lookup('download.zipReady', 'ZIP ready with {total} files.', { total });
     } catch (error) {
-      status.textContent = error.message || 'Unable to create ZIP.';
+      status.textContent = getErrorText(error, lookup('download.zipError', 'Unable to create ZIP.'));
       console.error(error);
     } finally {
       await restoreFrame(originalFrame);
@@ -131,20 +133,24 @@ export function createDownloadActions({
     setDisabled(true);
     try {
       for (let frame = 1; frame <= total; frame += 1) {
-        status.textContent = `Rendering PDF frame ${frame} of ${total}...`;
+        status.textContent = lookup('download.renderingPdf', 'Rendering PDF frame {frame} of {total}...', { frame, total });
         setCurrentFrame(frame);
         syncFrameNavigation();
         await render();
         frames.push(await capturePdf(canvas));
       }
-      status.textContent = 'Laying out PDF pages...';
+      status.textContent = lookup('download.layoutPdf', 'Laying out PDF pages...');
       const { createPdfSheetBlob, getPdfSheetLayout } = await loadExporters();
       const { framesPerPage } = getPdfSheetLayout(frames);
       triggerDownload(createPdfSheetBlob(frames), `qr-codes-${total}.pdf`);
       const pages = Math.ceil(total / framesPerPage);
-      status.textContent = `PDF ready with ${total} QR codes on ${pages} ${pages === 1 ? 'page' : 'pages'}.`;
+      status.textContent = lookup(
+        pages === 1 ? 'download.pdfSheetReadyOne' : 'download.pdfSheetReadyMany',
+        pages === 1 ? 'PDF ready with {total} QR codes on {pages} page.' : 'PDF ready with {total} QR codes on {pages} pages.',
+        { total, pages },
+      );
     } catch (error) {
-      status.textContent = error.message || 'Unable to create PDF.';
+      status.textContent = getErrorText(error, lookup('download.pdfError', 'Unable to create PDF.'));
       console.error(error);
     } finally {
       await restoreFrame(originalFrame);
@@ -158,7 +164,7 @@ export function createDownloadActions({
     const frames = [];
     try {
       for (let frame = 1; frame <= total; frame += 1) {
-        status.textContent = `Capturing animation frame ${frame} of ${total}...`;
+        status.textContent = lookup('download.capturingFrame', 'Capturing animation frame {frame} of {total}...', { frame, total });
         setCurrentFrame(frame);
         syncFrameNavigation();
         await render();
@@ -175,20 +181,20 @@ export function createDownloadActions({
     const total = getFrameCount();
     if (total <= 1) return;
     if (total > MAX_ANIMATION_FRAMES) {
-      status.textContent = `Animation is limited to ${MAX_ANIMATION_FRAMES} images to protect browser memory.`;
+      status.textContent = lookup('download.animationLimit', 'Animation is limited to {max} images to protect browser memory.', { max: MAX_ANIMATION_FRAMES });
       return;
     }
     const { enteredDurationMs, perFrameMs, totalDurationMs } = getAnimationTiming(total);
     if (enteredDurationMs <= 0 || perFrameMs < 10) {
-      status.textContent = 'Choose a duration that provides at least 10 milliseconds per image.';
+      status.textContent = lookup('download.durationMinimum', 'Choose a duration that provides at least 10 milliseconds per image.');
       return;
     }
     if (format === 'gif' && perFrameMs > 655350) {
-      status.textContent = 'GIF supports at most 10 minutes 55.35 seconds per image.';
+      status.textContent = lookup('download.gifDurationMaximum', 'GIF supports at most 10 minutes 55.35 seconds per image.');
       return;
     }
     if (format === 'mp4' && perFrameMs < 16) {
-      status.textContent = 'MP4 needs at least 16 milliseconds per image.';
+      status.textContent = lookup('download.mp4DurationMinimum', 'MP4 needs at least 16 milliseconds per image.');
       return;
     }
     setDisabled(true);
@@ -196,20 +202,23 @@ export function createDownloadActions({
       const frames = await captureAnimationFrames(total);
       if (format === 'gif') {
         const { createAnimatedGifBlob } = await loadExporters();
-        status.textContent = 'Encoding animated GIF...';
+        status.textContent = lookup('download.encodingGif', 'Encoding animated GIF...');
         triggerDownload(createAnimatedGifBlob(frames, perFrameMs), `qr-animation-${total}.gif`);
-        status.textContent = `Animated GIF ready - ${formatAnimationDuration(totalDurationMs)} total.`;
+        status.textContent = lookup('download.gifReady', 'Animated GIF ready - {duration} total.', { duration: formatAnimationDuration(totalDurationMs) });
       } else {
         const { createAnimatedMp4Blob } = await loadExporters();
-        status.textContent = `Recording MP4 in real time - ${formatAnimationDuration(totalDurationMs)}...`;
+        status.textContent = lookup('download.recordingMp4', 'Recording MP4 in real time - {duration}...', { duration: formatAnimationDuration(totalDurationMs) });
         const blob = await createAnimatedMp4Blob(frames, perFrameMs, (frame, count) => {
-          status.textContent = `Recording MP4 frame ${frame} of ${count}...`;
+          status.textContent = lookup('download.recordingFrame', 'Recording MP4 frame {frame} of {total}...', { frame, total: count });
         });
         triggerDownload(blob, `qr-animation-${total}.mp4`);
-        status.textContent = 'MP4 ready.';
+        status.textContent = lookup('download.mp4Ready', 'MP4 ready.');
       }
     } catch (error) {
-      status.textContent = error.message || `Unable to create ${format.toUpperCase()} animation.`;
+      status.textContent = getErrorText(
+        error,
+        lookup('download.animationError', 'Unable to create {format} animation.', { format: format.toUpperCase() }),
+      );
       console.error(error);
     } finally {
       setDisabled(false);

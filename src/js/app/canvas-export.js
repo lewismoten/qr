@@ -1,4 +1,6 @@
 
+import { lookup } from '../i18n/index.js';
+
 export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
   return new Promise((resolve, reject) => {
     let exportCanvas = sourceCanvas;
@@ -15,7 +17,7 @@ export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
       if (blob) {
         resolve(blob);
       } else {
-        reject(new Error(`Unable to create ${type} image.`));
+        reject(new Error(lookup('download.imageError', 'Unable to create {type} image.', { type })));
       }
     }, type, quality);
   });

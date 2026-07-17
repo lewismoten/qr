@@ -49,9 +49,21 @@ function findMessage(key) {
   ), messages);
 }
 
-export function lookup(key, defaultText = '') {
+function interpolate(text, options) {
+  if (!options || typeof options !== 'object') return text;
+  return text.replace(/\{([A-Za-z][\w.-]*)\}/g, (placeholder, tag) => (
+    Object.prototype.hasOwnProperty.call(options, tag) ? String(options[tag]) : placeholder
+  ));
+}
+
+export function lookup(key, defaultText = '', options) {
   const value = findMessage(key);
-  return typeof value === 'string' ? value : defaultText;
+  return interpolate(typeof value === 'string' ? value : defaultText, options);
+}
+
+export function getErrorText(error, defaultText = '') {
+  if (error?.i18nKey) return lookup(error.i18nKey, error.message || defaultText, error.i18nOptions);
+  return error?.message || defaultText;
 }
 
 export function getActiveLocale() {

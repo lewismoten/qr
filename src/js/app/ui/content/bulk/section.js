@@ -1,6 +1,7 @@
 import { formatBytes } from '../../../bytes.js';
 import { parseCsv } from '../../../csv.js';
 import { validateBulkImport } from './validation.js';
+import { lookup } from '../../../../i18n/index.js';
 
 const MAX_ROWS = 10000;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -48,19 +49,19 @@ export function createBulkImportSection({
   const parse = (text) => {
     const schema = getSchema();
     const parsedRows = parseCsv(text);
-    if (!schema || parsedRows.length === 0) throw new Error('The CSV is empty.');
+    if (!schema || parsedRows.length === 0) throw new Error(lookup('bulk.csv.empty', 'The CSV is empty.'));
     const headers = parsedRows[0].map((header) => String(header).replace(/^\uFEFF/, '').trim().toLowerCase());
     const namedHeaders = headers.filter(Boolean);
     if (new Set(namedHeaders).size !== namedHeaders.length) {
-      throw new Error('The first row contains duplicate field names.');
+      throw new Error(lookup('bulk.csv.duplicateFields', 'The first row contains duplicate field names.'));
     }
     const missingHeaders = schema.fields.filter((field) => !namedHeaders.includes(field));
-    if (missingHeaders.length) throw new Error(`The first row is missing: ${missingHeaders.join(', ')}.`);
+    if (missingHeaders.length) throw new Error(lookup('bulk.csv.missingFields', 'The first row is missing: {fields}.', { fields: missingHeaders.join(', ') }));
     const dataRows = parsedRows.slice(1).filter((cells) => cells.some((cell) => cell.trim()));
     if (dataRows.length > MAX_ROWS) {
-      throw new Error(`Bulk imports are limited to ${MAX_ROWS.toLocaleString()} data rows.`);
+      throw new Error(lookup('bulk.csv.rowLimit', 'Bulk imports are limited to {maxRows} data rows.', { maxRows: MAX_ROWS.toLocaleString() }));
     }
-    if (!dataRows.length) throw new Error('The CSV has a header row but no data rows.');
+    if (!dataRows.length) throw new Error(lookup('bulk.csv.noRows', 'The CSV has a header row but no data rows.'));
     return dataRows.map((cells) =>
       Object.fromEntries(headers.flatMap((header, index) => (header ? [[header, cells[index] ?? '']] : []))),
     );
@@ -71,10 +72,12 @@ export function createBulkImportSection({
     clearButton.disabled = !file && !rows.length && !parseError;
     status.classList.toggle('has-error', Boolean(parseError));
     if (parseError) status.textContent = parseError;
-    else if (!rows.length) status.textContent = 'No CSV loaded.';
+    else if (!rows.length) status.textContent = lookup('bulk.status.empty', 'No CSV loaded.');
     else {
       const current = Math.min(rows.length, Math.max(1, Number.parseInt(rowIndex.value, 10) || 1));
-      status.textContent = `${rows.length.toLocaleString()} rows loaded. Showing ${current.toLocaleString()} of ${rows.length.toLocaleString()}.`;
+      status.textContent = lookup('bulk.status.loaded', '{count} rows loaded. Showing {current} of {count}.', {
+        count: rows.length.toLocaleString(), current: current.toLocaleString(),
+      });
     }
   };
 
@@ -99,7 +102,9 @@ export function createBulkImportSection({
       return;
     }
     if (file.size > MAX_FILE_BYTES) {
-      parseError = `The CSV is ${formatBytes(file.size)}; Bulk Import CSV files are limited to ${formatBytes(MAX_FILE_BYTES)}.`;
+      parseError = lookup('bulk.csv.fileSize', 'The CSV is {size}; Bulk Import CSV files are limited to {maxSize}.', {
+        size: formatBytes(file.size), maxSize: formatBytes(MAX_FILE_BYTES),
+      });
     } else {
       try {
         const parsedRows = parse(await file.text());
@@ -107,7 +112,7 @@ export function createBulkImportSection({
         rows = parsedRows;
       } catch (error) {
         if (request !== loadRequest) return;
-        parseError = error.message || 'Unable to read this CSV.';
+        parseError = error.message || lookup('bulk.csv.readError', 'Unable to read this CSV.');
       }
     }
     syncStatus();
@@ -124,7 +129,9 @@ export function createBulkImportSection({
     fields.hidden = !bulk;
     fields.setAttribute('aria-hidden', String(!bulk));
     expectedFields.textContent = schema?.fields.join(', ') || '';
-    requiredFields.textContent = `Required values: ${schema?.required.join(', ') || 'none'}`;
+    requiredFields.textContent = lookup('bulk.requiredValues', 'Required values: {values}', {
+      values: schema?.required.join(', ') || lookup('common.none', 'none'),
+    });
     fileFormatButton.disabled = bulk;
     fileFormatButton.setAttribute('aria-disabled', String(bulk));
     syncStatus();

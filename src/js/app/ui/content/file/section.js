@@ -1,4 +1,5 @@
 import { formatBytes } from '../../../bytes.js';
+import { lookup } from '../../../../i18n/index.js';
 
 export function createFileSection({
   format,
@@ -51,8 +52,11 @@ export function createFileSection({
       const maxBytes = getDownloadUrlCapacity(file);
       const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
       capacityHint.textContent = file
-        ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of about ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.`
-        : 'Choose a file to generate a shareable download URL.';
+        ? lookup('file.capacity.download', 'Loaded {loadedBytes} B ({loadedSize}) of about {maxBytes} B ({maxSize}) max ({percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.', {
+          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes),
+          maxBytes: maxBytes.toLocaleString(), maxSize: formatBytes(maxBytes), percent,
+        })
+        : lookup('file.capacity.chooseDownload', 'Choose a file to generate a shareable download URL.');
     } else if (selectedMode === 'chunked') {
       const info = getChunkInfo(file);
       const currentFrameBytes = Math.max(
@@ -63,17 +67,30 @@ export function createFileSection({
         ),
       );
       const limitText = info.autoVersion
-        ? `auto-selected uniform V${info.configuredChunkVersion}`
-        : `uniform V${info.configuredChunkVersion}`;
+        ? lookup('file.capacity.autoVersion', 'auto-selected uniform V{version}', { version: info.configuredChunkVersion })
+        : lookup('file.capacity.version', 'uniform V{version}', { version: info.configuredChunkVersion });
+      const transfer = isCompressionEnabled()
+        ? lookup('file.capacity.gzip', 'gzip transfer is {bytes} B ({size})', {
+          bytes: info.transferByteLength.toLocaleString(), size: formatBytes(info.transferByteLength),
+        })
+        : lookup('file.capacity.noCompression', 'transfer compression is off');
       capacityHint.textContent = file
-        ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}); ${isCompressionEnabled() ? `gzip transfer is ${info.transferByteLength.toLocaleString()} B (${formatBytes(info.transferByteLength)})` : 'transfer compression is off'}, plus a ${info.manifestLength.toLocaleString()} B manifest. Frame ${info.currentChunk} of ${info.totalChunks} carries ${currentFrameBytes.toLocaleString()} B with ${limitText}; full frames use ${info.chunkCapacity.toLocaleString()} B (${formatBytes(info.chunkCapacity)}) of stream capacity.`
-        : 'Choose a file to split it into chunked QR payloads.';
+        ? lookup('file.capacity.chunked', 'Loaded {loadedBytes} B ({loadedSize}); {transfer}, plus a {manifestBytes} B manifest. Frame {current} of {total} carries {frameBytes} B with {limit}; full frames use {capacityBytes} B ({capacitySize}) of stream capacity.', {
+          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes), transfer,
+          manifestBytes: info.manifestLength.toLocaleString(), current: info.currentChunk,
+          total: info.totalChunks, frameBytes: currentFrameBytes.toLocaleString(), limit: limitText,
+          capacityBytes: info.chunkCapacity.toLocaleString(), capacitySize: formatBytes(info.chunkCapacity),
+        })
+        : lookup('file.capacity.chooseChunked', 'Choose a file to split it into chunked QR payloads.');
     } else {
       const maxBytes = getDataUrlCapacity();
       const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
       capacityHint.textContent = file
-        ? `Loaded ${loadedBytes.toLocaleString()} B (${formatBytes(loadedBytes)}) of ${maxBytes.toLocaleString()} B (${formatBytes(maxBytes)}) max (${percent}%).`
-        : 'Choose a file to embed it directly as a data URL.';
+        ? lookup('file.capacity.data', 'Loaded {loadedBytes} B ({loadedSize}) of {maxBytes} B ({maxSize}) max ({percent}%).', {
+          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes),
+          maxBytes: maxBytes.toLocaleString(), maxSize: formatBytes(maxBytes), percent,
+        })
+        : lookup('file.capacity.chooseData', 'Choose a file to embed it directly as a data URL.');
     }
 
     clearButton.disabled = !input.files?.length && !cache.getPayload();

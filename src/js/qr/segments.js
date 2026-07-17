@@ -2,6 +2,7 @@ import { BitBuffer } from './bit-buffer.js';
 import { getCountBitLength, getDataCodewords } from './capacity.js';
 import { ALPHANUMERIC, MODE_BITS } from './constants.js';
 import { getQrKanjiValue } from './kanji.js';
+import { createQrError } from './error.js';
 
 const textEncoder = new TextEncoder();
 
@@ -14,13 +15,13 @@ function detectMode(text) {
 function makeSegment(data, requestedMode) {
   const text = String(data);
   const mode = requestedMode || detectMode(text);
-  if (!MODE_BITS[mode]) throw new Error(`Native QR mode is not supported yet: ${mode}.`);
-  if (mode === 'numeric' && !/^[0-9]*$/.test(text)) throw new Error('Numeric mode only accepts digits 0-9.');
+  if (!MODE_BITS[mode]) throw createQrError('modeUnsupported', 'Native QR mode is not supported yet: {mode}.', { mode });
+  if (mode === 'numeric' && !/^[0-9]*$/.test(text)) throw createQrError('numericCharacters', 'Numeric mode only accepts digits 0-9.');
   if (mode === 'alphanumeric' && ![...text].every((character) => ALPHANUMERIC.includes(character))) {
-    throw new Error('Alphanumeric mode contains unsupported characters.');
+    throw createQrError('alphanumericCharacters', 'Alphanumeric mode contains unsupported characters.');
   }
   if (mode === 'kanji' && ![...text].every((character) => getQrKanjiValue(character) !== null)) {
-    throw new Error('Kanji mode contains characters outside the QR Shift JIS ranges.');
+    throw createQrError('kanjiCharacters', 'Kanji mode contains characters outside the QR Shift JIS ranges.');
   }
 
   const payload = new BitBuffer();
@@ -172,19 +173,19 @@ function chooseVersion(segments, errorLevel, requestedVersion) {
   const fits = (version) => getRequiredBits(segments, version) <= getDataCodewords(version, errorLevel) * 8;
   if (requestedVersion !== undefined) {
     if (!Number.isInteger(requestedVersion) || requestedVersion < 1 || requestedVersion > 40) {
-      throw new RangeError('QR version must be an integer from 1 through 40.');
+      throw createQrError('versionRange', 'QR version must be an integer from 1 through 40.', undefined, RangeError);
     }
     if (fits(requestedVersion)) return requestedVersion;
   }
   for (let version = 1; version <= 40; version += 1) {
     if (fits(version)) {
       if (requestedVersion !== undefined) {
-        throw new Error(`The chosen QR Code version cannot contain this amount of data. Minimum version required is: ${version}.`);
+        throw createQrError('minimumVersion', 'The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.', { version });
       }
       return version;
     }
   }
-  throw new Error('The content is too large for a version 40 QR Code.');
+  throw createQrError('tooLarge', 'The content is too large for a version 40 QR Code.');
 }
 
 export function selectVersionAndSegments(payload, errorLevel, requestedVersion) {
@@ -204,7 +205,7 @@ export function selectVersionAndSegments(payload, errorLevel, requestedVersion) 
 
   if (requestedVersion !== undefined) {
     if (!Number.isInteger(requestedVersion) || requestedVersion < 1 || requestedVersion > 40) {
-      throw new RangeError('QR version must be an integer from 1 through 40.');
+      throw createQrError('versionRange', 'QR version must be an integer from 1 through 40.', undefined, RangeError);
     }
     const requestedSegments = getOptimized(requestedVersion);
     if (fits(requestedVersion, requestedSegments)) return { segments: requestedSegments, version: requestedVersion };
@@ -214,11 +215,11 @@ export function selectVersionAndSegments(payload, errorLevel, requestedVersion) 
     const segments = getOptimized(version);
     if (!fits(version, segments)) continue;
     if (requestedVersion !== undefined) {
-      throw new Error(`The chosen QR Code version cannot contain this amount of data. Minimum version required is: ${version}.`);
+      throw createQrError('minimumVersion', 'The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.', { version });
     }
     return { segments, version };
   }
-  throw new Error('The content is too large for a version 40 QR Code.');
+  throw createQrError('tooLarge', 'The content is too large for a version 40 QR Code.');
 }
 
 export function makeDataCodewords(segments, version, errorLevel) {

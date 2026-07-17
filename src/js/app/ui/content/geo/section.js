@@ -49,7 +49,7 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
     if (!map) {
       ensureMap().then(update).catch((error) => {
         mapElement.classList.add('has-load-error');
-        mapElement.textContent = 'Unable to initialize the map preview.';
+        mapElement.textContent = lookup('map.loadError', 'Unable to initialize the map preview.');
         console.error(error);
       });
       return;
@@ -68,3 +68,4 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
 
   return { buildPayload, getCoordinates, update };
 }
+import { lookup } from '../../../../i18n/index.js';

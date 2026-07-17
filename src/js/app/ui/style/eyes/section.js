@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createEyeShapeSection({
   shape,
   controls,
@@ -14,8 +16,8 @@ export function createEyeShapeSection({
     controls.hidden = shape.value !== 'custom';
     customColorsEnabled.disabled = imageFill;
     colorControls.hidden = imageFill || !customColorsEnabled.checked;
-    outerRoundingValue.textContent = `${outerRounding.value}%`;
-    centerRoundingValue.textContent = `${centerRounding.value}%`;
+    outerRoundingValue.textContent = lookup('units.percent', '{value}%', { value: outerRounding.value });
+    centerRoundingValue.textContent = lookup('units.percent', '{value}%', { value: centerRounding.value });
   };
 
   const getOptions = () => ({

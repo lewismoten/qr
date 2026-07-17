@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function createFrameNavigation({
   format,
   isBulkMode,
@@ -59,7 +61,7 @@ export function createFrameNavigation({
     const show = supportsSequence && total > 1;
     navigation.classList.toggle('has-navigation', show);
     status.hidden = !show;
-    status.textContent = `${current} of ${total}`;
+    status.textContent = lookup('common.sequence', '{current} of {total}', { current, total });
     previousButton.hidden = !show;
     nextButton.hidden = !show;
     previousButton.disabled = !show || current <= 1;

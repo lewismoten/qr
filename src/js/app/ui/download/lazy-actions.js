@@ -1,3 +1,5 @@
+import { lookup } from '../../../i18n/index.js';
+
 export function setupLazyDownloadActions(options) {
   const buttons = [
     options.currentButton,
@@ -38,7 +40,7 @@ export function setupLazyDownloadActions(options) {
         button.click();
       } catch (error) {
         console.error(error);
-        options.status.textContent = `Download tools could not be loaded: ${error.message}`;
+        options.status.textContent = lookup('download.toolsError', 'Download tools could not be loaded: {message}', { message: error.message });
       }
     });
   });

@@ -6,6 +6,7 @@ import {
   getFileDataUrlPrefix,
   getFileDownloadUrlPrefix,
 } from './protocol.js';
+import { lookup } from '../../../../i18n/index.js';
 
 function assembleChunk(manifestBytes, transferBytes, start, end) {
   const chunkBytes = new Uint8Array(end - start);
@@ -62,7 +63,7 @@ export function createFilePayloadBuilder({
     syncCapacity();
     const { chunkCapacity, totalChunks, streamLength, isSingleFrame } = getCapacityInfo(file);
     if (chunkCapacity <= 0) {
-      throw new Error('Unable to fit the current chunk protocol into this QR configuration.');
+      throw new Error(lookup('file.chunkFitError', 'Unable to fit the current chunk protocol into this QR configuration.'));
     }
 
     const currentChunk = Math.min(Number.parseInt(chunkIndex.value, 10) || 1, totalChunks);

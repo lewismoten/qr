@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createColorSection({
   darkColor,
   lightColor,
@@ -19,9 +21,9 @@ export function createColorSection({
   colorWithTransparency,
 }) {
   const formatTransparency = () => {
-    darkTransparencyValue.textContent = `${darkTransparency.value}%`;
-    lightTransparencyValue.textContent = `${lightTransparency.value}%`;
-    gradientEndTransparencyValue.textContent = `${gradientEndTransparency.value}%`;
+    darkTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: darkTransparency.value });
+    lightTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: lightTransparency.value });
+    gradientEndTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: gradientEndTransparency.value });
   };
 
   const sync = () => {
@@ -30,7 +32,7 @@ export function createColorSection({
     gradientAngleControls.hidden = gradientType.value !== 'linear';
     imageFillControls.hidden = gradientType.value !== 'image';
     imageFillClear.disabled = !hasImageFill();
-    gradientAngleValue.textContent = `${gradientAngle.value} degrees`;
+    gradientAngleValue.textContent = lookup('units.degrees', '{value} degrees', { value: gradientAngle.value });
   };
 
   const getGradientOptions = () => ({

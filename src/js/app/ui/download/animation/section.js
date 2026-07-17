@@ -1,3 +1,5 @@
+import { lookup } from '../../../../i18n/index.js';
+
 export function createAnimationSection({
   timingMode,
   minutesInput,
@@ -25,16 +27,18 @@ export function createAnimationSection({
       const seconds = ((milliseconds % 60000) / 1000).toFixed(3).padStart(6, '0');
       return `${minutes}:${seconds}`;
     }
-    return `${(milliseconds / 1000).toFixed(3)} seconds`;
+    return lookup('download.seconds', '{seconds} seconds', { seconds: (milliseconds / 1000).toFixed(3) });
   };
 
   const sync = () => {
     const frameCount = getFrameCount();
     const { perFrameMs, totalDurationMs } = getTiming(frameCount);
-    summary.textContent = `${formatDuration(perFrameMs)} per image - ${formatDuration(totalDurationMs)} total.`;
+    summary.textContent = lookup('download.durationSummary', '{perImage} per image - {total} total.', {
+      perImage: formatDuration(perFrameMs), total: formatDuration(totalDurationMs),
+    });
     mp4Button.title = getSupportedMp4MimeType()
-      ? 'Download an MP4 animation'
-      : 'MP4 encoding is not available in this browser; animated GIF remains available.';
+      ? lookup('download.mp4Title', 'Download an MP4 animation')
+      : lookup('download.mp4Unavailable', 'MP4 encoding is not available in this browser; animated GIF remains available.');
   };
 
   return { getTiming, formatDuration, sync };
