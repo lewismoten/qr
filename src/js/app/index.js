@@ -252,7 +252,7 @@ runtime.connect({
   preview,
 });
 
-startApplication({
+export const applicationReady = startApplication({
   document,
   window,
   elements,

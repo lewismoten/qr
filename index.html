@@ -28,9 +28,55 @@
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
     </script>
-    <link rel="stylesheet" href="dist/app.min.css" />
+    <style>
+      .boot-loading {
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        display: grid;
+        grid-auto-flow: column;
+        gap: 0.7rem;
+        place-content: center;
+        align-items: center;
+        color: #ecfeff;
+        background: #071827;
+        font: 800 1rem sans-serif;
+      }
+      .boot-loading-spinner {
+        width: 1.2rem;
+        aspect-ratio: 1;
+        border: 0.2rem solid #ffffff47;
+        border-top-color: #5eead4;
+        border-radius: 50%;
+        animation: boot-spin 650ms linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+    </style>
+    <link
+      id="app-styles"
+      rel="stylesheet"
+      href="dist/app.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <style>
+        #boot-loading {
+          display: none;
+        }
+      </style>
+      <link rel="stylesheet" href="dist/app.min.css" />
+    </noscript>
   </head>
   <body>
+    <div id="boot-loading" class="boot-loading" role="status" aria-live="polite">
+      <span class="boot-loading-spinner" aria-hidden="true"></span>
+      <span data-i18n="common.loading">Loading...</span>
+    </div>
     <main class="app-shell">
       <h1 class="sr-only" data-i18n="page.title">Free QR Code Generator, Designer and Debugger</h1>
       <form id="qr-form" class="app-layout">

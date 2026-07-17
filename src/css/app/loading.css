@@ -1,0 +1,76 @@
+.module-loading-region {
+  position: relative;
+}
+
+.boot-loading {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.7rem;
+  place-content: center;
+  align-items: center;
+  color: #ecfeff;
+  background: rgba(7, 24, 39, 0.9);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(5px);
+}
+
+.boot-loading-spinner {
+  width: 1.2rem;
+  aspect-ratio: 1;
+  border: 0.2rem solid rgba(255, 255, 255, 0.28);
+  border-top-color: #5eead4;
+  border-radius: 50%;
+  animation: module-loading-spin 650ms linear infinite;
+}
+
+.boot-loading.has-error .boot-loading-spinner {
+  animation: none;
+  border-color: #fca5a5;
+}
+
+.module-loading-indicator {
+  position: absolute;
+  z-index: 80;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  width: 2rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  border-radius: 50%;
+  background: rgba(7, 24, 39, 0.92);
+  box-shadow: 0 8px 22px rgba(7, 24, 39, 0.25);
+  pointer-events: none;
+}
+
+.module-loading-indicator::before {
+  content: "";
+  width: 0.8rem;
+  aspect-ratio: 1;
+  border: 0.18rem solid rgba(255, 255, 255, 0.28);
+  border-top-color: #5eead4;
+  border-radius: 50%;
+  animation: module-loading-spin 650ms linear infinite;
+}
+
+.module-loading-indicator[hidden] {
+  display: none;
+}
+
+@keyframes module-loading-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-loading-spinner,
+  .module-loading-indicator::before {
+    animation-duration: 1.5s;
+  }
+}

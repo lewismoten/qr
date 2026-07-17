@@ -3,6 +3,7 @@ import { createDownloadSubtabs } from './download-subtabs.js';
 import { createStyleSubtabs } from '../style/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
 import { createTabSet } from '../tab-set.js';
+import { createLoadingIndicator } from '../loading-indicator.js';
 
 export function createNavigation({
   elements: e,
@@ -18,12 +19,20 @@ export function createNavigation({
   let activeStyleSubtab = 'size';
   let activeDownloadSubtab = 'image';
   let activeDebugSubtab = 'encoding';
-  const loadDebug = (name) =>
-    Promise.resolve(prepareDebug?.(name)).then(render).catch(console.error);
-  const loadStyle = (name) =>
-    Promise.resolve(prepareStyle?.(name)).then(render).catch(console.error);
-  const loadDownload = (name) =>
-    Promise.resolve(prepareDownload?.(name)).then(render).catch(console.error);
+  const loading = createLoadingIndicator({
+    region: e.tabPanels[0]?.parentElement,
+  });
+  const load = (prepare, name) =>
+    loading
+      .track(
+        Promise.resolve()
+          .then(() => prepare?.(name))
+          .then(render),
+      )
+      .catch(console.error);
+  const loadDebug = (name) => load(prepareDebug, name);
+  const loadStyle = (name) => load(prepareStyle, name);
+  const loadDownload = (name) => load(prepareDownload, name);
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,

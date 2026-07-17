@@ -78,6 +78,6 @@ export function startApplication({
       )
       .catch(console.error);
   }
-  systems.preview.render();
   dialogs.syncFromHash();
+  return systems.preview.render();
 }

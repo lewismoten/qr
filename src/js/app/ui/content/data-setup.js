@@ -1,4 +1,5 @@
 import { lookup } from '../../../i18n/index.js';
+import { createLoadingIndicator } from '../loading-indicator.js';
 
 const EMPTY_CHUNK_INFO = Object.freeze({
   totalChunks: 1,
@@ -24,14 +25,17 @@ export function createContentDataSetup({
   let bulk = null;
   let fileRequest = null;
   let bulkRequest = null;
+  const loading = createLoadingIndicator({
+    region: e.tabPanels[0]?.parentElement,
+  });
 
   const ensureFile = () => {
     if (file) return Promise.resolve(file);
     if (fileRequest) return fileRequest;
-    fileRequest = Promise.all([
-      import('./file/setup.js'),
-      import('./file/protocol.js'),
-    ])
+    fileRequest = loading
+      .track(
+        Promise.all([import('./file/setup.js'), import('./file/protocol.js')]),
+      )
       .then(
         ([
           { createFileSetup },
@@ -83,7 +87,8 @@ export function createContentDataSetup({
   const ensureBulk = () => {
     if (bulk) return Promise.resolve(bulk);
     if (bulkRequest) return bulkRequest;
-    bulkRequest = import('./bulk/section.js')
+    bulkRequest = loading
+      .track(import('./bulk/section.js'))
       .then(({ createBulkImportSection }) => {
         bulk = createBulkImportSection({
           enabled: e.bulkEnabled,

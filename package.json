@@ -24,7 +24,7 @@
     "lint:markdown": "markdownlint-cli2 \"README.md\"",
     "lint:web-metadata": "node scripts/lint-web-metadata.mjs",
     "format:js": "prettier --write \"src/js/**/*.js\" \"scripts/**/*.mjs\" \"tests/**/*.js\" \"*.mjs\" \"eslint.config.js\"",
-    "test": "node tests/qr.test.js && node tests/qr-parity.test.js && node tests/bytes.test.js && node tests/content-formats.test.js && node tests/modes.test.js && node tests/map.test.js && node tests/export-formats.test.js && node tests/lzw.test.js && node tests/abort.test.js && node tests/progress.test.js && node tests/csv.test.js && node tests/i18n.test.js && node tests/i18n-markup.test.js",
+    "test": "node tests/qr.test.js && node tests/qr-parity.test.js && node tests/bytes.test.js && node tests/content-formats.test.js && node tests/modes.test.js && node tests/map.test.js && node tests/export-formats.test.js && node tests/lzw.test.js && node tests/abort.test.js && node tests/progress.test.js && node tests/loading-indicator.test.js && node tests/csv.test.js && node tests/i18n.test.js && node tests/i18n-markup.test.js",
     "verify": "npm run lint && npm test && npm run build"
   },
   "devDependencies": {
