@@ -917,6 +917,17 @@
 
                   <section class="subtab-panel" data-subtab-panel="advanced" hidden>
                     <fieldset class="option-group">
+                      <legend>QR engine</legend>
+                      <label class="toggle-field">
+                        <input id="native-encoder-enabled" name="native-encoder-enabled" type="checkbox" />
+                        <span>Use experimental first-party encoder</span>
+                      </label>
+                      <p id="native-encoder-status" class="hint" aria-live="polite">
+                        Reference encoder active. Enable this to run the Phase 1 native encoder and compare matrices.
+                      </p>
+                    </fieldset>
+
+                    <fieldset class="option-group">
                       <legend>Raw options</legend>
                       <label for="options-json">Extra options JSON</label>
                       <textarea
@@ -1164,6 +1175,7 @@
       </article>
     </dialog>
 
+    <script src="qr-native.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

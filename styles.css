@@ -394,6 +394,16 @@ input[type="file"] {
   font-weight: 800;
 }
 
+#native-encoder-status.has-success {
+  color: #0f766e;
+  font-weight: 800;
+}
+
+#native-encoder-status.has-error {
+  color: #b42318;
+  font-weight: 800;
+}
+
 .file-mode-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

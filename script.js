@@ -123,6 +123,8 @@ const downloadAllPdf = document.getElementById('download-all-pdf');
 const downloadActions = document.querySelectorAll('.download-actions');
 const downloadStatus = document.getElementById('download-status');
 const optionsJson = document.getElementById('options-json');
+const nativeEncoderEnabled = document.getElementById('native-encoder-enabled');
+const nativeEncoderStatus = document.getElementById('native-encoder-status');
 const errorCorrection = document.getElementById('error-correction');
 const errorCorrectionLabel = document.getElementById('error-correction-label');
 const errorCorrectionValue = document.getElementById('error-correction-value');
@@ -3716,6 +3718,56 @@ function buildPayload(encodedText) {
   return [{ data: encodedText, mode }];
 }
 
+function compareQrDefinitions(nativeDefinition, referenceDefinition) {
+  const sizeMatches = nativeDefinition.modules.size === referenceDefinition.modules.size;
+  const versionMatches = nativeDefinition.version === referenceDefinition.version;
+  const maskMatches = nativeDefinition.maskPattern === referenceDefinition.maskPattern;
+  let differentModules = sizeMatches ? 0 : Infinity;
+  if (sizeMatches) {
+    for (let row = 0; row < nativeDefinition.modules.size; row += 1) {
+      for (let column = 0; column < nativeDefinition.modules.size; column += 1) {
+        if (Boolean(moduleIsDark(nativeDefinition, row, column)) !== Boolean(moduleIsDark(referenceDefinition, row, column))) {
+          differentModules += 1;
+        }
+      }
+    }
+  }
+  return { sizeMatches, versionMatches, maskMatches, differentModules };
+}
+
+function createQrDefinition(payload, options) {
+  if (!nativeEncoderEnabled.checked) {
+    nativeEncoderStatus.textContent = 'Reference encoder active. Enable the experimental encoder to compare matrices.';
+    nativeEncoderStatus.classList.remove('has-error', 'has-success');
+    return QRCode.create(payload, options);
+  }
+  if (typeof globalThis.NativeQRCode?.create !== 'function') {
+    throw new Error('The first-party QR encoder did not load.');
+  }
+
+  const payloadParts = Array.isArray(payload) ? payload : [];
+  const usesKanji = payloadParts.some((part) => {
+    const mode = typeof part.mode === 'string' ? part.mode : part.mode?.id;
+    return String(mode).toLowerCase() === 'kanji';
+  });
+  if (usesKanji) {
+    nativeEncoderStatus.classList.remove('has-error', 'has-success');
+    nativeEncoderStatus.textContent = 'Kanji is scheduled for a later native phase; this preview safely uses the reference encoder.';
+    return QRCode.create(payload, options);
+  }
+
+  const nativeDefinition = globalThis.NativeQRCode.create(payload, options);
+  const referenceDefinition = QRCode.create(payload, options);
+  const comparison = compareQrDefinitions(nativeDefinition, referenceDefinition);
+  const matches = comparison.versionMatches && comparison.maskMatches && comparison.differentModules === 0;
+  nativeEncoderStatus.classList.toggle('has-success', matches);
+  nativeEncoderStatus.classList.toggle('has-error', !matches);
+  nativeEncoderStatus.textContent = matches
+    ? `Native parity confirmed: V${nativeDefinition.version}, mask ${nativeDefinition.maskPattern}, every module matches.`
+    : `Native comparison: V${nativeDefinition.version} vs V${referenceDefinition.version}; mask ${nativeDefinition.maskPattern} vs ${referenceDefinition.maskPattern}; ${Number.isFinite(comparison.differentModules) ? comparison.differentModules : 'different-sized'} modules differ.`;
+  return nativeDefinition;
+}
+
 function updateOptionsPreview(options) {
   optionsPreview.textContent = JSON.stringify(options, null, 2);
 }
@@ -6713,7 +6765,7 @@ async function renderQr() {
 
   try {
     const payload = buildPayload(encodedText);
-    const qrDefinition = QRCode.create(payload, options);
+    const qrDefinition = createQrDefinition(payload, options);
     updateEncodingSummary(qrDefinition, options);
     setValidationMessage(formatValidationState.warning, [], formatValidationState.warning ? 'warning' : 'error');
     drawQr(qrDefinition, options);

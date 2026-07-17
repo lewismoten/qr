@@ -2,6 +2,35 @@
 
 Simple QR Code Builder
 
+## First-party QR encoder roadmap
+
+QR matrix generation is being moved into `qr-native.js` in testable phases. The
+production path still uses the pinned QRCode 1.5.0 reference encoder by default.
+Under **Debug > Advanced**, enable **Use experimental first-party encoder** to
+render with the native implementation and compare its selected version, mask, and
+matrix against the reference implementation.
+
+Phase 1 includes numeric, alphanumeric, and UTF-8 byte encoding, versions 1-40,
+all four error-correction levels, Reed-Solomon block generation and interleaving,
+functional patterns, data placement, all masks, and automatic mask scoring. Kanji,
+mixed-mode optimization, independent reference vectors, and removal of the CDN
+encoder remain later phases.
+
+Run the Phase 1 structural suite with:
+
+```sh
+node qr-native.test.js
+```
+
+For independent matrix parity, download the same pinned reference bundle used by
+the site and run the parity suite. The reference file stays outside the project:
+
+```sh
+curl -fsSL https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js \
+  -o /tmp/qrcode-1.5.0.min.js
+node qr-native.parity.test.js
+```
+
 ## FILE chunked transport
 
 Files use a readable `FILE` transport. When the complete transfer stream fits in
