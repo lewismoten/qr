@@ -6,6 +6,7 @@ let messages = Object.freeze({});
 let debugLanguage = false;
 let availableLocales = Object.freeze([{ code: DEFAULT_LOCALE, flag: '🇺🇸' }]);
 let languageReady = Promise.resolve({ locale: activeLocale, loaded: false });
+let loadLocaleResource;
 
 function canonicalizeLocale(locale) {
   if (typeof locale !== 'string' || !locale.trim()) return undefined;
@@ -98,11 +99,15 @@ function createLocaleLoader(fetcher, baseUrl) {
   return load;
 }
 
-function findMessage(key) {
+function findMessageIn(source, key) {
   if (typeof key !== 'string' || !key.trim()) return undefined;
   return key.split('.').reduce((value, part) => (
     value && Object.prototype.hasOwnProperty.call(value, part) ? value[part] : undefined
-  ), messages);
+  ), source);
+}
+
+function findMessage(key) {
+  return findMessageIn(messages, key);
 }
 
 function interpolate(text, options, key) {
@@ -141,6 +146,33 @@ export function getAvailableLocales() {
   return availableLocales;
 }
 
+export function isDebugLanguage() {
+  return debugLanguage;
+}
+
+export async function getTranslationEntries(key) {
+  if (!loadLocaleResource) return [];
+  const locales = availableLocales.filter(({ code }) => code !== 'en-XA');
+  return Promise.all(locales.map(async (locale) => {
+    try {
+      const localeMessages = await loadLocaleResource(locale.code);
+      const value = findMessageIn(localeMessages, key);
+      return { ...locale, value: typeof value === 'string' ? value : undefined };
+    } catch {
+      return { ...locale, value: undefined };
+    }
+  }));
+}
+
+export function preloadTranslationEntries() {
+  if (!loadLocaleResource) return Promise.resolve([]);
+  return Promise.allSettled(
+    availableLocales
+      .filter(({ code }) => code !== 'en-XA')
+      .map(({ code }) => loadLocaleResource(code)),
+  );
+}
+
 export function whenLanguageReady() {
   return languageReady;
 }
@@ -152,6 +184,7 @@ export function initializeLanguage({
   baseUrl = new URL('locales/', globalThis.document?.baseURI || 'http://localhost/'),
 } = {}) {
   languageReady = (async () => {
+    loadLocaleResource = undefined;
     if (typeof fetcher !== 'function') return { locale: activeLocale, loaded: false };
 
     let manifest = { defaultLocale: DEFAULT_LOCALE, locales: [DEFAULT_LOCALE] };
@@ -170,6 +203,7 @@ export function initializeLanguage({
     const selected = selectLocale(locale ? [locale] : languages, localeCodes, fallback);
     const attempts = [...new Set([selected, fallback, DEFAULT_LOCALE])];
     const loadLocale = createLocaleLoader(fetcher, baseUrl);
+    loadLocaleResource = loadLocale;
 
     for (const locale of attempts) {
       try {
@@ -193,6 +227,7 @@ export function initializeLanguage({
 export function translateDocument(document) {
   document.documentElement.lang = activeLocale;
   document.documentElement.dir = /^(ar|fa|he|ur)(-|$)/i.test(activeLocale) ? 'rtl' : 'ltr';
+  document.documentElement.classList.toggle('i18n-debug', debugLanguage);
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = lookup(element.dataset.i18n, element.textContent);
   });

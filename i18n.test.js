@@ -4,7 +4,9 @@ import {
   getActiveLocale,
   getAvailableLocales,
   getErrorText,
+  getTranslationEntries,
   initializeLanguage,
+  isDebugLanguage,
   lookup,
 } from './src/js/i18n/index.js';
 import { getSavedLocale, LOCALE_STORAGE_KEY } from './src/js/i18n/picker.js';
@@ -96,10 +98,12 @@ await initializeLanguage({
         { code: 'en-XA', flag: '🐞', name: 'Debug', nativeName: 'Translation keys' },
       ],
     },
+    'en-US.json': { navigation: { content: 'Content' } },
     'en-XA.json': { $debug: true },
   }),
 });
 assert.equal(getActiveLocale(), 'en-XA');
+assert.equal(isDebugLanguage(), true);
 assert.equal(lookup('navigation.content', 'Content'), 'navigation.content');
 assert.equal(lookup('common.sequence', '{current} of {total}', { current: 1, total: 4 }), 'common.sequence');
 assert.deepEqual(getAvailableLocales()[1], {
@@ -108,6 +112,10 @@ assert.deepEqual(getAvailableLocales()[1], {
   name: 'Debug',
   nativeName: 'Translation keys',
 });
+assert.equal(
+  (await getTranslationEntries('navigation.content')).find(({ code }) => code === 'en-US')?.value,
+  'Content',
+);
 
 await initializeLanguage({
   locale: 'en-US',
@@ -119,6 +127,7 @@ await initializeLanguage({
   }),
 });
 assert.equal(getActiveLocale(), 'en-US');
+assert.equal(isDebugLanguage(), false);
 assert.equal(lookup('navigation.content', 'Fallback'), 'Content');
 assert.deepEqual(getAvailableLocales(), [
   { code: 'de-DE', flag: '🏳️', name: undefined, nativeName: undefined },
