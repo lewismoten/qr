@@ -49,12 +49,12 @@ body::before {
 .app-shell {
   width: 100%;
   min-height: 100vh;
-  padding: 0.75rem;
+  padding: 0.75rem 0.75rem calc(4.75rem + env(safe-area-inset-bottom));
 }
 
 .app-layout {
   width: min(100%, 1180px);
-  min-height: calc(100vh - 1.5rem);
+  min-height: max(0px, calc(100dvh - 6rem - env(safe-area-inset-bottom)));
   margin: 0 auto;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
@@ -84,7 +84,7 @@ body::before {
 .preview-frame {
   min-height: min(30vh, 16rem);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   place-items: center;
   gap: 0.55rem;
   padding: 0.65rem;
@@ -105,13 +105,16 @@ body::before {
 }
 
 .preview-view-controls {
-  justify-self: end;
+  position: absolute;
+  z-index: 4;
+  top: 0.4rem;
+  right: 1.15rem;
   display: flex;
-  gap: 0.25rem;
-  padding: 0.2rem;
-  border: 1px solid rgba(13, 148, 136, 0.2);
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.88);
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .preview-view-controls.is-hidden {
@@ -120,22 +123,65 @@ body::before {
 }
 
 .preview-view-button {
-  min-height: 2.25rem;
-  padding: 0.35rem 0.7rem;
-  border: 0;
-  border-radius: 0.55rem;
+  position: relative;
+  min-height: 1.25rem;
+  padding: 0 0.3rem 0 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
   background: transparent;
-  color: #52687a;
+  color: rgba(226, 242, 241, 0.58);
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.58rem;
   font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
+.preview-view-button::before {
+  content: "";
+  position: absolute;
+  left: 0.34rem;
+  top: 50%;
+  width: 0.42rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%);
+}
+
+.preview-view-button:last-child::before {
+  background: rgba(245, 158, 11, 0.35);
+}
+
 .preview-view-button.is-active {
-  color: #071827;
-  background: linear-gradient(135deg, #5eead4, #fcd38d);
-  box-shadow: 0 4px 12px rgba(7, 24, 39, 0.12);
+  border-color: transparent;
+  background: transparent;
+  color: #fffaf0;
+}
+
+.preview-view-button.is-active::before {
+  background: var(--signal-bright);
+  box-shadow: 0 0 0.35rem rgba(45, 212, 191, 0.95);
+}
+
+.preview-view-button:last-child.is-active::before {
+  background: var(--flare);
+  box-shadow: 0 0 0.35rem rgba(245, 158, 11, 0.95);
+}
+
+.preview-view-button:focus {
+  outline: none;
+}
+
+.preview-view-button:focus-visible::before {
+  box-shadow:
+    0 0 0 2px #071827,
+    0 0 0 3px rgba(255, 255, 255, 0.9);
 }
 
 .qr-preview-viewport {
@@ -1362,11 +1408,11 @@ output {
 
 @media (min-width: 720px) {
   .app-shell {
-    padding: 1rem;
+    padding: 1rem 1rem calc(4.75rem + env(safe-area-inset-bottom));
   }
 
   .app-layout {
-    min-height: calc(100vh - 2rem);
+    min-height: max(0px, calc(100dvh - 6.75rem - env(safe-area-inset-bottom)));
     gap: 1rem;
   }
 
@@ -1421,7 +1467,7 @@ output {
 
   .preview-card {
     grid-area: preview;
-    min-height: calc(100vh - 2rem);
+    min-height: max(0px, calc(100dvh - 6.75rem - env(safe-area-inset-bottom)));
   }
 
   .tab-navigation-card {
@@ -1575,15 +1621,7 @@ body::after {
 }
 
 .preview-card::after {
-  content: "";
-  position: absolute;
-  right: 1.1rem;
-  top: 1.08rem;
-  width: 2.8rem;
-  height: 0.32rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--signal-bright) 0 28%, transparent 28% 36%, var(--flare) 36% 62%, transparent 62% 70%, rgba(255, 255, 255, 0.28) 70%);
-  pointer-events: none;
+  display: none;
 }
 
 .preview-frame {
@@ -1827,15 +1865,21 @@ input[type="color"] {
 }
 
 .site-footer {
-  width: min(100%, 1180px);
-  margin: 1rem auto 0;
-  padding: 1rem 1.1rem;
+  width: min(calc(100% - 1.5rem), 1180px);
+  min-height: 3.5rem;
+  margin: 0;
+  padding: 0.35rem 0.6rem 0.35rem 0.85rem;
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   border: 1px solid rgba(45, 212, 191, 0.2);
-  border-radius: 1.2rem;
+  border-radius: 1rem;
   background: linear-gradient(135deg, rgba(16, 42, 61, 0.98), rgba(7, 24, 39, 0.98));
   box-shadow: 0 18px 48px rgba(7, 24, 39, 0.2);
   color: rgba(226, 242, 241, 0.72);
@@ -1867,7 +1911,7 @@ input[type="color"] {
 
 .site-footer a {
   min-height: 2.5rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.45rem 0.65rem;
   display: inline-flex;
   align-items: center;
   border-radius: 0.7rem;
@@ -2110,13 +2154,24 @@ input[type="color"] {
   }
 
   .site-footer {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .site-footer nav {
-    width: 100%;
-    justify-content: flex-start;
+    width: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .site-footer p {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .site-footer a {
+    padding-inline: 0.45rem;
+    font-size: 0.75rem;
   }
 
   .info-dialog-header {
@@ -2130,6 +2185,17 @@ input[type="color"] {
   .fact-grid,
   .dependency-list {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 359px) {
+  .site-footer p {
+    display: none;
+  }
+
+  .site-footer nav {
+    width: 100%;
+    justify-content: center;
   }
 }
 

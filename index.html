@@ -33,11 +33,11 @@
       <h1 class="sr-only">Free QR Code Generator, Designer and Debugger</h1>
       <form id="qr-form" class="app-layout">
         <section class="preview-card" aria-live="polite">
+          <div id="preview-view-controls" class="preview-view-controls is-hidden" role="group" aria-label="QR preview size" aria-hidden="true">
+            <button id="preview-view-fit" type="button" class="preview-view-button is-active" aria-pressed="true">Fit</button>
+            <button id="preview-view-actual" type="button" class="preview-view-button" aria-label="Actual size" aria-pressed="false">1:1</button>
+          </div>
           <div class="preview-frame">
-            <div id="preview-view-controls" class="preview-view-controls is-hidden" role="group" aria-label="QR preview size" aria-hidden="true">
-              <button id="preview-view-fit" type="button" class="preview-view-button is-active" aria-pressed="true">Fit</button>
-              <button id="preview-view-actual" type="button" class="preview-view-button" aria-pressed="false">Actual size</button>
-            </div>
             <div id="chunk-preview-nav" class="chunk-preview-nav">
               <button id="chunk-preview-prev" type="button" class="chunk-nav-button" aria-label="Previous QR code">‹</button>
               <div id="qr-preview-viewport" class="qr-preview-viewport is-fit">
