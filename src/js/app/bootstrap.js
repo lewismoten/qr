@@ -2,15 +2,6 @@ import { colorWithTransparency, getContrastingHex } from './colors.js';
 import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_LABELS, MASK_VALUES,
   MODE_CAPACITY, MODE_LABELS, QR_ALPHANUMERIC_CHARACTERS } from './configuration.js';
 import { validatePrintableText } from './validation.js';
-import {
-  getAlignmentPatternCenters,
-  isAlignmentRegion,
-  isDarkModuleRegion,
-  isFinderRegion,
-  isFormatRegion,
-  isTimingRegion,
-  isVersionRegion,
-} from './qr-regions.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
@@ -20,56 +11,49 @@ import {
 } from './ui/content/file/protocol.js';
 import { createFileSetup } from './ui/content/file/setup.js';
 import { createContentSections } from './ui/content/setup.js';
-import { getActiveOutlineGroups } from './ui/debug/boundaries.js';
 import {
   buildDebugOverlayModel,
   getDebugCategory,
 } from './ui/debug/model.js';
 import { createDebugSetup } from './ui/debug/setup.js';
 import { createDownloadControls } from './ui/download/controls.js';
-import { restoreLocationDownload } from './ui/download/location.js';
 import { createDownloadSetup } from './ui/download/setup.js';
-import { initializeDialogs } from './ui/dialogs.js';
-import { bindApplicationEvents } from './ui/events.js';
 import { getApplicationElements } from './ui/elements.js';
 import { createNavigation } from './ui/navigation/setup.js';
 import { createOutputSetup } from './ui/output/setup.js';
 import { createRuntimeHelpers } from './ui/runtime/helpers.js';
+import { startApplication } from './ui/runtime/startup.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
-import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
-import { createRenderController } from './ui/preview/render.js';
-import { createQrRenderer } from './ui/preview/qr-renderer.js';
+import { createPreviewSetup } from './ui/preview/setup.js';
 import { createPreviewSizeControls } from './ui/preview/size.js';
 import { createStyleSetup } from './ui/style/setup.js';
 import qrEncoder from '../qr/index.js';
 
 const elements = getApplicationElements(document);
 const {
-  form, canvas, qrPreviewViewport, previewViewControls, previewViewFit, previewViewActual, chunkPreviewNav,
-  chunkPreviewPrev, chunkPreviewNext, chunkPreviewStatus, optionsPreview, encodedPreview, payloadRevealSecrets, payloadRevealToggle,
+  canvas, qrPreviewViewport, previewViewControls, previewViewFit, previewViewActual, chunkPreviewNav,
+  chunkPreviewPrev, chunkPreviewNext, chunkPreviewStatus, encodedPreview, payloadRevealSecrets, payloadRevealToggle,
   qrFormat, bulkEnabled, bulkFields, bulkExpectedFields, bulkRequiredFields, bulkFileInput, bulkRowIndex,
-  bulkStatus, bulkClear, choiceButtons, formatFieldsets, qrVersion, qrVersionValue, versionAuto,
+  bulkStatus, bulkClear, choiceButtons, formatFieldsets, qrVersion, versionAuto,
   maskPattern, maskGrid, qrWidth, qrWidthValue, qrWidthAuto, qrScale, qrScaleValue,
   qrMargin, qrMarginValue, colorDark, colorLight, colorDarkTransparency, colorDarkTransparencyValue, colorLightTransparency,
   colorLightTransparencyValue, gradientType, gradientControls, gradientAngleControls, gradientAngle, gradientAngleValue, colorGradientEnd,
-  colorGradientEndTransparency, colorGradientEndTransparencyValue, imageFillControls, imageFillInput, imageFillRecommended, imageFillClear, frameMessageMode,
-  customFrameMessageField, customFrameMessage, frameMessageCenter, frameMessageCenterArt, frameFont, frameMessageColor, frameLineHeight,
-  frameLineHeightValue, moduleShape, moduleCustomControls, moduleRounding, moduleRoundingValue, moduleInset, moduleInsetValue,
+  colorGradientEndTransparency, colorGradientEndTransparencyValue, imageFillControls, imageFillInput, imageFillClear,
+  moduleShape, moduleCustomControls, moduleRounding, moduleRoundingValue, moduleInset, moduleInsetValue,
   moduleRotation, moduleRotationValue, eyeShape, eyeCustomControls, eyeOuterRounding, eyeOuterRoundingValue, eyeCenterRounding,
-  eyeCenterRoundingValue, eyeCustomColorsEnabled, eyeColorControls, eyeOuterColor, eyeCenterColor, centerArtMode, centerArtControls,
-  centerArtSize, centerArtSizeValue, centerArtBackground, centerArtBackgroundLabel, centerLogoControls, centerLogoInput, centerLogoClear,
+  eyeCenterRoundingValue, eyeCustomColorsEnabled, eyeColorControls, centerArtMode, centerArtControls,
+  centerArtSize, centerArtSizeValue, centerArtBackgroundLabel, centerLogoControls, centerLogoInput, centerLogoClear,
   centerEmojiControls, centerEmoji, emojiOptions, centerPixelControls, pixelArtColor, pixelArtClear, pixelArtPalette,
-  pixelArtMatchModuleShape, pixelArtSizeInput, pixelArtSizeValue, pixelArtGrid, downloadFormat, downloadQualityControls, downloadQuality,
+  pixelArtSizeInput, pixelArtSizeValue, pixelArtGrid, downloadFormat, downloadQualityControls, downloadQuality,
   downloadQualityValue, printWidthAuto, printWidth, printWidthValue, downloadCurrent, downloadCurrentPdf, downloadZip,
-  downloadAllPdf, downloadActions, downloadStatus, optionsJson, errorCorrection, errorCorrectionLabel, errorCorrectionValue,
-  errorCorrectionHelp, modeAuto, encodingMode, encodingModeButtons, detectedMode, segmentSummary, versionSummary,
+  downloadAllPdf, downloadActions, downloadStatus, errorCorrection, modeAuto, encodingMode, detectedMode, segmentSummary, versionSummary,
   capacitySummary, unusedSummary, modeValidation, formatValidation, tabButtons, tabPanels, debugSubtabButtons,
   debugSubtabPanels, styleSubtabButtons, styleSubtabPanels, downloadSubtabButtons, downloadSubtabPanels, downloadSubtabBar, downloadAnimationTab,
   animationTimingMode, animationMinutes, animationSeconds, animationMilliseconds, animationDurationSummary, downloadAnimatedGif, downloadAnimationMp4,
-  contentSubtabButtons, contentSubtabPanels, debugEnabled, debugUnmask, debugOutlineModeButtons, urlInput, textInput,
+  contentSubtabButtons, contentSubtabPanels, debugEnabled, debugOutlineModeButtons, textInput,
   numberStart, numberEnd, numberStep, numberPrefix, numberSuffix, numberSequenceIndex, numberSequenceValue,
   wifiSsid, wifiPassword, wifiEncryption, wifiHidden, emailTo, emailSubject, emailBody,
-  emailBodyLengthHint, phoneNumber, phoneFormatButtons, smsNumber, smsBody, smsLengthHint, eventTitle,
+  phoneNumber, phoneFormatButtons, smsNumber, smsBody, eventTitle,
   eventAllDay, eventStartDate, eventStartTime, eventEndDate, eventEndTime, eventLocation, eventDescription,
   eventUrl, eventTimeFields, geoLatitude, geoLongitude, geoQuery, geoMapElement, vcardName,
   vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl, fileInput, fileEncodingMode,
@@ -243,10 +227,6 @@ const setFormatVisibility = createFormatVisibility({
 
 const buildFilePayload = fileSetup.payload.build;
 
-function placeholderValue(value, placeholder) {
-  return value.trim() || placeholder;
-}
-
 const contentSections = createContentSections({
   elements: { format: qrFormat, eventTitle, eventAllDay, eventStartDate, eventStartTime,
     eventEndDate, eventEndTime, eventLocation, eventDescription, eventUrl, eventTimeFields,
@@ -388,31 +368,6 @@ const getModuleContrastColor = debugStyles.getModuleContrastColor;
 
 
 
-const drawQr = createQrRenderer({
-  canvas, qrWidth, qrWidthAuto, colorLight, eyeCustomColorsEnabled, eyeOuterColor,
-  eyeCenterColor, debugColors, debugUnmask, centerArtMode, centerEmoji, centerArtSize,
-  centerArtBackground, pixelArtMatchModuleShape, moduleShape, frameMessageCenter,
-  frameLineHeight, frameMessageColor, maxTargetWidth: MAX_QR_TARGET_WIDTH,
-  formatWidthLabel, getCurrentFrameMessage, getFrameFont, isDebugOverlayActive,
-  getCurrentModuleShapeOptions, getCurrentEyeShapeOptions, getCurrentGradientOptions,
-  imageFillController, getCodewordStyle, getModuleContrastColor, centerLogoController,
-  pixelArtEditor, readInteger, schedulePreviewViewportSync,
-  setRenderMetrics(width, scale) { renderedQrWidth = width; renderedQrModuleScale = scale; },
-  getActiveDebugOutlineMode: () => activeDebugOutlineMode,
-});
-
-const renderInvalidPreview = createInvalidPreviewRenderer({
-  canvas,
-  encoder: qrEncoder,
-  drawQr,
-  clearCanvas,
-});
-
-const maskSelector = debugSetup.masks;
-const ensureMaskButtons = maskSelector.ensure;
-const syncMaskSelection = maskSelector.sync;
-const renderMaskPreviews = maskSelector.renderPreviews;
-
 const navigation = createNavigation({
   elements: { tabs: tabButtons, tabPanels, debugTabs: debugSubtabButtons,
     debugPanels: debugSubtabPanels, styleTabs: styleSubtabButtons, stylePanels: styleSubtabPanels,
@@ -434,49 +389,35 @@ const syncChoiceButtons = navigation.syncChoices;
 const debugOutlineSelector = debugSetup.outlines;
 const syncDebugOutlineSelection = debugOutlineSelector.sync;
 
-const renderController = createRenderController({
-  syncOutputs,
-  syncFormat: setFormatVisibility,
-  updateMap: updateGeoMap,
-  buildText: buildEncodedText,
-  buildOptions,
-  buildPreview: buildEncodedPreviewTemplate,
-  updateTextPreview: updateEncodedPreview,
-  updateOptionsPreview,
-  syncMask: syncMaskSelection,
-  renderMasks: renderMaskPreviews,
-  getValidation: getFormatValidationState,
-  setValidation: setValidationMessage,
-  renderInvalid: renderInvalidPreview,
-  updateSummary: updateEncodingSummary,
-  validateMode: validateManualMode,
-  getModeError: () => modeValidation.textContent,
-  buildPayload,
-  createDefinition: createQrDefinition,
-  drawQr,
-  syncDownloads: syncDownloadControls,
-  showBuildError(error, options) {
-    encodedPreview.textContent = error.message;
-    encodedPreview.classList.add('has-error');
-    renderInvalidPreview(buildEncodedPreviewTemplate(), options, error.message);
-    setValidationMessage(error.message || 'Unable to build QR content.');
-    console.error(error);
-  },
+const previewSetup = createPreviewSetup({
+  e: elements,
+  encoder: qrEncoder,
+  debugColors,
+  maxTargetWidth: MAX_QR_TARGET_WIDTH,
+  content: { getFrameMessage: getCurrentFrameMessage, getFrameFont, buildText: buildEncodedText,
+    buildOptions, buildPreview: buildEncodedPreviewTemplate, updateTextPreview: updateEncodedPreview,
+    updateOptionsPreview, getValidation: getFormatValidationState, buildPayload, createDefinition: createQrDefinition },
+  debug: { setup: debugSetup, isOverlayActive: isDebugOverlayActive, getCodewordStyle,
+    getModuleContrastColor, getOutlineMode: () => activeDebugOutlineMode,
+    setValidation: setValidationMessage, updateSummary: updateEncodingSummary,
+    validateMode: validateManualMode },
+  style: { getModuleOptions: getCurrentModuleShapeOptions, getEyeOptions: getCurrentEyeShapeOptions,
+    getGradientOptions: getCurrentGradientOptions, imageFill: imageFillController,
+    centerLogo: centerLogoController, pixelEditor: pixelArtEditor },
+  helpers: { formatWidthLabel, readInteger, clearCanvas },
+  actions: { syncOutputs, syncFormat: setFormatVisibility, updateMap: updateGeoMap,
+    syncDownloads: syncDownloadControls },
+  runtime: { scheduleViewportSync: schedulePreviewViewportSync,
+    setRenderMetrics(width, scale) { renderedQrWidth = width; renderedQrModuleScale = scale; } },
 });
-const renderQr = renderController.render;
-cancelRenderRequest = renderController.cancel;
+const renderQr = previewSetup.render;
+cancelRenderRequest = previewSetup.cancel;
+const ensureMaskButtons = previewSetup.ensureMaskButtons;
+const syncMaskSelection = previewSetup.syncMaskSelection;
 
-bindApplicationEvents({
-  elements: {
-    form, bulkEnabled, bulkFileInput, animationMinutes, animationSeconds, animationMilliseconds,
-    downloadQuality, fileIncludeManifest, fileCompressTransfer, fileCustomMetadata,
-    fileChunkVersionAuto, fileChunkVersion, fileChunkVersionValue, fileChunkIndex,
-    fileInput, clearFileButton, qrFormat, frameMessageCenter, frameMessageCenterArt,
-    choiceButtons, gradientType, moduleShape, eyeShape, centerArtMode, wifiEncryption,
-    downloadFormat, animationTimingMode, fileEncodingMode, versionAuto, qrVersion,
-    emojiOptions, centerEmoji, imageFillRecommended, chunkPreviewPrev, chunkPreviewNext,
-  },
-  actions: {
+startApplication({
+  document, window, elements, defaultChunkVersion: DEFAULT_CHUNK_AUTO_VERSION,
+  eventActions: {
     syncFormat: setFormatVisibility, activateContent: activateContentSubtab, loadBulkFile,
     render: renderQr, syncAnimation: syncAnimationDurationSummary, syncDownloads: syncDownloadControls,
     resetTransfer: resetTransferDerivedState, scheduleChunkRefresh: scheduleChunkSettingsRefresh,
@@ -492,34 +433,16 @@ bindApplicationEvents({
     getFrameCount: getDownloadFrameCount, syncNavigation: syncChunkPreviewNavigation,
     getFileMode: getSelectedFileEncodingMode,
   },
-  defaultChunkVersion: DEFAULT_CHUNK_AUTO_VERSION,
+  initialize: {
+    pixelEditor: () => pixelArtEditor.initialize(), calendarDefaults: initializeCalendarEventDefaults,
+    getDefaultUrl: getDefaultUrlValue, outputs: syncOutputs, formatVisibility: setFormatVisibility,
+    maskButtons: ensureMaskButtons, maskSelection: syncMaskSelection, choiceButtons: syncChoiceButtons,
+    wifi: syncWifiSecurityState, phone: () => phoneSection.initialize(), fileCapacity: syncFileCapacityHint,
+    chunkVersion: syncChunkVersionControls, fileChunkLabel: syncFileChunkLabel,
+    sharedFields: () => sharedFieldsSection.initialize(), smsLength: syncSmsLengthHint,
+    emailLength: syncEmailBodyLengthHint, debugOutline: syncDebugOutlineSelection,
+    contentTab: activateContentSubtab, styleTab: activateStyleSubtab,
+    downloadTab: activateDownloadSubtab, debugTab: activateDebugSubtab, mainTab: activateTab,
+    previewMode: setPreviewViewMode, render: renderQr,
+  },
 });
-
-const dialogs = initializeDialogs({ document, window });
-
-pixelArtEditor.initialize();
-initializeCalendarEventDefaults();
-urlInput.value = getDefaultUrlValue();
-syncOutputs();
-setFormatVisibility();
-ensureMaskButtons();
-syncMaskSelection();
-syncChoiceButtons();
-syncWifiSecurityState();
-phoneSection.initialize();
-syncFileCapacityHint();
-syncChunkVersionControls();
-syncFileChunkLabel();
-sharedFieldsSection.initialize();
-syncSmsLengthHint();
-syncEmailBodyLengthHint();
-syncDebugOutlineSelection();
-activateContentSubtab('data');
-activateStyleSubtab('size');
-activateDownloadSubtab('image');
-activateDebugSubtab('encoding');
-activateTab('content');
-setPreviewViewMode('fit', true);
-  restoreLocationDownload({ window, document });
-renderQr();
-dialogs.syncFromHash();
