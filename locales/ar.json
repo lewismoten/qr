@@ -1,0 +1,78 @@
+{
+  "navigation": { "content": "المحتوى", "style": "النمط", "download": "تنزيل", "debug": "التصحيح" },
+  "content": { "data": "البيانات", "format": "التنسيق", "frame": "الإطار" },
+  "formats": { "url": "رابط", "event": "حدث", "vcard": "بطاقة اتصال", "sms": "رسالة نصية", "email": "بريد إلكتروني", "phone": "هاتف" },
+  "fields": {
+    "title": "العنوان", "location": "الموقع", "description": "الوصف", "recipientEmail": "بريد المستلم", "fullName": "الاسم الكامل",
+    "organization": "المؤسسة", "vcardPhone": "هاتف بطاقة الاتصال", "vcardEmail": "بريد بطاقة الاتصال", "smsPhone": "رقم الرسائل النصية",
+    "emailAddress": "عنوان البريد الإلكتروني", "telephoneNumber": "رقم الهاتف", "subject": "الموضوع", "body": "النص", "message": "الرسالة", "prefix": "البادئة", "suffix": "اللاحقة"
+  },
+  "footer": { "name": "منشئ رمز QR", "navigationLabel": "معلومات الموقع", "about": "حول", "specification": "مواصفات QR", "technology": "التقنية", "source": "المصدر" },
+  "language": { "choose": "اختر اللغة", "description": "تظهر الأسماء بلغتك الحالية وبالصيغة الأصلية لكل لغة.", "current": "اللغة: {language}. اختر اللغة." },
+  "validation": {
+    "contentRequired": "غير صالح بعد: المحتوى مطلوب.",
+    "email": {
+      "required": "غير صالح بعد لتنسيق {context}: ‏{label} مطلوب.", "invalid": "غير صالح بعد لتنسيق {context}: يجب أن يكون {label} صالحًا.",
+      "length": "غير صالح بعد لتنسيق {context}: يجب ألا يتجاوز {label} 254 حرفًا.", "subjectLabel": "غير صالح بعد للبريد الإلكتروني: الموضوع",
+      "bodyLabel": "غير صالح بعد للبريد الإلكتروني: النص", "capacity": "غير صالح بعد للبريد الإلكتروني: يتجاوز النص سعة QR الحالية ({current} / {max})."
+    },
+    "text": { "length": "يجب ألا يتجاوز {label} عدد {maxLength} من الأحرف.", "printable": "يجب أن يحتوي {label} على أحرف قابلة للطباعة فقط." },
+    "phone": {
+      "required": "غير صالح بعد لتنسيق {context}: ‏{label} مطلوب.", "characters": "غير صالح بعد لتنسيق {context}: يقبل {label} الأرقام والمسافات والأقواس والنقاط والشرطات وعلامة + اختيارية في البداية فقط.",
+      "plus": "غير صالح بعد لتنسيق {context}: لا يمكن استخدام + في {label} إلا في البداية.", "length": "غير صالح بعد لتنسيق {context}: يجب أن يحتوي {label} على 10 إلى 15 رقمًا."
+    },
+    "geo": {
+      "labelLength": "غير صالح بعد للموقع الجغرافي: يجب ألا تتجاوز التسمية 80 حرفًا.", "labelCharacters": "غير صالح بعد للموقع الجغرافي: تقبل التسمية الحروف والأرقام والمسافات وعلامات الترقيم الشائعة فقط.",
+      "latitudeRequired": "غير صالح بعد للموقع الجغرافي: خط العرض مطلوب.", "longitudeRequired": "غير صالح بعد للموقع الجغرافي: خط الطول مطلوب.",
+      "latitudeNumber": "غير صالح بعد للموقع الجغرافي: يجب أن يكون خط العرض رقمًا صالحًا.", "longitudeNumber": "غير صالح بعد للموقع الجغرافي: يجب أن يكون خط الطول رقمًا صالحًا.",
+      "latitudeRange": "غير صالح بعد للموقع الجغرافي: يجب أن يكون خط العرض بين -90 و90.", "longitudeRange": "غير صالح بعد للموقع الجغرافي: يجب أن يكون خط الطول بين -180 و180."
+    },
+    "website": {
+      "required": "غير صالح بعد لتنسيق {context}: الموقع الإلكتروني مطلوب.", "length": "غير صالح بعد لتنسيق {context}: يجب ألا يتجاوز الموقع 2048 حرفًا.",
+      "protocolRequired": "غير صالح بعد لتنسيق {context}: يجب تضمين بروتوكول كامل مثل https://.", "protocol": "غير صالح بعد لتنسيق {context}: يجب أن يبدأ الموقع بـ https:// أو http://.",
+      "insecure": "تحذير لتنسيق {context}: يستخدم الموقع http://. يوصى بشدة باستخدام https://."
+    },
+    "event": {
+      "required": "غير صالح بعد للحدث: ‏{label} مطلوب.", "length": "غير صالح بعد للحدث: يجب ألا يتجاوز {label} عدد {maxLength} من الأحرف.",
+      "characters": "غير صالح بعد للحدث: يحتوي {label} على أحرف تحكم غير مدعومة.", "startDate": "غير صالح بعد للحدث: تاريخ البدء مطلوب.",
+      "endDate": "غير صالح بعد للحدث: تاريخ الانتهاء مطلوب.", "dateOrder": "غير صالح بعد للحدث: لا يمكن أن يسبق تاريخ الانتهاء تاريخ البدء.",
+      "startTime": "غير صالح بعد للحدث: وقت البدء مطلوب.", "endTime": "غير صالح بعد للحدث: وقت الانتهاء مطلوب.", "timeOrder": "غير صالح بعد للحدث: يجب أن تكون النهاية بعد البداية."
+    },
+    "sms": { "length": "غير صالح بعد للرسائل النصية: يجب ألا تتجاوز الرسالة {maxLength} حرفًا لضمان التوافق." },
+    "file": { "required": "غير صالح بعد للملف: اختر ملفًا لترميزه." }
+  },
+  "common": { "auto": "تلقائي", "autoLower": "تلقائي", "none": "لا شيء", "preview": "معاينة", "sequence": "{current} من {total}", "count": "{current} / {total}" },
+  "bulk": { "loading": "جارٍ تحميل أدوات الاستيراد المجمع.", "warning": "صف الاستيراد {rowNumber}: ‏{message}", "requiredValues": "القيم المطلوبة: {values}", "status": { "empty": "لم يتم تحميل CSV.", "loaded": "تم تحميل {count} صفوف. عرض {current} من {count}." } },
+  "frame": { "allDay": "طوال اليوم", "wifi": "واي فاي {ssid}", "email": "راسل {email}", "call": "اتصل بـ {phone}", "text": "أرسل إلى {phone}", "location": "الموقع {location}", "contact": "جهة الاتصال {contact}", "sequence": "{current} من {total}" },
+  "encoding": {
+    "invalidPositions": "{message} المواضع: {positions}{suffix}.", "kanjiUnavailable": "وضع كانجي اليدوي غير متاح لأن محول Shift JIS لم يُحمّل.",
+    "incompatible": "غير متوافق مع وضع {mode}. الأحرف غير الصالحة: {characters}.", "waiting": "انتظار", "mixedSummary": "مختلط ({modes})", "unused": "{bytes} بايت ({percent}%)",
+    "modes": { "numeric": "رقمي", "alphanumeric": "أبجدي رقمي", "byte": "بايت / ثنائي", "kanji": "كانجي", "mixed": "مختلط" }
+  },
+  "mask": { "value": "قناع {value}", "bestFit": "أفضل ملاءمة" },
+  "preview": {
+    "invalid": "غير صالح", "invalidPayload": "معاينة غير صالحة", "buildError": "تعذر إنشاء محتوى QR.", "encodeError": "تعذر ترميز هذا المحتوى.",
+    "encoderError": "لم يتم تحميل مرمز QR المدمج.", "printSize": "{inches} بوصة{automatic} - {millimeters} مم/وحدة",
+    "width": "{width} بكسل · {scale} بكسل/وحدة · {inches} بوصة عند {ppi} نقطة/بوصة"
+  },
+  "errorCorrection": {
+    "L": { "label": "منخفض", "detail": "أقل قدر من التكرار، ويمكنه تحمل نحو 7% من التلف أو التغطية." }, "M": { "label": "متوسط", "detail": "يوازن بين السعة والمتانة، مع استرداد نحو 15% من التلف." },
+    "Q": { "label": "ربعي", "detail": "يستخدم بيانات تصحيح أكثر، مع استرداد نحو 25% من التلف." }, "H": { "label": "مرتفع", "detail": "أعلى تصحيح، ويمكنه غالبًا تحمل نحو 30% من الحجب." }
+  },
+  "map": { "zoomControls": "عناصر تكبير الخريطة", "zoomIn": "تكبير", "zoomOut": "تصغير", "attribution": "© مساهمو OpenStreetMap", "loadError": "تعذر تهيئة معاينة الخريطة." },
+  "wifi": { "openPassword": "غير مستخدمة للشبكات المفتوحة", "password": "كلمة المرور" },
+  "units": { "pixels": "{value} بكسل", "degrees": "{value} درجة", "dimensions": "{width} × {height}", "percent": "{value}%" },
+  "download": {
+    "creating": "جارٍ إنشاء {format}...", "ready": "التنزيل جاهز.", "error": "تعذر إنشاء التنزيل.", "creatingPdf": "جارٍ إنشاء PDF...", "pdfReady": "ملف PDF جاهز.",
+    "pdfError": "تعذر إنشاء PDF.", "rendering": "جارٍ معالجة {frame} من {total}...", "buildingZip": "جارٍ إنشاء ZIP...", "zipReady": "ملف ZIP جاهز ويحتوي على {total} ملفات.",
+    "zipError": "تعذر إنشاء ZIP.", "capturingFrame": "جارٍ التقاط إطار الحركة {frame} من {total}...", "animationError": "تعذر إنشاء حركة {format}.",
+    "seconds": "{seconds} ثانية", "durationSummary": "{perImage} لكل صورة - {total} إجمالًا.", "mp4Title": "تنزيل حركة MP4",
+    "mp4Unavailable": "ترميز MP4 غير متاح في هذا المتصفح؛ لا يزال GIF المتحرك متاحًا.", "allZip": "تنزيل الكل ({count}) بصيغة ZIP", "allPdf": "تنزيل الكل ({count}) بصيغة PDF"
+  },
+  "qr": { "errors": {
+    "modeUnsupported": "وضع QR المدمج غير مدعوم بعد: {mode}.", "numericCharacters": "يقبل الوضع الرقمي الأرقام 0-9 فقط.",
+    "alphanumericCharacters": "يحتوي الوضع الأبجدي الرقمي على أحرف غير مدعومة.", "kanjiCharacters": "يحتوي وضع كانجي على أحرف خارج نطاقات QR Shift JIS.",
+    "kanjiUnsupported": "يتطلب وضع كانجي المدمج دعم المتصفح لفك Shift JIS.", "versionRange": "يجب أن يكون إصدار QR عددًا صحيحًا من 1 إلى 40.",
+    "minimumVersion": "لا يمكن لإصدار QR المختار احتواء هذه البيانات. الحد الأدنى المطلوب هو الإصدار {version}.", "tooLarge": "المحتوى أكبر من سعة رمز QR بالإصدار 40."
+  } }
+}

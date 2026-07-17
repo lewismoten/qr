@@ -1,4 +1,10 @@
 {
   "defaultLocale": "en-US",
-  "locales": ["en-US"]
+  "locales": [
+    { "code": "en-US", "flag": "🇺🇸" },
+    { "code": "zh-CN", "flag": "🇨🇳" },
+    { "code": "hi-IN", "flag": "🇮🇳" },
+    { "code": "es", "flag": "🇪🇸" },
+    { "code": "ar", "flag": "🇸🇦" }
+  ]
 }

@@ -38,10 +38,16 @@
   },
   "footer": {
     "name": "QR Code Generator",
+    "navigationLabel": "Site information",
     "about": "About",
     "specification": "QR spec",
     "technology": "Technology",
     "source": "Source"
+  },
+  "language": {
+    "choose": "Choose language",
+    "description": "Names appear in your current language and their native form.",
+    "current": "Language: {language}. Choose language."
   },
   "validation": {
     "contentRequired": "Not valid yet: content is required.",

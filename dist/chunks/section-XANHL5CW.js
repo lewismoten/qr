@@ -1,0 +1,2 @@
+import{a as t}from"./chunk-46XPEO3B.js";function r({format:e,qualityControls:a,quality:l,qualityValue:c,zip:o,getFrameCount:u}){return{sync:()=>{a.hidden=e.value!=="jpg",c.textContent=t("units.percent","{value}%",{value:l.value});let n=u();o.hidden=n<=1,n>1&&(o.textContent=t("download.allZip","Download all {count} as ZIP",{count:n}))}}}export{r as createDownloadImageSection};
+//# sourceMappingURL=section-XANHL5CW.js.map

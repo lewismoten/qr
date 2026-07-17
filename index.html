@@ -1043,12 +1043,24 @@
 
       <footer class="site-footer">
         <p data-i18n="footer.name">QR Code Generator</p>
-        <nav aria-label="Site information">
+        <nav aria-label="Site information" data-i18n-aria-label="footer.navigationLabel">
           <a href="#about" data-dialog-target="about" data-i18n="footer.about">About</a>
           <a href="spec.html" data-i18n="footer.specification">QR spec</a>
           <a href="#third-party" data-dialog-target="third-party" data-i18n="footer.technology">Technology</a>
           <a href="https://git.lewismoten.com/lewismoten/qr" data-i18n="footer.source">Source</a>
         </nav>
+        <div id="language-picker" class="language-picker">
+          <button id="language-picker-trigger" class="language-picker-trigger" type="button"
+            aria-haspopup="listbox" aria-expanded="false" aria-controls="language-picker-panel">🇺🇸</button>
+          <section id="language-picker-panel" class="language-picker-panel" hidden
+            aria-labelledby="language-picker-title">
+            <header>
+              <strong id="language-picker-title" data-i18n="language.choose">Choose language</strong>
+              <span data-i18n="language.description">Names appear in your current language and their native form.</span>
+            </header>
+            <div id="language-picker-grid" class="language-picker-grid" role="listbox"></div>
+          </section>
+        </div>
       </footer>
     </main>
 

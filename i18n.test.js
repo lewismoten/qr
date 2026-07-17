@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import { getActiveLocale, getErrorText, initializeLanguage, lookup } from './src/js/i18n/index.js';
+import {
+  getActiveLocale,
+  getAvailableLocales,
+  getErrorText,
+  initializeLanguage,
+  lookup,
+} from './src/js/i18n/index.js';
+import { getSavedLocale, LOCALE_STORAGE_KEY } from './src/js/i18n/picker.js';
 
 function createFetcher(resources) {
   return async (url) => {
@@ -14,6 +21,9 @@ function createFetcher(resources) {
 }
 
 const baseUrl = new URL('https://example.test/locales/');
+
+assert.equal(getSavedLocale({ getItem: (key) => key === LOCALE_STORAGE_KEY ? 'es' : null }), 'es');
+assert.equal(getSavedLocale({ getItem: () => { throw new Error('Storage blocked'); } }), undefined);
 
 await initializeLanguage({
   languages: ['fr-CA', 'en-US'],
@@ -35,6 +45,19 @@ assert.equal(
 );
 assert.equal(lookup('navigation.missing', 'Fallback'), 'Fallback');
 assert.equal(lookup('navigation.count', '{current} / {total}', { current: 0, total: 8 }), '0 / 8');
+let functionCalls = 0;
+assert.equal(lookup('navigation.repeated', '{value} + {value}', {
+  value: ({ key, tag, locale }) => {
+    functionCalls += 1;
+    assert.deepEqual({ key, tag, locale }, {
+      key: 'navigation.repeated',
+      tag: 'value',
+      locale: 'fr',
+    });
+    return 4;
+  },
+}), '4 + 4');
+assert.equal(functionCalls, 1);
 assert.equal(getErrorText({
   message: 'Minimum version is 9.',
   i18nKey: 'qr.errors.minimumVersion',
@@ -42,6 +65,7 @@ assert.equal(getErrorText({
 }), 'La version minimale est 9.');
 
 await initializeLanguage({
+  locale: 'en-US',
   languages: ['de-DE'],
   baseUrl,
   fetcher: createFetcher({
@@ -51,5 +75,9 @@ await initializeLanguage({
 });
 assert.equal(getActiveLocale(), 'en-US');
 assert.equal(lookup('navigation.content', 'Fallback'), 'Content');
+assert.deepEqual(getAvailableLocales(), [
+  { code: 'de-DE', flag: '🏳️' },
+  { code: 'en-US', flag: '🏳️' },
+]);
 
 console.log('Language lookup and locale fallback tests passed.');

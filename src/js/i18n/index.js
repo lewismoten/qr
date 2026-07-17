@@ -3,6 +3,7 @@ const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title'];
 
 let activeLocale = DEFAULT_LOCALE;
 let messages = Object.freeze({});
+let availableLocales = Object.freeze([{ code: DEFAULT_LOCALE, flag: '🇺🇸' }]);
 let languageReady = Promise.resolve({ locale: activeLocale, loaded: false });
 
 function canonicalizeLocale(locale) {
@@ -18,6 +19,18 @@ function normalizeLocales(locales) {
   return [...new Set((Array.isArray(locales) ? locales : [locales])
     .map(canonicalizeLocale)
     .filter(Boolean))];
+}
+
+function normalizeLocaleEntries(locales) {
+  const entries = Array.isArray(locales) ? locales : [locales];
+  const normalized = [];
+  for (const entry of entries) {
+    const source = typeof entry === 'string' ? { code: entry } : entry;
+    const code = canonicalizeLocale(source?.code);
+    if (!code || normalized.some((locale) => locale.code === code)) continue;
+    normalized.push(Object.freeze({ code, flag: String(source.flag || '🏳️') }));
+  }
+  return normalized;
 }
 
 function selectLocale(requestedLocales, availableLocales, fallbackLocale) {
@@ -49,16 +62,26 @@ function findMessage(key) {
   ), messages);
 }
 
-function interpolate(text, options) {
+function interpolate(text, options, key) {
   if (!options || typeof options !== 'object') return text;
+  const resolved = new Map();
   return text.replace(/\{([A-Za-z][\w.-]*)\}/g, (placeholder, tag) => (
-    Object.prototype.hasOwnProperty.call(options, tag) ? String(options[tag]) : placeholder
+    Object.prototype.hasOwnProperty.call(options, tag)
+      ? String(resolved.has(tag) ? resolved.get(tag) : (() => {
+        const option = options[tag];
+        const value = typeof option === 'function'
+          ? option({ key, tag, locale: activeLocale, options })
+          : option;
+        resolved.set(tag, value);
+        return value;
+      })())
+      : placeholder
   ));
 }
 
 export function lookup(key, defaultText = '', options) {
   const value = findMessage(key);
-  return interpolate(typeof value === 'string' ? value : defaultText, options);
+  return interpolate(typeof value === 'string' ? value : defaultText, options, key);
 }
 
 export function getErrorText(error, defaultText = '') {
@@ -70,11 +93,16 @@ export function getActiveLocale() {
   return activeLocale;
 }
 
+export function getAvailableLocales() {
+  return availableLocales;
+}
+
 export function whenLanguageReady() {
   return languageReady;
 }
 
 export function initializeLanguage({
+  locale,
   languages = globalThis.navigator?.languages || [globalThis.navigator?.language],
   fetcher = globalThis.fetch?.bind(globalThis),
   baseUrl = new URL('locales/', globalThis.document?.baseURI || 'http://localhost/'),
@@ -89,8 +117,13 @@ export function initializeLanguage({
       // The built-in default remains usable if locale discovery is unavailable.
     }
 
+    const localeEntries = normalizeLocaleEntries(manifest.locales);
+    availableLocales = Object.freeze(localeEntries.length
+      ? localeEntries
+      : [{ code: DEFAULT_LOCALE, flag: '🇺🇸' }]);
+    const localeCodes = availableLocales.map(({ code }) => code);
     const fallback = canonicalizeLocale(manifest.defaultLocale) || DEFAULT_LOCALE;
-    const selected = selectLocale(languages, manifest.locales, fallback);
+    const selected = selectLocale(locale ? [locale] : languages, localeCodes, fallback);
     const attempts = [...new Set([selected, fallback, DEFAULT_LOCALE])];
 
     for (const locale of attempts) {
@@ -113,6 +146,7 @@ export function initializeLanguage({
 
 export function translateDocument(document) {
   document.documentElement.lang = activeLocale;
+  document.documentElement.dir = /^(ar|fa|he|ur)(-|$)/i.test(activeLocale) ? 'rtl' : 'ltr';
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = lookup(element.dataset.i18n, element.textContent);
   });

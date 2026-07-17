@@ -1,0 +1,96 @@
+{
+  "navigation": { "content": "Contenido", "style": "Estilo", "download": "Descargar", "debug": "Depurar" },
+  "content": { "data": "Datos", "format": "Formato", "frame": "Marco" },
+  "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono" },
+  "fields": {
+    "title": "título", "location": "ubicación", "description": "descripción", "recipientEmail": "correo del destinatario",
+    "fullName": "nombre completo", "organization": "organización", "vcardPhone": "teléfono de vCard",
+    "vcardEmail": "correo de vCard", "smsPhone": "teléfono SMS", "emailAddress": "correo electrónico",
+    "telephoneNumber": "número de teléfono", "subject": "asunto", "body": "cuerpo", "message": "mensaje",
+    "prefix": "prefijo", "suffix": "sufijo"
+  },
+  "footer": { "name": "Generador de códigos QR", "navigationLabel": "Información del sitio", "about": "Acerca de", "specification": "Especificación QR", "technology": "Tecnología", "source": "Código fuente" },
+  "language": { "choose": "Elegir idioma", "description": "Los nombres aparecen en tu idioma actual y en su forma nativa.", "current": "Idioma: {language}. Elegir idioma." },
+  "validation": {
+    "contentRequired": "Aún no es válido: el contenido es obligatorio.",
+    "email": {
+      "required": "Aún no es válido para el formato {context}: {label} es obligatorio.",
+      "invalid": "Aún no es válido para el formato {context}: {label} debe ser válido.",
+      "length": "Aún no es válido para el formato {context}: {label} debe tener como máximo 254 caracteres.",
+      "subjectLabel": "Aún no es válido para Correo: asunto", "bodyLabel": "Aún no es válido para Correo: cuerpo",
+      "capacity": "Aún no es válido para Correo: el cuerpo supera la capacidad QR actual ({current} / {max})."
+    },
+    "text": { "length": "{label} debe tener como máximo {maxLength} caracteres.", "printable": "{label} solo puede usar caracteres imprimibles." },
+    "phone": {
+      "required": "Aún no es válido para el formato {context}: {label} es obligatorio.",
+      "characters": "Aún no es válido para {context}: {label} solo admite dígitos, espacios, paréntesis, puntos, guiones y un + inicial opcional.",
+      "plus": "Aún no es válido para {context}: {label} solo puede usar + al principio.",
+      "length": "Aún no es válido para {context}: {label} debe contener entre 10 y 15 dígitos."
+    },
+    "geo": {
+      "labelLength": "Aún no es válido para Geo: la etiqueta debe tener como máximo 80 caracteres.",
+      "labelCharacters": "Aún no es válido para Geo: la etiqueta solo admite letras, números, espacios y puntuación común.",
+      "latitudeRequired": "Aún no es válido para Geo: la latitud es obligatoria.", "longitudeRequired": "Aún no es válido para Geo: la longitud es obligatoria.",
+      "latitudeNumber": "Aún no es válido para Geo: la latitud debe ser un número válido.", "longitudeNumber": "Aún no es válido para Geo: la longitud debe ser un número válido.",
+      "latitudeRange": "Aún no es válido para Geo: la latitud debe estar entre -90 y 90.", "longitudeRange": "Aún no es válido para Geo: la longitud debe estar entre -180 y 180."
+    },
+    "website": {
+      "required": "Aún no es válido para {context}: el sitio web es obligatorio.", "length": "Aún no es válido para {context}: el sitio web no debe superar 2048 caracteres.",
+      "protocolRequired": "Aún no es válido para {context}: incluye un protocolo completo como https://.",
+      "protocol": "Aún no es válido para {context}: el sitio debe comenzar con https:// o http://.",
+      "insecure": "Advertencia para {context}: el sitio usa http://. Se recomienda encarecidamente https://."
+    },
+    "event": {
+      "required": "Aún no es válido para Evento: {label} es obligatorio.", "length": "Aún no es válido para Evento: {label} debe tener como máximo {maxLength} caracteres.",
+      "characters": "Aún no es válido para Evento: {label} contiene caracteres de control no compatibles.",
+      "startDate": "Aún no es válido para Evento: la fecha inicial es obligatoria.", "endDate": "Aún no es válido para Evento: la fecha final es obligatoria.",
+      "dateOrder": "Aún no es válido para Evento: la fecha final no puede ser anterior a la inicial.",
+      "startTime": "Aún no es válido para Evento: la hora inicial es obligatoria.", "endTime": "Aún no es válido para Evento: la hora final es obligatoria.",
+      "timeOrder": "Aún no es válido para Evento: el final debe ser posterior al inicio."
+    },
+    "sms": { "length": "Aún no es válido para SMS: el mensaje debe tener {maxLength} caracteres o menos." },
+    "file": { "required": "Aún no es válido para Archivo: elige un archivo para codificar." }
+  },
+  "common": { "auto": "Automático", "autoLower": "automático", "none": "ninguno", "preview": "Vista previa", "sequence": "{current} de {total}", "count": "{current} / {total}" },
+  "bulk": {
+    "loading": "Cargando las herramientas de importación masiva.", "warning": "Fila {rowNumber} de importación: {message}",
+    "requiredValues": "Valores obligatorios: {values}",
+    "status": { "empty": "No se ha cargado ningún CSV.", "loaded": "{count} filas cargadas. Mostrando {current} de {count}." }
+  },
+  "frame": { "allDay": "Todo el día", "wifi": "Wi-Fi {ssid}", "email": "Correo {email}", "call": "Llamar a {phone}", "text": "Enviar SMS a {phone}", "location": "Ubicación {location}", "contact": "Contacto {contact}", "sequence": "{current} de {total}" },
+  "encoding": {
+    "invalidPositions": "{message} Posiciones: {positions}{suffix}.", "kanjiUnavailable": "El modo Kanji manual no está disponible porque no se cargó el conversor Shift JIS.",
+    "incompatible": "Incompatible con el modo {mode}. Caracteres no válidos: {characters}.", "waiting": "Esperando", "mixedSummary": "Mixto ({modes})", "unused": "{bytes} B ({percent}%)",
+    "modes": { "numeric": "Numérico", "alphanumeric": "Alfanumérico", "byte": "Byte / Binario", "kanji": "Kanji", "mixed": "Mixto" }
+  },
+  "mask": { "value": "Máscara {value}", "bestFit": "Mejor ajuste" },
+  "preview": {
+    "invalid": "No válido", "invalidPayload": "Vista previa no válida", "buildError": "No se pudo crear el contenido QR.",
+    "encodeError": "No se pudo codificar este contenido.", "encoderError": "No se cargó el codificador QR propio.",
+    "printSize": "{inches} in{automatic} - {millimeters} mm/módulo", "width": "{width} px · {scale} px/módulo · {inches} in a {ppi} ppp"
+  },
+  "errorCorrection": {
+    "L": { "label": "Baja", "detail": "Usa la menor redundancia y tolera aproximadamente un 7% de daño o cobertura." },
+    "M": { "label": "Media", "detail": "Equilibra capacidad y resistencia, con recuperación de aproximadamente un 15%." },
+    "Q": { "label": "Cuartil", "detail": "Dedica más datos a corrección y permite recuperar aproximadamente un 25%." },
+    "H": { "label": "Alta", "detail": "Usa la máxima corrección y puede tolerar cerca de un 30% de obstrucción." }
+  },
+  "map": { "zoomControls": "Controles de zoom del mapa", "zoomIn": "Acercar", "zoomOut": "Alejar", "attribution": "© colaboradores de OpenStreetMap", "loadError": "No se pudo iniciar la vista previa del mapa." },
+  "wifi": { "openPassword": "No se usa en redes abiertas", "password": "Contraseña" },
+  "units": { "pixels": "{value} px", "degrees": "{value} grados", "dimensions": "{width} x {height}", "percent": "{value}%" },
+  "download": {
+    "creating": "Creando {format}...", "ready": "Descarga lista.", "error": "No se pudo crear la descarga.",
+    "creatingPdf": "Creando PDF...", "pdfReady": "PDF listo.", "pdfError": "No se pudo crear el PDF.",
+    "rendering": "Procesando {frame} de {total}...", "buildingZip": "Creando ZIP...", "zipReady": "ZIP listo con {total} archivos.", "zipError": "No se pudo crear el ZIP.",
+    "capturingFrame": "Capturando fotograma {frame} de {total}...", "animationError": "No se pudo crear la animación {format}.",
+    "seconds": "{seconds} segundos", "durationSummary": "{perImage} por imagen - {total} en total.",
+    "mp4Title": "Descargar una animación MP4", "mp4Unavailable": "La codificación MP4 no está disponible en este navegador; GIF animado sí está disponible.",
+    "allZip": "Descargar los {count} como ZIP", "allPdf": "Descargar los {count} como PDF"
+  },
+  "qr": { "errors": {
+    "modeUnsupported": "El modo QR nativo aún no es compatible: {mode}.", "numericCharacters": "El modo numérico solo acepta dígitos 0-9.",
+    "alphanumericCharacters": "El modo alfanumérico contiene caracteres no compatibles.", "kanjiCharacters": "El modo Kanji contiene caracteres fuera de los rangos Shift JIS de QR.",
+    "kanjiUnsupported": "El modo Kanji nativo requiere compatibilidad del navegador con Shift JIS.", "versionRange": "La versión QR debe ser un entero del 1 al 40.",
+    "minimumVersion": "La versión QR elegida no admite estos datos. La versión mínima necesaria es {version}.", "tooLarge": "El contenido es demasiado grande para un código QR versión 40."
+  } }
+}
