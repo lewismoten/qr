@@ -11,6 +11,9 @@ import {
 } from '../app/qr-regions.js';
 import { COUNT_BITS, MODE_BITS } from '../qr/constants.js';
 import { isMaskActive } from '../qr/mask.js';
+import { setupExternalLinks } from '../external-links.js';
+
+setupExternalLinks();
 
 const COLORS = {
   finder: '#ef4444',
