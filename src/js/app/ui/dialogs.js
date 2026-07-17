@@ -1,13 +1,22 @@
 export function initializeDialogs({ document, window }) {
   const dialogs = document.querySelectorAll('.info-dialog');
 
+  const loadDialogContent = (dialog) => {
+    dialog.querySelectorAll('[data-dialog-src]').forEach((element) => {
+      if (!element.hasAttribute('src')) element.setAttribute('src', element.dataset.dialogSrc);
+    });
+  };
+
   const syncFromHash = () => {
     const targetId = window.location.hash.slice(1);
     const targetDialog = [...dialogs].find((dialog) => dialog.id === targetId);
     dialogs.forEach((dialog) => {
       if (dialog !== targetDialog && dialog.open) dialog.close();
     });
-    if (targetDialog && !targetDialog.open) targetDialog.showModal();
+    if (targetDialog && !targetDialog.open) {
+      loadDialogContent(targetDialog);
+      targetDialog.showModal();
+    }
   };
 
   document.querySelectorAll('[data-dialog-target]').forEach((link) => {

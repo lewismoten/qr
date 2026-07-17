@@ -58,6 +58,7 @@
     "emailAddress": "ईमेल पता", "telephoneNumber": "टेलीफ़ोन नंबर", "subject": "विषय", "body": "संदेश", "message": "संदेश", "prefix": "उपसर्ग", "suffix": "प्रत्यय"
   },
   "footer": { "name": "क्यूआर कोड जनरेटर", "navigationLabel": "साइट की जानकारी", "about": "परिचय", "specification": "क्यूआर विनिर्देश", "technology": "तकनीक", "source": "स्रोत" },
+  "specDialog": { "kicker": "दृश्य विनिर्देश", "title": "क्यूआर कोड कैसे काम करते हैं", "close": "क्यूआर विनिर्देश बंद करें", "frameTitle": "क्यूआर कोड विनिर्देश की दृश्य मार्गदर्शिका" },
   "language": { "choose": "भाषा चुनें", "description": "नाम आपकी वर्तमान भाषा और उस भाषा के मूल रूप में दिखते हैं।", "current": "भाषा: {language}। भाषा चुनें।" },
   "validation": {
     "contentRequired": "अभी मान्य नहीं है: सामग्री आवश्यक है।",
@@ -93,7 +94,7 @@
     "sms": { "length": "एसएमएस प्रारूप के लिए अभी मान्य नहीं: संदेश {maxLength} अक्षर या कम होना चाहिए।" },
     "file": { "required": "फ़ाइल प्रारूप के लिए अभी मान्य नहीं: एन्कोड करने के लिए फ़ाइल चुनें।" }
   },
-  "common": { "auto": "स्वचालित", "autoLower": "स्वचालित", "none": "कोई नहीं", "preview": "पूर्वावलोकन", "noFileSelected": "कोई फ़ाइल चयनित नहीं", "sequence": "{total} में से {current}", "count": "{current} / {total}" },
+  "common": { "close": "बंद करें", "auto": "स्वचालित", "autoLower": "स्वचालित", "none": "कोई नहीं", "preview": "पूर्वावलोकन", "noFileSelected": "कोई फ़ाइल चयनित नहीं", "sequence": "{total} में से {current}", "count": "{current} / {total}" },
   "bulk": { "loading": "बल्क आयात उपकरण लोड हो रहे हैं।", "warning": "बल्क आयात पंक्ति {rowNumber}: {message}", "requiredValues": "आवश्यक मान: {values}", "status": { "empty": "कोई CSV लोड नहीं है।", "loaded": "{count} पंक्तियाँ लोड हुईं। {count} में से {current} दिखाई जा रही है।" }, "progress": { "title": "CSV फ़ाइल संसाधित हो रही है", "reading": "{name} पढ़ी जा रही है...", "readingBytes": "{total} में से {current} पढ़ा जा रहा है...", "parsing": "CSV डेटा पार्स हो रहा है...", "loaded": "{count} पंक्तियाँ लोड हुईं।", "canceled": "CSV संसाधन रद्द किया गया।" } },
   "frame": { "message": "फ़्रेम संदेश", "mode": "फ़्रेम संदेश मोड", "automaticShort": "स्वचालित छोटा मान", "customMessage": "कस्टम संदेश", "noMessage": "कोई संदेश नहीं", "scanMore": "अधिक जानने के लिए स्कैन करें", "placeCenter": "संदेश को क्यूआर केंद्र में रखें", "font": "फ़ॉन्ट", "sans": "सैन्स", "round": "गोल", "serif": "सेरिफ़", "mono": "मोनो", "monospace": "मोनोस्पेस", "messageColor": "संदेश का रंग", "maximumLineHeight": "अधिकतम पंक्ति ऊँचाई", "hint": "संदेश क्यूआर के नीचे जुड़ता है या केंद्र में होने पर विपरीत रूपरेखा पाता है। स्वचालित मोड छोटा और गैर-गोपनीय यूआरएल, फ़ोन, ईमेल, नेटवर्क, संपर्क या फ़ाइल नाम उपयोग करता है।", "allDay": "पूरा दिन", "wifi": "वाई-फ़ाई {ssid}", "email": "ईमेल {email}", "call": "{phone} पर कॉल करें", "text": "{phone} पर संदेश भेजें", "location": "स्थान {location}", "contact": "संपर्क {contact}", "sequence": "{total} में से {current}" },
   "encoding": {

@@ -1078,7 +1078,7 @@
         <p data-i18n="footer.name">QR Code Generator</p>
         <nav aria-label="Site information" data-i18n-aria-label="footer.navigationLabel">
           <a href="#about" data-dialog-target="about" data-i18n="footer.about">About</a>
-          <a href="spec.html" data-i18n="footer.specification">QR spec</a>
+          <a href="#specification" data-dialog-target="specification" data-i18n="footer.specification">QR spec</a>
           <a href="#third-party" data-dialog-target="third-party" data-i18n="footer.technology">Technology</a>
           <a href="https://git.lewismoten.com/lewismoten/qr" data-i18n="footer.source">Source</a>
         </nav>
@@ -1142,6 +1142,19 @@
             <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format requests visible map tiles directly from OpenStreetMap. That service receives normal web request information such as an IP address, referrer and browser headers; it is not contacted unless Geo is opened.</p>
           </section>
         </div>
+      </article>
+    </dialog>
+
+    <dialog id="specification" class="info-dialog spec-dialog" aria-labelledby="specification-title">
+      <article class="info-dialog-shell spec-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker" data-i18n="specDialog.kicker">Visual specification</p>
+            <h1 id="specification-title" data-i18n="specDialog.title">How QR Codes work</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close QR specification" data-i18n="common.close" data-i18n-aria-label="specDialog.close">Close</button>
+        </header>
+        <iframe class="spec-dialog-frame" data-dialog-src="spec.html?embed=1" title="QR Code specification visual guide" data-i18n-title="specDialog.frameTitle"></iframe>
       </article>
     </dialog>
 

@@ -65,6 +65,7 @@
     "prefix": "prefijo", "suffix": "sufijo"
   },
   "footer": { "name": "Generador de códigos QR", "navigationLabel": "Información del sitio", "about": "Acerca de", "specification": "Especificación QR", "technology": "Tecnología", "source": "Código fuente" },
+  "specDialog": { "kicker": "Especificación visual", "title": "Cómo funcionan los códigos QR", "close": "Cerrar la especificación QR", "frameTitle": "Guía visual de la especificación de códigos QR" },
   "language": { "choose": "Elegir idioma", "description": "Los nombres aparecen en tu idioma actual y en su forma nativa.", "current": "Idioma: {language}. Elegir idioma." },
   "validation": {
     "contentRequired": "Aún no es válido: el contenido es obligatorio.",
@@ -106,7 +107,7 @@
     "sms": { "length": "Aún no es válido para SMS: el mensaje debe tener {maxLength} caracteres o menos." },
     "file": { "required": "Aún no es válido para Archivo: elige un archivo para codificar." }
   },
-  "common": { "auto": "Automático", "autoLower": "automático", "none": "ninguno", "preview": "Vista previa", "noFileSelected": "Ningún archivo seleccionado", "sequence": "{current} de {total}", "count": "{current} / {total}" },
+  "common": { "close": "Cerrar", "auto": "Automático", "autoLower": "automático", "none": "ninguno", "preview": "Vista previa", "noFileSelected": "Ningún archivo seleccionado", "sequence": "{current} de {total}", "count": "{current} / {total}" },
   "bulk": {
     "loading": "Cargando las herramientas de importación masiva.", "warning": "Fila {rowNumber} de importación: {message}",
     "requiredValues": "Valores obligatorios: {values}",

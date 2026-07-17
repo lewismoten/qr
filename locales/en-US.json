@@ -189,6 +189,12 @@
     "technology": "Technology",
     "source": "Source"
   },
+  "specDialog": {
+    "kicker": "Visual specification",
+    "title": "How QR Codes work",
+    "close": "Close QR specification",
+    "frameTitle": "QR Code specification visual guide"
+  },
   "language": {
     "choose": "Choose language",
     "description": "Names appear in your current language and their native form.",
@@ -264,6 +270,7 @@
     }
   },
   "common": {
+    "close": "Close",
     "auto": "Auto",
     "autoLower": "auto",
     "none": "none",
