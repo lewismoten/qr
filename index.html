@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title data-i18n="page.title">Free QR Code Generator, Designer and Debugger</title>
     <meta name="description" content="Create, customize, inspect and download QR codes for URLs, Wi-Fi, contacts, messages, calendar events, locations, files and number sequences. Includes advanced styling, batch export and developer overlays." />
     <meta name="keywords" content="QR code generator, free QR code maker, custom QR code, QR code designer, Wi-Fi QR code, calendar event QR code, vCard QR code, file QR code, QR code debugger, QR code SVG, batch QR codes" />
@@ -1080,6 +1081,7 @@
           <a href="#about" data-dialog-target="about" data-i18n="footer.about">About</a>
           <a href="#specification" data-dialog-target="specification" data-i18n="footer.specification">QR spec</a>
           <a href="#third-party" data-dialog-target="third-party" data-i18n="footer.technology">Technology</a>
+          <a href="#privacy" data-dialog-target="privacy" data-i18n="footer.privacy">Privacy</a>
           <a href="https://git.lewismoten.com/lewismoten/qr" data-i18n="footer.source">Source</a>
         </nav>
         <div id="language-picker" class="language-picker">
@@ -1152,6 +1154,19 @@
             <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format requests visible map tiles directly from OpenStreetMap. That service receives normal web request information such as an IP address, referrer and browser headers; it is not contacted unless Geo is opened.</p>
           </section>
         </div>
+      </article>
+    </dialog>
+
+    <dialog id="privacy" class="info-dialog info-page-dialog" aria-labelledby="privacy-dialog-title">
+      <article class="info-dialog-shell info-page-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker" data-i18n="privacyDialog.kicker">Privacy and data use</p>
+            <h1 id="privacy-dialog-title" data-i18n="privacyDialog.title">How this site handles your information</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close Privacy" data-i18n="common.close" data-i18n-aria-label="privacyDialog.close">Close</button>
+        </header>
+        <iframe class="info-page-dialog-frame" data-dialog-src="privacy.html?embed=1" title="QR Code Generator privacy information" data-i18n-title="privacyDialog.frameTitle"></iframe>
       </article>
     </dialog>
 

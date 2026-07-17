@@ -47,6 +47,7 @@ const server = createServer(async (request, response) => {
       'Cache-Control': 'no-cache',
       'Content-Length': finalStat.size,
       'Content-Type': mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
       'X-Content-Type-Options': 'nosniff',
     });
     if (request.method === 'HEAD') response.end();

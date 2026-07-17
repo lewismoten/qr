@@ -64,10 +64,11 @@
     "telephoneNumber": "número de teléfono", "subject": "asunto", "body": "cuerpo", "message": "mensaje",
     "prefix": "prefijo", "suffix": "sufijo"
   },
-  "footer": { "name": "Generador de códigos QR", "navigationLabel": "Información del sitio", "about": "Acerca de", "specification": "Especificación QR", "technology": "Tecnología", "source": "Código fuente" },
+  "footer": { "name": "Generador de códigos QR", "navigationLabel": "Información del sitio", "about": "Acerca de", "specification": "Especificación QR", "technology": "Tecnología", "privacy": "Privacidad", "source": "Código fuente" },
   "specDialog": { "kicker": "Especificación visual", "title": "Cómo funcionan los códigos QR", "close": "Cerrar la especificación QR", "frameTitle": "Guía visual de la especificación de códigos QR" },
   "aboutDialog": { "kicker": "Dentro de la matriz", "title": "Acerca del generador de códigos QR", "close": "Cerrar Acerca de", "frameTitle": "Acerca del generador de códigos QR" },
   "technologyDialog": { "kicker": "Inventario tecnológico", "title": "Tecnología, estándares y licencias", "close": "Cerrar el inventario tecnológico", "frameTitle": "Tecnología, estándares y licencias" },
+  "privacyDialog": { "kicker": "Privacidad y uso de datos", "title": "Cómo trata este sitio tu información", "close": "Cerrar Privacidad", "frameTitle": "Información de privacidad del generador de códigos QR" },
   "language": { "choose": "Elegir idioma", "description": "Los nombres aparecen en tu idioma actual y en su forma nativa.", "current": "Idioma: {language}. Elegir idioma." },
   "validation": {
     "contentRequired": "Aún no es válido: el contenido es obligatorio.",

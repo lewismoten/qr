@@ -57,10 +57,11 @@
     "organization": "组织", "vcardPhone": "名片电话号码", "vcardEmail": "名片邮箱", "smsPhone": "短信电话号码",
     "emailAddress": "电子邮箱", "telephoneNumber": "电话号码", "subject": "主题", "body": "正文", "message": "消息", "prefix": "前缀", "suffix": "后缀"
   },
-  "footer": { "name": "二维码生成器", "navigationLabel": "网站信息", "about": "关于", "specification": "二维码规范", "technology": "技术", "source": "源代码" },
+  "footer": { "name": "二维码生成器", "navigationLabel": "网站信息", "about": "关于", "specification": "二维码规范", "technology": "技术", "privacy": "隐私", "source": "源代码" },
   "specDialog": { "kicker": "可视化规范", "title": "二维码的工作原理", "close": "关闭二维码规范", "frameTitle": "二维码规范可视化指南" },
   "aboutDialog": { "kicker": "矩阵内部", "title": "关于二维码生成器", "close": "关闭关于", "frameTitle": "关于二维码生成器" },
   "technologyDialog": { "kicker": "技术清单", "title": "技术、标准和许可证", "close": "关闭技术清单", "frameTitle": "技术、标准和许可证" },
+  "privacyDialog": { "kicker": "隐私和数据使用", "title": "本网站如何处理您的信息", "close": "关闭隐私信息", "frameTitle": "二维码生成器隐私信息" },
   "language": { "choose": "选择语言", "description": "语言名称同时以当前语言和其本地形式显示。", "current": "当前语言：{language}。选择语言。" },
   "validation": {
     "contentRequired": "尚无效：内容为必填项。",

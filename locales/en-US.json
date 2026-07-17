@@ -187,6 +187,7 @@
     "about": "About",
     "specification": "QR spec",
     "technology": "Technology",
+    "privacy": "Privacy",
     "source": "Source"
   },
   "specDialog": {
@@ -206,6 +207,12 @@
     "title": "Technology, standards and licenses",
     "close": "Close technology inventory",
     "frameTitle": "Technology, standards and licenses"
+  },
+  "privacyDialog": {
+    "kicker": "Privacy and data use",
+    "title": "How this site handles your information",
+    "close": "Close Privacy",
+    "frameTitle": "QR Code Generator privacy information"
   },
   "language": {
     "choose": "Choose language",

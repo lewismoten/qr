@@ -94,7 +94,11 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
           let image = tiles.get(key);
           if (!image) {
             const wrappedX = ((tileX % (maximumTile + 1)) + maximumTile + 1) % (maximumTile + 1);
-            image = createElement('img', 'slippy-map-tile', { alt: '', draggable: 'false' });
+            image = createElement('img', 'slippy-map-tile', {
+              alt: '',
+              draggable: 'false',
+              referrerpolicy: 'strict-origin-when-cross-origin',
+            });
             image.decoding = 'async';
             image.src = TILE_URL.replace('{z}', currentZoom).replace('{x}', wrappedX).replace('{y}', tileY);
             tiles.set(key, image);

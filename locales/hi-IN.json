@@ -57,10 +57,11 @@
     "organization": "संगठन", "vcardPhone": "वीकार्ड फ़ोन नंबर", "vcardEmail": "वीकार्ड ईमेल", "smsPhone": "एसएमएस फ़ोन नंबर",
     "emailAddress": "ईमेल पता", "telephoneNumber": "टेलीफ़ोन नंबर", "subject": "विषय", "body": "संदेश", "message": "संदेश", "prefix": "उपसर्ग", "suffix": "प्रत्यय"
   },
-  "footer": { "name": "क्यूआर कोड जनरेटर", "navigationLabel": "साइट की जानकारी", "about": "परिचय", "specification": "क्यूआर विनिर्देश", "technology": "तकनीक", "source": "स्रोत" },
+  "footer": { "name": "क्यूआर कोड जनरेटर", "navigationLabel": "साइट की जानकारी", "about": "परिचय", "specification": "क्यूआर विनिर्देश", "technology": "तकनीक", "privacy": "गोपनीयता", "source": "स्रोत" },
   "specDialog": { "kicker": "दृश्य विनिर्देश", "title": "क्यूआर कोड कैसे काम करते हैं", "close": "क्यूआर विनिर्देश बंद करें", "frameTitle": "क्यूआर कोड विनिर्देश की दृश्य मार्गदर्शिका" },
   "aboutDialog": { "kicker": "मैट्रिक्स के अंदर", "title": "क्यूआर कोड जनरेटर के बारे में", "close": "परिचय बंद करें", "frameTitle": "क्यूआर कोड जनरेटर के बारे में" },
   "technologyDialog": { "kicker": "तकनीकी सूची", "title": "तकनीक, मानक और लाइसेंस", "close": "तकनीकी सूची बंद करें", "frameTitle": "तकनीक, मानक और लाइसेंस" },
+  "privacyDialog": { "kicker": "गोपनीयता और डेटा उपयोग", "title": "यह साइट आपकी जानकारी कैसे संभालती है", "close": "गोपनीयता बंद करें", "frameTitle": "क्यूआर कोड जनरेटर की गोपनीयता जानकारी" },
   "language": { "choose": "भाषा चुनें", "description": "नाम आपकी वर्तमान भाषा और उस भाषा के मूल रूप में दिखते हैं।", "current": "भाषा: {language}। भाषा चुनें।" },
   "validation": {
     "contentRequired": "अभी मान्य नहीं है: सामग्री आवश्यक है।",
