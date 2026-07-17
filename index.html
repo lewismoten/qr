@@ -1053,6 +1053,26 @@
         </section>
       </form>
 
+      <dialog id="task-progress-dialog" class="task-progress-dialog" aria-labelledby="task-progress-title">
+        <section class="task-progress-card">
+          <header>
+            <span class="task-progress-kicker" data-i18n="download.progress.working">Export in progress</span>
+            <h2 id="task-progress-title">Creating animation</h2>
+          </header>
+          <p id="task-progress-phase" class="task-progress-phase" aria-live="polite">Preparing...</p>
+          <div class="task-progress-meter-row">
+            <progress id="task-progress-meter" max="100" value="0">0%</progress>
+            <output id="task-progress-percent" class="task-progress-percent" for="task-progress-meter">0%</output>
+          </div>
+          <dl class="task-progress-times">
+            <div><dt data-i18n="download.progress.elapsed">Elapsed</dt><dd id="task-progress-elapsed">0 seconds</dd></div>
+            <div><dt data-i18n="download.progress.remaining">Estimated remaining</dt><dd id="task-progress-remaining" data-i18n="download.progress.estimating">Estimating...</dd></div>
+            <div><dt data-i18n="download.progress.completion">Estimated completion</dt><dd id="task-progress-completion">-</dd></div>
+          </dl>
+          <button id="task-progress-cancel" type="button" class="secondary-button task-progress-cancel" data-i18n="download.progress.cancel">Cancel</button>
+        </section>
+      </dialog>
+
       <footer class="site-footer">
         <p data-i18n="footer.name">QR Code Generator</p>
         <nav aria-label="Site information" data-i18n-aria-label="footer.navigationLabel">

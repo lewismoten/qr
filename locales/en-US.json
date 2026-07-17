@@ -439,7 +439,14 @@
     "toolsError": "Download tools could not be loaded: {message}",
     "mp4EncoderUnavailable": "This browser does not provide an MP4 encoder. Animated GIF is available instead.",
     "mp4EncodeError": "Unable to encode MP4.",
-    "imageError": "Unable to create {type} image."
+    "imageError": "Unable to create {type} image.",
+    "progress": {
+      "working": "Export in progress", "titleGif": "Creating animated GIF", "titleMp4": "Creating MP4 animation",
+      "preparing": "Preparing animation...", "encodingFrame": "Encoding GIF frame {frame} of {total}...",
+      "elapsed": "Elapsed", "remaining": "Estimated remaining", "completion": "Estimated completion",
+      "estimating": "Estimating...", "seconds": "{count} seconds", "minutes": "{minutes} min {seconds} sec",
+      "now": "Now", "cancel": "Cancel", "canceling": "Canceling...", "completed": "Completed", "canceled": "Animation export canceled."
+    }
   },
   "qr": {
     "errors": {
