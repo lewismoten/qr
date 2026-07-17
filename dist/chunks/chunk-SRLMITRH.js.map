@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/media-support.js"],
+  "sourcesContent": ["export function getSupportedMp4MimeType() {\n  if (typeof MediaRecorder === 'undefined') return '';\n  return (\n    ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1', 'video/mp4'].find(\n      (type) => MediaRecorder.isTypeSupported(type),\n    ) || ''\n  );\n}\n"],
+  "mappings": "AAAO,SAASA,GAA0B,CACxC,OAAI,OAAO,cAAkB,IAAoB,GAE/C,CAAC,+BAAgC,wBAAyB,WAAW,EAAE,KACpEC,GAAS,cAAc,gBAAgBA,CAAI,CAC9C,GAAK,EAET",
+  "names": ["getSupportedMp4MimeType", "type"]
+}

@@ -5,8 +5,14 @@
  * It favors a small, predictable implementation over maximum compression.
  */
 export function encodeGifLzw(indexes, minimumCodeSize = 8) {
-  if (!Number.isInteger(minimumCodeSize) || minimumCodeSize < 2 || minimumCodeSize > 8) {
-    throw new RangeError('GIF LZW minimum code size must be an integer from 2 through 8.');
+  if (
+    !Number.isInteger(minimumCodeSize) ||
+    minimumCodeSize < 2 ||
+    minimumCodeSize > 8
+  ) {
+    throw new RangeError(
+      'GIF LZW minimum code size must be an integer from 2 through 8.',
+    );
   }
 
   const clearCode = 1 << minimumCodeSize;
@@ -31,7 +37,9 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
   writeCode(clearCode);
   indexes.forEach((index) => {
     if (!Number.isInteger(index) || index < 0 || index >= clearCode) {
-      throw new RangeError(`GIF palette index must be between 0 and ${clearCode - 1}.`);
+      throw new RangeError(
+        `GIF palette index must be between 0 and ${clearCode - 1}.`,
+      );
     }
     writeCode(index);
     literalCount += 1;

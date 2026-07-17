@@ -18,7 +18,12 @@ export function pushUint16LE(bytes, value) {
 }
 
 export function pushUint32LE(bytes, value) {
-  bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+  bytes.push(
+    value & 255,
+    (value >>> 8) & 255,
+    (value >>> 16) & 255,
+    (value >>> 24) & 255,
+  );
 }
 
 export function formatBytes(bytes) {
@@ -46,6 +51,10 @@ export function hexToBytes(hex) {
 
 export function uint64Bytes(value) {
   const bytes = new Uint8Array(8);
-  new DataView(bytes.buffer).setBigUint64(0, BigInt(Math.max(0, value || 0)), false);
+  new DataView(bytes.buffer).setBigUint64(
+    0,
+    BigInt(Math.max(0, value || 0)),
+    false,
+  );
   return bytes;
 }

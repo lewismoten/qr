@@ -1,9 +1,15 @@
 import { serializeEmail } from '../../content-formats.js';
 
-export function createSharedFieldsSection({ emailInputs, messageInputs, emailSubject, onMessageChange }) {
+export function createSharedFieldsSection({
+  emailInputs,
+  messageInputs,
+  emailSubject,
+  onMessageChange,
+}) {
   const syncGroup = (inputs, source) => {
     inputs.forEach((input) => {
-      if (input !== source && input.value !== source.value) input.value = source.value;
+      if (input !== source && input.value !== source.value)
+        input.value = source.value;
     });
   };
 
@@ -17,9 +23,12 @@ export function createSharedFieldsSection({ emailInputs, messageInputs, emailSub
     });
   });
 
-  const buildEmailPayloadWithBody = (body) => serializeEmail({
-    email: emailInputs[0].value, subject: emailSubject.value, body,
-  });
+  const buildEmailPayloadWithBody = (body) =>
+    serializeEmail({
+      email: emailInputs[0].value,
+      subject: emailSubject.value,
+      body,
+    });
 
   const initialize = () => {
     syncGroup(emailInputs, emailInputs.at(-1));
@@ -28,7 +37,8 @@ export function createSharedFieldsSection({ emailInputs, messageInputs, emailSub
 
   return {
     initialize,
-    buildEmailPayload: () => buildEmailPayloadWithBody(messageInputs.at(-1).value),
+    buildEmailPayload: () =>
+      buildEmailPayloadWithBody(messageInputs.at(-1).value),
     buildEmailPayloadWithBody,
   };
 }

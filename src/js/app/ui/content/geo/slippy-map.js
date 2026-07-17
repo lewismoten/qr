@@ -1,36 +1,24 @@
 import { lookup } from '../../../../i18n/index.js';
+import {
+  TILE_SIZE,
+  clamp,
+  getWorldSize,
+  projectCoordinates,
+  unprojectPoint,
+} from './projection.js';
 
-const TILE_SIZE = 256;
 const MIN_ZOOM = 0;
 const MAX_ZOOM = 19;
-const MAX_LATITUDE = 85.05112878;
 const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
-const normalizeLongitude = (value) => ((value + 180) % 360 + 360) % 360 - 180;
-const getWorldSize = (zoom) => TILE_SIZE * (2 ** zoom);
-
-export function projectCoordinates({ latitude, longitude }, zoom) {
-  const worldSize = getWorldSize(zoom);
-  const boundedLatitude = clamp(latitude, -MAX_LATITUDE, MAX_LATITUDE);
-  const sine = Math.sin((boundedLatitude * Math.PI) / 180);
-  return {
-    x: ((normalizeLongitude(longitude) + 180) / 360) * worldSize,
-    y: (0.5 - Math.log((1 + sine) / (1 - sine)) / (4 * Math.PI)) * worldSize,
-  };
-}
-
-export function unprojectPoint({ x, y }, zoom) {
-  const worldSize = getWorldSize(zoom);
-  const longitude = normalizeLongitude((x / worldSize) * 360 - 180);
-  const latitude = (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / worldSize))) * 180) / Math.PI;
-  return { latitude: clamp(latitude, -MAX_LATITUDE, MAX_LATITUDE), longitude };
-}
+export { projectCoordinates, unprojectPoint } from './projection.js';
 
 function createElement(tag, className, attributes = {}) {
   const element = document.createElement(tag);
   element.className = className;
-  Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+  Object.entries(attributes).forEach(([name, value]) =>
+    element.setAttribute(name, value),
+  );
   return element;
 }
 
@@ -48,17 +36,23 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   container.classList.add('slippy-map');
   container.tabIndex = 0;
   container.setAttribute('role', 'region');
-  const tileLayer = createElement('div', 'slippy-map-tiles', { 'aria-hidden': 'true' });
-  const marker = createElement('div', 'slippy-map-marker', { 'aria-hidden': 'true' });
+  const tileLayer = createElement('div', 'slippy-map-tiles', {
+    'aria-hidden': 'true',
+  });
+  const marker = createElement('div', 'slippy-map-marker', {
+    'aria-hidden': 'true',
+  });
   const label = createElement('div', 'slippy-map-label');
   const controls = createElement('div', 'slippy-map-controls', {
     'aria-label': lookup('map.zoomControls', 'Map zoom controls'),
   });
   const zoomIn = createElement('button', 'slippy-map-control', {
-    type: 'button', 'aria-label': lookup('map.zoomIn', 'Zoom in'),
+    type: 'button',
+    'aria-label': lookup('map.zoomIn', 'Zoom in'),
   });
   const zoomOut = createElement('button', 'slippy-map-control', {
-    type: 'button', 'aria-label': lookup('map.zoomOut', 'Zoom out'),
+    type: 'button',
+    'aria-label': lookup('map.zoomOut', 'Zoom out'),
   });
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
@@ -66,7 +60,10 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   const attribution = createElement('div', 'slippy-map-attribution');
   const attributionLink = document.createElement('a');
   attributionLink.href = 'https://www.openstreetmap.org/copyright';
-  attributionLink.textContent = lookup('map.attribution', '© OpenStreetMap contributors');
+  attributionLink.textContent = lookup(
+    'map.attribution',
+    '© OpenStreetMap contributors',
+  );
   attribution.appendChild(attributionLink);
   container.append(tileLayer, marker, label, controls, attribution);
 
@@ -79,13 +76,19 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
-      const origin = { x: centerPoint.x - width / 2, y: centerPoint.y - height / 2 };
-      const maximumTile = (2 ** currentZoom) - 1;
+      const origin = {
+        x: centerPoint.x - width / 2,
+        y: centerPoint.y - height / 2,
+      };
+      const maximumTile = 2 ** currentZoom - 1;
       const visible = new Set();
       const firstX = Math.floor(origin.x / TILE_SIZE);
       const lastX = Math.floor((origin.x + width - 1) / TILE_SIZE);
       const firstY = Math.max(0, Math.floor(origin.y / TILE_SIZE));
-      const lastY = Math.min(maximumTile, Math.floor((origin.y + height - 1) / TILE_SIZE));
+      const lastY = Math.min(
+        maximumTile,
+        Math.floor((origin.y + height - 1) / TILE_SIZE),
+      );
 
       for (let tileY = firstY; tileY <= lastY; tileY += 1) {
         for (let tileX = firstX; tileX <= lastX; tileX += 1) {
@@ -93,14 +96,18 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
           visible.add(key);
           let image = tiles.get(key);
           if (!image) {
-            const wrappedX = ((tileX % (maximumTile + 1)) + maximumTile + 1) % (maximumTile + 1);
+            const wrappedX =
+              ((tileX % (maximumTile + 1)) + maximumTile + 1) %
+              (maximumTile + 1);
             image = createElement('img', 'slippy-map-tile', {
               alt: '',
               draggable: 'false',
               referrerpolicy: 'strict-origin-when-cross-origin',
             });
             image.decoding = 'async';
-            image.src = TILE_URL.replace('{z}', currentZoom).replace('{x}', wrappedX).replace('{y}', tileY);
+            image.src = TILE_URL.replace('{z}', currentZoom)
+              .replace('{x}', wrappedX)
+              .replace('{y}', tileY);
             tiles.set(key, image);
             tileLayer.appendChild(image);
           }
@@ -135,7 +142,10 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
 
   const setCenterFromPoint = (point) => {
     const worldSize = getWorldSize(currentZoom);
-    currentCenter = unprojectPoint({ x: point.x, y: clamp(point.y, 0, worldSize) }, currentZoom);
+    currentCenter = unprojectPoint(
+      { x: point.x, y: clamp(point.y, 0, worldSize) },
+      currentZoom,
+    );
     scheduleRender();
   };
   const setZoom = (value) => {
@@ -149,21 +159,36 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   const selectAt = (clientX, clientY) => {
     const bounds = container.getBoundingClientRect();
     const centerPoint = projectCoordinates(currentCenter, currentZoom);
-    onSelect?.(unprojectPoint({
-      x: centerPoint.x + clientX - bounds.left - bounds.width / 2,
-      y: centerPoint.y + clientY - bounds.top - bounds.height / 2,
-    }, currentZoom));
+    onSelect?.(
+      unprojectPoint(
+        {
+          x: centerPoint.x + clientX - bounds.left - bounds.width / 2,
+          y: centerPoint.y + clientY - bounds.top - bounds.height / 2,
+        },
+        currentZoom,
+      ),
+    );
   };
 
   zoomIn.addEventListener('click', () => setZoom(currentZoom + 1));
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
-  container.addEventListener('wheel', (event) => {
-    event.preventDefault();
-    setZoom(currentZoom + (event.deltaY < 0 ? 1 : -1));
-  }, { passive: false });
+  container.addEventListener(
+    'wheel',
+    (event) => {
+      event.preventDefault();
+      setZoom(currentZoom + (event.deltaY < 0 ? 1 : -1));
+    },
+    { passive: false },
+  );
   container.addEventListener('keydown', (event) => {
-    if (event.target.closest('.slippy-map-controls, .slippy-map-attribution')) return;
-    const movements = { ArrowLeft: [-64, 0], ArrowRight: [64, 0], ArrowUp: [0, -64], ArrowDown: [0, 64] };
+    if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))
+      return;
+    const movements = {
+      ArrowLeft: [-64, 0],
+      ArrowRight: [64, 0],
+      ArrowUp: [0, -64],
+      ArrowDown: [0, 64],
+    };
     if (event.key === '+' || event.key === '=') setZoom(currentZoom + 1);
     else if (event.key === '-' || event.key === '_') setZoom(currentZoom - 1);
     else if (movements[event.key]) {
@@ -175,12 +200,18 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   });
   container.addEventListener('pointerdown', (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    if (event.target.closest('.slippy-map-controls, .slippy-map-attribution')) return;
+    if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))
+      return;
     container.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 1) {
-      drag = { id: event.pointerId, x: event.clientX, y: event.clientY,
-        center: projectCoordinates(currentCenter, currentZoom), moved: false };
+      drag = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        center: projectCoordinates(currentCenter, currentZoom),
+        moved: false,
+      };
       container.classList.add('is-dragging');
     } else if (pointers.size === 2) {
       const [first, second] = [...pointers.values()];
@@ -194,7 +225,10 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
       const deltaX = event.clientX - drag.x;
       const deltaY = event.clientY - drag.y;
       if (Math.hypot(deltaX, deltaY) > 4) drag.moved = true;
-      setCenterFromPoint({ x: drag.center.x - deltaX, y: drag.center.y - deltaY });
+      setCenterFromPoint({
+        x: drag.center.x - deltaX,
+        y: drag.center.y - deltaY,
+      });
     } else if (pointers.size === 2) {
       const [first, second] = [...pointers.values()];
       const distance = Math.hypot(second.x - first.x, second.y - first.y);
@@ -209,16 +243,29 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   });
   const finishPointer = (event, cancelled = false) => {
     if (!pointers.has(event.pointerId)) return;
-    const select = !cancelled && pointers.size === 1 && drag?.id === event.pointerId && !drag.moved;
+    const select =
+      !cancelled &&
+      pointers.size === 1 &&
+      drag?.id === event.pointerId &&
+      !drag.moved;
     pointers.delete(event.pointerId);
     if (select) selectAt(event.clientX, event.clientY);
     const remaining = [...pointers.entries()][0];
-    drag = remaining ? { id: remaining[0], x: remaining[1].x, y: remaining[1].y,
-      center: projectCoordinates(currentCenter, currentZoom), moved: true } : null;
+    drag = remaining
+      ? {
+          id: remaining[0],
+          x: remaining[1].x,
+          y: remaining[1].y,
+          center: projectCoordinates(currentCenter, currentZoom),
+          moved: true,
+        }
+      : null;
     if (!remaining) container.classList.remove('is-dragging');
   };
   container.addEventListener('pointerup', (event) => finishPointer(event));
-  container.addEventListener('pointercancel', (event) => finishPointer(event, true));
+  container.addEventListener('pointercancel', (event) =>
+    finishPointer(event, true),
+  );
 
   const resizeObserver = new ResizeObserver(scheduleRender);
   resizeObserver.observe(container);
@@ -227,7 +274,10 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   return {
     getZoom: () => currentZoom,
     setView(nextCenter, nextZoom = currentZoom) {
-      currentCenter = { latitude: nextCenter.latitude, longitude: nextCenter.longitude };
+      currentCenter = {
+        latitude: nextCenter.latitude,
+        longitude: nextCenter.longitude,
+      };
       setZoom(nextZoom);
       scheduleRender();
     },

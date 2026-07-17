@@ -6,17 +6,27 @@ const COMPLETION_HOLD_MS = 2000;
 
 function formatDuration(milliseconds) {
   const seconds = Math.max(0, Math.round(milliseconds / 1000));
-  if (seconds < 60) return lookup('download.progress.seconds', '{count} seconds', { count: seconds });
+  if (seconds < 60)
+    return lookup('download.progress.seconds', '{count} seconds', {
+      count: seconds,
+    });
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
-  return lookup('download.progress.minutes', '{minutes} min {seconds} sec', { minutes, seconds: remainder });
+  return lookup('download.progress.minutes', '{minutes} min {seconds} sec', {
+    minutes,
+    seconds: remainder,
+  });
 }
 
-export function createTaskProgress(elements, now = () => performance.now(), {
-  showDelay = SHOW_DELAY_MS,
-  completionHold = COMPLETION_HOLD_MS,
-  windowObject = globalThis.window,
-} = {}) {
+export function createTaskProgress(
+  elements,
+  now = () => performance.now(),
+  {
+    showDelay = SHOW_DELAY_MS,
+    completionHold = COMPLETION_HOLD_MS,
+    windowObject = globalThis.window,
+  } = {},
+) {
   let active = null;
 
   const renderTime = () => {
@@ -24,16 +34,23 @@ export function createTaskProgress(elements, now = () => performance.now(), {
     const elapsed = now() - active.startedAt;
     elements.elapsed.textContent = formatDuration(elapsed);
     if (active.fraction > 0.01 && active.fraction < 1) {
-      const remaining = elapsed * (1 - active.fraction) / active.fraction;
+      const remaining = (elapsed * (1 - active.fraction)) / active.fraction;
       elements.remaining.textContent = formatDuration(remaining);
-      elements.completion.textContent = new Date(Date.now() + remaining).toLocaleTimeString([], {
-        hour: 'numeric', minute: '2-digit', second: '2-digit',
+      elements.completion.textContent = new Date(
+        Date.now() + remaining,
+      ).toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
       });
     } else if (active.fraction >= 1) {
       elements.remaining.textContent = formatDuration(0);
       elements.completion.textContent = lookup('download.progress.now', 'Now');
     } else {
-      elements.remaining.textContent = lookup('download.progress.estimating', 'Estimating...');
+      elements.remaining.textContent = lookup(
+        'download.progress.estimating',
+        'Estimating...',
+      );
       elements.completion.textContent = '-';
     }
   };
@@ -41,7 +58,10 @@ export function createTaskProgress(elements, now = () => performance.now(), {
   const cancel = () => {
     if (!active || active.finished || active.controller.signal.aborted) return;
     elements.cancel.disabled = true;
-    elements.phase.textContent = lookup('download.progress.canceling', 'Canceling...');
+    elements.phase.textContent = lookup(
+      'download.progress.canceling',
+      'Canceling...',
+    );
     active.controller.abort();
   };
   elements.cancel.addEventListener('click', cancel);
@@ -58,14 +78,22 @@ export function createTaskProgress(elements, now = () => performance.now(), {
     if (elements.dialog.open) elements.dialog.close();
     const controller = new AbortController();
     const task = {
-      controller, startedAt: now(), fraction: 0, visible: false, finished: false,
-      showTimer: 0, clockTimer: 0, closeTimer: 0,
+      controller,
+      startedAt: now(),
+      fraction: 0,
+      visible: false,
+      finished: false,
+      showTimer: 0,
+      clockTimer: 0,
+      closeTimer: 0,
     };
     active = task;
     elements.title.textContent = title;
     elements.phase.textContent = phase;
     elements.meter.value = 0;
-    elements.percent.textContent = lookup('units.percent', '{value}%', { value: 0 });
+    elements.percent.textContent = lookup('units.percent', '{value}%', {
+      value: 0,
+    });
     elements.cancel.disabled = false;
     task.showTimer = windowObject.setTimeout(() => {
       if (active !== task || task.finished) return;
@@ -79,11 +107,14 @@ export function createTaskProgress(elements, now = () => performance.now(), {
       signal: controller.signal,
       cancel: () => controller.abort(),
       update(fraction, message) {
-        if (controller.signal.aborted || active?.controller !== controller) return;
+        if (controller.signal.aborted || active?.controller !== controller)
+          return;
         active.fraction = clamp(fraction);
         const percent = Math.round(active.fraction * 100);
         elements.meter.value = percent;
-        elements.percent.textContent = lookup('units.percent', '{value}%', { value: percent });
+        elements.percent.textContent = lookup('units.percent', '{value}%', {
+          value: percent,
+        });
         if (message) elements.phase.textContent = message;
         renderTime();
       },
@@ -100,8 +131,13 @@ export function createTaskProgress(elements, now = () => performance.now(), {
 
         task.fraction = 1;
         elements.meter.value = 100;
-        elements.percent.textContent = lookup('units.percent', '{value}%', { value: 100 });
-        elements.phase.textContent = lookup('download.progress.completed', 'Completed');
+        elements.percent.textContent = lookup('units.percent', '{value}%', {
+          value: 100,
+        });
+        elements.phase.textContent = lookup(
+          'download.progress.completed',
+          'Completed',
+        );
         elements.cancel.disabled = true;
         renderTime();
         task.closeTimer = windowObject.setTimeout(() => {

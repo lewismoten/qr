@@ -12,50 +12,108 @@ function testCapacityBoundaries() {
     { mode: 'byte', maximum: 'A'.repeat(17), overflow: 'A'.repeat(18) },
   ];
   boundaries.forEach(({ mode, maximum, overflow }) => {
-    assert.equal(NativeQRCode.create([{ data: maximum, mode }], { errorCorrectionLevel: 'L' }).version, 1);
-    assert.equal(NativeQRCode.create([{ data: overflow, mode }], { errorCorrectionLevel: 'L' }).version, 2);
+    assert.equal(
+      NativeQRCode.create([{ data: maximum, mode }], {
+        errorCorrectionLevel: 'L',
+      }).version,
+      1,
+    );
+    assert.equal(
+      NativeQRCode.create([{ data: overflow, mode }], {
+        errorCorrectionLevel: 'L',
+      }).version,
+      2,
+    );
   });
-  assert.equal(NativeQRCode.create([{ data: 'A'.repeat(14), mode: 'byte' }], { errorCorrectionLevel: 'M' }).version, 1);
+  assert.equal(
+    NativeQRCode.create([{ data: 'A'.repeat(14), mode: 'byte' }], {
+      errorCorrectionLevel: 'M',
+    }).version,
+    1,
+  );
   assert.throws(
-    () => NativeQRCode.create([{ data: 'A'.repeat(18), mode: 'byte' }], { errorCorrectionLevel: 'L', version: 1 }),
-    /Minimum version required is: 2/
+    () =>
+      NativeQRCode.create([{ data: 'A'.repeat(18), mode: 'byte' }], {
+        errorCorrectionLevel: 'L',
+        version: 1,
+      }),
+    /Minimum version required is: 2/,
   );
 }
 
 function testEveryVersionAndCorrectionLevel() {
   for (const errorCorrectionLevel of ['L', 'M', 'Q', 'H']) {
     for (let version = 1; version <= 40; version += 1) {
-      const definition = NativeQRCode.create('A', { errorCorrectionLevel, version, maskPattern: 0 });
+      const definition = NativeQRCode.create('A', {
+        errorCorrectionLevel,
+        version,
+        maskPattern: 0,
+      });
       assert.equal(definition.version, version);
       assert.equal(definition.modules.size, version * 4 + 17);
-      assert.equal(definition.modules.data.length, definition.modules.size ** 2);
-      assert.ok([...definition.modules.data].every((module) => module === 0 || module === 1));
-      assert.equal(definition.modules.get(3, 3), true, `finder center V${version}-${errorCorrectionLevel}`);
-      assert.equal(definition.modules.get(definition.modules.size - 8, 8), true, `dark module V${version}-${errorCorrectionLevel}`);
+      assert.equal(
+        definition.modules.data.length,
+        definition.modules.size ** 2,
+      );
+      assert.ok(
+        [...definition.modules.data].every(
+          (module) => module === 0 || module === 1,
+        ),
+      );
+      assert.equal(
+        definition.modules.get(3, 3),
+        true,
+        `finder center V${version}-${errorCorrectionLevel}`,
+      );
+      assert.equal(
+        definition.modules.get(definition.modules.size - 8, 8),
+        true,
+        `dark module V${version}-${errorCorrectionLevel}`,
+      );
     }
   }
 }
 
 function testModesAndUtf8() {
   assert.equal(NativeQRCode.create('12345').segments[0].mode, 'numeric');
-  assert.equal(NativeQRCode.create('HELLO WORLD').segments[0].mode, 'alphanumeric');
+  assert.equal(
+    NativeQRCode.create('HELLO WORLD').segments[0].mode,
+    'alphanumeric',
+  );
   const utf8 = NativeQRCode.create('Hello, 世界');
-  assert.deepEqual(utf8.segments.map(({ mode }) => mode), ['byte']);
+  assert.deepEqual(
+    utf8.segments.map(({ mode }) => mode),
+    ['byte'],
+  );
   assert.equal(utf8.segments[0].characterCount, 13);
   assert.equal(utf8.segments[0].getBitsLength(), 104);
-  assert.throws(() => NativeQRCode.create([{ data: '12-A', mode: 'numeric' }]), /only accepts digits/);
+  assert.throws(
+    () => NativeQRCode.create([{ data: '12-A', mode: 'numeric' }]),
+    /only accepts digits/,
+  );
 }
 
 function testKanjiAndMixedModes() {
-  const kanji = NativeQRCode.create([{ data: 'あかが', mode: 'kanji' }], { errorCorrectionLevel: 'M' });
+  const kanji = NativeQRCode.create([{ data: 'あかが', mode: 'kanji' }], {
+    errorCorrectionLevel: 'M',
+  });
   assert.equal(kanji.segments[0].characterCount, 3);
   assert.equal(kanji.segments[0].getBitsLength(), 39);
   assert.equal(NativeQRCode.toSJIS('あ'), 0x82a0);
-  assert.throws(() => NativeQRCode.create([{ data: 'QRあ', mode: 'kanji' }]), /outside the QR Shift JIS ranges/);
+  assert.throws(
+    () => NativeQRCode.create([{ data: 'QRあ', mode: 'kanji' }]),
+    /outside the QR Shift JIS ranges/,
+  );
 
   const mixed = NativeQRCode.create('ABC123あかがXYZ789');
-  assert.deepEqual(mixed.segments.map(({ mode }) => mode), ['alphanumeric', 'byte', 'alphanumeric']);
-  assert.deepEqual(mixed.segments.map(({ data }) => data), ['ABC123', 'あかが', 'XYZ789']);
+  assert.deepEqual(
+    mixed.segments.map(({ mode }) => mode),
+    ['alphanumeric', 'byte', 'alphanumeric'],
+  );
+  assert.deepEqual(
+    mixed.segments.map(({ data }) => data),
+    ['ABC123', 'あかが', 'XYZ789'],
+  );
 }
 
 function testVersion40CapacityLimits() {
@@ -66,10 +124,24 @@ function testVersion40CapacityLimits() {
     ['kanji', 'あ'.repeat(1817)],
   ];
   maximums.forEach(([mode, payload]) => {
-    assert.equal(NativeQRCode.create([{ data: payload, mode }], { errorCorrectionLevel: 'L' }).version, 40);
+    assert.equal(
+      NativeQRCode.create([{ data: payload, mode }], {
+        errorCorrectionLevel: 'L',
+      }).version,
+      40,
+    );
     assert.throws(
-      () => NativeQRCode.create([{ data: `${payload}${mode === 'numeric' ? '1' : mode === 'kanji' ? 'あ' : 'A'}`, mode }], { errorCorrectionLevel: 'L' }),
-      /too large/
+      () =>
+        NativeQRCode.create(
+          [
+            {
+              data: `${payload}${mode === 'numeric' ? '1' : mode === 'kanji' ? 'あ' : 'A'}`,
+              mode,
+            },
+          ],
+          { errorCorrectionLevel: 'L' },
+        ),
+      /too large/,
     );
   });
 }

@@ -7,10 +7,13 @@ function uint16(bytes, offset) {
 }
 
 function uint32(bytes, offset) {
-  return (bytes[offset]
-    | (bytes[offset + 1] << 8)
-    | (bytes[offset + 2] << 16)
-    | (bytes[offset + 3] << 24)) >>> 0;
+  return (
+    (bytes[offset] |
+      (bytes[offset + 1] << 8) |
+      (bytes[offset + 2] << 16) |
+      (bytes[offset + 3] << 24)) >>>
+    0
+  );
 }
 
 const payload = new TextEncoder().encode('QR export');
@@ -26,7 +29,15 @@ assert.equal(uint16(bytes, 8), 0, 'stored compression method');
 assert.equal(uint32(bytes, 14), getCrc32(payload), 'CRC-32 checksum');
 assert.equal(uint32(bytes, 18), payload.length, 'compressed size');
 assert.equal(uint32(bytes, 22), payload.length, 'uncompressed size');
-assert.equal(uint32(bytes, bytes.length - 22), 0x06054b50, 'end-of-central-directory signature');
-assert.equal(getCrc32(standardVector), 0xcbf43926, 'standard CRC-32 check value');
+assert.equal(
+  uint32(bytes, bytes.length - 22),
+  0x06054b50,
+  'end-of-central-directory signature',
+);
+assert.equal(
+  getCrc32(standardVector),
+  0xcbf43926,
+  'standard CRC-32 check value',
+);
 
 console.log('Export format tests passed.');

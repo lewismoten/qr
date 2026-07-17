@@ -17,11 +17,16 @@ function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
   const family = '"Apple Color Emoji", "Segoe UI Emoji", sans-serif';
   emojiContext.font = `${fontSize}px ${family}`;
   const measuredWidth = emojiContext.measureText(emoji).width;
-  if (measuredWidth > artSize * 0.92) fontSize *= (artSize * 0.92) / measuredWidth;
+  if (measuredWidth > artSize * 0.92)
+    fontSize *= (artSize * 0.92) / measuredWidth;
   emojiContext.font = `${fontSize}px ${family}`;
   emojiContext.textAlign = 'center';
   emojiContext.textBaseline = 'middle';
-  emojiContext.fillText(emoji, bufferSize / 2, bufferSize / 2 + fontSize * 0.04);
+  emojiContext.fillText(
+    emoji,
+    bufferSize / 2,
+    bufferSize / 2 + fontSize * 0.04,
+  );
   maskContext.drawImage(emojiCanvas, 0, 0);
   maskContext.globalCompositeOperation = 'source-in';
   maskContext.fillStyle = outlineColor;
@@ -29,15 +34,20 @@ function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
   const target = center - bufferSize / 2;
   for (let step = 0; step < 24; step += 1) {
     const angle = (step / 24) * Math.PI * 2;
-    context.drawImage(maskCanvas, target + Math.cos(angle) * outlineWidth, target + Math.sin(angle) * outlineWidth);
+    context.drawImage(
+      maskCanvas,
+      target + Math.cos(angle) * outlineWidth,
+      target + Math.sin(angle) * outlineWidth,
+    );
   }
   context.drawImage(emojiCanvas, target, target);
 }
 
 export function drawCenterArtwork(context, qrStart, qrSize, options) {
-  const hasArtwork = (options.mode === 'logo' && options.logo)
-    || (options.mode === 'emoji' && options.emoji)
-    || (options.mode === 'pixel' && options.pixelArt.pixels.some(Boolean));
+  const hasArtwork =
+    (options.mode === 'logo' && options.logo) ||
+    (options.mode === 'emoji' && options.emoji) ||
+    (options.mode === 'pixel' && options.pixelArt.pixels.some(Boolean));
   if (!hasArtwork) return;
   const badgeSize = qrSize * (options.sizePercent / 100);
   const center = qrStart + qrSize / 2;
@@ -55,15 +65,30 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
     );
   }
   if (options.mode === 'logo') {
-    const scale = Math.min(artSize / options.logo.naturalWidth, artSize / options.logo.naturalHeight);
+    const scale = Math.min(
+      artSize / options.logo.naturalWidth,
+      artSize / options.logo.naturalHeight,
+    );
     const width = options.logo.naturalWidth * scale;
     const height = options.logo.naturalHeight * scale;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = 'high';
-    context.drawImage(options.logo, center - width / 2, center - height / 2, width, height);
+    context.drawImage(
+      options.logo,
+      center - width / 2,
+      center - height / 2,
+      width,
+      height,
+    );
   } else if (options.mode === 'emoji') {
     if (options.protectBackground) {
-      drawOutlinedEmoji(context, options.emoji, center, artSize, getOpaqueArtworkBackground(options.lightColor));
+      drawOutlinedEmoji(
+        context,
+        options.emoji,
+        center,
+        artSize,
+        getOpaqueArtworkBackground(options.lightColor),
+      );
     } else {
       context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
       context.textAlign = 'center';
@@ -81,7 +106,13 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
       const column = index % options.pixelArt.size;
       context.fillStyle = color;
       if (options.matchModuleShape) {
-        drawQrModule(context, artX + column * pixelSize, artY + row * pixelSize, pixelSize, options.moduleShape);
+        drawQrModule(
+          context,
+          artX + column * pixelSize,
+          artY + row * pixelSize,
+          pixelSize,
+          options.moduleShape,
+        );
       } else {
         const left = Math.round(artX + column * pixelSize);
         const top = Math.round(artY + row * pixelSize);

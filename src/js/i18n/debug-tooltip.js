@@ -9,22 +9,29 @@ const KEY_SELECTOR = [
 ].join(',');
 
 function getKey(element) {
-  return element?.dataset.i18n
-    || element?.dataset.i18nAriaLabel
-    || element?.dataset.i18nPlaceholder
-    || element?.dataset.i18nTitle
-    || element?.dataset.i18nValue;
+  return (
+    element?.dataset.i18n ||
+    element?.dataset.i18nAriaLabel ||
+    element?.dataset.i18nPlaceholder ||
+    element?.dataset.i18nTitle ||
+    element?.dataset.i18nValue
+  );
 }
 
 function getLanguageName(locale) {
   try {
-    return new Intl.DisplayNames([locale], { type: 'language' }).of(locale) || locale;
+    return (
+      new Intl.DisplayNames([locale], { type: 'language' }).of(locale) || locale
+    );
   } catch {
     return locale;
   }
 }
 
-export function setupTranslationDebugTooltip({ document = globalThis.document, window = globalThis.window } = {}) {
+export function setupTranslationDebugTooltip({
+  document = globalThis.document,
+  window = globalThis.window,
+} = {}) {
   if (!document?.body || !window) return;
 
   const tooltip = document.createElement('aside');
@@ -48,9 +55,13 @@ export function setupTranslationDebugTooltip({ document = globalThis.document, w
       Math.max(gap, window.innerWidth - bounds.width - gap),
     );
     const above = anchor.top - bounds.height - gap;
-    const top = above >= gap
-      ? above
-      : Math.min(window.innerHeight - bounds.height - gap, anchor.bottom + gap);
+    const top =
+      above >= gap
+        ? above
+        : Math.min(
+            window.innerHeight - bounds.height - gap,
+            anchor.bottom + gap,
+          );
     tooltip.style.left = `${left}px`;
     tooltip.style.top = `${Math.max(gap, top)}px`;
   };

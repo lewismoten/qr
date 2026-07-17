@@ -4,7 +4,12 @@ import { throwIfAborted, waitFor } from './abort.js';
 
 export function createGifBlob(sourceCanvas) {
   const context = sourceCanvas.getContext('2d');
-  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
+  const pixels = context.getImageData(
+    0,
+    0,
+    sourceCanvas.width,
+    sourceCanvas.height,
+  ).data;
   const indexes = new Uint8Array(sourceCanvas.width * sourceCanvas.height);
   const levels = [0, 51, 102, 153, 204, 255];
   const palette = new Uint8Array(256 * 3);
@@ -64,13 +69,22 @@ export function createAnimationStage(frames) {
   return stage;
 }
 
-export function drawAnimationStageFrame(stage, frame, flatten = false, context = stage.getContext('2d')) {
+export function drawAnimationStageFrame(
+  stage,
+  frame,
+  flatten = false,
+  context = stage.getContext('2d'),
+) {
   context.clearRect(0, 0, stage.width, stage.height);
   if (flatten) {
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, stage.width, stage.height);
   }
-  context.drawImage(frame, (stage.width - frame.width) / 2, (stage.height - frame.height) / 2);
+  context.drawImage(
+    frame,
+    (stage.width - frame.width) / 2,
+    (stage.height - frame.height) / 2,
+  );
 }
 
 function getGifPaletteAndIndexes(stage, context) {
@@ -103,7 +117,11 @@ function getGifPaletteAndIndexes(stage, context) {
   return { palette, indexes };
 }
 
-export async function createAnimatedGifBlob(frames, frameDurationMs, { onProgress, signal } = {}) {
+export async function createAnimatedGifBlob(
+  frames,
+  frameDurationMs,
+  { onProgress, signal } = {},
+) {
   throwIfAborted(signal);
   const stage = createAnimationStage(frames);
   const context = stage.getContext('2d', { willReadFrequently: true });
@@ -113,7 +131,21 @@ export async function createAnimatedGifBlob(frames, frameDurationMs, { onProgres
   const bytes = [...textBytes('GIF89a')];
   pushUint16LE(bytes, stage.width);
   pushUint16LE(bytes, stage.height);
-  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xff, 0x0b, ...textBytes('NETSCAPE2.0'), 3, 1, 0, 0, 0);
+  bytes.push(
+    0xf7,
+    0,
+    0,
+    ...palette,
+    0x21,
+    0xff,
+    0x0b,
+    ...textBytes('NETSCAPE2.0'),
+    3,
+    1,
+    0,
+    0,
+    0,
+  );
 
   for (let frameIndex = 0; frameIndex < frames.length; frameIndex += 1) {
     throwIfAborted(signal);

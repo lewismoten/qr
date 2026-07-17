@@ -24,7 +24,9 @@ const mimeTypes = {
 };
 
 function getFilePath(requestUrl) {
-  const pathname = decodeURIComponent(new URL(requestUrl, 'http://localhost').pathname);
+  const pathname = decodeURIComponent(
+    new URL(requestUrl, 'http://localhost').pathname,
+  );
   const relativePath = normalize(pathname).replace(/^[/\\]+/, '');
   const filePath = resolve(join(root, relativePath || 'index.html'));
   return filePath === root || filePath.startsWith(`${root}/`) ? filePath : null;
@@ -46,19 +48,25 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, {
       'Cache-Control': 'no-cache',
       'Content-Length': finalStat.size,
-      'Content-Type': mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream',
+      'Content-Type':
+        mimeTypes[extname(filePath).toLowerCase()] ||
+        'application/octet-stream',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'X-Content-Type-Options': 'nosniff',
     });
     if (request.method === 'HEAD') response.end();
     else createReadStream(filePath).pipe(response);
   } catch {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
+    response
+      .writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+      .end('Not found');
   }
 });
 
 server.on('error', (error) => {
-  console.error(`Unable to start the local server on ${host}:${port}: ${error.message}`);
+  console.error(
+    `Unable to start the local server on ${host}:${port}: ${error.message}`,
+  );
   process.exitCode = 1;
 });
 

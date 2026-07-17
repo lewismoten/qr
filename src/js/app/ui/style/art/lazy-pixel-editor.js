@@ -7,20 +7,26 @@ export function createLazyPixelArtEditor(options, { isActive, onReady }) {
   const getSize = () => Number.parseInt(options.sizeInput.value, 10) || 16;
   const syncFallbackLabel = () => {
     const size = getSize();
-    options.sizeValue.textContent = lookup('units.dimensions', '{width} x {height}', { width: size, height: size });
+    options.sizeValue.textContent = lookup(
+      'units.dimensions',
+      '{width} x {height}',
+      { width: size, height: size },
+    );
   };
   const load = () => {
     if (editor) return Promise.resolve(editor);
     if (!request) {
-      request = import('./pixel-editor.js').then(({ createPixelArtEditor }) => {
-        editor = createPixelArtEditor(options);
-        editor.initialize();
-        onReady();
-        return editor;
-      }).catch((error) => {
-        request = null;
-        throw error;
-      });
+      request = import('./pixel-editor.js')
+        .then(({ createPixelArtEditor }) => {
+          editor = createPixelArtEditor(options);
+          editor.initialize();
+          onReady();
+          return editor;
+        })
+        .catch((error) => {
+          request = null;
+          throw error;
+        });
     }
     return request;
   };
@@ -28,7 +34,9 @@ export function createLazyPixelArtEditor(options, { isActive, onReady }) {
 
   options.grid.addEventListener('pointerdown', preload, { once: true });
   options.grid.addEventListener('focusin', preload, { once: true });
-  options.paletteElement.addEventListener('pointerdown', preload, { once: true });
+  options.paletteElement.addEventListener('pointerdown', preload, {
+    once: true,
+  });
   options.customColorInput.addEventListener('focus', preload, { once: true });
 
   return {

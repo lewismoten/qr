@@ -2,7 +2,9 @@ import { lookup } from '../i18n/index.js';
 import { throwIfAborted, waitFor } from './abort.js';
 
 export function parseBoolean(value, { allowBlank = true } = {}) {
-  const normalized = String(value ?? '').trim().toLowerCase();
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
   if (!normalized && allowBlank) return false;
   if (['true', '1', 'yes', 'y'].includes(normalized)) return true;
   if (['false', '0', 'no', 'n'].includes(normalized)) return false;
@@ -45,7 +47,13 @@ export function parseCsv(text) {
     }
   }
 
-  if (quoted) throw new Error(lookup('bulk.csv.unclosedQuote', 'The CSV contains an unclosed quoted value.'));
+  if (quoted)
+    throw new Error(
+      lookup(
+        'bulk.csv.unclosedQuote',
+        'The CSV contains an unclosed quoted value.',
+      ),
+    );
   if (value || row.length) {
     row.push(value);
     rows.push(row);
@@ -54,7 +62,10 @@ export function parseCsv(text) {
   return rows;
 }
 
-export async function parseCsvAsync(text, { signal, onProgress, yieldEvery = 32768 } = {}) {
+export async function parseCsvAsync(
+  text,
+  { signal, onProgress, yieldEvery = 32768 } = {},
+) {
   const rows = [];
   let row = [];
   let value = '';
@@ -88,7 +99,13 @@ export async function parseCsvAsync(text, { signal, onProgress, yieldEvery = 327
 
   throwIfAborted(signal);
   onProgress?.(text.length, text.length);
-  if (quoted) throw new Error(lookup('bulk.csv.unclosedQuote', 'The CSV contains an unclosed quoted value.'));
+  if (quoted)
+    throw new Error(
+      lookup(
+        'bulk.csv.unclosedQuote',
+        'The CSV contains an unclosed quoted value.',
+      ),
+    );
   if (value || row.length) {
     row.push(value);
     rows.push(row);

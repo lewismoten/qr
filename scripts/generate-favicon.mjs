@@ -26,7 +26,11 @@ function getColor(x, y) {
   let color = COLORS.teal;
   if (insideRoundedRect(x, y, 5, 5, 54, 54, 9)) color = COLORS.cream;
 
-  const eyes = [[10, 10], [37, 10], [10, 37]];
+  const eyes = [
+    [10, 10],
+    [37, 10],
+    [10, 37],
+  ];
   eyes.forEach(([left, top]) => {
     if (insideRect(x, y, [left, top, 17, 17])) color = COLORS.ink;
     if (insideRect(x, y, [left + 4, top + 4, 9, 9])) color = COLORS.cream;
@@ -34,9 +38,16 @@ function getColor(x, y) {
   });
 
   const modules = [
-    [31, 10, 4, 8], [30, 22, 7, 5], [30, 31, 5, 5], [39, 31, 6, 5],
-    [49, 30, 5, 8], [30, 40, 8, 5], [42, 40, 5, 5], [50, 42, 4, 12],
-    [30, 49, 5, 5], [39, 48, 7, 6],
+    [31, 10, 4, 8],
+    [30, 22, 7, 5],
+    [30, 31, 5, 5],
+    [39, 31, 6, 5],
+    [49, 30, 5, 8],
+    [30, 40, 8, 5],
+    [42, 40, 5, 5],
+    [50, 42, 4, 12],
+    [30, 49, 5, 5],
+    [39, 48, 7, 6],
   ];
   if (modules.some((rect) => insideRect(x, y, rect))) color = COLORS.ink;
   if (insideRect(x, y, [30, 30, 4, 4])) color = COLORS.gold;
@@ -56,14 +67,15 @@ function createDib(size) {
 
   for (let row = 0; row < size; row += 1) {
     for (let column = 0; column < size; column += 1) {
-      const x = (column + 0.5) * 64 / size;
-      const y = (row + 0.5) * 64 / size;
+      const x = ((column + 0.5) * 64) / size;
+      const y = ((row + 0.5) * 64) / size;
       const [red, green, blue, alpha] = getColor(x, y);
       const outputRow = size - row - 1;
       const offset = 40 + (outputRow * size + column) * 4;
       bitmap.set([blue, green, red, alpha], offset);
       if (alpha === 0) {
-        const maskOffset = 40 + pixelBytes + outputRow * maskRowBytes + Math.floor(column / 8);
+        const maskOffset =
+          40 + pixelBytes + outputRow * maskRowBytes + Math.floor(column / 8);
         bitmap[maskOffset] |= 0x80 >> (column % 8);
       }
     }
@@ -88,5 +100,8 @@ images.forEach(({ size, data }, index) => {
   imageOffset += data.length;
 });
 
-await writeFile('favicon.ico', Buffer.concat([header, ...images.map(({ data }) => data)]));
+await writeFile(
+  'favicon.ico',
+  Buffer.concat([header, ...images.map(({ data }) => data)]),
+);
 console.log(`Generated favicon.ico with ${sizes.join(', ')} px images.`);

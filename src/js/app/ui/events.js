@@ -1,4 +1,8 @@
-export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVersion }) {
+export function bindApplicationEvents({
+  elements: e,
+  actions: a,
+  defaultChunkVersion,
+}) {
   e.form.addEventListener('submit', (event) => event.preventDefault());
   e.form.addEventListener('input', (event) => {
     if (event.target === e.bulkEnabled) {
@@ -8,8 +12,19 @@ export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVer
       else a.render();
       return;
     }
-    if (event.target === e.bulkFileInput || event.target === e.fileChunkVersionAuto || event.target === e.fileChunkIndex) return;
-    if ([e.animationMinutes, e.animationSeconds, e.animationMilliseconds].includes(event.target)) {
+    if (
+      event.target === e.bulkFileInput ||
+      event.target === e.fileChunkVersionAuto ||
+      event.target === e.fileChunkIndex
+    )
+      return;
+    if (
+      [
+        e.animationMinutes,
+        e.animationSeconds,
+        e.animationMilliseconds,
+      ].includes(event.target)
+    ) {
       a.syncAnimation();
       return;
     }
@@ -17,7 +32,13 @@ export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVer
       a.syncDownloads();
       return;
     }
-    if ([e.fileIncludeManifest, e.fileCompressTransfer, e.fileCustomMetadata].includes(event.target)) {
+    if (
+      [
+        e.fileIncludeManifest,
+        e.fileCompressTransfer,
+        e.fileCustomMetadata,
+      ].includes(event.target)
+    ) {
       a.resetTransfer();
       a.scheduleChunkRefresh({ resetChunkIndex: true });
       return;
@@ -53,54 +74,63 @@ export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVer
     if (a.isBulkMode() && e.bulkFileInput.files?.[0]) a.loadBulkFile();
     else a.render();
   });
-  e.frameMessageCenter.addEventListener('input', () => a.setFrameCentered(e.frameMessageCenter.checked));
-  e.frameMessageCenterArt.addEventListener('input', () => a.setFrameCentered(e.frameMessageCenterArt.checked));
+  e.frameMessageCenter.addEventListener('input', () =>
+    a.setFrameCentered(e.frameMessageCenter.checked),
+  );
+  e.frameMessageCenterArt.addEventListener('input', () =>
+    a.setFrameCentered(e.frameMessageCenterArt.checked),
+  );
 
-  e.choiceButtons.forEach((button) => button.addEventListener('click', () => {
-    const target = document.getElementById(button.dataset.choiceTarget);
-    const value = button.dataset.choiceValue;
-    if (!target || target.value === value) return;
-    target.value = value;
-    a.syncChoices();
-    if (target === e.gradientType) a.syncGradient();
-    if (target === e.moduleShape) a.syncModules();
-    if (target === e.eyeShape) a.syncEyes();
-    if (target === e.centerArtMode) {
-      if (value !== 'none') a.setFrameCentered(false);
-      a.syncArtwork();
-    }
-    if (target === e.wifiEncryption) a.syncWifi();
-    if (target === e.qrFormat) {
-      a.syncFormat();
-      a.activateContent('data');
-      if (a.isBulkMode() && e.bulkFileInput.files?.[0]) {
-        a.loadBulkFile();
+  e.choiceButtons.forEach((button) =>
+    button.addEventListener('click', () => {
+      const target = document.getElementById(button.dataset.choiceTarget);
+      const value = button.dataset.choiceValue;
+      if (!target || target.value === value) return;
+      target.value = value;
+      a.syncChoices();
+      if (target === e.gradientType) a.syncGradient();
+      if (target === e.moduleShape) a.syncModules();
+      if (target === e.eyeShape) a.syncEyes();
+      if (target === e.centerArtMode) {
+        if (value !== 'none') a.setFrameCentered(false);
+        a.syncArtwork();
+      }
+      if (target === e.wifiEncryption) a.syncWifi();
+      if (target === e.qrFormat) {
+        a.syncFormat();
+        a.activateContent('data');
+        if (a.isBulkMode() && e.bulkFileInput.files?.[0]) {
+          a.loadBulkFile();
+          return;
+        }
+      }
+      if (target === e.downloadFormat) {
+        a.syncDownloads();
         return;
       }
-    }
-    if (target === e.downloadFormat) {
-      a.syncDownloads();
-      return;
-    }
-    if (target === e.animationTimingMode) {
-      a.syncAnimation();
-      return;
-    }
-    if (target === e.fileEncodingMode) {
-      if (value === 'chunked' && e.versionAuto.checked) e.qrVersion.value = String(defaultChunkVersion);
-      a.syncChunkVersion();
-      a.formatVersion();
-      a.scheduleChunkRefresh({ resetChunkIndex: true, delay: 0 });
-      return;
-    }
-    a.render();
-  }));
+      if (target === e.animationTimingMode) {
+        a.syncAnimation();
+        return;
+      }
+      if (target === e.fileEncodingMode) {
+        if (value === 'chunked' && e.versionAuto.checked)
+          e.qrVersion.value = String(defaultChunkVersion);
+        a.syncChunkVersion();
+        a.formatVersion();
+        a.scheduleChunkRefresh({ resetChunkIndex: true, delay: 0 });
+        return;
+      }
+      a.render();
+    }),
+  );
 
-  e.emojiOptions.forEach((button) => button.addEventListener('click', () => {
-    e.centerEmoji.value = button.dataset.emoji || '';
-    a.syncEmoji();
-    a.render();
-  }));
+  e.emojiOptions.forEach((button) =>
+    button.addEventListener('click', () => {
+      e.centerEmoji.value = button.dataset.emoji || '';
+      a.syncEmoji();
+      a.render();
+    }),
+  );
   e.imageFillRecommended.addEventListener('click', () => {
     a.applyImageContrast();
     a.render();
@@ -126,7 +156,8 @@ export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVer
   });
   e.fileChunkVersionAuto.addEventListener('change', () => {
     e.versionAuto.checked = e.fileChunkVersionAuto.checked;
-    if (e.fileChunkVersionAuto.checked) e.qrVersion.value = String(defaultChunkVersion);
+    if (e.fileChunkVersionAuto.checked)
+      e.qrVersion.value = String(defaultChunkVersion);
     a.formatVersion();
     a.syncChunkVersion();
     a.scheduleChunkRefresh({ resetChunkIndex: true, delay: 0 });
@@ -138,7 +169,11 @@ export function bindApplicationEvents({ elements: e, actions: a, defaultChunkVer
     a.scheduleChunkRefresh({ resetChunkIndex: true });
   });
   e.versionAuto.addEventListener('change', () => {
-    if (e.versionAuto.checked && e.qrFormat.value === 'file' && a.getFileMode() === 'chunked') {
+    if (
+      e.versionAuto.checked &&
+      e.qrFormat.value === 'file' &&
+      a.getFileMode() === 'chunked'
+    ) {
       e.qrVersion.value = String(defaultChunkVersion);
       a.scheduleChunkRefresh({ resetChunkIndex: true, delay: 0 });
     }

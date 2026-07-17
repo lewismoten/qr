@@ -1,21 +1,36 @@
 import { lookup } from '../../../i18n/index.js';
 
-export function createQrConfiguration({ elements: e, encoder, helpers, alphanumericCharacters }) {
+export function createQrConfiguration({
+  elements: e,
+  encoder,
+  helpers,
+  alphanumericCharacters,
+}) {
   const buildOptions = () => {
     const base = {
       errorCorrectionLevel: helpers.getErrorLevel().value,
       margin: helpers.readInteger(e.qrMargin) ?? 1,
       scale: helpers.readInteger(e.qrScale) ?? 4,
       color: {
-        dark: helpers.colorWithTransparency(e.colorDark.value.trim() || '#111827', e.colorDarkTransparency),
-        light: helpers.colorWithTransparency(e.colorLight.value.trim() || '#ffffff', e.colorLightTransparency),
+        dark: helpers.colorWithTransparency(
+          e.colorDark.value.trim() || '#111827',
+          e.colorDarkTransparency,
+        ),
+        light: helpers.colorWithTransparency(
+          e.colorLight.value.trim() || '#ffffff',
+          e.colorLightTransparency,
+        ),
       },
     };
-    if (!e.qrWidthAuto.checked) base.width = helpers.readInteger(e.qrWidth) ?? 320;
-    const chunked = e.qrFormat.value === 'file' && helpers.getFileMode() === 'chunked';
+    if (!e.qrWidthAuto.checked)
+      base.width = helpers.readInteger(e.qrWidth) ?? 320;
+    const chunked =
+      e.qrFormat.value === 'file' && helpers.getFileMode() === 'chunked';
     const version = chunked
       ? helpers.getChunkVersion()
-      : e.versionAuto.checked ? undefined : helpers.readInteger(e.qrVersion);
+      : e.versionAuto.checked
+        ? undefined
+        : helpers.readInteger(e.qrVersion);
     if (version !== undefined) base.version = version;
     const mask = helpers.readInteger(e.maskPattern);
     if (mask !== undefined) base.maskPattern = mask;
@@ -25,12 +40,15 @@ export function createQrConfiguration({ elements: e, encoder, helpers, alphanume
   };
 
   const buildPayload = (text) => {
-    const chunked = e.qrFormat.value === 'file' && helpers.getFileMode() === 'chunked';
+    const chunked =
+      e.qrFormat.value === 'file' && helpers.getFileMode() === 'chunked';
     if (chunked && text.trim()) return [{ data: text, mode: 'byte' }];
     if (e.qrFormat.value === 'number' && e.modeAuto.checked && text.trim()) {
       const mode = /^\d+$/.test(text)
         ? 'numeric'
-        : [...text].every((character) => alphanumericCharacters.includes(character))
+        : [...text].every((character) =>
+              alphanumericCharacters.includes(character),
+            )
           ? 'alphanumeric'
           : 'byte';
       return [{ data: text, mode }];
@@ -40,7 +58,13 @@ export function createQrConfiguration({ elements: e, encoder, helpers, alphanume
   };
 
   const createDefinition = (payload, options) => {
-    if (typeof encoder?.create !== 'function') throw new Error(lookup('preview.encoderError', 'The first-party QR encoder did not load.'));
+    if (typeof encoder?.create !== 'function')
+      throw new Error(
+        lookup(
+          'preview.encoderError',
+          'The first-party QR encoder did not load.',
+        ),
+      );
     return encoder.create(payload, options);
   };
 

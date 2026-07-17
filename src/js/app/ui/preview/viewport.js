@@ -1,4 +1,11 @@
-export function createPreviewViewport({ viewport, canvas, controls, fitButton, actualButton, getRenderMetrics }) {
+export function createPreviewViewport({
+  viewport,
+  canvas,
+  controls,
+  fitButton,
+  actualButton,
+  getRenderMetrics,
+}) {
   let viewMode = 'fit';
   let panX = 0;
   let panY = 0;
@@ -20,8 +27,14 @@ export function createPreviewViewport({ viewport, canvas, controls, fitButton, a
     panY = Math.max(-bounds.y, Math.min(bounds.y, panY));
     const centeredLeft = (viewport.clientWidth - canvas.width) / 2;
     const centeredTop = (viewport.clientHeight - canvas.height) / 2;
-    viewport.style.setProperty('--qr-preview-left', `${Math.round(centeredLeft + panX)}px`);
-    viewport.style.setProperty('--qr-preview-top', `${Math.round(centeredTop + panY)}px`);
+    viewport.style.setProperty(
+      '--qr-preview-left',
+      `${Math.round(centeredLeft + panX)}px`,
+    );
+    viewport.style.setProperty(
+      '--qr-preview-top',
+      `${Math.round(centeredTop + panY)}px`,
+    );
   };
 
   const setMode = (mode, resetPan = false) => {
@@ -41,17 +54,25 @@ export function createPreviewViewport({ viewport, canvas, controls, fitButton, a
   };
 
   const syncFitSize = () => {
-    const fitRatio = Math.min(1, viewport.clientWidth / canvas.width, viewport.clientHeight / canvas.height);
+    const fitRatio = Math.min(
+      1,
+      viewport.clientWidth / canvas.width,
+      viewport.clientHeight / canvas.height,
+    );
     let fitWidth = canvas.width;
     let fitHeight = canvas.height;
     const { renderedWidth, moduleScale } = getRenderMetrics();
     if (fitRatio < 1 && renderedWidth && moduleScale) {
       const totalModules = Math.round(renderedWidth / moduleScale);
       const fittedModuleScale = Math.floor(moduleScale * fitRatio);
-      fitWidth = fittedModuleScale >= 1
-        ? totalModules * fittedModuleScale
-        : Math.max(1, Math.floor(canvas.width * fitRatio));
-      fitHeight = Math.max(1, Math.round(canvas.height * (fitWidth / canvas.width)));
+      fitWidth =
+        fittedModuleScale >= 1
+          ? totalModules * fittedModuleScale
+          : Math.max(1, Math.floor(canvas.width * fitRatio));
+      fitHeight = Math.max(
+        1,
+        Math.round(canvas.height * (fitWidth / canvas.width)),
+      );
     }
     viewport.style.setProperty('--qr-fit-width', `${fitWidth}px`);
     viewport.style.setProperty('--qr-fit-height', `${fitHeight}px`);
@@ -61,7 +82,9 @@ export function createPreviewViewport({ viewport, canvas, controls, fitButton, a
     cancelAnimationFrame(syncRequest);
     syncRequest = requestAnimationFrame(() => {
       syncFitSize();
-      const oversized = canvas.width > viewport.clientWidth || canvas.height > viewport.clientHeight;
+      const oversized =
+        canvas.width > viewport.clientWidth ||
+        canvas.height > viewport.clientHeight;
       controls.classList.toggle('is-hidden', !oversized);
       controls.setAttribute('aria-hidden', String(!oversized));
       applyPan();
@@ -72,13 +95,18 @@ export function createPreviewViewport({ viewport, canvas, controls, fitButton, a
     if (panPointer !== event.pointerId) return;
     panPointer = null;
     viewport.classList.remove('is-dragging');
-    if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
+    if (viewport.hasPointerCapture(event.pointerId))
+      viewport.releasePointerCapture(event.pointerId);
   };
 
   fitButton.addEventListener('click', () => setMode('fit'));
   actualButton.addEventListener('click', () => setMode('actual', true));
   viewport.addEventListener('pointerdown', (event) => {
-    if (viewMode !== 'actual' || (event.button !== undefined && event.button !== 0)) return;
+    if (
+      viewMode !== 'actual' ||
+      (event.button !== undefined && event.button !== 0)
+    )
+      return;
     const bounds = getPanBounds();
     if (bounds.x === 0 && bounds.y === 0) return;
     panPointer = event.pointerId;
@@ -99,7 +127,8 @@ export function createPreviewViewport({ viewport, canvas, controls, fitButton, a
   viewport.addEventListener('pointerup', stopPan);
   viewport.addEventListener('pointercancel', stopPan);
 
-  if ('ResizeObserver' in window) new ResizeObserver(scheduleSync).observe(viewport);
+  if ('ResizeObserver' in window)
+    new ResizeObserver(scheduleSync).observe(viewport);
   else window.addEventListener('resize', scheduleSync);
 
   return { setMode, scheduleSync };

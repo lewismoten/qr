@@ -1,6 +1,15 @@
-import { createCalendarEventId, serializeCalendarEvent } from '../../../calendar.js';
-import { serializeEmail, serializeGeo, serializePhone, serializeSms, serializeVCard,
-  serializeWifi } from '../../../content-formats.js';
+import {
+  createCalendarEventId,
+  serializeCalendarEvent,
+} from '../../../calendar.js';
+import {
+  serializeEmail,
+  serializeGeo,
+  serializePhone,
+  serializeSms,
+  serializeVCard,
+  serializeWifi,
+} from '../../../content-formats.js';
 import { parseBoolean } from '../../../csv.js';
 
 export function normalizeBulkWifiSecurity(value) {
@@ -11,7 +20,12 @@ export function normalizeBulkWifiSecurity(value) {
   return '';
 }
 
-export function serializeBulkRow({ row, format, frameIndex, alphanumericCharacters }) {
+export function serializeBulkRow({
+  row,
+  format,
+  frameIndex,
+  alphanumericCharacters,
+}) {
   if (!row) return '';
 
   switch (format) {
@@ -22,15 +36,30 @@ export function serializeBulkRow({ row, format, frameIndex, alphanumericCharacte
     case 'number': {
       const raw = `${row.prefix}${row.number}${row.suffix}`;
       const uppercase = raw.toUpperCase();
-      return [...uppercase].every((character) => alphanumericCharacters.includes(character)) ? uppercase : raw;
+      return [...uppercase].every((character) =>
+        alphanumericCharacters.includes(character),
+      )
+        ? uppercase
+        : raw;
     }
     case 'wifi': {
-      const security = normalizeBulkWifiSecurity(row.security) || row.security.trim();
-      return serializeWifi({ security, ssid: row.ssid, password: row.password,
-        hidden: parseBoolean(row.hidden) });
+      const security =
+        normalizeBulkWifiSecurity(row.security) || row.security.trim();
+      return serializeWifi({
+        security,
+        ssid: row.ssid,
+        password: row.password,
+        hidden: parseBoolean(row.hidden),
+      });
     }
-    case 'email': return serializeEmail({ email: row.email, subject: row.subject, body: row.body });
-    case 'phone': return serializePhone(row.phone);
+    case 'email':
+      return serializeEmail({
+        email: row.email,
+        subject: row.subject,
+        body: row.body,
+      });
+    case 'phone':
+      return serializePhone(row.phone);
     case 'sms':
       return serializeSms({ number: row.phone, message: row.message });
     case 'event':
@@ -48,10 +77,21 @@ export function serializeBulkRow({ row, format, frameIndex, alphanumericCharacte
         },
         createCalendarEventId(frameIndex),
       );
-    case 'geo': return serializeGeo({ latitude: row.latitude, longitude: row.longitude,
-      label: row.label });
-    case 'vcard': return serializeVCard({ name: row.name, organization: row.organization,
-      title: row.title, phone: row.phone, email: row.email, url: row.url });
+    case 'geo':
+      return serializeGeo({
+        latitude: row.latitude,
+        longitude: row.longitude,
+        label: row.label,
+      });
+    case 'vcard':
+      return serializeVCard({
+        name: row.name,
+        organization: row.organization,
+        title: row.title,
+        phone: row.phone,
+        email: row.email,
+        url: row.url,
+      });
     default:
       return '';
   }

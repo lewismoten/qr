@@ -4,14 +4,26 @@ import { createStyleSubtabs } from '../style/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
 import { createTabSet } from '../tab-set.js';
 
-export function createNavigation({ elements: e, format, render, updateMap, prepareDebug, prepareStyle,
-  prepareDownload, setActiveTab, setActiveDebugSubtab }) {
+export function createNavigation({
+  elements: e,
+  format,
+  render,
+  updateMap,
+  prepareDebug,
+  prepareStyle,
+  prepareDownload,
+  setActiveTab,
+  setActiveDebugSubtab,
+}) {
   let activeStyleSubtab = 'size';
   let activeDownloadSubtab = 'image';
   let activeDebugSubtab = 'encoding';
-  const loadDebug = (name) => Promise.resolve(prepareDebug?.(name)).then(render).catch(console.error);
-  const loadStyle = (name) => Promise.resolve(prepareStyle?.(name)).then(render).catch(console.error);
-  const loadDownload = (name) => Promise.resolve(prepareDownload?.(name)).then(render).catch(console.error);
+  const loadDebug = (name) =>
+    Promise.resolve(prepareDebug?.(name)).then(render).catch(console.error);
+  const loadStyle = (name) =>
+    Promise.resolve(prepareStyle?.(name)).then(render).catch(console.error);
+  const loadDownload = (name) =>
+    Promise.resolve(prepareDownload?.(name)).then(render).catch(console.error);
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,
@@ -29,7 +41,8 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
         loadDownload(activeDownloadSubtab);
         return;
       }
-      if (name === 'content' && format.value === 'geo') window.requestAnimationFrame(updateMap);
+      if (name === 'content' && format.value === 'geo')
+        window.requestAnimationFrame(updateMap);
       render();
     },
   });
@@ -66,14 +79,24 @@ export function createNavigation({ elements: e, format, render, updateMap, prepa
     buttons: e.contentTabs,
     panels: e.contentPanels,
     onActivate(name) {
-      if (name === 'data' && format.value === 'geo') window.requestAnimationFrame(updateMap);
+      if (name === 'data' && format.value === 'geo')
+        window.requestAnimationFrame(updateMap);
     },
   });
-  const syncChoices = () => e.choices.forEach((button) => {
-    const target = document.getElementById(button.dataset.choiceTarget);
-    const active = Boolean(target) && target.value === button.dataset.choiceValue;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', String(active));
-  });
-  return { activateTab, activateDebug, activateStyle, activateDownload, activateContent, syncChoices };
+  const syncChoices = () =>
+    e.choices.forEach((button) => {
+      const target = document.getElementById(button.dataset.choiceTarget);
+      const active =
+        Boolean(target) && target.value === button.dataset.choiceValue;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  return {
+    activateTab,
+    activateDebug,
+    activateStyle,
+    activateDownload,
+    activateContent,
+    syncChoices,
+  };
 }

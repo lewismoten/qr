@@ -21,18 +21,31 @@ export function createColorSection({
   colorWithTransparency,
 }) {
   const formatTransparency = () => {
-    darkTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: darkTransparency.value });
-    lightTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: lightTransparency.value });
-    gradientEndTransparencyValue.textContent = lookup('units.percent', '{value}%', { value: gradientEndTransparency.value });
+    darkTransparencyValue.textContent = lookup('units.percent', '{value}%', {
+      value: darkTransparency.value,
+    });
+    lightTransparencyValue.textContent = lookup('units.percent', '{value}%', {
+      value: lightTransparency.value,
+    });
+    gradientEndTransparencyValue.textContent = lookup(
+      'units.percent',
+      '{value}%',
+      { value: gradientEndTransparency.value },
+    );
   };
 
   const sync = () => {
-    const isGradient = gradientType.value === 'linear' || gradientType.value === 'radial';
+    const isGradient =
+      gradientType.value === 'linear' || gradientType.value === 'radial';
     gradientControls.hidden = !isGradient;
     gradientAngleControls.hidden = gradientType.value !== 'linear';
     imageFillControls.hidden = gradientType.value !== 'image';
     imageFillClear.disabled = !hasImageFill();
-    gradientAngleValue.textContent = lookup('units.degrees', '{value} degrees', { value: gradientAngle.value });
+    gradientAngleValue.textContent = lookup(
+      'units.degrees',
+      '{value} degrees',
+      { value: gradientAngle.value },
+    );
   };
 
   const getGradientOptions = () => ({
@@ -52,5 +65,10 @@ export function createColorSection({
     formatTransparency();
   };
 
-  return { formatTransparency, sync, getGradientOptions, applyRecommendedImageContrast };
+  return {
+    formatTransparency,
+    sync,
+    getGradientOptions,
+    applyRecommendedImageContrast,
+  };
 }

@@ -1,10 +1,15 @@
-export function initializeHelpPopovers({ document = globalThis.document, window = globalThis.window } = {}) {
+export function initializeHelpPopovers({
+  document = globalThis.document,
+  window = globalThis.window,
+} = {}) {
   const popovers = [...document.querySelectorAll('.help-popover')];
 
   const close = (popover, { dismissed = false } = {}) => {
     popover.classList.remove('is-open');
     popover.classList.toggle('is-dismissed', dismissed);
-    popover.querySelector('.help-popover-trigger')?.setAttribute('aria-expanded', 'false');
+    popover
+      .querySelector('.help-popover-trigger')
+      ?.setAttribute('aria-expanded', 'false');
   };
 
   const closeOthers = (current) => {
@@ -21,19 +26,22 @@ export function initializeHelpPopovers({ document = globalThis.document, window 
     trigger.setAttribute('aria-expanded', 'false');
 
     const rememberVisibility = (event) => {
-      visibleBeforeActivation = event.pointerType && event.pointerType !== 'mouse'
-        ? popover.classList.contains('is-open')
-        : window.getComputedStyle(content).visibility === 'visible';
+      visibleBeforeActivation =
+        event.pointerType && event.pointerType !== 'mouse'
+          ? popover.classList.contains('is-open')
+          : window.getComputedStyle(content).visibility === 'visible';
     };
     trigger.addEventListener('pointerdown', rememberVisibility);
     trigger.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') rememberVisibility();
     });
     trigger.addEventListener('focus', () => {
-      if (!popover.classList.contains('is-dismissed')) trigger.setAttribute('aria-expanded', 'true');
+      if (!popover.classList.contains('is-dismissed'))
+        trigger.setAttribute('aria-expanded', 'true');
     });
     trigger.addEventListener('click', () => {
-      const shouldClose = visibleBeforeActivation || popover.classList.contains('is-open');
+      const shouldClose =
+        visibleBeforeActivation || popover.classList.contains('is-open');
       visibleBeforeActivation = false;
       closeOthers(popover);
       if (shouldClose) {
@@ -63,7 +71,10 @@ export function initializeHelpPopovers({ document = globalThis.document, window 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     popovers.forEach((popover) => {
-      if (popover.classList.contains('is-open') || popover.matches(':focus-within')) {
+      if (
+        popover.classList.contains('is-open') ||
+        popover.matches(':focus-within')
+      ) {
         close(popover, { dismissed: true });
       }
     });

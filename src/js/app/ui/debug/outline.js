@@ -1,4 +1,8 @@
-export function createOutlineSelector({ buttons, defaultValue = 'codewords', onChange }) {
+export function createOutlineSelector({
+  buttons,
+  defaultValue = 'codewords',
+  onChange,
+}) {
   let value = defaultValue;
 
   const sync = () => {

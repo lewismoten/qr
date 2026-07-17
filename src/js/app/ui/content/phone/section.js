@@ -1,6 +1,11 @@
 import { formatPhoneNumberForDisplay } from '../../../phone.js';
 
-export function createPhoneSection({ buttons, inputs, defaultFormat = 'usa', onChange }) {
+export function createPhoneSection({
+  buttons,
+  inputs,
+  defaultFormat = 'usa',
+  onChange,
+}) {
   let format = defaultFormat;
 
   const syncButtons = () => {
@@ -13,7 +18,8 @@ export function createPhoneSection({ buttons, inputs, defaultFormat = 'usa', onC
 
   const syncValues = (source) => {
     inputs.forEach((input) => {
-      if (input !== source && input.value !== source.value) input.value = source.value;
+      if (input !== source && input.value !== source.value)
+        input.value = source.value;
     });
   };
 

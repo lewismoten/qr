@@ -8,11 +8,16 @@ function prepareExternalLink(link) {
   } catch {
     return;
   }
-  if (!['http:', 'https:'].includes(destination.protocol)
-      || destination.origin === window.location.origin) return;
+  if (
+    !['http:', 'https:'].includes(destination.protocol) ||
+    destination.origin === window.location.origin
+  )
+    return;
 
   link.setAttribute('target', '_blank');
-  const relations = new Set((link.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+  const relations = new Set(
+    (link.getAttribute('rel') || '').split(/\s+/).filter(Boolean),
+  );
   relations.add('noopener');
   relations.add('noreferrer');
   link.setAttribute('rel', [...relations].join(' '));
@@ -35,10 +40,14 @@ function prepareLinks(root) {
 export function setupExternalLinks(root = document) {
   prepareLinks(root);
 
-  root.addEventListener('click', (event) => {
-    const link = event.target.closest?.('a[href]');
-    if (link) prepareExternalLink(link);
-  }, true);
+  root.addEventListener(
+    'click',
+    (event) => {
+      const link = event.target.closest?.('a[href]');
+      if (link) prepareExternalLink(link);
+    },
+    true,
+  );
 
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {

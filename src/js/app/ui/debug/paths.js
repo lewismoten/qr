@@ -4,19 +4,27 @@ import { getActiveOutlineGroups } from './boundaries.js';
 function getMetadataOffset(routeIndex, cellSize) {
   const offset = Math.max(1.25, cellSize * 0.18);
   const vectors = [
-    { x: -offset, y: -offset * 0.35 }, { x: offset, y: offset * 0.35 },
-    { x: -offset * 0.6, y: offset }, { x: offset * 0.6, y: -offset },
+    { x: -offset, y: -offset * 0.35 },
+    { x: offset, y: offset * 0.35 },
+    { x: -offset * 0.6, y: offset },
+    { x: offset * 0.6, y: -offset },
   ];
-  return vectors[((routeIndex % vectors.length) + vectors.length) % vectors.length];
+  return vectors[
+    ((routeIndex % vectors.length) + vectors.length) % vectors.length
+  ];
 }
 
 function drawMetadataSegment(context, from, to, color, opacity, offset) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy);
-  const normal = length === 0
-    ? offset
-    : { x: (-dy / length) * offset.x + offset.x * 0.2, y: (dx / length) * offset.y + offset.y * 0.2 };
+  const normal =
+    length === 0
+      ? offset
+      : {
+          x: (-dy / length) * offset.x + offset.x * 0.2,
+          y: (dx / length) * offset.y + offset.y * 0.2,
+        };
   context.strokeStyle = hexToRgba(color, opacity);
   context.beginPath();
   context.moveTo(from.x, from.y);
@@ -29,7 +37,16 @@ function drawMetadataSegment(context, from, to, color, opacity, offset) {
   context.stroke();
 }
 
-function drawMetadataBridge(context, from, to, color, opacity, lineWidth, routeIndex, cellSize) {
+function drawMetadataBridge(
+  context,
+  from,
+  to,
+  color,
+  opacity,
+  lineWidth,
+  routeIndex,
+  cellSize,
+) {
   const direction = to.x >= from.x ? 1 : -1;
   const curveDirection = routeIndex % 2 === 0 ? -1 : 1;
   context.strokeStyle = hexToRgba(color, opacity);
@@ -62,17 +79,33 @@ export function drawCodewordPaths(
       x: (column + marginModules + 0.5) * cellSize,
       y: (row + marginModules + 0.5) * cellSize,
     }));
-    const strokeOpacity = group.kind === 'data' ? (index % 2 === 0 ? 0.25 : 0.5) : 0.5;
-    const effectiveWidth = group.kind === 'metadata' ? Math.max(0.8, cellSize * 0.11) : lineWidth;
+    const strokeOpacity =
+      group.kind === 'data' ? (index % 2 === 0 ? 0.25 : 0.5) : 0.5;
+    const effectiveWidth =
+      group.kind === 'metadata' ? Math.max(0.8, cellSize * 0.11) : lineWidth;
     context.lineWidth = effectiveWidth;
     context.lineJoin = 'round';
     context.lineCap = 'round';
     const routeIndex = group.kind === 'metadata' ? groups.indexOf(group) : -1;
-    const offset = group.kind === 'metadata' ? getMetadataOffset(routeIndex, cellSize) : null;
+    const offset =
+      group.kind === 'metadata'
+        ? getMetadataOffset(routeIndex, cellSize)
+        : null;
     for (let pointIndex = 1; pointIndex < points.length; pointIndex += 1) {
-      const color = getModuleContrastColor(group.modules[pointIndex], qrDefinition, model);
+      const color = getModuleContrastColor(
+        group.modules[pointIndex],
+        qrDefinition,
+        model,
+      );
       if (group.kind === 'metadata') {
-        drawMetadataSegment(context, points[pointIndex - 1], points[pointIndex], color, 0.78, offset);
+        drawMetadataSegment(
+          context,
+          points[pointIndex - 1],
+          points[pointIndex],
+          color,
+          0.78,
+          offset,
+        );
       } else {
         context.strokeStyle = hexToRgba(color, strokeOpacity);
         context.beginPath();
@@ -92,7 +125,16 @@ export function drawCodewordPaths(
     const color = getModuleContrastColor(next, qrDefinition, model);
     if (group.kind === 'metadata' && nextGroup.kind === 'metadata') {
       if (group.metadataSequenceId !== nextGroup.metadataSequenceId) return;
-      drawMetadataBridge(context, from, to, color, 0.78, Math.max(0.8, cellSize * 0.11), routeIndex, cellSize);
+      drawMetadataBridge(
+        context,
+        from,
+        to,
+        color,
+        0.78,
+        Math.max(0.8, cellSize * 0.11),
+        routeIndex,
+        cellSize,
+      );
     } else if (group.kind !== 'metadata' && nextGroup.kind !== 'metadata') {
       context.strokeStyle = hexToRgba(color, strokeOpacity);
       context.lineWidth = Math.max(1, cellSize * 0.1);
@@ -111,7 +153,14 @@ function getRoleCategory(role) {
   return role;
 }
 
-export function drawStreamFieldStarts(context, model, marginModules, cellSize, outlineMode, colors) {
+export function drawStreamFieldStarts(
+  context,
+  model,
+  marginModules,
+  cellSize,
+  outlineMode,
+  colors,
+) {
   if (outlineMode === 'metadata') return;
   model.fieldStarts.forEach(({ role, module }) => {
     if (!module) return;

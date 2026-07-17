@@ -1,6 +1,11 @@
 export async function createSvgBlob(sourceCanvas) {
   const context = sourceCanvas.getContext('2d');
-  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
+  const pixels = context.getImageData(
+    0,
+    0,
+    sourceCanvas.width,
+    sourceCanvas.height,
+  ).data;
   const pathsByColor = new Map();
   let activeRuns = new Map();
 
@@ -62,10 +67,10 @@ export async function createSvgBlob(sourceCanvas) {
   pathsByColor.forEach((paths, color) => {
     const [red, green, blue, alpha] = color.split(',').map(Number);
     const hex = `#${[red, green, blue].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
-    const opacity = alpha < 255 ? ` fill-opacity="${(alpha / 255).toFixed(4)}"` : '';
+    const opacity =
+      alpha < 255 ? ` fill-opacity="${(alpha / 255).toFixed(4)}"` : '';
     parts.push(`<path fill="${hex}"${opacity} d="${paths.join('')}"/>`);
   });
   parts.push('</svg>');
   return new Blob(parts, { type: 'image/svg+xml' });
 }
-

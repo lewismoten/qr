@@ -1,4 +1,10 @@
-export function createRuntimeHelpers({ window, canvas, controls, errorLevels, getDebugState }) {
+export function createRuntimeHelpers({
+  window,
+  canvas,
+  controls,
+  errorLevels,
+  getDebugState,
+}) {
   function getDefaultUrl() {
     return window.location.protocol === 'file:'
       ? 'https://qr.lewismoten.com'
@@ -22,7 +28,10 @@ export function createRuntimeHelpers({ window, canvas, controls, errorLevels, ge
   }
 
   function getErrorLevel() {
-    return errorLevels[Number.parseInt(controls.errorCorrection.value, 10)] ?? errorLevels[1];
+    return (
+      errorLevels[Number.parseInt(controls.errorCorrection.value, 10)] ??
+      errorLevels[1]
+    );
   }
 
   function getEncodingMode() {
@@ -31,7 +40,10 @@ export function createRuntimeHelpers({ window, canvas, controls, errorLevels, ge
 
   function isDebugOverlayActive() {
     const state = getDebugState();
-    return (state.tab === 'debug' && state.subtab === 'overlay') || controls.debugEnabled.checked;
+    return (
+      (state.tab === 'debug' && state.subtab === 'overlay') ||
+      controls.debugEnabled.checked
+    );
   }
 
   return {

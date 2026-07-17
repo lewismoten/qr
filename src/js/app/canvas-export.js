@@ -1,4 +1,3 @@
-
 import { lookup } from '../i18n/index.js';
 
 export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
@@ -13,12 +12,22 @@ export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
       context.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
       context.drawImage(sourceCanvas, 0, 0);
     }
-    exportCanvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error(lookup('download.imageError', 'Unable to create {type} image.', { type })));
-      }
-    }, type, quality);
+    exportCanvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(
+            new Error(
+              lookup('download.imageError', 'Unable to create {type} image.', {
+                type,
+              }),
+            ),
+          );
+        }
+      },
+      type,
+      quality,
+    );
   });
 }

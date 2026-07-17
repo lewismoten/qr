@@ -17,14 +17,20 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
     }
 
     switch (group.kind) {
-      case 'errorCorrection': return colors.errorCorrection.value;
-      case 'metadata': return colors.format.value;
-      case 'remainder': return colors.remainder.value;
+      case 'errorCorrection':
+        return colors.errorCorrection.value;
+      case 'metadata':
+        return colors.format.value;
+      case 'remainder':
+        return colors.remainder.value;
       case 'padding':
-      case 'padByte': return colors.padding.value;
-      case 'header': return colors.mode.value;
+      case 'padByte':
+        return colors.padding.value;
+      case 'header':
+        return colors.mode.value;
       case 'data':
-      default: return colors.data.value;
+      default:
+        return colors.data.value;
     }
   };
 
@@ -32,7 +38,8 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
     const color = getGroupBaseColor(group);
     let opacity = 0.7;
     if (group.kind === 'header') opacity = 0.9;
-    else if (group.kind === 'padding' || group.kind === 'padByte') opacity = 0.75;
+    else if (group.kind === 'padding' || group.kind === 'padByte')
+      opacity = 0.75;
     else if (group.kind === 'remainder') opacity = 0.78;
     return { color, strokeColor: getContrastingHex(color), opacity };
   };
@@ -59,7 +66,13 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
   };
 
   const getModuleContrastColor = (module, qrDefinition, debugModel) => {
-    const category = getCategory(module.row, module.column, qrDefinition, debugModel, 'overlay');
+    const category = getCategory(
+      module.row,
+      module.column,
+      qrDefinition,
+      debugModel,
+      'overlay',
+    );
     return getContrastingHex(getCategoryOverlayColor(category));
   };
 

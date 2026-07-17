@@ -7,9 +7,15 @@ function getCharCountBits(mode, version) {
   return COUNT_BITS[mode]?.[bucket] ?? COUNT_BITS.byte[bucket];
 }
 
-export function classifyTraversalBits(qrDefinition, dataCodewordsCount, traversalLength) {
+export function classifyTraversalBits(
+  qrDefinition,
+  dataCodewordsCount,
+  traversalLength,
+) {
   const dataCapacityBits = dataCodewordsCount * 8;
-  const totalCodewords = Math.floor(getRawDataModules(qrDefinition.version) / 8);
+  const totalCodewords = Math.floor(
+    getRawDataModules(qrDefinition.version) / 8,
+  );
   const totalCodewordBits = totalCodewords * 8;
   const roles = Array(traversalLength).fill('remainder');
   let cursor = 0;
@@ -22,18 +28,30 @@ export function classifyTraversalBits(qrDefinition, dataCodewordsCount, traversa
     }
 
     const charCountBits = getCharCountBits(mode, qrDefinition.version);
-    for (let index = 0; index < charCountBits && cursor < dataCapacityBits; index += 1) {
+    for (
+      let index = 0;
+      index < charCountBits && cursor < dataCapacityBits;
+      index += 1
+    ) {
       roles[cursor++] = 'charCount';
     }
 
     const payloadBits = segment.getBitsLength();
-    for (let index = 0; index < payloadBits && cursor < dataCapacityBits; index += 1) {
+    for (
+      let index = 0;
+      index < payloadBits && cursor < dataCapacityBits;
+      index += 1
+    ) {
       roles[cursor++] = 'payload';
     }
   });
 
   const terminatorBits = Math.min(4, Math.max(0, dataCapacityBits - cursor));
-  for (let index = 0; index < terminatorBits && cursor < dataCapacityBits; index += 1) {
+  for (
+    let index = 0;
+    index < terminatorBits && cursor < dataCapacityBits;
+    index += 1
+  ) {
     roles[cursor++] = 'terminator';
   }
 
@@ -47,7 +65,11 @@ export function classifyTraversalBits(qrDefinition, dataCodewordsCount, traversa
     }
   }
 
-  for (let index = dataCapacityBits; index < Math.min(totalCodewordBits, traversalLength); index += 1) {
+  for (
+    let index = dataCapacityBits;
+    index < Math.min(totalCodewordBits, traversalLength);
+    index += 1
+  ) {
     roles[index] = 'errorCorrection';
   }
 
@@ -67,7 +89,12 @@ export function summarizeCodewordRoles(roles) {
   if (roles.some((role) => role === 'mode' || role === 'charCount')) {
     return 'header';
   }
-  if (roles.some((role) => role === 'terminator' || role === 'bytePad' || role === 'padByte')) {
+  if (
+    roles.some(
+      (role) =>
+        role === 'terminator' || role === 'bytePad' || role === 'padByte',
+    )
+  ) {
     return 'padding';
   }
   return 'data';
@@ -86,7 +113,12 @@ export function summarizeGroupRoles(roles) {
   if (roles.every((role) => role === 'terminator')) {
     return 'terminator';
   }
-  if (roles.some((role) => role === 'terminator' || role === 'bytePad' || role === 'padByte')) {
+  if (
+    roles.some(
+      (role) =>
+        role === 'terminator' || role === 'bytePad' || role === 'padByte',
+    )
+  ) {
     return 'padding';
   }
   if (roles.some((role) => role === 'mode' || role === 'charCount')) {
@@ -99,7 +131,12 @@ export function buildPostHeaderStreamGroups(traversal, bitRoles) {
   const streamBitIndexes = [];
 
   bitRoles.forEach((role, index) => {
-    if (role === 'payload' || role === 'terminator' || role === 'bytePad' || role === 'padByte') {
+    if (
+      role === 'payload' ||
+      role === 'terminator' ||
+      role === 'bytePad' ||
+      role === 'padByte'
+    ) {
       streamBitIndexes.push(index);
     }
   });
@@ -122,7 +159,8 @@ export function buildPostHeaderStreamGroups(traversal, bitRoles) {
 
 export function getEncodingUnitBitLengths(segment, mode) {
   const payloadBits = segment.getBitsLength();
-  const dataLength = typeof segment.getLength === 'function' ? segment.getLength() : 0;
+  const dataLength =
+    typeof segment.getLength === 'function' ? segment.getLength() : 0;
   const bitLengths = [];
 
   if (mode === 'numeric') {
@@ -143,7 +181,10 @@ export function getEncodingUnitBitLengths(segment, mode) {
     bitLengths.push(...Array(Math.floor(payloadBits / 8)).fill(8));
   }
 
-  const describedBits = bitLengths.reduce((total, bitLength) => total + bitLength, 0);
+  const describedBits = bitLengths.reduce(
+    (total, bitLength) => total + bitLength,
+    0,
+  );
   if (describedBits < payloadBits) {
     bitLengths.push(payloadBits - describedBits);
   }

@@ -1,17 +1,35 @@
 import { createFrameNavigation } from '../preview/frame-navigation.js';
 
-export function createLazyDownloadSetup({ elements: e, bulk, file, number, runtime, taskProgress,
-  maxNumberFrames, getPrintWidth, syncPrint }) {
+export function createLazyDownloadSetup({
+  elements: e,
+  bulk,
+  file,
+  number,
+  runtime,
+  taskProgress,
+  maxNumberFrames,
+  getPrintWidth,
+  syncPrint,
+}) {
   let controller = null;
   let request = null;
   const frames = createFrameNavigation({
-    format: e.qrFormat, isBulkMode: bulk.isMode, getBulkRowCount: bulk.getRowCount,
-    bulkRowIndex: e.bulkRowIndex, syncBulkStatus: bulk.syncStatus,
-    getFileEncodingMode: file.getMode, fileChunkIndex: e.fileChunkIndex,
-    syncFileChunkLabel: file.syncChunkLabel, numberSequenceIndex: e.numberSequenceIndex,
-    getNumberSequenceInfo: number.getInfo, syncNumberSequenceControls: number.sync,
-    maxNumberFrames, navigation: e.chunkPreviewNav, status: e.chunkPreviewStatus,
-    previousButton: e.chunkPreviewPrev, nextButton: e.chunkPreviewNext,
+    format: e.qrFormat,
+    isBulkMode: bulk.isMode,
+    getBulkRowCount: bulk.getRowCount,
+    bulkRowIndex: e.bulkRowIndex,
+    syncBulkStatus: bulk.syncStatus,
+    getFileEncodingMode: file.getMode,
+    fileChunkIndex: e.fileChunkIndex,
+    syncFileChunkLabel: file.syncChunkLabel,
+    numberSequenceIndex: e.numberSequenceIndex,
+    getNumberSequenceInfo: number.getInfo,
+    syncNumberSequenceControls: number.sync,
+    maxNumberFrames,
+    navigation: e.chunkPreviewNav,
+    status: e.chunkPreviewStatus,
+    previousButton: e.chunkPreviewPrev,
+    nextButton: e.chunkPreviewNext,
     onStateChange: () => controller?.syncControls(),
   });
 
@@ -21,10 +39,16 @@ export function createLazyDownloadSetup({ elements: e, bulk, file, number, runti
       request = import('../download/application-setup.js')
         .then(({ createApplicationDownloadSetup }) => {
           controller = createApplicationDownloadSetup({
-            elements: e, frames, runtime, getPrintWidth, syncPrint, taskProgress,
+            elements: e,
+            frames,
+            runtime,
+            getPrintWidth,
+            syncPrint,
+            taskProgress,
           });
           return controller;
-        }).catch((error) => {
+        })
+        .catch((error) => {
           request = null;
           throw error;
         });

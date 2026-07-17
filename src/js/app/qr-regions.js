@@ -20,7 +20,9 @@ export function getAlignmentPatternCenters(version) {
 }
 
 export function isInSquare(row, column, top, left, size) {
-  return row >= top && row < top + size && column >= left && column < left + size;
+  return (
+    row >= top && row < top + size && column >= left && column < left + size
+  );
 }
 
 export function isFinderRegion(size, row, column) {
@@ -51,10 +53,20 @@ export function getFinderPatternPart(size, row, column) {
     }
     const localRow = row - top;
     const localColumn = column - left;
-    if (localRow >= 2 && localRow <= 4 && localColumn >= 2 && localColumn <= 4) {
+    if (
+      localRow >= 2 &&
+      localRow <= 4 &&
+      localColumn >= 2 &&
+      localColumn <= 4
+    ) {
       return 'center';
     }
-    if (localRow === 0 || localRow === 6 || localColumn === 0 || localColumn === 6) {
+    if (
+      localRow === 0 ||
+      localRow === 6 ||
+      localColumn === 0 ||
+      localColumn === 6
+    ) {
       return 'outer';
     }
     return null;
@@ -77,7 +89,13 @@ export function isFormatRegion(size, row, column) {
   const topLeftColumn = column === 8 && row <= 8 && row !== 6;
   const topRight = row === 8 && column >= size - 8;
   const bottomLeft = column === 8 && row >= size - 7;
-  return topLeftRow || topLeftColumn || topRight || bottomLeft || (row === size - 8 && column === 8);
+  return (
+    topLeftRow ||
+    topLeftColumn ||
+    topRight ||
+    bottomLeft ||
+    (row === size - 8 && column === 8)
+  );
 }
 
 export function isVersionRegion(size, version, row, column) {
@@ -97,14 +115,38 @@ export function isDarkModuleRegion(size, row, column) {
 export function getFormatInfoCoordinates(size) {
   return {
     primary: [
-      [8, 0], [8, 1], [8, 2], [8, 3], [8, 4],
-      [8, 5], [8, 7], [8, 8], [7, 8], [5, 8],
-      [4, 8], [3, 8], [2, 8], [1, 8], [0, 8],
+      [8, 0],
+      [8, 1],
+      [8, 2],
+      [8, 3],
+      [8, 4],
+      [8, 5],
+      [8, 7],
+      [8, 8],
+      [7, 8],
+      [5, 8],
+      [4, 8],
+      [3, 8],
+      [2, 8],
+      [1, 8],
+      [0, 8],
     ],
     secondary: [
-      [size - 1, 8], [size - 2, 8], [size - 3, 8], [size - 4, 8], [size - 5, 8],
-      [size - 6, 8], [size - 7, 8], [8, size - 8], [8, size - 7], [8, size - 6],
-      [8, size - 5], [8, size - 4], [8, size - 3], [8, size - 2], [8, size - 1],
+      [size - 1, 8],
+      [size - 2, 8],
+      [size - 3, 8],
+      [size - 4, 8],
+      [size - 5, 8],
+      [size - 6, 8],
+      [size - 7, 8],
+      [8, size - 8],
+      [8, size - 7],
+      [8, size - 6],
+      [8, size - 5],
+      [8, size - 4],
+      [8, size - 3],
+      [8, size - 2],
+      [8, size - 1],
     ],
   };
 }
@@ -158,8 +200,12 @@ export function getFormatBitGroups(size) {
   const maskBits = new Set();
 
   [primary, secondary].forEach((coords) => {
-    coords.slice(0, 2).forEach(([row, column]) => ecLevelBits.add(coordKey(row, column)));
-    coords.slice(2, 5).forEach(([row, column]) => maskBits.add(coordKey(row, column)));
+    coords
+      .slice(0, 2)
+      .forEach(([row, column]) => ecLevelBits.add(coordKey(row, column)));
+    coords
+      .slice(2, 5)
+      .forEach(([row, column]) => maskBits.add(coordKey(row, column)));
   });
 
   return { ecLevelBits, maskBits };
@@ -197,7 +243,10 @@ export function isAlignmentRegion(version, size, row, column) {
         continue;
       }
 
-      if (Math.abs(row - centerRow) <= 2 && Math.abs(column - centerColumn) <= 2) {
+      if (
+        Math.abs(row - centerRow) <= 2 &&
+        Math.abs(column - centerColumn) <= 2
+      ) {
         return true;
       }
     }
@@ -229,4 +278,3 @@ export function getModuleCategory(qrDefinition, row, column) {
   }
   return 'data';
 }
-

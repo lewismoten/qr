@@ -1,4 +1,8 @@
-import { COUNT_BITS, ECC_CODEWORDS_PER_BLOCK, NUM_ERROR_CORRECTION_BLOCKS } from './constants.js';
+import {
+  COUNT_BITS,
+  ECC_CODEWORDS_PER_BLOCK,
+  NUM_ERROR_CORRECTION_BLOCKS,
+} from './constants.js';
 
 export function getCountBitLength(mode, version) {
   return COUNT_BITS[mode][version <= 9 ? 0 : version <= 26 ? 1 : 2];
@@ -15,6 +19,9 @@ export function getRawDataModules(version) {
 }
 
 export function getDataCodewords(version, errorLevel) {
-  return Math.floor(getRawDataModules(version) / 8) -
-    ECC_CODEWORDS_PER_BLOCK[errorLevel][version] * NUM_ERROR_CORRECTION_BLOCKS[errorLevel][version];
+  return (
+    Math.floor(getRawDataModules(version) / 8) -
+    ECC_CODEWORDS_PER_BLOCK[errorLevel][version] *
+      NUM_ERROR_CORRECTION_BLOCKS[errorLevel][version]
+  );
 }

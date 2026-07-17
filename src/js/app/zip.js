@@ -55,5 +55,7 @@ export async function createZipBlob(files) {
   pushUint32LE(end, centralDirectory.length);
   pushUint32LE(end, offset);
   pushUint16LE(end, 0);
-  return new Blob([...localParts, centralDirectory, new Uint8Array(end)], { type: 'application/zip' });
+  return new Blob([...localParts, centralDirectory, new Uint8Array(end)], {
+    type: 'application/zip',
+  });
 }

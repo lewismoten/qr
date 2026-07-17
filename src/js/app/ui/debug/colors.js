@@ -17,6 +17,10 @@ const COLOR_IDS = {
 };
 
 export function getDebugColorElements(document) {
-  return Object.fromEntries(Object.entries(COLOR_IDS)
-    .map(([name, id]) => [name, document.getElementById(id)]));
+  return Object.fromEntries(
+    Object.entries(COLOR_IDS).map(([name, id]) => [
+      name,
+      document.getElementById(id),
+    ]),
+  );
 }

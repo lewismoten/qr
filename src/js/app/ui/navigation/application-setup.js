@@ -1,7 +1,14 @@
 import { createNavigation } from './setup.js';
 
-export function createApplicationNavigation({ elements: e, render, updateMap, prepareDebug,
-  prepareStyle, prepareDownload, state }) {
+export function createApplicationNavigation({
+  elements: e,
+  render,
+  updateMap,
+  prepareDebug,
+  prepareStyle,
+  prepareDownload,
+  state,
+}) {
   return createNavigation({
     elements: {
       tabs: e.tabButtons,

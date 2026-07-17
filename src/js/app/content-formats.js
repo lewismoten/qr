@@ -4,8 +4,16 @@ export function escapeWifiValue(value) {
   return String(value).replace(/([\\;,:"])/g, '\\$1');
 }
 
-export function serializeWifi({ security, ssid, password = '', hidden = false }) {
-  const segments = [`T:${security}`, `S:${escapeWifiValue(String(ssid).trim())}`];
+export function serializeWifi({
+  security,
+  ssid,
+  password = '',
+  hidden = false,
+}) {
+  const segments = [
+    `T:${security}`,
+    `S:${escapeWifiValue(String(ssid).trim())}`,
+  ];
   if (security !== 'nopass') segments.push(`P:${escapeWifiValue(password)}`);
   if (hidden) segments.push('H:true');
   return `WIFI:${segments.join(';')};;`;
@@ -36,11 +44,21 @@ export function serializeGeo({ latitude, longitude, label = '' }) {
     : `geo:${coordinates}`;
 }
 
-export function serializeVCard({ name, organization = '', title = '', phone = '',
-  email = '', url = '' }) {
+export function serializeVCard({
+  name,
+  organization = '',
+  title = '',
+  phone = '',
+  email = '',
+  url = '',
+}) {
   const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${String(name).trim()}`];
   const optionalFields = [
-    ['ORG', organization], ['TITLE', title], ['TEL', phone], ['EMAIL', email], ['URL', url],
+    ['ORG', organization],
+    ['TITLE', title],
+    ['TEL', phone],
+    ['EMAIL', email],
+    ['URL', url],
   ];
   optionalFields.forEach(([key, value]) => {
     if (String(value).trim()) lines.push(`${key}:${String(value).trim()}`);

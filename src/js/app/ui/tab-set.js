@@ -24,7 +24,9 @@ export function createTabSet({
   };
 
   buttons.forEach((button) => {
-    button.addEventListener('click', () => activate(button.dataset[buttonData] || defaultValue));
+    button.addEventListener('click', () =>
+      activate(button.dataset[buttonData] || defaultValue),
+    );
   });
 
   return activate;

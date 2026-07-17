@@ -3,7 +3,8 @@ export function initializeDialogs({ document, window }) {
 
   const loadDialogContent = (dialog) => {
     dialog.querySelectorAll('[data-dialog-src]').forEach((element) => {
-      if (!element.hasAttribute('src')) element.setAttribute('src', element.dataset.dialogSrc);
+      if (!element.hasAttribute('src'))
+        element.setAttribute('src', element.dataset.dialogSrc);
     });
   };
 
@@ -21,12 +22,20 @@ export function initializeDialogs({ document, window }) {
 
   document.querySelectorAll('[data-dialog-target]').forEach((link) => {
     link.addEventListener('click', (event) => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
       const targetId = link.dataset.dialogTarget;
       const targetHash = `#${targetId}`;
       if (![...dialogs].some((dialog) => dialog.id === targetId)) return;
       event.preventDefault();
-      if (window.location.hash === targetHash) window.requestAnimationFrame(syncFromHash);
+      if (window.location.hash === targetHash)
+        window.requestAnimationFrame(syncFromHash);
       else window.location.hash = targetHash;
     });
   });
@@ -39,7 +48,11 @@ export function initializeDialogs({ document, window }) {
     });
     dialog.addEventListener('close', () => {
       if (window.location.hash === `#${dialog.id}`) {
-        history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+        history.replaceState(
+          null,
+          '',
+          `${window.location.pathname}${window.location.search}`,
+        );
       }
     });
   });

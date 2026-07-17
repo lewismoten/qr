@@ -47,6 +47,10 @@ JavaScript, CSS, HTML, JSON, Markdown, sitemap and robots checks with:
 npm run lint
 ```
 
+Authored JavaScript is formatted to an 80-column target and limited to 300
+physical lines per module. URLs, regular expressions and indivisible translated
+strings may exceed the column target without weakening the module-size limit.
+
 ## Locales
 
 Locale files live in `locales` and are listed in `locales/manifest.json`. A locale

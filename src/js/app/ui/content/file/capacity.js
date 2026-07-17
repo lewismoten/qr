@@ -6,7 +6,10 @@ import {
   getFileDownloadUrlPrefix,
 } from './protocol.js';
 
-export function findMaximumEncodableBytes(canEncode, { initialProbe = 256, maximumProbe = 1024 * 1024 } = {}) {
+export function findMaximumEncodableBytes(
+  canEncode,
+  { initialProbe = 256, maximumProbe = 1024 * 1024 } = {},
+) {
   if (!canEncode(0)) return 0;
 
   let low = 0;
@@ -79,7 +82,10 @@ export function createFileCapacityCalculator({
     const prefix = getFileDownloadUrlPrefix(getShareableAppUrl(), file);
     return findMaximumEncodableBytes((byteCount) => {
       const base64Length = Math.ceil(byteCount / 3) * 4;
-      return canEncode(`${prefix}${base64ToBase64Url('A'.repeat(base64Length))}`, options);
+      return canEncode(
+        `${prefix}${base64ToBase64Url('A'.repeat(base64Length))}`,
+        options,
+      );
     });
   };
 
@@ -101,7 +107,12 @@ export function createFileCapacityCalculator({
     const autoVersion = isAutoVersion();
     const capacityOptions = { ...options, version: configuredChunkVersion };
     const cacheKey = JSON.stringify({
-      file: { name: file.name, type: file.type, size: file.size, lastModified: file.lastModified },
+      file: {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+      },
       options: capacityOptions,
       configuredChunkVersion,
       autoVersion,
@@ -112,25 +123,39 @@ export function createFileCapacityCalculator({
       manualMode: getManualMode() || 'auto',
     });
     if (cachedKey === cacheKey && cachedValue) {
-      return { ...cachedValue, currentChunk: Math.min(getCurrentChunk(), cachedValue.totalChunks) };
+      return {
+        ...cachedValue,
+        currentChunk: Math.min(getCurrentChunk(), cachedValue.totalChunks),
+      };
     }
 
-    const transferByteLength = cache.getCachedTransferBytes()?.length ?? file.size;
+    const transferByteLength =
+      cache.getCachedTransferBytes()?.length ?? file.size;
     const manifestLength = getManifestLength(file);
     const streamLength = transferByteLength + manifestLength;
-    const isSingleFrame = canEncode(buildSingleFileFrameTemplate(streamLength, {
-      file,
-      includeManifest: includeManifest(),
-    }), capacityOptions);
+    const isSingleFrame = canEncode(
+      buildSingleFileFrameTemplate(streamLength, {
+        file,
+        includeManifest: includeManifest(),
+      }),
+      capacityOptions,
+    );
     const chunkCapacity = isSingleFrame
       ? streamLength
-      : findMaximumEncodableBytes((byteCount) => canEncode(buildChunkFileFrameTemplate(byteCount, {
-          file,
-          streamLength,
-          offset: Math.max(0, streamLength - 1),
-          includeManifest: includeManifest(),
-        }), capacityOptions));
-    const totalChunks = isSingleFrame ? 1 : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
+      : findMaximumEncodableBytes((byteCount) =>
+          canEncode(
+            buildChunkFileFrameTemplate(byteCount, {
+              file,
+              streamLength,
+              offset: Math.max(0, streamLength - 1),
+              includeManifest: includeManifest(),
+            }),
+            capacityOptions,
+          ),
+        );
+    const totalChunks = isSingleFrame
+      ? 1
+      : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
     const capacityInfo = {
       chunkCapacity,
       naturalChunkCapacity: chunkCapacity,
@@ -148,5 +173,10 @@ export function createFileCapacityCalculator({
     return capacityInfo;
   };
 
-  return { invalidate, getDataUrlCapacity, getDownloadUrlCapacity, getChunkInfo };
+  return {
+    invalidate,
+    getDataUrlCapacity,
+    getDownloadUrlCapacity,
+    getChunkInfo,
+  };
 }

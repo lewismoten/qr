@@ -1,7 +1,12 @@
 import { lookup } from '../../../../i18n/index.js';
 import { refreshFilePicker } from '../../file-picker.js';
 
-export function createFileCache({ input, createId, encodeBase64, isCompressionEnabled }) {
+export function createFileCache({
+  input,
+  createId,
+  encodeBase64,
+  isCompressionEnabled,
+}) {
   let owner = null;
   let payload = '';
   let arrayBuffer = null;
@@ -76,10 +81,17 @@ export function createFileCache({ input, createId, encodeBase64, isCompressionEn
       return originalBytes;
     }
     if (typeof CompressionStream !== 'function') {
-      throw new Error(lookup('file.compressionUnsupported', 'Gzip transfer compression is not supported by this browser. Turn compression off to continue.'));
+      throw new Error(
+        lookup(
+          'file.compressionUnsupported',
+          'Gzip transfer compression is not supported by this browser. Turn compression off to continue.',
+        ),
+      );
     }
 
-    const stream = new Blob([originalBytes]).stream().pipeThrough(new CompressionStream('gzip'));
+    const stream = new Blob([originalBytes])
+      .stream()
+      .pipeThrough(new CompressionStream('gzip'));
     const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
     if (requestRevision === revision) transferBytes = compressed;
     return compressed;
@@ -88,7 +100,9 @@ export function createFileCache({ input, createId, encodeBase64, isCompressionEn
   const getIntegrityHash = async (manifestBytes, fileBytes) => {
     if (hash) return hash;
     const requestRevision = revision;
-    const canonicalBytes = new Uint8Array(manifestBytes.length + fileBytes.length);
+    const canonicalBytes = new Uint8Array(
+      manifestBytes.length + fileBytes.length,
+    );
     canonicalBytes.set(manifestBytes, 0);
     canonicalBytes.set(fileBytes, manifestBytes.length);
     const digest = await crypto.subtle.digest('SHA-256', canonicalBytes);
@@ -112,9 +126,13 @@ export function createFileCache({ input, createId, encodeBase64, isCompressionEn
     isCurrent: (requestRevision) => requestRevision === revision,
     getId: () => id,
     getPayload: () => payload,
-    setPayload: (value) => { payload = value; },
+    setPayload: (value) => {
+      payload = value;
+    },
     getManifest: () => manifest,
-    setManifest: (value) => { manifest = value; },
+    setManifest: (value) => {
+      manifest = value;
+    },
     getCachedTransferBytes: () => transferBytes,
   };
 }

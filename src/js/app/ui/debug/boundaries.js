@@ -18,19 +18,40 @@ export function drawHighlightedBoundaries(
   const lineWidth = Math.max(0.8, cellSize * 0.08);
   for (let row = 0; row < size; row += 1) {
     for (let column = 0; column < size; column += 1) {
-      const category = getDebugCategory(row, column, qrDefinition, model, 'overlay');
+      const category = getDebugCategory(
+        row,
+        column,
+        qrDefinition,
+        model,
+        'overlay',
+      );
       if (category === 'data') continue;
       const left = (column + marginModules) * cellSize;
       const top = (row + marginModules) * cellSize;
       const right = left + cellSize;
       const bottom = top + cellSize;
       const neighbors = {
-        left: column > 0 ? getDebugCategory(row, column - 1, qrDefinition, model, 'overlay') : null,
-        right: column < size - 1 ? getDebugCategory(row, column + 1, qrDefinition, model, 'overlay') : null,
-        top: row > 0 ? getDebugCategory(row - 1, column, qrDefinition, model, 'overlay') : null,
-        bottom: row < size - 1 ? getDebugCategory(row + 1, column, qrDefinition, model, 'overlay') : null,
+        left:
+          column > 0
+            ? getDebugCategory(row, column - 1, qrDefinition, model, 'overlay')
+            : null,
+        right:
+          column < size - 1
+            ? getDebugCategory(row, column + 1, qrDefinition, model, 'overlay')
+            : null,
+        top:
+          row > 0
+            ? getDebugCategory(row - 1, column, qrDefinition, model, 'overlay')
+            : null,
+        bottom:
+          row < size - 1
+            ? getDebugCategory(row + 1, column, qrDefinition, model, 'overlay')
+            : null,
       };
-      context.strokeStyle = hexToRgba(getContrastingHex(getOverlayColor(category, colors)), 0.75);
+      context.strokeStyle = hexToRgba(
+        getContrastingHex(getOverlayColor(category, colors)),
+        0.75,
+      );
       context.lineWidth = lineWidth;
       context.lineCap = 'round';
       for (const [edge, differs] of [
@@ -56,8 +77,17 @@ export function getActiveOutlineGroups(model, mode) {
   return model.codewords;
 }
 
-function drawSegmentPerimeter(context, modules, marginModules, cellSize, strokeStyle, lineWidth) {
-  const moduleSet = new Set(modules.map(({ row, column }) => coordKey(row, column)));
+function drawSegmentPerimeter(
+  context,
+  modules,
+  marginModules,
+  cellSize,
+  strokeStyle,
+  lineWidth,
+) {
+  const moduleSet = new Set(
+    modules.map(({ row, column }) => coordKey(row, column)),
+  );
   context.strokeStyle = strokeStyle;
   context.lineWidth = lineWidth;
   context.lineCap = 'round';
@@ -92,7 +122,12 @@ export function drawCodewordOutlines(
 ) {
   const lineWidth = Math.max(1.25, cellSize * 0.14);
   const groups = getActiveOutlineGroups(model, outlineMode);
-  const outlinedKinds = new Set(['header', 'data', 'errorCorrection', 'metadata']);
+  const outlinedKinds = new Set([
+    'header',
+    'data',
+    'errorCorrection',
+    'metadata',
+  ]);
   if (outlineMode === 'codewords') outlinedKinds.add('padding').add('padByte');
   groups.forEach((group, index) => {
     if (group.modules.length === 0) return;
@@ -108,17 +143,26 @@ export function drawCodewordOutlines(
       );
     }
     const previous = groups[index - 1];
-    const metadataStart = group.kind === 'metadata'
-      && (!previous || previous.metadataSequenceId !== group.metadataSequenceId);
-    const drawStart = outlinedKinds.has(group.kind) && (group.kind !== 'metadata' || metadataStart);
+    const metadataStart =
+      group.kind === 'metadata' &&
+      (!previous || previous.metadataSequenceId !== group.metadataSequenceId);
+    const drawStart =
+      outlinedKinds.has(group.kind) &&
+      (group.kind !== 'metadata' || metadataStart);
     const first = group.modules[0];
     if (!first || !drawStart) return;
-    context.fillStyle = hexToRgba(style.strokeColor, Math.min(1, style.opacity + 0.1));
+    context.fillStyle = hexToRgba(
+      style.strokeColor,
+      Math.min(1, style.opacity + 0.1),
+    );
     context.beginPath();
     context.arc(
       (first.column + marginModules + 0.5) * cellSize,
       (first.row + marginModules + 0.5) * cellSize,
-      Math.max(group.kind === 'metadata' ? 2.2 : 1.4, cellSize * (group.kind === 'metadata' ? 0.24 : 0.18)),
+      Math.max(
+        group.kind === 'metadata' ? 2.2 : 1.4,
+        cellSize * (group.kind === 'metadata' ? 0.24 : 0.18),
+      ),
       0,
       Math.PI * 2,
     );

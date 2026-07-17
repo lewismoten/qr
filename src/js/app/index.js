@@ -1,6 +1,13 @@
 import { colorWithTransparency } from './colors.js';
-import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_VALUES,
-  MODE_CAPACITY, MODE_LABELS, QR_ALPHANUMERIC_CHARACTERS } from './configuration.js';
+import {
+  ERROR_LEVELS,
+  FILE_PROTOCOL,
+  LIMITS,
+  MASK_VALUES,
+  MODE_CAPACITY,
+  MODE_LABELS,
+  QR_ALPHANUMERIC_CHARACTERS,
+} from './configuration.js';
 import { validatePrintableText } from './validation.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
@@ -22,10 +29,14 @@ import qrEncoder from '../qr/matrix-encoder.js';
 
 const elements = getApplicationElements(document);
 const taskProgress = createTaskProgress({
-  dialog: elements.taskProgressDialog, title: elements.taskProgressTitle,
-  phase: elements.taskProgressPhase, meter: elements.taskProgressMeter,
-  percent: elements.taskProgressPercent, elapsed: elements.taskProgressElapsed,
-  remaining: elements.taskProgressRemaining, completion: elements.taskProgressCompletion,
+  dialog: elements.taskProgressDialog,
+  title: elements.taskProgressTitle,
+  phase: elements.taskProgressPhase,
+  meter: elements.taskProgressMeter,
+  percent: elements.taskProgressPercent,
+  elapsed: elements.taskProgressElapsed,
+  remaining: elements.taskProgressRemaining,
+  completion: elements.taskProgressCompletion,
   cancel: elements.taskProgressCancel,
 });
 const runtime = createRuntimeContext();
@@ -35,12 +46,16 @@ const previewControls = createPreviewControlsSetup({
   minPrintModuleInches: LIMITS.minPrintModuleInches,
 });
 const runtimeHelpers = createRuntimeHelpers({
-  window, canvas: elements.canvas, errorLevels: ERROR_LEVELS, controls: elements,
+  window,
+  canvas: elements.canvas,
+  errorLevels: ERROR_LEVELS,
+  controls: elements,
   getDebugState: runtime.getDebugState,
 });
 
 const contentData = createContentDataSetup({
-  document, elements,
+  document,
+  elements,
   taskProgress,
   encoder: qrEncoder,
   protocol: FILE_PROTOCOL,
@@ -63,8 +78,12 @@ const styleSetup = createStyleSetup({
 });
 
 const setFormatVisibility = createFormatVisibility({
-  elements: { format: elements.qrFormat, fieldsets: elements.formatFieldsets,
-    bulkEnabled: elements.bulkEnabled, secretToggle: elements.payloadRevealToggle },
+  elements: {
+    format: elements.qrFormat,
+    fieldsets: elements.formatFieldsets,
+    bulkEnabled: elements.bulkEnabled,
+    secretToggle: elements.payloadRevealToggle,
+  },
   syncBulk: contentData.syncBulkControls,
   syncFile: contentData.syncFileModeVisibility,
   syncEvent: runtime.syncEvent,
@@ -72,8 +91,12 @@ const setFormatVisibility = createFormatVisibility({
 
 const contentSections = createContentSections({
   elements,
-  runtime: { render: runtime.render, syncChoices: runtime.syncChoices,
-    syncSmsLength: runtime.syncSmsLength, syncEmailLength: runtime.syncEmailLength },
+  runtime: {
+    render: runtime.render,
+    syncChoices: runtime.syncChoices,
+    syncSmsLength: runtime.syncSmsLength,
+    syncEmailLength: runtime.syncEmailLength,
+  },
   limits: { numberFrames: LIMITS.numberFrames },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
@@ -82,12 +105,23 @@ const contentSections = createContentSections({
 const download = createLazyDownloadSetup({
   elements,
   taskProgress,
-  bulk: { isMode: contentData.isBulkMode, getRowCount: contentData.getBulkRowCount,
-    syncStatus: contentData.syncBulkStatus },
-  file: { getMode: contentData.getSelectedFileEncodingMode,
-    syncChunkLabel: contentData.file.settings.syncChunkLabel },
-  number: { getInfo: contentSections.number.getSequenceInfo, sync: contentSections.number.sync },
-  runtime: { activateImageTab: () => runtime.activateDownload('image'), render: runtime.render },
+  bulk: {
+    isMode: contentData.isBulkMode,
+    getRowCount: contentData.getBulkRowCount,
+    syncStatus: contentData.syncBulkStatus,
+  },
+  file: {
+    getMode: contentData.getSelectedFileEncodingMode,
+    syncChunkLabel: contentData.file.settings.syncChunkLabel,
+  },
+  number: {
+    getInfo: contentSections.number.getSequenceInfo,
+    sync: contentSections.number.sync,
+  },
+  runtime: {
+    activateImageTab: () => runtime.activateDownload('image'),
+    render: runtime.render,
+  },
   maxNumberFrames: LIMITS.numberFrames,
   getPrintWidth: previewControls.getPrintWidth,
   syncPrint: previewControls.syncPrint,
@@ -96,32 +130,56 @@ const download = createLazyDownloadSetup({
 const contentEncoding = createContentEncodingSetup({
   e: elements,
   encoder: qrEncoder,
-  bulk: { isMode: contentData.isBulkMode, getRow: contentData.getBulkCurrentRow,
-    getError: contentData.getBulkParseError, getSchema: contentData.getBulkSchema,
-    getValidationState: contentData.getBulkValidationState },
-  file: { getActive: contentData.getActiveFile, getMode: contentData.getSelectedFileEncodingMode,
+  bulk: {
+    isMode: contentData.isBulkMode,
+    getRow: contentData.getBulkCurrentRow,
+    getError: contentData.getBulkParseError,
+    getSchema: contentData.getBulkSchema,
+    getValidationState: contentData.getBulkValidationState,
+  },
+  file: {
+    getActive: contentData.getActiveFile,
+    getMode: contentData.getSelectedFileEncodingMode,
     getCapacity: contentData.getChunkedFileCapacityInfo,
     getChunkVersion: contentData.file.settings.getVersion,
-    buildPayload: contentData.file.payload.build },
+    buildPayload: contentData.file.payload.build,
+  },
   sections: contentSections,
-  runtime: { getFrameIndex: download.getCurrentFrame,
-    syncChoices: runtime.syncChoices, syncArtwork: styleSetup.artwork.sync,
-    getDebugState: runtime.getDebugState },
-  helpers: { getErrorLevel: runtimeHelpers.getErrorLevel, readInteger: runtimeHelpers.readInteger,
-    colorWithTransparency, getEncodingMode: runtimeHelpers.getEncodingMode },
+  runtime: {
+    getFrameIndex: download.getCurrentFrame,
+    syncChoices: runtime.syncChoices,
+    syncArtwork: styleSetup.artwork.sync,
+    getDebugState: runtime.getDebugState,
+  },
+  helpers: {
+    getErrorLevel: runtimeHelpers.getErrorLevel,
+    readInteger: runtimeHelpers.readInteger,
+    colorWithTransparency,
+    getEncodingMode: runtimeHelpers.getEncodingMode,
+  },
   config: {
     alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
-    validationLimits: { emailSubject: LIMITS.emailSubject,
-      byteCapacity: MODE_CAPACITY.byte.L, sms: LIMITS.sms,
-      calendarTitle: LIMITS.calendarTitle, calendarLocation: LIMITS.calendarLocation,
-      calendarDescription: LIMITS.calendarDescription },
+    validationLimits: {
+      emailSubject: LIMITS.emailSubject,
+      byteCapacity: MODE_CAPACITY.byte.L,
+      sms: LIMITS.sms,
+      calendarTitle: LIMITS.calendarTitle,
+      calendarLocation: LIMITS.calendarLocation,
+      calendarDescription: LIMITS.calendarDescription,
+    },
   },
 });
 
 const output = createOutputSetup({
   elements,
-  systems: { previewControls, style: styleSetup, contentSections, contentEncoding,
-    download, contentData },
+  systems: {
+    previewControls,
+    style: styleSetup,
+    contentSections,
+    contentEncoding,
+    download,
+    contentData,
+  },
   getErrorLevel: runtimeHelpers.getErrorLevel,
   smsMaxLength: LIMITS.sms,
 });
@@ -129,23 +187,33 @@ const output = createOutputSetup({
 const debugSetup = createLazyDebugSetup({
   elements,
   encoder: qrEncoder,
-  config: { modeLabels: MODE_LABELS,
-    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES },
+  config: {
+    modeLabels: MODE_LABELS,
+    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+    maskValues: MASK_VALUES,
+  },
   getCurrentMode: runtimeHelpers.getEncodingMode,
   getErrorLevel: runtimeHelpers.getErrorLevel,
   isBulkMode: contentData.isBulkMode,
-  runtime: { render: runtime.render, getOutlineMode: runtime.getOutlineMode,
-    setOutlineMode: runtime.setOutlineMode, getDebugState: runtime.getDebugState },
+  runtime: {
+    render: runtime.render,
+    getOutlineMode: runtime.getOutlineMode,
+    setOutlineMode: runtime.setOutlineMode,
+    getDebugState: runtime.getDebugState,
+  },
 });
 const navigation = createApplicationNavigation({
   elements,
   render: runtime.render,
   updateMap: contentSections.geo.update,
   prepareDebug: debugSetup.load,
-  prepareStyle: (name) => name === 'size' ? previewControls.loadSize() : styleSetup.load(name),
+  prepareStyle: (name) =>
+    name === 'size' ? previewControls.loadSize() : styleSetup.load(name),
   prepareDownload: download.load,
-  state: { setActiveTab: runtime.setActiveTab,
-    setActiveDebugSubtab: runtime.setActiveDebugSubtab },
+  state: {
+    setActiveTab: runtime.setActiveTab,
+    setActiveDebugSubtab: runtime.setActiveDebugSubtab,
+  },
 });
 
 const preview = createPreviewSetup({
@@ -153,20 +221,54 @@ const preview = createPreviewSetup({
   encoder: qrEncoder,
   debugColors: debugSetup.colors,
   maxTargetWidth: LIMITS.qrTargetWidth,
-  systems: { content: contentEncoding, debug: debugSetup, style: styleSetup,
-    output, download, previewControls },
-  helpers: { formatWidthLabel: previewControls.formatWidth,
-    readInteger: runtimeHelpers.readInteger, clearCanvas: runtimeHelpers.clearCanvas },
-  actions: { syncFormat: setFormatVisibility, updateMap: contentSections.geo.update },
-  runtime: { isDebugOverlayActive: runtimeHelpers.isDebugOverlayActive,
-    getOutlineMode: runtime.getOutlineMode },
+  systems: {
+    content: contentEncoding,
+    debug: debugSetup,
+    style: styleSetup,
+    output,
+    download,
+    previewControls,
+  },
+  helpers: {
+    formatWidthLabel: previewControls.formatWidth,
+    readInteger: runtimeHelpers.readInteger,
+    clearCanvas: runtimeHelpers.clearCanvas,
+  },
+  actions: {
+    syncFormat: setFormatVisibility,
+    updateMap: contentSections.geo.update,
+  },
+  runtime: {
+    isDebugOverlayActive: runtimeHelpers.isDebugOverlayActive,
+    getOutlineMode: runtime.getOutlineMode,
+  },
 });
-runtime.connect({ contentEncoding, contentSections, download, navigation, output, preview });
+runtime.connect({
+  contentEncoding,
+  contentSections,
+  download,
+  navigation,
+  output,
+  preview,
+});
 
 startApplication({
-  document, window, elements, defaultChunkVersion: FILE_PROTOCOL.defaultChunkVersion,
-  systems: { contentData, contentSections, contentEncoding, style: styleSetup, download,
-    output, debug: debugSetup, navigation, preview, previewControls,
-    syncFormat: setFormatVisibility },
+  document,
+  window,
+  elements,
+  defaultChunkVersion: FILE_PROTOCOL.defaultChunkVersion,
+  systems: {
+    contentData,
+    contentSections,
+    contentEncoding,
+    style: styleSetup,
+    download,
+    output,
+    debug: debugSetup,
+    navigation,
+    preview,
+    previewControls,
+    syncFormat: setFormatVisibility,
+  },
   runtime: { getDefaultUrl: runtimeHelpers.getDefaultUrl },
 });

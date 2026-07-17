@@ -1,6 +1,8 @@
-const eventUid = `${typeof globalThis.crypto?.randomUUID === 'function'
-  ? globalThis.crypto.randomUUID()
-  : `${Date.now()}-${Math.random().toString(36).slice(2)}`}@qr.lewismoten.com`;
+const eventUid = `${
+  typeof globalThis.crypto?.randomUUID === 'function'
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}@qr.lewismoten.com`;
 const eventTimestamp = new Date();
 
 export function formatCalendarInputDate(date) {
@@ -23,7 +25,10 @@ function formatDateTime(dateValue, timeValue) {
 }
 
 function formatUtcDateTime(date) {
-  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  return date
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}Z$/, 'Z');
 }
 
 function addDays(dateValue, days) {
@@ -32,7 +37,11 @@ function addDays(dateValue, days) {
 }
 
 function escapeText(value) {
-  return value.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
 }
 
 export function createCalendarEventId(suffix = '') {
@@ -58,8 +67,10 @@ export function serializeCalendarEvent(values, uid = eventUid) {
     lines.push(`DTSTART:${formatDateTime(values.startDate, values.startTime)}`);
     lines.push(`DTEND:${formatDateTime(values.endDate, values.endTime)}`);
   }
-  if (values.location.trim()) lines.push(`LOCATION:${escapeText(values.location.trim())}`);
-  if (values.description.trim()) lines.push(`DESCRIPTION:${escapeText(values.description.trim())}`);
+  if (values.location.trim())
+    lines.push(`LOCATION:${escapeText(values.location.trim())}`);
+  if (values.description.trim())
+    lines.push(`DESCRIPTION:${escapeText(values.description.trim())}`);
   if (values.url.trim()) lines.push(`URL:${values.url.trim()}`);
   lines.push('END:VEVENT', 'END:VCALENDAR');
   return lines.join('\r\n');

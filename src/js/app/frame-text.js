@@ -3,20 +3,35 @@ export function fitCanvasText(context, text, maximumWidth) {
   let high = text.length + 1;
   while (low + 1 < high) {
     const middle = Math.floor((low + high) / 2);
-    if (context.measureText(`${text.slice(0, middle).trimEnd()}...`).width <= maximumWidth) low = middle;
+    if (
+      context.measureText(`${text.slice(0, middle).trimEnd()}...`).width <=
+      maximumWidth
+    )
+      low = middle;
     else high = middle;
   }
   const fitted = text.slice(0, low).trimEnd();
   return fitted ? `${fitted}...` : '...';
 }
 
-export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2, truncate = true) {
+export function wrapFrameMessage(
+  context,
+  message,
+  maximumWidth,
+  maximumLines = 2,
+  truncate = true,
+) {
   const explicitLines = message
     .split(/\r?\n/)
     .map((line) => line.replace(/\s+/g, ' ').trim())
     .filter(Boolean);
   if (explicitLines.length > 1) {
-    if (explicitLines.length <= maximumLines && explicitLines.every((line) => context.measureText(line).width <= maximumWidth)) {
+    if (
+      explicitLines.length <= maximumLines &&
+      explicitLines.every(
+        (line) => context.measureText(line).width <= maximumWidth,
+      )
+    ) {
       return explicitLines;
     }
     if (!truncate) {
@@ -24,15 +39,24 @@ export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 
     }
     return explicitLines
       .slice(0, maximumLines)
-      .map((line) => context.measureText(line).width <= maximumWidth ? line : fitCanvasText(context, line, maximumWidth));
+      .map((line) =>
+        context.measureText(line).width <= maximumWidth
+          ? line
+          : fitCanvasText(context, line, maximumWidth),
+      );
   }
 
   let remaining = message.replace(/\s+/g, ' ').trim();
   const lines = [];
-  const emailBreak = maximumLines >= 2 ? remaining.match(/^(.*?)(@[^\s@]+)$/) : null;
+  const emailBreak =
+    maximumLines >= 2 ? remaining.match(/^(.*?)(@[^\s@]+)$/) : null;
   if (emailBreak && emailBreak[1].trim()) {
     const emailLines = [emailBreak[1].trim(), emailBreak[2]];
-    if (emailLines.every((line) => context.measureText(line).width <= maximumWidth)) {
+    if (
+      emailLines.every(
+        (line) => context.measureText(line).width <= maximumWidth,
+      )
+    ) {
       return emailLines;
     }
     if (!truncate) {
@@ -45,7 +69,8 @@ export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 
     let high = remaining.length + 1;
     while (low + 1 < high) {
       const middle = Math.floor((low + high) / 2);
-      if (context.measureText(remaining.slice(0, middle)).width <= maximumWidth) low = middle;
+      if (context.measureText(remaining.slice(0, middle)).width <= maximumWidth)
+        low = middle;
       else high = middle;
     }
     let length = Math.max(1, low);
@@ -73,25 +98,39 @@ export function wrapFrameMessage(context, message, maximumWidth, maximumLines = 
     return null;
   }
   if (remaining && lines.length) {
-    lines[lines.length - 1] = fitCanvasText(context, lines[lines.length - 1], maximumWidth);
+    lines[lines.length - 1] = fitCanvasText(
+      context,
+      lines[lines.length - 1],
+      maximumWidth,
+    );
   }
   return lines;
 }
 
-export function fitFrameMessage(context, message, maximumWidth, maximumLineHeight, getFont) {
+export function fitFrameMessage(
+  context,
+  message,
+  maximumWidth,
+  maximumLineHeight,
+  getFont,
+) {
   const maximumFontSize = Math.ceil(maximumLineHeight * 2.5);
   const trySize = (fontSize) => {
     const font = getFont(fontSize);
     context.font = font;
     const metrics = context.measureText('Mg');
     const measuredHeight =
-      metrics.actualBoundingBoxAscent !== undefined && metrics.actualBoundingBoxDescent !== undefined
+      metrics.actualBoundingBoxAscent !== undefined &&
+      metrics.actualBoundingBoxDescent !== undefined
         ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
         : fontSize;
     if (measuredHeight > maximumLineHeight) return null;
 
     const lines = wrapFrameMessage(context, message, maximumWidth, 2, false);
-    if (lines && lines.every((line) => context.measureText(line).width <= maximumWidth)) {
+    if (
+      lines &&
+      lines.every((line) => context.measureText(line).width <= maximumWidth)
+    ) {
       return { font, lines };
     }
     return null;
@@ -116,7 +155,15 @@ export function fitFrameMessage(context, message, maximumWidth, maximumLineHeigh
   return { font, lines: wrapFrameMessage(context, message, maximumWidth) };
 }
 
-export function drawFrameMessage(context, messageLines, canvasSize, captionHeight, font, lineHeight, textColor) {
+export function drawFrameMessage(
+  context,
+  messageLines,
+  canvasSize,
+  captionHeight,
+  font,
+  lineHeight,
+  textColor,
+) {
   if (!messageLines.length || captionHeight <= 0) {
     return;
   }
@@ -127,14 +174,24 @@ export function drawFrameMessage(context, messageLines, canvasSize, captionHeigh
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   const blockHeight = messageLines.length * lineHeight;
-  const firstLineY = canvasSize + (captionHeight - blockHeight) / 2 + lineHeight / 2;
+  const firstLineY =
+    canvasSize + (captionHeight - blockHeight) / 2 + lineHeight / 2;
   messageLines.forEach((line, index) => {
     context.fillText(line, canvasSize / 2, firstLineY + index * lineHeight);
   });
   context.restore();
 }
 
-export function drawCenteredFrameMessage(context, messageLines, font, lineHeight, center, textColor, lightColor, cellSize) {
+export function drawCenteredFrameMessage(
+  context,
+  messageLines,
+  font,
+  lineHeight,
+  center,
+  textColor,
+  lightColor,
+  cellSize,
+) {
   if (!messageLines.length) {
     return;
   }

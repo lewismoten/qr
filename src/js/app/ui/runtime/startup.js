@@ -2,8 +2,14 @@ import { initializeDialogs } from '../dialogs.js';
 import { bindApplicationEvents } from '../events.js';
 import { initializeHelpPopovers } from '../help-popovers.js';
 
-export function startApplication({ document, window, elements, defaultChunkVersion,
-  systems, runtime }) {
+export function startApplication({
+  document,
+  window,
+  elements,
+  defaultChunkVersion,
+  systems,
+  runtime,
+}) {
   const file = systems.contentData.file;
   const eventActions = {
     syncFormat: systems.syncFormat,
@@ -38,7 +44,11 @@ export function startApplication({ document, window, elements, defaultChunkVersi
     syncNavigation: systems.download.syncNavigation,
     getFileMode: systems.contentData.getSelectedFileEncodingMode,
   };
-  bindApplicationEvents({ elements, actions: eventActions, defaultChunkVersion });
+  bindApplicationEvents({
+    elements,
+    actions: eventActions,
+    defaultChunkVersion,
+  });
   const dialogs = initializeDialogs({ document, window });
   initializeHelpPopovers({ document, window });
 
@@ -58,9 +68,14 @@ export function startApplication({ document, window, elements, defaultChunkVersi
   systems.navigation.activateContent('data');
   systems.navigation.activateTab('content');
   systems.previewControls.setViewMode('fit', true);
-  if (window.location.hash.includes('download=1') && window.location.hash.includes('data=')) {
+  if (
+    window.location.hash.includes('download=1') &&
+    window.location.hash.includes('data=')
+  ) {
     import('../download/location.js')
-      .then(({ restoreLocationDownload }) => restoreLocationDownload({ window, document }))
+      .then(({ restoreLocationDownload }) =>
+        restoreLocationDownload({ window, document }),
+      )
       .catch(console.error);
   }
   systems.preview.render();

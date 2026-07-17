@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/js/app/ui/download/document/section.js"],
-  "sourcesContent": ["import { lookup } from '../../../../i18n/index.js';\n\nexport function createDownloadDocumentSection({ allPdf, getFrameCount, syncPrint }) {\n  const sync = () => {\n    const count = getFrameCount();\n    allPdf.hidden = count <= 1;\n    if (count > 1) allPdf.textContent = lookup('download.allPdf', 'Download all {count} as PDF', { count });\n    syncPrint();\n  };\n  return { sync };\n}\n"],
-  "mappings": "wCAEO,SAASA,EAA8B,CAAE,OAAAC,EAAQ,cAAAC,EAAe,UAAAC,CAAU,EAAG,CAOlF,MAAO,CAAE,KANI,IAAM,CACjB,IAAMC,EAAQF,EAAc,EAC5BD,EAAO,OAASG,GAAS,EACrBA,EAAQ,IAAGH,EAAO,YAAcI,EAAO,kBAAmB,8BAA+B,CAAE,MAAAD,CAAM,CAAC,GACtGD,EAAU,CACZ,CACc,CAChB",
-  "names": ["createDownloadDocumentSection", "allPdf", "getFrameCount", "syncPrint", "count", "lookup"]
-}

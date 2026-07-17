@@ -1,15 +1,28 @@
 import { getContrastingHex } from '../../colors.js';
-import { drawCodewordOutlines, drawHighlightedBoundaries } from './boundaries.js';
+import {
+  drawCodewordOutlines,
+  drawHighlightedBoundaries,
+} from './boundaries.js';
 import { getDebugColorElements } from './colors.js';
-import { buildDebugOverlayModel, getDebugCategory, moduleIsDarkForPreview } from './model.js';
+import {
+  buildDebugOverlayModel,
+  getDebugCategory,
+  moduleIsDarkForPreview,
+} from './model.js';
 import { createOutlineSelector } from './outline.js';
 import { drawCodewordPaths, drawStreamFieldStarts } from './paths.js';
 import { createDebugStyles } from './styles.js';
 
-export function createDebugOverlaySetup({ elements: e, colorElements, runtime }) {
+export function createDebugOverlaySetup({
+  elements: e,
+  colorElements,
+  runtime,
+}) {
   Object.assign(colorElements, getDebugColorElements(document));
   const styles = createDebugStyles({
-    colors: colorElements, getContrastingHex, getCategory: getDebugCategory,
+    colors: colorElements,
+    getContrastingHex,
+    getCategory: getDebugCategory,
   });
   const outlines = createOutlineSelector({
     buttons: e.debugOutlineModeButtons,

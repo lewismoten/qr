@@ -50,47 +50,91 @@ export function createFileSection({
 
     if (selectedMode === 'blob') {
       const maxBytes = getDownloadUrlCapacity(file);
-      const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+      const percent =
+        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
       capacityHint.textContent = file
-        ? lookup('file.capacity.download', 'Loaded {loadedBytes} B ({loadedSize}) of about {maxBytes} B ({maxSize}) max ({percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.', {
-          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes),
-          maxBytes: maxBytes.toLocaleString(), maxSize: formatBytes(maxBytes), percent,
-        })
-        : lookup('file.capacity.chooseDownload', 'Choose a file to generate a shareable download URL.');
+        ? lookup(
+            'file.capacity.download',
+            'Loaded {loadedBytes} B ({loadedSize}) of about {maxBytes} B ({maxSize}) max ({percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.',
+            {
+              loadedBytes: loadedBytes.toLocaleString(),
+              loadedSize: formatBytes(loadedBytes),
+              maxBytes: maxBytes.toLocaleString(),
+              maxSize: formatBytes(maxBytes),
+              percent,
+            },
+          )
+        : lookup(
+            'file.capacity.chooseDownload',
+            'Choose a file to generate a shareable download URL.',
+          );
     } else if (selectedMode === 'chunked') {
       const info = getChunkInfo(file);
       const currentFrameBytes = Math.max(
         0,
         Math.min(
           info.chunkCapacity,
-          info.streamLength - Math.max(0, info.currentChunk - 1) * Math.max(info.chunkCapacity, 1),
+          info.streamLength -
+            Math.max(0, info.currentChunk - 1) *
+              Math.max(info.chunkCapacity, 1),
         ),
       );
       const limitText = info.autoVersion
-        ? lookup('file.capacity.autoVersion', 'auto-selected uniform V{version}', { version: info.configuredChunkVersion })
-        : lookup('file.capacity.version', 'uniform V{version}', { version: info.configuredChunkVersion });
+        ? lookup(
+            'file.capacity.autoVersion',
+            'auto-selected uniform V{version}',
+            { version: info.configuredChunkVersion },
+          )
+        : lookup('file.capacity.version', 'uniform V{version}', {
+            version: info.configuredChunkVersion,
+          });
       const transfer = isCompressionEnabled()
         ? lookup('file.capacity.gzip', 'gzip transfer is {bytes} B ({size})', {
-          bytes: info.transferByteLength.toLocaleString(), size: formatBytes(info.transferByteLength),
-        })
+            bytes: info.transferByteLength.toLocaleString(),
+            size: formatBytes(info.transferByteLength),
+          })
         : lookup('file.capacity.noCompression', 'transfer compression is off');
       capacityHint.textContent = file
-        ? lookup('file.capacity.chunked', 'Loaded {loadedBytes} B ({loadedSize}); {transfer}, plus a {manifestBytes} B manifest. Frame {current} of {total} carries {frameBytes} B with {limit}; full frames use {capacityBytes} B ({capacitySize}) of stream capacity.', {
-          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes), transfer,
-          manifestBytes: info.manifestLength.toLocaleString(), current: info.currentChunk,
-          total: info.totalChunks, frameBytes: currentFrameBytes.toLocaleString(), limit: limitText,
-          capacityBytes: info.chunkCapacity.toLocaleString(), capacitySize: formatBytes(info.chunkCapacity),
-        })
-        : lookup('file.capacity.chooseChunked', 'Choose a file to split it into chunked QR payloads.');
+        ? lookup(
+            'file.capacity.chunked',
+            'Loaded {loadedBytes} B ({loadedSize}); {transfer}, plus a {manifestBytes} B manifest. Frame {current} of {total} carries {frameBytes} B with {limit}; full frames use {capacityBytes} B ({capacitySize}) of stream capacity.',
+            {
+              loadedBytes: loadedBytes.toLocaleString(),
+              loadedSize: formatBytes(loadedBytes),
+              transfer,
+              manifestBytes: info.manifestLength.toLocaleString(),
+              current: info.currentChunk,
+              total: info.totalChunks,
+              frameBytes: currentFrameBytes.toLocaleString(),
+              limit: limitText,
+              capacityBytes: info.chunkCapacity.toLocaleString(),
+              capacitySize: formatBytes(info.chunkCapacity),
+            },
+          )
+        : lookup(
+            'file.capacity.chooseChunked',
+            'Choose a file to split it into chunked QR payloads.',
+          );
     } else {
       const maxBytes = getDataUrlCapacity();
-      const percent = maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+      const percent =
+        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
       capacityHint.textContent = file
-        ? lookup('file.capacity.data', 'Loaded {loadedBytes} B ({loadedSize}) of {maxBytes} B ({maxSize}) max ({percent}%).', {
-          loadedBytes: loadedBytes.toLocaleString(), loadedSize: formatBytes(loadedBytes),
-          maxBytes: maxBytes.toLocaleString(), maxSize: formatBytes(maxBytes), percent,
-        })
-        : lookup('file.capacity.chooseData', 'Choose a file to embed it directly as a data URL.');
+        ? lookup(
+            'file.capacity.data',
+            'Loaded {loadedBytes} B ({loadedSize}) of {maxBytes} B ({maxSize}) max ({percent}%).',
+            {
+              loadedBytes: loadedBytes.toLocaleString(),
+              loadedSize: formatBytes(loadedBytes),
+              maxBytes: maxBytes.toLocaleString(),
+              maxSize: formatBytes(maxBytes),
+              percent,
+            },
+          )
+        : lookup(
+            'file.capacity.chooseData',
+            'Choose a file to embed it directly as a data URL.',
+          );
     }
 
     clearButton.disabled = !input.files?.length && !cache.getPayload();

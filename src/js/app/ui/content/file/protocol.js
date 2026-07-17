@@ -28,7 +28,9 @@ export function getFileDataUrlPrefix(file) {
 }
 
 export function getCompactFileExtension(value) {
-  const sanitized = String(value || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');
+  const sanitized = String(value || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9.]/g, '');
   const segments = sanitized.split('.');
   const extension = segments.length > 1 ? segments.pop() : '';
   return (extension || 'BIN').slice(0, 8);
@@ -53,7 +55,13 @@ export function getFileDownloadUrlPrefix(appUrl, file) {
   return `${appUrl}#download=1&name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}&data=`;
 }
 
-export function buildSingleFileFrame({ data, file, includeManifest, prefix = 'FILE', version = '1' }) {
+export function buildSingleFileFrame({
+  data,
+  file,
+  includeManifest,
+  prefix = 'FILE',
+  version = '1',
+}) {
   const parts = [prefix, version, 'S', getFileManifestFlag(includeManifest)];
   if (!includeManifest) parts.push(getCompactFileExtension(file?.name));
   parts.push(data);
@@ -83,7 +91,10 @@ export function buildChunkFileFrame({
   ].join(':');
 }
 
-export function buildSingleFileFrameTemplate(byteCount, { file, includeManifest } = {}) {
+export function buildSingleFileFrameTemplate(
+  byteCount,
+  { file, includeManifest } = {},
+) {
   return buildSingleFileFrame({
     data: 'a'.repeat(getBase64UrlLength(byteCount)),
     file: file ?? { name: 'file.bin' },
@@ -91,12 +102,10 @@ export function buildSingleFileFrameTemplate(byteCount, { file, includeManifest 
   });
 }
 
-export function buildChunkFileFrameTemplate(byteCount, {
-  file,
-  streamLength = 0,
-  offset = 0,
-  includeManifest,
-} = {}) {
+export function buildChunkFileFrameTemplate(
+  byteCount,
+  { file, streamLength = 0, offset = 0, includeManifest } = {},
+) {
   return buildChunkFileFrame({
     data: 'a'.repeat(getBase64UrlLength(byteCount)),
     file: file ?? { name: 'file.bin' },

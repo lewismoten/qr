@@ -11,19 +11,31 @@ function formatCoordinate(value) {
   return value.toFixed(5);
 }
 
-export function createGeoSection({ latitudeInput, longitudeInput, labelInput, mapElement, isActive, onChange }) {
+export function createGeoSection({
+  latitudeInput,
+  longitudeInput,
+  labelInput,
+  mapElement,
+  isActive,
+  onChange,
+}) {
   let map = null;
   let mapRequest = null;
 
   const getCoordinates = () => {
     const latitude = parseCoordinate(latitudeInput.value);
     const longitude = parseCoordinate(longitudeInput.value);
-    return latitude === null || longitude === null ? null : { latitude, longitude };
+    return latitude === null || longitude === null
+      ? null
+      : { latitude, longitude };
   };
 
-  const buildPayload = () => serializeGeo({
-    latitude: latitudeInput.value, longitude: longitudeInput.value, label: labelInput.value,
-  });
+  const buildPayload = () =>
+    serializeGeo({
+      latitude: latitudeInput.value,
+      longitude: longitudeInput.value,
+      label: labelInput.value,
+    });
 
   const ensureMap = () => {
     if (map) return Promise.resolve(map);
@@ -47,11 +59,16 @@ export function createGeoSection({ latitudeInput, longitudeInput, labelInput, ma
   const update = () => {
     if (!isActive()) return;
     if (!map) {
-      ensureMap().then(update).catch((error) => {
-        mapElement.classList.add('has-load-error');
-        mapElement.textContent = lookup('map.loadError', 'Unable to initialize the map preview.');
-        console.error(error);
-      });
+      ensureMap()
+        .then(update)
+        .catch((error) => {
+          mapElement.classList.add('has-load-error');
+          mapElement.textContent = lookup(
+            'map.loadError',
+            'Unable to initialize the map preview.',
+          );
+          console.error(error);
+        });
       return;
     }
     const coordinates = getCoordinates();

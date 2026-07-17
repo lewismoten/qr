@@ -15,13 +15,15 @@ export function setupLazyDownloadActions(options) {
   const load = () => {
     if (ready) return Promise.resolve();
     if (!request) {
-      request = import('./actions.js').then(({ createDownloadActions }) => {
-        createDownloadActions(options);
-        ready = true;
-      }).catch((error) => {
-        request = null;
-        throw error;
-      });
+      request = import('./actions.js')
+        .then(({ createDownloadActions }) => {
+          createDownloadActions(options);
+          ready = true;
+        })
+        .catch((error) => {
+          request = null;
+          throw error;
+        });
     }
     return request;
   };
@@ -40,7 +42,11 @@ export function setupLazyDownloadActions(options) {
         button.click();
       } catch (error) {
         console.error(error);
-        options.status.textContent = lookup('download.toolsError', 'Download tools could not be loaded: {message}', { message: error.message });
+        options.status.textContent = lookup(
+          'download.toolsError',
+          'Download tools could not be loaded: {message}',
+          { message: error.message },
+        );
       }
     });
   });

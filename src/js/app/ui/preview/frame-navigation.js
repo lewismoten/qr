@@ -32,14 +32,18 @@ export function createFrameNavigation({
   };
 
   const getCurrentFrame = () => {
-    if (isBulkMode()) return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
-    const input = format.value === 'number' ? numberSequenceIndex : fileChunkIndex;
+    if (isBulkMode())
+      return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
+    const input =
+      format.value === 'number' ? numberSequenceIndex : fileChunkIndex;
     return Math.max(1, Number.parseInt(input.value, 10) || 1);
   };
 
   const setCurrentFrame = (frame) => {
     if (isBulkMode()) {
-      bulkRowIndex.value = String(Math.min(Math.max(1, frame), Math.max(1, getBulkRowCount())));
+      bulkRowIndex.value = String(
+        Math.min(Math.max(1, frame), Math.max(1, getBulkRowCount())),
+      );
       syncBulkStatus();
       return;
     }
@@ -55,13 +59,17 @@ export function createFrameNavigation({
   const sync = () => {
     const total = getFrameCount();
     const current = Math.min(getCurrentFrame(), total);
-    const supportsSequence = isBulkMode()
-      || (format.value === 'file' && getFileEncodingMode() === 'chunked')
-      || format.value === 'number';
+    const supportsSequence =
+      isBulkMode() ||
+      (format.value === 'file' && getFileEncodingMode() === 'chunked') ||
+      format.value === 'number';
     const show = supportsSequence && total > 1;
     navigation.classList.toggle('has-navigation', show);
     status.hidden = !show;
-    status.textContent = lookup('common.sequence', '{current} of {total}', { current, total });
+    status.textContent = lookup('common.sequence', '{current} of {total}', {
+      current,
+      total,
+    });
     previousButton.hidden = !show;
     nextButton.hidden = !show;
     previousButton.disabled = !show || current <= 1;

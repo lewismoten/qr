@@ -5,7 +5,8 @@ export function createAbortError() {
 }
 
 export function throwIfAborted(signal) {
-  if (signal?.aborted) throw signal.reason instanceof Error ? signal.reason : createAbortError();
+  if (signal?.aborted)
+    throw signal.reason instanceof Error ? signal.reason : createAbortError();
 }
 
 export function isAbortError(error) {
@@ -28,7 +29,9 @@ export function waitFor(milliseconds, signal) {
     }
     function cancel() {
       cleanup();
-      reject(signal.reason instanceof Error ? signal.reason : createAbortError());
+      reject(
+        signal.reason instanceof Error ? signal.reason : createAbortError(),
+      );
     }
   });
 }

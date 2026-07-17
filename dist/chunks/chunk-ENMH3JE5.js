@@ -1,0 +1,2 @@
+function n(){let r=new Error("Operation canceled");return r.name="AbortError",r}function f(r){if(r?.aborted)throw r.reason instanceof Error?r.reason:n()}function E(r){return r?.name==="AbortError"}function b(r,o){return f(o),new Promise((c,u)=>{let a=setTimeout(i,r);o?.addEventListener("abort",t,{once:!0});function e(){clearTimeout(a),o?.removeEventListener("abort",t)}function i(){e(),c()}function t(){e(),u(o.reason instanceof Error?o.reason:n())}})}export{f as a,E as b,b as c};
+//# sourceMappingURL=chunk-ENMH3JE5.js.map

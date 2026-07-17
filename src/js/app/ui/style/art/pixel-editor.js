@@ -1,11 +1,22 @@
 import { lookup } from '../../../../i18n/index.js';
 
 const PALETTE = [
-  ['black', 'Black', '#000000'], ['blue', 'Blue', '#0000aa'], ['green', 'Green', '#00aa00'], ['cyan', 'Cyan', '#00aaaa'],
-  ['red', 'Red', '#aa0000'], ['magenta', 'Magenta', '#aa00aa'], ['brown', 'Brown', '#aa5500'], ['lightGray', 'Light gray', '#aaaaaa'],
-  ['darkGray', 'Dark gray', '#555555'], ['brightBlue', 'Bright blue', '#5555ff'], ['brightGreen', 'Bright green', '#55ff55'],
-  ['brightCyan', 'Bright cyan', '#55ffff'], ['brightRed', 'Bright red', '#ff5555'], ['brightMagenta', 'Bright magenta', '#ff55ff'],
-  ['yellow', 'Yellow', '#ffff55'], ['white', 'White', '#ffffff'],
+  ['black', 'Black', '#000000'],
+  ['blue', 'Blue', '#0000aa'],
+  ['green', 'Green', '#00aa00'],
+  ['cyan', 'Cyan', '#00aaaa'],
+  ['red', 'Red', '#aa0000'],
+  ['magenta', 'Magenta', '#aa00aa'],
+  ['brown', 'Brown', '#aa5500'],
+  ['lightGray', 'Light gray', '#aaaaaa'],
+  ['darkGray', 'Dark gray', '#555555'],
+  ['brightBlue', 'Bright blue', '#5555ff'],
+  ['brightGreen', 'Bright green', '#55ff55'],
+  ['brightCyan', 'Bright cyan', '#55ffff'],
+  ['brightRed', 'Bright red', '#ff5555'],
+  ['brightMagenta', 'Bright magenta', '#ff55ff'],
+  ['yellow', 'Yellow', '#ffff55'],
+  ['white', 'White', '#ffffff'],
 ];
 
 export function createPixelArtEditor({
@@ -25,7 +36,10 @@ export function createPixelArtEditor({
   let renderFrame = 0;
 
   const syncSizeLabel = () => {
-    sizeValue.textContent = lookup('units.dimensions', '{width} x {height}', { width: size, height: size });
+    sizeValue.textContent = lookup('units.dimensions', '{width} x {height}', {
+      width: size,
+      height: size,
+    });
   };
   const syncCell = (cell) => {
     const color = pixels[Number.parseInt(cell.dataset.pixelIndex, 10)];
@@ -34,42 +48,52 @@ export function createPixelArtEditor({
     else cell.style.removeProperty('--pixel-color');
     cell.setAttribute('aria-pressed', String(Boolean(color)));
   };
-  const syncGrid = () => grid.querySelectorAll('.pixel-art-cell').forEach(syncCell);
+  const syncGrid = () =>
+    grid.querySelectorAll('.pixel-art-cell').forEach(syncCell);
   const syncPalette = () => {
-    paletteElement.querySelectorAll('.pixel-palette-button').forEach((button) => {
-      const selected = (button.dataset.pixelColor || null) === activeColor;
-      button.classList.toggle('is-active', selected);
-      button.setAttribute('aria-pressed', String(selected));
-    });
+    paletteElement
+      .querySelectorAll('.pixel-palette-button')
+      .forEach((button) => {
+        const selected = (button.dataset.pixelColor || null) === activeColor;
+        button.classList.toggle('is-active', selected);
+        button.setAttribute('aria-pressed', String(selected));
+      });
     customColorInput.classList.toggle(
       'is-active',
-      Boolean(activeColor) && !PALETTE.some(([, , color]) => color === activeColor),
+      Boolean(activeColor) &&
+        !PALETTE.some(([, , color]) => color === activeColor),
     );
   };
   const ensurePalette = () => {
     if (paletteElement.childElementCount) return;
     const fragment = document.createDocumentFragment();
-    [['eraser', 'Transparent / eraser', null], ...PALETTE].forEach(([key, defaultLabel, color]) => {
-      const label = lookup(`art.colors.${key}`, defaultLabel);
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `pixel-palette-button${color ? '' : ' is-eraser'}`;
-      button.dataset.pixelColor = color || '';
-      button.title = label;
-      button.setAttribute('aria-label', label);
-      button.setAttribute('aria-pressed', 'false');
-      if (color) button.style.setProperty('--palette-color', color);
-      fragment.append(button);
-    });
+    [['eraser', 'Transparent / eraser', null], ...PALETTE].forEach(
+      ([key, defaultLabel, color]) => {
+        const label = lookup(`art.colors.${key}`, defaultLabel);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `pixel-palette-button${color ? '' : ' is-eraser'}`;
+        button.dataset.pixelColor = color || '';
+        button.title = label;
+        button.setAttribute('aria-label', label);
+        button.setAttribute('aria-pressed', 'false');
+        if (color) button.style.setProperty('--palette-color', color);
+        fragment.append(button);
+      },
+    );
     paletteElement.append(fragment);
     syncPalette();
   };
   const ensureGrid = () => {
     if (grid.childElementCount) return;
     grid.style.setProperty('--pixel-grid-size', String(size));
-    grid.setAttribute('aria-label', lookup('art.editorLabel', '{width} by {height} pixel art editor', {
-      width: size, height: size,
-    }));
+    grid.setAttribute(
+      'aria-label',
+      lookup('art.editorLabel', '{width} by {height} pixel art editor', {
+        width: size,
+        height: size,
+      }),
+    );
     const fragment = document.createDocumentFragment();
     for (let index = 0; index < size * size; index += 1) {
       const cell = document.createElement('button');
@@ -77,7 +101,10 @@ export function createPixelArtEditor({
       cell.className = 'pixel-art-cell';
       cell.dataset.pixelIndex = String(index);
       cell.setAttribute('role', 'gridcell');
-      cell.setAttribute('aria-label', lookup('art.pixelLabel', 'Pixel {number}', { number: index + 1 }));
+      cell.setAttribute(
+        'aria-label',
+        lookup('art.pixelLabel', 'Pixel {number}', { number: index + 1 }),
+      );
       cell.setAttribute('aria-pressed', 'false');
       fragment.append(cell);
     }
@@ -106,9 +133,16 @@ export function createPixelArtEditor({
     pixels = Array(normalized * normalized).fill(null);
     for (let row = 0; row < normalized; row += 1) {
       for (let column = 0; column < normalized; column += 1) {
-        const sourceRow = Math.min(previousSize - 1, Math.floor((row * previousSize) / normalized));
-        const sourceColumn = Math.min(previousSize - 1, Math.floor((column * previousSize) / normalized));
-        pixels[row * normalized + column] = previousPixels[sourceRow * previousSize + sourceColumn];
+        const sourceRow = Math.min(
+          previousSize - 1,
+          Math.floor((row * previousSize) / normalized),
+        );
+        const sourceColumn = Math.min(
+          previousSize - 1,
+          Math.floor((column * previousSize) / normalized),
+        );
+        pixels[row * normalized + column] =
+          previousPixels[sourceRow * previousSize + sourceColumn];
       }
     }
     size = normalized;
@@ -128,7 +162,9 @@ export function createPixelArtEditor({
     activeColor = customColorInput.value;
     syncPalette();
   });
-  sizeInput.addEventListener('input', () => resize(Number.parseInt(sizeInput.value, 10) || 16));
+  sizeInput.addEventListener('input', () =>
+    resize(Number.parseInt(sizeInput.value, 10) || 16),
+  );
   grid.addEventListener('pointerdown', (event) => {
     const cell = event.target.closest('.pixel-art-cell');
     if (!cell) return;
@@ -140,7 +176,9 @@ export function createPixelArtEditor({
   grid.addEventListener('pointermove', (event) => {
     if (!painting) return;
     event.preventDefault();
-    const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest('.pixel-art-cell');
+    const cell = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest('.pixel-art-cell');
     if (cell && grid.contains(cell)) paintCell(cell);
   });
   grid.addEventListener('click', (event) => {
@@ -148,8 +186,12 @@ export function createPixelArtEditor({
     paintValue = activeColor;
     paintCell(event.target.closest('.pixel-art-cell'));
   });
-  window.addEventListener('pointerup', () => { painting = false; });
-  window.addEventListener('pointercancel', () => { painting = false; });
+  window.addEventListener('pointerup', () => {
+    painting = false;
+  });
+  window.addEventListener('pointercancel', () => {
+    painting = false;
+  });
   clearButton.addEventListener('click', () => {
     pixels = Array(size * size).fill(null);
     syncGrid();
@@ -162,5 +204,10 @@ export function createPixelArtEditor({
     syncGrid();
     syncSizeLabel();
   };
-  return { initialize, syncPalette, syncSizeLabel, getState: () => ({ size, pixels }) };
+  return {
+    initialize,
+    syncPalette,
+    syncSizeLabel,
+    getState: () => ({ size, pixels }),
+  };
 }

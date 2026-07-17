@@ -1,6 +1,15 @@
 import { lookup } from '../../../../i18n/index.js';
 
-export function createFileSettings({ elements: e, cache, capacity, getMode, cancelRender, render, syncCapacity, defaultVersion }) {
+export function createFileSettings({
+  elements: e,
+  cache,
+  capacity,
+  getMode,
+  cancelRender,
+  render,
+  syncCapacity,
+  defaultVersion,
+}) {
   let timer = 0;
   let request = 0;
   const getVersion = () => {
@@ -10,9 +19,14 @@ export function createFileSettings({ elements: e, cache, capacity, getMode, canc
   const syncChunkLabel = () => {
     const current = Number.parseInt(e.chunkIndex.value, 10) || 1;
     const total = Number.parseInt(e.chunkIndex.max, 10) || 1;
-    e.chunkIndexValue.textContent = lookup('common.count', '{current} / {total}', {
-      current: Math.min(current, total), total,
-    });
+    e.chunkIndexValue.textContent = lookup(
+      'common.count',
+      '{current} / {total}',
+      {
+        current: Math.min(current, total),
+        total,
+      },
+    );
   };
   const syncVersion = () => {
     e.chunkVersionAuto.checked = e.versionAuto.checked;
@@ -42,5 +56,12 @@ export function createFileSettings({ elements: e, cache, capacity, getMode, canc
       render();
     }, delay);
   };
-  return { getVersion, syncChunkLabel, syncVersion, resetDerived, resetCache, schedule };
+  return {
+    getVersion,
+    syncChunkLabel,
+    syncVersion,
+    resetDerived,
+    resetCache,
+    schedule,
+  };
 }
