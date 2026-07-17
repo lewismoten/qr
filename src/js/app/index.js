@@ -2,6 +2,26 @@ import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean, parseCsv } from './csv.js';
 import { formatPhoneNumberForDisplay, normalizePhoneNumber } from './phone.js';
+import {
+  createCalendarEventId,
+  formatCalendarInputDate,
+  formatCalendarInputTime,
+  serializeCalendarEvent,
+} from './calendar.js';
+import {
+  cloneCanvas,
+  createAnimatedGifBlob,
+  createGifBlob,
+} from './gif.js';
+import { createAnimatedMp4Blob, getSupportedMp4MimeType } from './mp4.js';
+import { createSvgBlob } from './svg.js';
+import { createZipBlob } from './zip.js';
+import { canvasToBlob } from './canvas-export.js';
+import {
+  capturePdfFrame as encodePdfFrame,
+  createPdfBlob as encodePdfBlob,
+  createPdfSheetBlob,
+} from './pdf.js';
 import qrEncoder from '../qr/index.js';
 
 const form = document.getElementById('qr-form');
@@ -439,8 +459,6 @@ const FILE_MANIFEST_FIELDS = {
   validationValue: 6,
   customMetadata: 8,
 };
-const calendarEventUid = `${typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}@qr.lewismoten.com`;
-const calendarEventTimestamp = new Date();
 let bulkRows = [];
 let bulkHeaders = [];
 let bulkParseError = '';
@@ -710,483 +728,20 @@ function stopPreviewPan(event) {
   }
 }
 
-function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
-  return new Promise((resolve, reject) => {
-    let exportCanvas = sourceCanvas;
-    if (flatten) {
-      exportCanvas = document.createElement('canvas');
-      exportCanvas.width = sourceCanvas.width;
-      exportCanvas.height = sourceCanvas.height;
-      const context = exportCanvas.getContext('2d');
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-      context.drawImage(sourceCanvas, 0, 0);
-    }
-    exportCanvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error(`Unable to create ${type} image.`));
-      }
-    }, type, quality);
-  });
+function getPdfQuality() {
+  return (Number.parseInt(downloadQuality.value, 10) || 92) / 100;
 }
 
-async function createPdfBlob(sourceCanvas) {
-  const jpegBlob = await canvasToBlob(
-    sourceCanvas,
-    'image/jpeg',
-    (Number.parseInt(downloadQuality.value, 10) || 92) / 100,
-    true
-  );
-  const jpeg = new Uint8Array(await jpegBlob.arrayBuffer());
-  const pixelWidth = sourceCanvas.width;
-  const pixelHeight = sourceCanvas.height;
-  const width = getPrintWidthInches(sourceCanvas) * 72;
-  const height = width * (pixelHeight / pixelWidth);
-  const content = `q\n${width.toFixed(3)} 0 0 ${height.toFixed(3)} 0 0 cm\n/Im0 Do\nQ\n`;
-  const objects = [
-    textBytes('<< /Type /Catalog /Pages 2 0 R >>'),
-    textBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
-    textBytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(3)} ${height.toFixed(3)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`),
-    concatBytes([
-      textBytes(`<< /Type /XObject /Subtype /Image /Width ${pixelWidth} /Height ${pixelHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`),
-      jpeg,
-      textBytes('\nendstream'),
-    ]),
-    textBytes(`<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`),
-  ];
-  return createPdfDocumentBlob(objects);
+function createPdfBlob(sourceCanvas) {
+  return encodePdfBlob(sourceCanvas, getPdfQuality(), getPrintWidthInches(sourceCanvas));
 }
 
-function createPdfDocumentBlob(objects) {
-  const parts = [textBytes('%PDF-1.4\n')];
-  const offsets = [0];
-  let length = parts[0].length;
-  objects.forEach((object, index) => {
-    offsets.push(length);
-    const part = concatBytes([textBytes(`${index + 1} 0 obj\n`), object, textBytes('\nendobj\n')]);
-    parts.push(part);
-    length += part.length;
-  });
-  const xrefOffset = length;
-  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  offsets.slice(1).forEach((offset) => {
-    xref += `${String(offset).padStart(10, '0')} 00000 n \n`;
-  });
-  xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-  parts.push(textBytes(xref));
-  return new Blob(parts, { type: 'application/pdf' });
-}
-
-async function capturePdfFrame(sourceCanvas) {
-  const jpegBlob = await canvasToBlob(
-    sourceCanvas,
-    'image/jpeg',
-    (Number.parseInt(downloadQuality.value, 10) || 92) / 100,
-    true
-  );
-  return {
-    width: sourceCanvas.width,
-    height: sourceCanvas.height,
-    printWidthInches: getPrintWidthInches(sourceCanvas),
-    jpeg: new Uint8Array(await jpegBlob.arrayBuffer()),
-  };
-}
-
-function getPdfSheetLayout(frames) {
-  const pageWidth = 612;
-  const pageHeight = 792;
-  const margin = 36;
-  const gap = 10;
-  const printableWidth = pageWidth - margin * 2;
-  const printableHeight = pageHeight - margin * 2;
-  const printWidth = Math.min(
-    printableWidth,
-    Math.max(...frames.map((frame) => (frame.printWidthInches || 1.65) * 72))
-  );
-  const maximumAspectRatio = Math.max(...frames.map((frame) => frame.height / frame.width));
-  const printHeight = printWidth * maximumAspectRatio;
-  const columns = Math.max(1, Math.floor((printableWidth + gap) / (printWidth + gap)));
-  const rows = Math.max(1, Math.floor((printableHeight + gap) / (printHeight + gap)));
-  const framesPerPage = columns * rows;
-  const cellWidth = (pageWidth - margin * 2 - gap * (columns - 1)) / columns;
-  const cellHeight = (pageHeight - margin * 2 - gap * (rows - 1)) / rows;
-  return { pageWidth, pageHeight, margin, gap, columns, rows, framesPerPage, cellWidth, cellHeight, printWidth };
-}
-
-function createPdfSheetBlob(frames) {
-  const { pageWidth, pageHeight, margin, gap, columns, framesPerPage, cellWidth, cellHeight, printWidth } =
-    getPdfSheetLayout(frames);
-  const objects = [null, null];
-  const pageReferences = [];
-  const reserveObject = () => {
-    objects.push(null);
-    return objects.length;
-  };
-  const setObject = (reference, value) => {
-    objects[reference - 1] = value;
-  };
-
-  for (let pageStart = 0; pageStart < frames.length; pageStart += framesPerPage) {
-    const pageFrames = frames.slice(pageStart, pageStart + framesPerPage);
-    const pageReference = reserveObject();
-    const contentReference = reserveObject();
-    const imageReferences = pageFrames.map(() => reserveObject());
-    const resources = [];
-    const commands = [];
-
-    pageFrames.forEach((frame, index) => {
-      const column = index % columns;
-      const row = Math.floor(index / columns);
-      const scale = Math.min(printWidth / frame.width, cellWidth / frame.width, cellHeight / frame.height);
-      const drawWidth = frame.width * scale;
-      const drawHeight = frame.height * scale;
-      const x = margin + column * (cellWidth + gap) + (cellWidth - drawWidth) / 2;
-      const cellBottom = pageHeight - margin - (row + 1) * cellHeight - row * gap;
-      const y = cellBottom + (cellHeight - drawHeight) / 2;
-      const imageName = `Im${index + 1}`;
-      resources.push(`/${imageName} ${imageReferences[index]} 0 R`);
-      commands.push(`q\n${drawWidth.toFixed(3)} 0 0 ${drawHeight.toFixed(3)} ${x.toFixed(3)} ${y.toFixed(3)} cm\n/${imageName} Do\nQ\n`);
-      setObject(
-        imageReferences[index],
-        concatBytes([
-          textBytes(`<< /Type /XObject /Subtype /Image /Width ${frame.width} /Height ${frame.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${frame.jpeg.length} >>\nstream\n`),
-          frame.jpeg,
-          textBytes('\nendstream'),
-        ])
-      );
-    });
-
-    const content = commands.join('');
-    setObject(
-      pageReference,
-      textBytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << ${resources.join(' ')} >> >> /Contents ${contentReference} 0 R >>`)
-    );
-    setObject(contentReference, textBytes(`<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`));
-    pageReferences.push(pageReference);
-  }
-
-  objects[0] = textBytes('<< /Type /Catalog /Pages 2 0 R >>');
-  objects[1] = textBytes(`<< /Type /Pages /Kids [${pageReferences.map((reference) => `${reference} 0 R`).join(' ')}] /Count ${pageReferences.length} >>`);
-  return createPdfDocumentBlob(objects);
-}
-
-function pushUint16(bytes, value) {
-  bytes.push(value & 255, (value >>> 8) & 255);
+function capturePdfFrame(sourceCanvas) {
+  return encodePdfFrame(sourceCanvas, getPdfQuality(), getPrintWidthInches(sourceCanvas));
 }
 
 function pushUint32(bytes, value) {
   bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
-}
-
-function createGifBlob(sourceCanvas) {
-  const context = sourceCanvas.getContext('2d');
-  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
-  const indexes = new Uint8Array(sourceCanvas.width * sourceCanvas.height);
-  const levels = [0, 51, 102, 153, 204, 255];
-  const palette = new Uint8Array(256 * 3);
-  for (let r = 0; r < 6; r += 1) {
-    for (let g = 0; g < 6; g += 1) {
-      for (let b = 0; b < 6; b += 1) {
-        const index = 1 + r * 36 + g * 6 + b;
-        palette[index * 3] = levels[r];
-        palette[index * 3 + 1] = levels[g];
-        palette[index * 3 + 2] = levels[b];
-      }
-    }
-  }
-  for (let index = 0; index < indexes.length; index += 1) {
-    const pixel = index * 4;
-    if (pixels[pixel + 3] < 128) {
-      indexes[index] = 0;
-      continue;
-    }
-    const r = Math.round(pixels[pixel] / 51);
-    const g = Math.round(pixels[pixel + 1] / 51);
-    const b = Math.round(pixels[pixel + 2] / 51);
-    indexes[index] = 1 + r * 36 + g * 6 + b;
-  }
-
-  const codes = [256];
-  let literalCount = 0;
-  indexes.forEach((index) => {
-    codes.push(index);
-    literalCount += 1;
-    if (literalCount === 200) {
-      codes.push(256);
-      literalCount = 0;
-    }
-  });
-  codes.push(257);
-  const packed = [];
-  let accumulator = 0;
-  let bitCount = 0;
-  codes.forEach((code) => {
-    accumulator |= code << bitCount;
-    bitCount += 9;
-    while (bitCount >= 8) {
-      packed.push(accumulator & 255);
-      accumulator >>>= 8;
-      bitCount -= 8;
-    }
-  });
-  if (bitCount) {
-    packed.push(accumulator & 255);
-  }
-
-  const bytes = [...textBytes('GIF89a')];
-  pushUint16(bytes, sourceCanvas.width);
-  pushUint16(bytes, sourceCanvas.height);
-  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xf9, 4, 1, 0, 0, 0, 0, 0x2c);
-  pushUint16(bytes, 0);
-  pushUint16(bytes, 0);
-  pushUint16(bytes, sourceCanvas.width);
-  pushUint16(bytes, sourceCanvas.height);
-  bytes.push(0, 8);
-  for (let offset = 0; offset < packed.length; offset += 255) {
-    const block = packed.slice(offset, offset + 255);
-    bytes.push(block.length, ...block);
-  }
-  bytes.push(0, 0x3b);
-  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
-}
-
-function cloneCanvas(sourceCanvas) {
-  const copy = document.createElement('canvas');
-  copy.width = sourceCanvas.width;
-  copy.height = sourceCanvas.height;
-  copy.getContext('2d').drawImage(sourceCanvas, 0, 0);
-  return copy;
-}
-
-function createAnimationStage(frames) {
-  const stage = document.createElement('canvas');
-  stage.width = Math.max(...frames.map((frame) => frame.width));
-  stage.height = Math.max(...frames.map((frame) => frame.height));
-  return stage;
-}
-
-function drawAnimationStageFrame(stage, frame, flatten = false) {
-  const context = stage.getContext('2d');
-  context.clearRect(0, 0, stage.width, stage.height);
-  if (flatten) {
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, stage.width, stage.height);
-  }
-  context.drawImage(frame, (stage.width - frame.width) / 2, (stage.height - frame.height) / 2);
-}
-
-function getGifPaletteAndIndexes(stage) {
-  const levels = [0, 51, 102, 153, 204, 255];
-  const palette = new Uint8Array(256 * 3);
-  for (let red = 0; red < 6; red += 1) {
-    for (let green = 0; green < 6; green += 1) {
-      for (let blue = 0; blue < 6; blue += 1) {
-        const index = 1 + red * 36 + green * 6 + blue;
-        palette[index * 3] = levels[red];
-        palette[index * 3 + 1] = levels[green];
-        palette[index * 3 + 2] = levels[blue];
-      }
-    }
-  }
-
-  const pixels = stage.getContext('2d').getImageData(0, 0, stage.width, stage.height).data;
-  const indexes = new Uint8Array(stage.width * stage.height);
-  for (let index = 0; index < indexes.length; index += 1) {
-    const pixel = index * 4;
-    if (pixels[pixel + 3] < 128) {
-      indexes[index] = 0;
-      continue;
-    }
-    const red = Math.round(pixels[pixel] / 51);
-    const green = Math.round(pixels[pixel + 1] / 51);
-    const blue = Math.round(pixels[pixel + 2] / 51);
-    indexes[index] = 1 + red * 36 + green * 6 + blue;
-  }
-  return { palette, indexes };
-}
-
-function packGifIndexes(indexes) {
-  const codes = [256];
-  let literalCount = 0;
-  indexes.forEach((index) => {
-    codes.push(index);
-    literalCount += 1;
-    if (literalCount === 200) {
-      codes.push(256);
-      literalCount = 0;
-    }
-  });
-  codes.push(257);
-
-  const packed = [];
-  let accumulator = 0;
-  let bitCount = 0;
-  codes.forEach((code) => {
-    accumulator |= code << bitCount;
-    bitCount += 9;
-    while (bitCount >= 8) {
-      packed.push(accumulator & 255);
-      accumulator >>>= 8;
-      bitCount -= 8;
-    }
-  });
-  if (bitCount) {
-    packed.push(accumulator & 255);
-  }
-  return packed;
-}
-
-function createAnimatedGifBlob(frames, frameDurationMs) {
-  const stage = createAnimationStage(frames);
-  drawAnimationStageFrame(stage, frames[0]);
-  const { palette } = getGifPaletteAndIndexes(stage);
-  const delay = Math.max(1, Math.min(65535, Math.round(frameDurationMs / 10)));
-  const bytes = [...textBytes('GIF89a')];
-  pushUint16(bytes, stage.width);
-  pushUint16(bytes, stage.height);
-  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xff, 0x0b, ...textBytes('NETSCAPE2.0'), 3, 1, 0, 0, 0);
-
-  frames.forEach((frame) => {
-    drawAnimationStageFrame(stage, frame);
-    const { indexes } = getGifPaletteAndIndexes(stage);
-    const packed = packGifIndexes(indexes);
-    bytes.push(0x21, 0xf9, 4, 9);
-    pushUint16(bytes, delay);
-    bytes.push(0, 0, 0x2c);
-    pushUint16(bytes, 0);
-    pushUint16(bytes, 0);
-    pushUint16(bytes, stage.width);
-    pushUint16(bytes, stage.height);
-    bytes.push(0, 8);
-    for (let offset = 0; offset < packed.length; offset += 255) {
-      const block = packed.slice(offset, offset + 255);
-      bytes.push(block.length, ...block);
-    }
-    bytes.push(0);
-  });
-  bytes.push(0x3b);
-  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
-}
-
-function getSupportedMp4MimeType() {
-  if (typeof MediaRecorder === 'undefined') {
-    return '';
-  }
-  return ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1', 'video/mp4'].find((type) =>
-    MediaRecorder.isTypeSupported(type)
-  ) || '';
-}
-
-async function createAnimatedMp4Blob(frames, frameDurationMs, onProgress) {
-  const mimeType = getSupportedMp4MimeType();
-  if (!mimeType) {
-    throw new Error('This browser does not provide an MP4 encoder. Animated GIF is available instead.');
-  }
-
-  const stage = createAnimationStage(frames);
-  drawAnimationStageFrame(stage, frames[0], true);
-  const frameRate = Math.min(60, Math.max(1, Math.ceil(1000 / Math.max(16, frameDurationMs))));
-  const stream = stage.captureStream(frameRate);
-  try {
-    const recorder = new MediaRecorder(stream, { mimeType });
-    const chunks = [];
-    recorder.addEventListener('dataavailable', (event) => {
-      if (event.data.size) {
-        chunks.push(event.data);
-      }
-    });
-    const stopped = new Promise((resolve, reject) => {
-      recorder.addEventListener('stop', resolve, { once: true });
-      recorder.addEventListener('error', () => reject(recorder.error || new Error('Unable to encode MP4.')), {
-        once: true,
-      });
-    });
-
-    recorder.start(1000);
-    for (let index = 0; index < frames.length; index += 1) {
-      drawAnimationStageFrame(stage, frames[index], true);
-      onProgress?.(index + 1, frames.length);
-      await new Promise((resolve) => window.setTimeout(resolve, frameDurationMs));
-    }
-    recorder.stop();
-    await stopped;
-    return new Blob(chunks, { type: mimeType });
-  } finally {
-    stream.getTracks().forEach((track) => track.stop());
-  }
-}
-
-async function createSvgBlob(sourceCanvas) {
-  const context = sourceCanvas.getContext('2d');
-  const pixels = context.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
-  const pathsByColor = new Map();
-  let activeRuns = new Map();
-
-  const appendRectangle = ({ x, y, width, height, color }) => {
-    if (!pathsByColor.has(color)) {
-      pathsByColor.set(color, []);
-    }
-    pathsByColor.get(color).push(`M${x} ${y}h${width}v${height}h-${width}z`);
-  };
-
-  for (let y = 0; y < sourceCanvas.height; y += 1) {
-    const nextRuns = new Map();
-    let x = 0;
-    while (x < sourceCanvas.width) {
-      const offset = (y * sourceCanvas.width + x) * 4;
-      const red = pixels[offset];
-      const green = pixels[offset + 1];
-      const blue = pixels[offset + 2];
-      const alpha = pixels[offset + 3];
-      if (alpha === 0) {
-        x += 1;
-        continue;
-      }
-
-      let end = x + 1;
-      while (end < sourceCanvas.width) {
-        const nextOffset = (y * sourceCanvas.width + end) * 4;
-        if (
-          pixels[nextOffset] !== red ||
-          pixels[nextOffset + 1] !== green ||
-          pixels[nextOffset + 2] !== blue ||
-          pixels[nextOffset + 3] !== alpha
-        ) {
-          break;
-        }
-        end += 1;
-      }
-
-      const color = `${red},${green},${blue},${alpha}`;
-      const runKey = `${x},${end - x},${color}`;
-      const previous = activeRuns.get(runKey);
-      if (previous) {
-        previous.height += 1;
-        nextRuns.set(runKey, previous);
-        activeRuns.delete(runKey);
-      } else {
-        nextRuns.set(runKey, { x, y, width: end - x, height: 1, color });
-      }
-      x = end;
-    }
-    activeRuns.forEach(appendRectangle);
-    activeRuns = nextRuns;
-  }
-  activeRuns.forEach(appendRectangle);
-
-  const parts = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${sourceCanvas.width}" height="${sourceCanvas.height}" viewBox="0 0 ${sourceCanvas.width} ${sourceCanvas.height}" shape-rendering="crispEdges">`,
-  ];
-  pathsByColor.forEach((paths, color) => {
-    const [red, green, blue, alpha] = color.split(',').map(Number);
-    const hex = `#${[red, green, blue].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
-    const opacity = alpha < 255 ? ` fill-opacity="${(alpha / 255).toFixed(4)}"` : '';
-    parts.push(`<path fill="${hex}"${opacity} d="${paths.join('')}"/>`);
-  });
-  parts.push('</svg>');
-  return new Blob(parts, { type: 'image/svg+xml' });
 }
 
 async function exportCanvas(sourceCanvas, format) {
@@ -1203,79 +758,6 @@ async function exportCanvas(sourceCanvas, format) {
     return createPdfBlob(sourceCanvas);
   }
   return canvasToBlob(sourceCanvas, 'image/png');
-}
-
-const CRC_TABLE = Array.from({ length: 256 }, (_, value) => {
-  let crc = value;
-  for (let bit = 0; bit < 8; bit += 1) {
-    crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
-  }
-  return crc >>> 0;
-});
-
-function getCrc32(bytes) {
-  let crc = 0xffffffff;
-  bytes.forEach((byte) => {
-    crc = CRC_TABLE[(crc ^ byte) & 255] ^ (crc >>> 8);
-  });
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-async function createZipBlob(files) {
-  const localParts = [];
-  const centralParts = [];
-  let offset = 0;
-  for (const file of files) {
-    const name = textBytes(file.name);
-    const data = new Uint8Array(await file.blob.arrayBuffer());
-    const crc = getCrc32(data);
-    const local = [];
-    pushUint32(local, 0x04034b50);
-    pushUint16(local, 20);
-    pushUint16(local, 0x0800);
-    pushUint16(local, 0);
-    pushUint16(local, 0);
-    pushUint16(local, 0);
-    pushUint32(local, crc);
-    pushUint32(local, data.length);
-    pushUint32(local, data.length);
-    pushUint16(local, name.length);
-    pushUint16(local, 0);
-    const localPart = concatBytes([new Uint8Array(local), name, data]);
-    localParts.push(localPart);
-
-    const central = [];
-    pushUint32(central, 0x02014b50);
-    pushUint16(central, 20);
-    pushUint16(central, 20);
-    pushUint16(central, 0x0800);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint32(central, crc);
-    pushUint32(central, data.length);
-    pushUint32(central, data.length);
-    pushUint16(central, name.length);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint32(central, 0);
-    pushUint32(central, offset);
-    centralParts.push(concatBytes([new Uint8Array(central), name]));
-    offset += localPart.length;
-  }
-  const centralDirectory = concatBytes(centralParts);
-  const end = [];
-  pushUint32(end, 0x06054b50);
-  pushUint16(end, 0);
-  pushUint16(end, 0);
-  pushUint16(end, files.length);
-  pushUint16(end, files.length);
-  pushUint32(end, centralDirectory.length);
-  pushUint32(end, offset);
-  pushUint16(end, 0);
-  return new Blob([...localParts, centralDirectory, new Uint8Array(end)], { type: 'application/zip' });
 }
 
 function triggerBlobDownload(blob, name) {
@@ -3031,43 +2513,6 @@ function buildEmailPayloadWithBody(bodyValue) {
   return `mailto:${emailTo.value.trim()}${suffix}`;
 }
 
-function formatCalendarInputDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function formatCalendarInputTime(date) {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
-
-function formatCalendarDate(value) {
-  return value.replaceAll('-', '');
-}
-
-function formatCalendarDateTime(dateValue, timeValue) {
-  return `${formatCalendarDate(dateValue)}T${timeValue.replace(':', '')}00`;
-}
-
-function formatCalendarUtcDateTime(date) {
-  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-}
-
-function addCalendarDays(dateValue, days) {
-  const [year, month, day] = dateValue.split('-').map(Number);
-  const date = new Date(year, month - 1, day + days);
-  return formatCalendarInputDate(date);
-}
-
-function escapeCalendarText(value) {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/\r?\n/g, '\\n')
-    .replace(/,/g, '\\,')
-    .replace(/;/g, '\\;');
-}
-
 function initializeCalendarEventDefaults() {
   const start = new Date();
   start.setSeconds(0, 0);
@@ -3088,41 +2533,8 @@ function syncCalendarEventControls() {
   eventTimeFields.forEach((field) => field.classList.toggle('is-disabled', allDay));
 }
 
-function buildCalendarEventPayloadFromValues(values, uid = calendarEventUid) {
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Lewis Moten//QR Code Generator//EN',
-    'BEGIN:VEVENT',
-    `UID:${uid}`,
-    `DTSTAMP:${formatCalendarUtcDateTime(calendarEventTimestamp)}`,
-    `SUMMARY:${escapeCalendarText(values.title.trim())}`,
-  ];
-
-  if (values.allDay) {
-    lines.push(`DTSTART;VALUE=DATE:${formatCalendarDate(values.startDate)}`);
-    lines.push(`DTEND;VALUE=DATE:${formatCalendarDate(addCalendarDays(values.endDate, 1))}`);
-  } else {
-    lines.push(`DTSTART:${formatCalendarDateTime(values.startDate, values.startTime)}`);
-    lines.push(`DTEND:${formatCalendarDateTime(values.endDate, values.endTime)}`);
-  }
-
-  if (values.location.trim()) {
-    lines.push(`LOCATION:${escapeCalendarText(values.location.trim())}`);
-  }
-  if (values.description.trim()) {
-    lines.push(`DESCRIPTION:${escapeCalendarText(values.description.trim())}`);
-  }
-  if (values.url.trim()) {
-    lines.push(`URL:${values.url.trim()}`);
-  }
-
-  lines.push('END:VEVENT', 'END:VCALENDAR');
-  return lines.join('\r\n');
-}
-
 function buildCalendarEventPayload() {
-  return buildCalendarEventPayloadFromValues({
+  return serializeCalendarEvent({
     title: eventTitle.value,
     allDay: eventAllDay.checked,
     startDate: eventStartDate.value,
@@ -3295,7 +2707,7 @@ function buildBulkEncodedText(row = getBulkCurrentRow()) {
     case 'sms':
       return `SMSTO:${normalizePhoneNumber(row.phone)}:${row.message}`;
     case 'event':
-      return buildCalendarEventPayloadFromValues(
+      return serializeCalendarEvent(
         {
           title: row.title,
           allDay: Boolean(parseBulkBoolean(row.all_day)),
@@ -3307,7 +2719,7 @@ function buildBulkEncodedText(row = getBulkCurrentRow()) {
           description: row.description,
           url: row.url,
         },
-        `${calendarEventUid.replace('@qr.lewismoten.com', '')}-${getCurrentFrameIndex()}@qr.lewismoten.com`
+        createCalendarEventId(getCurrentFrameIndex())
       );
     case 'geo': {
       const coordinates = `${row.latitude.trim()},${row.longitude.trim()}`;
