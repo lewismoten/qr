@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { projectCoordinates, unprojectPoint } from './src/js/app/ui/content/geo/slippy-map.js';
+import { projectCoordinates, unprojectPoint } from '../src/js/app/ui/content/geo/slippy-map.js';
 
 assert.deepEqual(projectCoordinates({ latitude: 0, longitude: 0 }, 0), { x: 128, y: 128 });
 

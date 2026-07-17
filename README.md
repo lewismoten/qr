@@ -77,7 +77,7 @@ QR CDN request is required.
 Run the structural, mode and capacity suite with:
 
 ```sh
-node qr-native.test.js
+node tests/qr.test.js
 ```
 
 For independent matrix parity, download the former pinned reference bundles and
@@ -88,7 +88,7 @@ curl -fsSL https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js \
   -o /tmp/qrcode-1.5.0.min.js
 curl -fsSL https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.tosjis.min.js \
   -o /tmp/qrcode-1.5.0.tosjis.min.js
-node qr-native.parity.test.js
+node tests/qr-parity.test.js
 ```
 
 ## FILE chunked transport

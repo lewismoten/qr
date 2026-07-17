@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { encodeGifLzw } from './src/js/app/compression/lzw.js';
+import { encodeGifLzw } from '../src/js/app/compression/lzw.js';
 
 function unpackFixedWidthCodes(bytes, codeSize) {
   const codes = [];

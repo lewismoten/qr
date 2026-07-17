@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import NativeQRCode from './src/js/qr/matrix-encoder.js';
+import NativeQRCode from '../src/js/qr/matrix-encoder.js';
 
 const referencePath = process.env.QR_REFERENCE_BUNDLE || '/tmp/qrcode-1.5.0.min.js';
 if (!fs.existsSync(referencePath)) {

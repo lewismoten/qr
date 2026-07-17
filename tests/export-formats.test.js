@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { getCrc32 } from './src/js/app/checksum/crc32.js';
-import { createZipBlob } from './src/js/app/zip.js';
+import { getCrc32 } from '../src/js/app/checksum/crc32.js';
+import { createZipBlob } from '../src/js/app/zip.js';
 
 function uint16(bytes, offset) {
   return bytes[offset] | (bytes[offset + 1] << 8);

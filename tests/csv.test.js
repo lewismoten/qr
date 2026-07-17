@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { parseCsv, parseCsvAsync } from './src/js/app/csv.js';
+import { parseCsv, parseCsvAsync } from '../src/js/app/csv.js';
 
 const source = 'name,notes\r\n"Moten, Lewis","line ""one"""\r\nTaylor,plain\r\n';
 assert.deepEqual(await parseCsvAsync(source, { yieldEvery: 4 }), parseCsv(source));

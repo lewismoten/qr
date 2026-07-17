@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createTaskProgress } from './src/js/app/ui/download/progress.js';
+import { createTaskProgress } from '../src/js/app/ui/download/progress.js';
 
 class Control extends EventTarget {
   constructor() {

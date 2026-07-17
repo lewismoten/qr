@@ -8,13 +8,13 @@ import {
   initializeLanguage,
   isDebugLanguage,
   lookup,
-} from './src/js/i18n/index.js';
-import { getSavedLocale, LOCALE_STORAGE_KEY, prioritizeLocales } from './src/js/i18n/picker.js';
+} from '../src/js/i18n/index.js';
+import { getSavedLocale, LOCALE_STORAGE_KEY, prioritizeLocales } from '../src/js/i18n/picker.js';
 import {
   validateGeoLabel,
   validatePrintableText,
   validateVCardTextValue,
-} from './src/js/app/validation.js';
+} from '../src/js/app/validation.js';
 
 function createFetcher(resources) {
   return async (url) => {
@@ -158,7 +158,7 @@ const flattenMessages = (value, prefix = '', result = {}) => {
   });
   return result;
 };
-const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
+const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const htmlKeys = [...new Set([...html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)].map((match) => match[1]))];
 const formControls = html.match(/<(?:input|textarea)\b[^>]*>/gs) || [];
 const fileControls = formControls.filter((tag) => /\btype=["']file["']/.test(tag));
@@ -177,11 +177,11 @@ for (const id of ['phone-number', 'sms-number', 'event-title', 'geo-query', 'vca
   assert.match(tag || '', /\bdata-i18n-value=/, `${id} must localize its default value`);
 }
 const scopedFormKeys = htmlKeys.filter((key) => /^(content|formats|fields|form|style|frame|wifi|common|downloadUi|debugUi|encoding)\./.test(key));
-const englishMessages = flattenMessages(JSON.parse(await readFile(new URL('locales/en-US.json', import.meta.url), 'utf8')));
+const englishMessages = flattenMessages(JSON.parse(await readFile(new URL('../locales/en-US.json', import.meta.url), 'utf8')));
 const runtimeDownloadKeys = Object.keys(englishMessages).filter((key) => key.startsWith('download.'));
 const bulkProgressKeys = Object.keys(englishMessages).filter((key) => key.startsWith('bulk.progress.'));
 for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
-  const localeMessages = flattenMessages(JSON.parse(await readFile(new URL(`locales/${locale}.json`, import.meta.url), 'utf8')));
+  const localeMessages = flattenMessages(JSON.parse(await readFile(new URL(`../locales/${locale}.json`, import.meta.url), 'utf8')));
   const requiredKeys = locale === 'en-US' ? htmlKeys : scopedFormKeys;
   assert.deepEqual(requiredKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing form translations`);
   assert.deepEqual(runtimeDownloadKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing download status translations`);

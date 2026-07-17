@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { normalizeModeName } from './src/js/app/modes.js';
+import { normalizeModeName } from '../src/js/app/modes.js';
 
 assert.equal(normalizeModeName('Numeric'), 'numeric');
 assert.equal(normalizeModeName({ id: 'Alphanumeric' }), 'alphanumeric');

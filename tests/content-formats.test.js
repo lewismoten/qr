@@ -7,7 +7,7 @@ import {
   serializeSms,
   serializeVCard,
   serializeWifi,
-} from './src/js/app/content-formats.js';
+} from '../src/js/app/content-formats.js';
 
 assert.equal(escapeWifiValue('a;b,c:d\\e"f'), 'a\\;b\\,c\\:d\\\\e\\"f');
 assert.equal(serializeWifi({ security: 'WPA', ssid: ' Office;WiFi ', password: 'a:b', hidden: true }),

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { pushUint16LE, pushUint32LE } from './src/js/app/bytes.js';
+import { pushUint16LE, pushUint32LE } from '../src/js/app/bytes.js';
 
 const bytes = [];
 pushUint16LE(bytes, 0x1234);

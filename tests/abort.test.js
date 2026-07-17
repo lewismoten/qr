@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { isAbortError, throwIfAborted, waitFor } from './src/js/app/abort.js';
+import { isAbortError, throwIfAborted, waitFor } from '../src/js/app/abort.js';
 
 const controller = new AbortController();
 const waiting = waitFor(1000, controller.signal);
