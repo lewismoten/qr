@@ -14,17 +14,6 @@ export const MODE_CAPACITY = {
   byte: { L: 2953, M: 2331, Q: 1663, H: 1273 },
   kanji: { L: 1817, M: 1435, Q: 1024, H: 784 },
 };
-export const MASK_LABELS = {
-  '': 'Best fit',
-  0: '(row + col) mod 2 = 0',
-  1: 'row mod 2 = 0',
-  2: 'col mod 3 = 0',
-  3: '(row + col) mod 3 = 0',
-  4: '(floor(row / 2) + floor(col / 3)) mod 2 = 0',
-  5: 'row * col mod 2 + row * col mod 3 = 0',
-  6: '((row * col mod 2) + (row * col mod 3)) mod 2 = 0',
-  7: '((row + col mod 2) + (row * col mod 3)) mod 2 = 0',
-};
 export const LIMITS = {
   sms: 160, emailSubject: 120, numberFrames: 10000, qrTargetWidth: 2048,
   printPixelsPerInch: 192, minPrintModuleInches: 0.02,

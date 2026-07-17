@@ -22,7 +22,7 @@ export function createDebugMaskSetup({ elements: e, config, encoder, getErrorLev
   };
   const masks = createMaskSelector({
     grid: e.maskGrid, input: e.maskPattern, values: config.maskValues,
-    labels: config.maskLabels, encoder, moduleIsDark, buildOptions,
+    encoder, moduleIsDark, buildOptions,
     onChange: render,
   });
   masks.ensure();

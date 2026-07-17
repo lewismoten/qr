@@ -50,6 +50,7 @@ export function createRenderController(deps) {
 
     try {
       const definition = deps.createDefinition(deps.buildPayload(encodedText), options);
+      deps.renderMasks(encodedText, definition);
       deps.updateSummary(definition, options);
       deps.drawQr(definition, options);
       deps.syncDownloads();

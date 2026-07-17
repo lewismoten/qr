@@ -2,6 +2,7 @@ import { getDataCodewords, getRawDataModules } from './capacity.js';
 import { FORMAT_ECL_BITS } from './constants.js';
 import { addErrorCorrection, getReedSolomonRemainder, makeReedSolomonDivisor } from './error-correction.js';
 import { toShiftJis } from './kanji.js';
+import { isMaskActive } from './mask.js';
 import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from './segments.js';
 
   function getAlignmentPositions(version) {
@@ -12,20 +13,6 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
     const result = [6];
     for (let position = size - 7; result.length < count; position -= step) result.splice(1, 0, position);
     return result;
-  }
-
-  function getMaskBit(mask, row, column) {
-    switch (mask) {
-      case 0: return (row + column) % 2 === 0;
-      case 1: return row % 2 === 0;
-      case 2: return column % 3 === 0;
-      case 3: return (row + column) % 3 === 0;
-      case 4: return (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0;
-      case 5: return ((row * column) % 2) + ((row * column) % 3) === 0;
-      case 6: return (((row * column) % 2) + ((row * column) % 3)) % 2 === 0;
-      case 7: return (((row + column) % 2) + ((row * column) % 3)) % 2 === 0;
-      default: throw new RangeError('Mask pattern must be from 0 through 7.');
-    }
   }
 
   class MatrixBuilder {
@@ -139,7 +126,7 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
     applyMask(mask) {
       for (let row = 0; row < this.size; row += 1) {
         for (let column = 0; column < this.size; column += 1) {
-          if (!this.functionModules[row][column] && getMaskBit(mask, row, column)) {
+          if (!this.functionModules[row][column] && isMaskActive(mask, row, column)) {
             this.modules[row][column] = !this.modules[row][column];
           }
         }

@@ -1,3 +1,8 @@
+import { isMaskActive } from '../../../qr/mask.js';
+import { isFunctionModule } from '../../qr-regions.js';
+
+const MASK_BLUE = '#2563eb';
+
 function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
   const context = targetCanvas.getContext('2d');
   const margin = options.margin ?? 1;
@@ -12,7 +17,21 @@ function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
   context.fillStyle = options.color?.dark || '#111827';
   for (let row = 0; row < qrDefinition.modules.size; row += 1) {
     for (let column = 0; column < qrDefinition.modules.size; column += 1) {
-      if (!moduleIsDark(qrDefinition, row, column)) continue;
+      if (!isFunctionModule(qrDefinition, row, column)
+          || !moduleIsDark(qrDefinition, row, column)) continue;
+      context.fillRect(
+        offsetX + (column + margin) * moduleSize,
+        offsetY + (row + margin) * moduleSize,
+        moduleSize,
+        moduleSize,
+      );
+    }
+  }
+  for (let row = 0; row < qrDefinition.modules.size; row += 1) {
+    for (let column = 0; column < qrDefinition.modules.size; column += 1) {
+      if (isFunctionModule(qrDefinition, row, column)
+          || !isMaskActive(qrDefinition.maskPattern, row, column)) continue;
+      context.fillStyle = MASK_BLUE;
       context.fillRect(
         offsetX + (column + margin) * moduleSize,
         offsetY + (row + margin) * moduleSize,
@@ -23,7 +42,7 @@ function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
   }
 }
 
-export function createMaskSelector({ grid, input, values, labels, encoder, moduleIsDark, buildOptions, onChange }) {
+export function createMaskSelector({ grid, input, values, encoder, moduleIsDark, buildOptions, onChange }) {
   const sync = () => {
     const activeValue = input.value;
     grid.querySelectorAll('.mask-option').forEach((button) => {
@@ -44,7 +63,12 @@ export function createMaskSelector({ grid, input, values, labels, encoder, modul
     preview.className = 'mask-preview';
     if (maskValue === '') {
       preview.classList.add('mask-preview-auto');
-      preview.textContent = 'Auto';
+      const autoTitle = document.createElement('span');
+      autoTitle.textContent = 'Auto';
+      const autoValue = document.createElement('span');
+      autoValue.className = 'mask-auto-value';
+      autoValue.textContent = 'Mask -';
+      preview.append(autoTitle, autoValue);
     } else {
       const thumbnail = document.createElement('canvas');
       thumbnail.width = 96;
@@ -56,10 +80,7 @@ export function createMaskSelector({ grid, input, values, labels, encoder, modul
     const label = document.createElement('span');
     label.className = 'mask-label';
     label.textContent = maskValue === '' ? 'Best fit' : `Mask ${maskValue}`;
-    const detail = document.createElement('span');
-    detail.className = 'mask-detail';
-    detail.textContent = labels[maskValue];
-    button.append(preview, label, detail);
+    button.append(preview, label);
     button.addEventListener('click', () => {
       input.value = maskValue;
       sync();
@@ -73,9 +94,25 @@ export function createMaskSelector({ grid, input, values, labels, encoder, modul
     values.forEach((maskValue) => grid.appendChild(createButton(maskValue)));
   };
 
-  const renderPreviews = (encodedText) => {
+  const updateAutoMask = (definition) => {
+    const value = grid.querySelector('.mask-auto-value');
+    if (value && Number.isInteger(definition?.maskPattern)) {
+      value.textContent = `Mask ${definition.maskPattern}`;
+    }
+  };
+
+  const renderPreviews = (encodedText, appliedDefinition) => {
     ensure();
+    if (appliedDefinition) {
+      if (input.value === '') updateAutoMask(appliedDefinition);
+      return;
+    }
     const previewValue = encodedText.trim() || 'Preview';
+    try {
+      updateAutoMask(encoder.create(previewValue, buildOptions('')));
+    } catch (error) {
+      console.error(error);
+    }
     grid.querySelectorAll('.mask-option').forEach((button) => {
       const previewCanvas = button.querySelector('canvas');
       if (!previewCanvas) return;

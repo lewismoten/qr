@@ -1,5 +1,5 @@
 import { colorWithTransparency } from './colors.js';
-import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_LABELS, MASK_VALUES,
+import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_VALUES,
   MODE_CAPACITY, MODE_LABELS, QR_ALPHANUMERIC_CHARACTERS } from './configuration.js';
 import { validatePrintableText } from './validation.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
@@ -120,8 +120,7 @@ const debugSetup = createLazyDebugSetup({
   elements,
   encoder: qrEncoder,
   config: { modeLabels: MODE_LABELS,
-    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES,
-    maskLabels: MASK_LABELS },
+    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS, maskValues: MASK_VALUES },
   getCurrentMode: runtimeHelpers.getEncodingMode,
   getErrorLevel: runtimeHelpers.getErrorLevel,
   isBulkMode: contentData.isBulkMode,

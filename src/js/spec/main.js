@@ -10,6 +10,7 @@ import {
   isFunctionModule,
 } from '../app/qr-regions.js';
 import { COUNT_BITS, MODE_BITS } from '../qr/constants.js';
+import { isMaskActive } from '../qr/mask.js';
 
 const COLORS = {
   finder: '#ef4444',
@@ -43,20 +44,6 @@ const createDefinition = (text, version, errorCorrectionLevel = 'M') => {
 const large = createDefinition('QR SPEC VISUAL GUIDE 2026 / MODE + COUNT + PAYLOAD', 7, 'M');
 const compact = createDefinition('QR GUIDE 123', 2, 'M');
 const mixed = createDefinition(MIXED_TEXT, 1, 'L');
-
-function maskApplies(mask, row, column) {
-  switch (mask) {
-    case 0: return (row + column) % 2 === 0;
-    case 1: return row % 2 === 0;
-    case 2: return column % 3 === 0;
-    case 3: return (row + column) % 3 === 0;
-    case 4: return (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0;
-    case 5: return ((row * column) % 2) + ((row * column) % 3) === 0;
-    case 6: return (((row * column) % 2) + ((row * column) % 3)) % 2 === 0;
-    case 7: return (((row + column) % 2) + ((row * column) % 3)) % 2 === 0;
-    default: return false;
-  }
-}
 
 function indexesForRoles(definition, roles, limit = Infinity) {
   const indexes = [];
@@ -165,7 +152,7 @@ function getVisuals() {
 
 function getCategory(definition, row, column, showMaskEffect) {
   const { qr, model } = definition;
-  if (showMaskEffect && !isFunctionModule(qr, row, column) && maskApplies(qr.maskPattern, row, column)) {
+  if (showMaskEffect && !isFunctionModule(qr, row, column) && isMaskActive(qr.maskPattern, row, column)) {
     return 'maskEffect';
   }
   return getDebugCategory(row, column, qr, model, 'overlay');
@@ -252,12 +239,54 @@ const renderAll = () => canvases.forEach((canvas) => {
   if (visual) renderVisual(canvas, visual);
 });
 
+const MASK_LANDMARKS = new Set(['finder', 'alignment', 'timing']);
+const maskCanvases = [...document.querySelectorAll('[data-mask-preview]')];
+
+function renderMaskPreview(canvas) {
+  const maskPattern = Number.parseInt(canvas.dataset.maskPreview, 10);
+  const qr = qrEncoder.create('MASK PATTERN', { version: 2, errorCorrectionLevel: 'M', maskPattern });
+  const model = buildDebugOverlayModel(qr, { errorCorrectionLevel: 'M' });
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const width = Math.max(120, Math.round(canvas.clientWidth || 180));
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(width * ratio);
+  const context = canvas.getContext('2d');
+  context.scale(ratio, ratio);
+  context.imageSmoothingEnabled = false;
+  context.fillStyle = '#f8faf9';
+  context.fillRect(0, 0, width, width);
+  const margin = 1;
+  const moduleSize = Math.max(1, Math.floor(width / (qr.modules.size + margin * 2)));
+  const matrixSize = (qr.modules.size + margin * 2) * moduleSize;
+  const offset = Math.floor((width - matrixSize) / 2) + margin * moduleSize;
+
+  for (let row = 0; row < qr.modules.size; row += 1) {
+    for (let column = 0; column < qr.modules.size; column += 1) {
+      const x = offset + column * moduleSize;
+      const y = offset + row * moduleSize;
+      const category = getDebugCategory(row, column, qr, model, 'overlay');
+      if (MASK_LANDMARKS.has(category) && moduleIsDark(qr, row, column)) {
+        context.fillStyle = '#071827';
+        context.fillRect(x, y, moduleSize, moduleSize);
+      } else if (!isFunctionModule(qr, row, column) && isMaskActive(maskPattern, row, column)) {
+        context.fillStyle = COLORS.maskEffect;
+        context.fillRect(x, y, moduleSize, moduleSize);
+      }
+    }
+  }
+}
+
+const renderPage = () => {
+  renderAll();
+  maskCanvases.forEach(renderMaskPreview);
+};
+
 let resizeRequest = 0;
 window.addEventListener('resize', () => {
   cancelAnimationFrame(resizeRequest);
-  resizeRequest = requestAnimationFrame(renderAll);
+  resizeRequest = requestAnimationFrame(renderPage);
 });
-renderAll();
+renderPage();
 
 function toBits(value, length) {
   return Number(value).toString(2).padStart(length, '0');

@@ -14,30 +14,17 @@ import {
   summarizeCodewordRoles,
 } from '../../qr-stream.js';
 import qrEncoder from '../../../qr/index.js';
+import { isMaskActive } from '../../../qr/mask.js';
 
 export function moduleIsDark(qrDefinition, row, column) {
   if (typeof qrDefinition.modules.get === 'function') return qrDefinition.modules.get(row, column);
   return Boolean(qrDefinition.modules.data[row * qrDefinition.modules.size + column]);
 }
 
-function isMaskedModule(mask, row, column) {
-  switch (mask) {
-    case 0: return (row + column) % 2 === 0;
-    case 1: return row % 2 === 0;
-    case 2: return column % 3 === 0;
-    case 3: return (row + column) % 3 === 0;
-    case 4: return (Math.floor(row / 2) + Math.floor(column / 3)) % 2 === 0;
-    case 5: return ((row * column) % 2) + ((row * column) % 3) === 0;
-    case 6: return (((row * column) % 2) + ((row * column) % 3)) % 2 === 0;
-    case 7: return (((row + column) % 2) + ((row * column) % 3)) % 2 === 0;
-    default: return false;
-  }
-}
-
 export function moduleIsDarkForPreview(qrDefinition, row, column, debugActive, unmaskEnabled) {
   const dark = moduleIsDark(qrDefinition, row, column);
   if (!debugActive || !unmaskEnabled || isFunctionModule(qrDefinition, row, column)) return dark;
-  return isMaskedModule(qrDefinition.maskPattern, row, column) ? !dark : dark;
+  return isMaskActive(qrDefinition.maskPattern, row, column) ? !dark : dark;
 }
 
 function splitCoordinateRuns(coordinates) {
