@@ -1,7 +1,6 @@
 import { colorWithTransparency, getContrastingHex } from './colors.js';
 import { ERROR_LEVELS, FILE_PROTOCOL, LIMITS, MASK_LABELS, MASK_VALUES,
   MODE_CAPACITY, MODE_LABELS, QR_ALPHANUMERIC_CHARACTERS } from './configuration.js';
-import { parseBoolean as parseBulkBoolean } from './csv.js';
 import { validatePrintableText } from './validation.js';
 import {
   getAlignmentPatternCenters,
@@ -14,16 +13,14 @@ import {
 } from './qr-regions.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createEmailCapacity } from './ui/content/email/capacity.js';
-import { createContentPayload, createFilePayloadPreview } from './ui/content/payload.js';
+import { createContentPipeline } from './ui/content/pipeline.js';
 import { createFormatValidator } from './ui/content/validation.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
-import { serializeBulkRow } from './ui/content/bulk/payload.js';
 import {
   arrayBufferToBase64,
   createCompactFileId,
 } from './ui/content/file/protocol.js';
 import { createFileSetup } from './ui/content/file/setup.js';
-import { createFrameSection } from './ui/content/frame/section.js';
 import { createContentSections } from './ui/content/setup.js';
 import { getActiveOutlineGroups } from './ui/debug/boundaries.js';
 import {
@@ -394,70 +391,33 @@ const centerLogoController = styleSetup.centerLogo;
 const vcardSection = contentSections.vcard;
 const buildVCardPayload = vcardSection.buildPayload;
 
-function buildBulkEncodedText(row = getBulkCurrentRow()) {
-  return serializeBulkRow({
-    row,
-    format: qrFormat.value,
-    frameIndex: getCurrentFrameIndex(),
-    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
-  });
-}
-
-const frameSection = createFrameSection({
-  format: qrFormat,
-  isBulkMode,
-  getBulkRow: getBulkCurrentRow,
-  buildBulkText: buildBulkEncodedText,
-  parseBoolean: parseBulkBoolean,
-  getNumberPayload,
-  getActiveFile,
-  getFileMode: getSelectedFileEncodingMode,
-  fileIndex: fileChunkIndex,
-  mode: frameMessageMode,
-  customField: customFrameMessageField,
-  customMessage: customFrameMessage,
-  centerCheckbox: frameMessageCenter,
-  artCenterCheckbox: frameMessageCenterArt,
-  artMode: centerArtMode,
-  font: frameFont,
-  values: {
-    url: urlInput,
-    text: textInput,
-    wifi: wifiSsid,
-    email: emailTo,
-    phone: phoneNumber,
-    sms: smsNumber,
-    geoLabel: geoQuery,
-    latitude: geoLatitude,
-    longitude: geoLongitude,
-    vcardName,
-    vcardOrg,
-    vcardEmail,
-  },
-  event: {
-    title: eventTitle,
-    allDay: eventAllDay,
-    startDate: eventStartDate,
-    startTime: eventStartTime,
-    endDate: eventEndDate,
-    endTime: eventEndTime,
-  },
-  onDisableArtwork() {
-    centerArtMode.value = 'none';
-    syncChoiceButtons();
-    syncCenterArtworkControls();
-  },
+const contentPipeline = createContentPipeline({
+  elements: { format: qrFormat, fileIndex: fileChunkIndex, frameMode: frameMessageMode,
+    customFrameField: customFrameMessageField, customFrameMessage, frameCenter: frameMessageCenter,
+    frameCenterArt: frameMessageCenterArt, artMode: centerArtMode, frameFont,
+    url: urlInput, text: textInput, wifi: wifiSsid, email: emailTo, phone: phoneNumber,
+    sms: smsNumber, smsBody, geoLabel: geoQuery, latitude: geoLatitude, longitude: geoLongitude,
+    vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl, wifiEncryption,
+    wifiPassword, wifiHidden, emailSubject, emailBody, includeManifest: fileIncludeManifest,
+    event: { title: eventTitle, allDay: eventAllDay, startDate: eventStartDate,
+      startTime: eventStartTime, endDate: eventEndDate, endTime: eventEndTime } },
+  bulk: { isMode: isBulkMode, getRow: getBulkCurrentRow },
+  number: { getPayload: getNumberPayload },
+  file: { getActive: getActiveFile, getMode: getSelectedFileEncodingMode,
+    getCapacity: getChunkedFileCapacityInfo },
+  builders: { number: getNumberPayload, wifi: buildWifiPayload, email: buildEmailPayload,
+    event: buildCalendarEventPayload, geo: buildGeoPayload, vcard: buildVCardPayload,
+    file: buildFilePayload },
+  runtime: { getFrameIndex: getCurrentFrameIndex, syncChoices: () => syncChoiceButtons(),
+    syncArtwork: syncCenterArtworkControls },
+  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
 });
+const frameSection = contentPipeline.frame;
 const getCurrentFrameMessage = frameSection.getMessage;
 const setFrameMessageCenter = frameSection.setCentered;
 const getFrameFont = frameSection.getFont;
 
-const contentPayload = createContentPayload({
-  elements: { qrFormat, urlInput, textInput, phoneNumber, smsNumber, smsBody, wifiEncryption, wifiSsid, wifiPassword, wifiHidden, emailTo, emailSubject, emailBody, geoLatitude, geoLongitude, geoQuery, vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl },
-  bulk: { isMode: isBulkMode, build: buildBulkEncodedText },
-  builders: { number: getNumberPayload, wifi: buildWifiPayload, email: buildEmailPayload, event: buildCalendarEventPayload, geo: buildGeoPayload, vcard: buildVCardPayload, file: buildFilePayload },
-  file: { preview: createFilePayloadPreview({ getFile: getActiveFile, getMode: getSelectedFileEncodingMode, getCapacity: getChunkedFileCapacityInfo, includeManifest: fileIncludeManifest }) },
-});
+const contentPayload = contentPipeline.payload;
 const buildEncodedText = contentPayload.build;
 const buildEncodedPreviewTemplate = contentPayload.preview;
 
