@@ -1097,12 +1097,22 @@
       </footer>
     </main>
 
-    <dialog id="about" class="info-dialog" aria-labelledby="about-title">
-      <article class="info-dialog-shell">
+    <dialog id="about" class="info-dialog info-page-dialog" aria-labelledby="about-dialog-title">
+      <article class="info-dialog-shell info-page-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker" data-i18n="aboutDialog.kicker">Inside the matrix</p>
+            <h1 id="about-dialog-title" data-i18n="aboutDialog.title">About the QR Code Generator</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close About" data-i18n="common.close" data-i18n-aria-label="aboutDialog.close">Close</button>
+        </header>
+        <iframe class="info-page-dialog-frame" data-dialog-src="about.html?embed=1" title="About the QR Code Generator" data-i18n-title="aboutDialog.frameTitle"></iframe>
+      </article>
+      <article class="info-dialog-shell" hidden>
         <header class="info-dialog-header">
           <div>
             <p class="info-kicker">Inside the matrix</p>
-            <h1 id="about-title">About the QR Code Generator</h1>
+            <h1>About the QR Code Generator</h1>
           </div>
           <button type="button" class="dialog-close" data-close-dialog aria-label="Close About">Close</button>
         </header>
@@ -1158,12 +1168,22 @@
       </article>
     </dialog>
 
-    <dialog id="third-party" class="info-dialog" aria-labelledby="third-party-title">
-      <article class="info-dialog-shell">
+    <dialog id="third-party" class="info-dialog info-page-dialog" aria-labelledby="technology-dialog-title">
+      <article class="info-dialog-shell info-page-dialog-shell">
+        <header class="info-dialog-header">
+          <div>
+            <p class="info-kicker" data-i18n="technologyDialog.kicker">Technology inventory</p>
+            <h1 id="technology-dialog-title" data-i18n="technologyDialog.title">Technology, standards and licenses</h1>
+          </div>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close technology inventory" data-i18n="common.close" data-i18n-aria-label="technologyDialog.close">Close</button>
+        </header>
+        <iframe class="info-page-dialog-frame" data-dialog-src="technology.html?embed=1" title="Technology, standards and licenses" data-i18n-title="technologyDialog.frameTitle"></iframe>
+      </article>
+      <article class="info-dialog-shell" hidden>
         <header class="info-dialog-header">
           <div>
             <p class="info-kicker">Technology inventory</p>
-            <h1 id="third-party-title">Technology, standards and licenses</h1>
+            <h1>Technology, standards and licenses</h1>
           </div>
           <button type="button" class="dialog-close" data-close-dialog aria-label="Close technology inventory">Close</button>
         </header>

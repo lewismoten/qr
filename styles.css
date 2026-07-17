@@ -2541,18 +2541,74 @@ input[type="color"] {
   height: calc(100dvh - 1.25rem);
 }
 
-.spec-dialog-shell {
+.info-page-dialog {
+  height: calc(100dvh - 1.25rem);
+}
+
+.spec-dialog-shell,
+.info-page-dialog-shell {
   width: 100%;
   height: 100%;
 }
 
-.spec-dialog-frame {
+.spec-dialog-frame,
+.info-page-dialog-frame {
   display: block;
   width: 100%;
   height: 100%;
   min-height: 0;
   border: 0;
   background: #eef4f2;
+}
+
+.info-page-body {
+  min-width: 18rem;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.standalone-info-page {
+  width: min(52rem, 100%);
+  margin: 0 auto;
+}
+
+.standalone-info-page .info-dialog-shell {
+  max-height: none;
+  overflow: visible;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 1.4rem;
+  box-shadow: 0 30px 80px rgba(7, 24, 39, 0.2);
+}
+
+.standalone-info-page .info-dialog-content {
+  overflow: visible;
+}
+
+.info-page-back {
+  align-self: center;
+  color: #0f615c;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.is-embedded .info-page-body {
+  min-width: 0;
+  padding: 0;
+  background: #fffaf0;
+}
+
+.is-embedded .standalone-info-page {
+  width: 100%;
+}
+
+.is-embedded .standalone-info-page .info-dialog-shell {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.is-embedded .info-page-header {
+  display: none;
 }
 
 .info-dialog::backdrop {

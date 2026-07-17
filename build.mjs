@@ -44,6 +44,13 @@ const builds = [
   },
   {
     ...shared,
+    entryPoints: ['src/js/info/main.js'],
+    outfile: 'dist/info.min.js',
+    format: 'esm',
+    platform: 'browser',
+  },
+  {
+    ...shared,
     entryPoints: ['src/css/spec.css'],
     outfile: 'dist/spec.min.css',
   },

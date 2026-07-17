@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About the QR Code Generator</title>
+    <meta name="description" content="Learn what the QR Code Generator creates, how QR codes work, how customization affects reliability, and how browser-based processing protects privacy." />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="canonical" href="https://qr.lewismoten.com/about.html" />
+    <script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('is-embedded');</script>
+    <link rel="stylesheet" href="dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Inside the matrix</p>
+            <h1>About the QR Code Generator</h1>
+          </div>
+          <a class="info-page-back" href="index.html">Open generator</a>
+        </header>
+        <div class="info-dialog-content">
+          <p class="info-lead">This free, browser-based QR code generator is built for quick everyday codes and unusually deep inspection. Paste a URL and leave, or control encoding, version, masks, artwork, print size, file chunks and the path of individual bits.</p>
+
+          <section>
+            <h2>What you can create</h2>
+            <p>Generate QR codes for websites, plain text, number sequences, Wi-Fi credentials, email, phone calls, SMS messages, calendar events, geographic coordinates, vCards and small files. Batch controls can produce numbered sets or a random-order series of file chunks, while frame captions make printed codes easier to identify.</p>
+            <p>Style modules, finder eyes, gradients, transparency, background images, logos, emoji and pixel art. Export the current code as PNG, JPEG, GIF, SVG or PDF; export multi-code projects as ZIP, PDF sheets, animated GIF or MP4.</p>
+          </section>
+
+          <section>
+            <h2>How QR codes work</h2>
+            <div class="fact-grid">
+              <article><strong>40 versions</strong><span>Version 1 is 21 by 21 modules. Every version adds four modules per side, ending at 177 by 177 for version 40.</span></article>
+              <article><strong>Four data modes</strong><span>Numeric, alphanumeric, byte and Kanji modes trade character flexibility for storage efficiency. Automatic segmentation usually creates the shortest stream.</span></article>
+              <article><strong>Four recovery levels</strong><span>L, M, Q and H add increasing Reed-Solomon redundancy. Rough damage-recovery targets are about 7%, 15%, 25% and 30%, with higher recovery reducing payload capacity.</span></article>
+              <article><strong>Eight masks</strong><span>A required mask breaks up scanner-hostile patterns. Auto evaluates every mask and chooses the lowest penalty score; Debug can reveal the unmasked data.</span></article>
+            </div>
+            <p>The three finder patterns establish position. Timing and alignment patterns correct sampling and distortion. Format information records error correction and mask choice, while version information appears in versions 7 and higher. The remaining path carries mode and character-count headers, payload bits, terminator and padding, error-correction codewords and occasional remainder bits.</p>
+          </section>
+
+          <section>
+            <h2>Design without losing reliability</h2>
+            <p>Scanners need contrast, a clear quiet zone and recognizable functional patterns. Rounded modules, gradients and center artwork can work well, but every customization spends part of the code's scanning tolerance. Use stronger error correction for artwork, avoid covering finder patterns, print modules large enough for the expected distance and test the final physical result with several devices.</p>
+          </section>
+
+          <section>
+            <h2>Developer and file tools</h2>
+            <p>The Debug workspace separates functional regions, metadata, payload, padding, error correction and remainder bits with configurable colors. It can outline codewords or stream bytes, trace read paths, show metadata order and reverse the selected mask for a raw-data view.</p>
+            <p>File transport supports data URLs, browser blob URLs and a documented <code>FILE:1</code> chunk protocol. Chunked transfers use a compact identifier, byte offsets, optional gzip compression, metadata and SHA-256 verification so frames can be collected out of order and checked before assembly. Blob URLs only work in the browser session that created them; ordinary phone cameras generally need an HTTPS link or a compatible receiving app for file workflows.</p>
+          </section>
+
+          <section>
+            <h2>Privacy and network use</h2>
+            <p>QR rendering, artwork, file processing and downloads happen in your browser; this application does not upload entered payloads or selected files to its own server. Opening the Geo format requests visible map tiles directly from OpenStreetMap. That service receives normal web request information such as an IP address, referrer and browser headers; it is not contacted unless Geo is opened.</p>
+          </section>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="dist/info.min.js"></script>
+  </body>
+</html>

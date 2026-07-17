@@ -195,6 +195,18 @@
     "close": "Close QR specification",
     "frameTitle": "QR Code specification visual guide"
   },
+  "aboutDialog": {
+    "kicker": "Inside the matrix",
+    "title": "About the QR Code Generator",
+    "close": "Close About",
+    "frameTitle": "About the QR Code Generator"
+  },
+  "technologyDialog": {
+    "kicker": "Technology inventory",
+    "title": "Technology, standards and licenses",
+    "close": "Close technology inventory",
+    "frameTitle": "Technology, standards and licenses"
+  },
   "language": {
     "choose": "Choose language",
     "description": "Names appear in your current language and their native form.",

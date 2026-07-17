@@ -59,6 +59,8 @@
   },
   "footer": { "name": "منشئ رمز QR", "navigationLabel": "معلومات الموقع", "about": "حول", "specification": "مواصفات QR", "technology": "التقنية", "source": "المصدر" },
   "specDialog": { "kicker": "مواصفات مرئية", "title": "كيف تعمل رموز QR", "close": "إغلاق مواصفات QR", "frameTitle": "دليل مرئي لمواصفات رموز QR" },
+  "aboutDialog": { "kicker": "داخل المصفوفة", "title": "حول منشئ رموز QR", "close": "إغلاق حول", "frameTitle": "حول منشئ رموز QR" },
+  "technologyDialog": { "kicker": "جرد التقنيات", "title": "التقنيات والمعايير والتراخيص", "close": "إغلاق جرد التقنيات", "frameTitle": "التقنيات والمعايير والتراخيص" },
   "language": { "choose": "اختر اللغة", "description": "تظهر الأسماء بلغتك الحالية وبالصيغة الأصلية لكل لغة.", "current": "اللغة: {language}. اختر اللغة." },
   "validation": {
     "contentRequired": "غير صالح بعد: المحتوى مطلوب.",
