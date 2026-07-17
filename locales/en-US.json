@@ -108,6 +108,20 @@
       "fileProtocolHint": "FILE:1:S is a complete single QR. Multi-QR transfers use FILE:1:C chunks with an ID, byte offset, and total length."
     }
   },
+  "downloadUi": {
+    "tools": "Download type", "tabs": { "image": "Image", "document": "Document", "animation": "Animation" },
+    "image": { "legend": "Export image", "format": "Image format", "quality": "JPG quality", "current": "Download current image", "allZip": "Download all as ZIP", "svgHint": "SVG traces the complete canvas into paths only, including frame text." },
+    "document": { "legend": "PDF document", "autoSize": "Auto-size printed QR from pixels and version", "printedWidth": "Printed width", "current": "Download current as PDF", "allPdf": "Download all as PDF", "hint": "Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows." },
+    "animation": { "legend": "Animation timing", "mode": "Animation timing mode", "perImage": "Per image", "totalDuration": "Total duration", "minutes": "Minutes", "seconds": "Seconds", "milliseconds": "Milliseconds", "initialSummary": "1.000 seconds per image - 8.000 seconds total.", "gif": "Download animated GIF", "mp4": "Download MP4", "hint": "GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time." }
+  },
+  "debugUi": {
+    "tools": "Debug tools", "tabs": { "encoding": "Encoding", "mask": "Mask", "payload": "Payload", "overlay": "Overlay" },
+    "encoding": { "errorCorrection": "Error correction", "aboutErrorCorrection": "About error correction", "damageRecovery": "Damage recovery", "inputMode": "Input mode", "aboutInputModes": "About input modes", "encodingModes": "Encoding modes", "autoHelp": "Auto-detect chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.", "manualHelp": "Manual forces the selected mode and flags incompatible characters.", "autoDetect": "Auto-detect (excludes Kanji)", "manual": "Manual", "alphanumericShort": "A-Z / 0-9", "mode": "Mode", "version": "Version", "autoVersion": "Auto-pick QR version", "versionLabel": "Version:", "target": "Target" },
+    "mask": { "legend": "Mask pattern", "choices": "Mask pattern choices" },
+    "payload": { "legend": "Encoded payload", "reveal": "Reveal passwords and secrets in preview" },
+    "overlay": { "legend": "Debug overlay", "about": "About debug overlays", "controls": "Overlay controls", "persistHelp": "Persist keeps overlays enabled while visiting other tabs.", "unmaskHelp": "Unmask shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.", "persistAria": "Persist overlays in other tabs", "persist": "Persist", "unmaskAria": "Show unmasked data modules", "unmask": "Unmask", "segments": "Segments", "unused": "Unused", "unusedCapacity": "Unused capacity", "outlineGrouping": "Outline grouping", "aboutOutline": "About outline grouping", "groupMarks": "How groups are marked", "dotHelp": "Solid dots start outline groups; ringed dots start encoded fields.", "unitsHelp": "Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.", "codewords": "Codewords", "stream": "Stream", "units": "Units", "encodingUnits": "Encoding units", "metadata": "Metadata" },
+    "colors": { "data": "Data stream", "mode": "Mode bits", "characterCount": "Char count", "ecLevel": "EC level bits", "mask": "Mask bits", "ecWords": "EC words", "ecWordsAria": "Error correction codewords color", "remainder": "Remainder", "remainderAria": "Remainder bits color", "padding": "Padding", "paddingAria": "Pad-to-byte and pad codewords color", "terminator": "Terminator", "finder": "Finder", "alignment": "Alignment", "timing": "Timing", "format": "Format", "darkModule": "Dark module", "version": "Version (v7+)" }
+  },
   "style": {
     "tools": "Style tools",
     "tabs": { "size": "Size", "modules": "Modules", "colors": "Colors", "art": "Art" },

@@ -29,6 +29,20 @@
       "fileProtocolHint": "يمثل FILE:1:S رمز QR واحدًا كاملًا. تستخدم عمليات النقل متعددة الرموز أجزاء FILE:1:C مع معرّف وإزاحة بالبايت والطول الإجمالي."
     }
   },
+  "downloadUi": {
+    "tools": "نوع التنزيل", "tabs": { "image": "صورة", "document": "مستند", "animation": "رسوم متحركة" },
+    "image": { "legend": "تصدير الصورة", "format": "تنسيق الصورة", "quality": "جودة JPG", "current": "تنزيل الصورة الحالية", "allZip": "تنزيل الكل بصيغة ZIP", "svgHint": "يحوّل SVG اللوحة الكاملة إلى مسارات فقط، بما في ذلك نص الإطار." },
+    "document": { "legend": "مستند PDF", "autoSize": "ضبط حجم QR المطبوع تلقائيًا من البكسلات والإصدار", "printedWidth": "العرض المطبوع", "current": "تنزيل الحالي بصيغة PDF", "allPdf": "تنزيل الكل بصيغة PDF", "hint": "يستخدم عرض الطباعة التلقائي 192 بكسل لكل بوصة ويحمي وحدات QR ذات الإصدارات الأعلى من أن تصبح صغيرة جدًا. ترتب صفحات PDF أكبر عدد تسمح به المساحة وفق العرض المحدد." },
+    "animation": { "legend": "توقيت الرسوم المتحركة", "mode": "وضع توقيت الرسوم المتحركة", "perImage": "لكل صورة", "totalDuration": "المدة الإجمالية", "minutes": "دقائق", "seconds": "ثوانٍ", "milliseconds": "مللي ثانية", "initialSummary": "1.000 ثانية لكل صورة - 8.000 ثوانٍ إجمالًا.", "gif": "تنزيل GIF متحرك", "mp4": "تنزيل MP4", "hint": "يتكرر GIF باستمرار. يعتمد توفر MP4 على برنامج الترميز المدمج في المتصفح ويتم التسجيل في الوقت الفعلي." }
+  },
+  "debugUi": {
+    "tools": "أدوات التصحيح", "tabs": { "encoding": "الترميز", "mask": "القناع", "payload": "الحمولة", "overlay": "التراكب" },
+    "encoding": { "errorCorrection": "تصحيح الأخطاء", "aboutErrorCorrection": "حول تصحيح الأخطاء", "damageRecovery": "استعادة التلف", "inputMode": "وضع الإدخال", "aboutInputModes": "حول أوضاع الإدخال", "encodingModes": "أوضاع الترميز", "autoHelp": "يختار الاكتشاف التلقائي مقاطع رقمية أو أبجدية رقمية أو بايت وفق التكلفة الإجمالية للبتات. يظل كانجي يدويًا.", "manualHelp": "يفرض الوضع اليدوي النمط المحدد ويشير إلى الأحرف غير المتوافقة.", "autoDetect": "اكتشاف تلقائي (باستثناء كانجي)", "manual": "يدوي", "alphanumericShort": "A-Z / 0-9", "mode": "الوضع", "version": "الإصدار", "autoVersion": "اختيار إصدار QR تلقائيًا", "versionLabel": "الإصدار:", "target": "الهدف" },
+    "mask": { "legend": "نمط القناع", "choices": "خيارات نمط القناع" },
+    "payload": { "legend": "الحمولة المرمزة", "reveal": "إظهار كلمات المرور والأسرار في المعاينة" },
+    "overlay": { "legend": "تراكب التصحيح", "about": "حول تراكبات التصحيح", "controls": "عناصر تحكم التراكب", "persistHelp": "يبقي خيار الاستمرار التراكبات مفعلة عند زيارة علامات تبويب أخرى.", "unmaskHelp": "يعرض إلغاء القناع وحدات البيانات قبل تطبيق قناع QR المحدد. يؤثر هذا في معاينة التصحيح فقط؛ وتبقى الأنماط الوظيفية ومعلومات التنسيق دون تغيير.", "persistAria": "إبقاء التراكبات في علامات التبويب الأخرى", "persist": "استمرار", "unmaskAria": "إظهار وحدات البيانات غير المقنعة", "unmask": "إلغاء القناع", "segments": "المقاطع", "unused": "غير مستخدم", "unusedCapacity": "السعة غير المستخدمة", "outlineGrouping": "تجميع الحدود", "aboutOutline": "حول تجميع الحدود", "groupMarks": "كيفية تمييز المجموعات", "dotHelp": "تبدأ النقاط المصمتة مجموعات الحدود؛ وتبدأ النقاط المحاطة بحلقة الحقول المرمزة.", "unitsHelp": "تجمع الوحدات 3 أرقام أو حرفين أبجديين رقميين أو حرف كانجي واحدًا أو بايتًا مرمزًا واحدًا.", "codewords": "كلمات الرمز", "stream": "التدفق", "units": "الوحدات", "encodingUnits": "وحدات الترميز", "metadata": "البيانات الوصفية" },
+    "colors": { "data": "تدفق البيانات", "mode": "بتات الوضع", "characterCount": "عدد الأحرف", "ecLevel": "بتات مستوى التصحيح", "mask": "بتات القناع", "ecWords": "كلمات التصحيح", "ecWordsAria": "لون كلمات تصحيح الأخطاء", "remainder": "الباقي", "remainderAria": "لون بتات الباقي", "padding": "الحشو", "paddingAria": "لون إكمال البايت وكلمات الحشو", "terminator": "المنهي", "finder": "محدد الموضع", "alignment": "المحاذاة", "timing": "التوقيت", "format": "التنسيق", "darkModule": "الوحدة الداكنة", "version": "الإصدار (v7+)" }
+  },
   "style": {
     "tools": "أدوات النمط", "tabs": { "size": "الحجم", "modules": "الوحدات", "colors": "الألوان", "art": "الرسم" },
     "size": { "legend": "الحجم والهامش", "targetWidth": "العرض المستهدف", "fromScale": "تحديد الحجم بالكامل من مقياس الوحدة", "minimumPixels": "الحد الأدنى للبكسلات لكل وحدة", "margin": "الهامش" },
@@ -107,7 +121,10 @@
     "pdfError": "تعذر إنشاء PDF.", "rendering": "جارٍ معالجة {frame} من {total}...", "buildingZip": "جارٍ إنشاء ZIP...", "zipReady": "ملف ZIP جاهز ويحتوي على {total} ملفات.",
     "zipError": "تعذر إنشاء ZIP.", "capturingFrame": "جارٍ التقاط إطار الحركة {frame} من {total}...", "animationError": "تعذر إنشاء حركة {format}.",
     "seconds": "{seconds} ثانية", "durationSummary": "{perImage} لكل صورة - {total} إجمالًا.", "mp4Title": "تنزيل حركة MP4",
-    "mp4Unavailable": "ترميز MP4 غير متاح في هذا المتصفح؛ لا يزال GIF المتحرك متاحًا.", "allZip": "تنزيل الكل ({count}) بصيغة ZIP", "allPdf": "تنزيل الكل ({count}) بصيغة PDF"
+    "mp4Unavailable": "ترميز MP4 غير متاح في هذا المتصفح؛ لا يزال GIF المتحرك متاحًا.", "allZip": "تنزيل الكل ({count}) بصيغة ZIP", "allPdf": "تنزيل الكل ({count}) بصيغة PDF",
+    "renderingPdf": "جارٍ عرض إطار PDF رقم {frame} من {total}...", "layoutPdf": "جارٍ ترتيب صفحات PDF...", "pdfSheetReadyOne": "ملف PDF جاهز ويحتوي على {total} من رموز QR في صفحة واحدة.", "pdfSheetReadyMany": "ملف PDF جاهز ويحتوي على {total} من رموز QR في {pages} صفحات.",
+    "animationLimit": "تقتصر الرسوم المتحركة على {max} صور لحماية ذاكرة المتصفح.", "durationMinimum": "اختر مدة توفر 10 مللي ثانية على الأقل لكل صورة.", "gifDurationMaximum": "يدعم GIF مدة قصوى تبلغ 10 دقائق و55.35 ثانية لكل صورة.", "mp4DurationMinimum": "يحتاج MP4 إلى 16 مللي ثانية على الأقل لكل صورة.",
+    "encodingGif": "جارٍ ترميز GIF المتحرك...", "gifReady": "GIF المتحرك جاهز - المدة الإجمالية {duration}.", "recordingMp4": "جارٍ تسجيل MP4 في الوقت الفعلي - {duration}...", "recordingFrame": "جارٍ تسجيل إطار MP4 رقم {frame} من {total}...", "mp4Ready": "MP4 جاهز.", "toolsError": "تعذر تحميل أدوات التنزيل: {message}", "mp4EncoderUnavailable": "لا يوفر هذا المتصفح برنامج ترميز MP4. يتوفر GIF المتحرك بدلًا منه.", "mp4EncodeError": "تعذر ترميز MP4.", "imageError": "تعذر إنشاء صورة {type}."
   },
   "qr": { "errors": {
     "modeUnsupported": "وضع QR المدمج غير مدعوم بعد: {mode}.", "numericCharacters": "يقبل الوضع الرقمي الأرقام 0-9 فقط.",

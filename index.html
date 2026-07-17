@@ -729,23 +729,23 @@
 
             <section class="tab-panel" data-tab-panel="download" hidden>
               <div class="panel-card compact-stack">
-                <nav class="subtab-bar download-subtab-bar" aria-label="Download type">
-                  <button type="button" class="subtab-button download-subtab-button is-active" data-download-subtab="image" aria-pressed="true">Image</button>
-                  <button type="button" class="subtab-button download-subtab-button" data-download-subtab="document" aria-pressed="false">Document</button>
-                  <button id="download-animation-tab" type="button" class="subtab-button download-subtab-button" data-download-subtab="animation" aria-pressed="false" hidden>Animation</button>
+                <nav class="subtab-bar download-subtab-bar" aria-label="Download type" data-i18n-aria-label="downloadUi.tools">
+                  <button type="button" class="subtab-button download-subtab-button is-active" data-download-subtab="image" aria-pressed="true" data-i18n="downloadUi.tabs.image">Image</button>
+                  <button type="button" class="subtab-button download-subtab-button" data-download-subtab="document" aria-pressed="false" data-i18n="downloadUi.tabs.document">Document</button>
+                  <button id="download-animation-tab" type="button" class="subtab-button download-subtab-button" data-download-subtab="animation" aria-pressed="false" hidden data-i18n="downloadUi.tabs.animation">Animation</button>
                 </nav>
 
                 <div class="subtab-panels download-subtab-panels">
                   <section class="subtab-panel download-subtab-panel is-active" data-download-subtab-panel="image">
                     <fieldset class="option-group">
-                      <legend>Export image</legend>
-                      <div class="choice-grid download-format-grid" role="group" aria-label="Image format">
+                      <legend data-i18n="downloadUi.image.legend">Export image</legend>
+                      <div class="choice-grid download-format-grid" role="group" aria-label="Image format" data-i18n-aria-label="downloadUi.image.format">
                         <button type="button" class="choice-button is-active" data-choice-target="download-format" data-choice-value="png" aria-pressed="true">PNG</button>
                         <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="jpg" aria-pressed="false">JPG</button>
                         <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="gif" aria-pressed="false">GIF</button>
                         <button type="button" class="choice-button" data-choice-target="download-format" data-choice-value="svg" aria-pressed="false">SVG</button>
                       </div>
-                      <select id="download-format" name="download-format" class="sr-only" aria-label="Image format">
+                      <select id="download-format" name="download-format" class="sr-only" aria-label="Image format" data-i18n-aria-label="downloadUi.image.format">
                         <option value="png" selected>PNG</option>
                         <option value="jpg">JPG</option>
                         <option value="gif">GIF</option>
@@ -754,73 +754,73 @@
 
                       <div id="download-quality-controls" hidden>
                         <label class="slider-field" for="download-quality">
-                          <span>JPG quality</span>
+                          <span data-i18n="downloadUi.image.quality">JPG quality</span>
                           <output id="download-quality-value" for="download-quality">92%</output>
                         </label>
                         <input id="download-quality" name="download-quality" type="range" min="40" max="100" step="1" value="92" />
                       </div>
 
                       <div class="download-actions">
-                        <button id="download-current" type="button" class="download-button">Download current image</button>
-                        <button id="download-zip" type="button" class="secondary-button" hidden>Download all as ZIP</button>
+                        <button id="download-current" type="button" class="download-button" data-i18n="downloadUi.image.current">Download current image</button>
+                        <button id="download-zip" type="button" class="secondary-button" hidden data-i18n="downloadUi.image.allZip">Download all as ZIP</button>
                       </div>
-                      <p class="hint">SVG traces the complete canvas into paths only, including frame text.</p>
+                      <p class="hint" data-i18n="downloadUi.image.svgHint">SVG traces the complete canvas into paths only, including frame text.</p>
                     </fieldset>
                   </section>
 
                   <section class="subtab-panel download-subtab-panel" data-download-subtab-panel="document" hidden>
                     <fieldset class="option-group">
-                      <legend>PDF document</legend>
+                      <legend data-i18n="downloadUi.document.legend">PDF document</legend>
                       <label class="toggle-field">
                         <input id="print-width-auto" name="print-width-auto" type="checkbox" checked />
-                        <span>Auto-size printed QR from pixels and version</span>
+                        <span data-i18n="downloadUi.document.autoSize">Auto-size printed QR from pixels and version</span>
                       </label>
                       <label class="slider-field" for="print-width">
-                        <span>Printed width</span>
+                        <span data-i18n="downloadUi.document.printedWidth">Printed width</span>
                         <output id="print-width-value" for="print-width">1.67 in auto</output>
                       </label>
                       <input id="print-width" name="print-width" type="range" min="0.5" max="7" step="0.05" value="1.65" disabled />
 
                       <div class="download-actions document-download-actions">
-                        <button id="download-current-pdf" type="button" class="download-button">Download current as PDF</button>
-                        <button id="download-all-pdf" type="button" class="secondary-button" hidden>Download all as PDF</button>
+                        <button id="download-current-pdf" type="button" class="download-button" data-i18n="downloadUi.document.current">Download current as PDF</button>
+                        <button id="download-all-pdf" type="button" class="secondary-button" hidden data-i18n="downloadUi.document.allPdf">Download all as PDF</button>
                       </div>
-                      <p class="hint">Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows.</p>
+                      <p class="hint" data-i18n="downloadUi.document.hint">Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows.</p>
                     </fieldset>
                   </section>
 
                   <section class="subtab-panel download-subtab-panel" data-download-subtab-panel="animation" hidden>
                     <fieldset class="option-group">
-                      <legend>Animation timing</legend>
-                      <div class="choice-grid animation-timing-mode-grid" role="group" aria-label="Animation timing mode">
-                        <button type="button" class="choice-button is-active" data-choice-target="animation-timing-mode" data-choice-value="per-frame" aria-pressed="true">Per image</button>
-                        <button type="button" class="choice-button" data-choice-target="animation-timing-mode" data-choice-value="total" aria-pressed="false">Total duration</button>
+                      <legend data-i18n="downloadUi.animation.legend">Animation timing</legend>
+                      <div class="choice-grid animation-timing-mode-grid" role="group" aria-label="Animation timing mode" data-i18n-aria-label="downloadUi.animation.mode">
+                        <button type="button" class="choice-button is-active" data-choice-target="animation-timing-mode" data-choice-value="per-frame" aria-pressed="true" data-i18n="downloadUi.animation.perImage">Per image</button>
+                        <button type="button" class="choice-button" data-choice-target="animation-timing-mode" data-choice-value="total" aria-pressed="false" data-i18n="downloadUi.animation.totalDuration">Total duration</button>
                       </div>
-                      <select id="animation-timing-mode" name="animation-timing-mode" class="sr-only" aria-label="Animation timing mode">
-                        <option value="per-frame" selected>Per image</option>
-                        <option value="total">Total duration</option>
+                      <select id="animation-timing-mode" name="animation-timing-mode" class="sr-only" aria-label="Animation timing mode" data-i18n-aria-label="downloadUi.animation.mode">
+                        <option value="per-frame" selected data-i18n="downloadUi.animation.perImage">Per image</option>
+                        <option value="total" data-i18n="downloadUi.animation.totalDuration">Total duration</option>
                       </select>
 
                       <div class="animation-duration-grid">
                         <div>
-                          <label for="animation-minutes">Minutes</label>
+                          <label for="animation-minutes" data-i18n="downloadUi.animation.minutes">Minutes</label>
                           <input id="animation-minutes" name="animation-minutes" type="number" inputmode="numeric" min="0" max="60" step="1" value="0" />
                         </div>
                         <div>
-                          <label for="animation-seconds">Seconds</label>
+                          <label for="animation-seconds" data-i18n="downloadUi.animation.seconds">Seconds</label>
                           <input id="animation-seconds" name="animation-seconds" type="number" inputmode="numeric" min="0" max="59" step="1" value="1" />
                         </div>
                         <div>
-                          <label for="animation-milliseconds">Milliseconds</label>
+                          <label for="animation-milliseconds" data-i18n="downloadUi.animation.milliseconds">Milliseconds</label>
                           <input id="animation-milliseconds" name="animation-milliseconds" type="number" inputmode="numeric" min="0" max="999" step="1" value="0" />
                         </div>
                       </div>
-                      <p id="animation-duration-summary" class="hint">1.000 seconds per image - 8.000 seconds total.</p>
+                      <p id="animation-duration-summary" class="hint" data-i18n="downloadUi.animation.initialSummary">1.000 seconds per image - 8.000 seconds total.</p>
                       <div class="download-actions animation-download-actions">
-                        <button id="download-animated-gif" type="button" class="download-button">Download animated GIF</button>
-                        <button id="download-animation-mp4" type="button" class="secondary-button">Download MP4</button>
+                        <button id="download-animated-gif" type="button" class="download-button" data-i18n="downloadUi.animation.gif">Download animated GIF</button>
+                        <button id="download-animation-mp4" type="button" class="secondary-button" data-i18n="downloadUi.animation.mp4">Download MP4</button>
                       </div>
-                      <p class="hint">GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time.</p>
+                      <p class="hint" data-i18n="downloadUi.animation.hint">GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time.</p>
                     </fieldset>
                   </section>
                 </div>
@@ -830,21 +830,21 @@
 
             <section class="tab-panel" data-tab-panel="debug" hidden>
               <div class="panel-card compact-stack">
-                <nav class="subtab-bar debug-subtab-bar" aria-label="Debug tools">
-                  <button type="button" class="subtab-button is-active" data-subtab="encoding">Encoding</button>
-                  <button type="button" class="subtab-button" data-subtab="mask">Mask</button>
-                  <button type="button" class="subtab-button" data-subtab="payload">Payload</button>
-                  <button type="button" class="subtab-button" data-subtab="overlay">Overlay</button>
+                <nav class="subtab-bar debug-subtab-bar" aria-label="Debug tools" data-i18n-aria-label="debugUi.tools">
+                  <button type="button" class="subtab-button is-active" data-subtab="encoding" data-i18n="debugUi.tabs.encoding">Encoding</button>
+                  <button type="button" class="subtab-button" data-subtab="mask" data-i18n="debugUi.tabs.mask">Mask</button>
+                  <button type="button" class="subtab-button" data-subtab="payload" data-i18n="debugUi.tabs.payload">Payload</button>
+                  <button type="button" class="subtab-button" data-subtab="overlay" data-i18n="debugUi.tabs.overlay">Overlay</button>
                 </nav>
 
                 <div class="subtab-panels">
                   <section class="subtab-panel is-active" data-subtab-panel="encoding">
                     <fieldset class="option-group encoding-control-group">
-                      <legend>Error correction</legend>
+                      <legend data-i18n="debugUi.encoding.errorCorrection">Error correction</legend>
                       <span class="help-popover section-help-popover">
-                        <button type="button" class="help-popover-trigger" aria-label="About error correction" aria-describedby="error-correction-help-content">?</button>
+                        <button type="button" class="help-popover-trigger" aria-label="About error correction" aria-describedby="error-correction-help-content" data-i18n-aria-label="debugUi.encoding.aboutErrorCorrection">?</button>
                         <span id="error-correction-help-content" class="help-popover-content" role="tooltip">
-                          <strong>Damage recovery</strong>
+                          <strong data-i18n="debugUi.encoding.damageRecovery">Damage recovery</strong>
                           <span id="error-correction-help">Balances capacity and resilience, with recovery for about 15% of damaged or covered area.</span>
                         </span>
                       </span>
@@ -856,53 +856,53 @@
                     </fieldset>
 
                     <fieldset class="option-group encoding-control-group encoding-mode-group">
-                      <legend>Input mode</legend>
+                      <legend data-i18n="debugUi.encoding.inputMode">Input mode</legend>
                       <span class="help-popover section-help-popover">
-                        <button type="button" class="help-popover-trigger" aria-label="About input modes" aria-describedby="input-mode-help-content">?</button>
+                        <button type="button" class="help-popover-trigger" aria-label="About input modes" aria-describedby="input-mode-help-content" data-i18n-aria-label="debugUi.encoding.aboutInputModes">?</button>
                         <span id="input-mode-help-content" class="help-popover-content" role="tooltip">
-                          <strong>Encoding modes</strong>
-                          <span><strong>Auto-detect:</strong> Chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.</span>
-                          <span><strong>Manual:</strong> Forces the selected mode and flags incompatible characters.</span>
+                          <strong data-i18n="debugUi.encoding.encodingModes">Encoding modes</strong>
+                          <span data-i18n="debugUi.encoding.autoHelp">Auto-detect chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.</span>
+                          <span data-i18n="debugUi.encoding.manualHelp">Manual forces the selected mode and flags incompatible characters.</span>
                         </span>
                       </span>
 
                       <label class="toggle-field encoding-auto-toggle">
                         <input id="mode-auto" name="mode-auto" type="checkbox" checked />
-                        <span>Auto-detect (excludes Kanji)</span>
+                        <span data-i18n="debugUi.encoding.autoDetect">Auto-detect (excludes Kanji)</span>
                       </label>
 
-                      <span class="field-label" id="encoding-mode-label">Manual</span>
+                      <span class="field-label" id="encoding-mode-label" data-i18n="debugUi.encoding.manual">Manual</span>
                       <div class="choice-grid encoding-mode-grid" role="group" aria-labelledby="encoding-mode-label">
-                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="numeric" aria-pressed="true">Numeric</button>
-                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="alphanumeric" aria-pressed="false">A-Z / 0-9</button>
-                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="byte" aria-pressed="false">Byte</button>
-                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="kanji" aria-pressed="false">Kanji</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="numeric" aria-pressed="true" data-i18n="encoding.modes.numeric">Numeric</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="alphanumeric" aria-pressed="false" data-i18n="debugUi.encoding.alphanumericShort">A-Z / 0-9</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="byte" aria-pressed="false" data-i18n="encoding.modes.byte">Byte</button>
+                        <button type="button" class="choice-button encoding-mode-button" data-choice-target="encoding-mode" data-choice-value="kanji" aria-pressed="false" data-i18n="encoding.modes.kanji">Kanji</button>
                       </div>
                       <select id="encoding-mode" name="encoding-mode" class="sr-only" aria-labelledby="encoding-mode-label">
-                        <option value="numeric">Numeric</option>
-                        <option value="alphanumeric">Alphanumeric</option>
-                        <option value="byte">Byte / Binary</option>
-                        <option value="kanji">Kanji</option>
+                        <option value="numeric" data-i18n="encoding.modes.numeric">Numeric</option>
+                        <option value="alphanumeric" data-i18n="encoding.modes.alphanumeric">Alphanumeric</option>
+                        <option value="byte" data-i18n="encoding.modes.byte">Byte / Binary</option>
+                        <option value="kanji" data-i18n="encoding.modes.kanji">Kanji</option>
                       </select>
 
                       <div class="encoding-mode-summary">
-                        <span class="info-label">Mode</span>
+                        <span class="info-label" data-i18n="debugUi.encoding.mode">Mode</span>
                         <strong id="detected-mode">Auto</strong>
                       </div>
                       <div id="mode-validation" class="validation-message" hidden></div>
                     </fieldset>
 
                     <fieldset class="option-group encoding-control-group encoding-version-group">
-                      <legend>Version</legend>
+                      <legend data-i18n="debugUi.encoding.version">Version</legend>
 
                       <label class="toggle-field version-auto-row">
-                        <input id="version-auto" name="version-auto" type="checkbox" checked aria-label="Auto-pick QR version" />
-                        <span>Auto</span>
-                        <span class="version-current">Version: <strong id="version-summary">Auto</strong></span>
+                        <input id="version-auto" name="version-auto" type="checkbox" checked aria-label="Auto-pick QR version" data-i18n-aria-label="debugUi.encoding.autoVersion" />
+                        <span data-i18n="common.auto">Auto</span>
+                        <span class="version-current"><span data-i18n="debugUi.encoding.versionLabel">Version:</span> <strong id="version-summary">Auto</strong></span>
                       </label>
 
                       <label class="slider-field" for="qr-version">
-                        <span>Target</span>
+                        <span data-i18n="debugUi.encoding.target">Target</span>
                         <output id="qr-version-value" for="qr-version">Auto</output>
                       </label>
                       <input id="qr-version" name="qr-version" type="range" min="1" max="40" step="1" value="8" />
@@ -911,18 +911,18 @@
 
                   <section class="subtab-panel" data-subtab-panel="mask" hidden>
                     <fieldset class="option-group">
-                      <legend>Mask pattern</legend>
+                      <legend data-i18n="debugUi.mask.legend">Mask pattern</legend>
                       <input id="mask-pattern" name="mask-pattern" type="hidden" value="" />
-                      <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices"></div>
+                      <div id="mask-grid" class="mask-grid" role="radiogroup" aria-label="Mask pattern choices" data-i18n-aria-label="debugUi.mask.choices"></div>
                     </fieldset>
                   </section>
 
                   <section class="subtab-panel" data-subtab-panel="payload" hidden>
                     <fieldset class="option-group">
-                      <legend>Encoded payload</legend>
+                      <legend data-i18n="debugUi.payload.legend">Encoded payload</legend>
                       <label class="toggle-field payload-toggle" id="payload-reveal-toggle" hidden>
                         <input id="payload-reveal-secrets" name="payload-reveal-secrets" type="checkbox" />
-                        <span>Reveal passwords and secrets in preview</span>
+                        <span data-i18n="debugUi.payload.reveal">Reveal passwords and secrets in preview</span>
                       </label>
                       <pre id="encoded-preview"></pre>
                     </fieldset>
@@ -930,117 +930,117 @@
 
                   <section class="subtab-panel" data-subtab-panel="overlay" hidden>
                     <fieldset class="option-group overlay-controls">
-                      <legend>Debug overlay</legend>
+                      <legend data-i18n="debugUi.overlay.legend">Debug overlay</legend>
                       <span class="help-popover overlay-help-popover">
-                        <button type="button" class="help-popover-trigger" aria-label="About debug overlays" aria-describedby="overlay-help-content">?</button>
+                        <button type="button" class="help-popover-trigger" aria-label="About debug overlays" aria-describedby="overlay-help-content" data-i18n-aria-label="debugUi.overlay.about">?</button>
                         <span id="overlay-help-content" class="help-popover-content" role="tooltip">
-                          <strong>Overlay controls</strong>
-                          <span><strong>Persist:</strong> Keeps overlays enabled while visiting other tabs.</span>
-                          <span><strong>Unmask:</strong> Shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.</span>
+                          <strong data-i18n="debugUi.overlay.controls">Overlay controls</strong>
+                          <span data-i18n="debugUi.overlay.persistHelp">Persist keeps overlays enabled while visiting other tabs.</span>
+                          <span data-i18n="debugUi.overlay.unmaskHelp">Unmask shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.</span>
                         </span>
                       </span>
                       <div class="overlay-settings-grid">
                         <label class="toggle-field">
-                          <input id="debug-enabled" name="debug-enabled" type="checkbox" aria-label="Persist overlays in other tabs" />
-                          <span>Persist</span>
+                          <input id="debug-enabled" name="debug-enabled" type="checkbox" aria-label="Persist overlays in other tabs" data-i18n-aria-label="debugUi.overlay.persistAria" />
+                          <span data-i18n="debugUi.overlay.persist">Persist</span>
                         </label>
                         <label class="toggle-field">
-                          <input id="debug-unmask" name="debug-unmask" type="checkbox" aria-label="Show unmasked data modules" />
-                          <span>Unmask</span>
+                          <input id="debug-unmask" name="debug-unmask" type="checkbox" aria-label="Show unmasked data modules" data-i18n-aria-label="debugUi.overlay.unmaskAria" />
+                          <span data-i18n="debugUi.overlay.unmask">Unmask</span>
                         </label>
                         <div class="info-chip">
-                          <span class="info-label">Segments</span>
+                          <span class="info-label" data-i18n="debugUi.overlay.segments">Segments</span>
                           <strong id="segment-summary">0</strong>
                         </div>
                         <div class="info-chip">
-                          <span class="info-label" aria-label="Unused capacity">Unused</span>
+                          <span class="info-label" aria-label="Unused capacity" data-i18n="debugUi.overlay.unused" data-i18n-aria-label="debugUi.overlay.unusedCapacity">Unused</span>
                           <strong id="unused-summary">-</strong>
                         </div>
                       </div>
                       <fieldset class="option-group overlay-outline-group">
-                        <legend>Outline grouping</legend>
+                        <legend data-i18n="debugUi.overlay.outlineGrouping">Outline grouping</legend>
                         <span class="help-popover section-help-popover">
-                          <button type="button" class="help-popover-trigger" aria-label="About outline grouping" aria-describedby="outline-help-content">?</button>
+                          <button type="button" class="help-popover-trigger" aria-label="About outline grouping" aria-describedby="outline-help-content" data-i18n-aria-label="debugUi.overlay.aboutOutline">?</button>
                           <span id="outline-help-content" class="help-popover-content" role="tooltip">
-                            <strong>How groups are marked</strong>
-                            <span>Solid dots start outline groups; ringed dots start encoded fields.</span>
-                            <span>Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.</span>
+                            <strong data-i18n="debugUi.overlay.groupMarks">How groups are marked</strong>
+                            <span data-i18n="debugUi.overlay.dotHelp">Solid dots start outline groups; ringed dots start encoded fields.</span>
+                            <span data-i18n="debugUi.overlay.unitsHelp">Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.</span>
                           </span>
                         </span>
-                        <div class="debug-outline-control" role="group" aria-label="Outline grouping">
+                        <div class="debug-outline-control" role="group" aria-label="Outline grouping" data-i18n-aria-label="debugUi.overlay.outlineGrouping">
                           <button type="button" class="outline-mode-button is-active" data-outline-mode="codewords" aria-pressed="true">
-                            Codewords
+                            <span data-i18n="debugUi.overlay.codewords">Codewords</span>
                           </button>
                           <button type="button" class="outline-mode-button" data-outline-mode="stream" aria-pressed="false">
-                            Stream
+                            <span data-i18n="debugUi.overlay.stream">Stream</span>
                           </button>
-                          <button type="button" class="outline-mode-button" data-outline-mode="units" aria-pressed="false" title="Encoding units">
-                            Units
+                          <button type="button" class="outline-mode-button" data-outline-mode="units" aria-pressed="false" title="Encoding units" data-i18n-title="debugUi.overlay.encodingUnits">
+                            <span data-i18n="debugUi.overlay.units">Units</span>
                           </button>
                           <button type="button" class="outline-mode-button" data-outline-mode="metadata" aria-pressed="false">
-                            Metadata
+                            <span data-i18n="debugUi.overlay.metadata">Metadata</span>
                           </button>
                         </div>
                       </fieldset>
                       <div class="color-grid debug-color-grid">
                         <label class="color-field" for="debug-data-color">
-                          <span>Data stream</span>
+                          <span data-i18n="debugUi.colors.data">Data stream</span>
                           <input id="debug-data-color" type="color" value="#0ea5e9" />
                         </label>
                         <label class="color-field" for="debug-mode-color">
-                          <span>Mode bits</span>
+                          <span data-i18n="debugUi.colors.mode">Mode bits</span>
                           <input id="debug-mode-color" type="color" value="#0f766e" />
                         </label>
                         <label class="color-field" for="debug-char-count-color">
-                          <span>Char count</span>
+                          <span data-i18n="debugUi.colors.characterCount">Char count</span>
                           <input id="debug-char-count-color" type="color" value="#f97316" />
                         </label>
                         <label class="color-field" for="debug-ecl-color">
-                          <span>EC level bits</span>
+                          <span data-i18n="debugUi.colors.ecLevel">EC level bits</span>
                           <input id="debug-ecl-color" type="color" value="#ec4899" />
                         </label>
                         <label class="color-field" for="debug-mask-color">
-                          <span>Mask bits</span>
+                          <span data-i18n="debugUi.colors.mask">Mask bits</span>
                           <input id="debug-mask-color" type="color" value="#2563eb" />
                         </label>
                         <label class="color-field" for="debug-ecc-color">
-                          <span>EC words</span>
-                          <input id="debug-ecc-color" type="color" value="#111827" aria-label="Error correction codewords color" />
+                          <span data-i18n="debugUi.colors.ecWords">EC words</span>
+                          <input id="debug-ecc-color" type="color" value="#111827" aria-label="Error correction codewords color" data-i18n-aria-label="debugUi.colors.ecWordsAria" />
                         </label>
                         <label class="color-field" for="debug-remainder-color">
-                          <span>Remainder</span>
-                          <input id="debug-remainder-color" type="color" value="#14b8a6" aria-label="Remainder bits color" />
+                          <span data-i18n="debugUi.colors.remainder">Remainder</span>
+                          <input id="debug-remainder-color" type="color" value="#14b8a6" aria-label="Remainder bits color" data-i18n-aria-label="debugUi.colors.remainderAria" />
                         </label>
                         <label class="color-field" for="debug-padding-color">
-                          <span>Padding</span>
-                          <input id="debug-padding-color" type="color" value="#cbd5e1" aria-label="Pad-to-byte and pad codewords color" />
+                          <span data-i18n="debugUi.colors.padding">Padding</span>
+                          <input id="debug-padding-color" type="color" value="#cbd5e1" aria-label="Pad-to-byte and pad codewords color" data-i18n-aria-label="debugUi.colors.paddingAria" />
                         </label>
                         <label class="color-field" for="debug-terminator-color">
-                          <span>Terminator</span>
+                          <span data-i18n="debugUi.colors.terminator">Terminator</span>
                           <input id="debug-terminator-color" type="color" value="#84cc16" />
                         </label>
                         <label class="color-field" for="debug-finder-color">
-                          <span>Finder</span>
+                          <span data-i18n="debugUi.colors.finder">Finder</span>
                           <input id="debug-finder-color" type="color" value="#ef4444" />
                         </label>
                         <label class="color-field" for="debug-alignment-color">
-                          <span>Alignment</span>
+                          <span data-i18n="debugUi.colors.alignment">Alignment</span>
                           <input id="debug-alignment-color" type="color" value="#facc15" />
                         </label>
                         <label class="color-field" for="debug-timing-color">
-                          <span>Timing</span>
+                          <span data-i18n="debugUi.colors.timing">Timing</span>
                           <input id="debug-timing-color" type="color" value="#06b6d4" />
                         </label>
                         <label class="color-field" for="debug-format-color">
-                          <span>Format</span>
+                          <span data-i18n="debugUi.colors.format">Format</span>
                           <input id="debug-format-color" type="color" value="#8b5cf6" />
                         </label>
                         <label class="color-field" for="debug-dark-module-color">
-                          <span>Dark module</span>
+                          <span data-i18n="debugUi.colors.darkModule">Dark module</span>
                           <input id="debug-dark-module-color" type="color" value="#4c1d95" />
                         </label>
                         <label class="color-field" for="debug-version-color">
-                          <span>Version (v7+)</span>
+                          <span data-i18n="debugUi.colors.version">Version (v7+)</span>
                           <input id="debug-version-color" type="color" value="#10b981" />
                         </label>
                       </div>
