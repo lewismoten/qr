@@ -1,16 +1,7 @@
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean } from './csv.js';
-import { normalizePhoneNumber } from './phone.js';
 import { getSupportedMp4MimeType } from './mp4.js';
-import {
-  getWebsiteValidationState,
-  validateCalendarText,
-  validateEmailValue,
-  validateGeoLabel,
-  validatePrintableText,
-  validateTelephoneValue,
-  validateVCardTextValue,
-} from './validation.js';
+import { validatePrintableText } from './validation.js';
 import {
   drawCenteredFrameMessage,
   drawFrameMessage,
@@ -33,15 +24,11 @@ import { createContentPayload, createFilePayloadPreview } from './ui/content/pay
 import { createFormatValidator } from './ui/content/validation.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import { serializeBulkRow } from './ui/content/bulk/payload.js';
-import { validateBulkImport } from './ui/content/bulk/validation.js';
 import { createEventSection } from './ui/content/event/section.js';
 import {
   arrayBufferToBase64,
   base64UrlToBase64,
   createCompactFileId,
-  encodeStreamPosition,
-  getCompactFileExtension,
-  getFileManifestFlag,
 } from './ui/content/file/protocol.js';
 import { createFileManifestController } from './ui/content/file/manifest.js';
 import { createFileCapacityCalculator } from './ui/content/file/capacity.js';
@@ -49,12 +36,12 @@ import { createFileCache } from './ui/content/file/cache.js';
 import { createFilePayloadBuilder } from './ui/content/file/payload.js';
 import { createFileSection } from './ui/content/file/section.js';
 import { createFrameSection } from './ui/content/frame/section.js';
-import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
+import { createGeoSection } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
 import { createPhoneSection } from './ui/content/phone/section.js';
 import { createSharedFieldsSection } from './ui/content/shared-fields.js';
 import { createVCardSection } from './ui/content/vcard/section.js';
-import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js';
+import { createWifiSection } from './ui/content/wifi/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
 import { createMaskSelector } from './ui/debug/mask-selector.js';
 import { createEncodingDiagnostics } from './ui/debug/encoding.js';
@@ -79,6 +66,8 @@ import { createFrameNavigation } from './ui/download/frames.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { createPrimaryTabs } from './ui/navigation.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
+import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
+import { createRenderController } from './ui/preview/render.js';
 import { createStyleSubtabs } from './ui/style/subtabs.js';
 import { createColorSection } from './ui/style/colors/section.js';
 import { createPixelArtEditor } from './ui/style/art/pixel-editor.js';
@@ -374,9 +363,9 @@ const MASK_LABELS = {
   7: '((row + col mod 2) + (row * col mod 3)) mod 2 = 0',
 };
 
-let renderRequest = 0;
 let chunkSettingsRefreshTimer = 0;
 let chunkSettingsRefreshRequest = 0;
+let cancelRenderRequest = () => {};
 let renderedQrWidth = null;
 let renderedQrModuleScale = null;
 const previewViewport = createPreviewViewport({
@@ -753,7 +742,7 @@ function isTransferCompressionEnabled() {
 function scheduleChunkSettingsRefresh({ resetChunkIndex = false, delay = 160 } = {}) {
   chunkSettingsRefreshRequest += 1;
   const refreshRequestId = chunkSettingsRefreshRequest;
-  renderRequest += 1;
+  cancelRenderRequest();
 
   if (chunkSettingsRefreshTimer) {
     window.clearTimeout(chunkSettingsRefreshTimer);
@@ -1606,54 +1595,12 @@ function drawQr(qrDefinition, options) {
   schedulePreviewViewportSync();
 }
 
-function drawInvalidOverlay(message) {
-  const context = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  const bannerHeight = Math.max(56, height * 0.18);
-
-  context.fillStyle = 'rgba(255, 255, 255, 0.64)';
-  context.fillRect(0, 0, width, height);
-
-  context.fillStyle = 'rgba(153, 27, 27, 0.92)';
-  context.fillRect(0, (height - bannerHeight) / 2, width, bannerHeight);
-
-  context.fillStyle = '#ffffff';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.font = `800 ${Math.max(18, width * 0.07)}px "Avenir Next", "Segoe UI", sans-serif`;
-  context.fillText('Invalid', width / 2, height / 2 - 8);
-
-  if (message) {
-    context.font = `600 ${Math.max(10, width * 0.027)}px "Avenir Next", "Segoe UI", sans-serif`;
-    context.fillText(message.slice(0, 80), width / 2, height / 2 + 16);
-  }
-}
-
-function renderInvalidPreview(previewText, options, message) {
-  const safeText = previewText?.trim() ? previewText : 'Invalid preview';
-  const previewOptions = options
-    ? { ...options }
-    : {
-        errorCorrectionLevel: 'M',
-        margin: 1,
-        scale: 4,
-        color: {
-          dark: '#111827',
-          light: '#ffffff',
-        },
-      };
-  delete previewOptions.version;
-
-  try {
-    const qrDefinition = qrEncoder.create(safeText, previewOptions);
-    drawQr(qrDefinition, previewOptions);
-  } catch (error) {
-    clearCanvas();
-  }
-
-  drawInvalidOverlay(message);
-}
+const renderInvalidPreview = createInvalidPreviewRenderer({
+  canvas,
+  encoder: qrEncoder,
+  drawQr,
+  clearCanvas,
+});
 
 const maskSelector = createMaskSelector({
   grid: maskGrid,
@@ -1731,76 +1678,37 @@ const debugOutlineSelector = createOutlineSelector({
 });
 const syncDebugOutlineSelection = debugOutlineSelector.sync;
 
-async function renderQr() {
-  const requestId = ++renderRequest;
-  syncOutputs();
-  setFormatVisibility();
-  updateGeoMap();
-
-  let encodedText = '';
-  let options;
-
-  try {
-    encodedText = await buildEncodedText();
-    options = buildOptions();
-  } catch (error) {
-    if (requestId !== renderRequest) {
-      return;
-    }
+const renderController = createRenderController({
+  syncOutputs,
+  syncFormat: setFormatVisibility,
+  updateMap: updateGeoMap,
+  buildText: buildEncodedText,
+  buildOptions,
+  buildPreview: buildEncodedPreviewTemplate,
+  updateTextPreview: updateEncodedPreview,
+  updateOptionsPreview,
+  syncMask: syncMaskSelection,
+  renderMasks: renderMaskPreviews,
+  getValidation: getFormatValidationState,
+  setValidation: setValidationMessage,
+  renderInvalid: renderInvalidPreview,
+  updateSummary: updateEncodingSummary,
+  validateMode: validateManualMode,
+  getModeError: () => modeValidation.textContent,
+  buildPayload,
+  createDefinition: createQrDefinition,
+  drawQr,
+  syncDownloads: syncDownloadControls,
+  showBuildError(error, options) {
     encodedPreview.textContent = error.message;
     encodedPreview.classList.add('has-error');
     renderInvalidPreview(buildEncodedPreviewTemplate(), options, error.message);
     setValidationMessage(error.message || 'Unable to build QR content.');
     console.error(error);
-    return;
-  }
-
-  if (requestId !== renderRequest) {
-    return;
-  }
-
-  updateEncodedPreview(encodedText);
-  updateOptionsPreview(options);
-  syncMaskSelection();
-  renderMaskPreviews(encodedText);
-
-  const formatValidationState = getFormatValidationState();
-  if (formatValidationState.error) {
-    setValidationMessage(formatValidationState.error);
-    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, formatValidationState.error);
-    updateEncodingSummary(null, options);
-    return;
-  }
-
-  const isModeValid = validateManualMode(encodedText);
-  if (!encodedText.trim()) {
-    const emptyMessage = 'Not valid yet: content is required.';
-    setValidationMessage(emptyMessage);
-    renderInvalidPreview(buildEncodedPreviewTemplate(), options, emptyMessage);
-    updateEncodingSummary(null, options);
-    return;
-  }
-
-  if (!isModeValid) {
-    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, modeValidation.textContent);
-    updateEncodingSummary(null, options);
-    return;
-  }
-
-  try {
-    const payload = buildPayload(encodedText);
-    const qrDefinition = createQrDefinition(payload, options);
-    updateEncodingSummary(qrDefinition, options);
-    setValidationMessage(formatValidationState.warning, [], formatValidationState.warning ? 'warning' : 'error');
-    drawQr(qrDefinition, options);
-    syncDownloadControls();
-  } catch (error) {
-    setValidationMessage(error.message || 'Unable to encode this content.');
-    renderInvalidPreview(encodedText || buildEncodedPreviewTemplate(), options, error.message || 'Unable to encode this content.');
-    updateEncodingSummary(null, options);
-    console.error(error);
-  }
-}
+  },
+});
+const renderQr = renderController.render;
+cancelRenderRequest = renderController.cancel;
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
