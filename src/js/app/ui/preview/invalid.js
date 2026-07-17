@@ -31,7 +31,7 @@ export function createInvalidPreviewRenderer({ canvas, encoder, drawQr, clearCan
     try {
       const definition = encoder.create(previewText?.trim() || lookup('preview.invalidPayload', 'Invalid preview'), previewOptions);
       drawQr(definition, previewOptions);
-    } catch (error) {
+    } catch {
       clearCanvas();
     }
     drawOverlay(message);

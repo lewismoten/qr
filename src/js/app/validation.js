@@ -117,7 +117,7 @@ export function getWebsiteValidationState(value, { required = false, contextLabe
   let parsedUrl;
   try {
     parsedUrl = new URL(trimmed);
-  } catch (error) {
+  } catch {
     return {
       error: lookup('validation.website.protocolRequired', 'Not valid for {context} format yet: website must include a full protocol such as https://.', { context: resolvedContext }),
       warning: '',
@@ -150,7 +150,10 @@ export function validateCalendarText(value, { required = false, label, maxLength
   }
 
   const invalidControlPattern = multiline
+    // These ranges intentionally identify non-printing control characters.
+    // eslint-disable-next-line no-control-regex
     ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/
+    // eslint-disable-next-line no-control-regex
     : /[\x00-\x1f\x7f]/;
   if (invalidControlPattern.test(value)) {
     return lookup('validation.event.characters', 'Not valid for Event format yet: {label} contains unsupported control characters.', { label });

@@ -15,10 +15,25 @@
     "favicon": "node scripts/generate-favicon.mjs",
     "serve": "node serve.mjs",
     "dev": "node serve.mjs",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:json && npm run lint:markdown && npm run lint:web-metadata",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"styles.css\" \"src/css/**/*.css\"",
+    "lint:html": "htmlhint \"*.html\"",
+    "lint:json": "node scripts/lint-json.mjs",
+    "lint:markdown": "markdownlint-cli2 \"README.md\"",
+    "lint:web-metadata": "node scripts/lint-web-metadata.mjs",
     "test": "node tests/qr.test.js && node tests/qr-parity.test.js && node tests/bytes.test.js && node tests/content-formats.test.js && node tests/modes.test.js && node tests/map.test.js && node tests/export-formats.test.js && node tests/lzw.test.js && node tests/abort.test.js && node tests/progress.test.js && node tests/csv.test.js && node tests/i18n.test.js",
-    "verify": "npm test && npm run build"
+    "verify": "npm run lint && npm test && npm run build"
   },
   "devDependencies": {
-    "esbuild": "0.28.1"
+    "@eslint/js": "^10.0.1",
+    "esbuild": "0.28.1",
+    "eslint": "^10.7.0",
+    "fast-xml-parser": "^5.10.1",
+    "globals": "^17.7.0",
+    "htmlhint": "^1.9.2",
+    "markdownlint-cli2": "^0.23.1",
+    "stylelint": "^17.14.0",
+    "stylelint-config-recommended": "^18.0.0"
   }
 }

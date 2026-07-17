@@ -8,7 +8,7 @@ export function createRenderController(deps) {
     deps.syncOutputs();
     deps.syncFormat();
     deps.updateMap();
-    let encodedText = '';
+    let encodedText;
     let options;
 
     try {

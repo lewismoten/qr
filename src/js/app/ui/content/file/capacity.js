@@ -49,7 +49,7 @@ export function createFileCapacityCalculator({
   const getEncodingOptions = () => {
     try {
       return getOptions();
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -58,7 +58,7 @@ export function createFileCapacityCalculator({
     try {
       encoder.create(buildPayload(payload), options);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };

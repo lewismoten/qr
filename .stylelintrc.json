@@ -1,0 +1,11 @@
+{
+  "extends": ["stylelint-config-recommended"],
+  "ignoreFiles": ["dist/**/*.css"],
+  "rules": {
+    "declaration-property-value-keyword-no-deprecated": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "property-no-deprecated": null,
+    "selector-class-pattern": null
+  }
+}

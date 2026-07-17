@@ -66,7 +66,11 @@ export function createFileManifestController({
     try {
       return JSON.stringify(JSON.parse(value));
     } catch (error) {
-      if (validate) throw new Error(lookup('file.metadataJson', 'Custom file metadata must be valid JSON.'));
+      if (validate) {
+        throw new Error(lookup('file.metadataJson', 'Custom file metadata must be valid JSON.'), {
+          cause: error,
+        });
+      }
       return value;
     }
   };

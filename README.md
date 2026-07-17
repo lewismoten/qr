@@ -40,6 +40,13 @@ Run the QR encoder tests and a production build together with:
 npm run verify
 ```
 
+`verify` runs source linting, tests and the production build. Run only the
+JavaScript, CSS, HTML, JSON, Markdown, sitemap and robots checks with:
+
+```sh
+npm run lint
+```
+
 ## Locales
 
 Locale files live in `locales` and are listed in `locales/manifest.json`. A locale

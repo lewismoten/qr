@@ -5,7 +5,7 @@ function prepareExternalLink(link) {
   let destination;
   try {
     destination = new URL(href, window.location.href);
-  } catch (error) {
+  } catch {
     return;
   }
   if (!['http:', 'https:'].includes(destination.protocol)

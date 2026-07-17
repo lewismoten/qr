@@ -7,7 +7,7 @@ function getShiftJisMap() {
   let decoder;
   try {
     decoder = new TextDecoder('shift_jis', { fatal: true });
-  } catch (error) {
+  } catch {
     throw createQrError('kanjiUnsupported', 'Native Kanji mode requires browser Shift JIS decoding support.');
   }
 
@@ -22,7 +22,7 @@ function getShiftJisMap() {
           if ([...character].length === 1 && character !== '\ufffd' && !shiftJisMap.has(character)) {
             shiftJisMap.set(character, (lead << 8) | trail);
           }
-        } catch (error) {
+        } catch {
           // Unassigned Shift JIS byte pairs are not QR Kanji characters.
         }
       }

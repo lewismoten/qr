@@ -9,7 +9,7 @@ export function createEmailCapacity({ body, hint, encoder, buildOptions, buildPa
     let options;
     try {
       options = buildOptions();
-    } catch (error) {
+    } catch {
       return { current, max: 0 };
     }
     const emptyPayload = buildPayload(buildEmail(''));

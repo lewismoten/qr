@@ -9,7 +9,7 @@ function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
       let shiftJisValue;
       try {
         shiftJisValue = encoder.toSJIS(char);
-      } catch (error) {
+      } catch {
         shiftJisValue = undefined;
       }
       const isQrKanji = Number.isInteger(shiftJisValue)
@@ -58,7 +58,7 @@ export function createEncodingDiagnostics({
     modeValidation.classList.toggle('is-warning', validationStates.mode.level === 'warning');
     formatValidation.classList.toggle('is-warning', validationStates.format.level === 'warning');
   };
-  const setFormatValidation = (message, invalidIndexes = [], level = 'error') => {
+  const setFormatValidation = (message, _invalidIndexes = [], level = 'error') => {
     const { formatValidation } = elements;
     validationStates.format = { message, level };
     formatValidation.hidden = !message;
