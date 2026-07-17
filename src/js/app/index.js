@@ -49,6 +49,7 @@ import {
   getSerializedManifestLength,
   serializeManifest as encodeManifest,
 } from './ui/content/file/manifest.js';
+import { findMaximumEncodableBytes } from './ui/content/file/capacity.js';
 import { createFrameSection } from './ui/content/frame/section.js';
 import { createGeoSection, parseCoordinate } from './ui/content/geo/section.js';
 import { createNumberSection } from './ui/content/number/section.js';
@@ -57,6 +58,7 @@ import { createSharedFieldsSection } from './ui/content/shared-fields.js';
 import { createVCardSection } from './ui/content/vcard/section.js';
 import { createWifiSection, escapeWifiValue } from './ui/content/wifi/section.js';
 import { createDebugSubtabs } from './ui/debug/subtabs.js';
+import { createMaskSelector } from './ui/debug/mask-selector.js';
 import {
   drawCodewordOutlines,
   drawHighlightedBoundaries,
@@ -1052,28 +1054,7 @@ function getFileCapacityBytes() {
     }
   };
 
-  if (!canEncodeBytes(0)) {
-    return 0;
-  }
-
-  let low = 0;
-  let high = 256;
-
-  while (high <= 1024 * 1024 && canEncodeBytes(high)) {
-    low = high;
-    high *= 2;
-  }
-
-  while (low + 1 < high) {
-    const middle = Math.floor((low + high) / 2);
-    if (canEncodeBytes(middle)) {
-      low = middle;
-    } else {
-      high = middle;
-    }
-  }
-
-  return low;
+  return findMaximumEncodableBytes(canEncodeBytes);
 }
 
 function getBlobUrlCapacityBytes(file = getActiveFile()) {
@@ -1103,28 +1084,7 @@ function getBlobUrlCapacityBytes(file = getActiveFile()) {
     }
   };
 
-  if (!canEncodeBytes(0)) {
-    return 0;
-  }
-
-  let low = 0;
-  let high = 256;
-
-  while (high <= 1024 * 1024 && canEncodeBytes(high)) {
-    low = high;
-    high *= 2;
-  }
-
-  while (low + 1 < high) {
-    const middle = Math.floor((low + high) / 2);
-    if (canEncodeBytes(middle)) {
-      low = middle;
-    } else {
-      high = middle;
-    }
-  }
-
-  return low;
+  return findMaximumEncodableBytes(canEncodeBytes);
 }
 
 function getChunkedFileCapacityInfo(file = getActiveFile()) {
@@ -1194,33 +1154,8 @@ function getChunkedFileCapacityInfo(file = getActiveFile()) {
     }
   };
 
-  const findCapacity = () => {
-    if (!canEncodeBytes(0)) {
-      return 0;
-    }
-
-    let low = 0;
-    let high = 256;
-
-    while (high <= 1024 * 1024 && canEncodeBytes(high)) {
-      low = high;
-      high *= 2;
-    }
-
-    while (low + 1 < high) {
-      const middle = Math.floor((low + high) / 2);
-      if (canEncodeBytes(middle)) {
-        low = middle;
-      } else {
-        high = middle;
-      }
-    }
-
-    return low;
-  };
-
   const isSingleFrame = canEncodeSingleFrame();
-  const chunkCapacity = isSingleFrame ? streamLength : findCapacity();
+  const chunkCapacity = isSingleFrame ? streamLength : findMaximumEncodableBytes(canEncodeBytes);
   const naturalChunkCapacity = chunkCapacity;
   const totalChunks = isSingleFrame ? 1 : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
   const currentChunk = Math.min(Number.parseInt(fileChunkIndex.value, 10) || 1, totalChunks);
@@ -2835,110 +2770,19 @@ function renderInvalidPreview(previewText, options, message) {
   drawInvalidOverlay(message);
 }
 
-function createMaskButton(maskValue) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'mask-option';
-  button.dataset.maskValue = maskValue;
-  button.setAttribute('role', 'radio');
-
-  const preview = document.createElement('div');
-  preview.className = 'mask-preview';
-
-  if (maskValue === '') {
-    preview.classList.add('mask-preview-auto');
-    preview.textContent = 'Auto';
-  } else {
-    const thumbnail = document.createElement('canvas');
-    thumbnail.width = 96;
-    thumbnail.height = 96;
-    thumbnail.className = 'mask-canvas';
-    preview.appendChild(thumbnail);
-  }
-
-  const label = document.createElement('span');
-  label.className = 'mask-label';
-  label.textContent = maskValue === '' ? 'Best fit' : `Mask ${maskValue}`;
-
-  const detail = document.createElement('span');
-  detail.className = 'mask-detail';
-  detail.textContent = MASK_LABELS[maskValue];
-
-  button.append(preview, label, detail);
-  button.addEventListener('click', () => {
-    maskPattern.value = maskValue;
-    syncMaskSelection();
-    renderQr();
-  });
-
-  return button;
-}
-
-function ensureMaskButtons() {
-  if (maskGrid.childElementCount > 0) {
-    return;
-  }
-
-  MASK_VALUES.forEach((maskValue) => {
-    maskGrid.appendChild(createMaskButton(maskValue));
-  });
-}
-
-function syncMaskSelection() {
-  const activeValue = maskPattern.value;
-  maskGrid.querySelectorAll('.mask-option').forEach((button) => {
-    const isActive = button.dataset.maskValue === activeValue;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-checked', String(isActive));
-  });
-}
-
-function drawQrThumbnail(targetCanvas, qrDefinition, options) {
-  const context = targetCanvas.getContext('2d');
-  const margin = options.margin ?? 1;
-  const totalModules = qrDefinition.modules.size + margin * 2;
-  const moduleSize = Math.max(1, Math.floor(Math.min(targetCanvas.width, targetCanvas.height) / totalModules));
-  const drawSize = totalModules * moduleSize;
-  const offsetX = Math.floor((targetCanvas.width - drawSize) / 2);
-  const offsetY = Math.floor((targetCanvas.height - drawSize) / 2);
-  context.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-  context.fillStyle = options.color?.light || '#ffffff';
-  context.fillRect(offsetX, offsetY, drawSize, drawSize);
-  context.fillStyle = options.color?.dark || '#111827';
-  for (let row = 0; row < qrDefinition.modules.size; row += 1) {
-    for (let column = 0; column < qrDefinition.modules.size; column += 1) {
-      if (!moduleIsDark(qrDefinition, row, column)) continue;
-      context.fillRect(
-        offsetX + (column + margin) * moduleSize,
-        offsetY + (row + margin) * moduleSize,
-        moduleSize,
-        moduleSize
-      );
-    }
-  }
-}
-
-function renderMaskPreviews(encodedText) {
-  ensureMaskButtons();
-
-  const previewValue = encodedText.trim() || 'Preview';
-  maskGrid.querySelectorAll('.mask-option').forEach((button) => {
-    const maskValue = button.dataset.maskValue;
-    const previewCanvas = button.querySelector('canvas');
-
-    if (!previewCanvas) {
-      return;
-    }
-
-    try {
-      const previewOptions = buildMaskPreviewOptions(maskValue);
-      const definition = qrEncoder.create(previewValue, previewOptions);
-      drawQrThumbnail(previewCanvas, definition, previewOptions);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-}
+const maskSelector = createMaskSelector({
+  grid: maskGrid,
+  input: maskPattern,
+  values: MASK_VALUES,
+  labels: MASK_LABELS,
+  encoder: qrEncoder,
+  moduleIsDark,
+  buildOptions: buildMaskPreviewOptions,
+  onChange: renderQr,
+});
+const ensureMaskButtons = maskSelector.ensure;
+const syncMaskSelection = maskSelector.sync;
+const renderMaskPreviews = maskSelector.renderPreviews;
 
 const activateTab = createPrimaryTabs({
   buttons: tabButtons,

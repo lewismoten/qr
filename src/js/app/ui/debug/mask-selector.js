@@ -1,0 +1,93 @@
+function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
+  const context = targetCanvas.getContext('2d');
+  const margin = options.margin ?? 1;
+  const totalModules = qrDefinition.modules.size + margin * 2;
+  const moduleSize = Math.max(1, Math.floor(Math.min(targetCanvas.width, targetCanvas.height) / totalModules));
+  const drawSize = totalModules * moduleSize;
+  const offsetX = Math.floor((targetCanvas.width - drawSize) / 2);
+  const offsetY = Math.floor((targetCanvas.height - drawSize) / 2);
+  context.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+  context.fillStyle = options.color?.light || '#ffffff';
+  context.fillRect(offsetX, offsetY, drawSize, drawSize);
+  context.fillStyle = options.color?.dark || '#111827';
+  for (let row = 0; row < qrDefinition.modules.size; row += 1) {
+    for (let column = 0; column < qrDefinition.modules.size; column += 1) {
+      if (!moduleIsDark(qrDefinition, row, column)) continue;
+      context.fillRect(
+        offsetX + (column + margin) * moduleSize,
+        offsetY + (row + margin) * moduleSize,
+        moduleSize,
+        moduleSize,
+      );
+    }
+  }
+}
+
+export function createMaskSelector({ grid, input, values, labels, encoder, moduleIsDark, buildOptions, onChange }) {
+  const sync = () => {
+    const activeValue = input.value;
+    grid.querySelectorAll('.mask-option').forEach((button) => {
+      const isActive = button.dataset.maskValue === activeValue;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-checked', String(isActive));
+    });
+  };
+
+  const createButton = (maskValue) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mask-option';
+    button.dataset.maskValue = maskValue;
+    button.setAttribute('role', 'radio');
+
+    const preview = document.createElement('div');
+    preview.className = 'mask-preview';
+    if (maskValue === '') {
+      preview.classList.add('mask-preview-auto');
+      preview.textContent = 'Auto';
+    } else {
+      const thumbnail = document.createElement('canvas');
+      thumbnail.width = 96;
+      thumbnail.height = 96;
+      thumbnail.className = 'mask-canvas';
+      preview.appendChild(thumbnail);
+    }
+
+    const label = document.createElement('span');
+    label.className = 'mask-label';
+    label.textContent = maskValue === '' ? 'Best fit' : `Mask ${maskValue}`;
+    const detail = document.createElement('span');
+    detail.className = 'mask-detail';
+    detail.textContent = labels[maskValue];
+    button.append(preview, label, detail);
+    button.addEventListener('click', () => {
+      input.value = maskValue;
+      sync();
+      onChange();
+    });
+    return button;
+  };
+
+  const ensure = () => {
+    if (grid.childElementCount > 0) return;
+    values.forEach((maskValue) => grid.appendChild(createButton(maskValue)));
+  };
+
+  const renderPreviews = (encodedText) => {
+    ensure();
+    const previewValue = encodedText.trim() || 'Preview';
+    grid.querySelectorAll('.mask-option').forEach((button) => {
+      const previewCanvas = button.querySelector('canvas');
+      if (!previewCanvas) return;
+      try {
+        const previewOptions = buildOptions(button.dataset.maskValue);
+        const definition = encoder.create(previewValue, previewOptions);
+        drawQrThumbnail(previewCanvas, definition, previewOptions, moduleIsDark);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
+  return { ensure, sync, renderPreviews };
+}
