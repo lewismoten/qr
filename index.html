@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Free QR Code Generator, Designer and Debugger</title>
-    <meta name="description" content="Create, customize, inspect and download QR codes for URLs, Wi-Fi, contacts, messages, locations, files and number sequences. Includes advanced styling, batch export and developer overlays." />
-    <meta name="keywords" content="QR code generator, free QR code maker, custom QR code, QR code designer, Wi-Fi QR code, vCard QR code, file QR code, QR code debugger, QR code SVG, batch QR codes" />
+    <meta name="description" content="Create, customize, inspect and download QR codes for URLs, Wi-Fi, contacts, messages, calendar events, locations, files and number sequences. Includes advanced styling, batch export and developer overlays." />
+    <meta name="keywords" content="QR code generator, free QR code maker, custom QR code, QR code designer, Wi-Fi QR code, calendar event QR code, vCard QR code, file QR code, QR code debugger, QR code SVG, batch QR codes" />
     <meta name="application-name" content="QR Code Generator" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://qr.lewismoten.com/" />
@@ -33,6 +33,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.tosjis.min.js"></script>
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -93,6 +94,7 @@
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="email" aria-pressed="false">Email</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="phone" aria-pressed="false">Phone</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="sms" aria-pressed="false">SMS</button>
+                    <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="event" aria-pressed="false">Event</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="geo" aria-pressed="false">Geo</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="vcard" aria-pressed="false">vCard</button>
                     <button type="button" class="choice-button" data-choice-target="qr-format" data-choice-value="file" aria-pressed="false">File</button>
@@ -105,6 +107,7 @@
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
                     <option value="sms">SMS</option>
+                    <option value="event">Calendar event</option>
                     <option value="geo">Geo</option>
                     <option value="vcard">vCard</option>
                     <option value="file">File</option>
@@ -219,6 +222,41 @@
                   <label for="sms-body">Message</label>
                   <textarea id="sms-body" name="sms-body" rows="3" placeholder="Text message"></textarea>
                   <p id="sms-length-hint" class="hint">0 / 160</p>
+                </fieldset>
+
+                <fieldset class="option-group format-fields" data-format-fields="event" hidden>
+                  <legend>Calendar event</legend>
+                  <label for="event-title">Title</label>
+                  <input id="event-title" name="event-title" type="text" maxlength="120" value="New event" />
+                  <label class="toggle-field">
+                    <input id="event-all-day" name="event-all-day" type="checkbox" />
+                    <span>All-day event</span>
+                  </label>
+                  <div class="event-date-grid">
+                    <div>
+                      <label for="event-start-date">Start date</label>
+                      <input id="event-start-date" name="event-start-date" type="date" />
+                    </div>
+                    <div class="event-time-field">
+                      <label for="event-start-time">Start time</label>
+                      <input id="event-start-time" name="event-start-time" type="time" step="60" />
+                    </div>
+                    <div>
+                      <label for="event-end-date">End date</label>
+                      <input id="event-end-date" name="event-end-date" type="date" />
+                    </div>
+                    <div class="event-time-field">
+                      <label for="event-end-time">End time</label>
+                      <input id="event-end-time" name="event-end-time" type="time" step="60" />
+                    </div>
+                  </div>
+                  <label for="event-location">Location (optional)</label>
+                  <input id="event-location" name="event-location" type="text" maxlength="160" />
+                  <label for="event-description">Description (optional)</label>
+                  <textarea id="event-description" name="event-description" rows="3" maxlength="500"></textarea>
+                  <label for="event-url">Website (optional)</label>
+                  <input id="event-url" name="event-url" type="url" inputmode="url" placeholder="https://example.com/event" />
+                  <p class="hint">Timed events use the scanner's local time zone. For all-day events, the selected end date is treated as the last included day.</p>
                 </fieldset>
 
                 <fieldset class="option-group format-fields" data-format-fields="geo" hidden>
@@ -869,8 +907,8 @@
                         spellcheck="false"
                       >{}</textarea>
                       <p class="hint">
-                        Merged last into the QRCode options object. Function-based options such as
-                        <code>toSJISFunc</code> still need explicit code wiring.
+                        Merged last into the QRCode options object. The bundled Shift JIS helper is
+                        always restored after this merge so automatic and manual Kanji encoding remain available.
                       </p>
                     </fieldset>
 
@@ -912,10 +950,14 @@
                           <button type="button" class="outline-mode-button" data-outline-mode="stream" aria-pressed="false">
                             Stream
                           </button>
+                          <button type="button" class="outline-mode-button" data-outline-mode="units" aria-pressed="false" title="Encoding units">
+                            Units
+                          </button>
                           <button type="button" class="outline-mode-button" data-outline-mode="metadata" aria-pressed="false">
                             Metadata
                           </button>
                         </div>
+                        <p class="hint">Solid dots start outline groups; ringed dots start encoded fields. Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.</p>
                       </fieldset>
                       <div class="color-grid debug-color-grid">
                         <label class="color-field" for="debug-data-color">
@@ -1012,7 +1054,7 @@
 
           <section>
             <h2>What you can create</h2>
-            <p>Generate QR codes for websites, plain text, number sequences, Wi-Fi credentials, email, phone calls, SMS messages, geographic coordinates, vCards and small files. Batch controls can produce numbered sets or a random-order series of file chunks, while frame captions make printed codes easier to identify.</p>
+            <p>Generate QR codes for websites, plain text, number sequences, Wi-Fi credentials, email, phone calls, SMS messages, calendar events, geographic coordinates, vCards and small files. Batch controls can produce numbered sets or a random-order series of file chunks, while frame captions make printed codes easier to identify.</p>
             <p>Style modules, finder eyes, gradients, transparency, background images, logos, emoji and pixel art. Export the current code as PNG, JPEG, GIF, SVG or PDF; export multi-code projects as ZIP, PDF sheets, animated GIF or MP4.</p>
           </section>
 
@@ -1063,7 +1105,7 @@
             <div class="dependency-list">
               <article>
                 <div><h3>QRCode / node-qrcode</h3><span class="version-badge">1.5.0</span></div>
-                <p>Creates QR segments, versions, masks, error-correction data and module matrices.</p>
+                <p>Creates QR segments, versions, masks, error-correction data and module matrices. Its companion Shift JIS build enables efficient Kanji segments.</p>
                 <nav aria-label="QRCode links"><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">Website</a><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a></nav>
               </article>
               <article>
@@ -1084,7 +1126,7 @@
               </article>
               <article>
                 <div><h3>jsDelivr</h3><span class="version-badge">CDN service</span></div>
-                <p>Delivers the pinned QRCode 1.5.0 browser bundle.</p>
+                <p>Delivers the pinned QRCode 1.5.0 browser bundle and matching Shift JIS helper.</p>
                 <nav aria-label="jsDelivr links"><a href="https://www.jsdelivr.com/">Website</a><a href="https://github.com/jsdelivr/jsdelivr">Repository</a><a href="https://github.com/jsdelivr/jsdelivr/blob/master/LICENSE">MIT license</a><a href="https://www.jsdelivr.com/terms">Terms</a></nav>
               </article>
               <article>

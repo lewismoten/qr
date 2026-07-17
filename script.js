@@ -174,6 +174,16 @@ const phoneFormatButtons = document.querySelectorAll('.phone-format-button');
 const smsNumber = document.getElementById('sms-number');
 const smsBody = document.getElementById('sms-body');
 const smsLengthHint = document.getElementById('sms-length-hint');
+const eventTitle = document.getElementById('event-title');
+const eventAllDay = document.getElementById('event-all-day');
+const eventStartDate = document.getElementById('event-start-date');
+const eventStartTime = document.getElementById('event-start-time');
+const eventEndDate = document.getElementById('event-end-date');
+const eventEndTime = document.getElementById('event-end-time');
+const eventLocation = document.getElementById('event-location');
+const eventDescription = document.getElementById('event-description');
+const eventUrl = document.getElementById('event-url');
+const eventTimeFields = document.querySelectorAll('.event-time-field');
 const geoLatitude = document.getElementById('geo-latitude');
 const geoLongitude = document.getElementById('geo-longitude');
 const geoQuery = document.getElementById('geo-query');
@@ -373,6 +383,9 @@ const QR_ALPHANUMERIC_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./
 const PRINT_PIXELS_PER_INCH = 192;
 const MIN_PRINT_MODULE_INCHES = 0.02;
 const ANIMATION_MAX_FRAMES = 200;
+const CALENDAR_TITLE_MAX_LENGTH = 120;
+const CALENDAR_LOCATION_MAX_LENGTH = 160;
+const CALENDAR_DESCRIPTION_MAX_LENGTH = 500;
 const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
@@ -395,6 +408,8 @@ const FILE_MANIFEST_FIELDS = {
   validationValue: 6,
   customMetadata: 8,
 };
+const calendarEventUid = `${typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}@qr.lewismoten.com`;
+const calendarEventTimestamp = new Date();
 
 function isDebugOverlayActive() {
   return (activeTabName === 'debug' && activeDebugSubtab === 'overlay') || debugEnabled.checked;
@@ -1485,6 +1500,70 @@ function getAutomaticFileFrameMessage() {
   return `${shortenedName}${sequence}`;
 }
 
+function parseCalendarFrameDate(value) {
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) {
+    return null;
+  }
+  return new Date(year, month - 1, day, 12);
+}
+
+function formatCalendarFrameDate(value, includeYear = true) {
+  const date = parseCalendarFrameDate(value);
+  if (!date) {
+    return '';
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    ...(includeYear ? { year: 'numeric' } : {}),
+  }).format(date);
+}
+
+function formatCalendarFrameTime(value) {
+  if (!value) {
+    return '';
+  }
+  const [hour, minute] = value.split(':').map(Number);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+    return '';
+  }
+  const date = new Date(2000, 0, 1, hour, minute);
+  return new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+}
+
+function getAutomaticCalendarFrameMessage() {
+  const startDate = formatCalendarFrameDate(eventStartDate.value);
+  if (!startDate || !eventEndDate.value) {
+    return shortenFrameValue(eventTitle.value, 80);
+  }
+  const sameDate = eventStartDate.value === eventEndDate.value;
+  const sameYear = eventStartDate.value.slice(0, 4) === eventEndDate.value.slice(0, 4);
+  const endDate = sameDate
+    ? ''
+    : formatCalendarFrameDate(eventEndDate.value);
+  let schedule = sameDate ? startDate : `${formatCalendarFrameDate(eventStartDate.value, !sameYear)} - ${endDate}`;
+
+  if (eventAllDay.checked) {
+    schedule = `${schedule} | All day`;
+  } else {
+    const startTime = formatCalendarFrameTime(eventStartTime.value);
+    const endTime = formatCalendarFrameTime(eventEndTime.value);
+    if (sameDate) {
+      schedule = `${schedule} | ${startTime} - ${endTime}`;
+    } else {
+      schedule = `${formatCalendarFrameDate(eventStartDate.value, !sameYear)} ${startTime} - ${endDate} ${endTime}`;
+    }
+  }
+
+  const cleanSchedule = schedule.replace(/\s+/g, ' ').trim();
+  const title = shortenFrameValue(eventTitle.value, 80);
+  return [title, shortenFrameValue(cleanSchedule, 80)].filter(Boolean).join('\n');
+}
+
 function getAutomaticFrameMessage() {
   switch (qrFormat.value) {
     case 'url':
@@ -1501,6 +1580,8 @@ function getAutomaticFrameMessage() {
       return phoneNumber.value ? shortenFrameValue(`Call ${phoneNumber.value}`) : '';
     case 'sms':
       return smsNumber.value ? shortenFrameValue(`Text ${smsNumber.value}`) : '';
+    case 'event':
+      return getAutomaticCalendarFrameMessage();
     case 'geo':
       {
         const location =
@@ -2276,6 +2357,7 @@ function setFormatVisibility() {
   payloadRevealToggle.hidden = !showSecretToggle;
   payloadRevealToggle.setAttribute('aria-hidden', String(!showSecretToggle));
   syncFileModeVisibility();
+  syncCalendarEventControls();
 }
 
 async function readSelectedFile() {
@@ -2862,6 +2944,96 @@ function buildEmailPayloadWithBody(bodyValue) {
   return `mailto:${emailTo.value.trim()}${suffix}`;
 }
 
+function formatCalendarInputDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatCalendarInputTime(date) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function formatCalendarDate(value) {
+  return value.replaceAll('-', '');
+}
+
+function formatCalendarDateTime(dateValue, timeValue) {
+  return `${formatCalendarDate(dateValue)}T${timeValue.replace(':', '')}00`;
+}
+
+function formatCalendarUtcDateTime(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function addCalendarDays(dateValue, days) {
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1, day + days);
+  return formatCalendarInputDate(date);
+}
+
+function escapeCalendarText(value) {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function initializeCalendarEventDefaults() {
+  const start = new Date();
+  start.setSeconds(0, 0);
+  start.setMinutes(0);
+  start.setHours(start.getHours() + 1);
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+  eventStartDate.value = formatCalendarInputDate(start);
+  eventStartTime.value = formatCalendarInputTime(start);
+  eventEndDate.value = formatCalendarInputDate(end);
+  eventEndTime.value = formatCalendarInputTime(end);
+}
+
+function syncCalendarEventControls() {
+  const allDay = eventAllDay.checked;
+  eventStartTime.disabled = allDay;
+  eventEndTime.disabled = allDay;
+  eventTimeFields.forEach((field) => field.classList.toggle('is-disabled', allDay));
+}
+
+function buildCalendarEventPayload() {
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Lewis Moten//QR Code Generator//EN',
+    'BEGIN:VEVENT',
+    `UID:${calendarEventUid}`,
+    `DTSTAMP:${formatCalendarUtcDateTime(calendarEventTimestamp)}`,
+    `SUMMARY:${escapeCalendarText(eventTitle.value.trim())}`,
+  ];
+
+  if (eventAllDay.checked) {
+    lines.push(`DTSTART;VALUE=DATE:${formatCalendarDate(eventStartDate.value)}`);
+    lines.push(`DTEND;VALUE=DATE:${formatCalendarDate(addCalendarDays(eventEndDate.value, 1))}`);
+  } else {
+    lines.push(`DTSTART:${formatCalendarDateTime(eventStartDate.value, eventStartTime.value)}`);
+    lines.push(`DTEND:${formatCalendarDateTime(eventEndDate.value, eventEndTime.value)}`);
+  }
+
+  if (eventLocation.value.trim()) {
+    lines.push(`LOCATION:${escapeCalendarText(eventLocation.value.trim())}`);
+  }
+  if (eventDescription.value.trim()) {
+    lines.push(`DESCRIPTION:${escapeCalendarText(eventDescription.value.trim())}`);
+  }
+  if (eventUrl.value.trim()) {
+    lines.push(`URL:${eventUrl.value.trim()}`);
+  }
+
+  lines.push('END:VEVENT', 'END:VCALENDAR');
+  return lines.join('\r\n');
+}
+
 function buildGeoPayload() {
   const latitude = geoLatitude.value.trim();
   const longitude = geoLongitude.value.trim();
@@ -3002,6 +3174,8 @@ async function buildEncodedText() {
         return '';
       }
       return `SMSTO:${normalizePhoneNumber(smsNumber.value)}:${smsBody.value}`;
+    case 'event':
+      return buildCalendarEventPayload();
     case 'geo':
       if (!geoLatitude.value.trim() || !geoLongitude.value.trim()) {
         return '';
@@ -3054,6 +3228,8 @@ function buildEncodedPreviewTemplate() {
         smsBody.value,
         '[message]'
       )}`;
+    case 'event':
+      return buildCalendarEventPayload();
     case 'geo': {
       const latitude = placeholderValue(geoLatitude.value, '[latitude]');
       const longitude = placeholderValue(geoLongitude.value, '[longitude]');
@@ -3152,6 +3328,9 @@ function buildOptions() {
   };
   if (isChunkedFile) {
     mergedOptions.version = getConfiguredChunkVersion();
+  }
+  if (typeof QRCode.toSJIS === 'function') {
+    mergedOptions.toSJISFunc = QRCode.toSJIS;
   }
   return mergedOptions;
 }
@@ -3425,6 +3604,24 @@ function getWebsiteValidationState(value, { required = false, contextLabel = 'vC
   };
 }
 
+function validateCalendarText(value, { required = false, label, maxLength, multiline = false }) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return required ? `Not valid for Event format yet: ${label} is required.` : '';
+  }
+  if (value.length > maxLength) {
+    return `Not valid for Event format yet: ${label} should stay within ${maxLength} characters.`;
+  }
+
+  const invalidControlPattern = multiline
+    ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/
+    : /[\x00-\x1f\x7f]/;
+  if (invalidControlPattern.test(value)) {
+    return `Not valid for Event format yet: ${label} contains unsupported control characters.`;
+  }
+  return '';
+}
+
 function getFormatValidationState() {
   if (qrFormat.value === 'url') {
     return getWebsiteValidationState(urlInput.value, {
@@ -3467,6 +3664,68 @@ function getFormatValidationState() {
     if (suffixValidation) {
       return { error: suffixValidation, warning: '' };
     }
+  }
+
+  if (qrFormat.value === 'event') {
+    const titleValidation = validateCalendarText(eventTitle.value, {
+      required: true,
+      label: 'title',
+      maxLength: CALENDAR_TITLE_MAX_LENGTH,
+    });
+    if (titleValidation) {
+      return { error: titleValidation, warning: '' };
+    }
+
+    if (!eventStartDate.value) {
+      return { error: 'Not valid for Event format yet: start date is required.', warning: '' };
+    }
+    if (!eventEndDate.value) {
+      return { error: 'Not valid for Event format yet: end date is required.', warning: '' };
+    }
+
+    if (eventAllDay.checked) {
+      if (eventEndDate.value < eventStartDate.value) {
+        return { error: 'Not valid for Event format yet: end date cannot be before start date.', warning: '' };
+      }
+    } else {
+      if (!eventStartTime.value) {
+        return { error: 'Not valid for Event format yet: start time is required.', warning: '' };
+      }
+      if (!eventEndTime.value) {
+        return { error: 'Not valid for Event format yet: end time is required.', warning: '' };
+      }
+      const startValue = `${eventStartDate.value}T${eventStartTime.value}`;
+      const endValue = `${eventEndDate.value}T${eventEndTime.value}`;
+      if (endValue <= startValue) {
+        return { error: 'Not valid for Event format yet: end must be after start.', warning: '' };
+      }
+    }
+
+    const locationValidation = validateCalendarText(eventLocation.value, {
+      label: 'location',
+      maxLength: CALENDAR_LOCATION_MAX_LENGTH,
+    });
+    if (locationValidation) {
+      return { error: locationValidation, warning: '' };
+    }
+
+    const descriptionValidation = validateCalendarText(eventDescription.value, {
+      label: 'description',
+      maxLength: CALENDAR_DESCRIPTION_MAX_LENGTH,
+      multiline: true,
+    });
+    if (descriptionValidation) {
+      return { error: descriptionValidation, warning: '' };
+    }
+
+    const websiteValidation = getWebsiteValidationState(eventUrl.value, {
+      contextLabel: 'Event',
+    });
+    if (websiteValidation.error || websiteValidation.warning) {
+      return websiteValidation;
+    }
+
+    return { error: '', warning: '' };
   }
 
   if (qrFormat.value === 'file') {
@@ -3706,7 +3965,23 @@ function getInvalidCharacters(text, mode) {
   }
 
   if (mode === 'kanji') {
-    return null;
+    const invalid = [];
+    [...text].forEach((char, index) => {
+      let shiftJisValue;
+      try {
+        shiftJisValue = QRCode.toSJIS(char);
+      } catch (error) {
+        shiftJisValue = undefined;
+      }
+      const isQrKanji =
+        Number.isInteger(shiftJisValue) &&
+        ((shiftJisValue >= 0x8140 && shiftJisValue <= 0x9ffc) ||
+          (shiftJisValue >= 0xe040 && shiftJisValue <= 0xebbf));
+      if (!isQrKanji) {
+        invalid.push({ char, index });
+      }
+    });
+    return invalid;
   }
 
   const invalid = [];
@@ -3732,10 +4007,10 @@ function validateManualMode(encodedText) {
   }
 
   if (mode === 'kanji') {
-    setValidationMessage(
-      'Manual Kanji mode needs a Shift JIS conversion helper that is not bundled in this browser build.'
-    );
-    return false;
+    if (typeof QRCode.toSJIS !== 'function') {
+      setValidationMessage('Manual Kanji mode is unavailable because the Shift JIS conversion helper did not load.');
+      return false;
+    }
   }
 
   const invalid = getInvalidCharacters(encodedText, mode);
@@ -4154,6 +4429,68 @@ function buildPostHeaderStreamGroups(traversal, bitRoles) {
   return groups;
 }
 
+function getEncodingUnitBitLengths(segment, mode) {
+  const payloadBits = segment.getBitsLength();
+  const dataLength = typeof segment.getLength === 'function' ? segment.getLength() : 0;
+  const bitLengths = [];
+
+  if (mode === 'numeric') {
+    const completeGroups = Math.floor(dataLength / 3);
+    bitLengths.push(...Array(completeGroups).fill(10));
+    const remainingDigits = dataLength % 3;
+    if (remainingDigits > 0) {
+      bitLengths.push(remainingDigits === 1 ? 4 : 7);
+    }
+  } else if (mode === 'alphanumeric') {
+    bitLengths.push(...Array(Math.floor(dataLength / 2)).fill(11));
+    if (dataLength % 2 === 1) {
+      bitLengths.push(6);
+    }
+  } else if (mode === 'kanji') {
+    bitLengths.push(...Array(Math.floor(payloadBits / 13)).fill(13));
+  } else if (mode === 'byte') {
+    bitLengths.push(...Array(Math.floor(payloadBits / 8)).fill(8));
+  }
+
+  const describedBits = bitLengths.reduce((total, bitLength) => total + bitLength, 0);
+  if (describedBits < payloadBits) {
+    bitLengths.push(payloadBits - describedBits);
+  }
+
+  return bitLengths;
+}
+
+function buildEncodingUnitGroups(qrDefinition, traversal) {
+  const groups = [];
+  let cursor = 0;
+
+  qrDefinition.segments.forEach((segment, segmentIndex) => {
+    const mode = normalizeModeName(segment.mode);
+    cursor += 4 + getCharCountBits(mode, qrDefinition.version);
+    let segmentBitOffset = 0;
+
+    getEncodingUnitBitLengths(segment, mode).forEach((bitLength, unitIndex) => {
+      const start = cursor + segmentBitOffset;
+      const modules = traversal.slice(start, start + bitLength);
+      if (modules.length > 0) {
+        groups.push({
+          kind: 'data',
+          modules,
+          roles: Array(modules.length).fill('payload'),
+          encodingMode: mode,
+          segmentIndex,
+          unitIndex,
+        });
+      }
+      segmentBitOffset += bitLength;
+    });
+
+    cursor += segment.getBitsLength();
+  });
+
+  return groups;
+}
+
 function splitMetadataCoordinateRuns(coordinates) {
   if (coordinates.length === 0) {
     return [];
@@ -4228,6 +4565,16 @@ function buildDebugOverlayModel(qrDefinition, options) {
   const remainderBits = new Set();
   const codewords = [];
   const bitRoles = classifyTraversalBits(qrDefinition, dataCodewordsCount, traversal.length);
+  const fieldStarts = [];
+
+  bitRoles.forEach((role, index) => {
+    if (index === 0 || role !== bitRoles[index - 1]) {
+      fieldStarts.push({
+        role,
+        module: traversal[index],
+      });
+    }
+  });
 
   traversal.forEach((module, index) => {
     const role = bitRoles[index];
@@ -4264,6 +4611,7 @@ function buildDebugOverlayModel(qrDefinition, options) {
 
   const { ecLevelBits, maskBits } = getFormatBitGroups(qrDefinition.modules.size);
   const streamGroups = buildPostHeaderStreamGroups(traversal, bitRoles);
+  const encodingUnitGroups = buildEncodingUnitGroups(qrDefinition, traversal);
   const metadataGroups = buildMetadataGroups(qrDefinition);
 
   return {
@@ -4277,8 +4625,10 @@ function buildDebugOverlayModel(qrDefinition, options) {
     errorCorrectionBits,
     remainderBits,
     bitRoles,
+    fieldStarts,
     codewords,
     streamGroups,
+    encodingUnitGroups,
     metadataGroups,
   };
 }
@@ -4585,6 +4935,10 @@ function getActiveOutlineGroups(debugModel) {
     return debugModel.streamGroups;
   }
 
+  if (selectedMode === 'units') {
+    return debugModel.encodingUnitGroups;
+  }
+
   if (selectedMode === 'metadata') {
     return debugModel.metadataGroups;
   }
@@ -4640,6 +4994,10 @@ function drawCodewordOutlines(context, debugModel, marginModules, cellSize) {
   const lineWidth = Math.max(1.25, cellSize * 0.14);
   const groups = getActiveOutlineGroups(debugModel);
   const outlinedKinds = new Set(['header', 'data', 'errorCorrection', 'metadata']);
+  if (activeDebugOutlineMode === 'codewords') {
+    outlinedKinds.add('padding');
+    outlinedKinds.add('padByte');
+  }
 
   groups.forEach((codeword, index) => {
     if (codeword.modules.length === 0) {
@@ -4827,6 +5185,48 @@ function drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cel
     context.moveTo(from.x, from.y);
     context.lineTo(to.x, to.y);
     context.stroke();
+  });
+}
+
+function getBitRoleCategory(role) {
+  switch (role) {
+    case 'payload':
+      return 'data';
+    case 'bytePad':
+    case 'padByte':
+      return 'padding';
+    case 'errorCorrection':
+      return 'errorCorrection';
+    default:
+      return role;
+  }
+}
+
+function drawStreamFieldStarts(context, debugModel, marginModules, cellSize) {
+  if (activeDebugOutlineMode === 'metadata') {
+    return;
+  }
+
+  debugModel.fieldStarts.forEach(({ role, module }) => {
+    if (!module) {
+      return;
+    }
+
+    const category = getBitRoleCategory(role);
+    const categoryColor = debugColors[category]?.value ?? debugColors.data.value;
+    const contrastColor = getContrastingHex(categoryColor);
+    const centerX = (module.column + marginModules + 0.5) * cellSize;
+    const centerY = (module.row + marginModules + 0.5) * cellSize;
+
+    context.fillStyle = hexToRgba(contrastColor, 0.95);
+    context.beginPath();
+    context.arc(centerX, centerY, Math.max(2, cellSize * 0.28), 0, Math.PI * 2);
+    context.fill();
+
+    context.fillStyle = hexToRgba(categoryColor, 0.95);
+    context.beginPath();
+    context.arc(centerX, centerY, Math.max(0.9, cellSize * 0.12), 0, Math.PI * 2);
+    context.fill();
   });
 }
 
@@ -5053,6 +5453,22 @@ function fitCanvasText(context, text, maximumWidth) {
 }
 
 function wrapFrameMessage(context, message, maximumWidth, maximumLines = 2, truncate = true) {
+  const explicitLines = message
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+  if (explicitLines.length > 1) {
+    if (explicitLines.length <= maximumLines && explicitLines.every((line) => context.measureText(line).width <= maximumWidth)) {
+      return explicitLines;
+    }
+    if (!truncate) {
+      return null;
+    }
+    return explicitLines
+      .slice(0, maximumLines)
+      .map((line) => context.measureText(line).width <= maximumWidth ? line : fitCanvasText(context, line, maximumWidth));
+  }
+
   let remaining = message.replace(/\s+/g, ' ').trim();
   const lines = [];
   const emailBreak = maximumLines >= 2 ? remaining.match(/^(.*?)(@[^\s@]+)$/) : null;
@@ -5488,6 +5904,7 @@ function drawQr(qrDefinition, options) {
     drawHighlightedBoundaries(context, qrDefinition, debugModel, marginModules, cellSize);
     drawCodewordOutlines(context, debugModel, marginModules, cellSize);
     drawCodewordPaths(context, qrDefinition, debugModel, marginModules, cellSize);
+    drawStreamFieldStarts(context, debugModel, marginModules, cellSize);
   }
 
   drawCenterArtwork(context, marginModules * cellSize, moduleCount * cellSize, options.color.light);
@@ -6423,6 +6840,7 @@ if ('ResizeObserver' in window) {
 ensurePixelArtPalette();
 ensurePixelArtGrid();
 syncPixelArtGrid();
+initializeCalendarEventDefaults();
 urlInput.value = getDefaultUrlValue();
 syncOutputs();
 setFormatVisibility();
