@@ -4,6 +4,16 @@
   "formats": { "url": "رابط", "event": "حدث", "vcard": "بطاقة اتصال", "sms": "رسالة نصية", "email": "بريد إلكتروني", "phone": "هاتف", "text": "نص", "number": "رقم", "numberRange": "نطاق أرقام", "wifi": "واي فاي", "calendarEvent": "حدث تقويم", "geo": "موقع جغرافي", "file": "ملف" },
   "form": {
     "format": { "payloadFormat": "تنسيق المحتوى", "qrFormat": "تنسيق QR", "bulkImport": "استيراد مجمع" },
+    "placeholders": {
+      "numberPrefix": "عنصر-", "numberSuffix": "-أ", "email": "الاسم@مثال.موقع", "phone": "+966501234567",
+      "eventWebsite": "https://مثال.موقع/حدث", "personName": "تايلور مثال", "organization": "مؤسسة مثال",
+      "jobTitle": "مهندس", "website": "https://مثال.موقع", "metadata": "{\"collection\":\"البحث-عن-الكنز\"}"
+    },
+    "defaults": {
+      "eventTitle": "حدث جديد", "geoLabel": "فرونت رويال، فرجينيا", "vcardName": "Lewis Moten III",
+      "vcardOrganization": "LewisMoten.com", "vcardTitle": "المالك", "phone": "+15305394775",
+      "vcardEmail": "lewismoten@gmail.com", "vcardWebsite": "https://lewismoten.com"
+    },
     "data": {
       "bulkFileUnavailable": "تنسيق الملف غير متاح في الاستيراد المجمع. استخدم تنسيق الملف المخصص للبيانات الثنائية.", "bulkHeaders": "يجب أن يحتوي الصف الأول على أسماء الحقول التالية:",
       "chooseCsv": "اختر ملف CSV", "clearCsv": "مسح CSV", "urlContent": "محتوى الرابط", "textContent": "محتوى نصي", "textPayload": "النص المراد ترميزه", "enterText": "أدخل أي نص",

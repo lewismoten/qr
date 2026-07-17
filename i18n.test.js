@@ -10,6 +10,11 @@ import {
   lookup,
 } from './src/js/i18n/index.js';
 import { getSavedLocale, LOCALE_STORAGE_KEY } from './src/js/i18n/picker.js';
+import {
+  validateGeoLabel,
+  validatePrintableText,
+  validateVCardTextValue,
+} from './src/js/app/validation.js';
 
 function createFetcher(resources) {
   return async (url) => {
@@ -144,11 +149,25 @@ const flattenMessages = (value, prefix = '', result = {}) => {
 };
 const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const htmlKeys = [...new Set([...html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)].map((match) => match[1]))];
+const formControls = html.match(/<(?:input|textarea)\b[^>]*>/gs) || [];
+assert.deepEqual(
+  formControls.filter((tag) => /\bplaceholder=/.test(tag) && !/\bdata-i18n-placeholder=/.test(tag)),
+  [],
+  'All user-facing placeholders must be localized',
+);
+for (const id of ['phone-number', 'sms-number', 'event-title', 'geo-query', 'vcard-name', 'vcard-org', 'vcard-title', 'vcard-phone', 'vcard-email', 'vcard-url']) {
+  const tag = formControls.find((control) => new RegExp(`\\bid=["']${id}["']`).test(control));
+  assert.match(tag || '', /\bdata-i18n-value=/, `${id} must localize its default value`);
+}
 const scopedFormKeys = htmlKeys.filter((key) => /^(content|formats|fields|form|style|frame|wifi|common)\./.test(key));
 for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
   const localeMessages = flattenMessages(JSON.parse(await readFile(new URL(`locales/${locale}.json`, import.meta.url), 'utf8')));
   const requiredKeys = locale === 'en-US' ? htmlKeys : scopedFormKeys;
   assert.deepEqual(requiredKeys.filter((key) => !(key in localeMessages)), [], `${locale} is missing form translations`);
 }
+
+assert.equal(validatePrintableText('ARTÍCULO-项目', { label: 'prefix', maxLength: 32 }), '');
+assert.equal(validateGeoLabel('弗朗特罗亚尔，弗吉尼亚州'), '');
+assert.equal(validateVCardTextValue('अभियंता', { label: 'title' }), '');
 
 console.log('Language lookup and locale fallback tests passed.');

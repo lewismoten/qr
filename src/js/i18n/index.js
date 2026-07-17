@@ -1,5 +1,5 @@
 const DEFAULT_LOCALE = 'en-US';
-const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title'];
+const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title', 'value'];
 
 let activeLocale = DEFAULT_LOCALE;
 let messages = Object.freeze({});
@@ -234,7 +234,18 @@ export function translateDocument(document) {
   TRANSLATED_ATTRIBUTES.forEach((attribute) => {
     const dataAttribute = `data-i18n-${attribute}`;
     document.querySelectorAll(`[${dataAttribute}]`).forEach((element) => {
-      element.setAttribute(attribute, lookup(element.getAttribute(dataAttribute), element.getAttribute(attribute) || ''));
+      const translated = lookup(element.getAttribute(dataAttribute), element.getAttribute(attribute) || '');
+      if (attribute !== 'value') {
+        element.setAttribute(attribute, translated);
+        return;
+      }
+
+      const previous = element.dataset.i18nAppliedValue;
+      if (previous === undefined || element.value === previous) {
+        element.value = translated;
+        element.defaultValue = translated;
+      }
+      element.dataset.i18nAppliedValue = translated;
     });
   });
 }

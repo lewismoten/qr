@@ -1,8 +1,8 @@
 import { lookup } from '../i18n/index.js';
 
-const VCARD_TEXT_PATTERN = /^[A-Za-z0-9 .,&()'/:+-]*$/;
+const VCARD_TEXT_PATTERN = /^[\p{L}\p{M}\p{N}\p{P}\p{S}\p{Zs}]*$/u;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PRINTABLE_TEXT_PATTERN = /^[\x20-\x7E]*$/;
+const PRINTABLE_TEXT_PATTERN = /^[^\p{Cc}\p{Cs}]*$/u;
 
 export function validateEmailValue(value, { required = true, label, contextLabel } = {}) {
   const resolvedLabel = label ?? lookup('fields.emailAddress', 'email address');
@@ -72,7 +72,7 @@ export function validateGeoLabel(value) {
     return lookup('validation.geo.labelLength', 'Not valid for Geo format yet: label should stay within 80 characters.');
   }
 
-  const allowedPattern = /^[A-Za-z0-9 .,&#()'/:+-]*$/;
+  const allowedPattern = /^[\p{L}\p{M}\p{N}\p{P}\p{S}\p{Zs}]*$/u;
   if (!allowedPattern.test(trimmed)) {
     return lookup('validation.geo.labelCharacters', 'Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.');
   }

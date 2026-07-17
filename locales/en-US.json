@@ -32,6 +32,16 @@
       "qrFormat": "QR format",
       "bulkImport": "Bulk Import"
     },
+    "placeholders": {
+      "numberPrefix": "ITEM-", "numberSuffix": "-A", "email": "name@example.com", "phone": "+15551234567",
+      "eventWebsite": "https://example.com/event", "personName": "Taylor Example", "organization": "OpenAI",
+      "jobTitle": "Engineer", "website": "https://example.com", "metadata": "{\"collection\":\"scavenger-hunt\"}"
+    },
+    "defaults": {
+      "eventTitle": "New event", "geoLabel": "Front Royal, VA", "vcardName": "Lewis Moten III",
+      "vcardOrganization": "LewisMoten.com", "vcardTitle": "Owner", "phone": "+15305394775",
+      "vcardEmail": "lewismoten@gmail.com", "vcardWebsite": "https://lewismoten.com"
+    },
     "data": {
       "bulkFileUnavailable": "File format is unavailable in Bulk Import. Use the dedicated File format for binary data.",
       "bulkHeaders": "The first row must contain these field names:",

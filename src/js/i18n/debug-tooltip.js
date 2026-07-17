@@ -5,13 +5,15 @@ const KEY_SELECTOR = [
   '[data-i18n-aria-label]',
   '[data-i18n-placeholder]',
   '[data-i18n-title]',
+  '[data-i18n-value]',
 ].join(',');
 
 function getKey(element) {
   return element?.dataset.i18n
     || element?.dataset.i18nAriaLabel
     || element?.dataset.i18nPlaceholder
-    || element?.dataset.i18nTitle;
+    || element?.dataset.i18nTitle
+    || element?.dataset.i18nValue;
 }
 
 function getLanguageName(locale) {

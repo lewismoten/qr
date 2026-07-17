@@ -4,6 +4,16 @@
   "formats": { "url": "यूआरएल", "event": "कार्यक्रम", "vcard": "वीकार्ड", "sms": "एसएमएस", "email": "ईमेल", "phone": "फ़ोन", "text": "पाठ", "number": "संख्या", "numberRange": "संख्या सीमा", "wifi": "वाई-फ़ाई", "calendarEvent": "कैलेंडर कार्यक्रम", "geo": "भौगोलिक स्थान", "file": "फ़ाइल" },
   "form": {
     "format": { "payloadFormat": "सामग्री प्रारूप", "qrFormat": "क्यूआर प्रारूप", "bulkImport": "बल्क आयात" },
+    "placeholders": {
+      "numberPrefix": "वस्तु-", "numberSuffix": "-क", "email": "नाम@उदाहरण.कॉम", "phone": "+919876543210",
+      "eventWebsite": "https://उदाहरण.कॉम/कार्यक्रम", "personName": "टेलर उदाहरण", "organization": "उदाहरण संस्था",
+      "jobTitle": "अभियंता", "website": "https://उदाहरण.कॉम", "metadata": "{\"collection\":\"खजाने-की-खोज\"}"
+    },
+    "defaults": {
+      "eventTitle": "नया कार्यक्रम", "geoLabel": "फ्रंट रॉयल, वर्जीनिया", "vcardName": "Lewis Moten III",
+      "vcardOrganization": "LewisMoten.com", "vcardTitle": "मालिक", "phone": "+15305394775",
+      "vcardEmail": "lewismoten@gmail.com", "vcardWebsite": "https://lewismoten.com"
+    },
     "data": {
       "bulkFileUnavailable": "बल्क आयात में फ़ाइल प्रारूप उपलब्ध नहीं है। बाइनरी डेटा के लिए अलग फ़ाइल प्रारूप का उपयोग करें।", "bulkHeaders": "पहली पंक्ति में ये फ़ील्ड नाम होने चाहिए:",
       "chooseCsv": "CSV फ़ाइल चुनें", "clearCsv": "CSV साफ़ करें", "urlContent": "यूआरएल सामग्री", "textContent": "पाठ सामग्री", "textPayload": "एन्कोड किया जाने वाला पाठ", "enterText": "कोई भी पाठ लिखें",

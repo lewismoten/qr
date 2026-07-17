@@ -4,6 +4,16 @@
   "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono", "text": "Texto", "number": "Número", "numberRange": "Rango numérico", "wifi": "Wi-Fi", "calendarEvent": "Evento de calendario", "geo": "Geo", "file": "Archivo" },
   "form": {
     "format": { "payloadFormat": "Formato de contenido", "qrFormat": "Formato QR", "bulkImport": "Importación masiva" },
+    "placeholders": {
+      "numberPrefix": "ARTÍCULO-", "numberSuffix": "-A", "email": "nombre@ejemplo.com", "phone": "+34911234567",
+      "eventWebsite": "https://ejemplo.com/evento", "personName": "Taylor Ejemplo", "organization": "Organización",
+      "jobTitle": "Ingeniero/a", "website": "https://ejemplo.com", "metadata": "{\"collection\":\"busqueda-del-tesoro\"}"
+    },
+    "defaults": {
+      "eventTitle": "Nuevo evento", "geoLabel": "Front Royal, Virginia", "vcardName": "Lewis Moten III",
+      "vcardOrganization": "LewisMoten.com", "vcardTitle": "Propietario", "phone": "+15305394775",
+      "vcardEmail": "lewismoten@gmail.com", "vcardWebsite": "https://lewismoten.com"
+    },
     "data": {
       "bulkFileUnavailable": "El formato Archivo no está disponible en la importación masiva. Usa el formato Archivo para datos binarios.",
       "bulkHeaders": "La primera fila debe contener estos nombres de campo:", "chooseCsv": "Elegir un archivo CSV", "clearCsv": "Borrar CSV",
