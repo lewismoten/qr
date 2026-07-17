@@ -12,9 +12,7 @@ import {
   isVersionRegion,
 } from './qr-regions.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
-import { createEmailCapacity } from './ui/content/email/capacity.js';
-import { createContentPipeline } from './ui/content/pipeline.js';
-import { createFormatValidator } from './ui/content/validation.js';
+import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createBulkImportSection } from './ui/content/bulk/section.js';
 import {
   arrayBufferToBase64,
@@ -30,12 +28,13 @@ import {
 import { createDebugSetup } from './ui/debug/setup.js';
 import { createDownloadControls } from './ui/download/controls.js';
 import { restoreLocationDownload } from './ui/download/location.js';
-import { createQrConfiguration } from './ui/encoding/configuration.js';
 import { createDownloadSetup } from './ui/download/setup.js';
 import { initializeDialogs } from './ui/dialogs.js';
 import { bindApplicationEvents } from './ui/events.js';
 import { getApplicationElements } from './ui/elements.js';
 import { createNavigation } from './ui/navigation/setup.js';
+import { createOutputSetup } from './ui/output/setup.js';
+import { createRuntimeHelpers } from './ui/runtime/helpers.js';
 import { createPreviewViewport } from './ui/preview/viewport.js';
 import { createInvalidPreviewRenderer } from './ui/preview/invalid.js';
 import { createRenderController } from './ui/preview/render.js';
@@ -44,6 +43,7 @@ import { createPreviewSizeControls } from './ui/preview/size.js';
 import { createStyleSetup } from './ui/style/setup.js';
 import qrEncoder from '../qr/index.js';
 
+const elements = getApplicationElements(document);
 const {
   form, canvas, qrPreviewViewport, previewViewControls, previewViewFit, previewViewActual, chunkPreviewNav,
   chunkPreviewPrev, chunkPreviewNext, chunkPreviewStatus, optionsPreview, encodedPreview, payloadRevealSecrets, payloadRevealToggle,
@@ -75,7 +75,7 @@ const {
   vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl, fileInput, fileEncodingMode,
   fileChunkControls, fileChunkVersionAuto, fileChunkVersion, fileChunkVersionValue, fileIncludeManifest, fileCompressTransfer, fileCustomMetadata,
   fileChunkIndex, fileChunkIndexValue, fileCapacityHint, clearFileButton,
-} = getApplicationElements(document);
+} = elements;
 
 const debugColors = {
   data: document.getElementById('debug-data-color'),
@@ -111,6 +111,14 @@ const schedulePreviewViewportSync = previewViewport.scheduleSync;
 let activeTabName = 'content';
 let activeDebugSubtab = 'encoding';
 let activeDebugOutlineMode = 'codewords';
+const runtimeHelpers = createRuntimeHelpers({
+  window, canvas, errorLevels: ERROR_LEVELS,
+  controls: { errorCorrection, modeAuto, encodingMode, debugEnabled },
+  getDebugState: () => ({ tab: activeTabName, subtab: activeDebugSubtab }),
+});
+const { clearCanvas, getDefaultUrl: getDefaultUrlValue,
+  getEncodingMode: getCurrentEncodingMode, getErrorLevel: getSelectedErrorLevel,
+  getShareableUrl: getShareableAppUrl, isDebugOverlayActive, readInteger } = runtimeHelpers;
 const { sms: SMS_MAX_LENGTH, emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
   numberFrames: NUMBER_SERIES_MAX_FRAMES, qrTargetWidth: MAX_QR_TARGET_WIDTH,
   printPixelsPerInch: PRINT_PIXELS_PER_INCH, minPrintModuleInches: MIN_PRINT_MODULE_INCHES,
@@ -168,48 +176,6 @@ const syncBulkControls = bulkImportSection.syncControls;
 const clearBulkData = bulkImportSection.clear;
 const loadBulkFile = bulkImportSection.load;
 
-function isDebugOverlayActive() {
-  return (activeTabName === 'debug' && activeDebugSubtab === 'overlay') || debugEnabled.checked;
-}
-
-function getDefaultUrlValue() {
-  if (window.location.protocol === 'file:') {
-    return 'https://qr.lewismoten.com';
-  }
-
-  return window.location.href;
-}
-
-function getShareableAppUrl() {
-  if (window.location.protocol === 'file:') {
-    return 'https://qr.lewismoten.com/';
-  }
-
-  return `${window.location.origin}${window.location.pathname}`;
-}
-
-function clearCanvas() {
-  const context = canvas.getContext('2d');
-  context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function readInteger(inputElement) {
-  if (!inputElement?.value.trim()) {
-    return undefined;
-  }
-
-  const parsed = Number.parseInt(inputElement.value, 10);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
-
-function getSelectedErrorLevel() {
-  return ERROR_LEVELS[Number.parseInt(errorCorrection.value, 10)] ?? ERROR_LEVELS[1];
-}
-
-function getCurrentEncodingMode() {
-  return modeAuto.checked ? undefined : encodingMode.value;
-}
-
 const previewSizeControls = createPreviewSizeControls({
   canvas,
   elements: { width: qrWidth, widthValue: qrWidthValue, widthAuto: qrWidthAuto,
@@ -249,42 +215,6 @@ const artworkControls = styleSetup.artwork;
 const syncCenterArtworkControls = artworkControls.sync;
 const syncEmojiSelection = artworkControls.syncEmoji;
 
-function formatVersionLabel() {
-  qrVersionValue.textContent = versionAuto.checked ? 'Auto' : qrVersion.value;
-}
-
-function formatErrorCorrection() {
-  const selected = getSelectedErrorLevel();
-  errorCorrectionLabel.textContent = selected.label;
-  errorCorrectionValue.textContent = selected.value;
-  errorCorrectionHelp.textContent = selected.detail;
-}
-
-function syncOutputs() {
-  syncSizeLabels();
-  formatColorTransparency();
-  syncGradientControls();
-  syncNumberSequenceControls();
-  getCurrentFrameMessage();
-  frameMessageCenterArt.checked = frameMessageCenter.checked;
-  frameLineHeightValue.textContent = `${frameLineHeight.value} px`;
-  syncModuleShapeControls();
-  syncEyeShapeControls();
-  syncCenterArtworkControls();
-  syncChunkPreviewNavigation();
-  syncPrintWidthControls();
-  formatVersionLabel();
-  formatErrorCorrection();
-  qrVersion.disabled = versionAuto.checked;
-  encodingMode.disabled = modeAuto.checked;
-  encodingModeButtons.forEach((button) => {
-    button.disabled = modeAuto.checked;
-    button.setAttribute('aria-disabled', String(modeAuto.checked));
-  });
-  syncEmailBodyLengthHint();
-  syncFileCapacityHint();
-}
-
 const syncDownloadControls = createDownloadControls({
   elements: { format: downloadFormat, qualityControls: downloadQualityControls,
     quality: downloadQuality, qualityValue: downloadQualityValue, zip: downloadZip,
@@ -302,10 +232,6 @@ const syncChunkVersionControls = fileSettings.syncVersion;
 const resetTransferDerivedState = fileSettings.resetDerived;
 const resetCachedFileState = fileSettings.resetCache;
 const scheduleChunkSettingsRefresh = fileSettings.schedule;
-
-function syncSmsLengthHint() {
-  smsLengthHint.textContent = `${smsBody.value.length} / ${SMS_MAX_LENGTH}`;
-}
 
 const setFormatVisibility = createFormatVisibility({
   elements: { format: qrFormat, fieldsets: formatFieldsets, bulkEnabled,
@@ -338,14 +264,11 @@ const contentSections = createContentSections({
 const eventSection = contentSections.event;
 const initializeCalendarEventDefaults = eventSection.initialize;
 const syncCalendarEventControls = eventSection.sync;
-const buildCalendarEventPayload = eventSection.buildPayload;
 const geoSection = contentSections.geo;
-const buildGeoPayload = geoSection.buildPayload;
 const updateGeoMap = geoSection.update;
 const phoneSection = contentSections.phone;
 const numberSection = contentSections.number;
 const getNumberSequenceInfo = numberSection.getSequenceInfo;
-const getNumberPayload = numberSection.getPayload;
 const syncNumberSequenceControls = numberSection.sync;
 
 const downloadSetup = createDownloadSetup({
@@ -373,12 +296,8 @@ const syncAnimationDurationSummary = animationSection.sync;
 
 const wifiSection = contentSections.wifi;
 const syncWifiSecurityState = wifiSection.sync;
-const buildWifiPayload = wifiSection.buildPayload;
-const maskWifiPayload = wifiSection.maskPayload;
 
 const sharedFieldsSection = contentSections.shared;
-const buildEmailPayload = sharedFieldsSection.buildEmailPayload;
-const buildEmailPayloadWithBody = sharedFieldsSection.buildEmailPayloadWithBody;
 
 const colorSection = styleSetup.colors;
 const formatColorTransparency = colorSection.formatTransparency;
@@ -388,109 +307,59 @@ const applyRecommendedImageContrast = colorSection.applyRecommendedImageContrast
 const imageFillController = styleSetup.imageFill;
 const centerLogoController = styleSetup.centerLogo;
 
-const vcardSection = contentSections.vcard;
-const buildVCardPayload = vcardSection.buildPayload;
-
-const contentPipeline = createContentPipeline({
-  elements: { format: qrFormat, fileIndex: fileChunkIndex, frameMode: frameMessageMode,
-    customFrameField: customFrameMessageField, customFrameMessage, frameCenter: frameMessageCenter,
-    frameCenterArt: frameMessageCenterArt, artMode: centerArtMode, frameFont,
-    url: urlInput, text: textInput, wifi: wifiSsid, email: emailTo, phone: phoneNumber,
-    sms: smsNumber, smsBody, geoLabel: geoQuery, latitude: geoLatitude, longitude: geoLongitude,
-    vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl, wifiEncryption,
-    wifiPassword, wifiHidden, emailSubject, emailBody, includeManifest: fileIncludeManifest,
-    event: { title: eventTitle, allDay: eventAllDay, startDate: eventStartDate,
-      startTime: eventStartTime, endDate: eventEndDate, endTime: eventEndTime } },
-  bulk: { isMode: isBulkMode, getRow: getBulkCurrentRow },
-  number: { getPayload: getNumberPayload },
+const contentEncoding = createContentEncodingSetup({
+  e: elements,
+  encoder: qrEncoder,
+  bulk: { isMode: isBulkMode, getRow: getBulkCurrentRow, getError: getBulkParseError,
+    getSchema: getBulkSchema },
   file: { getActive: getActiveFile, getMode: getSelectedFileEncodingMode,
-    getCapacity: getChunkedFileCapacityInfo },
-  builders: { number: getNumberPayload, wifi: buildWifiPayload, email: buildEmailPayload,
-    event: buildCalendarEventPayload, geo: buildGeoPayload, vcard: buildVCardPayload,
-    file: buildFilePayload },
+    getCapacity: getChunkedFileCapacityInfo, getChunkVersion: getConfiguredChunkVersion,
+    buildPayload: buildFilePayload },
+  sections: contentSections,
   runtime: { getFrameIndex: getCurrentFrameIndex, syncChoices: () => syncChoiceButtons(),
     syncArtwork: syncCenterArtworkControls },
-  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+  helpers: { getErrorLevel: getSelectedErrorLevel, readInteger, colorWithTransparency,
+    getEncodingMode: getCurrentEncodingMode },
+  config: {
+    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+    validationLimits: { emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
+      byteCapacity: MODE_CAPACITY.byte.L, sms: SMS_MAX_LENGTH,
+      calendarTitle: CALENDAR_TITLE_MAX_LENGTH,
+      calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
+      calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH },
+  },
 });
+const contentPipeline = contentEncoding.pipeline;
 const frameSection = contentPipeline.frame;
 const getCurrentFrameMessage = frameSection.getMessage;
 const setFrameMessageCenter = frameSection.setCentered;
 const getFrameFont = frameSection.getFont;
-
 const contentPayload = contentPipeline.payload;
 const buildEncodedText = contentPayload.build;
 const buildEncodedPreviewTemplate = contentPayload.preview;
-
-const qrConfiguration = createQrConfiguration({
-  elements: { qrMargin, qrScale, colorDark, colorDarkTransparency, colorLight,
-    colorLightTransparency, qrWidthAuto, qrWidth, qrFormat, versionAuto, qrVersion,
-    maskPattern, optionsJson, modeAuto },
-  encoder: qrEncoder,
-  helpers: { getErrorLevel: getSelectedErrorLevel, readInteger, colorWithTransparency,
-    getFileMode: getSelectedFileEncodingMode, getChunkVersion: getConfiguredChunkVersion,
-    getEncodingMode: getCurrentEncodingMode },
-  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
-});
+const qrConfiguration = contentEncoding.qr;
 const buildOptions = qrConfiguration.buildOptions;
 const buildPayload = qrConfiguration.buildPayload;
 const createQrDefinition = qrConfiguration.createDefinition;
-
-function updateOptionsPreview(options) {
-  optionsPreview.textContent = JSON.stringify(options, null, 2);
-}
-
-function getEncodedPreviewText(encodedText) {
-  const previewText = encodedText || buildEncodedPreviewTemplate();
-
-  if (qrFormat.value === 'wifi') {
-    return maskWifiPayload(previewText);
-  }
-
-  return previewText;
-}
-
-function updateEncodedPreview(encodedText) {
-  encodedPreview.textContent = getEncodedPreviewText(encodedText);
-}
-
-const emailCapacity = createEmailCapacity({
-  body: emailBody, hint: emailBodyLengthHint, encoder: qrEncoder,
-  buildOptions, buildPayload, buildEmail: buildEmailPayloadWithBody,
-});
+const updateOptionsPreview = contentEncoding.updateOptionsPreview;
+const updateEncodedPreview = contentEncoding.updateTextPreview;
+const emailCapacity = contentEncoding.emailCapacity;
 const getEmailBodyCapacityInfo = emailCapacity.getInfo;
 const syncEmailBodyLengthHint = emailCapacity.sync;
+const getFormatValidationState = contentEncoding.validation;
 
-const getFormatValidationState = createFormatValidator({
-  elements: {
-    qrFormat, bulkFileInput, urlInput, emailTo, emailSubject, emailBody,
-    phoneNumber, smsNumber, smsBody, geoLatitude, geoLongitude, geoQuery,
-    vcardName, vcardOrg, vcardTitle, vcardPhone, vcardEmail, vcardUrl,
-    eventTitle, eventAllDay, eventStartDate, eventStartTime, eventEndDate,
-    eventEndTime, eventLocation, eventDescription, eventUrl,
-  },
-  bulk: {
-    isMode: isBulkMode,
-    getError: getBulkParseError,
-    getRow: getBulkCurrentRow,
-    getFrameIndex: getCurrentFrameIndex,
-    getSchema: getBulkSchema,
-  },
-  numberSection,
-  file: {
-    getActive: getActiveFile,
-    getMode: getSelectedFileEncodingMode,
-    getCapacity: getChunkedFileCapacityInfo,
-  },
-  getEmailCapacity: getEmailBodyCapacityInfo,
-  limits: {
-    emailSubject: EMAIL_SUBJECT_MAX_LENGTH,
-    byteCapacity: MODE_CAPACITY.byte.L,
-    sms: SMS_MAX_LENGTH,
-    calendarTitle: CALENDAR_TITLE_MAX_LENGTH,
-    calendarLocation: CALENDAR_LOCATION_MAX_LENGTH,
-    calendarDescription: CALENDAR_DESCRIPTION_MAX_LENGTH,
-  },
+const outputSetup = createOutputSetup({
+  elements,
+  getErrorLevel: getSelectedErrorLevel,
+  smsMaxLength: SMS_MAX_LENGTH,
+  actions: { syncSizeLabels, formatColorTransparency, syncGradientControls,
+    syncNumberSequenceControls, getCurrentFrameMessage, syncModuleShapeControls,
+    syncEyeShapeControls, syncCenterArtworkControls, syncChunkPreviewNavigation,
+    syncPrintWidthControls, syncEmailBodyLengthHint, syncFileCapacityHint },
 });
+const syncOutputs = outputSetup.sync;
+const formatVersionLabel = outputSetup.formatVersion;
+const syncSmsLengthHint = outputSetup.syncSmsLength;
 
 const debugSetup = createDebugSetup({
   elements: { format: qrFormat, diagnostics: { detectedMode, segmentSummary, versionSummary,
