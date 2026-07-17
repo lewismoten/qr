@@ -35,6 +35,7 @@ function normalizeLocaleEntries(locales) {
       flag: String(source.flag || '🏳️'),
       name: typeof source.name === 'string' ? source.name : undefined,
       nativeName: typeof source.nativeName === 'string' ? source.nativeName : undefined,
+      ...(source.debug === true ? { debug: true } : {}),
     }));
   }
   return normalized;

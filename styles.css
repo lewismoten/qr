@@ -2287,6 +2287,11 @@ input[type="color"] {
   outline: none;
 }
 
+.language-picker-trigger.is-debug-language {
+  border-color: rgba(251, 191, 36, 0.72);
+  background: rgba(245, 158, 11, 0.16);
+}
+
 .language-picker-panel {
   width: min(33rem, calc(100vw - 2rem));
   padding: 0.8rem;
@@ -2355,6 +2360,26 @@ input[type="color"] {
 .language-option[aria-current="true"] {
   border-color: #2dd4bf;
   box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.42);
+}
+
+.language-option-debug {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.language-option-debug:hover,
+.language-option-debug:focus-visible {
+  border-color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.language-option-debug[aria-current="true"] {
+  border-color: #f59e0b;
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.5);
+}
+
+.language-option-debug .language-option-names strong {
+  color: #fcd38d;
 }
 
 .language-option-flag {
