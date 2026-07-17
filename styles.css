@@ -1062,8 +1062,110 @@ output {
   white-space: nowrap;
 }
 
-.overlay-info-grid {
+.debug-color-grid .color-field input[type="color"] {
+  min-height: 2.75rem;
+}
+
+.overlay-controls {
+  gap: 0.6rem;
+}
+
+.overlay-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.overlay-settings-grid .toggle-field,
+.overlay-settings-grid .info-chip {
+  min-height: 3.3rem;
+  padding: 0.55rem 0.65rem;
+}
+
+.overlay-settings-grid .info-chip {
+  grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+
+.overlay-settings-grid .info-label {
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.overlay-settings-grid .info-chip strong {
+  white-space: nowrap;
+}
+
+.help-popover {
+  position: relative;
+  z-index: 8;
+  display: inline-flex;
+}
+
+.help-popover-trigger {
+  width: 1.55rem;
+  min-width: 1.55rem;
+  min-height: 1.55rem;
+  padding: 0;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  border-radius: 50%;
+  background: #fff1cf;
+  color: #9a4d05;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 3px 8px rgba(146, 64, 14, 0.12);
+}
+
+.help-popover-content {
+  width: min(19rem, calc(100vw - 3.5rem));
+  padding: 0.7rem 0.8rem;
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  display: grid;
+  gap: 0.3rem;
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  border-radius: 0.75rem;
+  background: rgba(7, 24, 39, 0.98);
+  box-shadow: 0 14px 35px rgba(7, 24, 39, 0.28);
+  color: rgba(240, 253, 250, 0.82);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.25rem);
+  visibility: hidden;
+}
+
+.help-popover-content strong {
+  color: #fffaf0;
+  font-size: 0.8rem;
+}
+
+.help-popover:hover .help-popover-content,
+.help-popover:focus-within .help-popover-content {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.help-popover:hover,
+.help-popover:focus-within {
+  z-index: 40;
+}
+
+.overlay-outline-group {
+  padding: 0.7rem;
+}
+
+.overlay-help-popover,
+.section-help-popover {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.55rem;
 }
 
 .color-field {
@@ -1344,7 +1446,7 @@ output {
 .subtab-bar {
   position: sticky;
   top: 0;
-  z-index: 5;
+  z-index: 50;
   background: rgba(247, 250, 252, 0.98);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -1458,6 +1560,14 @@ output {
 
   .subtab-bar {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .overlay-settings-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .overlay-settings-grid .info-chip {
+    grid-column: auto;
   }
 
   .tab-button {

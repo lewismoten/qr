@@ -916,25 +916,40 @@
                   </section>
 
                   <section class="subtab-panel" data-subtab-panel="overlay" hidden>
-                    <fieldset class="option-group">
+                    <fieldset class="option-group overlay-controls">
                       <legend>Debug overlay</legend>
-                      <label class="toggle-field">
-                        <input id="debug-enabled" name="debug-enabled" type="checkbox" />
-                        <span>Keep overlays on in other tabs</span>
-                      </label>
-                      <label class="toggle-field">
-                        <input id="debug-unmask" name="debug-unmask" type="checkbox" />
-                        <span>Show unmasked data modules</span>
-                      </label>
-                      <p class="hint">Reverses the selected mask for the debug preview only. Functional patterns and format information remain unchanged.</p>
-                      <div class="info-grid overlay-info-grid">
+                      <span class="help-popover overlay-help-popover">
+                        <button type="button" class="help-popover-trigger" aria-label="About debug overlays" aria-describedby="overlay-help-content">?</button>
+                        <span id="overlay-help-content" class="help-popover-content" role="tooltip">
+                          <strong>Overlay controls</strong>
+                          <span><strong>Persist:</strong> Keeps overlays enabled while visiting other tabs.</span>
+                          <span><strong>Unmask:</strong> Shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.</span>
+                        </span>
+                      </span>
+                      <div class="overlay-settings-grid">
+                        <label class="toggle-field">
+                          <input id="debug-enabled" name="debug-enabled" type="checkbox" aria-label="Persist overlays in other tabs" />
+                          <span>Persist</span>
+                        </label>
+                        <label class="toggle-field">
+                          <input id="debug-unmask" name="debug-unmask" type="checkbox" aria-label="Show unmasked data modules" />
+                          <span>Unmask</span>
+                        </label>
                         <div class="info-chip">
-                          <span class="info-label">Unused capacity</span>
+                          <span class="info-label" aria-label="Unused capacity">Unused</span>
                           <strong id="unused-summary">-</strong>
                         </div>
                       </div>
-                      <fieldset class="option-group">
+                      <fieldset class="option-group overlay-outline-group">
                         <legend>Outline grouping</legend>
+                        <span class="help-popover section-help-popover">
+                          <button type="button" class="help-popover-trigger" aria-label="About outline grouping" aria-describedby="outline-help-content">?</button>
+                          <span id="outline-help-content" class="help-popover-content" role="tooltip">
+                            <strong>How groups are marked</strong>
+                            <span>Solid dots start outline groups; ringed dots start encoded fields.</span>
+                            <span>Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.</span>
+                          </span>
+                        </span>
                         <div class="debug-outline-control" role="group" aria-label="Outline grouping">
                           <button type="button" class="outline-mode-button is-active" data-outline-mode="codewords" aria-pressed="true">
                             Codewords
@@ -949,7 +964,6 @@
                             Metadata
                           </button>
                         </div>
-                        <p class="hint">Solid dots start outline groups; ringed dots start encoded fields. Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.</p>
                       </fieldset>
                       <div class="color-grid debug-color-grid">
                         <label class="color-field" for="debug-data-color">
@@ -1013,7 +1027,6 @@
                           <input id="debug-version-color" type="color" value="#10b981" />
                         </label>
                       </div>
-                      <p class="hint">Useful for seeing how the symbol is structured before styling or embedding it.</p>
                     </fieldset>
                   </section>
                 </div>
