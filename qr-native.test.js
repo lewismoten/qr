@@ -40,10 +40,9 @@ function testModesAndUtf8() {
   assert.equal(NativeQRCode.create('12345').segments[0].mode, 'numeric');
   assert.equal(NativeQRCode.create('HELLO WORLD').segments[0].mode, 'alphanumeric');
   const utf8 = NativeQRCode.create('Hello, 世界');
-  assert.deepEqual(utf8.segments.map(({ mode }) => mode), ['byte', 'kanji']);
-  assert.equal(utf8.segments[0].characterCount, 7);
-  assert.equal(utf8.segments[0].getBitsLength(), 56);
-  assert.equal(utf8.segments[1].getBitsLength(), 26);
+  assert.deepEqual(utf8.segments.map(({ mode }) => mode), ['byte']);
+  assert.equal(utf8.segments[0].characterCount, 13);
+  assert.equal(utf8.segments[0].getBitsLength(), 104);
   assert.throws(() => NativeQRCode.create([{ data: '12-A', mode: 'numeric' }]), /only accepts digits/);
 }
 
@@ -55,7 +54,7 @@ function testKanjiAndMixedModes() {
   assert.throws(() => NativeQRCode.create([{ data: 'QRあ', mode: 'kanji' }]), /outside the QR Shift JIS ranges/);
 
   const mixed = NativeQRCode.create('ABC123あかがXYZ789');
-  assert.deepEqual(mixed.segments.map(({ mode }) => mode), ['alphanumeric', 'kanji', 'alphanumeric']);
+  assert.deepEqual(mixed.segments.map(({ mode }) => mode), ['alphanumeric', 'byte', 'alphanumeric']);
   assert.deepEqual(mixed.segments.map(({ data }) => data), ['ABC123', 'あかが', 'XYZ789']);
 }
 

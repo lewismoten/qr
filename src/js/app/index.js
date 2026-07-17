@@ -2,9 +2,9 @@ import { concatBytes, formatBytes, hexToBytes, textBytes, uint64Bytes } from './
 import { colorWithTransparency, getColorAlpha, getContrastingHex, hexToRgba } from './colors.js';
 import { parseBoolean as parseBulkBoolean, parseCsv } from './csv.js';
 import { formatPhoneNumberForDisplay, normalizePhoneNumber } from './phone.js';
+import qrEncoder from '../qr/index.js';
 
 const form = document.getElementById('qr-form');
-const qrEncoder = globalThis.NativeQRCode;
 const canvas = document.getElementById('qr-canvas');
 const qrPreviewViewport = document.getElementById('qr-preview-viewport');
 const previewViewControls = document.getElementById('preview-view-controls');

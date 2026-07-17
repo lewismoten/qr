@@ -1,6 +1,8 @@
 import { ECC_CODEWORDS_PER_BLOCK, NUM_ERROR_CORRECTION_BLOCKS } from './constants.js';
 import { getRawDataModules } from './capacity.js';
 
+const divisorCache = new Map();
+
 function multiply(x, y) {
   let result = 0;
   for (let index = 7; index >= 0; index -= 1) {
@@ -11,6 +13,8 @@ function multiply(x, y) {
 }
 
 export function makeReedSolomonDivisor(degree) {
+  if (divisorCache.has(degree)) return divisorCache.get(degree);
+
   const result = Array(degree).fill(0);
   result[degree - 1] = 1;
   let root = 1;
@@ -21,7 +25,9 @@ export function makeReedSolomonDivisor(degree) {
     }
     root = multiply(root, 2);
   }
-  return result;
+  const divisor = Object.freeze(result);
+  divisorCache.set(degree, divisor);
+  return divisor;
 }
 
 export function getReedSolomonRemainder(data, divisor) {

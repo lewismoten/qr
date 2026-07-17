@@ -35,7 +35,7 @@ npm run verify
 QR generation now runs through the first-party implementation in
 `src/js/qr`.
 It includes version-aware mixed segmentation, numeric, alphanumeric, UTF-8 byte
-and Shift JIS Kanji encoding, versions 1-40, all four error-correction levels,
+and opt-in Shift JIS Kanji encoding, versions 1-40, all four error-correction levels,
 Reed-Solomon block generation and interleaving, functional patterns, data
 placement, all masks, and automatic mask scoring. No third-party QR runtime or
 QR CDN request is required.

@@ -148,26 +148,36 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
 
     getPenalty() {
       let result = 0;
-      const lines = [
-        ...this.modules,
-        ...Array.from({ length: this.size }, (_, column) => this.modules.map((row) => row[column])),
-      ];
-      lines.forEach((line) => {
+      let darkCount = 0;
+
+      const scoreLine = (getModule) => {
         let run = 1;
-        for (let index = 1; index <= line.length; index += 1) {
-          if (index < line.length && line[index] === line[index - 1]) {
+        let pattern = getModule(0) ? 1 : 0;
+        for (let index = 1; index <= this.size; index += 1) {
+          if (index < this.size && getModule(index) === getModule(index - 1)) {
             run += 1;
           } else {
             if (run >= 5) result += run - 2;
             run = 1;
           }
+
+          if (index < this.size) {
+            pattern = ((pattern << 1) | (getModule(index) ? 1 : 0)) & 0x7ff;
+            if (index >= 10 && (pattern === 0x05d || pattern === 0x5d0)) result += 40;
+          }
         }
-        const pattern = line.map((dark) => dark ? '1' : '0').join('');
-        for (let index = 0; index + 11 <= pattern.length; index += 1) {
-          const sample = pattern.slice(index, index + 11);
-          if (sample === '00001011101' || sample === '10111010000') result += 40;
+      };
+
+      for (let row = 0; row < this.size; row += 1) {
+        scoreLine((column) => this.modules[row][column]);
+        for (let column = 0; column < this.size; column += 1) {
+          if (this.modules[row][column]) darkCount += 1;
         }
-      });
+      }
+      for (let column = 0; column < this.size; column += 1) {
+        scoreLine((row) => this.modules[row][column]);
+      }
+
       for (let row = 0; row < this.size - 1; row += 1) {
         for (let column = 0; column < this.size - 1; column += 1) {
           const color = this.modules[row][column];
@@ -175,9 +185,8 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
               color === this.modules[row + 1][column + 1]) result += 3;
         }
       }
-      const darkCount = this.modules.flat().filter(Boolean).length;
-      const darkPercentStep = Math.ceil((darkCount * 100 / (this.size * this.size)) / 5);
-      result += Math.abs(darkPercentStep - 10) * 10;
+      const darkPercentage = darkCount * 100 / (this.size * this.size);
+      result += Math.floor(Math.abs(darkPercentage - 50) / 5) * 10;
       return result;
     }
 
@@ -205,7 +214,7 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
 
   function create(payload, options = {}) {
     const errorLevel = String(options.errorCorrectionLevel || 'M').toUpperCase();
-    if (!FORMAT_ECL_BITS.hasOwnProperty(errorLevel)) throw new Error(`Unknown error correction level: ${errorLevel}.`);
+    if (!Object.hasOwn(FORMAT_ECL_BITS, errorLevel)) throw new Error(`Unknown error correction level: ${errorLevel}.`);
     const { segments, version } = selectVersionAndSegments(payload, errorLevel, options.version);
     const data = makeDataCodewords(segments, version, errorLevel);
     const codewords = addErrorCorrection(data, version, errorLevel);
@@ -233,7 +242,5 @@ import { makeDataCodewords, optimizeSegments, selectVersionAndSegments } from '.
     toSJIS: toShiftJis,
     internals: { getDataCodewords, getRawDataModules, makeReedSolomonDivisor, getReedSolomonRemainder, optimizeSegments },
   };
-globalThis.NativeQRCode = api;
-
 export { create, toShiftJis as toSJIS };
 export default api;

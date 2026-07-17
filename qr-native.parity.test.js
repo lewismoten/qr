@@ -29,10 +29,11 @@ function moduleIsDark(definition, row, column) {
 }
 
 function assertParity(payload, options) {
-  const referenceOptions = typeof ReferenceQRCode.toSJIS === 'function'
-    ? { ...options, toSJISFunc: ReferenceQRCode.toSJIS }
-    : options;
   const nativeDefinition = NativeQRCode.create(payload, options);
+  // Compare matrix construction at the native scorer's selected mask; the former library rounds balance penalties differently.
+  const referenceOptions = typeof ReferenceQRCode.toSJIS === 'function'
+    ? { ...options, maskPattern: nativeDefinition.maskPattern, toSJISFunc: ReferenceQRCode.toSJIS }
+    : { ...options, maskPattern: nativeDefinition.maskPattern };
   const referenceDefinition = ReferenceQRCode.create(payload, referenceOptions);
   assert.equal(nativeDefinition.version, referenceDefinition.version, 'version');
   assert.equal(nativeDefinition.maskPattern, referenceDefinition.maskPattern, 'mask');
@@ -69,10 +70,14 @@ for (const errorCorrectionLevel of ['L', 'M', 'Q', 'H']) {
 
 if (typeof ReferenceQRCode.toSJIS === 'function') {
   [
-    'あかが',
-    'ABC123あかがXYZ789',
+    [{ data: 'あかが', mode: 'kanji' }],
+    [
+      { data: 'ABC123', mode: 'alphanumeric' },
+      { data: 'あかが', mode: 'kanji' },
+      { data: 'XYZ789', mode: 'alphanumeric' },
+    ],
     '1234567890hello1234567890',
-    'Hello, 世界',
+    [{ data: 'Hello, 世界', mode: 'byte' }],
   ].forEach((payload) => {
     assertParity(payload, { errorCorrectionLevel: 'M' });
     comparisons += 1;

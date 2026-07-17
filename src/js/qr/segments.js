@@ -3,10 +3,11 @@ import { getCountBitLength, getDataCodewords } from './capacity.js';
 import { ALPHANUMERIC, MODE_BITS } from './constants.js';
 import { getQrKanjiValue } from './kanji.js';
 
+const textEncoder = new TextEncoder();
+
 function detectMode(text) {
   if (/^[0-9]+$/.test(text)) return 'numeric';
   if ([...text].every((character) => ALPHANUMERIC.includes(character))) return 'alphanumeric';
-  if ([...text].every((character) => character.codePointAt(0) > 0x7f && getQrKanjiValue(character) !== null)) return 'kanji';
   return 'byte';
 }
 
@@ -37,7 +38,7 @@ function makeSegment(data, requestedMode) {
     }
     if (text.length % 2) payload.append(ALPHANUMERIC.indexOf(text.at(-1)), 6);
   } else if (mode === 'byte') {
-    const bytes = new TextEncoder().encode(text);
+    const bytes = textEncoder.encode(text);
     count = bytes.length;
     bytes.forEach((byte) => payload.append(byte, 8));
   } else {
@@ -71,13 +72,12 @@ function getCharacterModes(character) {
   const modes = [];
   if (/^[0-9]$/.test(character)) modes.push('numeric');
   if (ALPHANUMERIC.includes(character)) modes.push('alphanumeric');
-  if (character.codePointAt(0) > 0x7f && getQrKanjiValue(character) !== null) modes.push('kanji');
   modes.push('byte');
   return modes;
 }
 
 function getModeUnitCount(mode, character) {
-  return mode === 'byte' ? new TextEncoder().encode(character).length : 1;
+  return mode === 'byte' ? textEncoder.encode(character).length : 1;
 }
 
 function getIncrementalPayloadBits(mode, previousCount, unitCount) {
