@@ -104,7 +104,8 @@
       "compressTransfer": "Compress for transfer (gzip)",
       "customMetadata": "Custom metadata (optional JSON)",
       "chunk": "Chunk",
-      "clearFile": "Clear file"
+      "clearFile": "Clear file",
+      "fileProtocolHint": "FILE:1:S is a complete single QR. Multi-QR transfers use FILE:1:C chunks with an ID, byte offset, and total length."
     }
   },
   "style": {

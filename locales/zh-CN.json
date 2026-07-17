@@ -25,7 +25,8 @@
       "eventTimeHint": "定时事件使用扫描设备的本地时区。对于全天事件，所选结束日期是最后包含的一天。", "latitude": "纬度", "longitude": "经度", "label": "标签",
       "mapLabel": "交互式地图预览。拖动平移，使用控件缩放，或点击选择坐标。", "website": "网站", "transport": "传输方式", "fileTransportMode": "文件传输模式",
       "blobUrl": "Blob 网址", "chunked": "分块", "dataUrl": "数据网址", "chunkedProtocol": "分块协议", "chooseFile": "选择文件", "autoPickVersion": "自动选择版本",
-      "chunkVersionTarget": "分块目标版本", "includeManifest": "包含清单", "compressTransfer": "压缩传输（gzip）", "customMetadata": "自定义元数据（可选 JSON）", "chunk": "分块", "clearFile": "清除文件"
+      "chunkVersionTarget": "分块目标版本", "includeManifest": "包含清单", "compressTransfer": "压缩传输（gzip）", "customMetadata": "自定义元数据（可选 JSON）", "chunk": "分块", "clearFile": "清除文件",
+      "fileProtocolHint": "FILE:1:S 表示一个完整的单二维码。多二维码传输使用 FILE:1:C 分块，其中包含标识符、字节偏移量和总长度。"
     }
   },
   "style": {
