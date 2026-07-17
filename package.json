@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
-    "test": "node qr-native.test.js && node qr-native.parity.test.js",
+    "test": "node qr-native.test.js && node qr-native.parity.test.js && node bytes.test.js && node export-formats.test.js && node lzw.test.js",
     "verify": "npm test && npm run build"
   },
   "devDependencies": {

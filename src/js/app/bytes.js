@@ -13,6 +13,14 @@ export function textBytes(value) {
   return new TextEncoder().encode(value);
 }
 
+export function pushUint16LE(bytes, value) {
+  bytes.push(value & 255, (value >>> 8) & 255);
+}
+
+export function pushUint32LE(bytes, value) {
+  bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+}
+
 export function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
 

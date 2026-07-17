@@ -1130,6 +1130,43 @@
                 <p>Draws styled modules, finder eyes, paths, codeword boundaries, metadata regions and unmasked data directly to Canvas. DENSO WAVE states that its patent rights are not exercised against standardized QR Codes; QR Code is also a registered trademark of DENSO WAVE.</p>
                 <nav aria-label="QR renderer references"><a href="https://html.spec.whatwg.org/multipage/canvas.html">HTML Canvas</a><a href="https://www.qrcode.com/en/about/standards.html">QR standards history</a><a href="https://www.qrcode.com/en/patent.html">DENSO patent policy</a></nav>
               </article>
+              <article>
+                <div><h3>Reed-Solomon error correction</h3><span class="version-badge">First-party algorithm</span></div>
+                <p>Generates QR error-correction codewords over GF(256), splits them into the block structure required by the selected QR version and recovery level, and interleaves them with data codewords. Reed-Solomon is an error-correcting-code family, not a bundled software library, so it has no separate software license here; this implementation is part of the repository's first-party source. The original code family was published by Irving Reed and Gustave Solomon in 1960, while the exact QR parameters are governed by ISO/IEC 18004. Later specialized Reed-Solomon implementation and decoding techniques have had their own patents, so this inventory should not be read as a general patent-clearance opinion.</p>
+                <nav aria-label="Reed-Solomon references"><a href="https://doi.org/10.1109/PGEC.1960.22230">Original 1960 paper</a><a href="https://www.iso.org/standard/83389.html">QR error-correction specification</a><a href="https://patents.google.com/?q=(Reed-Solomon)">Related patent records</a><a href="https://www.qrcode.com/en/patent.html">DENSO QR patent policy</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Payload formats and URI standards</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>Contacts and calendar events</h3><span class="version-badge">IETF formats</span></div>
+                <p>Contact codes are serialized as vCard 3.0 for broad scanner compatibility; RFC 2426 defines that version, while RFC 6350 is the newer vCard 4.0 specification. Calendar codes are iCalendar 2.0 objects containing a VEVENT, UID, timestamp, dates or local date-times, summary and optional details under RFC 5545. These are payload formats carried as QR text, not alternate QR symbol types.</p>
+                <nav aria-label="Contact and calendar format references"><a href="https://www.rfc-editor.org/info/rfc2426">RFC 2426 vCard 3.0</a><a href="https://www.rfc-editor.org/info/rfc6350">RFC 6350 vCard 4.0</a><a href="https://www.rfc-editor.org/info/rfc5545">RFC 5545 iCalendar</a></nav>
+              </article>
+              <article>
+                <div><h3>Web, email, phone and location</h3><span class="version-badge">URI standards</span></div>
+                <p>Website content uses ordinary HTTP or HTTPS URLs. Email uses the <code>mailto:</code> URI scheme, phone numbers use <code>tel:</code>, and geographic coordinates use <code>geo:</code> with WGS 84 latitude and longitude. Recognition and the action offered after scanning still depend on the receiving application.</p>
+                <nav aria-label="Payload URI references"><a href="https://www.rfc-editor.org/info/rfc3986">RFC 3986 URI syntax</a><a href="https://www.rfc-editor.org/info/rfc6068">RFC 6068 mailto</a><a href="https://www.rfc-editor.org/info/rfc3966">RFC 3966 tel</a><a href="https://www.rfc-editor.org/info/rfc5870">RFC 5870 geo</a></nav>
+              </article>
+              <article>
+                <div><h3>Wi-Fi and SMS scanner payloads</h3><span class="version-badge">De facto conventions</span></div>
+                <p>Wi-Fi credentials use the widely implemented <code>WIFI:T:...;S:...;P:...;;</code> text convention cataloged by ZXing, including escaping and the hidden-network flag. SMS uses the commonly recognized <code>SMSTO:</code> form. Neither wrapper is defined by ISO/IEC 18004 or by an IETF QR payload standard, and scanner support can vary by platform.</p>
+                <nav aria-label="Scanner payload convention references"><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11">ZXing Wi-Fi convention</a><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime">ZXing messaging conventions</a></nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Bulk import format</h2>
+            <div class="dependency-list">
+              <article>
+                <div><h3>Comma-separated values (CSV)</h3><span class="version-badge">RFC 4180-style</span></div>
+                <p>Bulk Import uses a first-party CSV parser modeled on the common format documented by RFC 4180 and the registered <code>text/csv</code> media type; RFC 4180 is informational rather than an Internet Standard. Files are read as UTF-8 and use commas, a required format-specific header row, optional quoted fields, doubled quotes for embedded quote characters, and CRLF, LF or CR record endings. Quoted fields may contain commas and line breaks. Blank header cells cause their columns to be ignored, fully blank data rows are ignored, and imports are limited to 5 MiB and 10,000 populated rows. No third-party CSV parser is bundled.</p>
+                <nav aria-label="CSV references"><a href="https://www.rfc-editor.org/info/rfc4180">RFC 4180 CSV format</a><a href="https://www.iana.org/assignments/media-types/text/csv">IANA text/csv registration</a><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text">File API Blob.text()</a></nav>
+              </article>
             </div>
           </section>
 
@@ -1138,13 +1175,23 @@
             <div class="dependency-list">
               <article>
                 <div><h3>Raster and vector images</h3><span class="version-badge">First-party + Canvas</span></div>
-                <p>PNG, JPEG and still GIF output is assembled from the application canvas. SVG export traces modules, artwork and text into paths rather than relying on an SVG generation library.</p>
-                <nav aria-label="Image format references"><a href="https://www.w3.org/TR/png-3/">PNG specification</a><a href="https://jpeg.org/jpeg/">JPEG information</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.w3.org/TR/SVG2/">SVG 2</a></nav>
+                <p>PNG and JPEG use the browser's canvas encoders: PNG preserves lossless pixels and transparency, while JPEG is lossy, honors the selected quality, and flattens transparency onto white. The first-party GIF89a encoder quantizes colors to a 216-color cube plus transparency and directly implements the format's Lempel-Ziv-Welch (LZW) image-data encoding; no third-party GIF or LZW codec is bundled. The historical patents that drove GIF/LZW licensing concerns have expired. Animated GIFs use the Netscape looping extension, loop continuously, and express frame delays in hundredths of a second. SVG export traces modules, artwork and text into paths rather than relying on an SVG generation library.</p>
+                <nav aria-label="Image format references"><a href="https://www.w3.org/TR/png-3/">PNG specification</a><a href="https://jpeg.org/jpeg/">JPEG information</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.gnu.org/philosophy/gif.html">GIF/LZW patent history</a><a href="https://www.w3.org/TR/SVG2/">SVG 2</a></nav>
               </article>
               <article>
-                <div><h3>PDF and ZIP writers</h3><span class="version-badge">First-party</span></div>
-                <p>PDF pages and multi-image ZIP archives are serialized directly by this application, including sheet layout, image resources, central-directory records and checksums.</p>
-                <nav aria-label="Document and archive references"><a href="https://www.iso.org/standard/75839.html">ISO 32000-2 PDF</a><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
+                <div><h3>PDF documents</h3><span class="version-badge">PDF 1.4 + JPEG</span></div>
+                <p>The first-party PDF writer embeds each QR image as an 8-bit RGB JPEG image using PDF's <code>DCTDecode</code> filter. Transparency is flattened onto white and the selected JPEG quality applies, so PDF image content is lossy even when the source canvas is not. A current-image PDF uses the selected printed width; multi-image documents arrange frames on US Letter pages with half-inch margins.</p>
+                <nav aria-label="PDF references"><a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.4.pdf">PDF 1.4 reference</a><a href="https://www.iso.org/standard/75839.html">ISO 32000-2 PDF</a><a href="https://jpeg.org/jpeg/">JPEG information</a></nav>
+              </article>
+              <article>
+                <div><h3>ZIP archives</h3><span class="version-badge">ZIP 2.0 stored entries</span></div>
+                <p>The first-party ZIP writer creates local headers, a central directory and UTF-8 file names. Entries use compression method 0 (stored without ZIP-level compression) because PNG, JPEG, GIF and PDF files are already encoded. Each local and central-directory entry includes the CRC-32 checksum described below.</p>
+                <nav aria-label="ZIP references"><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
+              </article>
+              <article>
+                <div><h3>CRC-32 checksums</h3><span class="version-badge">First-party</span></div>
+                <p>ZIP integrity fields use a directly implemented, table-driven CRC-32 with the reflected <code>0xEDB88320</code> polynomial and standard initial and final XOR values. CRC-32 detects common accidental transmission or storage errors, but it is not collision-resistant and must not be treated as a cryptographic hash, digital signature or proof of authenticity.</p>
+                <nav aria-label="CRC-32 references"><a href="https://www.rfc-editor.org/rfc/rfc1952#section-8">RFC 1952 CRC sample</a><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
               </article>
             </div>
           </section>
@@ -1197,7 +1244,7 @@
             </div>
           </section>
 
-          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the formats and platform technologies listed above. No separate third-party runtime package is used for QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed.</p>
+          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. No separate third-party runtime package is used for QR generation or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
         </div>
       </article>
     </dialog>

@@ -1,20 +1,5 @@
-import { concatBytes, textBytes } from './bytes.js';
-
-const CRC_TABLE = Array.from({ length: 256 }, (_, value) => {
-  let crc = value;
-  for (let bit = 0; bit < 8; bit += 1) {
-    crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
-  }
-  return crc >>> 0;
-});
-
-function getCrc32(bytes) {
-  let crc = 0xffffffff;
-  bytes.forEach((byte) => {
-    crc = CRC_TABLE[(crc ^ byte) & 255] ^ (crc >>> 8);
-  });
-  return (crc ^ 0xffffffff) >>> 0;
-}
+import { concatBytes, pushUint16LE, pushUint32LE, textBytes } from './bytes.js';
+import { getCrc32 } from './checksum/crc32.js';
 
 export async function createZipBlob(files) {
   const localParts = [];
@@ -25,51 +10,50 @@ export async function createZipBlob(files) {
     const data = new Uint8Array(await file.blob.arrayBuffer());
     const crc = getCrc32(data);
     const local = [];
-    pushUint32(local, 0x04034b50);
-    pushUint16(local, 20);
-    pushUint16(local, 0x0800);
-    pushUint16(local, 0);
-    pushUint16(local, 0);
-    pushUint16(local, 0);
-    pushUint32(local, crc);
-    pushUint32(local, data.length);
-    pushUint32(local, data.length);
-    pushUint16(local, name.length);
-    pushUint16(local, 0);
+    pushUint32LE(local, 0x04034b50);
+    pushUint16LE(local, 20);
+    pushUint16LE(local, 0x0800);
+    pushUint16LE(local, 0);
+    pushUint16LE(local, 0);
+    pushUint16LE(local, 0);
+    pushUint32LE(local, crc);
+    pushUint32LE(local, data.length);
+    pushUint32LE(local, data.length);
+    pushUint16LE(local, name.length);
+    pushUint16LE(local, 0);
     const localPart = concatBytes([new Uint8Array(local), name, data]);
     localParts.push(localPart);
 
     const central = [];
-    pushUint32(central, 0x02014b50);
-    pushUint16(central, 20);
-    pushUint16(central, 20);
-    pushUint16(central, 0x0800);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint32(central, crc);
-    pushUint32(central, data.length);
-    pushUint32(central, data.length);
-    pushUint16(central, name.length);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint16(central, 0);
-    pushUint32(central, 0);
-    pushUint32(central, offset);
+    pushUint32LE(central, 0x02014b50);
+    pushUint16LE(central, 20);
+    pushUint16LE(central, 20);
+    pushUint16LE(central, 0x0800);
+    pushUint16LE(central, 0);
+    pushUint16LE(central, 0);
+    pushUint16LE(central, 0);
+    pushUint32LE(central, crc);
+    pushUint32LE(central, data.length);
+    pushUint32LE(central, data.length);
+    pushUint16LE(central, name.length);
+    pushUint16LE(central, 0);
+    pushUint16LE(central, 0);
+    pushUint16LE(central, 0);
+    pushUint16LE(central, 0);
+    pushUint32LE(central, 0);
+    pushUint32LE(central, offset);
     centralParts.push(concatBytes([new Uint8Array(central), name]));
     offset += localPart.length;
   }
   const centralDirectory = concatBytes(centralParts);
   const end = [];
-  pushUint32(end, 0x06054b50);
-  pushUint16(end, 0);
-  pushUint16(end, 0);
-  pushUint16(end, files.length);
-  pushUint16(end, files.length);
-  pushUint32(end, centralDirectory.length);
-  pushUint32(end, offset);
-  pushUint16(end, 0);
+  pushUint32LE(end, 0x06054b50);
+  pushUint16LE(end, 0);
+  pushUint16LE(end, 0);
+  pushUint16LE(end, files.length);
+  pushUint16LE(end, files.length);
+  pushUint32LE(end, centralDirectory.length);
+  pushUint32LE(end, offset);
+  pushUint16LE(end, 0);
   return new Blob([...localParts, centralDirectory, new Uint8Array(end)], { type: 'application/zip' });
 }
-

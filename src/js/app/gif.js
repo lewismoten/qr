@@ -1,12 +1,5 @@
-import { textBytes } from './bytes.js';
-
-function pushUint16(bytes, value) {
-  bytes.push(value & 255, (value >>> 8) & 255);
-}
-
-function pushUint32(bytes, value) {
-  bytes.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
-}
+import { pushUint16LE, textBytes } from './bytes.js';
+import { encodeGifLzw } from './compression/lzw.js';
 
 export function createGifBlob(sourceCanvas) {
   const context = sourceCanvas.getContext('2d');
@@ -36,41 +29,16 @@ export function createGifBlob(sourceCanvas) {
     indexes[index] = 1 + r * 36 + g * 6 + b;
   }
 
-  const codes = [256];
-  let literalCount = 0;
-  indexes.forEach((index) => {
-    codes.push(index);
-    literalCount += 1;
-    if (literalCount === 200) {
-      codes.push(256);
-      literalCount = 0;
-    }
-  });
-  codes.push(257);
-  const packed = [];
-  let accumulator = 0;
-  let bitCount = 0;
-  codes.forEach((code) => {
-    accumulator |= code << bitCount;
-    bitCount += 9;
-    while (bitCount >= 8) {
-      packed.push(accumulator & 255);
-      accumulator >>>= 8;
-      bitCount -= 8;
-    }
-  });
-  if (bitCount) {
-    packed.push(accumulator & 255);
-  }
+  const packed = encodeGifLzw(indexes);
 
   const bytes = [...textBytes('GIF89a')];
-  pushUint16(bytes, sourceCanvas.width);
-  pushUint16(bytes, sourceCanvas.height);
+  pushUint16LE(bytes, sourceCanvas.width);
+  pushUint16LE(bytes, sourceCanvas.height);
   bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xf9, 4, 1, 0, 0, 0, 0, 0x2c);
-  pushUint16(bytes, 0);
-  pushUint16(bytes, 0);
-  pushUint16(bytes, sourceCanvas.width);
-  pushUint16(bytes, sourceCanvas.height);
+  pushUint16LE(bytes, 0);
+  pushUint16LE(bytes, 0);
+  pushUint16LE(bytes, sourceCanvas.width);
+  pushUint16LE(bytes, sourceCanvas.height);
   bytes.push(0, 8);
   for (let offset = 0; offset < packed.length; offset += 255) {
     const block = packed.slice(offset, offset + 255);
@@ -135,58 +103,27 @@ function getGifPaletteAndIndexes(stage) {
   return { palette, indexes };
 }
 
-function packGifIndexes(indexes) {
-  const codes = [256];
-  let literalCount = 0;
-  indexes.forEach((index) => {
-    codes.push(index);
-    literalCount += 1;
-    if (literalCount === 200) {
-      codes.push(256);
-      literalCount = 0;
-    }
-  });
-  codes.push(257);
-
-  const packed = [];
-  let accumulator = 0;
-  let bitCount = 0;
-  codes.forEach((code) => {
-    accumulator |= code << bitCount;
-    bitCount += 9;
-    while (bitCount >= 8) {
-      packed.push(accumulator & 255);
-      accumulator >>>= 8;
-      bitCount -= 8;
-    }
-  });
-  if (bitCount) {
-    packed.push(accumulator & 255);
-  }
-  return packed;
-}
-
 export function createAnimatedGifBlob(frames, frameDurationMs) {
   const stage = createAnimationStage(frames);
   drawAnimationStageFrame(stage, frames[0]);
   const { palette } = getGifPaletteAndIndexes(stage);
   const delay = Math.max(1, Math.min(65535, Math.round(frameDurationMs / 10)));
   const bytes = [...textBytes('GIF89a')];
-  pushUint16(bytes, stage.width);
-  pushUint16(bytes, stage.height);
+  pushUint16LE(bytes, stage.width);
+  pushUint16LE(bytes, stage.height);
   bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xff, 0x0b, ...textBytes('NETSCAPE2.0'), 3, 1, 0, 0, 0);
 
   frames.forEach((frame) => {
     drawAnimationStageFrame(stage, frame);
     const { indexes } = getGifPaletteAndIndexes(stage);
-    const packed = packGifIndexes(indexes);
+    const packed = encodeGifLzw(indexes);
     bytes.push(0x21, 0xf9, 4, 9);
-    pushUint16(bytes, delay);
+    pushUint16LE(bytes, delay);
     bytes.push(0, 0, 0x2c);
-    pushUint16(bytes, 0);
-    pushUint16(bytes, 0);
-    pushUint16(bytes, stage.width);
-    pushUint16(bytes, stage.height);
+    pushUint16LE(bytes, 0);
+    pushUint16LE(bytes, 0);
+    pushUint16LE(bytes, stage.width);
+    pushUint16LE(bytes, stage.height);
     bytes.push(0, 8);
     for (let offset = 0; offset < packed.length; offset += 255) {
       const block = packed.slice(offset, offset + 255);
@@ -197,4 +134,3 @@ export function createAnimatedGifBlob(frames, frameDurationMs) {
   bytes.push(0x3b);
   return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
 }
-
