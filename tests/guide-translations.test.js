@@ -111,6 +111,7 @@ test('Spanish guides use native QR and interface terminology', async () => {
     files.map((file) => readFile(file.replace(/\.html$/, '.es.html'), 'utf8')),
   );
   const source = pages.join('\n');
+  const copy = source.replaceAll(/href="[^"]*"/g, '').replaceAll(/\s+/g, ' ');
   const machinePhrases = [
     /palabras código/i,
     /niveles? de recuperación/i,
@@ -128,12 +129,23 @@ test('Spanish guides use native QR and interface terminology', async () => {
     /La representación de códigos QR/i,
     /a su propio servidor/i,
     /hasta que se abre Geo/i,
+    /\bvCards\b/,
+    /Reed-Solomon/,
+    /La generación de los códigos QR/i,
+    /se solicitan directamente a OpenStreetMap los mosaicos/i,
   ];
 
-  machinePhrases.forEach((phrase) => assert.doesNotMatch(source, phrase));
-  assert.match(source, /niveles de corrección de errores/i);
-  assert.match(source, /palabras de código/i);
-  assert.match(source, /URL de objeto Blob/i);
-  assert.match(source, /secuencia de bits más corta/i);
-  assert.match(source, /menor puntuación de\s+penalización/i);
+  machinePhrases.forEach((phrase) => assert.doesNotMatch(copy, phrase));
+  assert.match(copy, /niveles de corrección de errores/i);
+  assert.match(copy, /palabras de código/i);
+  assert.match(copy, /URL de objeto Blob/i);
+  assert.match(copy, /secuencia de bits más corta/i);
+  assert.match(copy, /menor puntuación de\s+penalización/i);
+  assert.match(copy, /contactos en formato vCard/i);
+  assert.match(copy, /Reed–Solomon/);
+  assert.match(copy, /se realizan localmente en su navegador/i);
+  assert.match(
+    copy,
+    /los mosaicos visibles del mapa se solicitan directamente/i,
+  );
 });
