@@ -73,7 +73,7 @@
             Un código QR no es un cuadrado de píxeles arbitrarios. Los patrones
             fijos orientan al lector; los metadatos indican cómo descodificarlo;
             y un flujo en zigzag transporta los encabezados de segmento, los
-            datos, el relleno y los datos de recuperación Reed-Solomon.
+            datos, el relleno y los datos de corrección de errores Reed-Solomon.
           </p>
           <div class="hero-actions">
             <a class="primary-link" href="../index.html">Abrir el generador</a>
@@ -522,7 +522,7 @@
             <div class="visual-heading multi-dot">
               <span class="color-dot data"></span
               ><span class="color-dot ec-words"></span>
-              <h3>Datos y palabras de corrección Reed-Solomon</h3>
+              <h3>Datos y palabras de código de corrección Reed-Solomon</h3>
             </div>
             <canvas
               data-qr-visual="error-correction"
@@ -766,10 +766,10 @@
             ><strong>Modos, anchos de recuento y tablas de bloques</strong
             ><span
               ><code>constants.js</code> define los indicadores de modo, el
-              alfabeto alfanumérico, el ancho de los recuentos de caracteres,
-              los valores de formato del nivel de corrección, las palabras de
-              corrección por bloque y la cantidad de bloques para las versiones
-              1 a 40.</span
+              alfabeto alfanumérico, los anchos del recuento de caracteres, los
+              valores de formato del nivel de corrección de errores, las
+              palabras de código de corrección por bloque y la cantidad de
+              bloques para las versiones 1 a 40.</span
             ></a
           >
           <a

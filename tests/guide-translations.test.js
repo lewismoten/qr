@@ -104,3 +104,25 @@ test('Spanish inline prose remains grammatical after HTML assembly', async () =>
     /<code>0x11<\/code> para completar la capacidad de datos/,
   );
 });
+
+test('Spanish guides use native QR and interface terminology', async () => {
+  const files = await listEnglishGuides();
+  const pages = await Promise.all(
+    files.map((file) => readFile(file.replace(/\.html$/, '.es.html'), 'utf8')),
+  );
+  const source = pages.join('\n');
+  const machinePhrases = [
+    /palabras código/i,
+    /niveles? de recuperación/i,
+    /arte píxel/i,
+    /URL de tipo blob/i,
+    /formato Geo/i,
+    /datos sin enmascarar/i,
+    /Volver a la parte superior/i,
+  ];
+
+  machinePhrases.forEach((phrase) => assert.doesNotMatch(source, phrase));
+  assert.match(source, /niveles de corrección de errores/i);
+  assert.match(source, /palabras de código/i);
+  assert.match(source, /URL de objeto Blob/i);
+});
