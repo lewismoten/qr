@@ -2,6 +2,11 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+  loadGuideTranslations,
+  translateGuideHtml,
+} from './guide-translations.mjs';
+
 const GUIDE_ROOT = 'guides';
 const LOCALES = ['ar', 'es', 'hi-IN', 'zh-CN'];
 const localeSuffix = new RegExp(String.raw`\.(${LOCALES.join('|')})\.html$`);
@@ -71,6 +76,16 @@ function ensureLocalizationScript(source, file) {
 export async function generateLocalizedGuides() {
   const files = await listHtmlFiles(GUIDE_ROOT);
   const guideFiles = new Set(files.map((file) => path.normalize(file)));
+  const translations = Object.fromEntries(
+    await Promise.all(
+      LOCALES.map(async (locale) => [
+        locale,
+        await loadGuideTranslations(
+          path.join(GUIDE_ROOT, 'translations', `${locale}.json`),
+        ),
+      ]),
+    ),
+  );
   await Promise.all(
     files.flatMap((file) =>
       LOCALES.map(async (locale) => {
@@ -78,6 +93,13 @@ export async function generateLocalizedGuides() {
         source = localizeGuideLinks(source, file, locale, guideFiles);
         source = localizeMetadata(source, file, locale);
         source = ensureLocalizationScript(source, file);
+        const missing = new Set();
+        source = translateGuideHtml(source, translations[locale], missing);
+        if (missing.size) {
+          throw new Error(
+            `${locale} is missing ${missing.size} guide translations.`,
+          );
+        }
         await writeFile(localizedFile(file, locale), source);
       }),
     ),
