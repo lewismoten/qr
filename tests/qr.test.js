@@ -206,6 +206,27 @@ function testInvalidConfiguration() {
       error.i18nKey === 'qr.errors.errorCorrectionLevel' &&
       error.i18nOptions.level === 'UNKNOWN',
   );
+  for (const version of [0, 1.5, 41]) {
+    assert.throws(
+      () => NativeQRCode.create('INVALID VERSION', { version }),
+      (error) =>
+        error instanceof RangeError &&
+        error.i18nKey === 'qr.errors.versionRange',
+    );
+  }
+  assert.throws(
+    () =>
+      NativeQRCode.create([{ data: '123', mode: 'numeric' }], {
+        version: 0,
+      }),
+    (error) => error.i18nKey === 'qr.errors.versionRange',
+  );
+  assert.equal(
+    NativeQRCode.create([{ data: '123', mode: { id: 'numeric' } }], {
+      version: 1,
+    }).version,
+    1,
+  );
 }
 
 testCapacityBoundaries();

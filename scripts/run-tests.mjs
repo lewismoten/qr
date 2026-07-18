@@ -20,9 +20,9 @@ if (requested.has('--coverage')) {
     '--test-coverage-include=src/js/**/*.js',
     '--test-coverage-exclude=src/js/main.js',
     '--test-coverage-exclude=src/js/spec/**',
-    '--test-coverage-lines=80',
-    '--test-coverage-branches=85',
-    '--test-coverage-functions=85',
+    '--test-coverage-lines=90',
+    '--test-coverage-branches=88',
+    '--test-coverage-functions=90',
   );
 }
 

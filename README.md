@@ -70,8 +70,8 @@ npm run test:coverage
 ```
 
 Coverage includes exercised modules under `src/js`, excluding the browser entry
-point and specification-page scripts. The command fails below 80% line, 85%
-branch, or 85% function coverage. These conservative repository-wide floors
+point and specification-page scripts. The command fails below 90% line, 88%
+branch, or 90% function coverage. These conservative repository-wide floors
 protect the current baseline while browser-heavy UI modules gain focused DOM
 integration tests. `npm run verify` enforces the same coverage thresholds.
 
