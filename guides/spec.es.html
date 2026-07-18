@@ -117,12 +117,12 @@
         <div class="section-intro">
           <p class="section-number">01 / Anatomía</p>
           <h2>
-            Los puntos de referencia indican al escáner dónde está la cuadrícula
+            Los patrones de referencia indican al lector dónde está la
+            cuadrícula
           </h2>
           <p>
-            Los patrones funcionales están reservados antes de que se coloque el
-            flujo codificado. No son bytes de carga útil, y los pasos de
-            recorrido de datos los rodean.
+            Los patrones funcionales se reservan antes de colocar el flujo
+            codificado. No son bytes de datos y el recorrido los evita.
           </p>
         </div>
 
@@ -199,10 +199,10 @@
           <p class="section-number">02 / Metadatos</p>
           <h2>El decodificador recibe instrucciones antes del contenido</h2>
           <p>
-            La información de formato y versión se codifica con protección
-            contra errores BCH. La información de formato se escribe dos veces
-            para que el daño cerca de un buscador no elimine las instrucciones
-            del decodificador.
+            La información de formato y versión se codifica con protección de
+            errores BCH. La información de formato se escribe dos veces para que
+            los daños próximos a un patrón de posición no eliminen las
+            instrucciones de descodificación.
           </p>
         </div>
         <div class="visual-grid metadata-grid">
@@ -252,9 +252,9 @@
             Los encabezados y los datos son campos de bits, no siempre bytes
           </h2>
           <p>
-            La segmentación automática puede cambiar de modo cuando el tamaño
-            reducido del peso útil vale otro modo y encabezado de conteo. Cada
-            segmento comienza con su propio modo y campos de conteo de
+            La segmentación automática puede cambiar de modo cuando el ahorro de
+            datos compensa el coste de otro encabezado de modo y recuento. Cada
+            segmento comienza con sus propios campos de modo y recuento de
             caracteres.
           </p>
         </div>
@@ -457,11 +457,11 @@
                 ></div>
               </div>
               <p>
-                Cada bloque de color es un segmento separado con otro indicador
-                de modo de 4 bits y un campo de conteo. El optimizador mantiene
-                un interruptor solo cuando su carga útil más pequeña compensa
-                ese costo de encabezado. La detección automática no selecciona
-                Kanji; Kanji debe solicitarse explícitamente.
+                Cada bloque de color es un segmento independiente con su propio
+                indicador de modo de 4 bits y campo de recuento. El optimizador
+                conserva un cambio de modo solo cuando el ahorro de datos
+                compensa el coste del encabezado. La detección automática no
+                selecciona Kanji; debe solicitarse expresamente.
               </p>
             </div>
           </article>
@@ -553,14 +553,14 @@
             <canvas
               data-qr-visual="mask"
               role="img"
-              aria-label="Encuentro de cerca mostrando módulos azules afectados por la máscara QR seleccionada"
+              aria-label="Detalle de los módulos azules afectados por la máscara QR seleccionada"
             ></canvas>
             <p>
-              Una de las ocho fórmulas invierte los módulos no funcionales
-              seleccionados. El codificador evalúa a todos los candidatos para
-              largas carreras, bloques de 2 por 2, patrones similares a
-              buscadores y equilibrio entre luz y oscuridad, y luego registra al
-              ganador en la información del formato.
+              Una de ocho fórmulas invierte determinados módulos no funcionales.
+              El codificador puntúa cada candidata según las secuencias largas,
+              los bloques de 2 por 2, los patrones similares a los de posición y
+              el equilibrio entre módulos oscuros y claros; después registra la
+              ganadora en la información de formato.
             </p>
           </article>
         </div>
@@ -682,7 +682,7 @@
       <section class="guide-section reading-section">
         <div class="section-intro">
           <p class="section-number">05 / Orden de descodificación</p>
-          <h2>Qué hace un escáner en términos conceptuales</h2>
+          <h2>Proceso conceptual de un lector</h2>
         </div>
         <ol class="process-list">
           <li>
@@ -711,8 +711,8 @@
             <div>
               <strong>Desmascarar y atravesar</strong>
               <p>
-                Reverta la máscara seleccionada en los módulos no funcionales y
-                recopile los bits de la palabra clave a lo largo del camino en
+                Invierta la máscara seleccionada en los módulos no funcionales y
+                recopile los bits de las palabras código siguiendo la ruta en
                 zigzag de dos columnas.
               </p>
             </div>
@@ -732,9 +732,9 @@
             <div>
               <strong>Analizar segmentos</strong>
               <p>
-                Lea cada modo y cuente el encabezado, luego descodifique sus
-                unidades de carga útil hasta que se alcance el terminador o la
-                capacidad de datos.
+                Lea el encabezado de modo y recuento de cada segmento y
+                descodifique sus unidades de datos hasta llegar al terminador o
+                completar la capacidad.
               </p>
             </div>
           </li>
@@ -861,11 +861,11 @@
           >
           <a
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"
-            ><strong>Cabo de paridad de referencia</strong
+            ><strong>Pruebas de paridad con la referencia</strong
             ><span
-              ><code>tests/helpers/qr-parity.js</code> Compara cada rango de
-              paridad de división con un paquete de referencia opcional de
-              código QR de nodo.</span
+              ><code>tests/helpers/qr-parity.js</code> compara cada intervalo de
+              paridad con un paquete de referencia opcional de
+              node-qrcode.</span
             ></a
           >
         </div>
@@ -887,7 +887,7 @@
       <section id="references" class="guide-section references-section">
         <div class="section-intro">
           <p class="section-number">Referencias primarias</p>
-          <h2>Normas e referencias de implementación</h2>
+          <h2>Estándares y referencias de implementación</h2>
           <p>
             Esta guía es explicativa, no es un sustituto del estándar normativo.
             Las tablas de bloques exactas, las anchuras de conteo, las

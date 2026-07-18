@@ -74,7 +74,7 @@
                   ocultación y colocación de matrices. La implementación es
                   local; el propio símbolo QR sigue la ISO/IEC 18004.
                 </p>
-                <nav aria-label="Referencias del encodificador QR nativo">
+                <nav aria-label="Referencias del codificador QR propio">
                   <a href="https://www.iso.org/standard/83389.html"
                     >ISO/IEC 18004:2024</a
                   ><a href="https://www.qrcode.com/en/about/standards.html"
@@ -146,7 +146,7 @@
           </section>
 
           <section>
-            <h2>Formatos de carga útil y transferencia</h2>
+            <h2>Formatos de datos y transferencia</h2>
             <div class="dependency-list">
               <article>
                 <div>
@@ -163,7 +163,7 @@
                   utiliza Base64url sin relleno para transportar datos binarios
                   de forma compacta.
                 </p>
-                <nav aria-label="Referencias de carga útil bruta">
+                <nav aria-label="Referencias de datos sin procesar">
                   <a href="https://www.rfc-editor.org/info/rfc3986"
                     >Sintaxis URI RFC 3986</a
                   ><a href="https://www.rfc-editor.org/info/rfc2397"
@@ -193,7 +193,7 @@
                   útil de texto, no tipos alternativos de símbolos QR.
                 </p>
                 <nav
-                  aria-label="Contactos y referencias de formato de calendario"
+                  aria-label="Referencias de formatos de contacto y calendario"
                 >
                   <a href="https://www.rfc-editor.org/info/rfc2426"
                     >RFC 2426 vCard 3.0</a
@@ -210,17 +210,17 @@
                   <span class="version-badge">Normas URI</span>
                 </div>
                 <p>
-                  El correo electrónico utiliza el
-                  <code>mailto:</code> Estructura URI, uso de números de
-                  teléfono <code>tel:</code>, y uso de coordenadas geográficas
-                  <code>geo:</code> Con latitud y longitud WGS 84. Se agrega una
-                  etiqueta Geo a través del comúnmente reconocido
-                  <code>q</code> Consulta la convención en lugar de un campo de
-                  etiqueta RFC 5870 dedicado. El reconocimiento y la acción
-                  ofrecida después de la escaneo todavía dependen de la
-                  aplicación receptora.
+                  El correo electrónico utiliza el esquema
+                  <code>mailto:</code> de URI; los números de teléfono utilizan
+                  <code>tel:</code>, y las coordenadas geográficas utilizan
+                  <code>geo:</code> con latitud y longitud WGS 84. Las etiquetas
+                  Geo se añaden mediante el parámetro reconocido habitualmente
+                  <code>q</code> como convención de consulta, en lugar de un
+                  campo de etiqueta específico de RFC 5870. El reconocimiento y
+                  la acción ofrecida después del escaneo siguen dependiendo de
+                  la aplicación receptora.
                 </p>
-                <nav aria-label="Referencias URI de la carga útil">
+                <nav aria-label="Referencias de URI de datos">
                   <a href="https://www.rfc-editor.org/info/rfc3986"
                     >Sintaxis URI RFC 3986</a
                   ><a href="https://www.rfc-editor.org/info/rfc6068"
@@ -234,25 +234,26 @@
               </article>
               <article>
                 <div>
-                  <h3>Carga útil del escáner de Wi-Fi y SMS</h3>
+                  <h3>Datos de Wi-Fi y SMS para lectores</h3>
                   <span class="version-badge">Convenciones de facto</span>
                 </div>
                 <p>
-                  Las credenciales de Wi-Fi utilizan el ampliamente implementado
-                  <code>WIFI:T:...;S:...;P:...;;</code> código de texto
-                  catalogado por ZXing, incluyendo escape y la bandera de red
-                  oculta. El SMS utiliza el comúnmente reconocido
-                  <code>SMSTO:</code> Formulario. Ninguna de las envolturas está
-                  definida por ISO/IEC 18004 ni por un estándar de carga útil QR
-                  de IETF, y el soporte del escáner puede variar según la
+                  Las credenciales Wi-Fi utilizan la convención de texto
+                  ampliamente implementada
+                  <code>WIFI:T:...;S:...;P:...;;</code> catalogada por ZXing,
+                  incluidos el escape y la indicación de red oculta. Los SMS
+                  utilizan el formato reconocido habitualmente
+                  <code>SMSTO:</code> . Ninguno de estos formatos está definido
+                  por ISO/IEC 18004 ni por un estándar IETF de datos QR, y la
+                  compatibilidad de los lectores puede variar según la
                   plataforma.
                 </p>
                 <nav
-                  aria-label="Referencias de la convención de carga útil del escáner"
+                  aria-label="Referencias de convenciones de datos para lectores"
                 >
                   <a
                     href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11"
-                    >Conferencia ZXing Wi-Fi</a
+                    >Convención Wi-Fi de ZXing</a
                   ><a
                     href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime"
                     >Convenciones de mensajería ZXing</a
@@ -265,19 +266,18 @@
                   <span class="version-badge">Estilo RFC 4180</span>
                 </div>
                 <p>
-                  Importación en masa utiliza un parser CSV de primera parte
-                  modelado en el formato común documentado por RFC 4180 y el
-                  registrado <code>text/csv</code> Tipo de medio; RFC 4180 es
-                  informativo en lugar de un estándar de Internet. Los archivos
-                  se leen como UTF-8 y utilizan comas, una fila de encabezado
-                  específica del formato requerida, campos entre comillas
-                  opcionales, comillas dobles para caracteres de cita
-                  incrustados y terminaciones de registro CRLF, LF o CR. Los
-                  campos entre comillas pueden contener comas y saltos de línea.
-                  Las celdas de encabezado en blanco hacen que sus columnas sean
-                  ignoradas, las filas de datos completamente en blanco son
-                  ignoradas y las importaciones están limitadas a 5 MiB y 10.000
-                  filas pobladas. No se incluye un parser CSV de terceros.
+                  La importación masiva utiliza un analizador CSV propio basado
+                  en el formato habitual documentado por RFC 4180 y en el tipo
+                  <code>text/csv</code> registrado; RFC 4180 es un documento
+                  informativo, no un estándar de Internet. Los archivos se leen
+                  como UTF-8 y utilizan comas, una fila de encabezado
+                  obligatoria específica del formato, campos opcionales entre
+                  comillas, comillas dobles para incluir comillas y finales de
+                  registro CRLF, LF o CR. Los campos entre comillas pueden
+                  contener comas y saltos de línea. Se ignoran las columnas cuyo
+                  encabezado esté vacío y las filas de datos completamente
+                  vacías. Las importaciones se limitan a 5 MiB y 10.000 filas
+                  con datos. No se incluye ningún analizador CSV de terceros.
                 </p>
                 <nav aria-label="Referencias CSV">
                   <a href="https://www.rfc-editor.org/info/rfc4180"
@@ -366,15 +366,15 @@
                   <span class="version-badge">PDF 1.4 + JPEG</span>
                 </div>
                 <p>
-                  El escritor de PDF de primera parte incorpora cada imagen QR
-                  como una imagen JPEG RGB de 8 bits utilizando los PDF.
-                  <code>DCTDecode</code> Filtro. La transparencia se aplasta
-                  sobre el blanco y se aplica la calidad JPEG seleccionada, por
-                  lo que el contenido de la imagen PDF es de pérdida incluso
-                  cuando la lienzo de origen no lo es. Un PDF de imagen actual
-                  utiliza la anchura impresa seleccionada; los documentos de
-                  múltiples imágenes organizan los marcos en páginas US Letter
-                  con márgenes de medio pulgada.
+                  El generador PDF propio incorpora cada código QR como una
+                  imagen JPEG RGB de 8 bits mediante el filtro
+                  <code>DCTDecode</code> de PDF. La transparencia se aplana
+                  sobre blanco y se aplica la calidad JPEG seleccionada, por lo
+                  que las imágenes del PDF tienen pérdida aunque el lienzo de
+                  origen no la tenga. El PDF de la imagen actual utiliza el
+                  ancho de impresión seleccionado; los documentos con varias
+                  imágenes las distribuyen en páginas Carta de EE. UU. con
+                  márgenes de media pulgada.
                 </p>
                 <nav aria-label="Referencias en PDF">
                   <a
@@ -539,25 +539,25 @@
               </article>
               <article>
                 <div>
-                  <h3>Mapa de baldosas de raster</h3>
-                  <span class="version-badge">Primer partido + OSM</span>
+                  <h3>Mapa de teselas ráster</h3>
+                  <span class="version-badge">Código propio + OSM</span>
                 </div>
                 <p>
-                  La vista previa de Geo implementa directamente la proyección
-                  Web Mercator, la selección de cuadros visibles, el envoltorio
-                  de longitud, el desplazamiento del puntero y del teclado, los
-                  controles de zoom, la conversión de clic a coordenadas y la
-                  colocación de marcadores/etiquetas. Solo solicita cuadros
-                  raster que intersecten la ventana de visualización activa y no
-                  empaqueta ni carga una biblioteca de mapeo de terceros.
+                  La vista previa Geo implementa directamente la proyección Web
+                  Mercator, la selección de teselas visibles, el ajuste cíclico
+                  de longitud, el desplazamiento con puntero y teclado, los
+                  controles de zoom, la conversión de clics en coordenadas y la
+                  colocación de marcadores y etiquetas. Solo solicita las
+                  teselas ráster que intersectan el área visible y no incluye ni
+                  carga bibliotecas cartográficas de terceros.
                 </p>
-                <nav aria-label="Referencias de mapas de baldosas de raster">
+                <nav aria-label="Referencias del mapa de teselas ráster">
                   <a
                     href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames"
-                    >Coordenadas de los cuadros de mapa deslizantes</a
+                    >Coordenadas de teselas de mapas interactivos</a
                   ><a
                     href="https://operations.osmfoundation.org/policies/tiles/"
-                    >Política de baldosas de OpenStreetMap</a
+                    >Política de teselas de OpenStreetMap</a
                   ><a href="https://www.openstreetmap.org/copyright"
                     >Atribución de OpenStreetMap</a
                   >
@@ -651,11 +651,11 @@
                   <span class="version-badge">Datos en vivo</span>
                 </div>
                 <p>
-                  Sirve las baldosas de mapas raster estándar directamente a la
-                  vista previa Geo de primera parte. La base de datos geográfica
-                  subyacente está licenciada bajo ODbL; las baldosas alojadas
-                  están regidas por la política separada de uso de baldosas e
-                  incluyen la atribución requerida del contribuyente en el mapa.
+                  Sirve teselas de mapa ráster estándar directamente a la vista
+                  previa Geo propia. La base de datos geográfica subyacente se
+                  publica con licencia ODbL; las teselas alojadas se rigen por
+                  una política de uso independiente e incluyen en el mapa la
+                  atribución obligatoria a las personas colaboradoras.
                 </p>
                 <nav aria-label="Enlaces de OpenStreetMap">
                   <a href="https://www.openstreetmap.org/">página web</a
@@ -666,7 +666,7 @@
                     >Derechos de autor y ODbL</a
                   ><a
                     href="https://operations.osmfoundation.org/policies/tiles/"
-                    >Política de baldosas</a
+                    >Política de teselas</a
                   >
                 </nav>
               </article>
@@ -674,21 +674,21 @@
           </section>
 
           <p class="inventory-note">
-            <strong>Nota de licencia:</strong> "Primer partido" identifica el
-            código implementado en esta aplicación; no reemplaza ni modifica las
-            licencias, patentes, marcas comerciales o especificaciones que rigen
-            los algoritmos, formatos y tecnologías de la plataforma enumerados
-            anteriormente. Los estándares técnicos y RFCs describen la
-            interoperabilidad; no son licencias de software para el código
-            fuente de esta aplicación. La aplicación implementada no tiene una
-            biblioteca de tiempo de ejecución del navegador de terceros; esbuild
-            solo se construye, node-qrcode solo se utiliza para pruebas y ningún
-            paquete separado realiza la generación, mapeo o exportación de QR de
-            producción. Este repositorio actualmente no tiene un archivo de
-            LICENCIA para todo el proyecto, por lo que no se deben asumir
-            derechos de redistribución para su código fuente de primer partido.
-            Las referencias de patentes son informativas y no son una opinión
-            legal ni un análisis de libertad de operar.
+            <strong>Nota sobre licencias:</strong> «Código propio» identifica el
+            código implementado en esta aplicación; no sustituye ni modifica las
+            licencias, patentes, marcas comerciales o especificaciones que
+            regulan los algoritmos, formatos y tecnologías de plataforma
+            enumerados anteriormente. Los estándares técnicos y los RFC
+            describen la interoperabilidad; no son licencias de software para el
+            código fuente de esta aplicación. La aplicación publicada no utiliza
+            bibliotecas de ejecución de terceros en el navegador: esbuild solo
+            interviene en la compilación, node-qrcode es opcional y exclusivo de
+            las pruebas, y ningún paquete independiente genera códigos QR, mapas
+            o exportaciones en producción. Este repositorio no dispone
+            actualmente de un archivo LICENSE para todo el proyecto, por lo que
+            no deben presuponerse derechos de redistribución sobre su código
+            propio. Las referencias a patentes son informativas y no constituyen
+            asesoramiento jurídico ni un análisis de libertad de operación.
           </p>
         </div>
         <footer class="info-page-footer">
