@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/js/app/ui/content/file/elements.js"],
-  "sourcesContent": ["export function getFileElements(document, core) {\n  const id = (name) => document.getElementById(name);\n  return {\n    input: id('file-input'),\n    format: core.qrFormat,\n    mode: id('file-encoding-mode'),\n    capacityHint: id('file-capacity-hint'),\n    clearButton: id('clear-file-button'),\n    chunkControls: id('file-chunk-controls'),\n    chunkVersionAuto: id('file-chunk-version-auto'),\n    chunkVersion: id('file-chunk-version'),\n    chunkVersionValue: id('file-chunk-version-value'),\n    includeManifest: id('file-include-manifest'),\n    compressTransfer: id('file-compress-transfer'),\n    customMetadata: id('file-custom-metadata'),\n    chunkIndex: id('file-chunk-index'),\n    chunkIndexValue: id('file-chunk-index-value'),\n    versionAuto: core.versionAuto,\n    qrVersion: core.qrVersion,\n  };\n}\n"],
-  "mappings": "AAAO,SAASA,EAAgBC,EAAUC,EAAM,CAC9C,IAAMC,EAAMC,GAASH,EAAS,eAAeG,CAAI,EACjD,MAAO,CACL,MAAOD,EAAG,YAAY,EACtB,OAAQD,EAAK,SACb,KAAMC,EAAG,oBAAoB,EAC7B,aAAcA,EAAG,oBAAoB,EACrC,YAAaA,EAAG,mBAAmB,EACnC,cAAeA,EAAG,qBAAqB,EACvC,iBAAkBA,EAAG,yBAAyB,EAC9C,aAAcA,EAAG,oBAAoB,EACrC,kBAAmBA,EAAG,0BAA0B,EAChD,gBAAiBA,EAAG,uBAAuB,EAC3C,iBAAkBA,EAAG,wBAAwB,EAC7C,eAAgBA,EAAG,sBAAsB,EACzC,WAAYA,EAAG,kBAAkB,EACjC,gBAAiBA,EAAG,wBAAwB,EAC5C,YAAaD,EAAK,YAClB,UAAWA,EAAK,SAClB,CACF",
-  "names": ["getFileElements", "document", "core", "id", "name"]
-}

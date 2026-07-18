@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/css/features/style/colors.css"],
-  "sourcesContent": [".gradient-field,\n.gradient-controls,\n.gradient-angle-controls {\n  display: grid;\n  gap: 0.55rem;\n}\n\n.gradient-type-grid {\n  grid-template-columns: repeat(4, minmax(0, 1fr));\n}\n\n.gradient-controls,\n.image-fill-controls {\n  padding: 0.75rem;\n  border: 1px solid rgba(15, 118, 110, 0.18);\n  border-radius: 1rem;\n  background: rgba(204, 251, 241, 0.28);\n}\n\n.gradient-controls[hidden],\n.gradient-angle-controls[hidden],\n.image-fill-controls[hidden] {\n  display: none;\n}\n\n.image-fill-controls {\n  display: grid;\n  gap: 0.65rem;\n}\n\n.image-fill-actions {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 0.6rem;\n}\n\n.color-field.gradient-end-color {\n  padding: 0;\n  border: 0;\n  background: transparent;\n}\n\n.color-transparency-label {\n  margin-top: 0.15rem;\n  font-size: 0.78rem;\n}\n"],
-  "mappings": "AAAA,CAAC,eACD,CAAC,kBACD,CAAC,wBACC,QAAS,KACT,IAAK,MACP,CAEA,CAAC,mBACC,sBAAuB,OAAO,CAAC,CAAE,OAAO,CAAC,CAAE,KAC7C,CAEA,CAVC,kBAWD,CAAC,oBAZD,QAaW,OACT,OAAQ,IAAI,MAAM,KAAK,EAAE,CAAE,GAAG,CAAE,GAAG,CAAE,KAdvC,cAeiB,KACf,WAAY,SACd,CAEA,CAlBC,iBAkBiB,CAAC,QACnB,CAlBC,uBAkBuB,CAAC,QACzB,CATC,mBASmB,CAAC,QACnB,QAAS,IACX,CAEA,CAbC,oBAcC,QAAS,KACT,IAAK,MACP,CAEA,CAAC,mBACC,QAAS,KACT,sBAAuB,OAAO,CAAC,CAAE,OAAO,CAAC,CAAE,MAC3C,IAAK,KACP,CAEA,CAAC,WAAW,CAAC,mBApCb,QAqCW,EACT,OAAQ,EACR,WAAY,WACd,CAEA,CAAC,yBACC,WAAY,OACZ,UAAW,MACb",
-  "names": []
-}
