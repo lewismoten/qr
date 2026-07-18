@@ -68,4 +68,36 @@ assert.equal(
   'completed state should close after its hold',
 );
 
+const canceled = progress.start({ title: 'Cancel', phase: 'Starting' });
+canceled.update(-0.5);
+assert.equal(elements.meter.value, 0, 'progress should clamp below zero');
+canceled.update(1.5, 'Finishing');
+assert.equal(elements.meter.value, 100, 'progress should clamp above 100%');
+elements.cancel.dispatchEvent(new Event('click'));
+assert.equal(canceled.signal.aborted, true);
+assert.equal(elements.cancel.disabled, true);
+assert.equal(elements.phase.textContent, 'Canceling...');
+canceled.update(0.5, 'Ignored after cancellation');
+assert.equal(elements.meter.value, 100);
+canceled.finish();
+
+const replaced = progress.start({ title: 'Old', phase: 'Working' });
+const replacement = progress.start({ title: 'New', phase: 'Working' });
+assert.equal(
+  replaced.signal.aborted,
+  true,
+  'a new task should abort the old one',
+);
+replacement.finish();
+
+const incomplete = progress.start({ title: 'Incomplete', phase: 'Working' });
+await wait(12);
+assert.equal(elements.dialog.open, true);
+incomplete.finish();
+assert.equal(
+  elements.dialog.open,
+  false,
+  'an incomplete task should close without the completion hold',
+);
+
 console.log('Task progress timing tests passed.');

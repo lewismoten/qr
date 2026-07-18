@@ -79,7 +79,7 @@ export function validateTelephoneValue(
       : '';
   }
 
-  const allowedPattern = /^\+?[\d\s().-]+$/;
+  const allowedPattern = /^[+\d\s().-]+$/;
   if (!allowedPattern.test(trimmed)) {
     return lookup(
       'validation.phone.characters',

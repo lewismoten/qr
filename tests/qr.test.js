@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { BitBuffer } from '../src/js/qr/bit-buffer.js';
 import NativeQRCode from '../src/js/qr/matrix-encoder.js';
 
 function matrixSignature(definition) {
@@ -87,10 +88,36 @@ function testModesAndUtf8() {
   );
   assert.equal(utf8.segments[0].characterCount, 13);
   assert.equal(utf8.segments[0].getBitsLength(), 104);
+  assert.equal(utf8.segments[0].getLength(), 13);
   assert.throws(
     () => NativeQRCode.create([{ data: '12-A', mode: 'numeric' }]),
     /only accepts digits/,
   );
+  assert.throws(
+    () => NativeQRCode.create([{ data: 'lowercase', mode: 'alphanumeric' }]),
+    /unsupported characters/,
+  );
+  assert.throws(
+    () => NativeQRCode.create([{ data: 'anything', mode: 'imaginary' }]),
+    (error) => error.i18nKey === 'qr.errors.modeUnsupported',
+  );
+}
+
+function testBitBufferLimits() {
+  const buffer = new BitBuffer();
+  buffer.append(0b101, 3);
+  assert.deepEqual(buffer.bits, [1, 0, 1]);
+  for (const [value, length] of [
+    [1, -1],
+    [1, 32],
+    [4, 2],
+  ]) {
+    assert.throws(
+      () => buffer.append(value, length),
+      (error) =>
+        error instanceof RangeError && error.i18nKey === 'qr.errors.bitLength',
+    );
+  }
 }
 
 function testKanjiAndMixedModes() {
@@ -158,12 +185,35 @@ function testMasksAndDeterminism() {
   }
   assert.equal(signatures.size, 8);
   assert.ok(NativeQRCode.create('AUTO MASK').maskPattern >= 0);
+
+  for (const maskPattern of [-1, 8, 1.5]) {
+    assert.throws(
+      () => NativeQRCode.create('INVALID MASK', { maskPattern }),
+      (error) =>
+        error instanceof RangeError &&
+        error.i18nKey === 'qr.errors.maskPattern',
+    );
+  }
+}
+
+function testInvalidConfiguration() {
+  assert.throws(
+    () =>
+      NativeQRCode.create('INVALID LEVEL', {
+        errorCorrectionLevel: 'unknown',
+      }),
+    (error) =>
+      error.i18nKey === 'qr.errors.errorCorrectionLevel' &&
+      error.i18nOptions.level === 'UNKNOWN',
+  );
 }
 
 testCapacityBoundaries();
 testEveryVersionAndCorrectionLevel();
 testModesAndUtf8();
+testBitBufferLimits();
 testKanjiAndMixedModes();
 testVersion40CapacityLimits();
 testMasksAndDeterminism();
+testInvalidConfiguration();
 console.log('Native QR structural, mode, and capacity tests passed.');
