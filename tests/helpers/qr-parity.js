@@ -98,7 +98,12 @@ function runSupplementalParity() {
   return comparisons;
 }
 
-export function runParityLevel(errorCorrectionLevel, supplemental = false) {
+export function runParityRange(
+  errorCorrectionLevel,
+  firstVersion,
+  lastVersion,
+  supplemental = false,
+) {
   if (!ReferenceQRCode) {
     console.log(
       'Reference parity skipped: set QR_REFERENCE_BUNDLE or place ' +
@@ -107,7 +112,7 @@ export function runParityLevel(errorCorrectionLevel, supplemental = false) {
     return;
   }
   let comparisons = 0;
-  for (let version = 1; version <= 40; version += 1) {
+  for (let version = firstVersion; version <= lastVersion; version += 1) {
     for (let maskPattern = 0; maskPattern < 8; maskPattern += 1) {
       assertParity('A', { errorCorrectionLevel, version, maskPattern });
       comparisons += 1;
@@ -115,6 +120,7 @@ export function runParityLevel(errorCorrectionLevel, supplemental = false) {
   }
   if (supplemental) comparisons += runSupplementalParity();
   console.log(
-    `${errorCorrectionLevel} parity passed for ${comparisons} matrices.`,
+    `${errorCorrectionLevel} V${firstVersion}-${lastVersion} parity ` +
+      `passed for ${comparisons} matrices.`,
   );
 }
