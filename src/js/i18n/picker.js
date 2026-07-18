@@ -116,6 +116,17 @@ export function setupLanguagePicker({
   const panel = document?.getElementById('language-picker-panel');
   const grid = document?.getElementById('language-picker-grid');
   if (!picker || !trigger || !panel || !grid) return;
+  const loadingStatus = document.createElement('div');
+  const loadingSpinner = document.createElement('span');
+  const loadingLabel = document.createElement('span');
+  loadingStatus.className = 'language-loading-status';
+  loadingStatus.hidden = true;
+  loadingStatus.setAttribute('role', 'status');
+  loadingStatus.setAttribute('aria-live', 'polite');
+  loadingSpinner.className = 'language-loading-spinner';
+  loadingSpinner.setAttribute('aria-hidden', 'true');
+  loadingStatus.append(loadingSpinner, loadingLabel);
+  picker.appendChild(loadingStatus);
 
   const close = ({ focus = false } = {}) => {
     panel.hidden = true;
@@ -171,8 +182,17 @@ export function setupLanguagePicker({
           return;
         }
         close();
+        loadingLabel.textContent = lookup(
+          'language.loading',
+          'Loading {language}...',
+          { language: translatedName },
+        );
+        loadingStatus.hidden = false;
+        picker.classList.add('is-loading');
+        trigger.disabled = true;
         trigger.setAttribute('aria-busy', 'true');
         try {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
           await onLocaleChange(code);
           saveLocale(storage || getDefaultStorage(), getActiveLocale());
           render();
@@ -181,6 +201,9 @@ export function setupLanguagePicker({
           console.error(error);
         } finally {
           trigger.removeAttribute('aria-busy');
+          trigger.disabled = false;
+          picker.classList.remove('is-loading');
+          loadingStatus.hidden = true;
         }
       });
       grid.appendChild(button);

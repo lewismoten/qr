@@ -62,7 +62,7 @@
   "aboutDialog": { "kicker": "داخل المصفوفة", "title": "حول منشئ رموز QR", "close": "إغلاق حول", "frameTitle": "حول منشئ رموز QR" },
   "technologyDialog": { "kicker": "جرد التقنيات", "title": "التقنيات والمعايير والتراخيص", "close": "إغلاق جرد التقنيات", "frameTitle": "التقنيات والمعايير والتراخيص" },
   "privacyDialog": { "kicker": "الخصوصية واستخدام البيانات", "title": "كيف يتعامل هذا الموقع مع معلوماتك", "close": "إغلاق الخصوصية", "frameTitle": "معلومات خصوصية منشئ رموز QR" },
-  "language": { "choose": "اختر اللغة", "description": "تظهر الأسماء بلغتك الحالية وبالصيغة الأصلية لكل لغة.", "current": "اللغة: {language}. اختر اللغة." },
+  "language": { "choose": "اختر اللغة", "description": "تظهر الأسماء بلغتك الحالية وبالصيغة الأصلية لكل لغة.", "current": "اللغة: {language}. اختر اللغة.", "loading": "جارٍ تحميل {language}..." },
   "validation": {
     "contentRequired": "غير صالح بعد: المحتوى مطلوب.",
     "email": {

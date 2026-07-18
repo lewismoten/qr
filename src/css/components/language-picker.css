@@ -1,6 +1,8 @@
 .language-picker {
   position: relative;
-  flex: 0 0 auto;
+  z-index: 2;
+  flex: 0 0 2.65rem;
+  overflow: visible;
 }
 
 .language-picker-trigger {
@@ -27,6 +29,49 @@
 .language-picker-trigger.is-debug-language {
   border-color: rgba(251, 191, 36, 0.72);
   background: rgba(245, 158, 11, 0.16);
+}
+
+.language-picker-trigger:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.language-loading-status {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.55rem);
+  min-height: 2.25rem;
+  padding: 0.45rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(94, 234, 212, 0.4);
+  border-radius: 0.7rem;
+  background: #0b2232;
+  box-shadow: 0 12px 30px rgba(2, 12, 20, 0.36);
+  color: #f5fffd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.language-loading-status[hidden] {
+  display: none;
+}
+
+.language-loading-spinner {
+  width: 0.9rem;
+  aspect-ratio: 1;
+  border: 0.15rem solid rgba(255, 255, 255, 0.25);
+  border-top-color: #5eead4;
+  border-radius: 50%;
+  animation: language-loading-spin 650ms linear infinite;
+}
+
+@keyframes language-loading-spin {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .language-picker-panel {
@@ -157,5 +202,11 @@
 
   .language-picker-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .language-loading-spinner {
+    animation-duration: 1.5s;
   }
 }

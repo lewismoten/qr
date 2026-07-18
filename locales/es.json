@@ -69,7 +69,7 @@
   "aboutDialog": { "kicker": "Dentro de la matriz", "title": "Acerca del generador de códigos QR", "close": "Cerrar Acerca de", "frameTitle": "Acerca del generador de códigos QR" },
   "technologyDialog": { "kicker": "Inventario tecnológico", "title": "Tecnología, estándares y licencias", "close": "Cerrar el inventario tecnológico", "frameTitle": "Tecnología, estándares y licencias" },
   "privacyDialog": { "kicker": "Privacidad y uso de datos", "title": "Cómo trata este sitio tu información", "close": "Cerrar Privacidad", "frameTitle": "Información de privacidad del generador de códigos QR" },
-  "language": { "choose": "Elegir idioma", "description": "Los nombres aparecen en tu idioma actual y en su forma nativa.", "current": "Idioma: {language}. Elegir idioma." },
+  "language": { "choose": "Elegir idioma", "description": "Los nombres aparecen en tu idioma actual y en su forma nativa.", "current": "Idioma: {language}. Elegir idioma.", "loading": "Cargando {language}..." },
   "validation": {
     "contentRequired": "Aún no es válido: el contenido es obligatorio.",
     "email": {

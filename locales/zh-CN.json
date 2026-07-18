@@ -62,7 +62,7 @@
   "aboutDialog": { "kicker": "矩阵内部", "title": "关于二维码生成器", "close": "关闭关于", "frameTitle": "关于二维码生成器" },
   "technologyDialog": { "kicker": "技术清单", "title": "技术、标准和许可证", "close": "关闭技术清单", "frameTitle": "技术、标准和许可证" },
   "privacyDialog": { "kicker": "隐私和数据使用", "title": "本网站如何处理您的信息", "close": "关闭隐私信息", "frameTitle": "二维码生成器隐私信息" },
-  "language": { "choose": "选择语言", "description": "语言名称同时以当前语言和其本地形式显示。", "current": "当前语言：{language}。选择语言。" },
+  "language": { "choose": "选择语言", "description": "语言名称同时以当前语言和其本地形式显示。", "current": "当前语言：{language}。选择语言。", "loading": "正在加载 {language}..." },
   "validation": {
     "contentRequired": "尚无效：内容为必填项。",
     "email": {

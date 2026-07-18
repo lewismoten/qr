@@ -215,6 +215,7 @@
     "frameTitle": "QR Code Generator privacy information"
   },
   "language": {
+    "loading": "Loading {language}...",
     "choose": "Choose language",
     "description": "Names appear in your current language and their native form.",
     "current": "Language: {language}. Choose language."
