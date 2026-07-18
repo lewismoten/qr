@@ -15,6 +15,8 @@ export function createLazyDownloadSetup({
   connectPrintElements,
 }) {
   let controller = null;
+  let featureElements = null;
+  let getElements = null;
   let request = null;
   const frames = createFrameNavigation({
     format: e.qrFormat,
@@ -46,10 +48,11 @@ export function createLazyDownloadSetup({
       ])
         .then(
           ([, { createApplicationDownloadSetup }, { getDownloadElements }]) => {
-            const downloadElements = getDownloadElements(document, e);
-            connectPrintElements(downloadElements);
+            getElements = getDownloadElements;
+            featureElements = getElements(document, e);
+            connectPrintElements(featureElements);
             controller = createApplicationDownloadSetup({
-              elements: downloadElements,
+              elements: featureElements,
               frames,
               runtime,
               getPrintWidth,
@@ -68,7 +71,12 @@ export function createLazyDownloadSetup({
   };
 
   return {
-    load: (name) => ensure().then((system) => system.load(name)),
+    load: (name) =>
+      ensure().then((system) => {
+        Object.assign(featureElements, getElements(document, e));
+        connectPrintElements(featureElements);
+        return system.load(name);
+      }),
     syncControls: () => controller?.syncControls(),
     syncAnimation: () => controller?.syncAnimation(),
     getFrameCount: frames.getFrameCount,

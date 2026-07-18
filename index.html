@@ -1679,323 +1679,54 @@
                   <section
                     class="subtab-panel download-subtab-panel is-active"
                     data-download-subtab-panel="image"
+                    data-fragment-url="fragments/download/image.html"
                   >
-                    <fieldset class="option-group">
-                      <legend data-i18n="downloadUi.image.legend">
-                        Export image
-                      </legend>
-                      <div
-                        class="choice-grid download-format-grid"
-                        role="group"
-                        aria-label="Image format"
-                        data-i18n-aria-label="downloadUi.image.format"
-                      >
-                        <button
-                          type="button"
-                          class="choice-button is-active"
-                          data-choice-target="download-format"
-                          data-choice-value="png"
-                          aria-pressed="true"
-                        >
-                          PNG
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="download-format"
-                          data-choice-value="jpg"
-                          aria-pressed="false"
-                        >
-                          JPG
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="download-format"
-                          data-choice-value="gif"
-                          aria-pressed="false"
-                        >
-                          GIF
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="download-format"
-                          data-choice-value="svg"
-                          aria-pressed="false"
-                        >
-                          SVG
-                        </button>
-                      </div>
-                      <select
-                        id="download-format"
-                        name="download-format"
-                        class="sr-only"
-                        aria-label="Image format"
-                        data-i18n-aria-label="downloadUi.image.format"
-                      >
-                        <option value="png" selected>PNG</option>
-                        <option value="jpg">JPG</option>
-                        <option value="gif">GIF</option>
-                        <option value="svg">SVG</option>
-                      </select>
-
-                      <div id="download-quality-controls" hidden>
-                        <label class="slider-field" for="download-quality">
-                          <span data-i18n="downloadUi.image.quality"
-                            >JPG quality</span
-                          >
-                          <output
-                            id="download-quality-value"
-                            for="download-quality"
-                            >92%</output
-                          >
-                        </label>
-                        <input
-                          id="download-quality"
-                          name="download-quality"
-                          type="range"
-                          min="40"
-                          max="100"
-                          step="1"
-                          value="92"
-                        />
-                      </div>
-
-                      <div class="download-actions">
-                        <button
-                          id="download-current"
-                          type="button"
-                          class="download-button"
-                          data-i18n="downloadUi.image.current"
-                        >
-                          Download current image
-                        </button>
-                        <button
-                          id="download-zip"
-                          type="button"
-                          class="secondary-button"
-                          hidden
-                          data-i18n="downloadUi.image.allZip"
-                        >
-                          Download all as ZIP
-                        </button>
-                      </div>
-                      <p class="hint" data-i18n="downloadUi.image.svgHint">
-                        SVG traces the complete canvas into paths only,
-                        including frame text.
-                      </p>
-                    </fieldset>
+                    <div class="fragment-loading" role="status">
+                      <span data-i18n="common.loading">Loading...</span>
+                    </div>
+                    <a
+                      class="fragment-help-link"
+                      href="fragments/download/image.html"
+                      data-fragment-help-link
+                      data-i18n="common.help"
+                      >Help</a
+                    >
                   </section>
 
                   <section
                     class="subtab-panel download-subtab-panel"
                     data-download-subtab-panel="document"
                     hidden
+                    data-fragment-url="fragments/download/document.html"
                   >
-                    <fieldset class="option-group">
-                      <legend data-i18n="downloadUi.document.legend">
-                        PDF document
-                      </legend>
-                      <label class="toggle-field">
-                        <input
-                          id="print-width-auto"
-                          name="print-width-auto"
-                          type="checkbox"
-                          checked
-                        />
-                        <span data-i18n="downloadUi.document.autoSize"
-                          >Auto-size printed QR from pixels and version</span
-                        >
-                      </label>
-                      <label class="slider-field" for="print-width">
-                        <span data-i18n="downloadUi.document.printedWidth"
-                          >Printed width</span
-                        >
-                        <output id="print-width-value" for="print-width"
-                          >1.67 in auto</output
-                        >
-                      </label>
-                      <input
-                        id="print-width"
-                        name="print-width"
-                        type="range"
-                        min="0.5"
-                        max="7"
-                        step="0.05"
-                        value="1.65"
-                        disabled
-                      />
-
-                      <div class="download-actions document-download-actions">
-                        <button
-                          id="download-current-pdf"
-                          type="button"
-                          class="download-button"
-                          data-i18n="downloadUi.document.current"
-                        >
-                          Download current as PDF
-                        </button>
-                        <button
-                          id="download-all-pdf"
-                          type="button"
-                          class="secondary-button"
-                          hidden
-                          data-i18n="downloadUi.document.allPdf"
-                        >
-                          Download all as PDF
-                        </button>
-                      </div>
-                      <p class="hint" data-i18n="downloadUi.document.hint">
-                        Auto print width uses 192 pixels per inch and protects
-                        higher-version QR modules from becoming too small. PDF
-                        sheets fit as many codes as the selected physical width
-                        allows.
-                      </p>
-                    </fieldset>
+                    <div class="fragment-loading" role="status">
+                      <span data-i18n="common.loading">Loading...</span>
+                    </div>
+                    <a
+                      class="fragment-help-link"
+                      href="fragments/download/document.html"
+                      data-fragment-help-link
+                      data-i18n="common.help"
+                      >Help</a
+                    >
                   </section>
 
                   <section
                     class="subtab-panel download-subtab-panel"
                     data-download-subtab-panel="animation"
                     hidden
+                    data-fragment-url="fragments/download/animation.html"
                   >
-                    <fieldset class="option-group">
-                      <legend data-i18n="downloadUi.animation.legend">
-                        Animation timing
-                      </legend>
-                      <div
-                        class="choice-grid animation-timing-mode-grid"
-                        role="group"
-                        aria-label="Animation timing mode"
-                        data-i18n-aria-label="downloadUi.animation.mode"
-                      >
-                        <button
-                          type="button"
-                          class="choice-button is-active"
-                          data-choice-target="animation-timing-mode"
-                          data-choice-value="per-frame"
-                          aria-pressed="true"
-                          data-i18n="downloadUi.animation.perImage"
-                        >
-                          Per image
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="animation-timing-mode"
-                          data-choice-value="total"
-                          aria-pressed="false"
-                          data-i18n="downloadUi.animation.totalDuration"
-                        >
-                          Total duration
-                        </button>
-                      </div>
-                      <select
-                        id="animation-timing-mode"
-                        name="animation-timing-mode"
-                        class="sr-only"
-                        aria-label="Animation timing mode"
-                        data-i18n-aria-label="downloadUi.animation.mode"
-                      >
-                        <option
-                          value="per-frame"
-                          selected
-                          data-i18n="downloadUi.animation.perImage"
-                        >
-                          Per image
-                        </option>
-                        <option
-                          value="total"
-                          data-i18n="downloadUi.animation.totalDuration"
-                        >
-                          Total duration
-                        </option>
-                      </select>
-
-                      <div class="animation-duration-grid">
-                        <div>
-                          <label
-                            for="animation-minutes"
-                            data-i18n="downloadUi.animation.minutes"
-                            >Minutes</label
-                          >
-                          <input
-                            id="animation-minutes"
-                            name="animation-minutes"
-                            type="number"
-                            inputmode="numeric"
-                            min="0"
-                            max="60"
-                            step="1"
-                            value="0"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            for="animation-seconds"
-                            data-i18n="downloadUi.animation.seconds"
-                            >Seconds</label
-                          >
-                          <input
-                            id="animation-seconds"
-                            name="animation-seconds"
-                            type="number"
-                            inputmode="numeric"
-                            min="0"
-                            max="59"
-                            step="1"
-                            value="1"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            for="animation-milliseconds"
-                            data-i18n="downloadUi.animation.milliseconds"
-                            >Milliseconds</label
-                          >
-                          <input
-                            id="animation-milliseconds"
-                            name="animation-milliseconds"
-                            type="number"
-                            inputmode="numeric"
-                            min="0"
-                            max="999"
-                            step="1"
-                            value="0"
-                          />
-                        </div>
-                      </div>
-                      <p
-                        id="animation-duration-summary"
-                        class="hint"
-                        data-i18n="downloadUi.animation.initialSummary"
-                      >
-                        1.000 seconds per image - 8.000 seconds total.
-                      </p>
-                      <div class="download-actions animation-download-actions">
-                        <button
-                          id="download-animated-gif"
-                          type="button"
-                          class="download-button"
-                          data-i18n="downloadUi.animation.gif"
-                        >
-                          Download animated GIF
-                        </button>
-                        <button
-                          id="download-animation-mp4"
-                          type="button"
-                          class="secondary-button"
-                          data-i18n="downloadUi.animation.mp4"
-                        >
-                          Download MP4
-                        </button>
-                      </div>
-                      <p class="hint" data-i18n="downloadUi.animation.hint">
-                        GIF loops continuously. MP4 availability depends on the
-                        browser's built-in encoder and records in real time.
-                      </p>
-                    </fieldset>
+                    <div class="fragment-loading" role="status">
+                      <span data-i18n="common.loading">Loading...</span>
+                    </div>
+                    <a
+                      class="fragment-help-link"
+                      href="fragments/download/animation.html"
+                      data-fragment-help-link
+                      data-i18n="common.help"
+                      >Help</a
+                    >
                   </section>
                 </div>
                 <p

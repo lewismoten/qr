@@ -7,41 +7,34 @@ const loadExporters = () => {
   return exportersPromise;
 };
 
-export function createDownloadActions({
-  canvas,
-  formatInput,
-  qualityInput,
-  status,
-  currentButton,
-  currentPdfButton,
-  zipButton,
-  allPdfButton,
-  gifButton,
-  mp4Button,
-  getPrintWidthInches,
-  getFrameCount,
-  getCurrentFrame,
-  setCurrentFrame,
-  syncFrameNavigation,
-  render,
-  getAnimationTiming,
-  formatAnimationDuration,
-  taskProgress,
-}) {
-  const buttons = [
+export function createDownloadActions(options) {
+  const {
+    canvas,
+    status,
     currentButton,
     currentPdfButton,
     zipButton,
     allPdfButton,
     gifButton,
     mp4Button,
-  ];
+    getPrintWidthInches,
+    getFrameCount,
+    getCurrentFrame,
+    setCurrentFrame,
+    syncFrameNavigation,
+    render,
+    getAnimationTiming,
+    formatAnimationDuration,
+    taskProgress,
+  } = options;
+  const buttons = new Set();
+  const connected = new WeakSet();
   const setDisabled = (disabled) =>
     buttons.forEach((button) => {
       button.disabled = disabled;
     });
   const getQuality = () =>
-    (Number.parseInt(qualityInput.value, 10) || 92) / 100;
+    (Number.parseInt(options.qualityInput?.value, 10) || 92) / 100;
   const makePdf = async (sourceCanvas) => {
     const { createPdfBlob } = await loadExporters();
     return createPdfBlob(
@@ -89,7 +82,7 @@ export function createDownloadActions({
   };
 
   const downloadCurrent = async () => {
-    const format = formatInput.value;
+    const format = options.formatInput.value;
     setDisabled(true);
     status.textContent = lookup('download.creating', 'Creating {format}...', {
       format: format.toUpperCase(),
@@ -132,7 +125,7 @@ export function createDownloadActions({
     const total = getFrameCount();
     if (total <= 1) return;
     const originalFrame = getCurrentFrame();
-    const format = formatInput.value;
+    const format = options.formatInput.value;
     const width = String(total).length;
     const files = [];
     setDisabled(true);
@@ -235,10 +228,27 @@ export function createDownloadActions({
     loadExporters,
   });
 
-  currentButton.addEventListener('click', downloadCurrent);
-  currentPdfButton.addEventListener('click', downloadCurrentPdf);
-  zipButton.addEventListener('click', downloadAllZip);
-  allPdfButton.addEventListener('click', downloadAllPdf);
-  gifButton.addEventListener('click', () => downloadAnimation('gif'));
-  mp4Button.addEventListener('click', () => downloadAnimation('mp4'));
+  const attach = (button, action) => {
+    if (!button || connected.has(button)) return;
+    connected.add(button);
+    buttons.add(button);
+    button.addEventListener('click', action);
+  };
+  const attachButtons = (next) => {
+    attach(next.currentButton, downloadCurrent);
+    attach(next.currentPdfButton, downloadCurrentPdf);
+    attach(next.zipButton, downloadAllZip);
+    attach(next.allPdfButton, downloadAllPdf);
+    attach(next.gifButton, () => downloadAnimation('gif'));
+    attach(next.mp4Button, () => downloadAnimation('mp4'));
+  };
+  attachButtons({
+    currentButton,
+    currentPdfButton,
+    zipButton,
+    allPdfButton,
+    gifButton,
+    mp4Button,
+  });
+  return { attachButtons };
 }

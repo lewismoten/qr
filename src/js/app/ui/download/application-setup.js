@@ -11,7 +11,7 @@ export function createApplicationDownloadSetup({
   let documentSection = null;
   let animation = null;
   let animationRequest = null;
-  let actionsRequest = null;
+  let lazyActions = null;
 
   const syncControls = () => {
     if (!active) return;
@@ -31,13 +31,13 @@ export function createApplicationDownloadSetup({
     animation?.sync();
   };
 
-  e.downloadQuality.addEventListener('input', syncControls);
+  e.downloadQuality?.addEventListener('input', syncControls);
   for (const input of [
     e.animationMinutes,
     e.animationSeconds,
     e.animationMilliseconds,
   ]) {
-    input.addEventListener('input', () => animation?.sync());
+    input?.addEventListener('input', () => animation?.sync());
   }
   document.getElementById('qr-form').addEventListener('click', (event) => {
     const button = event.target.closest('.choice-button');
@@ -100,44 +100,43 @@ export function createApplicationDownloadSetup({
     return animationRequest;
   };
 
-  const ensureActions = () => {
-    if (!actionsRequest) {
-      actionsRequest = import('./lazy-actions.js')
-        .then(({ setupLazyDownloadActions }) => {
-          setupLazyDownloadActions({
-            canvas: e.canvas,
-            formatInput: e.downloadFormat,
-            qualityInput: e.downloadQuality,
-            status: e.downloadStatus,
-            currentButton: e.downloadCurrent,
-            currentPdfButton: e.downloadCurrentPdf,
-            zipButton: e.downloadZip,
-            allPdfButton: e.downloadAllPdf,
-            gifButton: e.downloadAnimatedGif,
-            mp4Button: e.downloadAnimationMp4,
-            getPrintWidthInches: getPrintWidth,
-            taskProgress,
-            getFrameCount: frames.getFrameCount,
-            getCurrentFrame: frames.getCurrentFrame,
-            setCurrentFrame: frames.setCurrentFrame,
-            syncFrameNavigation: frames.sync,
-            render: () => runtime.render(),
-            getAnimationTiming: (count) =>
-              animation?.getTiming(count) ?? {
-                enteredDurationMs: 0,
-                perFrameMs: 0,
-                totalDurationMs: 0,
-              },
-            formatAnimationDuration: (value) =>
-              animation?.formatDuration(value) ?? `${value} ms`,
-          });
-        })
-        .catch((error) => {
-          actionsRequest = null;
-          throw error;
-        });
+  const ensureActions = async () => {
+    const options = {
+      canvas: e.canvas,
+      formatInput: e.downloadFormat,
+      qualityInput: e.downloadQuality,
+      status: e.downloadStatus,
+      currentButton: e.downloadCurrent,
+      currentPdfButton: e.downloadCurrentPdf,
+      zipButton: e.downloadZip,
+      allPdfButton: e.downloadAllPdf,
+      gifButton: e.downloadAnimatedGif,
+      mp4Button: e.downloadAnimationMp4,
+      getPrintWidthInches: getPrintWidth,
+      taskProgress,
+      getFrameCount: frames.getFrameCount,
+      getCurrentFrame: frames.getCurrentFrame,
+      setCurrentFrame: frames.setCurrentFrame,
+      syncFrameNavigation: frames.sync,
+      render: () => runtime.render(),
+      getAnimationTiming: (count) =>
+        animation?.getTiming(count) ?? {
+          enteredDurationMs: 0,
+          perFrameMs: 0,
+          totalDurationMs: 0,
+        },
+      formatAnimationDuration: (value) =>
+        animation?.formatDuration(value) ?? `${value} ms`,
+    };
+    if (!lazyActions) {
+      const { setupLazyDownloadActions } = await import('./lazy-actions.js');
+      lazyActions = setupLazyDownloadActions(
+        options,
+        () => import('./actions.js'),
+      );
+      return;
     }
-    return actionsRequest;
+    lazyActions.update(options);
   };
 
   const load = async (name) => {

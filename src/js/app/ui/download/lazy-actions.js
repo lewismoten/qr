@@ -1,23 +1,17 @@
 import { getErrorText, lookup } from '../../../i18n/index.js';
 
-export function setupLazyDownloadActions(options) {
-  const buttons = [
-    options.currentButton,
-    options.currentPdfButton,
-    options.zipButton,
-    options.allPdfButton,
-    options.gifButton,
-    options.mp4Button,
-  ].filter(Boolean);
+export function setupLazyDownloadActions(options, importActions) {
+  const watched = new WeakSet();
+  let actions = null;
   let ready = false;
   let request = null;
 
   const load = () => {
     if (ready) return Promise.resolve();
     if (!request) {
-      request = import('./actions.js')
+      request = importActions()
         .then(({ createDownloadActions }) => {
-          createDownloadActions(options);
+          actions = createDownloadActions(options);
           ready = true;
         })
         .catch((error) => {
@@ -28,8 +22,9 @@ export function setupLazyDownloadActions(options) {
     return request;
   };
   const preload = () => load().catch(console.error);
-
-  buttons.forEach((button) => {
+  const watch = (button) => {
+    if (!button || watched.has(button)) return;
+    watched.add(button);
     button.addEventListener('pointerenter', preload, { once: true });
     button.addEventListener('focus', preload, { once: true });
     button.addEventListener('pointerdown', preload, { once: true });
@@ -48,5 +43,20 @@ export function setupLazyDownloadActions(options) {
         );
       }
     });
-  });
+  };
+  const update = (next) => {
+    Object.assign(options, next);
+    const buttons = [
+      options.currentButton,
+      options.currentPdfButton,
+      options.zipButton,
+      options.allPdfButton,
+      options.gifButton,
+      options.mp4Button,
+    ];
+    buttons.forEach(watch);
+    actions?.attachButtons(options);
+  };
+  update(options);
+  return { update };
 }

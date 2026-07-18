@@ -150,6 +150,9 @@ describe('application fragments', () => {
       ['style/modules', 'tab=style&amp;subtab=modules'],
       ['style/colors', 'tab=style&amp;subtab=colors'],
       ['style/artwork', 'tab=style&amp;subtab=artwork'],
+      ['download/image', 'tab=download&amp;subtab=image'],
+      ['download/document', 'tab=download&amp;subtab=document'],
+      ['download/animation', 'tab=download&amp;subtab=animation'],
     ];
     for (const [path, hash] of definitions) {
       const relative = 'fragments/' + path + '.html';
@@ -180,6 +183,9 @@ describe('application fragments', () => {
     assert.doesNotMatch(index, /id="color-dark"/);
     assert.doesNotMatch(index, /id="center-art-mode"/);
     assert.doesNotMatch(index, /id="frame-message-mode"/);
+    assert.doesNotMatch(index, /id="download-format"/);
+    assert.doesNotMatch(index, /id="print-width-auto"/);
+    assert.doesNotMatch(index, /id="animation-timing-mode"/);
   });
 });
 
