@@ -1,5 +1,6 @@
 import { createLazySection } from './lazy-section.js';
 import { createContentPluginRegistry } from './plugin-registry.js';
+import { ensurePanelFragment } from '../fragment-loader.js';
 import { lookup } from '../../../i18n/index.js';
 import { validateUrl } from './url-validation.js';
 
@@ -93,8 +94,13 @@ export function createContentSections({
       'content.preview.loading',
       '[Content preview loads after selecting this format]',
     );
+  const withMarkup = (format, load) => async () => {
+    const fieldset = document.querySelector(`[data-format-fields="${format}"]`);
+    await ensurePanelFragment(fieldset);
+    return load();
+  };
   let registry;
-  const pluginLoaders = {
+  const loaders = {
     text: () =>
       import('./text/plugin.js').then(({ createTextPlugin }) =>
         createTextPlugin(document),
@@ -158,6 +164,12 @@ export function createContentSections({
         createFilePlugin(file),
       ),
   };
+  const pluginLoaders = Object.fromEntries(
+    Object.entries(loaders).map(([format, load]) => [
+      format,
+      withMarkup(format, load),
+    ]),
+  );
   registry = createContentPluginRegistry({
     format: e.qrFormat,
     initial: {

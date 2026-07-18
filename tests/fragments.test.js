@@ -147,6 +147,9 @@ describe('application fragments', () => {
     });
     const definitions = [
       ['content/frame', 'tab=content&amp;subtab=frame'],
+      ['content/number', 'tab=content&amp;subtab=data'],
+      ['content/wifi', 'tab=content&amp;subtab=data'],
+      ['content/geo', 'tab=content&amp;subtab=data'],
       ['style/modules', 'tab=style&amp;subtab=modules'],
       ['style/colors', 'tab=style&amp;subtab=colors'],
       ['style/artwork', 'tab=style&amp;subtab=artwork'],
@@ -183,6 +186,9 @@ describe('application fragments', () => {
     assert.doesNotMatch(index, /id="color-dark"/);
     assert.doesNotMatch(index, /id="center-art-mode"/);
     assert.doesNotMatch(index, /id="frame-message-mode"/);
+    assert.doesNotMatch(index, /id="number-start"/);
+    assert.doesNotMatch(index, /id="wifi-ssid"/);
+    assert.doesNotMatch(index, /id="geo-latitude"/);
     assert.doesNotMatch(index, /id="download-format"/);
     assert.doesNotMatch(index, /id="print-width-auto"/);
     assert.doesNotMatch(index, /id="animation-timing-mode"/);

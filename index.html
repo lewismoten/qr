@@ -574,205 +574,37 @@
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="number"
+                      data-fragment-url="guides/content/number.html"
                       hidden
                     >
-                      <legend data-i18n="form.data.numberSeries">
-                        Number series
-                      </legend>
-                      <div class="number-range-grid">
-                        <div>
-                          <label for="number-start" data-i18n="form.data.start"
-                            >Start</label
-                          >
-                          <input
-                            id="number-start"
-                            name="number-start"
-                            type="number"
-                            inputmode="numeric"
-                            step="1"
-                            value="1"
-                          />
-                        </div>
-                        <div>
-                          <label for="number-end" data-i18n="form.data.end"
-                            >End</label
-                          >
-                          <input
-                            id="number-end"
-                            name="number-end"
-                            type="number"
-                            inputmode="numeric"
-                            step="1"
-                            value="8"
-                          />
-                        </div>
-                        <div>
-                          <label for="number-step" data-i18n="form.data.step"
-                            >Step</label
-                          >
-                          <input
-                            id="number-step"
-                            name="number-step"
-                            type="number"
-                            inputmode="numeric"
-                            min="1"
-                            step="1"
-                            value="1"
-                          />
-                        </div>
+                      <div class="fragment-loading" role="status">
+                        <span data-i18n="common.loading">Loading...</span>
                       </div>
-                      <div class="number-affix-grid">
-                        <div>
-                          <label
-                            for="number-prefix"
-                            data-i18n="form.data.prefixOptional"
-                            >Prefix (optional)</label
-                          >
-                          <input
-                            id="number-prefix"
-                            name="number-prefix"
-                            type="text"
-                            maxlength="32"
-                            placeholder="ITEM-"
-                            data-i18n-placeholder="form.placeholders.numberPrefix"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            for="number-suffix"
-                            data-i18n="form.data.suffixOptional"
-                            >Suffix (optional)</label
-                          >
-                          <input
-                            id="number-suffix"
-                            name="number-suffix"
-                            type="text"
-                            maxlength="32"
-                            placeholder="-A"
-                            data-i18n-placeholder="form.placeholders.numberSuffix"
-                          />
-                        </div>
-                      </div>
-                      <label class="slider-field" for="number-sequence-index">
-                        <span data-i18n="form.data.currentValue"
-                          >Current value</span
-                        >
-                        <output
-                          id="number-sequence-value"
-                          for="number-sequence-index"
-                          >1 / 8 - 1</output
-                        >
-                      </label>
-                      <input
-                        id="number-sequence-index"
-                        name="number-sequence-index"
-                        type="range"
-                        min="1"
-                        max="8"
-                        step="1"
-                        value="1"
-                      />
+                      <a
+                        href="guides/content/number.html"
+                        class="fragment-help-link"
+                        data-fragment-help-link
+                        data-i18n="common.help"
+                        >Help</a
+                      >
                     </fieldset>
 
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="wifi"
+                      data-fragment-url="guides/content/wifi.html"
                       hidden
                     >
-                      <legend data-i18n="formats.wifi">Wi-Fi</legend>
-                      <label for="wifi-ssid" data-i18n="form.data.networkName"
-                        >Network name</label
-                      >
-                      <input
-                        id="wifi-ssid"
-                        name="wifi-ssid"
-                        type="text"
-                        maxlength="32"
-                        placeholder="My Wi-Fi"
-                        data-i18n-placeholder="form.data.networkPlaceholder"
-                      />
-                      <label for="wifi-password" data-i18n="wifi.password"
-                        >Password</label
-                      >
-                      <input
-                        id="wifi-password"
-                        name="wifi-password"
-                        type="password"
-                        maxlength="64"
-                        autocomplete="current-password"
-                        placeholder="Password"
-                        data-i18n-placeholder="wifi.password"
-                      />
-                      <label
-                        for="wifi-encryption"
-                        data-i18n="form.data.security"
-                        >Security</label
-                      >
-                      <div
-                        id="wifi-encryption-buttons"
-                        class="choice-grid choice-grid-compact wifi-security-grid"
-                        role="radiogroup"
-                        aria-label="Wi-Fi security"
-                        data-i18n-aria-label="form.data.wifiSecurity"
-                      >
-                        <button
-                          type="button"
-                          class="choice-button is-active"
-                          data-choice-target="wifi-encryption"
-                          data-choice-value="WPA"
-                          aria-pressed="true"
-                          data-i18n="form.data.wpa"
-                        >
-                          WPA/2/3
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="wifi-encryption"
-                          data-choice-value="WEP"
-                          aria-pressed="false"
-                          data-i18n="form.data.wep"
-                        >
-                          WEP
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="wifi-encryption"
-                          data-choice-value="nopass"
-                          aria-pressed="false"
-                          data-i18n="form.data.open"
-                        >
-                          Open
-                        </button>
+                      <div class="fragment-loading" role="status">
+                        <span data-i18n="common.loading">Loading...</span>
                       </div>
-                      <select
-                        id="wifi-encryption"
-                        name="wifi-encryption"
-                        class="sr-only"
-                        aria-hidden="true"
-                        tabindex="-1"
+                      <a
+                        href="guides/content/wifi.html"
+                        class="fragment-help-link"
+                        data-fragment-help-link
+                        data-i18n="common.help"
+                        >Help</a
                       >
-                        <option value="WPA" data-i18n="form.data.wpaLong">
-                          WPA/WPA2/WPA3
-                        </option>
-                        <option value="WEP" data-i18n="form.data.wep">
-                          WEP
-                        </option>
-                        <option value="nopass" data-i18n="form.data.open">
-                          Open
-                        </option>
-                      </select>
-                      <label class="toggle-field">
-                        <input
-                          id="wifi-hidden"
-                          name="wifi-hidden"
-                          type="checkbox"
-                        />
-                        <span data-i18n="form.data.hiddenNetwork"
-                          >Hidden network</span
-                        >
-                      </label>
                     </fieldset>
 
                     <fieldset
@@ -1088,64 +920,20 @@
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="geo"
+                      data-fragment-url="guides/content/geo.html"
                       hidden
                     >
-                      <legend data-i18n="formats.geo">Geo</legend>
-                      <div class="geo-row">
-                        <div class="geo-field">
-                          <label
-                            for="geo-latitude"
-                            data-i18n="form.data.latitude"
-                            >Latitude</label
-                          >
-                          <input
-                            id="geo-latitude"
-                            name="geo-latitude"
-                            type="text"
-                            inputmode="decimal"
-                            maxlength="24"
-                            value="38.9182"
-                          />
-                        </div>
-                        <div class="geo-field">
-                          <label
-                            for="geo-longitude"
-                            data-i18n="form.data.longitude"
-                            >Longitude</label
-                          >
-                          <input
-                            id="geo-longitude"
-                            name="geo-longitude"
-                            type="text"
-                            inputmode="decimal"
-                            maxlength="24"
-                            value="-78.1944"
-                          />
-                        </div>
-                        <div class="geo-field geo-label-field">
-                          <label for="geo-query" data-i18n="form.data.label"
-                            >Label</label
-                          >
-                          <input
-                            id="geo-query"
-                            name="geo-query"
-                            type="text"
-                            maxlength="80"
-                            value="Front Royal, VA"
-                            data-i18n-value="form.defaults.geoLabel"
-                          />
-                        </div>
+                      <div class="fragment-loading" role="status">
+                        <span data-i18n="common.loading">Loading...</span>
                       </div>
-                      <div class="geo-map-card">
-                        <div
-                          id="geo-map"
-                          class="geo-map"
-                          aria-label="Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates."
-                          data-i18n-aria-label="form.data.mapLabel"
-                        ></div>
-                      </div>
+                      <a
+                        href="guides/content/geo.html"
+                        class="fragment-help-link"
+                        data-fragment-help-link
+                        data-i18n="common.help"
+                        >Help</a
+                      >
                     </fieldset>
-
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="vcard"

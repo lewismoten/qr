@@ -21,6 +21,9 @@ const flattenMessages = (value, prefix = '', result = {}) => {
 const markupUrls = [
   '../index.html',
   '../guides/content/frame.html',
+  '../guides/content/number.html',
+  '../guides/content/wifi.html',
+  '../guides/content/geo.html',
   '../guides/style/modules.html',
   '../guides/style/colors.html',
   '../guides/style/artwork.html',

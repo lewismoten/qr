@@ -132,9 +132,18 @@ describe('structured input validation', () => {
   });
 
   test('declares matching browser-side length limits', async () => {
-    const html = await readFile(new URL('../index.html', import.meta.url), {
-      encoding: 'utf8',
-    });
+    const sources = [
+      '../index.html',
+      '../guides/content/wifi.html',
+      '../guides/content/geo.html',
+    ];
+    const html = (
+      await Promise.all(
+        sources.map((source) =>
+          readFile(new URL(source, import.meta.url), { encoding: 'utf8' }),
+        ),
+      )
+    ).join('\n');
     for (const [id, maxLength] of [
       ['url-input', 2048],
       ['wifi-ssid', 32],
