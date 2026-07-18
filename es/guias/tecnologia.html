@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es" data-guide-locale="es" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tecnología, normas y licencias de generación de códigos QR</title>
+    <meta
+      name="description"
+      content="Tecnologías, estándares, formatos, API del navegador, algoritmos, servicios, patentes y licencias utilizados por el generador de códigos QR."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/es/guias/tecnologia.html"
+    />
+    <script>
+      if (new URLSearchParams(location.search).has('embed'))
+        document.documentElement.classList.add('is-embedded');
+    </script>
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/technology.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/technology.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/tecnologia.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D8%AA%D9%82%D9%86%D9%8A%D8%A9.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%A4%E0%A4%95%E0%A4%A8%E0%A5%80%E0%A4%95.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E6%8A%80%E6%9C%AF.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/technology.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Inventario tecnológico</p>
+            <h1 id="technology-page-title">
+              Tecnología, estándares y licencias
+            </h1>
+          </div>
+          <a class="info-page-back" href="../../index.html"
+            >Abrir el generador</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <p id="technology-page-content" class="info-lead">
+            Un inventario transparente del código propio, las funciones de la
+            plataforma web, los estándares, las patentes, las herramientas de
+            desarrollo y los servicios de red que utiliza esta aplicación.
+          </p>
+
+          <section>
+            <h2>Implementación propia de QR</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>Código fuente del proyecto</h3>
+                  <span class="version-badge">Repositorio canónico</span>
+                </div>
+                <p>
+                  Lewis Moten aloja el código fuente propio de la aplicación y
+                  del codificador QR en <code>git.lewismoten.com</code>. La URL
+                  web permite consultar el proyecto; la <code>.git</code> es la
+                  URL HTTPS canónica para clonar el repositorio.
+                </p>
+                <nav aria-label="Enlaces al código fuente del proyecto">
+                  <a href="https://git.lewismoten.com/lewismoten/qr"
+                    >Explorar el repositorio</a
+                  ><a href="https://git.lewismoten.com/lewismoten/qr.git"
+                    >URL de clonación HTTPS</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Codificador QR propio</h3>
+                  <span class="version-badge">Código propio</span>
+                </div>
+                <p>
+                  Implementa la segmentación en modos mixtos; los modos
+                  numérico, alfanumérico, de bytes UTF-8 y Kanji Shift JIS; las
+                  versiones 1 a 40; la corrección Reed–Solomon; el entrelazado;
+                  los patrones funcionales; el enmascaramiento y la colocación
+                  en la matriz. La implementación es local; el símbolo QR se
+                  ajusta a ISO/IEC 18004.
+                </p>
+                <nav aria-label="Referencias del codificador QR propio">
+                  <a href="https://www.iso.org/standard/83389.html"
+                    >ISO/IEC 18004:2024</a
+                  ><a href="https://www.qrcode.com/en/about/standards.html"
+                    >Normas QR de DENSO</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes y marcas comerciales</a
+                  ><a href="https://encoding.spec.whatwg.org/"
+                    >Codificación WHATWG</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Depurador y renderizador QR</h3>
+                  <span class="version-badge">Código propio</span>
+                </div>
+                <p>
+                  Dibuja directamente en Canvas los módulos personalizados, los
+                  patrones de posición, las rutas, los límites de las palabras
+                  de código, las regiones de metadatos y los datos antes de
+                  aplicar la máscara. DENSO WAVE declara que no ejerce sus
+                  derechos de patente contra los códigos QR estandarizados; QR
+                  Code también es una marca registrada de DENSO WAVE.
+                </p>
+                <nav aria-label="Referencias del renderizador QR">
+                  <a href="https://html.spec.whatwg.org/multipage/canvas.html"
+                    >Canvas de HTML</a
+                  ><a href="https://www.qrcode.com/en/about/standards.html"
+                    >Historia de los estándares QR</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes de DENSO</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Corrección de errores de Reed–Solomon</h3>
+                  <span class="version-badge">Algoritmo propio</span>
+                </div>
+                <p>
+                  Genera palabras de código de corrección de errores QR sobre
+                  GF(256), las divide según la estructura de bloques exigida por
+                  la versión y el nivel de corrección de errores seleccionados y
+                  las intercala con las palabras de código de datos.
+                  Reed–Solomon es una familia de códigos de corrección de
+                  errores, no una biblioteca de software incluida; por tanto,
+                  aquí no tiene una licencia de software independiente. Esta
+                  implementación forma parte del código propio del repositorio.
+                  Irving Reed y Gustave Solomon publicaron la familia original
+                  en 1960, mientras que ISO/IEC 18004 regula los parámetros
+                  específicos de QR. Algunas técnicas especializadas posteriores
+                  de implementación y descodificación Reed–Solomon han estado
+                  sujetas a sus propias patentes, por lo que este inventario no
+                  debe interpretarse como una opinión general sobre libertad de
+                  operación.
+                </p>
+                <nav aria-label="Referencias de Reed–Solomon">
+                  <a href="https://doi.org/10.1109/PGEC.1960.22230"
+                    >Artículo original de 1960</a
+                  ><a href="https://www.iso.org/standard/83389.html"
+                    >Especificación de corrección de errores de QR</a
+                  ><a href="https://patents.google.com/?q=(Reed-Solomon)"
+                    >Registros de patentes relacionados</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes QR de DENSO</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Formatos de datos y transferencia</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>Texto sin formato, números, URL y URL de datos</h3>
+                  <span class="version-badge">Datos de texto QR</span>
+                </div>
+                <p>
+                  Los formatos de texto y número colocan el contenido
+                  directamente en uno o varios segmentos de datos QR, sin una
+                  envoltura adicional. Los códigos para sitios web contienen una
+                  URL absoluta HTTP o HTTPS. El modo Datos para un solo archivo
+                  utiliza una URL <code>data:</code> con Base64 estándar,
+                  mientras que el protocolo propio de fragmentos utiliza
+                  Base64url sin relleno para transportar datos binarios de forma
+                  compacta.
+                </p>
+                <nav aria-label="Referencias de datos sin procesar">
+                  <a href="https://www.rfc-editor.org/info/rfc3986"
+                    >Sintaxis URI RFC 3986</a
+                  ><a href="https://www.rfc-editor.org/info/rfc2397"
+                    >URL de datos RFC 2397</a
+                  ><a href="https://www.rfc-editor.org/info/rfc4648"
+                    >RFC 4648 Base64 y Base64url</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Contactos y eventos de calendario</h3>
+                  <span class="version-badge">Formatos IETF</span>
+                </div>
+                <p>
+                  Los códigos de contacto utilizan deliberadamente un
+                  subconjunto reducido, basado en vCard 3.0, que contiene
+                  <code>FN</code> y propiedades opcionales de organización,
+                  cargo, teléfono, correo electrónico y URL. Está pensado para
+                  el comportamiento habitual de los lectores, pero no implementa
+                  todas las reglas de escape, plegado y propiedades de RFC 2426;
+                  RFC 6350 define el formato vCard 4.0 más reciente. Los códigos
+                  de calendario son objetos iCalendar 2.0 que contienen un
+                  <code>VEVENT</code>, UID, marca de tiempo, fechas o fechas y
+                  horas locales sin zona horaria, resumen y detalles opcionales
+                  conforme a RFC 5545. Se trata de convenciones para datos de
+                  texto, no de tipos alternativos de símbolos QR.
+                </p>
+                <nav
+                  aria-label="Referencias de formatos de contacto y calendario"
+                >
+                  <a href="https://www.rfc-editor.org/info/rfc2426"
+                    >RFC 2426 vCard 3.0</a
+                  ><a href="https://www.rfc-editor.org/info/rfc6350"
+                    >RFC 6350 vCard 4.0</a
+                  ><a href="https://www.rfc-editor.org/info/rfc5545"
+                    >RFC 5545 iCalendar</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Página web, correo electrónico, teléfono y ubicación</h3>
+                  <span class="version-badge">Normas URI</span>
+                </div>
+                <p>
+                  El correo electrónico utiliza el esquema
+                  <code>mailto:</code> de URI; los números de teléfono utilizan
+                  <code>tel:</code>, y las coordenadas geográficas utilizan
+                  <code>geo:</code> con latitud y longitud WGS 84. Se puede
+                  añadir una etiqueta Geo mediante el parámetro
+                  <code>q</code> como convención de consulta habitual, en lugar
+                  de utilizar un campo de etiqueta específico de RFC 5870. El
+                  reconocimiento y la acción propuesta después de leer el código
+                  siguen dependiendo de la aplicación receptora.
+                </p>
+                <nav aria-label="Referencias de URI de datos">
+                  <a href="https://www.rfc-editor.org/info/rfc3986"
+                    >Sintaxis URI RFC 3986</a
+                  ><a href="https://www.rfc-editor.org/info/rfc6068"
+                    >RFC 6068 mailto</a
+                  ><a href="https://www.rfc-editor.org/info/rfc3966"
+                    >RFC 3966 tel</a
+                  ><a href="https://www.rfc-editor.org/info/rfc5870"
+                    >RFC 5870 geo</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Datos de Wi-Fi y SMS para lectores</h3>
+                  <span class="version-badge">Convenciones de facto</span>
+                </div>
+                <p>
+                  Las credenciales Wi-Fi utilizan la convención de texto
+                  ampliamente implementada
+                  <code>WIFI:T:...;S:...;P:...;;</code> catalogada por ZXing,
+                  incluidos los caracteres de escape y la indicación de red
+                  oculta. Los SMS utilizan la convención
+                  <code>SMSTO:</code> para preparar mensajes. Ninguna de estas
+                  convenciones está definida por ISO/IEC 18004 ni por un
+                  estándar IETF de datos QR, y su compatibilidad con los
+                  lectores puede variar según la plataforma.
+                </p>
+                <nav
+                  aria-label="Referencias de convenciones de datos para lectores"
+                >
+                  <a
+                    href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11"
+                    >Convención Wi-Fi de ZXing</a
+                  ><a
+                    href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime"
+                    >Convenciones de mensajería ZXing</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Valores separados por coma (CSV)</h3>
+                  <span class="version-badge">Estilo RFC 4180</span>
+                </div>
+                <p>
+                  La importación masiva utiliza un analizador CSV propio basado
+                  en el formato habitual documentado por RFC 4180 y en el tipo
+                  <code>text/csv</code> registrado; RFC 4180 es un documento
+                  informativo, no un estándar de Internet. Los archivos se leen
+                  como UTF-8 y utilizan comas, una fila de encabezado
+                  obligatoria específica del formato, campos opcionales entre
+                  comillas, comillas dobles para incluir comillas y finales de
+                  registro CRLF, LF o CR. Los campos entre comillas pueden
+                  contener comas y saltos de línea. Se ignoran las columnas cuyo
+                  encabezado esté vacío y las filas de datos completamente
+                  vacías. Las importaciones se limitan a 5 MiB y 10.000 filas
+                  con datos. No se incluye ningún analizador CSV de terceros.
+                </p>
+                <nav aria-label="Referencias CSV">
+                  <a href="https://www.rfc-editor.org/info/rfc4180"
+                    >Formato CSV RFC 4180</a
+                  ><a
+                    href="https://www.iana.org/assignments/media-types/text/csv"
+                    >Registro de texto/csv IANA</a
+                  ><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text"
+                    >API File: Blob.text()</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Transporte binario FILE:1</h3>
+                  <span class="version-badge">Protocolo propio</span>
+                </div>
+                <p>
+                  El formato propio <code>FILE:1</code> transporta un archivo
+                  único o fragmentos que pueden recibirse en cualquier orden. Su
+                  encabezado legible identifica el modo de archivo único o
+                  fragmentado, la presencia del manifiesto, un identificador
+                  aleatorio de transferencia de 128 bits codificado con 22
+                  caracteres Base64url, una indicación de extensión, el
+                  desplazamiento en bytes y la longitud total. Un manifiesto
+                  tipado opcional puede incluir el nombre, el tipo MIME, la
+                  fecha de modificación, el tamaño original, metadatos JSON y
+                  una validación SHA-256; una marca registra la codificación
+                  gzip opcional. No es un estándar ISO, IETF ni un formato
+                  establecido para lectores, por lo que requiere software
+                  receptor compatible.
+                </p>
+                <nav aria-label="Referencias de protocolos de archivos">
+                  <a href="../../README.md#file-chunked-transport"
+                    >Documentación del protocolo</a
+                  ><a href="https://www.rfc-editor.org/info/rfc4648"
+                    >RFC 4648 Base64url</a
+                  ><a href="https://www.rfc-editor.org/info/rfc8259"
+                    >RFC 8259 JSON</a
+                  ><a href="https://www.rfc-editor.org/info/rfc1952"
+                    >RFC 1952 gzip</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Formatos de exportación integrados</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>Imágenes ráster y vectoriales</h3>
+                  <span class="version-badge">Código propio + Canvas</span>
+                </div>
+                <p>
+                  PNG y JPEG utilizan los codificadores de Canvas del navegador:
+                  PNG conserva los píxeles sin pérdida y la transparencia,
+                  mientras que JPEG aplica compresión con pérdida, respeta la
+                  calidad seleccionada y aplana la transparencia sobre blanco.
+                  El codificador GIF89a propio cuantifica los colores en un cubo
+                  RGB fijo de 216 colores más transparencia y escribe un flujo
+                  de imagen Lempel-Ziv-Welch (LZW) válido orientado a literales;
+                  prioriza una implementación pequeña frente a una compresión
+                  intensa. Los GIF animados utilizan la extensión de repetición
+                  de Netscape, se reproducen continuamente y expresan la
+                  duración de cada fotograma en centésimas de segundo. La
+                  exportación SVG traza el lienzo ráster final como trazados
+                  rectangulares combinados del mismo color, incluidos el texto y
+                  las ilustraciones rasterizados, en lugar de conservar texto
+                  semántico o utilizar una biblioteca SVG.
+                </p>
+                <nav aria-label="Referencias de formato de imagen">
+                  <a href="https://www.w3.org/TR/png-3/">Especificación PNG</a
+                  ><a href="https://jpeg.org/jpeg/">Información JPEG</a
+                  ><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+                    >Especificación GIF89a</a
+                  ><a href="https://www.gnu.org/philosophy/gif.html"
+                    >Historia de patentes de GIF/LZW</a
+                  ><a href="https://www.w3.org/TR/SVG2/">SVG 2</a>
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Documentos PDF</h3>
+                  <span class="version-badge">PDF 1.4 + JPEG</span>
+                </div>
+                <p>
+                  El generador PDF propio incorpora cada código QR como una
+                  imagen JPEG RGB de 8 bits mediante el filtro
+                  <code>DCTDecode</code> de PDF. La transparencia se aplana
+                  sobre blanco y se aplica la calidad JPEG seleccionada, por lo
+                  que las imágenes del PDF tienen pérdida aunque el lienzo de
+                  origen no la tenga. El PDF de la imagen actual utiliza el
+                  ancho de impresión seleccionado; los documentos con varias
+                  imágenes las distribuyen en páginas Carta de EE. UU. con
+                  márgenes de media pulgada.
+                </p>
+                <nav aria-label="Referencias de PDF">
+                  <a
+                    href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.4.pdf"
+                    >Referencia PDF 1.4</a
+                  ><a href="https://www.iso.org/standard/75839.html"
+                    >ISO 32000-2 PDF</a
+                  ><a href="https://jpeg.org/jpeg/">Información JPEG</a>
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Archivos ZIP</h3>
+                  <span class="version-badge"
+                    >Entradas almacenadas ZIP 2.0</span
+                  >
+                </div>
+                <p>
+                  El generador ZIP propio crea encabezados locales, un
+                  directorio central y nombres de archivo UTF-8. Las entradas
+                  utilizan deliberadamente el método de compresión 0, por lo que
+                  el archivo es un contenedor ampliamente compatible sin
+                  compresión ZIP. Cada entrada local y del directorio central
+                  incluye la suma de verificación CRC-32 descrita a
+                  continuación.
+                </p>
+                <nav aria-label="Referencias ZIP">
+                  <a href="https://support.pkware.com/pkzip/appnote"
+                    >NOTA DE APLICACIÓN ZIP PKWARE</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Sumas de verificación CRC-32</h3>
+                  <span class="version-badge">Código propio</span>
+                </div>
+                <p>
+                  Los campos de integridad ZIP utilizan una implementación
+                  propia de CRC-32 basada en tablas, con el polinomio reflejado
+                  <code>0xEDB88320</code> y los valores XOR inicial y final
+                  estándar. CRC-32 detecta errores accidentales habituales de
+                  transmisión o almacenamiento, pero no es resistente a
+                  colisiones y no debe considerarse un hash criptográfico, una
+                  firma digital ni una prueba de autenticidad.
+                </p>
+                <nav aria-label="Referencias CRC-32">
+                  <a href="https://www.rfc-editor.org/rfc/rfc1952#section-8"
+                    >Muestra de CRC RFC 1952</a
+                  ><a href="https://support.pkware.com/pkzip/appnote"
+                    >NOTA DE APLICACIÓN ZIP PKWARE</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Funciones de la plataforma web</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>HTML, CSS, JavaScript y codificación de texto</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La interfaz utiliza formularios y diálogos HTML nativos,
+                  diseño y consultas de medios CSS, dibujo Canvas 2D, módulos
+                  ECMAScript en las páginas alojadas y una alternativa integrada
+                  para
+                  <code>file:</code> cuando se utiliza localmente.
+                  <code>TextEncoder</code> produce bytes UTF-8 en todo el
+                  codificador y el código de exportación. El modo Kanji opcional
+                  crea su correspondencia Shift JIS mediante
+                  <code>TextDecoder</code>; informa de un error cuando esa
+                  codificación no está disponible.
+                </p>
+                <nav
+                  aria-label="Referencias de la fundación de la plataforma web"
+                >
+                  <a href="https://html.spec.whatwg.org/"
+                    >Estándar HTML Living Standard</a
+                  ><a href="https://tc39.es/ecma262/">ECMAScript</a
+                  ><a href="https://html.spec.whatwg.org/multipage/canvas.html"
+                    >Canvas 2D</a
+                  ><a href="https://encoding.spec.whatwg.org/"
+                    >Codificación WHATWG</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Archivos, URL y descargas</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La selección y lectura de archivos, el almacenamiento Blob,
+                  las URL de objeto, las URL de datos y las descargas del
+                  cliente utilizan API del navegador. Las URL de objeto son
+                  referencias locales a la sesión y no incluyen los bytes del
+                  archivo en los datos QR; el transporte FILE personalizado
+                  descrito anteriormente es un formato propio independiente.
+                </p>
+                <nav aria-label="Referencias de las API File y URL">
+                  <a href="https://www.w3.org/TR/FileAPI/">API de archivos</a
+                  ><a href="https://url.spec.whatwg.org/">Estándar de URL</a
+                  ><a
+                    href="https://html.spec.whatwg.org/multipage/links.html#downloading-resources"
+                    >Descargas de HTML</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Integridad y compresión</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La verificación SHA-256 y los identificadores de transferencia
+                  de 128 bits generados de forma criptográficamente segura
+                  utilizan Web Crypto. La compresión gzip opcional utiliza
+                  Compression Streams cuando el navegador ofrece esta API; los
+                  formatos de hash y gzip subyacentes siguen FIPS 180-4 y RFC
+                  1952. SHA-256 permite detectar cambios en el contenido
+                  transferido, pero no es una firma ni demuestra quién creó el
+                  archivo.
+                </p>
+                <nav aria-label="Referencias de integridad y compresión">
+                  <a href="https://www.w3.org/TR/WebCryptoAPI/"
+                    >API de criptografía web</a
+                  ><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
+                    >FIPS 180-4</a
+                  ><a href="https://compression.spec.whatwg.org/"
+                    >API Compression Streams</a
+                  ><a href="https://www.rfc-editor.org/rfc/rfc1952"
+                    >RFC 1952 gzip</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Animación y grabación de medios</h3>
+                  <span class="version-badge">Código propio + API web</span>
+                </div>
+                <p>
+                  Los fotogramas del GIF animado se codifican directamente. La
+                  exportación MP4 dibuja los fotogramas en un flujo de captura
+                  de Canvas y los graba mediante
+                  <code>MediaRecorder</code>; solo se ofrece cuando el navegador
+                  declara compatibilidad con algún tipo MIME de MP4. El códec
+                  AVC exacto y la temporización dependen del navegador.
+                </p>
+                <nav aria-label="Referencias de animación y grabación">
+                  <a href="https://www.w3.org/TR/mediastream-recording/"
+                    >Grabación de MediaStream</a
+                  ><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+                    >Especificación GIF89a</a
+                  ><a
+                    href="https://www.iana.org/assignments/media-types/media-types.xhtml#video"
+                    >Tipos de medios de vídeo IANA</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Mapa de teselas ráster</h3>
+                  <span class="version-badge">Código propio + OSM</span>
+                </div>
+                <p>
+                  La vista previa Geo implementa directamente la proyección Web
+                  Mercator, la selección de teselas visibles, el ajuste cíclico
+                  de longitud, el desplazamiento con puntero y teclado, los
+                  controles de zoom, la conversión de clics en coordenadas y la
+                  colocación de marcadores y etiquetas. Solo solicita las
+                  teselas ráster que intersectan el área visible y no incluye ni
+                  carga bibliotecas cartográficas de terceros.
+                </p>
+                <nav aria-label="Referencias del mapa de teselas ráster">
+                  <a
+                    href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames"
+                    >Coordenadas de teselas de mapas interactivos</a
+                  ><a
+                    href="https://operations.osmfoundation.org/policies/tiles/"
+                    >Política de teselas de OpenStreetMap</a
+                  ><a href="https://www.openstreetmap.org/copyright"
+                    >Atribución de OpenStreetMap</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Software de desarrollo y pruebas</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>esbuild</h3>
+                  <span class="version-badge"
+                    >0.28.1 solo para la compilación</span
+                  >
+                </div>
+                <p>
+                  Empaqueta y minifica el código JavaScript y CSS modular, crea
+                  mapas de código fuente, separa los fragmentos alojados que se
+                  cargan bajo demanda y genera la versión autocontenida para
+                  <code>file:</code> como alternativa. Es una dependencia de
+                  desarrollo con licencia MIT; no es una biblioteca que se
+                  ejecute en el navegador ni genera solicitudes de red en la
+                  aplicación publicada.
+                </p>
+                <nav aria-label="Enlaces de esbuild">
+                  <a href="https://esbuild.github.io/">Documentación</a
+                  ><a href="https://github.com/evanw/esbuild">Repositorio</a
+                  ><a
+                    href="https://github.com/evanw/esbuild/blob/main/LICENSE.md"
+                    >Licencia MIT</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Node.js</h3>
+                  <span class="version-badge">Plataforma de desarrollo</span>
+                </div>
+                <p>
+                  Ejecuta el script de compilación local, las pruebas
+                  automatizadas, el generador del favicon y el servidor estático
+                  de desarrollo. El proyecto no fija una versión de Node.js ni
+                  distribuye Node.js a quienes visitan el sitio; el código
+                  publicado se ejecuta en el navegador.
+                </p>
+                <nav aria-label="Enlaces de Node.js">
+                  <a href="https://nodejs.org/">Sitio web</a
+                  ><a href="https://github.com/nodejs/node">Repositorio</a
+                  ><a href="https://github.com/nodejs/node/blob/main/LICENSE"
+                    >Licencia y avisos incluidos</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>Paquete de referencia node-qrcode</h3>
+                  <span class="version-badge">1.5.0 solo para pruebas</span>
+                </div>
+                <p>
+                  La prueba de paridad opcional puede cargar paquetes para
+                  navegador descargados manualmente del paquete con licencia MIT
+                  <code>qrcode</code> y comparar el codificador propio con 1.287
+                  matrices de referencia. Estos archivos permanecen fuera del
+                  repositorio, no son dependencias de npm y nunca se incluyen en
+                  las compilaciones de producción.
+                </p>
+                <nav aria-label="Enlaces de referencia de node-qrcode">
+                  <a href="https://github.com/soldair/node-qrcode"
+                    >Repositorio</a
+                  ><a href="https://www.npmjs.com/package/qrcode/v/1.5.0"
+                    >npm 1.5.0</a
+                  ><a
+                    href="https://github.com/soldair/node-qrcode/blob/master/license"
+                    >Licencia MIT</a
+                  ><a href="../../README.md#first-party-qr-encoder"
+                    >Configuración de la prueba de paridad</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Servicios de datos y entrega</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>OpenStreetMap</h3>
+                  <span class="version-badge">Datos en directo</span>
+                </div>
+                <p>
+                  Sirve teselas de mapa ráster estándar directamente a la vista
+                  previa Geo propia. La base de datos geográfica subyacente se
+                  publica con licencia ODbL; las teselas alojadas se rigen por
+                  una política de uso independiente e incluyen en el mapa la
+                  atribución obligatoria a las personas colaboradoras.
+                </p>
+                <nav aria-label="Enlaces de OpenStreetMap">
+                  <a href="https://www.openstreetmap.org/">Sitio web</a
+                  ><a
+                    href="https://github.com/openstreetmap/openstreetmap-website"
+                    >Repositorio del sitio web</a
+                  ><a href="https://www.openstreetmap.org/copyright"
+                    >Derechos de autor y ODbL</a
+                  ><a
+                    href="https://operations.osmfoundation.org/policies/tiles/"
+                    >Política de teselas</a
+                  >
+                </nav>
+              </article>
+            </div>
+          </section>
+
+          <p class="inventory-note">
+            <strong>Nota sobre licencias:</strong> «Código propio» identifica el
+            código implementado en esta aplicación; no sustituye ni modifica las
+            licencias, patentes, marcas comerciales o especificaciones que
+            regulan los algoritmos, formatos y tecnologías de plataforma
+            enumerados anteriormente. Los estándares técnicos y los RFC
+            describen la interoperabilidad; no son licencias de software para el
+            código fuente de esta aplicación. La aplicación publicada no utiliza
+            bibliotecas de ejecución de terceros en el navegador: esbuild solo
+            interviene en la compilación, node-qrcode es opcional y exclusivo de
+            las pruebas, y ningún paquete independiente genera códigos QR, mapas
+            o exportaciones en producción. Este repositorio no dispone
+            actualmente de un archivo LICENSE para todo el proyecto, por lo que
+            no deben presuponerse derechos de redistribución sobre su código
+            propio. Las referencias a patentes son informativas y no constituyen
+            asesoramiento jurídico ni un análisis de libertad de operación.
+          </p>
+        </div>
+        <footer class="info-page-footer">
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la página de tecnología">
+            <a href="../../index.html">Generador</a
+            ><a href="./index.html">Guías</a
+            ><a href="https://git.lewismoten.com/lewismoten/qr">Código fuente</a
+            ><a href="#technology-page-content">Volver arriba</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Idiomas">
+              <span aria-hidden="true">🇪🇸</span> Español
+            </summary>
+            <nav aria-label="Idiomas">
+              <a
+                href="../../guides/technology.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../guides/technology.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="./tecnologia.html"
+                hreflang="es"
+                lang="es"
+                aria-current="page"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a href="../../ar/أدلة/تقنية.html" hreflang="ar" lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../hi-IN/मार्गदर्शिकाएं/तकनीक.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../zh-CN/指南/技术.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

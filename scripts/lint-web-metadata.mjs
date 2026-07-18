@@ -1,22 +1,37 @@
 import { readFile } from 'node:fs/promises';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 
-const sitemapSource = await readFile('sitemap.xml', 'utf8');
-const sitemapValidation = XMLValidator.validate(sitemapSource);
-if (sitemapValidation !== true) {
-  throw new Error(`sitemap.xml: ${sitemapValidation.err.msg}`);
+function parseXml(source, file) {
+  const validation = XMLValidator.validate(source);
+  if (validation !== true) {
+    throw new Error(`${file}: ${validation.err.msg}`);
+  }
+  return new XMLParser().parse(source);
 }
 
-const sitemap = new XMLParser().parse(sitemapSource);
-const entries = [].concat(sitemap.urlset?.url || []);
-if (!entries.length)
-  throw new Error('sitemap.xml: expected at least one URL entry.');
-entries.forEach(({ loc }, index) => {
+function validateUrl(loc, file, index) {
   const url = new URL(loc);
   if (!['http:', 'https:'].includes(url.protocol)) {
-    throw new Error(`sitemap.xml: URL ${index + 1} must use HTTP or HTTPS.`);
+    throw new Error(`${file}: URL ${index + 1} must use HTTP or HTTPS.`);
   }
-});
+  return url;
+}
+
+const sitemapSource = await readFile('sitemap.xml', 'utf8');
+const sitemap = parseXml(sitemapSource, 'sitemap.xml');
+const sitemapFiles = [].concat(sitemap.sitemapindex?.sitemap || []);
+const entries = [].concat(sitemap.urlset?.url || []);
+for (const [index, entry] of sitemapFiles.entries()) {
+  const url = validateUrl(entry.loc, 'sitemap.xml', index);
+  const file = decodeURIComponent(url.pathname.replace(/^\//, ''));
+  const source = await readFile(file, 'utf8');
+  const child = parseXml(source, file);
+  entries.push(...[].concat(child.urlset?.url || []));
+}
+if (!entries.length) {
+  throw new Error('sitemap.xml: expected at least one URL entry.');
+}
+entries.forEach(({ loc }, index) => validateUrl(loc, 'sitemap.xml', index));
 
 const robotsSource = await readFile('robots.txt', 'utf8');
 const directives = robotsSource

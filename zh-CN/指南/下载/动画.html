@@ -1,0 +1,283 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  data-guide-locale="zh-CN"
+  data-locale-base="../../../locales/"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下载动画二维码 | 二维码生成器</title>
+    <meta
+      name="description"
+      content="设置二维码帧时间，并以GIF或MP4格式下载多个代码。"
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E4%B8%8B%E8%BD%BD/%E5%8A%A8%E7%94%BB.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../../dist/chunks/download.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/download/animation.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/download/animation.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/descargas/animacion.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D8%AA%D9%86%D8%B2%D9%8A%D9%84%D8%A7%D8%AA/%D8%B1%D8%B3%D9%88%D9%85-%D9%85%D8%AA%D8%AD%D8%B1%D9%83%D8%A9.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1/%E0%A4%90%E0%A4%A8%E0%A4%BF%E0%A4%AE%E0%A5%87%E0%A4%B6%E0%A4%A8.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E4%B8%8B%E8%BD%BD/%E5%8A%A8%E7%94%BB.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/download/animation.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">二维码生成器</p>
+            <h1>下载动画二维码</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E4%B8%8B%E8%BD%BD&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E5%8A%A8%E7%94%BB"
+            >在生成器中打开</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>随着时间的推移，呈现多个二维码</h2>
+            <p>
+              动画按顺序循环通过数字范围、批量记录或文件块。时间可以描述每个图像的延迟或每次完整通过每个帧的总持续时间。
+            </p>
+          </section>
+          <section data-app-fragment="tab=download&amp;subtab=animation">
+            <fieldset class="option-group">
+              <legend data-i18n="downloadUi.animation.legend">
+                Animation timing
+              </legend>
+              <div
+                class="choice-grid animation-timing-mode-grid"
+                role="group"
+                aria-label="Animation timing mode"
+                data-i18n-aria-label="downloadUi.animation.mode"
+              >
+                <button
+                  type="button"
+                  class="choice-button is-active"
+                  data-choice-target="animation-timing-mode"
+                  data-choice-value="per-frame"
+                  aria-pressed="true"
+                  data-i18n="downloadUi.animation.perImage"
+                >
+                  Per image
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="animation-timing-mode"
+                  data-choice-value="total"
+                  aria-pressed="false"
+                  data-i18n="downloadUi.animation.totalDuration"
+                >
+                  Total duration
+                </button>
+              </div>
+              <select
+                id="animation-timing-mode"
+                name="animation-timing-mode"
+                class="sr-only"
+                aria-label="Animation timing mode"
+                data-i18n-aria-label="downloadUi.animation.mode"
+              >
+                <option
+                  value="per-frame"
+                  selected
+                  data-i18n="downloadUi.animation.perImage"
+                >
+                  Per image
+                </option>
+                <option
+                  value="total"
+                  data-i18n="downloadUi.animation.totalDuration"
+                >
+                  Total duration
+                </option>
+              </select>
+              <div class="animation-duration-grid">
+                <div>
+                  <label
+                    for="animation-minutes"
+                    data-i18n="downloadUi.animation.minutes"
+                    >Minutes</label
+                  >
+                  <input
+                    id="animation-minutes"
+                    name="animation-minutes"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="60"
+                    step="1"
+                    value="0"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="animation-seconds"
+                    data-i18n="downloadUi.animation.seconds"
+                    >Seconds</label
+                  >
+                  <input
+                    id="animation-seconds"
+                    name="animation-seconds"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="59"
+                    step="1"
+                    value="1"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="animation-milliseconds"
+                    data-i18n="downloadUi.animation.milliseconds"
+                    >Milliseconds</label
+                  >
+                  <input
+                    id="animation-milliseconds"
+                    name="animation-milliseconds"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="999"
+                    step="1"
+                    value="0"
+                  />
+                </div>
+              </div>
+              <p
+                id="animation-duration-summary"
+                class="hint"
+                data-i18n="downloadUi.animation.initialSummary"
+              >
+                1.000 seconds per image - 8.000 seconds total.
+              </p>
+              <div class="download-actions animation-download-actions">
+                <button
+                  id="download-animated-gif"
+                  type="button"
+                  class="secondary-button"
+                  data-i18n="downloadUi.animation.gif"
+                >
+                  Download animated GIF
+                </button>
+                <button
+                  id="download-animation-mp4"
+                  type="button"
+                  class="secondary-button"
+                  data-i18n="downloadUi.animation.mp4"
+                >
+                  Download MP4
+                </button>
+              </div>
+              <p class="hint" data-i18n="downloadUi.animation.hint">
+                GIF loops continuously. MP4 availability depends on the
+                browser's built-in encoder and records in real time.
+              </p>
+            </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>GIF和MP4的行为</h2>
+            <p>
+              GIF循环持续播放，可广泛查看。MP4支持取决于浏览器的可用媒体编码器，并实时记录。较长的序列需要更多的处理时间和内存，因此可以在完成前监控和取消进度。
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>二维码生成器</span>
+          <nav aria-label="指南页面导航">
+            <a
+              href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E4%B8%8B%E8%BD%BD&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E5%8A%A8%E7%94%BB"
+              >打开这个工具</a
+            >
+            <a href="../关于.html">关于</a>
+            <a href="../index.html">指南</a>
+            <a href="../../../privacy.html">隐居</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="语言">
+              <span aria-hidden="true">🇨🇳</span> 简体中文
+            </summary>
+            <nav aria-label="语言">
+              <a
+                href="../../../guides/download/animation.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/download/animation.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="../../../es/guias/descargas/animacion.html"
+                hreflang="es"
+                lang="es"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/تنزيلات/رسوم-متحركة.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/डाउनलोड/ऐनिमेशन.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="./动画.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                aria-current="page"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  data-guide-locale="zh-CN"
+  data-locale-base="../../../locales/"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下载二维码PDF文件 | 二维码生成器</title>
+    <meta
+      name="description"
+      content="尺寸二维码用于打印和下载一个或多个PDF文件。"
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E4%B8%8B%E8%BD%BD/%E6%96%87%E6%A1%A3.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../../dist/chunks/download.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/download/document.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/download/document.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/descargas/documentos.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D8%AA%D9%86%D8%B2%D9%8A%D9%84%D8%A7%D8%AA/%D9%85%D8%B3%D8%AA%D9%86%D8%AF%D8%A7%D8%AA.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1/%E0%A4%A6%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%BE%E0%A4%B5%E0%A5%87%E0%A4%9C.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E4%B8%8B%E8%BD%BD/%E6%96%87%E6%A1%A3.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/download/document.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">二维码生成器</p>
+            <h1>下载二维码PDF文件</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E4%B8%8B%E8%BD%BD&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E6%96%87%E6%A1%A3"
+            >在生成器中打开</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>准备二维码以便打印</h2>
+            <p>
+              PDF导出为每个二维码分配物理宽度，而不是仅依赖屏幕像素。自动大小调整考虑了渲染的像素宽度和二维码版本，以使每个模块在打印后扫描实用。
+            </p>
+          </section>
+          <section data-app-fragment="tab=download&amp;subtab=document">
+            <fieldset class="option-group">
+              <legend data-i18n="downloadUi.document.legend">
+                PDF document
+              </legend>
+              <label class="toggle-field">
+                <input
+                  id="print-width-auto"
+                  name="print-width-auto"
+                  type="checkbox"
+                  checked
+                />
+                <span data-i18n="downloadUi.document.autoSize"
+                  >Auto-size printed QR from pixels and version</span
+                >
+              </label>
+              <label class="slider-field" for="print-width">
+                <span data-i18n="downloadUi.document.printedWidth"
+                  >Printed width</span
+                >
+                <output id="print-width-value" for="print-width"
+                  >1.67英寸自动</output
+                >
+              </label>
+              <input
+                id="print-width"
+                name="print-width"
+                type="range"
+                min="0.5"
+                max="7"
+                step="0.05"
+                value="1.65"
+                disabled
+              />
+              <div class="download-actions document-download-actions">
+                <button
+                  id="download-current-pdf"
+                  type="button"
+                  class="secondary-button"
+                  data-i18n="downloadUi.document.download"
+                >
+                  Download PDF
+                </button>
+                <button
+                  id="download-all-pdf"
+                  type="button"
+                  class="secondary-button"
+                  hidden
+                  data-i18n="downloadUi.document.allPdf"
+                >
+                  Download all as PDF
+                </button>
+              </div>
+              <p class="hint" data-i18n="downloadUi.document.hint">
+                Auto print width uses 192 pixels per inch and protects
+                higher-version QR modules from becoming too small. PDF sheets
+                fit as many codes as the selected physical width allows.
+              </p>
+            </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>单代码和多代码文档</h2>
+            <p>
+              下载当前会为可见的二维码创建一个PDF文件。使用所选的打印宽度，将所有生成的代码下载到一个或多个工作表中，这对于范围、批量数据和分块文件传输很有用。
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>二维码生成器</span>
+          <nav aria-label="指南页面导航">
+            <a
+              href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E4%B8%8B%E8%BD%BD&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E6%96%87%E6%A1%A3"
+              >打开这个工具</a
+            >
+            <a href="../关于.html">关于</a>
+            <a href="../index.html">指南</a>
+            <a href="../../../privacy.html">隐居</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="语言">
+              <span aria-hidden="true">🇨🇳</span> 简体中文
+            </summary>
+            <nav aria-label="语言">
+              <a
+                href="../../../guides/download/document.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/download/document.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="../../../es/guias/descargas/documentos.html"
+                hreflang="es"
+                lang="es"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/تنزيلات/مستندات.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/डाउनलोड/दस्तावेज.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="./文档.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                aria-current="page"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

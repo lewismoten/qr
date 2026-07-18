@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es" data-guide-locale="es" data-locale-base="../../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Códigos QR de Wi-Fi | Generador de códigos QR</title>
+    <meta
+      name="description"
+      content="Cree códigos QR Wi-Fi para redes inalámbricas WPA, WEP, abiertas y ocultas."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/es/guias/contenido/wifi.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/content/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/content/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/contenido/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/wifi.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/content/wifi.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Generador de códigos QR</p>
+            <h1>Códigos QR de Wi-Fi</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#pestana=contenido&subpestana=datos"
+            >Abrir en el generador</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Compartir el acceso a la red sin escribir</h2>
+            <p>
+              Los datos QR de Wi-Fi almacenan el nombre de la red, el tipo de
+              seguridad, la contraseña y la indicación de red oculta. Los
+              teléfonos compatibles pueden ofrecer conectarse a la red después
+              de escanear el código.
+            </p>
+            <p>
+              WPA/2/3 cubre las redes modernas de la familia WPA. Las redes
+              abiertas no utilizan contraseña, mientras que WEP se conserva para
+              equipos más antiguos.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.wifi">Wi-Fi</legend>
+            <label for="wifi-ssid" data-i18n="form.data.networkName"
+              >Network name</label
+            >
+            <input
+              id="wifi-ssid"
+              name="wifi-ssid"
+              type="text"
+              maxlength="32"
+              placeholder="My Wi-Fi"
+              data-i18n-placeholder="form.data.networkPlaceholder"
+            />
+            <label for="wifi-password" data-i18n="wifi.password"
+              >Password</label
+            >
+            <input
+              id="wifi-password"
+              name="wifi-password"
+              type="password"
+              maxlength="64"
+              autocomplete="current-password"
+              placeholder="Password"
+              data-i18n-placeholder="wifi.password"
+            />
+            <label for="wifi-encryption" data-i18n="form.data.security"
+              >Security</label
+            >
+            <div
+              id="wifi-encryption-buttons"
+              class="choice-grid choice-grid-compact wifi-security-grid"
+              role="radiogroup"
+              aria-label="Wi-Fi security"
+              data-i18n-aria-label="form.data.wifiSecurity"
+            >
+              <button
+                type="button"
+                class="choice-button is-active"
+                data-choice-target="wifi-encryption"
+                data-choice-value="WPA"
+                aria-pressed="true"
+                data-i18n="form.data.wpa"
+              >
+                WPA/2/3
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-choice-target="wifi-encryption"
+                data-choice-value="WEP"
+                aria-pressed="false"
+                data-i18n="form.data.wep"
+              >
+                WEP
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-choice-target="wifi-encryption"
+                data-choice-value="nopass"
+                aria-pressed="false"
+                data-i18n="form.data.open"
+              >
+                Open
+              </button>
+            </div>
+            <select
+              id="wifi-encryption"
+              name="wifi-encryption"
+              class="sr-only"
+              aria-hidden="true"
+              tabindex="-1"
+            >
+              <option value="WPA" data-i18n="form.data.wpaLong">
+                WPA/WPA2/WPA3
+              </option>
+              <option value="WEP" data-i18n="form.data.wep">WEP</option>
+              <option value="nopass" data-i18n="form.data.open">Open</option>
+            </select>
+            <label class="toggle-field">
+              <input id="wifi-hidden" name="wifi-hidden" type="checkbox" />
+              <span data-i18n="form.data.hiddenNetwork">Hidden network</span>
+            </label>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Privacidad de la contraseña</h2>
+            <p>
+              El código QR debe contener la contraseña real de la red. La vista
+              previa la oculta de forma predeterminada, pero cualquier persona
+              que pueda descodificar el código final podrá recuperarla. Comparta
+              el código teniendo esto en cuenta.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la guía">
+            <a href="../../../index.html#pestana=contenido&subpestana=datos"
+              >Abrir esta herramienta</a
+            >
+            <a href="../acerca-de.html">Acerca de</a>
+            <a href="../index.html">Guías</a>
+            <a href="../../../privacy.html">Privacidad</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Idiomas">
+              <span aria-hidden="true">🇪🇸</span> Español
+            </summary>
+            <nav aria-label="Idiomas">
+              <a
+                href="../../../guides/content/wifi.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/content/wifi.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a href="./wifi.html" hreflang="es" lang="es" aria-current="page"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/محتوى/wifi.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/सामग्री/wifi.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../../zh-CN/指南/内容/wifi.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es" data-guide-locale="es" data-locale-base="../../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Códigos QR de SMS | Generador de códigos QR</title>
+    <meta
+      name="description"
+      content="Cree códigos QR de SMS con un número de teléfono y un mensaje breve."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/es/guias/contenido/sms.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/content/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/content/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/contenido/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/sms.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/content/sms.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Generador de códigos QR</p>
+            <h1>Códigos QR de SMS</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#pestana=contenido&subpestana=datos"
+            >Abrir en el generador</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Preparar un mensaje de texto</h2>
+            <p>
+              Los códigos QR para SMS abren una aplicación de mensajería
+              compatible con el destinatario y, si se incluye, un mensaje listo
+              para revisar antes de enviarlo.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.sms">SMS</legend>
+            <label for="sms-number" data-i18n="fields.telephoneNumber"
+              >Phone number</label
+            >
+            <input
+              id="sms-number"
+              name="sms-number"
+              type="tel"
+              maxlength="40"
+              placeholder="+15551234567"
+              value="+15305394775"
+              data-i18n-placeholder="form.placeholders.phone"
+              data-i18n-value="form.defaults.phone"
+            />
+            <label data-i18n="content.format">Format</label>
+            <div
+              class="choice-grid choice-grid-compact phone-format-grid"
+              role="group"
+              aria-label="SMS phone number format"
+              data-i18n-aria-label="form.data.smsPhoneFormat"
+            >
+              <button
+                type="button"
+                class="choice-button phone-format-button is-active"
+                data-phone-format="usa"
+                aria-pressed="true"
+                data-i18n="form.data.usa"
+              >
+                USA
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="international"
+                aria-pressed="false"
+                data-i18n="form.data.international"
+              >
+                Intl
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="e164"
+                aria-pressed="false"
+                data-i18n="form.data.e164"
+              >
+                E.164
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="digits"
+                aria-pressed="false"
+                data-i18n="form.data.digits"
+              >
+                Digits
+              </button>
+            </div>
+            <label for="sms-body" data-i18n="fields.message">Message</label>
+            <textarea
+              id="sms-body"
+              name="sms-body"
+              rows="3"
+              maxlength="160"
+              placeholder="Text message"
+              data-i18n-placeholder="form.data.textMessage"
+            ></textarea>
+            <p id="sms-length-hint" class="hint">0 / 160</p>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Límites de mensajes</h2>
+            <p>
+              El contador en tiempo real limita el mensaje a 160 caracteres para
+              mantener una amplia compatibilidad con SMS. El envío sigue
+              requiriendo confirmación.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la guía">
+            <a href="../../../index.html#pestana=contenido&subpestana=datos"
+              >Abrir esta herramienta</a
+            >
+            <a href="../acerca-de.html">Acerca de</a>
+            <a href="../index.html">Guías</a>
+            <a href="../../../privacy.html">Privacidad</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Idiomas">
+              <span aria-hidden="true">🇪🇸</span> Español
+            </summary>
+            <nav aria-label="Idiomas">
+              <a
+                href="../../../guides/content/sms.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/content/sms.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a href="./sms.html" hreflang="es" lang="es" aria-current="page"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a href="../../../ar/أدلة/محتوى/sms.html" hreflang="ar" lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/सामग्री/sms.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../../zh-CN/指南/内容/sms.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

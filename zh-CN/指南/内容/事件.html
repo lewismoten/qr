@@ -1,0 +1,241 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  data-guide-locale="zh-CN"
+  data-locale-base="../../../locales/"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>日历事件二维码 | 二维码生成器</title>
+    <meta
+      name="description"
+      content="创建带有日期、时间、地点、描述和链接的日历事件二维码。"
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/%E4%BA%8B%E4%BB%B6.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/contenido/eventos.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/%D8%A3%D8%AD%D8%AF%D8%A7%D8%AB.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%AF%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%AE.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/%E4%BA%8B%E4%BB%B6.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">二维码生成器</p>
+            <h1>日历事件二维码</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E5%86%85%E5%AE%B9&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E6%95%B0%E6%8D%AE"
+            >在生成器中打开</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>在日历上添加一个事件</h2>
+            <p>
+              日历二维码将带有标题、开始和结束时间、可选地点、描述和网站的iCalendar事件编码。兼容的扫描仪可以提供将事件直接添加到日历中的选项。
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-format-fields="event"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.calendarEvent">Calendar event</legend>
+            <label for="event-title" data-i18n="fields.title">Title</label>
+            <input
+              id="event-title"
+              name="event-title"
+              type="text"
+              maxlength="120"
+              value="New event"
+              data-i18n-value="form.defaults.eventTitle"
+            />
+            <label class="toggle-field">
+              <input id="event-all-day" name="event-all-day" type="checkbox" />
+              <span data-i18n="form.data.allDayEvent">All-day event</span>
+            </label>
+            <div class="event-date-grid">
+              <div>
+                <label for="event-start-date" data-i18n="form.data.startDate"
+                  >Start date</label
+                >
+                <input
+                  id="event-start-date"
+                  name="event-start-date"
+                  type="date"
+                />
+              </div>
+              <div class="event-time-field">
+                <label for="event-start-time" data-i18n="form.data.startTime"
+                  >Start time</label
+                >
+                <input
+                  id="event-start-time"
+                  name="event-start-time"
+                  type="time"
+                  step="60"
+                />
+              </div>
+              <div>
+                <label for="event-end-date" data-i18n="form.data.endDate"
+                  >End date</label
+                >
+                <input id="event-end-date" name="event-end-date" type="date" />
+              </div>
+              <div class="event-time-field">
+                <label for="event-end-time" data-i18n="form.data.endTime"
+                  >End time</label
+                >
+                <input
+                  id="event-end-time"
+                  name="event-end-time"
+                  type="time"
+                  step="60"
+                />
+              </div>
+            </div>
+            <label for="event-location" data-i18n="form.data.locationOptional"
+              >Location (optional)</label
+            >
+            <input
+              id="event-location"
+              name="event-location"
+              type="text"
+              maxlength="160"
+            />
+            <label
+              for="event-description"
+              data-i18n="form.data.descriptionOptional"
+              >Description (optional)</label
+            >
+            <textarea
+              id="event-description"
+              name="event-description"
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <label for="event-url" data-i18n="form.data.websiteOptional"
+              >Website (optional)</label
+            >
+            <input
+              id="event-url"
+              name="event-url"
+              type="url"
+              inputmode="url"
+              maxlength="2048"
+              placeholder="https://example.com/event"
+              data-i18n-placeholder="form.placeholders.eventWebsite"
+            />
+            <p class="hint" data-i18n="form.data.eventTimeHint">
+              Timed events use the scanner's local time zone. For all-day
+              events, the selected end date is treated as the last included day.
+            </p>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>日期和当地时间</h2>
+            <p>
+              定时事件使用扫描仪的本地时区。全天事件省略时间，并包括所选结束日期作为最后一天。在分发打印代码之前，请验证事件详细信息。
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>二维码生成器</span>
+          <nav aria-label="指南页面导航">
+            <a
+              href="../../../index.html#%E6%A0%87%E7%AD%BE%E9%A1%B5=%E5%86%85%E5%AE%B9&%E5%AD%90%E6%A0%87%E7%AD%BE%E9%A1%B5=%E6%95%B0%E6%8D%AE"
+              >打开这个工具</a
+            >
+            <a href="../关于.html">关于</a>
+            <a href="../index.html">指南</a>
+            <a href="../../../privacy.html">隐居</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="语言">
+              <span aria-hidden="true">🇨🇳</span> 简体中文
+            </summary>
+            <nav aria-label="语言">
+              <a
+                href="../../../guides/content/event.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/content/event.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="../../../es/guias/contenido/eventos.html"
+                hreflang="es"
+                lang="es"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/محتوى/أحداث.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/सामग्री/कार्यक्रम.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="./事件.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                aria-current="page"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

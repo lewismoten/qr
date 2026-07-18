@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="es" data-guide-locale="es" data-locale-base="../../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Estilos de módulos y patrones de posición QR | Generador de códigos QR
+    </title>
+    <meta
+      name="description"
+      content="Personalice la forma de los módulos y los patrones de posición del código QR."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/es/guias/diseno/modulos.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../../dist/chunks/style-modules.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/style/modules.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/style/modules.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/diseno/modulos.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D8%AA%D8%B5%D9%85%D9%8A%D9%85/%D9%88%D8%AD%D8%AF%D8%A7%D8%AA.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%A1%E0%A4%BF%E0%A4%9C%E0%A4%BC%E0%A4%BE%E0%A4%87%E0%A4%A8/%E0%A4%AE%E0%A5%89%E0%A4%A1%E0%A5%8D%E0%A4%AF%E0%A5%82%E0%A4%B2.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E6%A0%B7%E5%BC%8F/%E6%A8%A1%E5%9D%97.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/style/modules.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Generador de códigos QR</p>
+            <h1>Estilos de módulos y patrones de posición QR</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#pestana=diseno&subpestana=modulos"
+            >Abrir en el generador</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Dar forma a la matriz QR</h2>
+            <p>
+              Los módulos son las pequeñas celdas oscuras y claras que contienen
+              los datos QR. Los módulos cuadrados conservan la geometría
+              estándar; los redondeados, de puntos, de rombo y personalizados
+              sacrifican parte de la tolerancia de lectura para ofrecer un
+              aspecto más distintivo.
+            </p>
+            <p>
+              Los tres grandes patrones de posición permiten que el lector
+              localice y oriente el código. Sus anillos exteriores y bloques
+              centrales pueden personalizarse por separado, pero deben conservar
+              un contraste alto y una estructura reconocible.
+            </p>
+          </section>
+          <section data-app-fragment="tab=style&amp;subtab=modules">
+            <fieldset class="option-group">
+              <legend data-i18n="style.modules.legend">
+                Modules &amp; corner eyes
+              </legend>
+
+              <div class="module-shape-field">
+                <span
+                  class="field-label"
+                  id="module-shape-label"
+                  data-i18n="style.modules.shape"
+                  >Module shape</span
+                >
+                <div
+                  class="choice-grid module-shape-grid"
+                  role="group"
+                  aria-labelledby="module-shape-label"
+                >
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button is-active"
+                    data-choice-target="module-shape"
+                    data-choice-value="square"
+                    aria-pressed="true"
+                  >
+                    <span
+                      class="module-shape-icon shape-square"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.square">Square</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="rounded"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-rounded"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.rounded">Rounded</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="dots"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-dots"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.dots">Dots</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="diamond"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-diamond"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.diamond">Diamond</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="custom"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-custom"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.custom">Custom</span>
+                  </button>
+                </div>
+                <select
+                  id="module-shape"
+                  name="module-shape"
+                  class="sr-only"
+                  aria-labelledby="module-shape-label"
+                >
+                  <option
+                    value="square"
+                    selected
+                    data-i18n="style.values.square"
+                  >
+                    Square
+                  </option>
+                  <option value="rounded" data-i18n="style.values.rounded">
+                    Rounded
+                  </option>
+                  <option value="dots" data-i18n="style.values.dots">
+                    Dots
+                  </option>
+                  <option value="diamond" data-i18n="style.values.diamond">
+                    Diamond
+                  </option>
+                  <option value="custom" data-i18n="style.values.custom">
+                    Custom
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="module-custom-controls"
+                class="module-custom-controls"
+                data-guide-reveal
+                data-guide-section
+                hidden
+              >
+                <label class="slider-field" for="module-rounding">
+                  <span data-i18n="style.modules.cornerRounding"
+                    >Corner rounding</span
+                  >
+                  <output id="module-rounding-value" for="module-rounding"
+                    >25%</output
+                  >
+                </label>
+                <input
+                  id="module-rounding"
+                  name="module-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="25"
+                />
+
+                <label class="slider-field" for="module-inset">
+                  <span data-i18n="style.modules.spacing">Spacing</span>
+                  <output id="module-inset-value" for="module-inset">4%</output>
+                </label>
+                <input
+                  id="module-inset"
+                  name="module-inset"
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value="4"
+                />
+
+                <label class="slider-field" for="module-rotation">
+                  <span data-i18n="style.modules.rotation">Rotation</span>
+                  <output id="module-rotation-value" for="module-rotation"
+                    >0 grados</output
+                  >
+                </label>
+                <input
+                  id="module-rotation"
+                  name="module-rotation"
+                  type="range"
+                  min="-45"
+                  max="45"
+                  step="1"
+                  value="0"
+                />
+              </div>
+
+              <div class="eye-shape-field">
+                <span
+                  class="field-label"
+                  id="eye-shape-label"
+                  data-i18n="style.modules.eyes"
+                  >Corner eyes</span
+                >
+                <div
+                  class="choice-grid eye-shape-grid"
+                  role="group"
+                  aria-labelledby="eye-shape-label"
+                >
+                  <button
+                    type="button"
+                    class="choice-button is-active"
+                    data-choice-target="eye-shape"
+                    data-choice-value="default"
+                    aria-pressed="true"
+                    data-i18n="style.values.default"
+                  >
+                    Default
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="square"
+                    aria-pressed="false"
+                    data-i18n="style.values.square"
+                  >
+                    Square
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="rounded"
+                    aria-pressed="false"
+                    data-i18n="style.values.rounded"
+                  >
+                    Rounded
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="circle"
+                    aria-pressed="false"
+                    data-i18n="style.values.circle"
+                  >
+                    Circle
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="custom"
+                    aria-pressed="false"
+                    data-i18n="style.values.custom"
+                  >
+                    Custom
+                  </button>
+                </div>
+                <select
+                  id="eye-shape"
+                  name="eye-shape"
+                  class="sr-only"
+                  aria-labelledby="eye-shape-label"
+                >
+                  <option
+                    value="default"
+                    selected
+                    data-i18n="style.values.defaultModules"
+                  >
+                    Default modules
+                  </option>
+                  <option value="square" data-i18n="style.values.square">
+                    Square
+                  </option>
+                  <option value="rounded" data-i18n="style.values.rounded">
+                    Rounded
+                  </option>
+                  <option value="circle" data-i18n="style.values.circle">
+                    Circle
+                  </option>
+                  <option value="custom" data-i18n="style.values.custom">
+                    Custom
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="eye-custom-controls"
+                class="module-custom-controls"
+                data-guide-reveal
+                data-guide-section
+                hidden
+              >
+                <label class="slider-field" for="eye-outer-rounding">
+                  <span data-i18n="style.modules.outerRounding"
+                    >Outer rounding</span
+                  >
+                  <output id="eye-outer-rounding-value" for="eye-outer-rounding"
+                    >20%</output
+                  >
+                </label>
+                <input
+                  id="eye-outer-rounding"
+                  name="eye-outer-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="20"
+                />
+
+                <label class="slider-field" for="eye-center-rounding">
+                  <span data-i18n="style.modules.centerRounding"
+                    >Center rounding</span
+                  >
+                  <output
+                    id="eye-center-rounding-value"
+                    for="eye-center-rounding"
+                    >35%</output
+                  >
+                </label>
+                <input
+                  id="eye-center-rounding"
+                  name="eye-center-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="35"
+                />
+              </div>
+
+              <p class="hint module-shape-hint" data-i18n="style.modules.hint">
+                Decorative modules can reduce scanning reliability. Test the
+                finished code at its intended size.
+              </p>
+            </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Qué cambian los controles personalizados</h2>
+            <p>
+              <strong>Redondeo</strong> suaviza las esquinas,
+              <strong>separación</strong> crea espacio entre celdas contiguas, y
+              <strong>rotación</strong> gira cada módulo. Una separación mayor y
+              las rotaciones extremas reducen la superficie oscura y pueden
+              dificultar la lectura de códigos densos o físicamente pequeños.
+            </p>
+            <p>
+              Los colores personalizados de los patrones de posición solo se
+              aplican cuando se activan. Pruebe la exportación final al tamaño
+              con el que se imprimirá o mostrará, especialmente si también
+              utiliza una ilustración central, transparencia o una imagen de
+              fondo.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la guía">
+            <a href="../../../index.html#pestana=diseno&subpestana=modulos"
+              >Abrir esta herramienta</a
+            >
+            <a href="../acerca-de.html">Acerca de</a>
+            <a href="../index.html">Guías</a>
+            <a href="../../../privacy.html">Privacidad</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Idiomas">
+              <span aria-hidden="true">🇪🇸</span> Español
+            </summary>
+            <nav aria-label="Idiomas">
+              <a
+                href="../../../guides/style/modules.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/style/modules.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="./modulos.html"
+                hreflang="es"
+                lang="es"
+                aria-current="page"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/تصميم/وحدات.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/डिज़ाइन/मॉड्यूल.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../../zh-CN/指南/样式/模块.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

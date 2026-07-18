@@ -200,6 +200,56 @@
   background: rgba(94, 234, 212, 0.12);
 }
 
+.info-page-footer .guide-language-switcher {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.info-page-footer .guide-language-switcher summary {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.7rem;
+  color: #fffaf0;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 800;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.info-page-footer .guide-language-switcher summary::-webkit-details-marker {
+  display: none;
+}
+
+.info-page-footer .guide-language-switcher[open] nav {
+  width: min(20rem, calc(100vw - 2rem));
+  max-height: min(24rem, 70vh);
+  padding: 0.4rem;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.45rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow-y: auto;
+  border: 1px solid rgba(94, 234, 212, 0.28);
+  border-radius: 0.9rem;
+  background: #071827;
+  box-shadow: 0 1rem 2rem rgba(7, 24, 39, 0.28);
+}
+
+.info-page-footer .guide-language-switcher a[aria-current='page'] {
+  background: rgba(94, 234, 212, 0.18);
+  color: #5eead4;
+}
+
+[dir='rtl'] .info-page-footer .guide-language-switcher[open] nav {
+  right: auto;
+  left: 0;
+}
+
 .is-embedded .info-page-body {
   min-width: 0;
   padding: 0;

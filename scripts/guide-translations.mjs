@@ -12,9 +12,14 @@ function isTranslatable(value) {
   return /[A-Za-z]{2}/.test(value);
 }
 
+function normalizeTranslationKey(value) {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
 function translateValue(value, translations, missing) {
   if (!isTranslatable(value)) return value;
-  const translated = translations[value];
+  const translated =
+    translations[value] ?? translations[normalizeTranslationKey(value)];
   if (translated === undefined) {
     missing?.add(value);
     return value;
@@ -122,6 +127,15 @@ export async function loadGuideTranslations(file) {
   return JSON.parse(await readFile(file, 'utf8'));
 }
 
+function includeNormalizedKeys(translations) {
+  return Object.fromEntries(
+    Object.entries(translations).flatMap(([key, value]) => [
+      [key, value],
+      [normalizeTranslationKey(key), value],
+    ]),
+  );
+}
+
 export async function loadGuideTranslationSet(directory, locale) {
   const translations = await loadGuideTranslations(
     `${directory}/${locale}.json`,
@@ -130,9 +144,9 @@ export async function loadGuideTranslationSet(directory, locale) {
     const reviewed = await loadGuideTranslations(
       `${directory}/${locale}.reviewed.json`,
     );
-    return { ...translations, ...reviewed };
+    return includeNormalizedKeys({ ...translations, ...reviewed });
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
-    return translations;
+    return includeNormalizedKeys(translations);
   }
 }

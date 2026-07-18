@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es" data-guide-locale="es" data-locale-base="../../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Códigos QR para eventos de calendario | Generador de códigos QR
+    </title>
+    <meta
+      name="description"
+      content="Cree códigos QR para eventos de calendario con fechas, horas, ubicaciones, descripciones y enlaces."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/es/guias/contenido/eventos.html"
+    />
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+    <!-- generated-guide-alternates:start -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/contenido/eventos.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/%D8%A3%D8%AD%D8%AF%D8%A7%D8%AB.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%AF%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%AE.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/%E4%BA%8B%E4%BB%B6.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/content/event.html"
+    />
+    <!-- generated-guide-alternates:end -->
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Generador de códigos QR</p>
+            <h1>Códigos QR para eventos de calendario</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../../index.html#pestana=contenido&subpestana=datos"
+            >Abrir en el generador</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Añadir un evento al calendario</h2>
+            <p>
+              Los códigos QR de calendario codifican un evento iCalendar con
+              título, inicio, fin y, opcionalmente, ubicación, descripción y
+              sitio web. Los lectores compatibles pueden ofrecer añadirlo
+              directamente al calendario.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-format-fields="event"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.calendarEvent">Calendar event</legend>
+            <label for="event-title" data-i18n="fields.title">Title</label>
+            <input
+              id="event-title"
+              name="event-title"
+              type="text"
+              maxlength="120"
+              value="New event"
+              data-i18n-value="form.defaults.eventTitle"
+            />
+            <label class="toggle-field">
+              <input id="event-all-day" name="event-all-day" type="checkbox" />
+              <span data-i18n="form.data.allDayEvent">All-day event</span>
+            </label>
+            <div class="event-date-grid">
+              <div>
+                <label for="event-start-date" data-i18n="form.data.startDate"
+                  >Start date</label
+                >
+                <input
+                  id="event-start-date"
+                  name="event-start-date"
+                  type="date"
+                />
+              </div>
+              <div class="event-time-field">
+                <label for="event-start-time" data-i18n="form.data.startTime"
+                  >Start time</label
+                >
+                <input
+                  id="event-start-time"
+                  name="event-start-time"
+                  type="time"
+                  step="60"
+                />
+              </div>
+              <div>
+                <label for="event-end-date" data-i18n="form.data.endDate"
+                  >End date</label
+                >
+                <input id="event-end-date" name="event-end-date" type="date" />
+              </div>
+              <div class="event-time-field">
+                <label for="event-end-time" data-i18n="form.data.endTime"
+                  >End time</label
+                >
+                <input
+                  id="event-end-time"
+                  name="event-end-time"
+                  type="time"
+                  step="60"
+                />
+              </div>
+            </div>
+            <label for="event-location" data-i18n="form.data.locationOptional"
+              >Location (optional)</label
+            >
+            <input
+              id="event-location"
+              name="event-location"
+              type="text"
+              maxlength="160"
+            />
+            <label
+              for="event-description"
+              data-i18n="form.data.descriptionOptional"
+              >Description (optional)</label
+            >
+            <textarea
+              id="event-description"
+              name="event-description"
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <label for="event-url" data-i18n="form.data.websiteOptional"
+              >Website (optional)</label
+            >
+            <input
+              id="event-url"
+              name="event-url"
+              type="url"
+              inputmode="url"
+              maxlength="2048"
+              placeholder="https://example.com/event"
+              data-i18n-placeholder="form.placeholders.eventWebsite"
+            />
+            <p class="hint" data-i18n="form.data.eventTimeHint">
+              Timed events use the scanner's local time zone. For all-day
+              events, the selected end date is treated as the last included day.
+            </p>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Fechas y hora local</h2>
+            <p>
+              Los eventos con hora utilizan la zona horaria local del lector.
+              Los eventos de día completo omiten las horas e incluyen la fecha
+              final seleccionada como último día. Compruebe los detalles antes
+              de distribuir un código impreso.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la guía">
+            <a href="../../../index.html#pestana=contenido&subpestana=datos"
+              >Abrir esta herramienta</a
+            >
+            <a href="../acerca-de.html">Acerca de</a>
+            <a href="../index.html">Guías</a>
+            <a href="../../../privacy.html">Privacidad</a>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Idiomas">
+              <span aria-hidden="true">🇪🇸</span> Español
+            </summary>
+            <nav aria-label="Idiomas">
+              <a
+                href="../../../guides/content/event.html"
+                hreflang="en-US"
+                lang="en-US"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a
+                href="../../../guides/content/event.html"
+                hreflang="en-GB"
+                lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="./eventos.html"
+                hreflang="es"
+                lang="es"
+                aria-current="page"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../../ar/أدلة/محتوى/أحداث.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../../hi-IN/मार्गदर्शिकाएं/सामग्री/कार्यक्रम.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../../zh-CN/指南/内容/事件.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../../../dist/info.min.js"></script>
+  </body>
+</html>

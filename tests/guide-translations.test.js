@@ -7,9 +7,25 @@ import {
   loadGuideTranslationSet,
   translateGuideHtml,
 } from '../scripts/guide-translations.mjs';
+import {
+  getGuideOutputPath,
+  getGuideRouteFromPath,
+} from '../src/js/i18n/guide-routes.js';
 
 const locales = ['ar', 'es', 'hi-IN', 'zh-CN'];
 const localizedName = /\.(?:ar|es|hi-IN|zh-CN)\.html$/;
+
+function stripGeneratedMarkup(source) {
+  return source
+    .replace(
+      /<!-- generated-guide-alternates:start -->[\s\S]*?<!-- generated-guide-alternates:end -->/g,
+      '',
+    )
+    .replace(
+      /<!-- generated-guide-languages:start -->[\s\S]*?<!-- generated-guide-languages:end -->/g,
+      '',
+    );
+}
 
 async function listEnglishGuides(directory = 'guides') {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -53,14 +69,19 @@ test('every supported locale translates all long-form guide prose', async () => 
   const files = await listEnglishGuides();
   const required = new Set();
   for (const file of files) {
-    const source = await readFile(file, 'utf8');
+    const source = stripGeneratedMarkup(await readFile(file, 'utf8'));
     collectGuideText(source).forEach((value) => required.add(value));
   }
 
   for (const locale of locales) {
-    const source = await readFile(`guides/translations/${locale}.json`);
-    const translations = JSON.parse(source);
-    const missing = [...required].filter((value) => !translations[value]);
+    const translations = await loadGuideTranslationSet(
+      'guides/translations',
+      locale,
+    );
+    const missing = [...required].filter((value) => {
+      const normalized = value.replace(/\s+/g, ' ').trim();
+      return !translations[value] && !translations[normalized];
+    });
     assert.deepEqual(missing, [], `${locale} has untranslated guide prose`);
   }
 });
@@ -84,8 +105,14 @@ test('reviewed guide translations override machine output', async () => {
 });
 
 test('Spanish inline prose remains grammatical after HTML assembly', async () => {
-  const technology = await readFile('guides/technology.es.html', 'utf8');
-  const specification = await readFile('guides/spec.es.html', 'utf8');
+  const technology = await readFile(
+    getGuideOutputPath('technology', 'es'),
+    'utf8',
+  );
+  const specification = await readFile(
+    getGuideOutputPath('spec', 'es'),
+    'utf8',
+  );
 
   assert.match(
     technology,
@@ -108,7 +135,10 @@ test('Spanish inline prose remains grammatical after HTML assembly', async () =>
 test('Spanish guides use native QR and interface terminology', async () => {
   const files = await listEnglishGuides();
   const pages = await Promise.all(
-    files.map((file) => readFile(file.replace(/\.html$/, '.es.html'), 'utf8')),
+    files.map((file) => {
+      const route = getGuideRouteFromPath(file);
+      return readFile(getGuideOutputPath(route, 'es'), 'utf8');
+    }),
   );
   const source = pages.join('\n');
   const copy = source.replaceAll(/href="[^"]*"/g, '').replaceAll(/\s+/g, ' ');
@@ -151,7 +181,7 @@ test('Spanish guides use native QR and interface terminology', async () => {
 });
 
 test('Spanish guide index uses polished interface copy', async () => {
-  const source = await readFile('guides/index.es.html', 'utf8');
+  const source = await readFile(getGuideOutputPath('index', 'es'), 'utf8');
   const copy = source.replaceAll(/\s+/g, ' ');
   const translatedPhrases = [
     'Guarde directamente',
@@ -183,7 +213,7 @@ test('Spanish guide index uses polished interface copy', async () => {
 });
 
 test('Spanish specification uses fluent technical language', async () => {
-  const source = await readFile('guides/spec.es.html', 'utf8');
+  const source = await readFile(getGuideOutputPath('spec', 'es'), 'utf8');
   const copy = source.replaceAll(/\s+/g, ' ');
   const literalPhrases = [
     'Generador de QR',

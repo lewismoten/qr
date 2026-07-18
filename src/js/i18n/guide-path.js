@@ -1,36 +1,53 @@
-const GUIDE_LOCALES = new Set(['ar', 'es', 'hi-IN', 'zh-CN']);
-const GUIDE_LOCALE_PATTERN = [...GUIDE_LOCALES].join('|');
+import {
+  getGuidePublicPath,
+  getGuideRouteFromPath,
+  NAVIGATION_ALIASES,
+} from './guide-routes.js';
 
-function getBaseGuidePath(path) {
-  const match = path.match(
-    new RegExp(`^(.*?)(?:\\.(${GUIDE_LOCALE_PATTERN}))?(\\.html)([?#].*)?$`),
-  );
-  if (!match) return null;
-  return {
-    base: match[1],
-    extension: match[3],
-    suffix: match[4] || '',
-  };
+function splitSuffix(path) {
+  const index = path.search(/[?#]/);
+  return index < 0 ? [path, ''] : [path.slice(0, index), path.slice(index)];
+}
+
+function normalizeGuidePath(path) {
+  return path.replace(/^\.\//, '').replace(/^\//, '');
 }
 
 export function getLocalizedGuidePath(path, locale) {
   if (typeof path !== 'string') return path;
-  const directory = path.match(/^((?:.*\/)?guides\/?)([?#].*)?$/);
-  if (directory) {
-    if (!GUIDE_LOCALES.has(locale)) return path;
-    return `${directory[1]}index.${locale}.html${directory[2] || ''}`;
-  }
+  const [pathname, suffix] = splitSuffix(path);
+  const normalized = normalizeGuidePath(pathname);
+  const directoryRoute = /^guides\/?$/.test(normalized) ? 'index' : null;
+  const route = directoryRoute || getGuideRouteFromPath(normalized);
+  if (!route) return path;
+  return getGuidePublicPath(route, locale) + suffix;
+}
 
-  const guide = getBaseGuidePath(path);
-  if (!guide) return path;
-  const localized = GUIDE_LOCALES.has(locale) ? `.${locale}` : '';
-  return `${guide.base}${localized}${guide.extension}${guide.suffix}`;
+function translateValue(values, value) {
+  return values?.[value] || value;
+}
+
+export function localizeNavigationHash(hash, locale) {
+  const aliases = NAVIGATION_ALIASES[locale];
+  if (!aliases || !hash) return hash;
+  const prefix = hash.startsWith('#') ? '#' : '';
+  const value = hash.replace(/^#/, '').replaceAll('&amp;', '&');
+  const parameters = new URLSearchParams(value);
+  const tab = parameters.get('tab');
+  const subtab = parameters.get('subtab');
+  if (!tab) return hash;
+  const localized = new URLSearchParams();
+  localized.set(aliases.keys[0], translateValue(aliases.tabs, tab));
+  if (subtab) {
+    localized.set(aliases.keys[1], translateValue(aliases.subtabs, subtab));
+  }
+  return prefix + localized.toString();
 }
 
 export function localizeGuideLinks(document, locale) {
   document?.querySelectorAll?.('a[href]').forEach((link) => {
     const href = link.getAttribute('href');
-    if (!/^(?:\.\/)?guides(?:\/|$)/.test(href || '')) return;
-    link.setAttribute('href', getLocalizedGuidePath(href, locale));
+    const localized = getLocalizedGuidePath(href, locale);
+    if (localized !== href) link.setAttribute('href', localized);
   });
 }
