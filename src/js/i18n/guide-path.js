@@ -46,6 +46,7 @@ export function localizeNavigationHash(hash, locale) {
 
 export function localizeGuideLinks(document, locale) {
   document?.querySelectorAll?.('a[href]').forEach((link) => {
+    if (link.getAttribute('hreflang')) return;
     const href = link.getAttribute('href');
     const localized = getLocalizedGuidePath(href, locale);
     if (localized !== href) link.setAttribute('href', localized);

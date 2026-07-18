@@ -5,7 +5,7 @@ import { GUIDE_LOCALES } from '../src/js/i18n/guide-routes.js';
 import { configuredGuidePath } from './html-config.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
-const PAGE_LOCALES = ['en-US', 'es', 'ar', 'hi-IN', 'zh-CN'];
+const PAGE_LOCALES = ['en-US', 'en-GB', 'es', 'ar', 'hi-IN', 'zh-CN'];
 
 function guideUrl(config, route, locale) {
   const output = configuredGuidePath(config, route, locale);

@@ -20,7 +20,7 @@ import {
 import { writeGuideSitemap } from './guide-sitemap.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
-const TRANSLATED_LOCALES = ['ar', 'es', 'hi-IN', 'zh-CN'];
+const GENERATED_LOCALES = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
 const LANGUAGE_HEADINGS = {
   'en-US': 'Languages',
   es: 'Idiomas',
@@ -176,7 +176,7 @@ function languageSwitcher(context) {
 }
 
 async function translate(source, context) {
-  if (context.locale === 'en-US') return source;
+  if (['en-US', 'en-GB'].includes(context.locale)) return source;
   const directory = path.join(context.config.sourceRoot, 'guides/translations');
   const translations = await loadGuideTranslationSet(directory, context.locale);
   const missing = new Set();
@@ -232,7 +232,7 @@ export async function generateLocalizedGuides(options = {}) {
     ),
   );
   await copyPages(config);
-  const locales = ['en-US', ...TRANSLATED_LOCALES];
+  const locales = ['en-US', ...GENERATED_LOCALES];
   await Promise.all(
     routeNames.flatMap((route) =>
       locales.map((locale) =>

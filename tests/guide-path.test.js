@@ -22,7 +22,7 @@ test('guide paths select translated copies and preserve fallbacks', () => {
   );
   assert.equal(
     getLocalizedGuidePath('guides/spec.html', 'en-GB'),
-    'guides/spec.html',
+    'en-GB/guides/spec.html',
   );
   assert.equal(getLocalizedGuidePath('guides/', 'es'), 'es/guias/');
   assert.equal(
@@ -98,10 +98,20 @@ test('guide links follow the active application locale', () => {
   );
 });
 
-function createLink(href) {
+test('guide localization preserves explicit language alternatives', () => {
+  const alternate = createLink('guides/privacy.html', {
+    hreflang: 'en-GB',
+  });
+
+  localizeGuideLinks({ querySelectorAll: () => [alternate] }, 'es');
+
+  assert.equal(alternate.href, 'guides/privacy.html');
+});
+
+function createLink(href, attributes = {}) {
   return {
     href,
-    getAttribute: () => href,
+    getAttribute: (name) => (name === 'href' ? href : attributes[name]),
     setAttribute(name, value) {
       this[name] = value;
       href = value;

@@ -82,4 +82,5 @@ test('privacy source exposes both English language flags', async () => {
   assert.match(source, /🇬🇧<\/span> English \(UK\)/);
   assert.match(source, /hreflang="en-US"/);
   assert.match(source, /hreflang="en-GB"/);
+  assert.match(source, /en-GB\/guides\/privacy\.html/);
 });

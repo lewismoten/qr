@@ -151,11 +151,12 @@ export const GUIDE_LOCALES = Object.freeze([
 ]);
 
 function translatedRoute(route, locale) {
+  const segments = route === 'index' ? [] : route.split('/');
+  if (locale === 'en-GB') return ['en-GB', 'guides', ...segments];
   const config = NATIVE_ROUTES[locale];
   if (!config) {
     return route === 'index' ? ['guides'] : ['guides', ...route.split('/')];
   }
-  const segments = route === 'index' ? [] : route.split('/');
   return [
     ...config.root,
     ...segments.map((part) => config.segments[part] || part),

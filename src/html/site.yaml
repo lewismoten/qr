@@ -47,7 +47,7 @@ locales:
   en-US:
     root: guides
   en-GB:
-    root: guides
+    root: en-GB/guides
   es:
     root: es/guias
   ar:

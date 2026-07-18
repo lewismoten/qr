@@ -8,7 +8,7 @@ import {
   getGuideOutputPath,
 } from '../src/js/i18n/guide-routes.js';
 
-const translatedLocales = ['ar', 'es', 'hi-IN', 'zh-CN'];
+const translatedLocales = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
 
 function generatedPath(route, locale) {
   return `build/site/${getGuideOutputPath(route, locale)}`;
