@@ -497,6 +497,7 @@
   },
   "common": {
     "close": "Close",
+    "help": "Help",
     "auto": "Auto",
     "autoLower": "auto",
     "none": "none",

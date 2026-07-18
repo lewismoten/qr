@@ -1,11 +1,44 @@
 import { lookup, translateDocument } from '../../i18n/index.js';
 
 const requests = new WeakMap();
+let helpDialogId = 0;
 
 function getParser(document) {
   const Parser = document.defaultView?.DOMParser ?? globalThis.DOMParser;
   if (!Parser) throw new Error('DOMParser is unavailable.');
   return new Parser();
+}
+
+function installFragmentHelp({ document, panel, parsed, link }) {
+  const sources = [
+    ...(parsed.querySelectorAll?.('[data-fragment-help]') ?? []),
+  ];
+  if (!link || sources.length === 0) return;
+
+  const dialog = document.createElement('dialog');
+  const content = document.createElement('div');
+  const close = document.createElement('button');
+  dialog.className = 'fragment-help-dialog';
+  content.className = 'fragment-help-dialog-content';
+  close.className = 'secondary-button fragment-help-close';
+  close.type = 'button';
+  close.textContent = lookup('common.close', 'Close');
+  sources.forEach((source) => {
+    const section = document.importNode(source, true);
+    section.removeAttribute('data-fragment-help');
+    content.append(section);
+  });
+  const heading = content.querySelector('h2');
+  helpDialogId += 1;
+  heading.id = 'fragment-help-title-' + helpDialogId;
+  dialog.setAttribute('aria-labelledby', heading.id);
+  close.addEventListener('click', () => dialog.close());
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    dialog.showModal();
+  });
+  dialog.append(content, close);
+  panel.append(dialog);
 }
 
 export function ensurePanelFragment(
@@ -23,6 +56,7 @@ export function ensurePanelFragment(
   }
   if (requests.has(panel)) return requests.get(panel);
 
+  const helpLink = panel.querySelector?.('[data-fragment-help-link]');
   panel.setAttribute('aria-busy', 'true');
   const request = Promise.resolve()
     .then(() => {
@@ -44,9 +78,16 @@ export function ensurePanelFragment(
       const children = [...fragment.childNodes].map((node) =>
         document.importNode(node, true),
       );
+      if (helpLink) children.push(helpLink);
       panel.replaceChildren(...children);
       panel.dataset.fragmentLoaded = 'true';
       translateDocument(document);
+      installFragmentHelp({
+        document,
+        panel,
+        parsed,
+        link: helpLink,
+      });
       panel.dispatchEvent(new Event('fragmentload'));
       return panel;
     })
@@ -58,7 +99,8 @@ export function ensurePanelFragment(
         'common.fragmentLoadError',
         'Unable to load this section. Check your connection and try again.',
       );
-      panel.replaceChildren(message);
+      const children = helpLink ? [message, helpLink] : [message];
+      panel.replaceChildren(...children);
       throw error;
     })
     .finally(() => panel.removeAttribute('aria-busy'));

@@ -32,6 +32,21 @@
           >
         </header>
         <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Shape the QR matrix</h2>
+            <p>
+              Modules are the small dark and light cells that carry QR data.
+              Square modules preserve the standard geometry; rounded, dotted,
+              diamond, and custom modules trade some scanning tolerance for a
+              more distinctive appearance.
+            </p>
+            <p>
+              Corner eyes are the three large finder patterns scanners use to
+              locate and orient the code. Their outer rings and center blocks
+              can be styled separately, but their overall contrast and
+              recognizable structure should remain strong.
+            </p>
+          </section>
           <section data-app-fragment="tab=style&amp;subtab=modules">
             <fieldset class="option-group">
               <legend data-i18n="style.modules.legend">
@@ -338,6 +353,21 @@
                 finished code at its intended size.
               </p>
             </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>What the custom controls change</h2>
+            <p>
+              <strong>Rounding</strong> softens corners,
+              <strong>inset</strong> creates space between neighboring cells,
+              and <strong>rotation</strong> turns each module. Larger insets and
+              extreme rotations remove more dark area and can make dense or
+              physically small codes harder to scan.
+            </p>
+            <p>
+              Custom eye colors apply only when enabled. Test the final export
+              at its intended printed or displayed size, especially when using
+              center artwork, transparency, or a background image as well.
+            </p>
           </section>
         </div>
         <footer class="info-page-footer">

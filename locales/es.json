@@ -486,6 +486,7 @@
   },
   "common": {
     "close": "Cerrar",
+    "help": "Ayuda",
     "auto": "Automático",
     "autoLower": "automático",
     "none": "ninguno",

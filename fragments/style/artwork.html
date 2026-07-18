@@ -32,6 +32,20 @@
           >
         </header>
         <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Add a recognizable center mark</h2>
+            <p>
+              Center artwork can use an uploaded logo, an emoji, editable pixel
+              art, or the frame message. Artwork is composited into the final
+              image and may cover data modules, so stronger error correction and
+              a modest artwork size improve the chance of recovery.
+            </p>
+            <p>
+              A protective background creates separation around logos and emoji.
+              Pixel art can instead follow the selected module shape so its
+              cells share the QR code’s visual language.
+            </p>
+          </section>
           <section data-app-fragment="tab=style&amp;subtab=artwork">
             <fieldset class="option-group">
               <legend data-i18n="style.art.legend">Center artwork</legend>
@@ -493,6 +507,21 @@
                 </div>
               </div>
             </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Logo, emoji, and pixel-art controls</h2>
+            <p>
+              The size slider controls the percentage of the matrix occupied by
+              the artwork. Uploaded logos remain in browser memory until cleared
+              or the page closes. Emoji rendering depends on the selected font
+              available on the device that creates the image.
+            </p>
+            <p>
+              The pixel editor supports an 8 to 32 cell grid, an EGA-inspired
+              palette, custom colors, and transparent erasing. Fine artwork
+              usually needs a larger QR output so both artwork pixels and QR
+              modules remain distinct.
+            </p>
           </section>
         </div>
         <footer class="info-page-footer">

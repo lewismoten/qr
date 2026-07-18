@@ -472,6 +472,7 @@
   },
   "common": {
     "close": "关闭",
+    "help": "帮助",
     "auto": "自动",
     "autoLower": "自动",
     "none": "无",

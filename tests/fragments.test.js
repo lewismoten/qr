@@ -160,8 +160,21 @@ describe('application fragments', () => {
       assert.match(page, /<header[\s>]/);
       assert.match(page, /<footer[\s>]/);
       assert.match(page, /data-app-fragment=/);
+      const appPosition = page.indexOf('data-app-fragment=');
+      const helpPositions = [...page.matchAll(/data-fragment-help>/g)].map(
+        (match) => match.index,
+      );
+      assert.equal(helpPositions.length, 2);
+      assert.ok(helpPositions[0] < appPosition);
+      assert.ok(helpPositions[1] > appPosition);
       assert.match(page, new RegExp(hash));
       assert.match(page, /rel="canonical"/);
+      assert.match(
+        index,
+        new RegExp(
+          'href="' + relative + '"[\\s\\S]{0,120}' + 'data-fragment-help-link',
+        ),
+      );
     }
     assert.doesNotMatch(index, /id="module-shape"/);
     assert.doesNotMatch(index, /id="color-dark"/);

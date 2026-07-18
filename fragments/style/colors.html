@@ -32,6 +32,21 @@
           >
         </header>
         <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Control contrast and visual tone</h2>
+            <p>
+              The dark color paints active modules; the light color paints the
+              remaining matrix and quiet zone. QR scanners generally perform
+              best when dark modules are substantially darker than the light
+              background. Transparency reveals whatever is behind the image, so
+              real-world contrast may differ from the editor preview.
+            </p>
+            <p>
+              Solid fills use one dark color. Linear and radial gradients blend
+              toward an ending color, while image fill uses a selected image
+              beneath separate dark and light contrast overlays.
+            </p>
+          </section>
           <section data-app-fragment="tab=style&amp;subtab=colors">
             <fieldset class="option-group">
               <legend data-i18n="style.colors.legend">
@@ -331,6 +346,20 @@
                 </p>
               </div>
             </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Gradients and image fills</h2>
+            <p>
+              Gradient angle controls the direction of a linear blend; radial
+              gradients move outward from the center. Avoid combinations where
+              part of the dark fill approaches the light color.
+            </p>
+            <p>
+              The recommended image setting overlays black at 25% on dark
+              modules and white at 75% on light areas. It is a useful starting
+              point, not a guarantee: detailed images and low-contrast regions
+              still require scanning tests on the final device or paper.
+            </p>
           </section>
         </div>
         <footer class="info-page-footer">

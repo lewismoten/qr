@@ -31,6 +31,20 @@
           >
         </header>
         <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Identify a QR code without scanning it</h2>
+            <p>
+              A frame message is visible text rendered as part of the exported
+              image. It can tell someone what a code does, distinguish printed
+              codes from one another, or provide a useful instruction such as
+              “Call,” “Text,” or “Join Wi-Fi.”
+            </p>
+            <p>
+              <strong>Auto</strong> derives a short, non-secret label from the
+              selected content. <strong>Custom</strong> uses your message, and
+              <strong>None</strong> preserves the most compact image.
+            </p>
+          </section>
           <section data-app-fragment="tab=content&amp;subtab=frame">
             <fieldset class="option-group">
               <legend data-i18n="frame.message">Frame message</legend>
@@ -222,6 +236,21 @@
                 contact, or file name.
               </p>
             </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Placement, typography, and scanning</h2>
+            <p>
+              Text below the matrix does not cover QR modules. Centered text
+              uses a contrasting outline rather than a solid box, but it still
+              changes useful modules and should be tested with several scanners.
+              The line-height control limits vertical space while the renderer
+              fits the largest practical text across the width.
+            </p>
+            <p>
+              Keep labels concise and avoid placing passwords or other secrets
+              in frame text: unlike encoded payload data, the message is
+              immediately readable by anyone who sees the image.
+            </p>
           </section>
         </div>
         <footer class="info-page-footer">
