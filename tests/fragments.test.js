@@ -204,6 +204,17 @@ describe('fragment hash navigation', () => {
     }
   });
 
+  test('debug mask setup receives the QR color provider', async () => {
+    const source = await readFile(
+      new URL('../src/js/app/index.js', import.meta.url),
+      { encoding: 'utf8' },
+    );
+    const facadeStart = source.indexOf('createDebugFacade({');
+    const navigationStart = source.indexOf('createApplicationNavigation({');
+    const facadeSetup = source.slice(facadeStart, navigationStart);
+    assert.match(facadeSetup, /getQrColors:\s*styleSetup\.colors\.getQrColors/);
+  });
+
   test('parses valid targets and rejects unrelated hashes', () => {
     assert.deepEqual(readNavigationHash('#tab=style&subtab=colors'), {
       tab: 'style',

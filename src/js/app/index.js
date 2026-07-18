@@ -198,6 +198,7 @@ const debugSetup = createDebugFacade({
   },
   getCurrentMode: runtimeHelpers.getEncodingMode,
   getErrorLevel: runtimeHelpers.getErrorLevel,
+  getQrColors: styleSetup.colors.getQrColors,
   isBulkMode: contentData.isBulkMode,
   runtime: {
     render: runtime.render,
