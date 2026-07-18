@@ -77,6 +77,31 @@ protect the current baseline. It also requires every included file to exceed
 appear in the report and maintain 100% for all three metrics. `npm run verify`
 enforces the same coverage thresholds.
 
+## Performance
+
+Run the QR speed and memory benchmarks with exposed garbage collection:
+
+```sh
+npm run benchmark
+npm run benchmark:quick
+```
+
+The report covers representative QR versions, fixed and automatic masks, mixed
+segmentation, and Kanji. It reports median and 95th-percentile generation time,
+throughput, peak heap growth, retained heap, and one-time Kanji initialization.
+
+Save a machine-specific baseline and compare later runs against it:
+
+```sh
+npm run benchmark -- --save=benchmark-results/qr.json
+npm run benchmark -- \
+  --baseline=benchmark-results/qr.json \
+  --threshold=20
+```
+
+Regression checks compare median time and peak heap. Keep comparisons on similar
+hardware and runtime versions; timing and garbage collection vary across systems.
+
 ## Locales
 
 Locale files live in `locales` and are listed in `locales/manifest.json`. A locale
