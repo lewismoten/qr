@@ -41,4 +41,19 @@ describe('specification guide', () => {
       paths.map((path) => access(new URL('../' + path, import.meta.url))),
     );
   });
+
+  test('localizes dynamically generated encoding examples', async () => {
+    const [source, localeSource] = await Promise.all([
+      read('src/js/spec/encoding-examples.js'),
+      read('locales/es.json'),
+    ]);
+    const locale = JSON.parse(localeSource);
+
+    assert.match(source, /lookup\('spec\.mixed\.segment'/);
+    assert.match(source, /lookup\(\s*'spec\.units\.numeric'/);
+    assert.equal(locale.spec.mixed.segment, 'Segmento {number}');
+    assert.equal(locale.spec.modes.byte, 'Modo de bytes');
+    assert.match(locale.spec.units.byte, /los datos ocupan 16 bits/);
+    assert.match(locale.spec.mixed.savings, /usando únicamente/);
+  });
 });

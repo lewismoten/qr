@@ -70,10 +70,11 @@
           <p class="eyebrow">El interior de la matriz</p>
           <h1 id="guide-title">Cómo se construye y se lee un código QR</h1>
           <p class="hero-lead">
-            Un código QR no es un cuadrado de píxeles arbitrarios. Los patrones
-            fijos orientan al lector; los metadatos indican cómo descodificarlo;
-            y un flujo en zigzag transporta los encabezados de segmento, los
-            datos, el relleno y los datos de corrección de errores Reed–Solomon.
+            Un código QR no es simplemente un conjunto arbitrario de píxeles.
+            Los patrones fijos orientan al lector; los metadatos indican cómo
+            decodificarlo; y un flujo en zigzag transporta los encabezados de
+            segmento, los datos, el relleno y los datos de corrección de errores
+            Reed–Solomon.
           </p>
           <div class="hero-actions">
             <a class="primary-link" href="../index.html">Abrir el generador</a>
@@ -87,7 +88,7 @@
             aria-label="Un código QR real de versión 7 con todas las regiones funcionales y de datos coloreadas mediante la paleta de capas de depuración del generador"
           ></canvas>
           <figcaption>
-            Matriz real de versión 7, coloreada con las mismas categorías de
+            Matriz real de la versión 7, coloreada con las mismas categorías de
             Depuración &gt; Superposición.
           </figcaption>
         </figure>
@@ -109,7 +110,9 @@
         <span style="--swatch: #0ea5e9">Datos</span>
         <span style="--swatch: #84cc16">Terminador</span>
         <span style="--swatch: #cbd5e1">Relleno</span>
-        <span style="--swatch: #111827">Palabras de código de corrección</span>
+        <span style="--swatch: #111827"
+          >Palabras de código de corrección de errores</span
+        >
         <span style="--swatch: #14b8a6">Bits restantes</span>
       </section>
 
@@ -204,7 +207,7 @@
           <p>
             La información de formato y versión se codifica con protección BCH
             contra errores. La información de formato se escribe dos veces para
-            conservar las instrucciones de descodificación aunque se produzcan
+            conservar las instrucciones de decodificación aunque se produzcan
             daños cerca de un patrón de posición.
           </p>
         </div>
@@ -256,10 +259,10 @@
             Los encabezados y los datos son campos de bits, no siempre bytes
           </h2>
           <p>
-            La segmentación automática puede cambiar de modo cuando la reducción
-            de los datos compensa los bits adicionales de un nuevo encabezado de
-            modo y recuento. Cada segmento comienza con sus propios campos de
-            modo y recuento de caracteres.
+            La segmentación automática puede cambiar de modo cuando el ahorro de
+            bits en los datos compensa los bits adicionales de un nuevo
+            encabezado de modo y recuento. Cada segmento comienza con sus
+            propios campos de modo y recuento de caracteres.
           </p>
         </div>
 
@@ -271,7 +274,7 @@
           <div class="segment-cycle">
             <header>
               <strong>Segmentos 1…N</strong
-              ><span>Se repite por cada segmento optimizado</span>
+              ><span>Se repite para cada segmento optimizado</span>
             </header>
             <div class="segment-fields">
               <div class="bit-field mode">
@@ -298,7 +301,7 @@
               ><span>0xEC / 0x11</span>
             </div>
             <div class="bit-field ec">
-              <strong>Palabras de código de corrección</strong
+              <strong>Palabras de código de corrección de errores</strong
               ><span>intercaladas</span>
             </div>
             <div class="bit-field remainder">
@@ -570,7 +573,7 @@
               El codificador puntúa cada candidata según las secuencias largas,
               los bloques de 2 por 2, los patrones similares a los de posición y
               el equilibrio entre módulos oscuros y claros; después registra la
-              máscara ganadora en la información de formato.
+              máscara seleccionada en la información de formato.
             </p>
           </article>
         </div>
@@ -677,7 +680,7 @@
             </figure>
           </div>
           <div class="mask-penalties">
-            <strong>Cómo selecciona la máscara el modo automático</strong>
+            <strong>Cómo elige el modo automático la máscara</strong>
             <span>1. Penalizar las secuencias largas del mismo color.</span>
             <span>2. Penalizar los bloques sólidos de 2 por 2.</span>
             <span
@@ -694,7 +697,7 @@
 
       <section class="guide-section reading-section">
         <div class="section-intro">
-          <p class="section-number">05 / Orden de descodificación</p>
+          <p class="section-number">05 / Orden de decodificación</p>
           <h2>Pasos conceptuales que sigue un lector</h2>
         </div>
         <ol class="process-list">
@@ -703,8 +706,9 @@
             <div>
               <strong>Localizar y muestrear</strong>
               <p>
-                Utilice los patrones de posición, separación, temporización y
-                alineación para reconstruir la cuadrícula de módulos.
+                Utiliza los patrones de posición, los separadores y los patrones
+                de temporización y alineación para reconstruir la cuadrícula de
+                módulos.
               </p>
             </div>
           </li>
@@ -713,9 +717,9 @@
             <div>
               <strong>Leer metadatos</strong>
               <p>
-                Descodifique la información de formato, determine el nivel de
-                corrección de errores y la máscara, y lea la información de
-                versión cuando esté presente.
+                Decodifica la información de formato, determina el nivel de
+                corrección de errores y la máscara, y lee la información de
+                versión cuando está presente.
               </p>
             </div>
           </li>
@@ -724,8 +728,8 @@
             <div>
               <strong>Desenmascarar y recorrer</strong>
               <p>
-                Deshaga la máscara seleccionada en los módulos de datos y
-                recopile los bits de las palabras de código siguiendo la ruta en
+                Deshace la máscara seleccionada en los módulos de datos y
+                recopila los bits de las palabras de código siguiendo la ruta en
                 zigzag de dos columnas.
               </p>
             </div>
@@ -735,9 +739,9 @@
             <div>
               <strong>Desintercalar y corregir</strong>
               <p>
-                Reconstruya los bloques Reed–Solomon, detecte los errores y
-                recupere las palabras de código cuando la redundancia lo
-                permita.
+                Reconstruye los bloques Reed–Solomon, detecta los errores y
+                recupera las palabras de código cuando la redundancia lo
+                permite.
               </p>
             </div>
           </li>
@@ -746,9 +750,9 @@
             <div>
               <strong>Analizar segmentos</strong>
               <p>
-                Lea el encabezado de modo y recuento de cada segmento y
-                descodifique sus unidades de datos hasta encontrar el terminador
-                o agotar la capacidad de datos.
+                Lee el encabezado de modo y recuento de cada segmento y
+                decodifica sus unidades de datos hasta encontrar el terminador o
+                agotar la capacidad de datos.
               </p>
             </div>
           </li>
@@ -895,9 +899,9 @@
             cuando se selecciona manualmente. No sirve como referencia de
             implementación para segmentos ECI, concatenación estructurada,
             FNC1/GS1, modo Hanzi, Micro QR, QR rectangular (rMQR), símbolos de
-            Modelo 1 ni descodificación de códigos QR. Consulte la
-            especificación normativa correspondiente antes de afirmar
-            compatibilidad más allá del alcance comprobado.
+            Modelo 1 ni decodificación de códigos QR. Consulte la especificación
+            normativa correspondiente antes de afirmar compatibilidad más allá
+            del alcance comprobado.
           </p>
         </div>
       </section>

@@ -754,6 +754,25 @@
       "canceled": "Animation export canceled."
     }
   },
+  "spec": {
+    "units": {
+      "numeric": "{value} is stored as one {bits}-bit binary number.",
+      "alphanumeric": "A × 45 + B = 461, stored in {bits} bits.",
+      "byte": "The visible character is UTF-8 C3 A9, so the count is 2 and the payload is 16 bits.",
+      "kanji": "Shift JIS {value} is transformed into one 13-bit QR Kanji value."
+    },
+    "modes": {
+      "numeric": "Numeric",
+      "alphanumeric": "Alphanumeric",
+      "byte": "Byte mode",
+      "kanji": "Kanji"
+    },
+    "mixed": {
+      "segment": "Segment {number}",
+      "fields": "mode {mode} | count {count} | payload: {bits} bits",
+      "savings": "{mixed} bits vs {bytes} using Byte mode only"
+    }
+  },
   "qr": {
     "errors": {
       "modeUnsupported": "Native QR mode is not supported yet: {mode}.",

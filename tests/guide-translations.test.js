@@ -206,6 +206,16 @@ test('Spanish specification uses fluent technical language', async () => {
     'Desentrelazar',
     'bits cero de terminación',
     'Proceso conceptual de un lector',
+    'descodific',
+    'máscara ganadora',
+    'Se repite por cada segmento',
+    'cuadrado de píxeles arbitrarios',
+    'Matriz real de versión 7',
+    'Utilice los patrones de posición',
+    'Descodifique la información',
+    'Deshaga la máscara',
+    'Reconstruya los bloques',
+    'Lea el encabezado',
   ];
 
   literalPhrases.forEach((phrase) =>
@@ -224,4 +234,11 @@ test('Spanish specification uses fluent technical language', async () => {
   assert.match(copy, /solo cambia de modo cuando la reducción/i);
   assert.match(copy, /Desintercalar y corregir/i);
   assert.match(copy, /se intercalan antes de colocarse/i);
+  assert.match(copy, /conjunto arbitrario de píxeles/i);
+  assert.match(copy, /Matriz real de la versión 7/i);
+  assert.match(copy, /ahorro de bits en los datos/i);
+  assert.match(copy, /Se repite para cada segmento optimizado/i);
+  assert.match(copy, /Cómo elige el modo automático la máscara/i);
+  assert.match(copy, /registra la máscara seleccionada/i);
+  assert.match(copy, /Decodifica la información de formato/i);
 });

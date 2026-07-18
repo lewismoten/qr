@@ -1,4 +1,4 @@
-import qrEncoder, { COUNT_BITS, MODE_BITS, isMaskActive } from '@lewismoten/qr';
+import qrEncoder, { isMaskActive } from '@lewismoten/qr';
 import {
   buildDebugOverlayModel,
   getDebugCategory,
@@ -7,7 +7,8 @@ import {
 import { isFunctionModule } from '../app/qr-regions.js';
 import { setupExternalLinks } from '../external-links.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
-import { COLORS, MIXED_TEXT, getVisuals } from './visual-models.js';
+import { renderEncodingExamples } from './encoding-examples.js';
+import { COLORS, getVisuals } from './visual-models.js';
 
 const guideLocale = document.documentElement.dataset.guideLocale;
 if (guideLocale) {
@@ -197,89 +198,4 @@ window.addEventListener('resize', () => {
   resizeRequest = requestAnimationFrame(renderPage);
 });
 renderPage();
-
-function toBits(value, length) {
-  return Number(value).toString(2).padStart(length, '0');
-}
-
-function getCountWidth(mode, version = 1) {
-  const bucket = version <= 9 ? 0 : version <= 26 ? 1 : 2;
-  return COUNT_BITS[mode][bucket];
-}
-
-function describeUnit(mode, value, segment) {
-  if (mode === 'numeric')
-    return `${value} is stored as one ${segment.bits.length}-bit binary number.`;
-  if (mode === 'alphanumeric')
-    return `A x 45 + B = 461, stored in ${segment.bits.length} bits.`;
-  if (mode === 'byte')
-    return 'The visible character is UTF-8 C3 A9, so the count is 2 and the payload is 16 bits.';
-  const shiftJis = qrEncoder
-    .toSJIS(value)
-    .toString(16)
-    .toUpperCase()
-    .padStart(4, '0');
-  return `Shift JIS ${shiftJis} is transformed into one 13-bit QR Kanji value.`;
-}
-
-document.querySelectorAll('[data-unit-mode]').forEach((example) => {
-  const mode = example.dataset.unitMode;
-  const value = example.dataset.unitValue;
-  const definition = qrEncoder.create([{ mode, data: value }], {
-    version: 1,
-    errorCorrectionLevel: 'L',
-  });
-  const segment = definition.segments[0];
-  example.querySelector('[data-mode-bits]').textContent = toBits(
-    MODE_BITS[mode],
-    4,
-  );
-  example.querySelector('[data-count-bits]').textContent = toBits(
-    segment.characterCount,
-    getCountWidth(mode),
-  );
-  example.querySelector('[data-payload-bits]').textContent =
-    segment.bits.join('');
-  example.querySelector('[data-unit-detail]').textContent = describeUnit(
-    mode,
-    value,
-    segment,
-  );
-});
-
-const mixedSegments = qrEncoder.internals.optimizeSegments(MIXED_TEXT, 1);
-const mixedStream = document.getElementById('mixed-mode-stream');
-if (mixedStream) {
-  mixedSegments.forEach((segment, index) => {
-    const mode = segment.mode;
-    const element = document.createElement('article');
-    element.className = `mixed-segment ${mode}`;
-    const number = document.createElement('span');
-    number.className = 'segment-number';
-    number.textContent = `Segment ${index + 1}`;
-    const heading = document.createElement('strong');
-    heading.textContent =
-      mode === 'alphanumeric'
-        ? 'Alphanumeric'
-        : `${mode[0].toUpperCase()}${mode.slice(1)}`;
-    const source = document.createElement('code');
-    source.textContent = segment.data;
-    const fields = document.createElement('span');
-    fields.textContent = `mode ${toBits(MODE_BITS[mode], 4)} | count ${toBits(segment.characterCount, getCountWidth(mode))} | payload ${segment.bits.length} bits`;
-    element.append(number, heading, source, fields);
-    mixedStream.append(element);
-  });
-
-  const mixedBits = mixedSegments.reduce(
-    (total, segment) =>
-      total + 4 + getCountWidth(segment.mode) + segment.bits.length,
-    0,
-  );
-  const byteSegment = qrEncoder.create([{ mode: 'byte', data: MIXED_TEXT }], {
-    version: 2,
-    errorCorrectionLevel: 'L',
-  }).segments[0];
-  const byteBits = 4 + getCountWidth('byte') + byteSegment.bits.length;
-  document.getElementById('mixed-mode-savings').textContent =
-    `${mixedBits} bits vs ${byteBits} all-Byte`;
-}
+renderEncodingExamples();

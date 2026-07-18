@@ -749,6 +749,25 @@
       "canceled": "تم إلغاء تصدير الرسوم المتحركة."
     }
   },
+  "spec": {
+    "units": {
+      "numeric": "يُخزَّن {value} كعدد ثنائي واحد بطول {bits} بت.",
+      "alphanumeric": "A × 45 + B = 461، وتُخزَّن النتيجة في {bits} بت.",
+      "byte": "يُرمَّز الحرف الظاهر في UTF-8 بالقيمة C3 A9، لذلك يكون العدد 2 وتشغل البيانات 16 بت.",
+      "kanji": "تُحوَّل قيمة Shift JIS ‏{value} إلى قيمة كانجي QR بطول 13 بت."
+    },
+    "modes": {
+      "numeric": "رقمي",
+      "alphanumeric": "أبجدي رقمي",
+      "byte": "وضع البايت",
+      "kanji": "كانجي"
+    },
+    "mixed": {
+      "segment": "المقطع {number}",
+      "fields": "الوضع {mode} | العدد {count} | البيانات: {bits} بت",
+      "savings": "{mixed} بت مقابل {bytes} باستخدام وضع البايت فقط"
+    }
+  },
   "qr": {
     "errors": {
       "modeUnsupported": "وضع QR المدمج غير مدعوم بعد: {mode}.",

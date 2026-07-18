@@ -736,6 +736,25 @@
       "canceled": "动画导出已取消。"
     }
   },
+  "spec": {
+    "units": {
+      "numeric": "{value} 存储为一个 {bits} 位二进制数。",
+      "alphanumeric": "A × 45 + B = 461，并存储为 {bits} 位。",
+      "byte": "可见字符的 UTF-8 编码为 C3 A9，因此计数为 2，数据占 16 位。",
+      "kanji": "Shift JIS 值 {value} 转换为一个 13 位的 QR 汉字值。"
+    },
+    "modes": {
+      "numeric": "数字",
+      "alphanumeric": "字母数字",
+      "byte": "字节模式",
+      "kanji": "汉字"
+    },
+    "mixed": {
+      "segment": "分段 {number}",
+      "fields": "模式 {mode} | 计数 {count} | 数据：{bits} 位",
+      "savings": "{mixed} 位，对比仅使用字节模式时的 {bytes} 位"
+    }
+  },
   "qr": {
     "errors": {
       "modeUnsupported": "尚不支持此原生二维码模式：{mode}。",
