@@ -10,6 +10,13 @@ import { getGuideOutputPath } from '../src/js/i18n/guide-routes.js';
 
 const sourceRoot = 'src/html/guides';
 
+function stripLanguageSwitcher(source) {
+  return source.replace(
+    /<!-- generated-guide-languages:start -->[\s\S]*?<!-- generated-guide-languages:end -->/g,
+    '',
+  );
+}
+
 test('reviewed translations include only known or privacy prose', async () => {
   const machine = JSON.parse(
     await readFile(`${sourceRoot}/translations/es.json`, 'utf8'),
@@ -38,7 +45,9 @@ test('reviewed translations include only known or privacy prose', async () => {
 });
 
 test('Spanish privacy guide uses complete reviewed prose', async () => {
-  const source = await readFile(`${sourceRoot}/privacy.html`, 'utf8');
+  const source = stripLanguageSwitcher(
+    await readFile(`${sourceRoot}/privacy.html`, 'utf8'),
+  );
   const translations = await loadGuideTranslationSet(
     `${sourceRoot}/translations`,
     'es',
@@ -64,4 +73,13 @@ test('Spanish privacy guide uses complete reviewed prose', async () => {
   assert.match(copy, /URL <code>file:<\/code>, las reglas de seguridad/);
   assert.doesNotMatch(copy, /How this site handles your information/);
   assert.doesNotMatch(copy, /Information stored in your browser/);
+});
+
+test('privacy source exposes both English language flags', async () => {
+  const source = await readFile(`${sourceRoot}/privacy.html`, 'utf8');
+
+  assert.match(source, /🇺🇸<\/span> English \(US\)/);
+  assert.match(source, /🇬🇧<\/span> English \(UK\)/);
+  assert.match(source, /hreflang="en-US"/);
+  assert.match(source, /hreflang="en-GB"/);
 });
