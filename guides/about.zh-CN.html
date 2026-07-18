@@ -3,14 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About the QR Code Generator</title>
+    <title>关于二维码生成器</title>
     <meta
       name="description"
-      content="Learn what the QR Code Generator creates, how QR codes work, how customization affects reliability, and how browser-based processing protects privacy."
+      content="了解二维码生成器生成的内容，二维码是如何工作的，定制如何影响可靠性，以及基于浏览器的处理如何保护隐私。"
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
-    <link rel="canonical" href="https://qr.lewismoten.com/guides/about.zh-CN.html" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/about.zh-CN.html"
+    />
     <script>
       if (new URLSearchParams(location.search).has('embed'))
         document.documentElement.classList.add('is-embedded');
@@ -22,135 +25,98 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">Inside the matrix</p>
-            <h1 id="about-page-title">About the QR Code Generator</h1>
+            <p class="info-kicker">在矩阵内部</p>
+            <h1 id="about-page-title">关于二维码生成器</h1>
           </div>
-          <a class="info-page-back" href="../index.html">Open generator</a>
+          <a class="info-page-back" href="../index.html">打开生成器</a>
         </header>
         <div class="info-dialog-content">
           <p id="about-page-content" class="info-lead">
-            This free, browser-based QR code generator is built for quick
-            everyday codes and unusually deep inspection. Paste a URL and leave,
-            or control encoding, version, masks, artwork, print size, file
-            chunks and the path of individual bits.
+            这个免费的基于浏览器的二维码生成器是为快速日常代码和异常深入的检查而构建的。粘贴一个URL并离开，或控制编码、版本、掩码、艺术品、打印尺寸、文件块和单个位元的路径。
           </p>
 
           <section>
-            <h2>What you can create</h2>
+            <h2>你可以创造什么</h2>
             <p>
-              Generate QR codes for websites, plain text, number sequences,
-              Wi-Fi credentials, email, phone calls, SMS messages, calendar
-              events, geographic coordinates, vCards and small files. Batch
-              controls can produce numbered sets or a random-order series of
-              file chunks, while frame captions make printed codes easier to
-              identify.
+              为网站、纯文本、数字序列、Wi-Fi凭据、电子邮件、电话、短信、日历事件、地理坐标、vCard和小型文件生成二维码。批量控制可以生成编号集或随机顺序的文件块序列，而帧标题则使打印代码更容易识别。
             </p>
             <p>
-              Style modules, finder eyes, gradients, transparency, background
-              images, logos, emoji and pixel art. Export the current code as
-              PNG, JPEG, GIF, SVG or PDF; export multi-code projects as ZIP, PDF
-              sheets, animated GIF or MP4.
+              样式模块、查找器眼睛、渐变、透明度、背景图像、徽标、表情符号和像素艺术。将当前代码导出为PNG、JPEG、GIF、SVG或PDF；将多代码项目导出为ZIP、PDF表格、动画GIF或MP4。
             </p>
           </section>
 
           <section>
-            <h2>How QR codes work</h2>
+            <h2>二维码是如何工作的</h2>
             <div class="fact-grid">
               <article>
-                <strong>40 versions</strong
+                <strong>40个版本</strong
                 ><span
-                  >Version 1 is 21 by 21 modules. Every version adds four
-                  modules per side, ending at 177 by 177 for version 40.</span
+                  >版本1是21x21个模块。每个版本每侧增加四个模块，版本40结束时为177x177。</span
                 >
               </article>
               <article>
-                <strong>Four data modes</strong
+                <strong>四个数据模式</strong
                 ><span
-                  >Numeric, alphanumeric, byte and Kanji modes trade character
-                  flexibility for storage efficiency. Automatic segmentation
-                  usually creates the shortest stream.</span
+                  >数字、字母数字、字节和汉字模式以字符灵活性为代价换取存储效率。自动分割通常会创建最短的流。</span
                 >
               </article>
               <article>
-                <strong>Four recovery levels</strong
+                <strong>四个恢复级别</strong
                 ><span
-                  >L, M, Q and H add increasing Reed-Solomon redundancy. Rough
-                  damage-recovery targets are about 7%, 15%, 25% and 30%, with
-                  higher recovery reducing payload capacity.</span
+                  >L、M、Q和H增加了越来越多的Reed-Solomon冗余。粗略的损坏恢复目标约为7%、15%、25%和30%，恢复率越高，有效载荷容量就越低。</span
                 >
               </article>
               <article>
-                <strong>Eight masks</strong
+                <strong>八个掩模</strong
                 ><span
-                  >A required mask breaks up scanner-hostile patterns. Auto
-                  evaluates every mask and chooses the lowest penalty score;
-                  Debug can reveal the unmasked data.</span
+                  >必需的掩码可以打破扫描仪对主机的敌对模式。自动评估每个掩码，并选择最低的罚款分数；调试可以揭示未掩码的数据。</span
                 >
               </article>
             </div>
             <p class="guide-callout">
-              <strong>Want to look inside the matrix?</strong>
-              <a href="spec.zh-CN.html" data-parent-dialog-target="specification"
-                >Explore the visual QR specification</a
+              <strong>想看看矩阵的内部吗？</strong>
+              <a
+                href="spec.zh-CN.html"
+                data-parent-dialog-target="specification"
+                >探索视觉二维码规格</a
               >
-              for annotated patterns, metadata, bit streams, recovery codewords,
-              masks, placement order and implementation references.
+              用于注释模式、元数据、位流、恢复码字、掩码、放置顺序和实现参考。
             </p>
           </section>
 
           <section>
-            <h2>Design without losing reliability</h2>
+            <h2>设计而不失去可靠性</h2>
             <p>
-              Scanners need contrast, a clear quiet zone and recognizable
-              functional patterns. Rounded modules, gradients and center artwork
-              can work well, but every customization spends part of the code's
-              scanning tolerance. Use stronger error correction for artwork,
-              avoid covering finder patterns, print modules large enough for the
-              expected distance and test the final physical result with several
-              devices.
+              扫描仪需要对比度、清晰的静音区和可识别的功能模式。圆形模块、渐变和中心艺术品效果良好，但每次自定义都会消耗一部分代码的扫描容差。对于艺术品，使用更强的错误校正，避免覆盖检索器模式，打印模块足够大的，以满足预期距离，并使用几个设备测试最终的物理结果。
             </p>
           </section>
 
           <section>
-            <h2>Developer and file tools</h2>
+            <h2>开发者和文件工具</h2>
             <p>
-              The Debug workspace separates functional regions, metadata,
-              payload, padding, error correction and remainder bits with
-              configurable colors. It can outline codewords or stream bytes,
-              trace read paths, show metadata order and reverse the selected
-              mask for a raw-data view.
+              调试工作区将功能区域、元数据、有效载荷、填充、错误校正和剩余位以可配置的颜色分离开来。它可以概述码字或流字节，跟踪读取路径，显示元数据顺序，并对选定的掩码进行反转以获得原始数据视图。
             </p>
             <p>
-              File transport supports data URLs, browser blob URLs and a
-              documented <code>FILE:1</code> chunk protocol. Chunked transfers
-              use a compact identifier, byte offsets, optional gzip compression,
-              metadata and SHA-256 verification so frames can be collected out
-              of order and checked before assembly. Blob URLs only work in the
-              browser session that created them; ordinary phone cameras
-              generally need an HTTPS link or a compatible receiving app for
-              file workflows.
+              文件传输支持数据URL、浏览器块URL和文档
+              <code>FILE:1</code>
+              块协议。块传输使用紧凑的标识符、字节偏移量、可选的gzip压缩、元数据和SHA-256验证，因此可以在组装前按顺序收集帧并进行检查。Blob
+              URL仅在创建它们的浏览器会话中有效；普通手机相机通常需要HTTPS链接或兼容的接收应用程序来处理文件工作流程。
             </p>
           </section>
 
           <section>
-            <h2>Privacy and network use</h2>
+            <h2>隐私和网络使用</h2>
             <p>
-              QR rendering, artwork, file processing and downloads happen in
-              your browser; this application does not upload entered payloads or
-              selected files to its own server. Opening the Geo format requests
-              visible map tiles directly from OpenStreetMap. That service
-              receives normal web request information such as an IP address,
-              referrer and browser headers; it is not contacted unless Geo is
-              opened.
+              二维码渲染、艺术品、文件处理和下载发生在您的浏览器中；此应用程序不会将输入的有效载荷或选定的文件上传到自己的服务器。打开Geo格式时，会直接从OpenStreetMap请求可见的地图图块。该服务接收正常的网络请求信息，如IP地址、参考者和浏览器头信息；除非打开Geo，否则不会与之联系。
             </p>
           </section>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="About page navigation">
-            <a href="../index.html">Generator</a><a href="index.zh-CN.html">Guides</a
-            ><a href="https://git.lewismoten.com/lewismoten/qr">Source</a
-            ><a href="#about-page-content">Back to top</a>
+          <span>二维码生成器</span>
+          <nav aria-label="关于页面导航">
+            <a href="../index.html">生成器</a><a href="index.zh-CN.html">指南</a
+            ><a href="https://git.lewismoten.com/lewismoten/qr">源</a
+            ><a href="#about-page-content">返回顶部</a>
           </nav>
         </footer>
       </article>

@@ -1,12 +1,19 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-guide-locale="ar" data-locale-base="../../locales/">
+<html
+  lang="ar"
+  dir="rtl"
+  data-guide-locale="ar"
+  data-locale-base="../../locales/"
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bulk QR code import | QR Code Generator</title>
+    <title>
+      استيراد رمز الاستجابة السريعة بالجملة | مولد رمز الاستجابة السريعة
+    </title>
     <meta
       name="description"
-      content="Generate multiple QR codes by importing structured rows from a CSV file."
+      content="قم بإنشاء رموز QR متعددة عن طريق استيراد صفوف منظمة من ملف CSV."
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../../favicon.ico" sizes="any" />
@@ -21,22 +28,22 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">QR Code Generator</p>
-            <h1>Bulk QR code import</h1>
+            <p class="info-kicker">مولد رمز الاستجابة السريعة</p>
+            <h1>استيراد رمز الاستجابة السريعة المجمع</h1>
           </div>
           <a
             class="info-page-back"
             href="../../index.html#tab=content&amp;subtab=data"
-            >Open in generator</a
+            >افتح في المولد</a
           >
         </header>
         <div class="info-dialog-content">
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Create many codes from CSV</h2>
+            <h2>قم بإنشاء العديد من الرموز من CSV</h2>
             <p>
-              Bulk Import reads one QR code per nonempty CSV row. The first row
-              names fields for the selected content format. Blank column names
-              and their values are ignored, as are completely blank rows.
+              الاستيراد المجمع يقرأ رمز الاستجابة السريعة واحد لكل صف CSV غير
+              فارغ. حقول أسماء الصف الأول لتنسيق المحتوى المحدد. يتم تجاهل أسماء
+              الأعمدة الفارغة وقيمها، وكذلك الصفوف الفارغة تماما.
             </p>
           </section>
           <fieldset
@@ -93,7 +100,7 @@
             />
             <div class="file-status-row">
               <p id="bulk-status" class="hint file-capacity-hint">
-                No CSV loaded.
+                لم يتم تحميل CSV.
               </p>
               <button
                 id="bulk-clear"
@@ -107,28 +114,28 @@
             </div>
           </fieldset>
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Headers and validation</h2>
+            <h2>الرؤوس والتحقق من الصحة</h2>
             <p>
-              Expected and required fields change with the selected format. Rows
-              are validated before export, and malformed, oversized, or
-              unexpectedly structured files are rejected with a clear error.
-              Binary File transfers use their dedicated format instead.
+              تتغير الحقول المتوقعة والمطلوبة بالتنسيق المحدد. يتم التحقق من صحة
+              الصفوف قبل التصدير، ويتم رفض الملفات المشوهة أو كبيرة الحجم أو
+              المنظمة بشكل غير متوقع مع خطأ واضح. تستخدم عمليات نقل الملفات
+              الثنائية تنسيقها المخصص بدلا من ذلك.
             </p>
           </section>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="Guide page navigation">
+          <span>مولد رمز الاستجابة السريعة</span>
+          <nav aria-label="التنقل في صفحة الدليل">
             <a href="../../index.html#tab=content&amp;subtab=data"
-              >Open this tool</a
+              >افتح هذه الأداة</a
             >
-            <a href="../about.ar.html">About</a>
-            <a href="../index.ar.html">Guides</a>
-            <a href="../../privacy.html">Privacy</a>
+            <a href="../about.ar.html">عَنْ</a>
+            <a href="../index.ar.html">مرشدون</a>
+            <a href="../../privacy.html">خُصوصيّة</a>
           </nav>
         </footer>
       </article>
     </main>
-      <script type="module" src="../../dist/info.min.js"></script>
+    <script type="module" src="../../dist/info.min.js"></script>
   </body>
 </html>

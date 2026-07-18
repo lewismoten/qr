@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bulk QR code import | QR Code Generator</title>
+    <title>批量二维码导入 | 二维码生成器</title>
     <meta
       name="description"
-      content="Generate multiple QR codes by importing structured rows from a CSV file."
+      content="通过从CSV文件导入结构化行来生成多个二维码。"
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../../favicon.ico" sizes="any" />
@@ -21,22 +21,20 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">QR Code Generator</p>
-            <h1>Bulk QR code import</h1>
+            <p class="info-kicker">二维码生成器</p>
+            <h1>批量二维码导入</h1>
           </div>
           <a
             class="info-page-back"
             href="../../index.html#tab=content&amp;subtab=data"
-            >Open in generator</a
+            >在生成器中打开</a
           >
         </header>
         <div class="info-dialog-content">
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Create many codes from CSV</h2>
+            <h2>从CSV中创建许多代码</h2>
             <p>
-              Bulk Import reads one QR code per nonempty CSV row. The first row
-              names fields for the selected content format. Blank column names
-              and their values are ignored, as are completely blank rows.
+              批量导入每行非空的CSV文件读取一个二维码。第一行为所选内容格式的字段命名。空字段名及其值以及完全空行的内容均被忽略。
             </p>
           </section>
           <fieldset
@@ -93,7 +91,7 @@
             />
             <div class="file-status-row">
               <p id="bulk-status" class="hint file-capacity-hint">
-                No CSV loaded.
+                未加载CSV。
               </p>
               <button
                 id="bulk-clear"
@@ -107,28 +105,25 @@
             </div>
           </fieldset>
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Headers and validation</h2>
+            <h2>头和验证</h2>
             <p>
-              Expected and required fields change with the selected format. Rows
-              are validated before export, and malformed, oversized, or
-              unexpectedly structured files are rejected with a clear error.
-              Binary File transfers use their dedicated format instead.
+              预期和要求的字段会随着所选的格式而变化。行在导出前会进行验证，格式不正确、超大或结构不正常的文件将以明确的错误拒绝。二进制文件传输则使用其专用格式。
             </p>
           </section>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="Guide page navigation">
+          <span>二维码生成器</span>
+          <nav aria-label="指南页面导航">
             <a href="../../index.html#tab=content&amp;subtab=data"
-              >Open this tool</a
+              >打开这个工具</a
             >
-            <a href="../about.zh-CN.html">About</a>
-            <a href="../index.zh-CN.html">Guides</a>
-            <a href="../../privacy.html">Privacy</a>
+            <a href="../about.zh-CN.html">关于</a>
+            <a href="../index.zh-CN.html">指南</a>
+            <a href="../../privacy.html">隐居</a>
           </nav>
         </footer>
       </article>
     </main>
-      <script type="module" src="../../dist/info.min.js"></script>
+    <script type="module" src="../../dist/info.min.js"></script>
   </body>
 </html>

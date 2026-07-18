@@ -3,12 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Code Specification Visual Guide</title>
-    <meta name="description" content="A visual guide to QR Code structure: finder and alignment patterns, mode and character-count bits, payload data, error correction, masks, format information, padding and remainder bits." />
-    <meta name="keywords" content="QR code specification, QR code structure, QR mode bits, QR character count, QR error correction codewords, QR mask pattern, finder pattern, alignment pattern, QR format bits" />
+    <title>Guía visual de especificaciones del código QR</title>
+    <meta
+      name="description"
+      content="Una guía visual de la estructura del código QR: patrones de búsqueda y alineación, bits de modo y conteo de caracteres, datos de carga útil, corrección de errores, máscaras, información de formato, espaciadores y bits de resto."
+    />
+    <meta
+      name="keywords"
+      content="Especificación del código QR, estructura del código QR, bits del modo QR, número de caracteres del QR, palabras de código de corrección de errores del QR, patrón de máscara del QR, patrón de localizador, patrón de alineación, bits del formato QR"
+    />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
-    <link rel="canonical" href="https://qr.lewismoten.com/guides/spec.es.html" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/spec.es.html"
+    />
     <script type="importmap">
       {
         "imports": {
@@ -18,12 +27,18 @@
     </script>
     <meta property="og:type" content="article" />
     <meta property="og:title" content="QR Code Specification Visual Guide" />
-    <meta property="og:description" content="Explore QR Code functional patterns, metadata, encoding fields, masks, error correction and matrix placement through real debug-overlay visuals." />
+    <meta
+      property="og:description"
+      content="Explore QR Code functional patterns, metadata, encoding fields, masks, error correction and matrix placement through real debug-overlay visuals."
+    />
     <meta
       property="og:url"
       content="https://qr.lewismoten.com/guides/spec.html"
     />
-    <script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('is-embedded');</script>
+    <script>
+      if (new URLSearchParams(location.search).has('embed'))
+        document.documentElement.classList.add('is-embedded');
+    </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -38,176 +53,377 @@
   </head>
   <body>
     <header class="spec-header">
-      <a class="back-link" href="../index.html">QR Generator</a>
-      <nav aria-label="Guide sections">
-        <a href="#anatomy">Anatomy</a>
-        <a href="#stream">Data stream</a>
-        <a href="#masks">Masks</a>
-        <a href="#recovery">Recovery</a>
-        <a href="#implementation">Build it</a>
-        <a href="#references">References</a>
+      <a class="back-link" href="../index.html">Generador de QR</a>
+      <nav aria-label="Secciones de guía">
+        <a href="#anatomy">anatomía</a>
+        <a href="#stream">Flujo de datos</a>
+        <a href="#masks">Máscaras</a>
+        <a href="#recovery">recuperación</a>
+        <a href="#implementation">Construyelo</a>
+        <a href="#references">Referencias</a>
       </nav>
     </header>
 
     <main>
       <section class="hero" aria-labelledby="guide-title">
         <div class="hero-copy">
-          <p class="eyebrow">Inside the matrix</p>
-          <h1 id="guide-title">How a QR Code is assembled and read</h1>
-          <p class="hero-lead">A QR Code is not a square of arbitrary pixels. Fixed landmarks orient the scanner; metadata explains how to decode it; a zigzag stream carries segment headers, payload, padding and Reed-Solomon recovery data.</p>
+          <p class="eyebrow">Dentro de la matriz</p>
+          <h1 id="guide-title">Cómo se ensambla y lee un código QR</h1>
+          <p class="hero-lead">
+            Un código QR no es un cuadrado de píxeles arbitrarios. Los puntos de
+            referencia fijos orientan al escáner; los metadatos explican cómo
+            descodificarlo; un flujo en zigzag lleva encabezados de segmentos,
+            carga útil, puntuación y datos de recuperación de Reed-Solomon.
+          </p>
           <div class="hero-actions">
-            <a class="primary-link" href="../index.html"
-              >Open the generator</a
-            >
-            <a href="#stream">Follow the bitstream</a>
+            <a class="primary-link" href="../index.html">Abra el generador</a>
+            <a href="#stream">Sigue el flujo de bits</a>
           </div>
         </div>
         <figure class="hero-visual matrix-figure">
-          <canvas data-qr-visual="overview" role="img" aria-label="A real Version 7 QR Code with every functional and data region colored using the generator's debug overlay palette"></canvas>
-          <figcaption>Real Version 7 matrix, colored by the same categories used in Debug &gt; Overlay.</figcaption>
+          <canvas
+            data-qr-visual="overview"
+            role="img"
+            aria-label="Un verdadero código QR de versión 7 con todas las regiones funcionales y de datos coloreadas utilizando la paleta de superposición de depuración del generador"
+          ></canvas>
+          <figcaption>
+            Matriz Real Version 7, coloreada por las mismas categorías
+            utilizadas en Debug &gt; Superposición.
+          </figcaption>
         </figure>
       </section>
 
-      <section class="palette" aria-label="Debug overlay color legend">
-        <span style="--swatch:#ef4444">Finder</span>
-        <span style="--swatch:#facc15">Alignment</span>
-        <span style="--swatch:#06b6d4">Timing</span>
-        <span style="--swatch:#8b5cf6">Format</span>
-        <span style="--swatch:#ec4899">EC level</span>
-        <span style="--swatch:#60a5fa">Mask</span>
-        <span style="--swatch:#10b981">Version</span>
-        <span style="--swatch:#0f766e">Mode</span>
-        <span style="--swatch:#f97316">Character count</span>
-        <span style="--swatch:#0ea5e9">Data</span>
-        <span style="--swatch:#84cc16">Terminator</span>
-        <span style="--swatch:#cbd5e1">Padding</span>
-        <span style="--swatch:#111827">EC words</span>
-        <span style="--swatch:#14b8a6">Remainder</span>
+      <section
+        class="palette"
+        aria-label="Legenda de colores de superposición de depuración"
+      >
+        <span style="--swatch: #ef4444">buscador</span>
+        <span style="--swatch: #facc15">alineación</span>
+        <span style="--swatch: #06b6d4">momento</span>
+        <span style="--swatch: #8b5cf6">formato</span>
+        <span style="--swatch: #ec4899">Nivel EC</span>
+        <span style="--swatch: #60a5fa">mascarilla</span>
+        <span style="--swatch: #10b981">variante</span>
+        <span style="--swatch: #0f766e">modo</span>
+        <span style="--swatch: #f97316">Contador de caracteres</span>
+        <span style="--swatch: #0ea5e9">información</span>
+        <span style="--swatch: #84cc16">Terminator</span>
+        <span style="--swatch: #cbd5e1">relleno</span>
+        <span style="--swatch: #111827">Palabras EC</span>
+        <span style="--swatch: #14b8a6">restante</span>
       </section>
 
       <section id="anatomy" class="guide-section">
         <div class="section-intro">
-          <p class="section-number">01 / Anatomy</p>
-          <h2>Landmarks tell a scanner where the grid is</h2>
-          <p>Functional patterns are reserved before the encoded stream is placed. They are not payload bytes, and the data traversal steps around them.</p>
+          <p class="section-number">01 / Anatomía</p>
+          <h2>
+            Los puntos de referencia indican al escáner dónde está la cuadrícula
+          </h2>
+          <p>
+            Los patrones funcionales están reservados antes de que se coloque el
+            flujo codificado. No son bytes de carga útil, y los pasos de
+            recorrido de datos los rodean.
+          </p>
         </div>
 
         <div class="visual-grid">
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot finder"></span><h3>Finder patterns</h3></div>
-            <canvas data-qr-visual="finder" role="img" aria-label="Close-up of a red finder pattern and separator"></canvas>
-            <p>Three 7-by-7 targets identify the symbol and its rotation. A one-module light separator isolates each target from nearby modules.</p>
+            <div class="visual-heading">
+              <span class="color-dot finder"></span>
+              <h3>Patrones de localizador</h3>
+            </div>
+            <canvas
+              data-qr-visual="finder"
+              role="img"
+              aria-label="Encuentro de un patrón de localizador rojo y separador en primer plano"
+            ></canvas>
+            <p>
+              Tres objetivos de 7 por 7 identifican el símbolo y su rotación. Un
+              separador de luz de un módulo aisló cada objetivo de los módulos
+              cercanos.
+            </p>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot alignment"></span><h3>Alignment patterns</h3></div>
-            <canvas data-qr-visual="alignment" role="img" aria-label="Close-up of a yellow alignment pattern"></canvas>
-            <p>Version 2 and higher add smaller 5-by-5 targets. Their number grows with the version so a reader can correct perspective and surface distortion.</p>
+            <div class="visual-heading">
+              <span class="color-dot alignment"></span>
+              <h3>Patrones de alineación</h3>
+            </div>
+            <canvas
+              data-qr-visual="alignment"
+              role="img"
+              aria-label="Encuentro de un patrón de alineación amarillo"
+            ></canvas>
+            <p>
+              La versión 2 y posterior agregan objetivos más pequeños de 5 por
+              5. Su número aumenta con la versión, por lo que un lector puede
+              corregir la perspectiva y la distorsión superficial.
+            </p>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot timing"></span><h3>Timing tracks</h3></div>
-            <canvas data-qr-visual="timing" role="img" aria-label="Close-up of cyan horizontal and vertical timing patterns"></canvas>
-            <p>Alternating dark and light modules on row 6 and column 6 establish the module rhythm and connect the finder regions.</p>
+            <div class="visual-heading">
+              <span class="color-dot timing"></span>
+              <h3>Marcas de tiempo</h3>
+            </div>
+            <canvas
+              data-qr-visual="timing"
+              role="img"
+              aria-label="Encuentro de patrones de sincronización horizontal y vertical cian en primer plano"
+            ></canvas>
+            <p>
+              Los módulos oscuros y claros alternados en la fila 6 y la columna
+              6 establecen el ritmo del módulo y conectan las regiones de
+              búsqueda.
+            </p>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot dark-module"></span><h3>Dark module</h3></div>
-            <canvas data-qr-visual="dark-module" role="img" aria-label="Close-up of the fixed dark module colored deep violet"></canvas>
-            <p>One fixed dark module sits at row <code>4V + 9</code>, column 8. It is always on and is separate from the nearby format copy.</p>
+            <div class="visual-heading">
+              <span class="color-dot dark-module"></span>
+              <h3>Módulo oscuro</h3>
+            </div>
+            <canvas
+              data-qr-visual="dark-module"
+              role="img"
+              aria-label="Encuentro de cerca del módulo oscuro fijo de color violeta profundo"
+            ></canvas>
+            <p>
+              Un módulo oscuro fijo se encuentra en la fila <code>4V + 9</code>,
+              columna 8. Siempre está encendida y está separada de la copia del
+              formato cercana.
+            </p>
           </article>
         </div>
-
       </section>
 
       <section class="guide-section metadata-section">
         <div class="section-intro">
-          <p class="section-number">02 / Metadata</p>
-          <h2>The decoder receives instructions before content</h2>
-          <p>Format and version information are encoded with BCH error protection. Format information is written twice so damage near one finder does not remove the decoder instructions.</p>
+          <p class="section-number">02 / Metadatos</p>
+          <h2>El decodificador recibe instrucciones antes del contenido</h2>
+          <p>
+            La información de formato y versión se codifica con protección
+            contra errores BCH. La información de formato se escribe dos veces
+            para que el daño cerca de un buscador no elimine las instrucciones
+            del decodificador.
+          </p>
         </div>
         <div class="visual-grid metadata-grid">
           <article class="visual-card wide-card">
             <div class="visual-heading multi-dot">
-              <span class="color-dot ec-level"></span><span class="color-dot mask"></span><span class="color-dot format"></span>
-              <h3>EC level, mask and format protection</h3>
+              <span class="color-dot ec-level"></span
+              ><span class="color-dot mask"></span
+              ><span class="color-dot format"></span>
+              <h3>Nivel EC, protección de mascarilla y formato</h3>
             </div>
-            <canvas data-qr-visual="format" role="img" aria-label="Top-left metadata close-up showing pink error correction level bits, blue mask bits and purple protected format bits"></canvas>
-            <p>The 15-bit format value contains 2 error-correction-level bits and 3 mask-pattern bits. Ten BCH protection bits are appended, then the result is XOR-masked with a fixed pattern. The same value appears in two locations.</p>
+            <canvas
+              data-qr-visual="format"
+              role="img"
+              aria-label="Macro de los metadatos en la esquina superior izquierda mostrando los bits de nivel de corrección de errores rosados, los bits de máscara azules y los bits de formato protegido morados"
+            ></canvas>
+            <p>
+              El valor del formato de 15 bits contiene 2 bits de nivel de
+              corrección de errores y 3 bits de patrón de máscara. Se añaden
+              diez bits de protección BCH, luego el resultado se enmascara con
+              una máscara XOR con un patrón fijo. El mismo valor aparece en dos
+              ubicaciones.
+            </p>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot version"></span><h3>Version information</h3></div>
-            <canvas data-qr-visual="version" role="img" aria-label="Close-up of green Version 7 information beside a finder pattern"></canvas>
-            <p>Versions 7 through 40 store an 18-bit protected version value in two 3-by-6 areas. Smaller versions communicate their size directly through matrix dimensions.</p>
+            <div class="visual-heading">
+              <span class="color-dot version"></span>
+              <h3>Información de la versión</h3>
+            </div>
+            <canvas
+              data-qr-visual="version"
+              role="img"
+              aria-label="Encuentro de información de la versión 7 verde en primer plano junto a un patrón de búsqueda"
+            ></canvas>
+            <p>
+              Las versiones 7 a 40 almacenan un valor de versión protegido de 18
+              bits en dos áreas de 3 por 6. Las versiones más pequeñas comunican
+              su tamaño directamente a través de las dimensiones de la matriz.
+            </p>
           </article>
         </div>
       </section>
 
       <section id="stream" class="guide-section stream-section">
         <div class="section-intro">
-          <p class="section-number">03 / Encoded stream</p>
-          <h2>Headers and payload are bit fields, not always bytes</h2>
-          <p>Automatic segmentation can switch modes when the reduced payload size is worth another mode and count header. Every segment starts with its own mode and character-count fields.</p>
+          <p class="section-number">03 / Flujo codificado</p>
+          <h2>
+            Los encabezados y la carga útil son campos de bits, no siempre bytes
+          </h2>
+          <p>
+            La segmentación automática puede cambiar de modo cuando el tamaño
+            reducido del peso útil vale otro modo y encabezado de conteo. Cada
+            segmento comienza con su propio modo y campos de conteo de
+            caracteres.
+          </p>
         </div>
 
-        <div class="bitstream" role="img" aria-label="Ordered QR data stream with one or more repeated segments followed by terminator, padding, error correction and remainder bits">
+        <div
+          class="bitstream"
+          role="img"
+          aria-label="Flujo de datos QR ordenado con uno o más segmentos repetidos seguidos de terminador, puntuación, corrección de errores y bits de resto"
+        >
           <div class="segment-cycle">
-            <header><strong>Segment 1…N</strong><span>Repeat once for every optimized segment</span></header>
+            <header>
+              <strong>Segmento 1...N</strong
+              ><span>Repita una vez por cada segmento optimizado</span>
+            </header>
             <div class="segment-fields">
-              <div class="bit-field mode"><strong>Mode</strong><span>4 bits</span></div>
-              <div class="bit-field count"><strong>Character count</strong><span>width varies</span></div>
-              <div class="bit-field data"><strong>Payload</strong><span>mode encoded</span></div>
+              <div class="bit-field mode">
+                <strong>modo</strong><span>4 bits</span>
+              </div>
+              <div class="bit-field count">
+                <strong>Contador de caracteres</strong
+                ><span>La anchura varía</span>
+              </div>
+              <div class="bit-field data">
+                <strong>carga</strong><span>Modo codificado</span>
+              </div>
             </div>
           </div>
           <div class="post-segment-fields">
-            <div class="bit-field terminator"><strong>Terminator</strong><span>up to 4 bits</span></div>
-            <div class="bit-field padding"><strong>Byte boundary</strong><span>0 bits</span></div>
-            <div class="bit-field padding"><strong>Pad words</strong><span>EC / 11</span></div>
-            <div class="bit-field ec"><strong>EC words</strong><span>interleaved</span></div>
-            <div class="bit-field remainder"><strong>Remainder</strong><span>0–7 bits</span></div>
+            <div class="bit-field terminator">
+              <strong>Terminator</strong><span>Hasta 4 bits</span>
+            </div>
+            <div class="bit-field padding">
+              <strong>Límite de byte</strong><span>0 bits</span>
+            </div>
+            <div class="bit-field padding">
+              <strong>Palabras de relleno</strong><span>EC / 11</span>
+            </div>
+            <div class="bit-field ec">
+              <strong>Palabras EC</strong><span>entrecortado</span>
+            </div>
+            <div class="bit-field remainder">
+              <strong>restante</strong><span>0-7 bits</span>
+            </div>
           </div>
         </div>
 
         <div class="visual-grid stream-grid">
           <article class="visual-card">
-            <div class="visual-heading multi-dot"><span class="color-dot mode"></span><span class="color-dot count"></span><h3>Mode and character count</h3></div>
-            <canvas data-qr-visual="header" role="img" aria-label="Close-up of green mode bits followed by orange character-count bits and blue payload modules"></canvas>
-            <p>The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or Kanji. Count-field width depends on both mode and version range; Byte mode counts encoded bytes.</p>
+            <div class="visual-heading multi-dot">
+              <span class="color-dot mode"></span
+              ><span class="color-dot count"></span>
+              <h3>Modo y número de caracteres</h3>
+            </div>
+            <canvas
+              data-qr-visual="header"
+              role="img"
+              aria-label="Encuentro de bits de modo verde, seguido de bits de conteo de caracteres naranjas y módulos de carga útil azules."
+            ></canvas>
+            <p>
+              El indicador de modo de 4 bits selecciona Numérico, Alfánumérico,
+              Byte o Kanji. El ancho del campo de conteo depende tanto del modo
+              como del rango de versiones; el modo Byte cuenta los bytes
+              codificados.
+            </p>
           </article>
           <article class="visual-card payload-units-card">
-            <div class="visual-heading"><span class="color-dot data"></span><h3>Payload units</h3></div>
-            <p>Each example below is a complete Version 1 segment header and payload. The count field changes width by mode; Byte counts encoded bytes rather than visible characters.</p>
+            <div class="visual-heading">
+              <span class="color-dot data"></span>
+              <h3>Unidades de carga útil</h3>
+            </div>
+            <p>
+              Cada ejemplo a continuación es un encabezado de segmento y un
+              encabezado de carga útil completos de la Versión 1. El campo de
+              conteo cambia de ancho según el modo; los conteos de bytes
+              codifican bytes en lugar de caracteres visibles.
+            </p>
             <div class="unit-example-grid">
-              <article class="unit-example" data-unit-mode="numeric" data-unit-value="123">
-                <header><strong>Numeric</strong><code>123</code><span>3 digits</span></header>
-                <div class="unit-stream" aria-label="Numeric segment bits">
-                  <span class="mode"><small>Mode</small><code data-mode-bits>0001</code></span>
-                  <span class="count"><small>Count</small><code data-count-bits></code></span>
-                  <span class="data"><small>Payload</small><code data-payload-bits></code></span>
+              <article
+                class="unit-example"
+                data-unit-mode="numeric"
+                data-unit-value="123"
+              >
+                <header>
+                  <strong>numérico</strong><code>123</code
+                  ><span>3 dígitos</span>
+                </header>
+                <div
+                  class="unit-stream"
+                  aria-label="Bits del segmento numérico"
+                >
+                  <span class="mode"
+                    ><small>modo</small><code data-mode-bits>0001</code></span
+                  >
+                  <span class="count"
+                    ><small>cuenta</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>carga</small><code data-payload-bits></code
+                  ></span>
                 </div>
                 <p data-unit-detail></p>
               </article>
-              <article class="unit-example" data-unit-mode="alphanumeric" data-unit-value="AB">
-                <header><strong>Alphanumeric</strong><code>AB</code><span>2 characters</span></header>
-                <div class="unit-stream" aria-label="Alphanumeric segment bits">
-                  <span class="mode"><small>Mode</small><code data-mode-bits>0010</code></span>
-                  <span class="count"><small>Count</small><code data-count-bits></code></span>
-                  <span class="data"><small>Payload</small><code data-payload-bits></code></span>
+              <article
+                class="unit-example"
+                data-unit-mode="alphanumeric"
+                data-unit-value="AB"
+              >
+                <header>
+                  <strong>alfanumérico</strong><code>AB</code
+                  ><span>2 caracteres</span>
+                </header>
+                <div
+                  class="unit-stream"
+                  aria-label="Bits del segmento alfanumérico"
+                >
+                  <span class="mode"
+                    ><small>modo</small><code data-mode-bits>0010</code></span
+                  >
+                  <span class="count"
+                    ><small>cuenta</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>carga</small><code data-payload-bits></code
+                  ></span>
                 </div>
                 <p data-unit-detail></p>
               </article>
-              <article class="unit-example" data-unit-mode="byte" data-unit-value="é">
-                <header><strong>Byte</strong><code>é</code><span>2 UTF-8 bytes</span></header>
-                <div class="unit-stream" aria-label="Byte segment bits">
-                  <span class="mode"><small>Mode</small><code data-mode-bits>0100</code></span>
-                  <span class="count"><small>Count</small><code data-count-bits></code></span>
-                  <span class="data"><small>Payload</small><code data-payload-bits></code></span>
+              <article
+                class="unit-example"
+                data-unit-mode="byte"
+                data-unit-value="é"
+              >
+                <header>
+                  <strong>byte</strong><code>é</code><span>2 bytes UTF-8</span>
+                </header>
+                <div class="unit-stream" aria-label="Bits del segmento de byte">
+                  <span class="mode"
+                    ><small>modo</small><code data-mode-bits>0100</code></span
+                  >
+                  <span class="count"
+                    ><small>cuenta</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>carga</small><code data-payload-bits></code
+                  ></span>
                 </div>
                 <p data-unit-detail></p>
               </article>
-              <article class="unit-example" data-unit-mode="kanji" data-unit-value="漢">
-                <header><strong>Kanji</strong><code>漢</code><span>1 character</span></header>
-                <div class="unit-stream" aria-label="Kanji segment bits">
-                  <span class="mode"><small>Mode</small><code data-mode-bits>1000</code></span>
-                  <span class="count"><small>Count</small><code data-count-bits></code></span>
-                  <span class="data"><small>Payload</small><code data-payload-bits></code></span>
+              <article
+                class="unit-example"
+                data-unit-mode="kanji"
+                data-unit-value="漢"
+              >
+                <header>
+                  <strong>Kanji</strong><code>漢</code><span>1 carácter</span>
+                </header>
+                <div
+                  class="unit-stream"
+                  aria-label="Bits de segmentos de Kanji"
+                >
+                  <span class="mode"
+                    ><small>modo</small><code data-mode-bits>1000</code></span
+                  >
+                  <span class="count"
+                    ><small>cuenta</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>carga</small><code data-payload-bits></code
+                  ></span>
                 </div>
                 <p data-unit-detail></p>
               </article>
@@ -215,141 +431,507 @@
 
             <div class="mixed-example">
               <header>
-                <div><span class="example-kicker">Automatic mixed mode</span><strong><code>1234567890HELLO-world</code></strong></div>
+                <div>
+                  <span class="example-kicker">Modo mixto automático</span
+                  ><strong><code>1234567890HELLO-world</code></strong>
+                </div>
                 <span id="mixed-mode-savings"></span>
               </header>
               <div class="mixed-example-layout">
                 <figure class="mixed-qr-figure">
-                  <canvas class="mixed-qr-visual" data-qr-visual="mixed" role="img" aria-label="Version 1 QR Code for the mixed-mode example with debug overlays and the stream path"></canvas>
-                  <figcaption>Repeated green Mode and orange Count fields mark each segment before its blue payload.</figcaption>
+                  <canvas
+                    class="mixed-qr-visual"
+                    data-qr-visual="mixed"
+                    role="img"
+                    aria-label="Código QR de la versión 1 para el ejemplo de modo mixto con superposiciones de depuración y el camino del flujo"
+                  ></canvas>
+                  <figcaption>
+                    Los campos repetidos de modo verde y conteo naranja marcan
+                    cada segmento antes de su carga útil azul.
+                  </figcaption>
                 </figure>
-                <div id="mixed-mode-stream" class="mixed-mode-stream" aria-label="Automatically optimized mixed-mode segment stream"></div>
+                <div
+                  id="mixed-mode-stream"
+                  class="mixed-mode-stream"
+                  aria-label="Transmisión de segmentos de modo mixto optimizada automáticamente"
+                ></div>
               </div>
-              <p>Each colored block is a separate segment with another 4-bit mode indicator and count field. The optimizer keeps a switch only when its smaller payload offsets that header cost. Automatic detection does not select Kanji; Kanji must be requested explicitly.</p>
+              <p>
+                Cada bloque de color es un segmento separado con otro indicador
+                de modo de 4 bits y un campo de conteo. El optimizador mantiene
+                un interruptor solo cuando su carga útil más pequeña compensa
+                ese costo de encabezado. La detección automática no selecciona
+                Kanji; Kanji debe solicitarse explícitamente.
+              </p>
             </div>
           </article>
           <article class="visual-card">
-            <div class="visual-heading multi-dot"><span class="color-dot terminator"></span><span class="color-dot padding"></span><h3>Terminator and padding</h3></div>
-            <canvas data-qr-visual="padding" role="img" aria-label="Close-up of lime terminator bits and gray byte-boundary and pad modules"></canvas>
-            <p>After the last segment, up to four zero terminator bits are added. More zero bits reach a byte boundary; alternating <code>0xEC</code> and <code>0x11</code> pad codewords fill the data capacity.</p>
+            <div class="visual-heading multi-dot">
+              <span class="color-dot terminator"></span
+              ><span class="color-dot padding"></span>
+              <h3>Terminator y acolchado</h3>
+            </div>
+            <canvas
+              data-qr-visual="padding"
+              role="img"
+              aria-label="Encuentro de cerca de los bits del terminador de lima y los módulos de borde de byte y almohadilla gris."
+            ></canvas>
+            <p>
+              Después del último segmento, se agregan hasta cuatro bits
+              terminadores de cero. Más bits de cero alcanzan el límite de un
+              byte; alternando <code>0xEC</code> y <code>0x11</code> Las
+              palabras de código de puntuación llenan la capacidad de datos.
+            </p>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot remainder"></span><h3>Remainder bits</h3></div>
-            <canvas data-qr-visual="remainder" role="img" aria-label="Close-up of teal remainder modules after the final codeword"></canvas>
-            <p>Some versions leave 3, 4 or 7 traversable modules after all complete codewords. These zero remainder bits complete the matrix geometry; they are not data or error correction.</p>
+            <div class="visual-heading">
+              <span class="color-dot remainder"></span>
+              <h3>Bits restantes</h3>
+            </div>
+            <canvas
+              data-qr-visual="remainder"
+              role="img"
+              aria-label="Encuentro de los módulos restantes de azul turquesa después de la palabra clave final"
+            ></canvas>
+            <p>
+              Algunas versiones dejan 3, 4 o 7 módulos traversables después de
+              todas las palabras de código completas. Estos bits de resto cero
+              completan la geometría de la matriz; no son datos ni corrección de
+              errores.
+            </p>
           </article>
         </div>
       </section>
 
       <section id="recovery" class="guide-section recovery-section">
         <div class="section-intro">
-          <p class="section-number">04 / Recovery and placement</p>
-          <h2>Codewords are protected, interleaved, placed and masked</h2>
-          <p>Error correction does not simply occupy a rectangular corner. Data and recovery codewords follow the same two-column zigzag placement path after block interleaving.</p>
+          <p class="section-number">04 / Recuperación y colocación</p>
+          <h2>
+            Las palabras clave están protegidas, intercaladas, colocadas y
+            encubiertas.
+          </h2>
+          <p>
+            La corrección de errores no ocupa simplemente un rincón rectangular.
+            Los datos y las palabras de código de recuperación siguen el mismo
+            camino de colocación en zigzag de dos columnas después de la
+            intersección de bloques.
+          </p>
         </div>
         <div class="visual-grid">
           <article class="visual-card wide-card">
-            <div class="visual-heading multi-dot"><span class="color-dot data"></span><span class="color-dot ec-words"></span><h3>Data and Reed-Solomon EC words</h3></div>
-            <canvas data-qr-visual="error-correction" role="img" aria-label="Matrix close-up contrasting blue data codewords with ink-colored Reed-Solomon error-correction codewords"></canvas>
-            <p>The selected version and recovery level define one or more Reed-Solomon blocks over GF(256). Data and EC codewords are interleaved across blocks before placement, spreading localized damage across recoverable symbols.</p>
-            <div class="level-row" aria-label="Approximate recovery levels">
-              <span><b>L</b> about 7%</span><span><b>M</b> about 15%</span><span><b>Q</b> about 25%</span><span><b>H</b> about 30%</span>
+            <div class="visual-heading multi-dot">
+              <span class="color-dot data"></span
+              ><span class="color-dot ec-words"></span>
+              <h3>Datos y palabras EC de Reed-Solomon</h3>
+            </div>
+            <canvas
+              data-qr-visual="error-correction"
+              role="img"
+              aria-label="Macro de la matriz contrastando palabras clave de código de datos azules con palabras clave de corrección de errores de color tinta de Reed-Solomon"
+            ></canvas>
+            <p>
+              La versión seleccionada y el nivel de recuperación definen uno o
+              más bloques de Reed-Solomon sobre GF(256). Los datos y las
+              palabras de código EC se intercalan entre los bloques antes de su
+              colocación, propagando el daño localizado a través de los símbolos
+              recuperables.
+            </p>
+            <div
+              class="level-row"
+              aria-label="Niveles aproximados de recuperación"
+            >
+              <span><b>L</b> Alrededor del 7 %</span
+              ><span><b>M</b> Alrededor del 15 %</span
+              ><span><b>Q</b> Alrededor del 25 %</span
+              ><span><b>H</b> Alrededor del 30 %</span>
             </div>
           </article>
           <article class="visual-card">
-            <div class="visual-heading"><span class="color-dot mask"></span><h3>Required mask</h3></div>
-            <canvas data-qr-visual="mask" role="img" aria-label="Close-up showing blue modules affected by the selected QR mask"></canvas>
-            <p>One of eight formulas flips selected non-functional modules. The encoder scores all candidates for long runs, 2-by-2 blocks, finder-like patterns and dark/light balance, then records the winner in format information.</p>
+            <div class="visual-heading">
+              <span class="color-dot mask"></span>
+              <h3>Mascarilla requerida</h3>
+            </div>
+            <canvas
+              data-qr-visual="mask"
+              role="img"
+              aria-label="Encuentro de cerca mostrando módulos azules afectados por la máscara QR seleccionada"
+            ></canvas>
+            <p>
+              Una de las ocho fórmulas invierte los módulos no funcionales
+              seleccionados. El codificador evalúa a todos los candidatos para
+              largas carreras, bloques de 2 por 2, patrones similares a
+              buscadores y equilibrio entre luz y oscuridad, y luego registra al
+              ganador en la información del formato.
+            </p>
           </article>
         </div>
 
         <div id="masks" class="mask-guide">
           <div class="mask-guide-intro">
-            <p class="section-number">Eight mask candidates</p>
-            <h3>The formula changes; the landmarks do not</h3>
-            <p>For every non-functional module at row <code>r</code> and column <code>c</code>, a true formula flips the stored bit. Blue shows where each formula is active. Finder, alignment and timing patterns remain as dark reference landmarks because masking never changes them.</p>
+            <p class="section-number">Ocho candidatos a la máscara</p>
+            <h3>La fórmula cambia; los puntos de referencia no lo hacen</h3>
+            <p>
+              Para cada módulo no funcional en la fila <code>r</code> Y columna
+              <code>c</code>, una verdadera fórmula invierte el bit almacenado.
+              El azul muestra dónde está activa cada fórmula. Los patrones de
+              búsqueda, alineación y temporización permanecen como puntos de
+              referencia oscuros porque la máscara nunca los cambia.
+            </p>
           </div>
           <div class="mask-formula-grid">
-            <figure class="mask-formula-card"><canvas data-mask-preview="0" role="img" aria-label="Mask 0 pattern preview"></canvas><figcaption><strong>Mask 0</strong><code>(r + c) mod 2 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="1" role="img" aria-label="Mask 1 pattern preview"></canvas><figcaption><strong>Mask 1</strong><code>r mod 2 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="2" role="img" aria-label="Mask 2 pattern preview"></canvas><figcaption><strong>Mask 2</strong><code>c mod 3 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="3" role="img" aria-label="Mask 3 pattern preview"></canvas><figcaption><strong>Mask 3</strong><code>(r + c) mod 3 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="4" role="img" aria-label="Mask 4 pattern preview"></canvas><figcaption><strong>Mask 4</strong><code>(floor(r / 2) + floor(c / 3)) mod 2 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="5" role="img" aria-label="Mask 5 pattern preview"></canvas><figcaption><strong>Mask 5</strong><code>(r x c) mod 2 + (r x c) mod 3 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="6" role="img" aria-label="Mask 6 pattern preview"></canvas><figcaption><strong>Mask 6</strong><code>(((r x c) mod 2) + ((r x c) mod 3)) mod 2 = 0</code></figcaption></figure>
-            <figure class="mask-formula-card"><canvas data-mask-preview="7" role="img" aria-label="Mask 7 pattern preview"></canvas><figcaption><strong>Mask 7</strong><code>(((r + c) mod 2) + ((r x c) mod 3)) mod 2 = 0</code></figcaption></figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="0"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 0"
+              ></canvas>
+              <figcaption>
+                <strong>Mascarilla 0</strong><code>(r + c) mod 2 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="1"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 1"
+              ></canvas>
+              <figcaption>
+                <strong>Mascarilla 1</strong><code>r mod 2 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="2"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 2"
+              ></canvas>
+              <figcaption>
+                <strong>Mascarilla 2</strong><code>c mod 3 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="3"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 3"
+              ></canvas>
+              <figcaption>
+                <strong>Máscara 3</strong><code>(r + c) mod 3 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="4"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 4"
+              ></canvas>
+              <figcaption>
+                <strong>Mascarilla 4</strong
+                ><code>(floor(r / 2) + floor(c / 3)) mod 2 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="5"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 5"
+              ></canvas>
+              <figcaption>
+                <strong>Mascarilla 5</strong
+                ><code>(r x c) mod 2 + (r x c) mod 3 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="6"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 6"
+              ></canvas>
+              <figcaption>
+                <strong>Máscara 6</strong
+                ><code>(((r x c) mod 2) + ((r x c) mod 3)) mod 2 = 0</code>
+              </figcaption>
+            </figure>
+            <figure class="mask-formula-card">
+              <canvas
+                data-mask-preview="7"
+                role="img"
+                aria-label="Vista previa del patrón de máscara 7"
+              ></canvas>
+              <figcaption>
+                <strong>Máscara 7</strong
+                ><code>(((r + c) mod 2) + ((r x c) mod 3)) mod 2 = 0</code>
+              </figcaption>
+            </figure>
           </div>
           <div class="mask-penalties">
-            <strong>How Auto chooses</strong>
-            <span>1. Penalize long same-color runs.</span>
-            <span>2. Penalize solid 2-by-2 blocks.</span>
-            <span>3. Penalize finder-like 1:1:3:1:1 sequences.</span>
-            <span>4. Penalize an uneven dark/light balance.</span>
+            <strong>Cómo Auto elige</strong>
+            <span>1. Penalizar largas carreras de la misma color.</span>
+            <span>2. Penalizar bloques sólidos de 2 por 2.</span>
+            <span
+              >3. Penalizar secuencias 1:1:3:1:1 similares a las de
+              búsqueda.</span
+            >
+            <span
+              >4. Penalizar un equilibrio desigual entre el oscuro y el
+              claro.</span
+            >
           </div>
         </div>
       </section>
 
       <section class="guide-section reading-section">
         <div class="section-intro">
-          <p class="section-number">05 / Decoder order</p>
-          <h2>What a scanner conceptually does</h2>
+          <p class="section-number">05 / Pedido de decodificador</p>
+          <h2>Qué hace un escáner en términos conceptuales</h2>
         </div>
         <ol class="process-list">
-          <li><span>1</span><div><strong>Locate and sample</strong><p>Use finder, separator, timing and alignment patterns to estimate the module grid.</p></div></li>
-          <li><span>2</span><div><strong>Read metadata</strong><p>Decode format information, select the EC level and mask, and read version information when present.</p></div></li>
-          <li><span>3</span><div><strong>Unmask and traverse</strong><p>Reverse the selected mask on non-functional modules and collect codeword bits along the two-column zigzag path.</p></div></li>
-          <li><span>4</span><div><strong>Deinterleave and correct</strong><p>Reconstruct Reed-Solomon blocks, detect errors and recover codewords where redundancy permits.</p></div></li>
-          <li><span>5</span><div><strong>Parse segments</strong><p>Read each mode and count header, then decode its payload units until the terminator or data capacity is reached.</p></div></li>
+          <li>
+            <span>1</span>
+            <div>
+              <strong>Localizar y tomar muestras</strong>
+              <p>
+                Utilice los patrones de búsqueda, separación, temporización y
+                alineación para estimar la cuadrícula del módulo.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>2</span>
+            <div>
+              <strong>Leer metadatos</strong>
+              <p>
+                Decodificar la información del formato, seleccionar el nivel y
+                la máscara EC y leer la información de la versión cuando esté
+                presente.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>3</span>
+            <div>
+              <strong>Desmascarar y atravesar</strong>
+              <p>
+                Reverta la máscara seleccionada en los módulos no funcionales y
+                recopile los bits de la palabra clave a lo largo del camino en
+                zigzag de dos columnas.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>4</span>
+            <div>
+              <strong>Desentrelazar y corregir</strong>
+              <p>
+                Reconstruya los bloques Reed-Solomon, detecte errores y recupere
+                palabras de código donde la redundancia lo permita.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>5</span>
+            <div>
+              <strong>Analizar segmentos</strong>
+              <p>
+                Lea cada modo y cuente el encabezado, luego descodifique sus
+                unidades de carga útil hasta que se alcance el terminador o la
+                capacidad de datos.
+              </p>
+            </div>
+          </li>
         </ol>
       </section>
 
       <section id="implementation" class="guide-section implementation-section">
         <div class="section-intro">
-          <p class="section-number">06 / Implementation boundaries</p>
-          <h2>Use the guide to learn; use the source to reproduce</h2>
-          <p>This visual guide explains the structure and read order, but it does not reproduce every normative table, polynomial, coordinate, bit-width rule or edge case needed to build a conforming encoder. The links below show where this generator implements those details. They are readable implementation references, not replacements for ISO/IEC 18004.</p>
+          <p class="section-number">06 / Límites de implementación</p>
+          <h2>
+            Utilice la guía para aprender; utilice la fuente para reproducir
+          </h2>
+          <p>
+            Esta guía visual explica la estructura y el orden de lectura, pero
+            no reproduce todas las tablas normativas, polinomios, coordenadas,
+            reglas de anchura de bit o casos límite necesarios para construir un
+            codificador conforme. Los enlaces a continuación muestran dónde este
+            generador implementa esos detalles. Son referencias de
+            implementación legibles, no sustitutos de ISO/IEC 18004.
+          </p>
         </div>
 
         <div class="reference-links implementation-links">
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"><strong>Modes, count widths and block tables</strong><span><code>constants.js</code> defines mode indicators, the alphanumeric alphabet, character-count widths, EC-level format values, EC codewords per block and block counts for versions 1–40.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment.js"><strong>Encoding units</strong><span><code>segment.js</code> validates and converts Numeric, Alphanumeric, UTF-8 Byte and Shift JIS Kanji units into payload bits.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment-optimizer.js"><strong>Mixed-mode optimization</strong><span><code>segment-optimizer.js</code> finds a low-cost sequence of Numeric, Alphanumeric and Byte segments, including each repeated mode and count header.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"><strong>Version and data codewords</strong><span><code>segments.js</code> selects a fitting version and writes segment headers, payload, terminator, byte alignment and alternating pad words.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"><strong>Capacity and remainder geometry</strong><span><code>capacity.js</code> calculates raw data modules, character-count widths and usable data codewords from version, recovery level and block structure.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/reed-solomon.js"><strong>Reed-Solomon and interleaving</strong><span><code>reed-solomon.js</code> contains GF(256) multiplication, generator-divisor construction, remainder generation, short/long block division and data/EC interleaving.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/matrix-encoder.js"><strong>Matrix, metadata and placement</strong><span><code>matrix-encoder.js</code> places functional patterns, writes BCH-protected metadata, traverses codeword bits and produces each mask candidate.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"><strong>Eight mask formulas</strong><span><code>mask.js</code> gives the exact row/column predicate used by every mask candidate.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/penalty.js"><strong>Mask penalty scoring</strong><span><code>penalty.js</code> scores runs, blocks, finder-like sequences and dark/light imbalance to select the automatic mask.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"><strong>Shift JIS Kanji conversion</strong><span><code>kanji.js</code> builds the browser-supported Shift JIS map, validates the two QR Kanji ranges and transforms characters into 13-bit values.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/qr.test.js"><strong>Structural and capacity tests</strong><span><code>tests/qr.test.js</code> exercises versions, modes, capacities, masks, codewords and expected matrices.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"><strong>Reference parity harness</strong><span><code>tests/helpers/qr-parity.js</code> compares each split parity range against an optional node-qrcode reference bundle.</span></a>
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"
+            ><strong>Modos, anchuras de conteo y tablas de bloques</strong
+            ><span
+              ><code>constants.js</code> Define los indicadores de modo, el
+              alfabeto alfanumérico, las anchuras de conteo de caracteres, los
+              valores de formato de nivel EC, las palabras clave EC por bloque y
+              los conteos de bloques para las versiones 1-40.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment.js"
+            ><strong>Unidades de codificación</strong
+            ><span
+              ><code>segment.js</code> valida y convierte unidades numéricas,
+              alfanuméricas, UTF-8 Byte y Shift JIS Kanji en bits de carga
+              útil.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment-optimizer.js"
+            ><strong>Optimización de modo mixto</strong
+            ><span
+              ><code>segment-optimizer.js</code> Encuentra una secuencia de bajo
+              costo de segmentos numéricos, alfanuméricos y de bytes, incluyendo
+              cada modo repetido y encabezado de conteo.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"
+            ><strong>Versión y palabras clave de datos</strong
+            ><span
+              ><code>segments.js</code> Selecciona una versión adecuada y
+              escribe encabezados de segmentos, carga útil, terminador,
+              alineación de bytes y palabras de almohadilla alternas.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"
+            ><strong>Capacidad y geometría del residuo</strong
+            ><span
+              ><code>capacity.js</code> Calcula módulos de datos brutos,
+              anchuras de conteo de caracteres y palabras de código de datos
+              utilizables a partir de la versión, el nivel de recuperación y la
+              estructura del bloque.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/reed-solomon.js"
+            ><strong>Reed-Solomon y intersección</strong
+            ><span
+              ><code>reed-solomon.js</code> contiene multiplicación GF(256),
+              construcción de generador-divisor, generación de resto, división
+              de bloques cortos/largos e interposición de datos/EC.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/matrix-encoder.js"
+            ><strong>Matriz, metadatos y colocación</strong
+            ><span
+              ><code>matrix-encoder.js</code> Coloca patrones funcionales,
+              escribe metadatos protegidos por BCH, recorre los bits de la
+              palabra clave y produce cada candidato de máscara.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"
+            ><strong>Ocho fórmulas de mascarillas</strong
+            ><span
+              ><code>mask.js</code> Da el predicado exacto de fila/columna
+              utilizado por cada candidato a máscara.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/penalty.js"
+            ><strong>Puntuación de penalidades por mascarilla</strong
+            ><span
+              ><code>penalty.js</code> Puntuaciones de carreras, bloqueos,
+              secuencias similares a buscadores y desequilibrio oscuro/oscuro
+              para seleccionar la máscara automática.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"
+            ><strong>Conversión de Shift JIS Kanji</strong
+            ><span
+              ><code>kanji.js</code> Crea el mapa Shift JIS compatible con el
+              navegador, valida las dos rangos de Kanji QR y transforma los
+              caracteres en valores de 13 bits.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/qr.test.js"
+            ><strong>Pruebas estructurales y de capacidad</strong
+            ><span
+              ><code>tests/qr.test.js</code> Ejercicios de versiones, modos,
+              capacidades, máscaras, palabras clave y matrices esperadas.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"
+            ><strong>Cabo de paridad de referencia</strong
+            ><span
+              ><code>tests/helpers/qr-parity.js</code> Compara cada rango de
+              paridad de división con un paquete de referencia opcional de
+              código QR de nodo.</span
+            ></a
+          >
         </div>
 
         <div class="implementation-warning">
-          <strong>Not implemented by this encoder</strong>
-          <p>The current source targets standard Model 2 QR Codes in Numeric, Alphanumeric, Byte and manually selected Kanji modes. It is not an implementation reference for ECI segments, Structured Append, FNC1/GS1, Hanzi mode, Micro QR, Rectangular Micro QR, Model 1 symbols or QR decoding. Consult the applicable normative specification before claiming compatibility beyond the tested scope.</p>
+          <strong>No implementado por este codificador</strong>
+          <p>
+            La fuente actual tiene como objetivo los códigos QR estándar del
+            Modelo 2 en modos numéricos, alfanuméricos, de bytes y seleccionados
+            manualmente por Kanji. No es una referencia de implementación para
+            los segmentos ECI, Append Estructurado, FNC1/GS1, modo Hanzi, Micro
+            QR, Micro QR Rectangular, símbolos del Modelo 1 o decodificación de
+            QR. Consulte la especificación normativa aplicable antes de reclamar
+            compatibilidad más allá del alcance probado.
+          </p>
         </div>
       </section>
 
       <section id="references" class="guide-section references-section">
         <div class="section-intro">
-          <p class="section-number">Primary references</p>
-          <h2>Standards and implementation references</h2>
-          <p>This guide is explanatory, not a substitute for the normative standard. Exact block tables, count widths, mask penalties and encoding rules are implemented by the generator and tested against reference matrices.</p>
+          <p class="section-number">Referencias primarias</p>
+          <h2>Normas e referencias de implementación</h2>
+          <p>
+            Esta guía es explicativa, no es un sustituto del estándar normativo.
+            Las tablas de bloques exactas, las anchuras de conteo, las
+            penalizaciones por máscara y las reglas de codificación se
+            implementan por el generador y se prueban contra matrices de
+            referencia.
+          </p>
         </div>
         <div class="reference-links">
-          <a href="https://www.iso.org/standard/83389.html"><strong>ISO/IEC 18004:2024</strong><span>Normative QR Code symbology specification</span></a>
-          <a href="https://www.qrcode.com/en/about/standards.html"><strong>DENSO WAVE standards history</strong><span>QR Code development and standardization</span></a>
-          <a href="https://www.qrcode.com/en/howto/cell.html"><strong>DENSO module configuration</strong><span>Functional-pattern overview</span></a>
-          <a href="https://www.qrcode.com/en/about/error_correction.html"><strong>DENSO error correction</strong><span>Recovery levels and symbol capacity tradeoffs</span></a>
-          <a href="https://doi.org/10.1109/PGEC.1960.22230"><strong>Reed and Solomon, 1960</strong><span>Original error-correcting-code paper</span></a>
+          <a href="https://www.iso.org/standard/83389.html"
+            ><strong>ISO/IEC 18004:2024</strong
+            ><span
+              >Especificación de la simbología normativa del código QR</span
+            ></a
+          >
+          <a href="https://www.qrcode.com/en/about/standards.html"
+            ><strong>Historia de los estándares DENSO WAVE</strong
+            ><span>Desarrollo y estandarización del código QR</span></a
+          >
+          <a href="https://www.qrcode.com/en/howto/cell.html"
+            ><strong>Configuración del módulo DENSO</strong
+            ><span>Visión general del patrón funcional</span></a
+          >
+          <a href="https://www.qrcode.com/en/about/error_correction.html"
+            ><strong>Corrección de errores DENSO</strong
+            ><span
+              >Niveles de recuperación y compromisos de capacidad de
+              símbolo</span
+            ></a
+          >
+          <a href="https://doi.org/10.1109/PGEC.1960.22230"
+            ><strong>Reed y Solomon, 1960</strong
+            ><span>Papel original del código de corrección de errores</span></a
+          >
         </div>
       </section>
     </main>
 
     <footer class="spec-footer">
-      <span>QR Code Specification Visual Guide</span>
-      <nav aria-label="Guide footer"><a href="../index.html">Generator</a><a href="index.es.html">Guides</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#guide-title">Back to top</a></nav>
+      <span>Guía visual de especificaciones del código QR</span>
+      <nav aria-label="Pie de página del guía">
+        <a href="../index.html">Generador</a><a href="index.es.html">Guías</a
+        ><a href="https://git.lewismoten.com/lewismoten/qr">fuente</a
+        ><a href="#guide-title">Volver a la parte superior</a>
+      </nav>
     </footer>
     <script type="module" src="../dist/spec.min.js"></script>
   </body>

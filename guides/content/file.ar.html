@@ -1,12 +1,19 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-guide-locale="ar" data-locale-base="../../locales/">
+<html
+  lang="ar"
+  dir="rtl"
+  data-guide-locale="ar"
+  data-locale-base="../../locales/"
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File transfer QR codes | QR Code Generator</title>
+    <title>
+      رموز الاستجابة السريعة لنقل الملفات | مولد رمز الاستجابة السريعة
+    </title>
     <meta
       name="description"
-      content="Transfer files through data URLs, browser blob URLs, or verifiable multi-QR chunks."
+      content="نقل الملفات من خلال عناوين URL للبيانات أو عناوين URL للمتصفح أو قطع QR متعددة يمكن التحقق منها."
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../../favicon.ico" sizes="any" />
@@ -21,23 +28,23 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">QR Code Generator</p>
-            <h1>File transfer QR codes</h1>
+            <p class="info-kicker">مولد رمز الاستجابة السريعة</p>
+            <h1>رموز الاستجابة السريعة لنقل الملفات</h1>
           </div>
           <a
             class="info-page-back"
             href="../../index.html#tab=content&amp;subtab=data"
-            >Open in generator</a
+            >افتح في المولد</a
           >
         </header>
         <div class="info-dialog-content">
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Choose a file transport</h2>
+            <h2>اختر نقل ملف</h2>
             <p>
-              Data URLs place a small file in one QR code. Blob URLs refer to
-              browser memory and generally work only in the creating browser.
-              Chunked transfer divides larger files into an ordered, verifiable
-              set of QR codes.
+              تضع عناوين URL للبيانات ملفا صغيرا في رمز الاستجابة السريعة واحد.
+              تشير عناوين URL Blob إلى ذاكرة المتصفح وتعمل بشكل عام فقط في متصفح
+              الإنشاء. يقسم النقل المجزأ الملفات الأكبر حجما إلى مجموعة مرتبة
+              ويمكن التحقق منها من رموز الاستجابة السريعة.
             </p>
           </section>
           <fieldset
@@ -217,7 +224,7 @@
             </div>
             <div class="file-status-row">
               <p id="file-capacity-hint" class="hint file-capacity-hint">
-                Loaded 0 B of 0 B max (0%).
+                محملة 0 B من 0 B كحد أقصى (0٪).
               </p>
               <button
                 id="clear-file-button"
@@ -231,28 +238,28 @@
             </div>
           </fieldset>
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Chunk manifests and verification</h2>
+            <h2>بيانات القطعة والتحقق</h2>
             <p>
-              The FILE protocol identifies each transfer and byte range.
-              Optional manifests describe the file, while hashes detect missing
-              or modified data after every chunk is collected. Compression can
-              reduce the number of QR codes without changing the restored file.
+              يحدد بروتوكول FILE كل نطاق نقل وبايت. تصف البيانات الاختيارية
+              الملف، في حين تكتشف التجزئة البيانات المفقودة أو المعدلة بعد جمع
+              كل جزء. يمكن للضغط تقليل عدد رموز الاستجابة السريعة دون تغيير
+              الملف المستعادة.
             </p>
           </section>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="Guide page navigation">
+          <span>مولد رمز الاستجابة السريعة</span>
+          <nav aria-label="التنقل في صفحة الدليل">
             <a href="../../index.html#tab=content&amp;subtab=data"
-              >Open this tool</a
+              >افتح هذه الأداة</a
             >
-            <a href="../about.ar.html">About</a>
-            <a href="../index.ar.html">Guides</a>
-            <a href="../../privacy.html">Privacy</a>
+            <a href="../about.ar.html">عَنْ</a>
+            <a href="../index.ar.html">مرشدون</a>
+            <a href="../../privacy.html">خُصوصيّة</a>
           </nav>
         </footer>
       </article>
     </main>
-      <script type="module" src="../../dist/info.min.js"></script>
+    <script type="module" src="../../dist/info.min.js"></script>
   </body>
 </html>

@@ -3,6 +3,35 @@ import path from 'node:path';
 
 const [locale, inputFile, outputFile] = process.argv.slice(2);
 
+const overrides = {
+  ar: {
+    Generator: 'المولد',
+    'Open generator': 'فتح المولد',
+  },
+  es: {
+    Generator: 'Generador',
+    'Open generator': 'Abrir generador',
+  },
+  'hi-IN': {
+    Generator: 'जनरेटर',
+    'Open generator': 'जनरेटर खोलें',
+  },
+  'zh-CN': {
+    Generator: '生成器',
+    'Open generator': '打开生成器',
+  },
+};
+
+function normalizeTranslation(source, translated) {
+  const overridden = overrides[locale]?.[source] ?? translated;
+  if (locale !== 'zh-CN') return overridden;
+  return overridden
+    .replaceAll('发电机', '生成器')
+    .replaceAll('口罩', '掩模')
+    .replaceAll('代码字', '码字')
+    .replaceAll('代码单词', '码字');
+}
+
 if (!locale || !inputFile || !outputFile) {
   throw new Error(
     'Usage: cache-guide-translations.mjs <locale> <input> <output>',
@@ -23,7 +52,7 @@ const translations = Object.fromEntries(
     if (!translated) {
       throw new Error(`Empty translation for ${locale}: ${value}`);
     }
-    return [value, translated];
+    return [value, normalizeTranslation(value, translated)];
   }),
 );
 

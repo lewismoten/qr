@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File transfer QR codes | QR Code Generator</title>
+    <title>文件传输二维码 | 二维码生成器</title>
     <meta
       name="description"
-      content="Transfer files through data URLs, browser blob URLs, or verifiable multi-QR chunks."
+      content="通过数据URL、浏览器块URL或可验证的多二维码块传输文件。"
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../../favicon.ico" sizes="any" />
@@ -21,23 +21,20 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">QR Code Generator</p>
-            <h1>File transfer QR codes</h1>
+            <p class="info-kicker">二维码生成器</p>
+            <h1>文件传输二维码</h1>
           </div>
           <a
             class="info-page-back"
             href="../../index.html#tab=content&amp;subtab=data"
-            >Open in generator</a
+            >在生成器中打开</a
           >
         </header>
         <div class="info-dialog-content">
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Choose a file transport</h2>
+            <h2>选择文件传输方式</h2>
             <p>
-              Data URLs place a small file in one QR code. Blob URLs refer to
-              browser memory and generally work only in the creating browser.
-              Chunked transfer divides larger files into an ordered, verifiable
-              set of QR codes.
+              数据URL将一个小型文件放在一个二维码中。块URL指的是浏览器内存，通常仅在创建浏览器中有效。分块传输将较大的文件分成一个有序、可验证的二维码集。
             </p>
           </section>
           <fieldset
@@ -217,7 +214,7 @@
             </div>
             <div class="file-status-row">
               <p id="file-capacity-hint" class="hint file-capacity-hint">
-                Loaded 0 B of 0 B max (0%).
+                加载0 B，总容量为0 B（0%）。
               </p>
               <button
                 id="clear-file-button"
@@ -231,28 +228,25 @@
             </div>
           </fieldset>
           <section class="fragment-help-copy" data-fragment-help>
-            <h2>Chunk manifests and verification</h2>
+            <h2>块的显示和验证</h2>
             <p>
-              The FILE protocol identifies each transfer and byte range.
-              Optional manifests describe the file, while hashes detect missing
-              or modified data after every chunk is collected. Compression can
-              reduce the number of QR codes without changing the restored file.
+              FILE协议识别每个传输和字节范围。可选的摘要文件描述了文件，而哈希值在收集每个片段后检测到缺失或修改的数据。压缩可以减少二维码的数量，而不会改变恢复后的文件。
             </p>
           </section>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="Guide page navigation">
+          <span>二维码生成器</span>
+          <nav aria-label="指南页面导航">
             <a href="../../index.html#tab=content&amp;subtab=data"
-              >Open this tool</a
+              >打开这个工具</a
             >
-            <a href="../about.zh-CN.html">About</a>
-            <a href="../index.zh-CN.html">Guides</a>
-            <a href="../../privacy.html">Privacy</a>
+            <a href="../about.zh-CN.html">关于</a>
+            <a href="../index.zh-CN.html">指南</a>
+            <a href="../../privacy.html">隐居</a>
           </nav>
         </footer>
       </article>
     </main>
-      <script type="module" src="../../dist/info.min.js"></script>
+    <script type="module" src="../../dist/info.min.js"></script>
   </body>
 </html>

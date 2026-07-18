@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { format } from 'prettier';
 
 import {
   loadGuideTranslations,
@@ -100,6 +101,11 @@ export async function generateLocalizedGuides() {
             `${locale} is missing ${missing.size} guide translations.`,
           );
         }
+        source = await format(source, {
+          parser: 'html',
+          printWidth: 80,
+          singleQuote: true,
+        });
         await writeFile(localizedFile(file, locale), source);
       }),
     ),

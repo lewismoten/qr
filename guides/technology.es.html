@@ -3,183 +3,702 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Generator Technology, Standards and Licenses</title>
-    <meta name="description" content="Technology, standards, formats, browser APIs, algorithms, services, patents and licenses used by the QR Code Generator." />
+    <title>Tecnología, normas y licencias de generación de códigos QR</title>
+    <meta
+      name="description"
+      content="Tecnología, estándares, formatos, API de navegadores, algoritmos, servicios, patentes y licencias utilizadas por el Generador de Códigos QR."
+    />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
     <link
       rel="canonical"
       href="https://qr.lewismoten.com/guides/technology.es.html"
     />
-    <script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('is-embedded');</script>
+    <script>
+      if (new URLSearchParams(location.search).has('embed'))
+        document.documentElement.classList.add('is-embedded');
+    </script>
     <link rel="stylesheet" href="../dist/app.min.css" />
   </head>
   <body class="info-page-body">
     <main class="standalone-info-page">
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
-          <div><p class="info-kicker">Technology inventory</p><h1 id="technology-page-title">Technology, standards and licenses</h1></div>
-          <a class="info-page-back" href="../index.html">Open generator</a>
+          <div>
+            <p class="info-kicker">Inventario de tecnología</p>
+            <h1 id="technology-page-title">
+              Tecnología, estándares y licencias
+            </h1>
+          </div>
+          <a class="info-page-back" href="../index.html">Abrir generador</a>
         </header>
         <div class="info-dialog-content">
-          <p id="technology-page-content" class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, development tools and network services used by this application.</p>
+          <p id="technology-page-content" class="info-lead">
+            Un inventario transparente de módulos de primera parte,
+            características de la plataforma del navegador, estándares,
+            patentes, herramientas de desarrollo y servicios de red utilizados
+            por esta aplicación.
+          </p>
 
           <section>
-            <h2>First-party QR implementation</h2>
+            <h2>Implementación de QR de primera parte</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>Project source</h3><span class="version-badge">Canonical repository</span></div>
-                <p>The first-party application and QR encoder source is hosted by Lewis Moten at <code>git.lewismoten.com</code>. The browser URL is intended for reading the project; the <code>.git</code> URL is the canonical HTTPS clone endpoint.</p>
-                <nav aria-label="Project source links"><a href="https://git.lewismoten.com/lewismoten/qr">Browse repository</a><a href="https://git.lewismoten.com/lewismoten/qr.git">HTTPS clone URL</a></nav>
+                <div>
+                  <h3>Fuente del proyecto</h3>
+                  <span class="version-badge">Repositorio canónico</span>
+                </div>
+                <p>
+                  La aplicación de primera parte y la fuente del encodificador
+                  QR están alojadas por Lewis Moten en
+                  <code>git.lewismoten.com</code>. URL del navegador está
+                  destinada a leer el proyecto; el <code>.git</code> La URL es
+                  el extremo de clonación HTTPS canónico.
+                </p>
+                <nav aria-label="Enlaces de la fuente del proyecto">
+                  <a href="https://git.lewismoten.com/lewismoten/qr"
+                    >Buscar en el repositorio</a
+                  ><a href="https://git.lewismoten.com/lewismoten/qr.git"
+                    >URL de clonación HTTPS</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Native QR encoder</h3><span class="version-badge">First-party</span></div>
-                <p>Implements mixed-mode segmentation, Numeric, Alphanumeric, UTF-8 Byte and Shift JIS Kanji data, versions 1-40, Reed-Solomon correction, interleaving, functional patterns, masking and matrix placement. The implementation is local; the QR symbol itself follows ISO/IEC 18004.</p>
-                <nav aria-label="Native QR encoder references"><a href="https://www.iso.org/standard/83389.html">ISO/IEC 18004:2024</a><a href="https://www.qrcode.com/en/about/standards.html">DENSO QR standards</a><a href="https://www.qrcode.com/en/patent.html">Patent and trademark policy</a><a href="https://encoding.spec.whatwg.org/">WHATWG Encoding</a></nav>
+                <div>
+                  <h3>Encodador QR nativo</h3>
+                  <span class="version-badge">Parte primera</span>
+                </div>
+                <p>
+                  Implanta segmentación de modo mixto, datos numéricos,
+                  alfanuméricos, UTF-8 Byte y Shift JIS Kanji, versiones 1-40,
+                  corrección Reed-Solomon, interposición, patrones funcionales,
+                  ocultación y colocación de matrices. La implementación es
+                  local; el propio símbolo QR sigue la ISO/IEC 18004.
+                </p>
+                <nav aria-label="Referencias del encodificador QR nativo">
+                  <a href="https://www.iso.org/standard/83389.html"
+                    >ISO/IEC 18004:2024</a
+                  ><a href="https://www.qrcode.com/en/about/standards.html"
+                    >Normas QR de DENSO</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes y marcas comerciales</a
+                  ><a href="https://encoding.spec.whatwg.org/"
+                    >Codificación WHATWG</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>QR debugger and renderer</h3><span class="version-badge">First-party</span></div>
-                <p>Draws styled modules, finder eyes, paths, codeword boundaries, metadata regions and unmasked data directly to Canvas. DENSO WAVE states that its patent rights are not exercised against standardized QR Codes; QR Code is also a registered trademark of DENSO WAVE.</p>
-                <nav aria-label="QR renderer references"><a href="https://html.spec.whatwg.org/multipage/canvas.html">HTML Canvas</a><a href="https://www.qrcode.com/en/about/standards.html">QR standards history</a><a href="https://www.qrcode.com/en/patent.html">DENSO patent policy</a></nav>
+                <div>
+                  <h3>Desarrollador y renderizador de errores QR</h3>
+                  <span class="version-badge">Parte primera</span>
+                </div>
+                <p>
+                  Dibuja módulos estilizados, ojos de búsqueda, rutas, límites
+                  de palabras clave, regiones de metadatos y datos sin máscara
+                  directamente en Canvas. DENSO WAVE afirma que sus derechos de
+                  patente no se ejercen contra códigos QR estandarizados; el
+                  código QR también es una marca registrada de DENSO WAVE.
+                </p>
+                <nav aria-label="Referencias del renderizador QR">
+                  <a href="https://html.spec.whatwg.org/multipage/canvas.html"
+                    >Pintoría HTML</a
+                  ><a href="https://www.qrcode.com/en/about/standards.html"
+                    >Historia de los estándares QR</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes de DENSO</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Reed-Solomon error correction</h3><span class="version-badge">First-party algorithm</span></div>
-                <p>Generates QR error-correction codewords over GF(256), splits them into the block structure required by the selected QR version and recovery level, and interleaves them with data codewords. Reed-Solomon is an error-correcting-code family, not a bundled software library, so it has no separate software license here; this implementation is part of the repository's first-party source. The original code family was published by Irving Reed and Gustave Solomon in 1960, while the exact QR parameters are governed by ISO/IEC 18004. Later specialized Reed-Solomon implementation and decoding techniques have had their own patents, so this inventory should not be read as a general patent-clearance opinion.</p>
-                <nav aria-label="Reed-Solomon references"><a href="https://doi.org/10.1109/PGEC.1960.22230">Original 1960 paper</a><a href="https://www.iso.org/standard/83389.html">QR error-correction specification</a><a href="https://patents.google.com/?q=(Reed-Solomon)">Related patent records</a><a href="https://www.qrcode.com/en/patent.html">DENSO QR patent policy</a></nav>
+                <div>
+                  <h3>Corrección de errores de Reed-Solomon</h3>
+                  <span class="version-badge">Algoritmo de primera parte</span>
+                </div>
+                <p>
+                  Genera palabras de código de corrección de errores QR sobre
+                  GF(256), las divide en la estructura de bloque requerida por
+                  la versión QR seleccionada y el nivel de recuperación, e
+                  intercala con palabras de código de datos. Reed-Solomon es una
+                  familia de códigos de corrección de errores, no una biblioteca
+                  de software empaquetada, por lo que no tiene licencia de
+                  software separada aquí; esta implementación es parte de la
+                  fuente de primera parte del repositorio. La familia de código
+                  original fue publicada por Irving Reed y Gustave Solomon en
+                  1960, mientras que los parámetros exactos del QR están
+                  regulados por ISO/IEC 18004. Posteriormente, las técnicas
+                  especializadas de implementación y descodificación de
+                  Reed-Solomon han tenido sus propios patentes, por lo que este
+                  inventario no debe interpretarse como una opinión general de
+                  aprobación de patentes.
+                </p>
+                <nav aria-label="Referencias de Reed-Solomon">
+                  <a href="https://doi.org/10.1109/PGEC.1960.22230"
+                    >Papel original de 1960</a
+                  ><a href="https://www.iso.org/standard/83389.html"
+                    >Especificación de corrección de errores de QR</a
+                  ><a href="https://patents.google.com/?q=(Reed-Solomon)"
+                    >Registros de patentes relacionados</a
+                  ><a href="https://www.qrcode.com/en/patent.html"
+                    >Política de patentes QR de DENSO</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Payload and transfer formats</h2>
+            <h2>Formatos de carga útil y transferencia</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>Raw text, numbers, URLs and data URLs</h3><span class="version-badge">QR text payloads</span></div>
-                <p>Text and number formats place their resulting characters directly into one or more QR data segments without an additional wrapper. Website codes carry an absolute HTTP or HTTPS URL. Single-file Data mode uses a <code>data:</code> URL with standard Base64, while the first-party chunk protocol uses unpadded Base64url for compact binary transport.</p>
-                <nav aria-label="Raw payload references"><a href="https://www.rfc-editor.org/info/rfc3986">RFC 3986 URI syntax</a><a href="https://www.rfc-editor.org/info/rfc2397">RFC 2397 data URLs</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64 and Base64url</a></nav>
+                <div>
+                  <h3>Texto bruto, números, URL y URL de datos</h3>
+                  <span class="version-badge">Peso de carga de texto QR</span>
+                </div>
+                <p>
+                  Los formatos de texto y número colocan sus caracteres
+                  resultantes directamente en uno o más segmentos de datos QR
+                  sin un envoltorio adicional. Los códigos de sitios web llevan
+                  una URL HTTP o HTTPS absoluta. El modo de datos de archivo
+                  único utiliza un <code>data:</code> URL con Base64 estándar,
+                  mientras que el protocolo de trozos de primera parte utiliza
+                  Base64url sin puntuación para el transporte binario compacto.
+                </p>
+                <nav aria-label="Referencias de carga útil bruta">
+                  <a href="https://www.rfc-editor.org/info/rfc3986"
+                    >Sintaxis URI RFC 3986</a
+                  ><a href="https://www.rfc-editor.org/info/rfc2397"
+                    >URL de datos RFC 2397</a
+                  ><a href="https://www.rfc-editor.org/info/rfc4648"
+                    >RFC 4648 Base64 y Base64url</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Contacts and calendar events</h3><span class="version-badge">IETF formats</span></div>
-                <p>Contact codes use a deliberately small vCard 3.0-style subset containing <code>FN</code> and optional organization, title, telephone, email and URL properties. It targets common scanner behavior but does not implement every RFC 2426 escaping, folding or property rule; RFC 6350 defines the newer vCard 4.0 format. Calendar codes are iCalendar 2.0 objects containing a <code>VEVENT</code>, UID, timestamp, dates or floating local date-times, summary and optional details under RFC 5545. These are text payload conventions, not alternate QR symbol types.</p>
-                <nav aria-label="Contact and calendar format references"><a href="https://www.rfc-editor.org/info/rfc2426">RFC 2426 vCard 3.0</a><a href="https://www.rfc-editor.org/info/rfc6350">RFC 6350 vCard 4.0</a><a href="https://www.rfc-editor.org/info/rfc5545">RFC 5545 iCalendar</a></nav>
+                <div>
+                  <h3>Contactos y eventos del calendario</h3>
+                  <span class="version-badge">Formatos IETF</span>
+                </div>
+                <p>
+                  Los códigos de contacto utilizan un subconjunto
+                  deliberadamente pequeño al estilo vCard 3.0 que contiene
+                  <code>FN</code> Y propiedades de organización, título,
+                  teléfono, correo electrónico y URL opcionales. Se dirige al
+                  comportamiento común de los escáneres, pero no implementa
+                  todas las reglas de escapamiento, plegado o propiedad de RFC
+                  2426; RFC 6350 define el formato más reciente de vCard 4.0.
+                  Los códigos de calendario son objetos iCalendar 2.0 que
+                  contienen un <code>VEVENT</code>, UID, hora y fecha, fechas o
+                  fechas y horas locales flotantes, resumen y detalles
+                  opcionales según RFC 5545. Estas son convenciones de carga
+                  útil de texto, no tipos alternativos de símbolos QR.
+                </p>
+                <nav
+                  aria-label="Contactos y referencias de formato de calendario"
+                >
+                  <a href="https://www.rfc-editor.org/info/rfc2426"
+                    >RFC 2426 vCard 3.0</a
+                  ><a href="https://www.rfc-editor.org/info/rfc6350"
+                    >RFC 6350 vCard 4.0</a
+                  ><a href="https://www.rfc-editor.org/info/rfc5545"
+                    >RFC 5545 iCalendar</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Web, email, phone and location</h3><span class="version-badge">URI standards</span></div>
-                <p>Email uses the <code>mailto:</code> URI scheme, phone numbers use <code>tel:</code>, and geographic coordinates use <code>geo:</code> with WGS 84 latitude and longitude. A Geo label is added through the commonly recognized <code>q</code> query convention rather than a dedicated RFC 5870 label field. Recognition and the action offered after scanning still depend on the receiving application.</p>
-                <nav aria-label="Payload URI references"><a href="https://www.rfc-editor.org/info/rfc3986">RFC 3986 URI syntax</a><a href="https://www.rfc-editor.org/info/rfc6068">RFC 6068 mailto</a><a href="https://www.rfc-editor.org/info/rfc3966">RFC 3966 tel</a><a href="https://www.rfc-editor.org/info/rfc5870">RFC 5870 geo</a></nav>
+                <div>
+                  <h3>Página web, correo electrónico, teléfono y ubicación</h3>
+                  <span class="version-badge">Normas URI</span>
+                </div>
+                <p>
+                  El correo electrónico utiliza el
+                  <code>mailto:</code> Estructura URI, uso de números de
+                  teléfono <code>tel:</code>, y uso de coordenadas geográficas
+                  <code>geo:</code> Con latitud y longitud WGS 84. Se agrega una
+                  etiqueta Geo a través del comúnmente reconocido
+                  <code>q</code> Consulta la convención en lugar de un campo de
+                  etiqueta RFC 5870 dedicado. El reconocimiento y la acción
+                  ofrecida después de la escaneo todavía dependen de la
+                  aplicación receptora.
+                </p>
+                <nav aria-label="Referencias URI de la carga útil">
+                  <a href="https://www.rfc-editor.org/info/rfc3986"
+                    >Sintaxis URI RFC 3986</a
+                  ><a href="https://www.rfc-editor.org/info/rfc6068"
+                    >RFC 6068 mailto</a
+                  ><a href="https://www.rfc-editor.org/info/rfc3966"
+                    >RFC 3966 tel</a
+                  ><a href="https://www.rfc-editor.org/info/rfc5870"
+                    >RFC 5870 geo</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Wi-Fi and SMS scanner payloads</h3><span class="version-badge">De facto conventions</span></div>
-                <p>Wi-Fi credentials use the widely implemented <code>WIFI:T:...;S:...;P:...;;</code> text convention cataloged by ZXing, including escaping and the hidden-network flag. SMS uses the commonly recognized <code>SMSTO:</code> form. Neither wrapper is defined by ISO/IEC 18004 or by an IETF QR payload standard, and scanner support can vary by platform.</p>
-                <nav aria-label="Scanner payload convention references"><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11">ZXing Wi-Fi convention</a><a href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime">ZXing messaging conventions</a></nav>
+                <div>
+                  <h3>Carga útil del escáner de Wi-Fi y SMS</h3>
+                  <span class="version-badge">Convenciones de facto</span>
+                </div>
+                <p>
+                  Las credenciales de Wi-Fi utilizan el ampliamente implementado
+                  <code>WIFI:T:...;S:...;P:...;;</code> código de texto
+                  catalogado por ZXing, incluyendo escape y la bandera de red
+                  oculta. El SMS utiliza el comúnmente reconocido
+                  <code>SMSTO:</code> Formulario. Ninguna de las envolturas está
+                  definida por ISO/IEC 18004 ni por un estándar de carga útil QR
+                  de IETF, y el soporte del escáner puede variar según la
+                  plataforma.
+                </p>
+                <nav
+                  aria-label="Referencias de la convención de carga útil del escáner"
+                >
+                  <a
+                    href="https://github.com/zxing/zxing/wiki/Barcode-Contents#wi-fi-network-config-android-ios-11"
+                    >Conferencia ZXing Wi-Fi</a
+                  ><a
+                    href="https://github.com/zxing/zxing/wiki/Barcode-Contents#smsmmsfacetime"
+                    >Convenciones de mensajería ZXing</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Comma-separated values (CSV)</h3><span class="version-badge">RFC 4180-style</span></div>
-                <p>Bulk Import uses a first-party CSV parser modeled on the common format documented by RFC 4180 and the registered <code>text/csv</code> media type; RFC 4180 is informational rather than an Internet Standard. Files are read as UTF-8 and use commas, a required format-specific header row, optional quoted fields, doubled quotes for embedded quote characters, and CRLF, LF or CR record endings. Quoted fields may contain commas and line breaks. Blank header cells cause their columns to be ignored, fully blank data rows are ignored, and imports are limited to 5 MiB and 10,000 populated rows. No third-party CSV parser is bundled.</p>
-                <nav aria-label="CSV references"><a href="https://www.rfc-editor.org/info/rfc4180">RFC 4180 CSV format</a><a href="https://www.iana.org/assignments/media-types/text/csv">IANA text/csv registration</a><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text">File API Blob.text()</a></nav>
+                <div>
+                  <h3>Valores separados por coma (CSV)</h3>
+                  <span class="version-badge">Estilo RFC 4180</span>
+                </div>
+                <p>
+                  Importación en masa utiliza un parser CSV de primera parte
+                  modelado en el formato común documentado por RFC 4180 y el
+                  registrado <code>text/csv</code> Tipo de medio; RFC 4180 es
+                  informativo en lugar de un estándar de Internet. Los archivos
+                  se leen como UTF-8 y utilizan comas, una fila de encabezado
+                  específica del formato requerida, campos entre comillas
+                  opcionales, comillas dobles para caracteres de cita
+                  incrustados y terminaciones de registro CRLF, LF o CR. Los
+                  campos entre comillas pueden contener comas y saltos de línea.
+                  Las celdas de encabezado en blanco hacen que sus columnas sean
+                  ignoradas, las filas de datos completamente en blanco son
+                  ignoradas y las importaciones están limitadas a 5 MiB y 10.000
+                  filas pobladas. No se incluye un parser CSV de terceros.
+                </p>
+                <nav aria-label="Referencias CSV">
+                  <a href="https://www.rfc-editor.org/info/rfc4180"
+                    >Formato CSV RFC 4180</a
+                  ><a
+                    href="https://www.iana.org/assignments/media-types/text/csv"
+                    >Registro de texto/csv IANA</a
+                  ><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text"
+                    >Archivo API Blob.text()</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>FILE:1 binary transport</h3><span class="version-badge">First-party protocol</span></div>
-                <p>The application-defined <code>FILE:1</code> format carries a single file or random-order chunks. Its readable header identifies single/chunk mode, manifest presence, a 128-bit random transfer ID encoded as 22 Base64url characters, extension hint, byte offset and total transfer length. An optional typed manifest can include filename, MIME type, modified time, original size, JSON metadata and SHA-256 validation; a flag records optional gzip transfer encoding. This is not an ISO, IETF or established scanner standard, so receiving it requires compatible software.</p>
-                <nav aria-label="FILE protocol references"><a href="../README.md#file-chunked-transport">Protocol documentation</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64url</a><a href="https://www.rfc-editor.org/info/rfc8259">RFC 8259 JSON</a><a href="https://www.rfc-editor.org/info/rfc1952">RFC 1952 gzip</a></nav>
+                <div>
+                  <h3>ARCHIVO: 1 transporte binario</h3>
+                  <span class="version-badge">Protocolo de primera parte</span>
+                </div>
+                <p>
+                  Definido por la aplicación <code>FILE:1</code> El formato
+                  lleva un solo archivo o trozos en orden aleatorio. Su
+                  encabezado legible identifica el modo de solo archivo/trozos,
+                  la presencia del manifiesto, un ID de transferencia aleatorio
+                  de 128 bits codificado como 22 caracteres Base64url, una pista
+                  de extensión, el desplazamiento de bytes y la longitud total
+                  de la transferencia. Un manifiesto opcional escrito a mano
+                  puede incluir el nombre del archivo, el tipo MIME, la hora
+                  modificada, el tamaño original, los metadatos JSON y la
+                  validación SHA-256; una bandera registra la codificación
+                  opcional de transferencia gzip. Este no es un estándar de
+                  escáner ISO, IETF o establecido, por lo que su recepción
+                  requiere un software compatible.
+                </p>
+                <nav aria-label="Referencias de protocolos de archivos">
+                  <a href="../README.md#file-chunked-transport"
+                    >Documentación del protocolo</a
+                  ><a href="https://www.rfc-editor.org/info/rfc4648"
+                    >RFC 4648 Base64url</a
+                  ><a href="https://www.rfc-editor.org/info/rfc8259"
+                    >RFC 8259 JSON</a
+                  ><a href="https://www.rfc-editor.org/info/rfc1952"
+                    >RFC 1952 gzip</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Built-in export formats</h2>
+            <h2>Formatos de exportación integrados</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>Raster and vector images</h3><span class="version-badge">First-party + Canvas</span></div>
-                <p>PNG and JPEG use the browser's canvas encoders: PNG preserves lossless pixels and transparency, while JPEG is lossy, honors the selected quality, and flattens transparency onto white. The first-party GIF89a encoder quantizes colors to a fixed 216-color RGB cube plus transparency and writes a valid, literal-oriented Lempel-Ziv-Welch (LZW) image stream; it favors a small implementation over strong compression. Animated GIFs use the Netscape looping extension, loop continuously, and express frame delays in hundredths of a second. SVG export traces the final raster canvas into merged same-color rectangular paths, including rasterized text and artwork, rather than retaining semantic text or using an SVG library.</p>
-                <nav aria-label="Image format references"><a href="https://www.w3.org/TR/png-3/">PNG specification</a><a href="https://jpeg.org/jpeg/">JPEG information</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.gnu.org/philosophy/gif.html">GIF/LZW patent history</a><a href="https://www.w3.org/TR/SVG2/">SVG 2</a></nav>
+                <div>
+                  <h3>Imágenes raster y vectoriales</h3>
+                  <span class="version-badge">Primer partido + Canvas</span>
+                </div>
+                <p>
+                  PNG y JPEG utilizan los codificadores de lienzo del navegador:
+                  PNG preserva los píxeles sin pérdida y la transparencia,
+                  mientras que JPEG es de pérdida, honra la calidad seleccionada
+                  y aplana la transparencia sobre el blanco. El codificador
+                  GIF89a de primera parte cuantifica los colores a un cubo RGB
+                  fijo de 216 colores más la transparencia y escribe un flujo de
+                  imagen Lempel-Ziv-Welch (LZW) válido y orientado a la
+                  literalidad; favorece una pequeña implementación sobre una
+                  compresión fuerte. Los GIF animados utilizan la extensión de
+                  bucle de Netscape, bucle continuamente y expresan los retrasos
+                  de fotograma en centésimas de segundo. La exportación SVG
+                  rastrea el lienzo raster final en rutas rectangulares de mismo
+                  color fusionadas, incluyendo texto y obras de arte
+                  rasterizadas, en lugar de retener texto semántico o utilizar
+                  una biblioteca SVG.
+                </p>
+                <nav aria-label="Referencias de formato de imagen">
+                  <a href="https://www.w3.org/TR/png-3/">Especificación PNG</a
+                  ><a href="https://jpeg.org/jpeg/">Información JPEG</a
+                  ><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+                    >Especificación GIF89a</a
+                  ><a href="https://www.gnu.org/philosophy/gif.html"
+                    >Historia de patentes de GIF/LZW</a
+                  ><a href="https://www.w3.org/TR/SVG2/">SVG 2</a>
+                </nav>
               </article>
               <article>
-                <div><h3>PDF documents</h3><span class="version-badge">PDF 1.4 + JPEG</span></div>
-                <p>The first-party PDF writer embeds each QR image as an 8-bit RGB JPEG image using PDF's <code>DCTDecode</code> filter. Transparency is flattened onto white and the selected JPEG quality applies, so PDF image content is lossy even when the source canvas is not. A current-image PDF uses the selected printed width; multi-image documents arrange frames on US Letter pages with half-inch margins.</p>
-                <nav aria-label="PDF references"><a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.4.pdf">PDF 1.4 reference</a><a href="https://www.iso.org/standard/75839.html">ISO 32000-2 PDF</a><a href="https://jpeg.org/jpeg/">JPEG information</a></nav>
+                <div>
+                  <h3>Documentos PDF</h3>
+                  <span class="version-badge">PDF 1.4 + JPEG</span>
+                </div>
+                <p>
+                  El escritor de PDF de primera parte incorpora cada imagen QR
+                  como una imagen JPEG RGB de 8 bits utilizando los PDF.
+                  <code>DCTDecode</code> Filtro. La transparencia se aplasta
+                  sobre el blanco y se aplica la calidad JPEG seleccionada, por
+                  lo que el contenido de la imagen PDF es de pérdida incluso
+                  cuando la lienzo de origen no lo es. Un PDF de imagen actual
+                  utiliza la anchura impresa seleccionada; los documentos de
+                  múltiples imágenes organizan los marcos en páginas US Letter
+                  con márgenes de medio pulgada.
+                </p>
+                <nav aria-label="Referencias en PDF">
+                  <a
+                    href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.4.pdf"
+                    >Referencia PDF 1.4</a
+                  ><a href="https://www.iso.org/standard/75839.html"
+                    >ISO 32000-2 PDF</a
+                  ><a href="https://jpeg.org/jpeg/">Información JPEG</a>
+                </nav>
               </article>
               <article>
-                <div><h3>ZIP archives</h3><span class="version-badge">ZIP 2.0 stored entries</span></div>
-                <p>The first-party ZIP writer creates local headers, a central directory and UTF-8 file names. Entries deliberately use compression method 0, so the archive is a broadly compatible container with no ZIP-level compression. Each local and central-directory entry includes the CRC-32 checksum described below.</p>
-                <nav aria-label="ZIP references"><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
+                <div>
+                  <h3>Archivos ZIP</h3>
+                  <span class="version-badge"
+                    >Entradas almacenadas ZIP 2.0</span
+                  >
+                </div>
+                <p>
+                  El escritor ZIP de primera parte crea encabezados locales, un
+                  directorio central y nombres de archivos UTF-8. Las entradas
+                  utilizan deliberadamente el método de compresión 0, por lo que
+                  el archivo es un contenedor ampliamente compatible sin
+                  compresión a nivel ZIP. Cada entrada local y del directorio
+                  central incluye el cómputo de verificación CRC-32 descrito a
+                  continuación.
+                </p>
+                <nav aria-label="Referencias ZIP">
+                  <a href="https://support.pkware.com/pkzip/appnote"
+                    >NOTA DE APLICACIÓN ZIP PKWARE</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>CRC-32 checksums</h3><span class="version-badge">First-party</span></div>
-                <p>ZIP integrity fields use a directly implemented, table-driven CRC-32 with the reflected <code>0xEDB88320</code> polynomial and standard initial and final XOR values. CRC-32 detects common accidental transmission or storage errors, but it is not collision-resistant and must not be treated as a cryptographic hash, digital signature or proof of authenticity.</p>
-                <nav aria-label="CRC-32 references"><a href="https://www.rfc-editor.org/rfc/rfc1952#section-8">RFC 1952 CRC sample</a><a href="https://support.pkware.com/pkzip/appnote">PKWARE ZIP APPNOTE</a></nav>
+                <div>
+                  <h3>Suma de verificación CRC-32</h3>
+                  <span class="version-badge">Parte primera</span>
+                </div>
+                <p>
+                  Los campos de integridad ZIP utilizan un CRC-32 basado en
+                  tablas implementado directamente con el reflejado
+                  <code>0xEDB88320</code> Valores iniciales y finales XOR
+                  polinómicos y estándar. CRC-32 detecta errores comunes de
+                  transmisión o almacenamiento accidentales, pero no es
+                  resistente a colisiones y no debe tratarse como un hash
+                  criptográfico, firma digital o prueba de autenticidad.
+                </p>
+                <nav aria-label="Referencias CRC-32">
+                  <a href="https://www.rfc-editor.org/rfc/rfc1952#section-8"
+                    >Muestra de CRC RFC 1952</a
+                  ><a href="https://support.pkware.com/pkzip/appnote"
+                    >NOTA DE APLICACIÓN ZIP PKWARE</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Browser platform features</h2>
+            <h2>Funciones de la plataforma del navegador</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>HTML, CSS, JavaScript and text encoding</h3><span class="version-badge">Web platform</span></div>
-                <p>The interface uses native HTML forms and dialogs, CSS layout and media queries, Canvas 2D drawing, ECMAScript modules on hosted pages, and a bundled fallback for <code>file:</code> use. <code>TextEncoder</code> produces UTF-8 bytes throughout the encoder and export code. Opt-in Kanji mode builds its Shift JIS mapping with the browser's <code>TextDecoder</code>; it reports an error when that encoding is unavailable.</p>
-                <nav aria-label="Web platform foundation references"><a href="https://html.spec.whatwg.org/">HTML Living Standard</a><a href="https://tc39.es/ecma262/">ECMAScript</a><a href="https://html.spec.whatwg.org/multipage/canvas.html">Canvas 2D</a><a href="https://encoding.spec.whatwg.org/">WHATWG Encoding</a></nav>
+                <div>
+                  <h3>HTML, CSS, JavaScript y codificación de texto</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La interfaz utiliza formularios y dialogos HTML nativos,
+                  diseño CSS y consultas de medios, dibujo 2D de Canvas, módulos
+                  ECMAScript en páginas alojadas y una solución alternativa
+                  incluida para <code>file:</code> Usar.
+                  <code>TextEncoder</code> Produce bytes UTF-8 a lo largo del
+                  codificador y el código de exportación. El modo Kanji opcional
+                  construye su mapeo Shift JIS con el del navegador
+                  <code>TextDecoder</code>; informa de un error cuando esa
+                  codificación no está disponible.
+                </p>
+                <nav
+                  aria-label="Referencias de la fundación de la plataforma web"
+                >
+                  <a href="https://html.spec.whatwg.org/">Nivel de vida HTML</a
+                  ><a href="https://tc39.es/ecma262/">ECMAScript</a
+                  ><a href="https://html.spec.whatwg.org/multipage/canvas.html"
+                    >Pintura en lienzo 2D</a
+                  ><a href="https://encoding.spec.whatwg.org/"
+                    >Codificación WHATWG</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Files, URLs and downloads</h3><span class="version-badge">Web platform</span></div>
-                <p>File selection and reading, Blob storage, object URLs, data URLs and client-side downloads use browser APIs. Object URLs are session-local references and do not embed file bytes in the QR payload; the custom FILE transport described above is a separate first-party format.</p>
-                <nav aria-label="File and URL API references"><a href="https://www.w3.org/TR/FileAPI/">File API</a><a href="https://url.spec.whatwg.org/">URL Standard</a><a href="https://html.spec.whatwg.org/multipage/links.html#downloading-resources">HTML downloads</a></nav>
+                <div>
+                  <h3>Archivos, URL y descargas</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La selección y lectura de archivos, el almacenamiento de
+                  bloques, las URL de objetos, las URL de datos y las descargas
+                  del lado del cliente utilizan las API del navegador. Las URL
+                  de objetos son referencias locales de sesión y no incorporan
+                  bytes de archivo en el encabezado QR; el transporte de ARCHIVO
+                  personalizado descrito anteriormente es un formato separado de
+                  primera parte.
+                </p>
+                <nav aria-label="Referencias de archivos y URL de la API">
+                  <a href="https://www.w3.org/TR/FileAPI/">API de archivos</a
+                  ><a href="https://url.spec.whatwg.org/">Estándar de URL</a
+                  ><a
+                    href="https://html.spec.whatwg.org/multipage/links.html#downloading-resources"
+                    >Descargas de HTML</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Integrity and compression</h3><span class="version-badge">Web platform</span></div>
-                <p>SHA-256 verification and cryptographically strong 128-bit transfer identifiers use Web Crypto. Optional gzip transfer compression uses Compression Streams when the browser provides it; the underlying hash and gzip formats follow FIPS 180-4 and RFC 1952. SHA-256 detects changed transfer content but is not a signature and does not prove who created a file.</p>
-                <nav aria-label="Integrity and compression references"><a href="https://www.w3.org/TR/WebCryptoAPI/">Web Cryptography API</a><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4</a><a href="https://compression.spec.whatwg.org/">Compression Streams</a><a href="https://www.rfc-editor.org/rfc/rfc1952">RFC 1952 gzip</a></nav>
+                <div>
+                  <h3>Integridad y compresión</h3>
+                  <span class="version-badge">Plataforma web</span>
+                </div>
+                <p>
+                  La verificación SHA-256 y los identificadores de transferencia
+                  de 128 bits criptográficamente fuertes utilizan Web Crypto. La
+                  compresión de transferencia gzip opcional utiliza Compression
+                  Streams cuando el navegador lo proporciona; el hash subyacente
+                  y los formatos gzip siguen FIPS 180-4 y RFC 1952. SHA-256
+                  detecta el contenido de la transferencia cambiado, pero no es
+                  una firma y no demuestra quién creó un archivo.
+                </p>
+                <nav aria-label="Referencias de integridad y compresión">
+                  <a href="https://www.w3.org/TR/WebCryptoAPI/"
+                    >API de criptografía web</a
+                  ><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
+                    >FIPS 180-4</a
+                  ><a href="https://compression.spec.whatwg.org/"
+                    >Streams de compresión</a
+                  ><a href="https://www.rfc-editor.org/rfc/rfc1952"
+                    >RFC 1952 gzip</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Animation and media recording</h3><span class="version-badge">First-party + Web API</span></div>
-                <p>Animated GIF frames are encoded directly. MP4 export draws frames to a Canvas capture stream and records through <code>MediaRecorder</code>; it is offered only when the browser reports support for an MP4 MIME type, and the exact AVC codec and timing behavior depend on that browser.</p>
-                <nav aria-label="Animation and recording references"><a href="https://www.w3.org/TR/mediastream-recording/">MediaStream Recording</a><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt">GIF89a specification</a><a href="https://www.iana.org/assignments/media-types/media-types.xhtml#video">IANA video media types</a></nav>
+                <div>
+                  <h3>Animación y grabación de medios</h3>
+                  <span class="version-badge">Primera parte + API web</span>
+                </div>
+                <p>
+                  Los fotogramas GIF animados se codifican directamente. La
+                  exportación MP4 dibuja fotogramas a un flujo de captura de
+                  lienzo y los registra a través de <code>MediaRecorder</code>;
+                  solo se ofrece cuando el navegador informa de la
+                  compatibilidad con un tipo de MIME MP4, y el códec AVC exacto
+                  y el comportamiento de sincronización dependen de ese
+                  navegador.
+                </p>
+                <nav aria-label="Referencias de animación y grabación">
+                  <a href="https://www.w3.org/TR/mediastream-recording/"
+                    >Grabación de MediaStream</a
+                  ><a href="https://www.w3.org/Graphics/GIF/spec-gif89a.txt"
+                    >Especificación GIF89a</a
+                  ><a
+                    href="https://www.iana.org/assignments/media-types/media-types.xhtml#video"
+                    >Tipos de medios de vídeo IANA</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Raster tile map</h3><span class="version-badge">First-party + OSM</span></div>
-                <p>The Geo preview directly implements Web Mercator projection, visible-tile selection, longitude wrapping, pointer and keyboard panning, zoom controls, click-to-coordinate conversion, and marker/label placement. It requests only raster tiles intersecting the active viewport and does not bundle or load a third-party mapping library.</p>
-                <nav aria-label="Raster tile map references"><a href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">Slippy map tile coordinates</a><a href="https://operations.osmfoundation.org/policies/tiles/">OpenStreetMap tile policy</a><a href="https://www.openstreetmap.org/copyright">OpenStreetMap attribution</a></nav>
+                <div>
+                  <h3>Mapa de baldosas de raster</h3>
+                  <span class="version-badge">Primer partido + OSM</span>
+                </div>
+                <p>
+                  La vista previa de Geo implementa directamente la proyección
+                  Web Mercator, la selección de cuadros visibles, el envoltorio
+                  de longitud, el desplazamiento del puntero y del teclado, los
+                  controles de zoom, la conversión de clic a coordenadas y la
+                  colocación de marcadores/etiquetas. Solo solicita cuadros
+                  raster que intersecten la ventana de visualización activa y no
+                  empaqueta ni carga una biblioteca de mapeo de terceros.
+                </p>
+                <nav aria-label="Referencias de mapas de baldosas de raster">
+                  <a
+                    href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames"
+                    >Coordenadas de los cuadros de mapa deslizantes</a
+                  ><a
+                    href="https://operations.osmfoundation.org/policies/tiles/"
+                    >Política de baldosas de OpenStreetMap</a
+                  ><a href="https://www.openstreetmap.org/copyright"
+                    >Atribución de OpenStreetMap</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Development and test software</h2>
+            <h2>Software de desarrollo y prueba</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>esbuild</h3><span class="version-badge">0.28.1 build-only</span></div>
-                <p>Bundles and minifies the modular JavaScript and CSS, creates source maps, splits lazy-loaded hosted chunks and emits the self-contained <code>file:</code> fallback. It is a development dependency under the MIT License and is not a browser runtime library or network request made by the deployed application.</p>
-                <nav aria-label="esbuild links"><a href="https://esbuild.github.io/">Documentation</a><a href="https://github.com/evanw/esbuild">Repository</a><a href="https://github.com/evanw/esbuild/blob/main/LICENSE.md">MIT license</a></nav>
+                <div>
+                  <h3>esbuild</h3>
+                  <span class="version-badge"
+                    >0.28.1 solo para la compilación</span
+                  >
+                </div>
+                <p>
+                  Empaqueta y minimiza JavaScript y CSS modulares, crea mapas de
+                  origen, divide fragmentos alojados cargados de forma perezosa
+                  y emite el contenido independiente.
+                  <code>file:</code> fallback. Es una dependencia de desarrollo
+                  bajo la Licencia de MIT y no es una biblioteca de tiempo de
+                  ejecución del navegador ni una solicitud de red realizada por
+                  la aplicación implementada.
+                </p>
+                <nav aria-label="Enlaces de esbuild">
+                  <a href="https://esbuild.github.io/">documentación</a
+                  ><a href="https://github.com/evanw/esbuild">depósito</a
+                  ><a
+                    href="https://github.com/evanw/esbuild/blob/main/LICENSE.md"
+                    >Licencia MIT</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>Node.js</h3><span class="version-badge">Development platform</span></div>
-                <p>Runs the local build script, automated tests, favicon generator and static development server. The project does not pin a Node.js release or ship Node.js to visitors; deployed application code runs in the browser.</p>
-                <nav aria-label="Node.js links"><a href="https://nodejs.org/">Website</a><a href="https://github.com/nodejs/node">Repository</a><a href="https://github.com/nodejs/node/blob/main/LICENSE">License and bundled notices</a></nav>
+                <div>
+                  <h3>Node.js</h3>
+                  <span class="version-badge">Plataforma de desarrollo</span>
+                </div>
+                <p>
+                  Ejecuta el script de construcción local, las pruebas
+                  automatizadas, el generador de favicon y el servidor de
+                  desarrollo estático. El proyecto no fija una versión de
+                  Node.js ni envía Node.js a los visitantes; el código de la
+                  aplicación implementada se ejecuta en el navegador.
+                </p>
+                <nav aria-label="Enlaces de Node.js">
+                  <a href="https://nodejs.org/">página web</a
+                  ><a href="https://github.com/nodejs/node">depósito</a
+                  ><a href="https://github.com/nodejs/node/blob/main/LICENSE"
+                    >Licencia y avisos incluidos</a
+                  >
+                </nav>
               </article>
               <article>
-                <div><h3>node-qrcode reference bundle</h3><span class="version-badge">1.5.0 test-only</span></div>
-                <p>The optional parity test can load manually downloaded browser bundles from the MIT-licensed <code>qrcode</code> package and compare the first-party encoder against 1,287 reference matrices. These files stay outside the repository, are not npm dependencies, and are never included in production builds.</p>
-                <nav aria-label="node-qrcode reference links"><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">npm 1.5.0</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a><a href="../README.md#first-party-qr-encoder">Parity-test setup</a></nav>
+                <div>
+                  <h3>Paquete de referencia de código QR de nodos</h3>
+                  <span class="version-badge">1.5.0 solo para pruebas</span>
+                </div>
+                <p>
+                  La prueba de paridad opcional puede cargar paquetes de
+                  navegador descargados manualmente desde el MIT-licenciado
+                  <code>qrcode</code> Empaquetar y comparar el codificador de
+                  primera parte con 1.287 matrices de referencia. Estos archivos
+                  permanecen fuera del repositorio, no son dependencias de npm y
+                  nunca se incluyen en las construcciones de producción.
+                </p>
+                <nav aria-label="Enlaces de referencia de código QR de nodos">
+                  <a href="https://github.com/soldair/node-qrcode">depósito</a
+                  ><a href="https://www.npmjs.com/package/qrcode/v/1.5.0"
+                    >npm 1.5.0</a
+                  ><a
+                    href="https://github.com/soldair/node-qrcode/blob/master/license"
+                    >Licencia MIT</a
+                  ><a href="../README.md#first-party-qr-encoder"
+                    >Configuración de la prueba de paridad</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
           <section>
-            <h2>Data and delivery services</h2>
+            <h2>Servicios de datos y entrega</h2>
             <div class="dependency-list">
               <article>
-                <div><h3>OpenStreetMap</h3><span class="version-badge">Live data</span></div>
-                <p>Serves standard raster map tiles directly to the first-party Geo preview. The underlying geographic database is licensed under ODbL; hosted tiles are governed by the separate tile usage policy and include the required contributor attribution in the map.</p>
-                <nav aria-label="OpenStreetMap links"><a href="https://www.openstreetmap.org/">Website</a><a href="https://github.com/openstreetmap/openstreetmap-website">Website repository</a><a href="https://www.openstreetmap.org/copyright">Copyright and ODbL</a><a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a></nav>
+                <div>
+                  <h3>OpenStreetMap</h3>
+                  <span class="version-badge">Datos en vivo</span>
+                </div>
+                <p>
+                  Sirve las baldosas de mapas raster estándar directamente a la
+                  vista previa Geo de primera parte. La base de datos geográfica
+                  subyacente está licenciada bajo ODbL; las baldosas alojadas
+                  están regidas por la política separada de uso de baldosas e
+                  incluyen la atribución requerida del contribuyente en el mapa.
+                </p>
+                <nav aria-label="Enlaces de OpenStreetMap">
+                  <a href="https://www.openstreetmap.org/">página web</a
+                  ><a
+                    href="https://github.com/openstreetmap/openstreetmap-website"
+                    >Repositorio del sitio web</a
+                  ><a href="https://www.openstreetmap.org/copyright"
+                    >Derechos de autor y ODbL</a
+                  ><a
+                    href="https://operations.osmfoundation.org/policies/tiles/"
+                    >Política de baldosas</a
+                  >
+                </nav>
               </article>
             </div>
           </section>
 
-          <p class="inventory-note"><strong>Licensing note:</strong> "First-party" identifies code implemented in this application; it does not replace or modify the licenses, patents, trademarks or specifications governing the algorithms, formats and platform technologies listed above. Technical standards and RFCs describe interoperability; they are not software licenses for this application's source. The deployed application has no third-party browser runtime library; esbuild is build-only, node-qrcode is optional test-only, and no separate package performs production QR generation, mapping or exports. This repository currently has no project-wide LICENSE file, so redistribution rights for its first-party source should not be assumed. Patent references are informational and are not a legal opinion or freedom-to-operate analysis.</p>
+          <p class="inventory-note">
+            <strong>Nota de licencia:</strong> "Primer partido" identifica el
+            código implementado en esta aplicación; no reemplaza ni modifica las
+            licencias, patentes, marcas comerciales o especificaciones que rigen
+            los algoritmos, formatos y tecnologías de la plataforma enumerados
+            anteriormente. Los estándares técnicos y RFCs describen la
+            interoperabilidad; no son licencias de software para el código
+            fuente de esta aplicación. La aplicación implementada no tiene una
+            biblioteca de tiempo de ejecución del navegador de terceros; esbuild
+            solo se construye, node-qrcode solo se utiliza para pruebas y ningún
+            paquete separado realiza la generación, mapeo o exportación de QR de
+            producción. Este repositorio actualmente no tiene un archivo de
+            LICENCIA para todo el proyecto, por lo que no se deben asumir
+            derechos de redistribución para su código fuente de primer partido.
+            Las referencias de patentes son informativas y no son una opinión
+            legal ni un análisis de libertad de operar.
+          </p>
         </div>
         <footer class="info-page-footer">
-          <span>QR Code Generator</span>
-          <nav aria-label="Technology page navigation"><a href="../index.html">Generator</a><a href="index.es.html">Guides</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#technology-page-content">Back to top</a></nav>
+          <span>Generador de códigos QR</span>
+          <nav aria-label="Navegación de la página de tecnología">
+            <a href="../index.html">Generador</a
+            ><a href="index.es.html">Guías</a
+            ><a href="https://git.lewismoten.com/lewismoten/qr">fuente</a
+            ><a href="#technology-page-content">Volver a la parte superior</a>
+          </nav>
         </footer>
       </article>
     </main>

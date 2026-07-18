@@ -22,6 +22,22 @@ function translateValue(value, translations, missing) {
   return translated;
 }
 
+function escapeAttribute(value, quote) {
+  const quotePattern = quote === '"' ? /"/g : /'/g;
+  const quoteEntity = quote === '"' ? '&quot;' : '&#39;';
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(quotePattern, quoteEntity);
+}
+
+function escapeText(value) {
+  return value
+    .replace(/&(?!#\d+;|#x[\da-f]+;|[a-z]+;)/gi, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function translateAttributes(tag, translations, missing) {
   const isMeta = /^<meta\b/i.test(tag);
   const metaName = tag.match(/\bname=(['"])(.*?)\1/i)?.[2]?.toLowerCase();
@@ -38,7 +54,7 @@ function translateAttributes(tag, translations, missing) {
         (normalized === 'content' && translateContent);
       if (!shouldTranslate) return attribute;
       const translated = translateValue(value, translations, missing);
-      return `${name}=${quote}${translated}${quote}`;
+      return `${name}=${quote}${escapeAttribute(translated, quote)}${quote}`;
     },
   );
 }
@@ -60,6 +76,7 @@ export function translateGuideHtml(source, translations, missing) {
     .map((token) => {
       if (!token) return token;
       if (!token.startsWith('<')) {
+        if (!token.trim()) return token;
         const blocked = stack.some((entry) => entry.blocked || entry.keyed);
         if (blocked) return token;
         const leading = token.match(/^\s*/)[0];
@@ -68,9 +85,8 @@ export function translateGuideHtml(source, translations, missing) {
           leading.length,
           token.length - trailing.length,
         );
-        return (
-          `${leading}${translateValue(value, translations, missing)}` + trailing
-        );
+        const translated = translateValue(value, translations, missing);
+        return `${leading}${escapeText(translated)}${trailing}`;
       }
 
       const details = getTagDetails(token);
