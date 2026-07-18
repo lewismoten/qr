@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { BitBuffer } from '../src/js/qr/bit-buffer.js';
+import { getQrKanjiValue } from '../src/js/qr/kanji.js';
 import { isMaskActive } from '../src/js/qr/mask.js';
 import NativeQRCode from '../src/js/qr/matrix-encoder.js';
 import { makeSegment } from '../src/js/qr/segment.js';
@@ -126,12 +127,28 @@ function testBitBufferLimits() {
 }
 
 function testKanjiAndMixedModes() {
+  const OriginalTextDecoder = globalThis.TextDecoder;
+  globalThis.TextDecoder = class {
+    constructor() {
+      throw new Error('Shift JIS unavailable');
+    }
+  };
+  try {
+    assert.throws(
+      () => getQrKanjiValue('あ'),
+      (error) => error.i18nKey === 'qr.errors.kanjiUnsupported',
+    );
+  } finally {
+    globalThis.TextDecoder = OriginalTextDecoder;
+  }
+
   const kanji = NativeQRCode.create([{ data: 'あかが', mode: 'kanji' }], {
     errorCorrectionLevel: 'M',
   });
   assert.equal(kanji.segments[0].characterCount, 3);
   assert.equal(kanji.segments[0].getBitsLength(), 39);
   assert.equal(NativeQRCode.toSJIS('あ'), 0x82a0);
+  assert.equal(getQrKanjiValue('蜿'), 0x1b4f);
   assert.throws(
     () => NativeQRCode.create([{ data: 'QRあ', mode: 'kanji' }]),
     /outside the QR Shift JIS ranges/,
@@ -232,6 +249,17 @@ function testInvalidConfiguration() {
       version: 1,
     }).version,
     1,
+  );
+  assert.throws(
+    () => NativeQRCode.create('a'.repeat(18), { version: 1 }),
+    /Minimum version required is: 2/,
+  );
+  assert.throws(
+    () =>
+      NativeQRCode.create('a'.repeat(2954), {
+        errorCorrectionLevel: 'L',
+      }),
+    /too large/,
   );
 }
 

@@ -8,15 +8,12 @@ import { optimizeSegments } from './segment-optimizer.js';
 export { optimizeSegments } from './segment-optimizer.js';
 
 function normalizeSegments(payload) {
-  if (Array.isArray(payload)) {
-    return payload.map((part) =>
-      makeSegment(
-        part.data,
-        typeof part.mode === 'string' ? part.mode : part.mode?.id,
-      ),
-    );
-  }
-  return [makeSegment(payload)];
+  return payload.map((part) =>
+    makeSegment(
+      part.data,
+      typeof part.mode === 'string' ? part.mode : part.mode?.id,
+    ),
+  );
 }
 
 function getRequiredBits(segments, version) {

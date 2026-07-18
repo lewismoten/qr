@@ -45,4 +45,10 @@ assert.throws(
   (error) => isAbortError(error),
 );
 
+const stringWaitingController = new AbortController();
+const stringWaiting = waitFor(1000, stringWaitingController.signal);
+stringWaitingController.abort('plain reason');
+await assert.rejects(stringWaiting, (error) => isAbortError(error));
+assert.equal(isAbortError(undefined), false);
+
 console.log('Abortable export operation tests passed.');

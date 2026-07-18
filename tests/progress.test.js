@@ -108,6 +108,25 @@ assert.equal(
   'an incomplete task should close without the completion hold',
 );
 
+const directCancel = progress.start({ title: 'Direct', phase: 'Working' });
+directCancel.cancel();
+assert.equal(directCancel.signal.aborted, true);
+directCancel.finish();
+
+const visibleOld = progress.start({ title: 'Visible old', phase: 'Working' });
+await wait(12);
+const visibleNew = progress.start({ title: 'Visible new', phase: 'Working' });
+assert.equal(visibleOld.signal.aborted, true);
+assert.equal(elements.dialog.open, false);
+visibleNew.finish();
+
+const holding = progress.start({ title: 'Holding', phase: 'Working' });
+await wait(12);
+holding.finish({ completed: true });
+const afterHold = progress.start({ title: 'After hold', phase: 'Working' });
+assert.equal(elements.dialog.open, false);
+afterHold.finish();
+
 let clock = 0;
 const timedElements = createElements();
 const timedProgress = createTaskProgress(timedElements, () => clock, {
@@ -165,5 +184,23 @@ try {
 } finally {
   console.error = originalError;
 }
+
+let resolveStyles;
+const deferredStyles = new Promise((resolve) => {
+  resolveStyles = resolve;
+});
+const deferredProgress = createTaskProgress(createElements(), undefined, {
+  showDelay: 0,
+  windowObject: globalThis,
+  ensureStyles: () => deferredStyles,
+});
+const deferredTask = deferredProgress.start({
+  title: 'Deferred CSS',
+  phase: 'Loading',
+});
+await wait(1);
+deferredTask.finish({ completed: true });
+resolveStyles();
+await wait(0);
 
 console.log('Task progress timing tests passed.');

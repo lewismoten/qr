@@ -128,7 +128,7 @@ export function createTaskProgress(
     elements.cancel.disabled = false;
     task.showTimer = windowObject.setTimeout(() => {
       styleRequest.then(() => {
-        if (active !== task || task.finished) return;
+        if (active !== task) return;
         task.visible = true;
         if (!elements.dialog.open) elements.dialog.showModal();
         renderTime();

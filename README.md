@@ -72,8 +72,9 @@ npm run test:coverage
 Coverage includes exercised modules under `src/js`, excluding the browser entry
 point and specification-page scripts. The command fails below 95% line, 96%
 branch, or 95% function coverage. These conservative repository-wide floors
-protect the current baseline while browser-heavy UI modules gain focused DOM
-integration tests. `npm run verify` enforces the same coverage thresholds.
+protect the current baseline. It also requires every included file to exceed
+95% line, branch, and function coverage. `npm run verify` enforces the same
+coverage thresholds.
 
 ## Locales
 
@@ -179,19 +180,19 @@ the extension in each frame is the only file-type hint.
 
 The manifest has this 10-byte header. All integers are unsigned and big-endian.
 
-| Offset | Size | Value |
-| ---: | ---: | --- |
-| 0 | 4 | ASCII `FILE` manifest marker |
-| 4 | 1 | Manifest version, currently `1` |
-| 5 | 1 | Transfer flags |
-| 6 | 4 | Total manifest byte length |
+| Offset | Size | Value                           |
+| -----: | ---: | ------------------------------- |
+|      0 |    4 | ASCII `FILE` manifest marker    |
+|      4 |    1 | Manifest version, currently `1` |
+|      5 |    1 | Transfer flags                  |
+|      6 |    4 | Total manifest byte length      |
 
 Manifest flags:
 
-| Bit | Mask | Meaning |
-| ---: | ---: | --- |
-| 0 | `0x01` | File payload is gzip-compressed for transfer |
-| 1-7 | | Reserved; writers set to zero and readers ignore |
+| Bit |   Mask | Meaning                                          |
+| --: | -----: | ------------------------------------------------ |
+|   0 | `0x01` | File payload is gzip-compressed for transfer     |
+| 1-7 |        | Reserved; writers set to zero and readers ignore |
 
 The header is followed by zero or more TLV fields. Each field is encoded as a
 one-byte type, a two-byte value length, and exactly that many value bytes. A field
@@ -199,15 +200,15 @@ can therefore contain at most 65,535 bytes.
 Readers must skip unknown field types using their length so the manifest can be
 extended without changing the frame protocol.
 
-| Type | Name | Value encoding |
-| ---: | --- | --- |
-| 1 | Filename | UTF-8 |
-| 2 | MIME type | UTF-8 |
-| 3 | Modified date | 8-byte Unix time in milliseconds |
-| 4 | Original file size | 8-byte integer |
-| 5 | Validation type | UTF-8, currently `SHA-256` |
-| 6 | Validation value | Algorithm-specific bytes; 32 bytes for SHA-256 |
-| 8 | Custom metadata | UTF-8 JSON |
+| Type | Name               | Value encoding                                 |
+| ---: | ------------------ | ---------------------------------------------- |
+|    1 | Filename           | UTF-8                                          |
+|    2 | MIME type          | UTF-8                                          |
+|    3 | Modified date      | 8-byte Unix time in milliseconds               |
+|    4 | Original file size | 8-byte integer                                 |
+|    5 | Validation type    | UTF-8, currently `SHA-256`                     |
+|    6 | Validation value   | Algorithm-specific bytes; 32 bytes for SHA-256 |
+|    8 | Custom metadata    | UTF-8 JSON                                     |
 
 Fields are optional and may appear in any order. Types 5 and 6 are paired: a
 reader that does not recognize the validation type must not interpret its value.
