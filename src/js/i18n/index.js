@@ -7,6 +7,7 @@ import {
   normalizeLocaleEntries,
   selectLocale,
 } from './locale-resources.js';
+import { localizeGuideLinks } from './guide-path.js';
 
 const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title', 'value'];
 
@@ -180,6 +181,7 @@ export function translateDocument(document) {
     ? 'rtl'
     : 'ltr';
   document.documentElement.classList.toggle('i18n-debug', debugLanguage);
+  localizeGuideLinks(document, activeLocale);
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = lookup(element.dataset.i18n, element.textContent);
   });
