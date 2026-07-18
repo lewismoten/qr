@@ -215,6 +215,19 @@ describe('fragment hash navigation', () => {
     assert.match(facadeSetup, /getQrColors:\s*styleSetup\.colors\.getQrColors/);
   });
 
+  test('preview print controls tolerate an unloaded document fragment', async () => {
+    const source = await readFile(
+      new URL('../src/js/app/ui/preview/controls-setup.js', import.meta.url),
+      { encoding: 'utf8' },
+    );
+    assert.match(source, /const hasPrintElements =/);
+    assert.match(
+      source,
+      /printElements\?\.printWidthAuto\?\.checked \?\? true/,
+    );
+    assert.match(source, /if \(!hasPrintElements\(\)\) return;/);
+  });
+
   test('parses valid targets and rejects unrelated hashes', () => {
     assert.deepEqual(readNavigationHash('#tab=style&subtab=colors'), {
       tab: 'style',

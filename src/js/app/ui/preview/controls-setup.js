@@ -20,6 +20,34 @@ export function createPreviewControlsSetup({
   });
   let size = null;
   let sizeRequest = null;
+  const hasPrintElements = () =>
+    Boolean(
+      printElements?.printWidthAuto &&
+      printElements.printWidth &&
+      printElements.printWidthValue,
+    );
+  const deferredPrintAuto = {
+    get checked() {
+      return printElements?.printWidthAuto?.checked ?? true;
+    },
+  };
+  const deferredPrintWidth = {
+    get value() {
+      return printElements?.printWidth?.value ?? '1.65';
+    },
+    set value(value) {
+      if (printElements?.printWidth) printElements.printWidth.value = value;
+    },
+    set disabled(value) {
+      if (printElements?.printWidth) printElements.printWidth.disabled = value;
+    },
+  };
+  const deferredPrintValue = {
+    set textContent(value) {
+      if (printElements?.printWidthValue)
+        printElements.printWidthValue.textContent = value;
+    },
+  };
   const getSizeElements = () => ({
     width: e.qrWidth,
     widthValue: document.getElementById('qr-width-value'),
@@ -28,9 +56,9 @@ export function createPreviewControlsSetup({
     scaleValue: document.getElementById('qr-scale-value'),
     margin: e.qrMargin,
     marginValue: document.getElementById('qr-margin-value'),
-    printAuto: printElements.printWidthAuto,
-    printWidth: printElements.printWidth,
-    printValue: printElements.printWidthValue,
+    printAuto: deferredPrintAuto,
+    printWidth: deferredPrintWidth,
+    printValue: deferredPrintValue,
   });
   const getMetrics = () => ({ width: renderedWidth, scale: moduleScale });
   const getAutomaticPrintWidth = (source = e.canvas) => {
@@ -52,7 +80,7 @@ export function createPreviewControlsSetup({
   };
   const getPrintWidth = (source = e.canvas) => {
     if (size) return size.getPrintWidth(source);
-    if (!printElements) return getAutomaticPrintWidth(source);
+    if (!hasPrintElements()) return getAutomaticPrintWidth(source);
     return printElements.printWidthAuto.checked
       ? getAutomaticPrintWidth(source)
       : Math.min(
@@ -68,7 +96,7 @@ export function createPreviewControlsSetup({
       size.syncPrint();
       return;
     }
-    if (!printElements) return;
+    if (!hasPrintElements()) return;
     const automatic = getAutomaticPrintWidth();
     if (printElements.printWidthAuto.checked) {
       printElements.printWidth.value = automatic.toFixed(2);
