@@ -42,6 +42,16 @@ class MatrixBuilder {
     this.drawCodewords(codewords);
   }
 
+  prepareMaskableColumns() {
+    this.maskableColumns = this.functionModules.map((row) => {
+      const columns = [];
+      for (let column = 0; column < row.length; column += 1) {
+        if (!row[column]) columns.push(column);
+      }
+      return Uint8Array.from(columns);
+    });
+  }
+
   setFunction(row, column, dark) {
     this.modules[row][column] = dark;
     this.functionModules[row][column] = true;
@@ -164,14 +174,33 @@ class MatrixBuilder {
     const previous =
       previousMask === undefined ? null : getMaskMap(this.size, previousMask);
     const next = getMaskMap(this.size, nextMask);
+    if (!this.maskableColumns) {
+      for (let row = 0; row < this.size; row += 1) {
+        const modules = this.modules[row];
+        const functions = this.functionModules[row];
+        const offset = row * this.size;
+        for (let column = 0; column < this.size; column += 1) {
+          if (!functions[column] && next[offset + column])
+            modules[column] = !modules[column];
+        }
+      }
+      return;
+    }
     for (let row = 0; row < this.size; row += 1) {
-      for (let column = 0; column < this.size; column += 1) {
-        const index = row * this.size + column;
-        if (
-          !this.functionModules[row][column] &&
-          Boolean(previous?.[index]) !== Boolean(next[index])
-        ) {
-          this.modules[row][column] = !this.modules[row][column];
+      const columns = this.maskableColumns[row];
+      const modules = this.modules[row];
+      const offset = row * this.size;
+      if (previous === null) {
+        for (let item = 0; item < columns.length; item += 1) {
+          const column = columns[item];
+          if (next[offset + column]) modules[column] = !modules[column];
+        }
+      } else {
+        for (let item = 0; item < columns.length; item += 1) {
+          const column = columns[item];
+          const index = offset + column;
+          if (previous[index] !== next[index])
+            modules[column] = !modules[column];
         }
       }
     }
@@ -181,6 +210,7 @@ class MatrixBuilder {
     let mask = requestedMask;
     let appliedMask;
     if (mask === undefined) {
+      this.prepareMaskableColumns();
       let minimumPenalty = Infinity;
       for (let candidate = 0; candidate < 8; candidate += 1) {
         this.transitionMask(appliedMask, candidate);
@@ -223,9 +253,14 @@ function create(payload, options = {}) {
   const codewords = addErrorCorrection(data, version, errorLevel);
   const builder = new MatrixBuilder(version, errorLevel, codewords);
   const maskPattern = builder.finish(options.maskPattern);
-  const flatModules = Uint8Array.from(builder.modules.flat(), (dark) =>
-    dark ? 1 : 0,
-  );
+  const flatModules = new Uint8Array(builder.size * builder.size);
+  let moduleIndex = 0;
+  for (const row of builder.modules) {
+    for (const dark of row) {
+      flatModules[moduleIndex] = dark ? 1 : 0;
+      moduleIndex += 1;
+    }
+  }
 
   return {
     version,
