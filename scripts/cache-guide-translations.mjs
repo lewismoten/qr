@@ -11,13 +11,14 @@ if (!locale || !inputFile || !outputFile) {
 
 const input = JSON.parse(await readFile(inputFile, 'utf8'));
 const output = JSON.parse(await readFile(outputFile, 'utf8'));
+const sources = input.sources ?? input.values;
 
-if (input.values.length !== output.values.length) {
+if (sources.length !== output.values.length) {
   throw new Error(`Translation count mismatch for ${locale}.`);
 }
 
 const translations = Object.fromEntries(
-  input.values.map((value, index) => {
+  sources.map((value, index) => {
     const translated = output.values[index]?.trim();
     if (!translated) {
       throw new Error(`Empty translation for ${locale}: ${value}`);
