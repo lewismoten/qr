@@ -1,4 +1,4 @@
-import { initializeDialogs } from '../dialogs.js';
+import { initializeLazyDialogs } from '../lazy-dialogs.js';
 import { bindApplicationEvents } from '../events.js';
 
 export function startApplication({
@@ -47,7 +47,7 @@ export function startApplication({
     actions: eventActions,
     defaultChunkVersion,
   });
-  const dialogs = initializeDialogs({ document, window });
+  initializeLazyDialogs({ document, window });
 
   systems.contentSections.event.initialize();
   elements.urlInput.value = runtime.getDefaultUrl();
@@ -73,6 +73,5 @@ export function startApplication({
       )
       .catch(console.error);
   }
-  dialogs.syncFromHash();
   return systems.preview.render();
 }

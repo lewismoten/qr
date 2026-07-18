@@ -20,6 +20,16 @@ export function initializeDialogs({ document, window }) {
     }
   };
 
+  const open = (targetId) => {
+    if (![...dialogs].some((dialog) => dialog.id === targetId)) return;
+    const targetHash = `#${targetId}`;
+    if (window.location.hash === targetHash) {
+      window.requestAnimationFrame(syncFromHash);
+    } else {
+      window.location.hash = targetHash;
+    }
+  };
+
   document.querySelectorAll('[data-dialog-target]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (
@@ -31,12 +41,8 @@ export function initializeDialogs({ document, window }) {
       )
         return;
       const targetId = link.dataset.dialogTarget;
-      const targetHash = `#${targetId}`;
-      if (![...dialogs].some((dialog) => dialog.id === targetId)) return;
       event.preventDefault();
-      if (window.location.hash === targetHash)
-        window.requestAnimationFrame(syncFromHash);
-      else window.location.hash = targetHash;
+      open(targetId);
     });
   });
   document.querySelectorAll('[data-close-dialog]').forEach((button) => {
@@ -57,5 +63,5 @@ export function initializeDialogs({ document, window }) {
     });
   });
   window.addEventListener('hashchange', syncFromHash);
-  return { syncFromHash };
+  return { open, syncFromHash };
 }
