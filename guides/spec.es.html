@@ -101,7 +101,7 @@
         <span style="--swatch: #facc15">Alineación</span>
         <span style="--swatch: #06b6d4">Temporización</span>
         <span style="--swatch: #8b5cf6">Formato</span>
-        <span style="--swatch: #ec4899">Nivel de corrección</span>
+        <span style="--swatch: #ec4899">Nivel de corrección de errores</span>
         <span style="--swatch: #60a5fa">Máscara</span>
         <span style="--swatch: #10b981">Versión</span>
         <span style="--swatch: #0f766e">Modo</span>
@@ -109,7 +109,7 @@
         <span style="--swatch: #0ea5e9">Datos</span>
         <span style="--swatch: #84cc16">Terminador</span>
         <span style="--swatch: #cbd5e1">Relleno</span>
-        <span style="--swatch: #111827">Palabras de corrección</span>
+        <span style="--swatch: #111827">Palabras de código de corrección</span>
         <span style="--swatch: #14b8a6">Bits restantes</span>
       </section>
 
@@ -212,12 +212,14 @@
               <span class="color-dot ec-level"></span
               ><span class="color-dot mask"></span
               ><span class="color-dot format"></span>
-              <h3>Nivel de corrección, máscara y protección de formato</h3>
+              <h3>
+                Nivel de corrección de errores, máscara y protección de formato
+              </h3>
             </div>
             <canvas
               data-qr-visual="format"
               role="img"
-              aria-label="Detalle de los metadatos superiores izquierdos: bits rosados del nivel de corrección, bits azules de máscara y bits morados de formato protegido"
+              aria-label="Detalle de los metadatos superiores izquierdos: bits rosados del nivel de corrección de errores, bits azules de máscara y bits morados de formato protegido"
             ></canvas>
             <p>
               El valor de formato de 15 bits contiene 2 bits del nivel de
@@ -293,7 +295,8 @@
               <strong>Palabras de relleno</strong><span>EC / 11</span>
             </div>
             <div class="bit-field ec">
-              <strong>Palabras de corrección</strong><span>intercaladas</span>
+              <strong>Palabras de código de corrección</strong
+              ><span>intercaladas</span>
             </div>
             <div class="bit-field remainder">
               <strong>Bits restantes</strong><span>0–7 bits</span>

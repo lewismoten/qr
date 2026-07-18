@@ -101,7 +101,7 @@ test('Spanish inline prose remains grammatical after HTML assembly', async () =>
   );
   assert.match(
     specification,
-    /<code>0x11<\/code> para completar la capacidad de datos/,
+    /<code>0x11<\/code>\s+para completar la capacidad\s+de datos/,
   );
 });
 
