@@ -33,14 +33,6 @@ if (fs.existsSync(shiftJisReferencePath)) {
   vm.runInContext(fs.readFileSync(shiftJisReferencePath, 'utf8'), context);
 }
 
-function moduleIsDark(definition, row, column) {
-  return Boolean(
-    typeof definition.modules.get === 'function'
-      ? definition.modules.get(row, column)
-      : definition.modules.data[row * definition.modules.size + column],
-  );
-}
-
 function assertParity(payload, options) {
   const nativeDefinition = NativeQRCode.create(payload, options);
   // Compare at the native scorer's mask. The former library rounds balance
@@ -69,14 +61,15 @@ function assertParity(payload, options) {
     referenceDefinition.modules.size,
     'matrix size',
   );
-  for (let row = 0; row < nativeDefinition.modules.size; row += 1) {
-    for (let column = 0; column < nativeDefinition.modules.size; column += 1) {
-      assert.equal(
-        moduleIsDark(nativeDefinition, row, column),
-        moduleIsDark(referenceDefinition, row, column),
-        `module ${row},${column}`,
-      );
-    }
+  const nativeModules = Buffer.from(nativeDefinition.modules.data);
+  const referenceModules = Buffer.from(referenceDefinition.modules.data);
+  if (!nativeModules.equals(referenceModules)) {
+    const index = nativeModules.findIndex(
+      (module, moduleIndex) => module !== referenceModules[moduleIndex],
+    );
+    const row = Math.floor(index / nativeDefinition.modules.size);
+    const column = index % nativeDefinition.modules.size;
+    assert.fail(`module ${row},${column}`);
   }
 }
 
