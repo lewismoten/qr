@@ -52,10 +52,11 @@
               fáciles de identificar.
             </p>
             <p>
-              Módulos de estilo, ojos de búsqueda, gradientes, transparencia,
-              imágenes de fondo, logotipos, emojis y arte pixel. Exporta el
-              código actual como PNG, JPEG, GIF, SVG o PDF; exporta proyectos de
-              código múltiple como ZIP, hojas de PDF, GIF animado o MP4.
+              Personalice los módulos, los patrones de posición, los degradados,
+              la transparencia, las imágenes de fondo, los logotipos, los emojis
+              y el arte píxel. Exporte el código actual como PNG, JPEG, GIF, SVG
+              o PDF; exporte proyectos con varios códigos como ZIP, hojas PDF,
+              GIF animado o MP4.
             </p>
           </section>
 
@@ -82,19 +83,19 @@
               <article>
                 <strong>Cuatro niveles de recuperación</strong
                 ><span
-                  >L, M, Q y H añaden redundancia Reed-Solomon cada vez mayor.
-                  Los objetivos de recuperación de daños sueltos son de
-                  aproximadamente 7 %, 15 %, 25 % y 30 %, con una recuperación
-                  más alta que reduce la capacidad de carga útil.</span
+                  >L, M, Q y H añaden niveles crecientes de redundancia
+                  Reed-Solomon. Los objetivos aproximados de recuperación ante
+                  daños son del 7 %, 15 %, 25 % y 30 %; una mayor recuperación
+                  reduce la capacidad de datos.</span
                 >
               </article>
               <article>
                 <strong>Ocho máscaras</strong
                 ><span
-                  >Una máscara requerida rompe los patrones hostiles al escáner.
-                  Evalúa automáticamente cada máscara y elige la puntuación de
-                  penalización más baja; el depuración puede revelar los datos
-                  sin máscara.</span
+                  >Una máscara obligatoria rompe los patrones que dificultan la
+                  lectura. El modo automático evalúa todas las máscaras y elige
+                  la puntuación de penalización más baja; la vista de depuración
+                  puede mostrar los datos sin enmascarar.</span
                 >
               </article>
             </div>
@@ -103,8 +104,8 @@
               <a href="spec.es.html" data-parent-dialog-target="specification"
                 >Explora la especificación visual del QR</a
               >
-              Para patrones anotados, metadatos, flujos de bits, palabras de
-              código de recuperación, máscaras, orden de colocación y
+              para consultar patrones anotados, metadatos, flujos de bits,
+              palabras código de recuperación, máscaras, orden de colocación y
               referencias de implementación.
             </p>
           </section>
@@ -112,38 +113,38 @@
           <section>
             <h2>Diseño sin perder fiabilidad</h2>
             <p>
-              Los escáneres necesitan contraste, una zona clara y silenciosa y
+              Los lectores necesitan contraste, una zona de silencio despejada y
               patrones funcionales reconocibles. Los módulos redondeados, los
-              gradientes y la obra de arte central pueden funcionar bien, pero
-              cada personalización gasta parte de la tolerancia de escaneo del
-              código. Utilice una corrección de errores más fuerte para la obra
-              de arte, evite cubrir los patrones del buscador, imprima módulos
-              lo suficientemente grandes como para la distancia esperada y
-              pruebe el resultado físico final con varios dispositivos.
+              degradados y las ilustraciones centrales pueden funcionar bien,
+              pero cada personalización reduce el margen de tolerancia de
+              lectura. Use una corrección de errores más alta para las
+              ilustraciones, no cubra los patrones de posición, imprima módulos
+              suficientemente grandes para la distancia prevista y pruebe el
+              resultado físico final con varios dispositivos.
             </p>
           </section>
 
           <section>
             <h2>Herramientas de desarrollo y archivos</h2>
             <p>
-              El espacio de trabajo de depuración separa regiones funcionales,
-              metadatos, carga útil, espaciadores, corrección de errores y bits
-              restantes con colores configurables. Puede delinear palabras de
-              código o bytes de flujo, rastrear rutas de lectura, mostrar el
-              orden de los metadatos y invertir la máscara seleccionada para una
-              vista de datos brutos.
+              El espacio de trabajo de depuración separa con colores
+              configurables las regiones funcionales, los metadatos, los datos,
+              el relleno, la corrección de errores y los bits restantes. Puede
+              delimitar palabras código o bytes del flujo, trazar las rutas de
+              lectura, mostrar el orden de los metadatos e invertir la máscara
+              seleccionada para obtener una vista de los datos sin procesar.
             </p>
             <p>
-              El transporte de archivos admite URL de datos, URL de bloques del
-              navegador y un documentoado <code>FILE:1</code> Protocolo de
-              fragmentos. Las transferencias fragmentadas utilizan un
+              El transporte de archivos admite URL de datos, URL de tipo blob
+              del navegador y el protocolo documentado <code>FILE:1</code> para
+              transferencias por fragmentos. Estas transferencias utilizan un
               identificador compacto, desplazamientos de bytes, compresión gzip
-              opcional, metadatos y verificación SHA-256 para que los fotogramas
-              puedan recopilarse en orden irregular y verificarse antes de la
-              montaje. Las URL de blob solo funcionan en la sesión del navegador
-              que las creó; las cámaras telefónicas ordinarias generalmente
-              necesitan un enlace HTTPS o una aplicación de recepción compatible
-              para los flujos de trabajo de archivos.
+              opcional, metadatos y verificación SHA-256. Así, los códigos
+              pueden recopilarse en cualquier orden y comprobarse antes del
+              ensamblaje. Las URL de tipo blob solo funcionan en la sesión del
+              navegador que las creó; para trabajar con archivos, las cámaras de
+              teléfono habituales suelen necesitar un enlace HTTPS o una
+              aplicación receptora compatible.
             </p>
           </section>
 

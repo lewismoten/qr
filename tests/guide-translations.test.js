@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import {
   collectGuideText,
+  loadGuideTranslationSet,
   translateGuideHtml,
 } from '../scripts/guide-translations.mjs';
 
@@ -62,4 +63,22 @@ test('every supported locale translates all long-form guide prose', async () => 
     const missing = [...required].filter((value) => !translations[value]);
     assert.deepEqual(missing, [], `${locale} has untranslated guide prose`);
   }
+});
+
+test('reviewed guide translations override machine output', async () => {
+  const machine = JSON.parse(
+    await readFile('guides/translations/es.json', 'utf8'),
+  );
+  const reviewed = JSON.parse(
+    await readFile('guides/translations/es.reviewed.json', 'utf8'),
+  );
+  const translations = await loadGuideTranslationSet(
+    'guides/translations',
+    'es',
+  );
+
+  const unknown = Object.keys(reviewed).filter((key) => !(key in machine));
+  assert.deepEqual(unknown, []);
+  assert.equal(translations.Mask, 'Máscara');
+  assert.equal(translations['Open generator'], 'Abrir generador');
 });

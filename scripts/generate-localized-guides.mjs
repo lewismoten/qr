@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
 
 import {
-  loadGuideTranslations,
+  loadGuideTranslationSet,
   translateGuideHtml,
 } from './guide-translations.mjs';
 
@@ -81,8 +81,9 @@ export async function generateLocalizedGuides() {
     await Promise.all(
       LOCALES.map(async (locale) => [
         locale,
-        await loadGuideTranslations(
-          path.join(GUIDE_ROOT, 'translations', `${locale}.json`),
+        await loadGuideTranslationSet(
+          path.join(GUIDE_ROOT, 'translations'),
+          locale,
         ),
       ]),
     ),

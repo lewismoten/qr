@@ -121,3 +121,18 @@ export function collectGuideText(source) {
 export async function loadGuideTranslations(file) {
   return JSON.parse(await readFile(file, 'utf8'));
 }
+
+export async function loadGuideTranslationSet(directory, locale) {
+  const translations = await loadGuideTranslations(
+    `${directory}/${locale}.json`,
+  );
+  try {
+    const reviewed = await loadGuideTranslations(
+      `${directory}/${locale}.reviewed.json`,
+    );
+    return { ...translations, ...reviewed };
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    return translations;
+  }
+}

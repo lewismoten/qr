@@ -49,15 +49,14 @@
                   <span class="version-badge">Repositorio canónico</span>
                 </div>
                 <p>
-                  La aplicación de primera parte y la fuente del encodificador
-                  QR están alojadas por Lewis Moten en
-                  <code>git.lewismoten.com</code>. URL del navegador está
-                  destinada a leer el proyecto; el <code>.git</code> La URL es
-                  el extremo de clonación HTTPS canónico.
+                  Lewis Moten aloja el código fuente propio de la aplicación y
+                  del codificador QR en <code>git.lewismoten.com</code>. La URL
+                  web permite consultar el proyecto; la <code>.git</code> es la
+                  URL HTTPS canónica para clonar el repositorio.
                 </p>
                 <nav aria-label="Enlaces de la fuente del proyecto">
                   <a href="https://git.lewismoten.com/lewismoten/qr"
-                    >Buscar en el repositorio</a
+                    >Explorar el repositorio</a
                   ><a href="https://git.lewismoten.com/lewismoten/qr.git"
                     >URL de clonación HTTPS</a
                   >
@@ -65,8 +64,8 @@
               </article>
               <article>
                 <div>
-                  <h3>Encodador QR nativo</h3>
-                  <span class="version-badge">Parte primera</span>
+                  <h3>Codificador QR propio</h3>
+                  <span class="version-badge">Código propio</span>
                 </div>
                 <p>
                   Implanta segmentación de modo mixto, datos numéricos,
@@ -89,19 +88,20 @@
               </article>
               <article>
                 <div>
-                  <h3>Desarrollador y renderizador de errores QR</h3>
-                  <span class="version-badge">Parte primera</span>
+                  <h3>Depurador y renderizador QR</h3>
+                  <span class="version-badge">Código propio</span>
                 </div>
                 <p>
-                  Dibuja módulos estilizados, ojos de búsqueda, rutas, límites
-                  de palabras clave, regiones de metadatos y datos sin máscara
-                  directamente en Canvas. DENSO WAVE afirma que sus derechos de
-                  patente no se ejercen contra códigos QR estandarizados; el
-                  código QR también es una marca registrada de DENSO WAVE.
+                  Dibuja directamente en Canvas los módulos personalizados, los
+                  patrones de posición, las rutas, los límites de palabras
+                  código, las regiones de metadatos y los datos sin enmascarar.
+                  DENSO WAVE declara que no ejerce sus derechos de patente
+                  contra los códigos QR estandarizados; QR Code también es una
+                  marca registrada de DENSO WAVE.
                 </p>
                 <nav aria-label="Referencias del renderizador QR">
                   <a href="https://html.spec.whatwg.org/multipage/canvas.html"
-                    >Pintoría HTML</a
+                    >Canvas de HTML</a
                   ><a href="https://www.qrcode.com/en/about/standards.html"
                     >Historia de los estándares QR</a
                   ><a href="https://www.qrcode.com/en/patent.html"
@@ -115,25 +115,24 @@
                   <span class="version-badge">Algoritmo de primera parte</span>
                 </div>
                 <p>
-                  Genera palabras de código de corrección de errores QR sobre
-                  GF(256), las divide en la estructura de bloque requerida por
-                  la versión QR seleccionada y el nivel de recuperación, e
-                  intercala con palabras de código de datos. Reed-Solomon es una
-                  familia de códigos de corrección de errores, no una biblioteca
-                  de software empaquetada, por lo que no tiene licencia de
-                  software separada aquí; esta implementación es parte de la
-                  fuente de primera parte del repositorio. La familia de código
-                  original fue publicada por Irving Reed y Gustave Solomon en
-                  1960, mientras que los parámetros exactos del QR están
-                  regulados por ISO/IEC 18004. Posteriormente, las técnicas
-                  especializadas de implementación y descodificación de
-                  Reed-Solomon han tenido sus propios patentes, por lo que este
-                  inventario no debe interpretarse como una opinión general de
-                  aprobación de patentes.
+                  Genera palabras código de corrección de errores QR sobre
+                  GF(256), las divide según la estructura de bloques exigida por
+                  la versión y el nivel de recuperación seleccionados y las
+                  intercala con las palabras código de datos. Reed-Solomon es
+                  una familia de códigos de corrección de errores, no una
+                  biblioteca de software incluida; por tanto, aquí no tiene una
+                  licencia de software independiente. Esta implementación forma
+                  parte del código propio del repositorio. Irving Reed y Gustave
+                  Solomon publicaron la familia original en 1960, mientras que
+                  ISO/IEC 18004 regula los parámetros específicos de QR. Algunas
+                  técnicas especializadas posteriores de implementación y
+                  descodificación Reed-Solomon han estado sujetas a sus propias
+                  patentes, por lo que este inventario no debe interpretarse
+                  como una opinión general sobre libertad de operación.
                 </p>
                 <nav aria-label="Referencias de Reed-Solomon">
                   <a href="https://doi.org/10.1109/PGEC.1960.22230"
-                    >Papel original de 1960</a
+                    >Artículo original de 1960</a
                   ><a href="https://www.iso.org/standard/83389.html"
                     >Especificación de corrección de errores de QR</a
                   ><a href="https://patents.google.com/?q=(Reed-Solomon)"
@@ -152,16 +151,17 @@
               <article>
                 <div>
                   <h3>Texto bruto, números, URL y URL de datos</h3>
-                  <span class="version-badge">Peso de carga de texto QR</span>
+                  <span class="version-badge">Datos de texto QR</span>
                 </div>
                 <p>
                   Los formatos de texto y número colocan sus caracteres
                   resultantes directamente en uno o más segmentos de datos QR
                   sin un envoltorio adicional. Los códigos de sitios web llevan
                   una URL HTTP o HTTPS absoluta. El modo de datos de archivo
-                  único utiliza un <code>data:</code> URL con Base64 estándar,
-                  mientras que el protocolo de trozos de primera parte utiliza
-                  Base64url sin puntuación para el transporte binario compacto.
+                  único utiliza un <code>data:</code> una URL con Base64
+                  estándar, mientras que el protocolo propio de fragmentos
+                  utiliza Base64url sin relleno para transportar datos binarios
+                  de forma compacta.
                 </p>
                 <nav aria-label="Referencias de carga útil bruta">
                   <a href="https://www.rfc-editor.org/info/rfc3986"
@@ -293,22 +293,22 @@
               <article>
                 <div>
                   <h3>ARCHIVO: 1 transporte binario</h3>
-                  <span class="version-badge">Protocolo de primera parte</span>
+                  <span class="version-badge">Protocolo propio</span>
                 </div>
                 <p>
-                  Definido por la aplicación <code>FILE:1</code> El formato
-                  lleva un solo archivo o trozos en orden aleatorio. Su
-                  encabezado legible identifica el modo de solo archivo/trozos,
-                  la presencia del manifiesto, un ID de transferencia aleatorio
-                  de 128 bits codificado como 22 caracteres Base64url, una pista
-                  de extensión, el desplazamiento de bytes y la longitud total
-                  de la transferencia. Un manifiesto opcional escrito a mano
-                  puede incluir el nombre del archivo, el tipo MIME, la hora
-                  modificada, el tamaño original, los metadatos JSON y la
-                  validación SHA-256; una bandera registra la codificación
-                  opcional de transferencia gzip. Este no es un estándar de
-                  escáner ISO, IETF o establecido, por lo que su recepción
-                  requiere un software compatible.
+                  Definido por la aplicación <code>FILE:1</code> transporta un
+                  archivo único o fragmentos que pueden recibirse en cualquier
+                  orden. Su encabezado legible identifica el modo de archivo
+                  único o fragmentado, la presencia del manifiesto, un
+                  identificador aleatorio de transferencia de 128 bits
+                  codificado con 22 caracteres Base64url, una indicación de
+                  extensión, el desplazamiento en bytes y la longitud total. Un
+                  manifiesto tipado opcional puede incluir el nombre, el tipo
+                  MIME, la fecha de modificación, el tamaño original, metadatos
+                  JSON y una validación SHA-256; una marca registra la
+                  codificación gzip opcional. No es un estándar ISO, IETF ni un
+                  formato establecido para lectores, por lo que requiere
+                  software receptor compatible.
                 </p>
                 <nav aria-label="Referencias de protocolos de archivos">
                   <a href="../README.md#file-chunked-transport"
@@ -331,7 +331,7 @@
               <article>
                 <div>
                   <h3>Imágenes raster y vectoriales</h3>
-                  <span class="version-badge">Primer partido + Canvas</span>
+                  <span class="version-badge">Código propio + Canvas</span>
                 </div>
                 <p>
                   PNG y JPEG utilizan los codificadores de lienzo del navegador:
@@ -410,7 +410,7 @@
               <article>
                 <div>
                   <h3>Suma de verificación CRC-32</h3>
-                  <span class="version-badge">Parte primera</span>
+                  <span class="version-badge">Código propio</span>
                 </div>
                 <p>
                   Los campos de integridad ZIP utilizan un CRC-32 basado en
@@ -441,23 +441,24 @@
                   <span class="version-badge">Plataforma web</span>
                 </div>
                 <p>
-                  La interfaz utiliza formularios y dialogos HTML nativos,
-                  diseño CSS y consultas de medios, dibujo 2D de Canvas, módulos
-                  ECMAScript en páginas alojadas y una solución alternativa
-                  incluida para <code>file:</code> Usar.
-                  <code>TextEncoder</code> Produce bytes UTF-8 a lo largo del
+                  La interfaz utiliza formularios y diálogos HTML nativos,
+                  diseño y consultas de medios CSS, dibujo Canvas 2D, módulos
+                  ECMAScript en las páginas alojadas y una alternativa integrada
+                  para <code>file:</code> cuando se utiliza localmente.
+                  <code>TextEncoder</code> produce bytes UTF-8 en todo el
                   codificador y el código de exportación. El modo Kanji opcional
-                  construye su mapeo Shift JIS con el del navegador
+                  crea su correspondencia Shift JIS mediante
                   <code>TextDecoder</code>; informa de un error cuando esa
                   codificación no está disponible.
                 </p>
                 <nav
                   aria-label="Referencias de la fundación de la plataforma web"
                 >
-                  <a href="https://html.spec.whatwg.org/">Nivel de vida HTML</a
+                  <a href="https://html.spec.whatwg.org/"
+                    >Estándar HTML Living Standard</a
                   ><a href="https://tc39.es/ecma262/">ECMAScript</a
                   ><a href="https://html.spec.whatwg.org/multipage/canvas.html"
-                    >Pintura en lienzo 2D</a
+                    >Canvas 2D</a
                   ><a href="https://encoding.spec.whatwg.org/"
                     >Codificación WHATWG</a
                   >
@@ -469,13 +470,12 @@
                   <span class="version-badge">Plataforma web</span>
                 </div>
                 <p>
-                  La selección y lectura de archivos, el almacenamiento de
-                  bloques, las URL de objetos, las URL de datos y las descargas
-                  del lado del cliente utilizan las API del navegador. Las URL
-                  de objetos son referencias locales de sesión y no incorporan
-                  bytes de archivo en el encabezado QR; el transporte de ARCHIVO
-                  personalizado descrito anteriormente es un formato separado de
-                  primera parte.
+                  La selección y lectura de archivos, el almacenamiento Blob,
+                  las URL de objeto, las URL de datos y las descargas del
+                  cliente utilizan API del navegador. Las URL de objeto son
+                  referencias locales a la sesión y no incluyen los bytes del
+                  archivo en los datos QR; el transporte FILE personalizado
+                  descrito anteriormente es un formato propio independiente.
                 </p>
                 <nav aria-label="Referencias de archivos y URL de la API">
                   <a href="https://www.w3.org/TR/FileAPI/">API de archivos</a
@@ -515,7 +515,7 @@
               <article>
                 <div>
                   <h3>Animación y grabación de medios</h3>
-                  <span class="version-badge">Primera parte + API web</span>
+                  <span class="version-badge">Código propio + API web</span>
                 </div>
                 <p>
                   Los fotogramas GIF animados se codifican directamente. La
