@@ -482,6 +482,7 @@
     "none": "कोई नहीं",
     "preview": "पूर्वावलोकन",
     "loading": "लोड हो रहा है...",
+    "fragmentLoadError": "यह अनुभाग लोड नहीं हो सका। अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
     "noFileSelected": "कोई फ़ाइल चयनित नहीं",
     "sequence": "{total} में से {current}",
     "count": "{current} / {total}"

@@ -5,7 +5,7 @@ import {
 import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 const readInteger = (input, fallback) => {
-  const value = Number.parseInt(input.value, 10);
+  const value = Number.parseInt(input?.value, 10);
   return Number.isNaN(value) ? fallback : value;
 };
 
@@ -128,6 +128,10 @@ export function createStyleSetup({
         },
       });
       colorsSystem = { colors, imageFill };
+      e.imageFillRecommended.addEventListener('click', () => {
+        colors.applyRecommendedImageContrast();
+        render();
+      });
       colors.formatTransparency();
       colors.sync();
     });
@@ -187,6 +191,13 @@ export function createStyleSetup({
         onUpdate: render,
       });
       artworkSystem = { artwork, centerLogo, pixelEditor };
+      e.emojiOptions.forEach((button) =>
+        button.addEventListener('click', () => {
+          e.centerEmoji.value = button.dataset.emoji || '';
+          artwork.syncEmoji();
+          render();
+        }),
+      );
       pixelEditor.initialize();
       artwork.sync();
     });
@@ -195,7 +206,7 @@ export function createStyleSetup({
     sync: () => modulesSystem?.modules.sync(),
     getOptions: () =>
       modulesSystem?.modules.getOptions() ?? {
-        type: e.moduleShape.value,
+        type: e.moduleShape?.value ?? 'square',
         rounding: readInteger(e.moduleRounding, 25),
         inset: readInteger(e.moduleInset, 4),
         rotation: readInteger(e.moduleRotation, 0),
@@ -205,7 +216,7 @@ export function createStyleSetup({
     sync: () => modulesSystem?.eyes.sync(),
     getOptions: () =>
       modulesSystem?.eyes.getOptions() ?? {
-        type: e.eyeShape.value,
+        type: e.eyeShape?.value ?? 'default',
         outerRounding: readInteger(e.eyeOuterRounding, 20),
         centerRounding: readInteger(e.eyeCenterRounding, 35),
       },
@@ -217,12 +228,14 @@ export function createStyleSetup({
       colorsSystem?.colors.applyRecommendedImageContrast(),
     getGradientOptions: () =>
       colorsSystem?.colors.getGradientOptions() ?? {
-        type: e.gradientType.value,
+        type: e.gradientType?.value ?? 'solid',
         angle: readInteger(e.gradientAngle, 0),
-        endColor: colorWithTransparency(
-          e.colorGradientEnd.value.trim() || '#0f766e',
-          e.colorGradientEndTransparency,
-        ),
+        endColor: e.colorGradientEnd
+          ? colorWithTransparency(
+              e.colorGradientEnd.value.trim() || '#0f766e',
+              e.colorGradientEndTransparency,
+            )
+          : '#0f766e',
       },
   };
   const artwork = {
@@ -247,17 +260,6 @@ export function createStyleSetup({
     if (name === 'artwork') await loadArtwork();
   };
 
-  e.imageFillRecommended.addEventListener('click', () => {
-    colors.applyRecommendedImageContrast();
-    render();
-  });
-  e.emojiOptions.forEach((button) =>
-    button.addEventListener('click', () => {
-      e.centerEmoji.value = button.dataset.emoji || '';
-      artwork.syncEmoji();
-      render();
-    }),
-  );
   document.getElementById('qr-form').addEventListener('click', (event) => {
     const button = event.target.closest('.choice-button');
     if (!button) return;

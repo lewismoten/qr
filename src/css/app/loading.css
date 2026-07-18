@@ -89,6 +89,14 @@
   display: none;
 }
 
+.fragment-loading {
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 800;
+}
+
 @keyframes module-loading-spin {
   to {
     transform: rotate(1turn);

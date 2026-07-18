@@ -491,6 +491,7 @@
     "none": "ninguno",
     "preview": "Vista previa",
     "loading": "Cargando...",
+    "fragmentLoadError": "No se pudo cargar esta sección. Comprueba tu conexión e inténtalo de nuevo.",
     "noFileSelected": "Ningún archivo seleccionado",
     "sequence": "{current} de {total}",
     "count": "{current} / {total}"

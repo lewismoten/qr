@@ -20,7 +20,7 @@ export function createTabSet({
       panel.hidden = !active;
     });
 
-    onActivate?.(value);
+    return onActivate?.(value);
   };
 
   buttons.forEach((button) => {

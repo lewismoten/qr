@@ -1,6 +1,7 @@
 import { createContentSubtabs } from '../content/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
 import { createLoadingIndicator } from '../loading-indicator.js';
+import { ensurePanelFragment } from '../fragment-loader.js';
 
 export function createNavigation({
   elements: e,
@@ -22,18 +23,21 @@ export function createNavigation({
   const loading = createLoadingIndicator({
     region: e.tabPanels[0]?.parentElement,
   });
-  const load = (prepare, name) =>
+  const getPanel = (group, name) =>
+    document.querySelector('[data-' + group + '-panel="' + name + '"]');
+  const load = (prepare, group, name) =>
     loading
       .track(
         Promise.resolve()
+          .then(() => ensurePanelFragment(getPanel(group, name)))
           .then(() => prepare?.(name))
           .then(render),
       )
       .catch(console.error);
-  const loadDebug = (name) => load(prepareDebug, name);
-  const loadStyle = (name) => load(prepareStyle, name);
-  const loadDownload = (name) => load(prepareDownload, name);
-  const loadContent = (name) => load(prepareContent, name);
+  const loadDebug = (name) => load(prepareDebug, 'subtab', name);
+  const loadStyle = (name) => load(prepareStyle, 'style-subtab', name);
+  const loadDownload = (name) => load(prepareDownload, 'download-subtab', name);
+  const loadContent = (name) => load(prepareContent, 'content-subtab', name);
   const getSubtabElements = (name) => ({
     buttons: document.querySelectorAll(`.${name}-subtab-button`),
     panels: document.querySelectorAll(`.${name}-subtab-panel`),
@@ -97,20 +101,19 @@ export function createNavigation({
     onActivate(name) {
       setActiveTab(name);
       if (name === 'debug') {
-        ensureDebugSubtabs().then(() => loadDebug(activeDebugSubtab));
-        return;
+        return ensureDebugSubtabs().then(() => loadDebug(activeDebugSubtab));
       }
       if (name === 'style') {
-        ensureStyleSubtabs().then(() => loadStyle(activeStyleSubtab));
-        return;
+        return ensureStyleSubtabs().then(() => loadStyle(activeStyleSubtab));
       }
       if (name === 'download') {
-        ensureDownloadSubtabs().then(() => loadDownload(activeDownloadSubtab));
-        return;
+        return ensureDownloadSubtabs().then(() =>
+          loadDownload(activeDownloadSubtab),
+        );
       }
       if (name === 'content' && format.value === 'geo')
         window.requestAnimationFrame(updateMap);
-      render();
+      return render();
     },
   });
   const activateDebug = (name) =>

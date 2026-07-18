@@ -1,7 +1,8 @@
 import { initializeLazyDialogs } from '../lazy-dialogs.js';
 import { bindApplicationEvents } from '../events.js';
+import { activateNavigationHash } from '../navigation/location.js';
 
-export function startApplication({
+export async function startApplication({
   document,
   window,
   elements,
@@ -60,8 +61,8 @@ export function startApplication({
   systems.contentSections.shared.initialize();
   systems.output.syncSmsLength();
   systems.contentEncoding.emailCapacity.sync();
-  systems.navigation.activateContent('data');
-  systems.navigation.activateTab('content');
+  await systems.navigation.activateContent('data');
+  await systems.navigation.activateTab('content');
   systems.previewControls.setViewMode('fit', true);
   if (
     window.location.hash.includes('download=1') &&
@@ -73,5 +74,9 @@ export function startApplication({
       )
       .catch(console.error);
   }
+  const activateHash = () =>
+    activateNavigationHash(systems.navigation, window.location.hash);
+  await activateHash();
+  window.addEventListener('hashchange', () => void activateHash());
   return systems.preview.render();
 }

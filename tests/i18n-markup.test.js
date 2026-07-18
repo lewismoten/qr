@@ -18,7 +18,18 @@ const flattenMessages = (value, prefix = '', result = {}) => {
   return result;
 };
 
-const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const markupUrls = [
+  '../index.html',
+  '../fragments/content/frame.html',
+  '../fragments/style/modules.html',
+  '../fragments/style/colors.html',
+  '../fragments/style/artwork.html',
+];
+const html = (
+  await Promise.all(
+    markupUrls.map((url) => readFile(new URL(url, import.meta.url), 'utf8')),
+  )
+).join('\n');
 const htmlKeys = [
   ...new Set(
     [...html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)].map(

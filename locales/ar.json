@@ -484,6 +484,7 @@
     "none": "لا شيء",
     "preview": "معاينة",
     "loading": "جارٍ التحميل...",
+    "fragmentLoadError": "تعذر تحميل هذا القسم. تحقق من اتصالك وحاول مرة أخرى.",
     "noFileSelected": "لم يتم اختيار ملف",
     "sequence": "{current} من {total}",
     "count": "{current} / {total}"

@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR center artwork | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Add logos, emoji, or editable pixel artwork to a QR code."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/fragments/style/artwork.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../dist/chunks/style-artwork.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>QR center artwork</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=style&amp;subtab=artwork"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section data-app-fragment="tab=style&amp;subtab=artwork">
+            <fieldset class="option-group">
+              <legend data-i18n="style.art.legend">Center artwork</legend>
+              <label class="toggle-field">
+                <input
+                  id="frame-message-center-art"
+                  name="frame-message-center-art"
+                  type="checkbox"
+                />
+                <span data-i18n="style.art.useFrameMessage"
+                  >Use frame message as center artwork</span
+                >
+              </label>
+              <div
+                class="choice-grid center-art-mode-grid"
+                role="group"
+                aria-label="Center artwork type"
+                data-i18n-aria-label="style.art.type"
+              >
+                <button
+                  type="button"
+                  class="choice-button is-active"
+                  data-choice-target="center-art-mode"
+                  data-choice-value="none"
+                  aria-pressed="true"
+                  data-i18n="common.none"
+                >
+                  None
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="center-art-mode"
+                  data-choice-value="logo"
+                  aria-pressed="false"
+                  data-i18n="style.art.logo"
+                >
+                  Logo
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="center-art-mode"
+                  data-choice-value="emoji"
+                  aria-pressed="false"
+                  data-i18n="style.art.emoji"
+                >
+                  Emoji
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="center-art-mode"
+                  data-choice-value="pixel"
+                  aria-pressed="false"
+                  data-i18n="style.art.pixelArt"
+                >
+                  Pixel art
+                </button>
+              </div>
+              <select
+                id="center-art-mode"
+                name="center-art-mode"
+                class="sr-only"
+                aria-label="Center artwork type"
+              >
+                <option value="none" selected data-i18n="common.none">
+                  None
+                </option>
+                <option value="logo" data-i18n="style.art.logo">Logo</option>
+                <option value="emoji" data-i18n="style.art.emoji">Emoji</option>
+                <option value="pixel" data-i18n="style.art.pixelArt">
+                  Pixel art
+                </option>
+              </select>
+
+              <div id="center-art-controls" class="center-art-controls" hidden>
+                <label class="slider-field" for="center-art-size">
+                  <span data-i18n="style.art.size">Artwork size</span>
+                  <output id="center-art-size-value" for="center-art-size"
+                    >20%</output
+                  >
+                </label>
+                <input
+                  id="center-art-size"
+                  name="center-art-size"
+                  type="range"
+                  min="10"
+                  max="30"
+                  step="1"
+                  value="20"
+                />
+                <label class="toggle-field">
+                  <input
+                    id="center-art-background"
+                    name="center-art-background"
+                    type="checkbox"
+                    checked
+                  />
+                  <span
+                    id="center-art-background-label"
+                    data-i18n="art.protectBackground"
+                    >Protect with a light background</span
+                  >
+                </label>
+
+                <div
+                  id="center-logo-controls"
+                  class="center-art-mode-controls"
+                  hidden
+                >
+                  <div class="file-picker">
+                    <input
+                      id="center-logo-input"
+                      class="file-picker-input"
+                      name="center-logo-input"
+                      type="file"
+                      accept="image/*"
+                      aria-describedby="center-logo-selection"
+                    />
+                    <label
+                      class="file-picker-button"
+                      for="center-logo-input"
+                      data-i18n="style.art.logoImage"
+                      >Logo image</label
+                    >
+                    <span
+                      id="center-logo-selection"
+                      class="file-picker-selection"
+                      data-file-picker-status
+                      data-i18n="common.noFileSelected"
+                      >No file selected</span
+                    >
+                  </div>
+                  <button
+                    id="center-logo-clear"
+                    type="button"
+                    class="secondary-button"
+                    data-i18n="style.art.clearLogo"
+                  >
+                    Clear logo
+                  </button>
+                </div>
+
+                <div
+                  id="center-emoji-controls"
+                  class="center-art-mode-controls"
+                  hidden
+                >
+                  <label for="center-emoji" data-i18n="style.art.emoji"
+                    >Emoji</label
+                  >
+                  <input
+                    id="center-emoji"
+                    name="center-emoji"
+                    type="text"
+                    maxlength="8"
+                    value="&#128279;"
+                    aria-describedby="emoji-picker-label"
+                  />
+                  <span
+                    id="emoji-picker-label"
+                    class="field-label"
+                    data-i18n="style.art.quickPicks"
+                    >Quick picks</span
+                  >
+                  <div
+                    id="emoji-picker"
+                    class="emoji-picker"
+                    role="group"
+                    aria-labelledby="emoji-picker-label"
+                  >
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128279;"
+                      aria-label="Link"
+                      data-i18n-aria-label="style.art.icons.link"
+                    >
+                      &#128279;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128241;"
+                      aria-label="Phone"
+                      data-i18n-aria-label="style.art.icons.phone"
+                    >
+                      &#128241;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#9993;&#65039;"
+                      aria-label="Envelope"
+                      data-i18n-aria-label="style.art.icons.envelope"
+                    >
+                      &#9993;&#65039;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128205;"
+                      aria-label="Location pin"
+                      data-i18n-aria-label="style.art.icons.location"
+                    >
+                      &#128205;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127968;"
+                      aria-label="Home"
+                      data-i18n-aria-label="style.art.icons.home"
+                    >
+                      &#127968;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128722;"
+                      aria-label="Shopping cart"
+                      data-i18n-aria-label="style.art.icons.cart"
+                    >
+                      &#128722;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127873;"
+                      aria-label="Gift"
+                      data-i18n-aria-label="style.art.icons.gift"
+                    >
+                      &#127873;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#11088;"
+                      aria-label="Star"
+                      data-i18n-aria-label="style.art.icons.star"
+                    >
+                      &#11088;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#10084;&#65039;"
+                      aria-label="Heart"
+                      data-i18n-aria-label="style.art.icons.heart"
+                    >
+                      &#10084;&#65039;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#9989;"
+                      aria-label="Check mark"
+                      data-i18n-aria-label="style.art.icons.check"
+                    >
+                      &#9989;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128640;"
+                      aria-label="Rocket"
+                      data-i18n-aria-label="style.art.icons.rocket"
+                    >
+                      &#128640;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128161;"
+                      aria-label="Light bulb"
+                      data-i18n-aria-label="style.art.icons.bulb"
+                    >
+                      &#128161;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127760;"
+                      aria-label="Globe"
+                      data-i18n-aria-label="style.art.icons.globe"
+                    >
+                      &#127760;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128247;"
+                      aria-label="Camera"
+                      data-i18n-aria-label="style.art.icons.camera"
+                    >
+                      &#128247;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127925;"
+                      aria-label="Music"
+                      data-i18n-aria-label="style.art.icons.music"
+                    >
+                      &#127925;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#9749;"
+                      aria-label="Coffee"
+                      data-i18n-aria-label="style.art.icons.coffee"
+                    >
+                      &#9749;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128273;"
+                      aria-label="Key"
+                      data-i18n-aria-label="style.art.icons.key"
+                    >
+                      &#128273;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128274;"
+                      aria-label="Lock"
+                      data-i18n-aria-label="style.art.icons.lock"
+                    >
+                      &#128274;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128246;"
+                      aria-label="Signal bars"
+                      data-i18n-aria-label="style.art.icons.signal"
+                    >
+                      &#128246;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128214;"
+                      aria-label="Book"
+                      data-i18n-aria-label="style.art.icons.book"
+                    >
+                      &#128214;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128197;"
+                      aria-label="Calendar"
+                      data-i18n-aria-label="style.art.icons.calendar"
+                    >
+                      &#128197;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127915;"
+                      aria-label="Ticket"
+                      data-i18n-aria-label="style.art.icons.ticket"
+                    >
+                      &#127915;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#127828;"
+                      aria-label="Food"
+                      data-i18n-aria-label="style.art.icons.food"
+                    >
+                      &#127828;
+                    </button>
+                    <button
+                      type="button"
+                      class="emoji-option"
+                      data-emoji="&#128522;"
+                      aria-label="Smile"
+                      data-i18n-aria-label="style.art.icons.smile"
+                    >
+                      &#128522;
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  id="center-pixel-controls"
+                  class="center-art-mode-controls"
+                  hidden
+                >
+                  <label class="slider-field" for="pixel-art-size">
+                    <span data-i18n="style.art.canvasWidth">Canvas width</span>
+                    <output id="pixel-art-size-value" for="pixel-art-size"
+                      >16 x 16</output
+                    >
+                  </label>
+                  <input
+                    id="pixel-art-size"
+                    name="pixel-art-size"
+                    type="range"
+                    min="8"
+                    max="32"
+                    step="2"
+                    value="16"
+                  />
+                  <div class="pixel-art-toolbar">
+                    <label
+                      for="pixel-art-color"
+                      data-i18n="style.art.customColor"
+                      >Custom color</label
+                    >
+                    <input
+                      id="pixel-art-color"
+                      name="pixel-art-color"
+                      type="color"
+                      value="#111827"
+                    />
+                    <button
+                      id="pixel-art-clear"
+                      type="button"
+                      class="secondary-button"
+                      data-i18n="style.art.clear"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div
+                    id="pixel-art-palette"
+                    class="pixel-art-palette"
+                    role="group"
+                    aria-label="EGA paint colors"
+                  ></div>
+                  <label class="toggle-field">
+                    <input
+                      id="pixel-art-match-module-shape"
+                      name="pixel-art-match-module-shape"
+                      type="checkbox"
+                    />
+                    <span data-i18n="style.art.matchShape"
+                      >Match the QR module shape</span
+                    >
+                  </label>
+                  <div
+                    id="pixel-art-grid"
+                    class="pixel-art-grid"
+                    role="grid"
+                    aria-label="16 by 16 pixel art editor"
+                  ></div>
+                  <p class="hint" data-i18n="style.art.paintHint">
+                    Choose a color or Transparent, then tap or drag across the
+                    canvas.
+                  </p>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Fragment page navigation">
+            <a href="../../index.html#tab=style&amp;subtab=artwork"
+              >Open this tool</a
+            >
+            <a href="../../about.html">About</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+  </body>
+</html>

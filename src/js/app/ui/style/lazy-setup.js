@@ -1,12 +1,14 @@
 export function createLazyStyleSetup(options) {
   let controller = null;
   let featureElements = null;
+  let getElements = null;
   let request = null;
   const ensure = () => {
     if (controller) return Promise.resolve(controller);
     if (!request) {
       request = Promise.all([import('./setup.js'), import('./elements.js')])
         .then(([{ createStyleSetup }, { getStyleElements }]) => {
+          getElements = getStyleElements;
           featureElements = getStyleElements(options.document);
           controller = createStyleSetup({
             ...options,
@@ -22,7 +24,11 @@ export function createLazyStyleSetup(options) {
     return request;
   };
   return {
-    load: (name) => ensure().then((system) => system.load(name)),
+    load: (name) =>
+      ensure().then((system) => {
+        Object.assign(featureElements, getElements(options.document));
+        return system.load(name);
+      }),
     modules: {
       sync: () => controller?.modules.sync(),
       getOptions: () =>
@@ -54,13 +60,13 @@ export function createLazyStyleSetup(options) {
           endColor: '#0f766e',
         },
       getQrColors: () => ({
-        dark: featureElements
+        dark: featureElements?.colorDark
           ? options.colorWithTransparency(
               featureElements.colorDark.value.trim() || '#111827',
               featureElements.colorDarkTransparency,
             )
           : '#111827ff',
-        light: featureElements
+        light: featureElements?.colorLight
           ? options.colorWithTransparency(
               featureElements.colorLight.value.trim() || '#ffffff',
               featureElements.colorLightTransparency,
@@ -72,14 +78,15 @@ export function createLazyStyleSetup(options) {
       sync: () => controller?.artwork.sync(),
       syncEmoji: () => controller?.artwork.syncEmoji(),
       getOptions: () => ({
-        mode: featureElements?.centerArtMode.value ?? 'none',
-        emoji: featureElements?.centerEmoji.value.trim() ?? '',
-        sizePercent: featureElements
+        mode: featureElements?.centerArtMode?.value ?? 'none',
+        emoji: featureElements?.centerEmoji?.value.trim() ?? '',
+        sizePercent: featureElements?.centerArtSize
           ? Number.parseInt(featureElements.centerArtSize.value, 10) || 20
           : 20,
-        protectBackground: featureElements?.centerArtBackground.checked ?? true,
+        protectBackground:
+          featureElements?.centerArtBackground?.checked ?? true,
         matchModuleShape:
-          featureElements?.pixelArtMatchModuleShape.checked ?? false,
+          featureElements?.pixelArtMatchModuleShape?.checked ?? false,
       }),
     },
     pixelEditor: {
@@ -95,9 +102,9 @@ export function createLazyStyleSetup(options) {
     imageFill: { getImage: () => controller?.imageFill.getImage() ?? null },
     centerLogo: { getImage: () => controller?.centerLogo.getImage() ?? null },
     getEyeColors: () => ({
-      enabled: featureElements?.eyeCustomColorsEnabled.checked ?? false,
-      outer: featureElements?.eyeOuterColor.value ?? '#0f766e',
-      center: featureElements?.eyeCenterColor.value ?? '#111827',
+      enabled: featureElements?.eyeCustomColorsEnabled?.checked ?? false,
+      outer: featureElements?.eyeOuterColor?.value ?? '#0f766e',
+      center: featureElements?.eyeCenterColor?.value ?? '#111827',
     }),
   };
 }
