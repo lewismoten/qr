@@ -430,6 +430,7 @@
     "phone": {
       "required": "Not valid for {context} format yet: {label} is required.",
       "characters": "Not valid for {context} format yet: {label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.",
+      "formatLength": "Not valid for {context} format yet: {label} should stay within 40 characters.",
       "plus": "Not valid for {context} format yet: {label} can only use + at the beginning.",
       "length": "Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits."
     },
@@ -461,10 +462,22 @@
       "characters": "Not valid for Event format yet: {label} contains unsupported control characters.",
       "startDate": "Not valid for Event format yet: start date is required.",
       "endDate": "Not valid for Event format yet: end date is required.",
+      "dates": "Not valid for Event format yet: enter real dates using YYYY-MM-DD.",
       "dateOrder": "Not valid for Event format yet: end date cannot be before start date.",
       "startTime": "Not valid for Event format yet: start time is required.",
       "endTime": "Not valid for Event format yet: end time is required.",
+      "times": "Not valid for Event format yet: enter real 24-hour times using HH:MM.",
       "timeOrder": "Not valid for Event format yet: end must be after start."
+    },
+    "wifi": {
+      "security": "Not valid for Wi-Fi format yet: choose WPA, WEP, or Open.",
+      "ssidRequired": "Not valid for Wi-Fi format yet: network name is required.",
+      "ssidLabel": "Wi-Fi network name",
+      "ssidBytes": "Not valid for Wi-Fi format yet: network name must fit within 32 UTF-8 bytes.",
+      "passwordRequired": "Not valid for Wi-Fi format yet: a password is required.",
+      "passwordLabel": "Wi-Fi password",
+      "wepPassword": "Not valid for Wi-Fi format yet: WEP keys must be 5 or 13 characters, or 10 or 26 hexadecimal digits.",
+      "wpaPassword": "Not valid for Wi-Fi format yet: WPA passwords must be 8 to 63 characters, or exactly 64 hexadecimal digits."
     },
     "sms": {
       "length": "Not valid for SMS format yet: message should stay at {maxLength} characters or fewer for broad SMS compatibility."

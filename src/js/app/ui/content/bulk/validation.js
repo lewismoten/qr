@@ -11,6 +11,7 @@ import {
   validateVCardTextValue,
 } from '../../../validation.js';
 import { parseCoordinate } from '../geo/coordinates.js';
+import { validateWifiValues } from '../wifi/validation.js';
 import { normalizeBulkWifiSecurity } from './payload.js';
 import { lookup } from '../../../../i18n/index.js';
 
@@ -89,7 +90,7 @@ export function validateBulkImport({
   if (format === 'text' && !row.text.trim())
     return fail(lookup('bulk.validation.textRequired', 'text is required.'));
   if (format === 'number') {
-    if (!/^-?\d+$/.test(row.number.trim()))
+    if (!Number.isSafeInteger(Number(row.number.trim())))
       return fail(
         lookup('bulk.validation.wholeNumber', 'number must be a whole number.'),
       );
@@ -102,7 +103,8 @@ export function validateBulkImport({
     }
   }
   if (format === 'wifi') {
-    if (!normalizeBulkWifiSecurity(row.security))
+    const security = normalizeBulkWifiSecurity(row.security);
+    if (!security)
       return fail(
         lookup(
           'bulk.validation.security',
@@ -116,6 +118,12 @@ export function validateBulkImport({
           'hidden must be true/false, yes/no, or 1/0.',
         ),
       );
+    const wifiError = validateWifiValues({
+      security,
+      ssid: row.ssid,
+      password: row.password,
+    });
+    if (wifiError) return fail(detail(wifiError));
   }
   if (format === 'email') {
     const emailError = validateEmailValue(row.email);

@@ -19,6 +19,7 @@ describe('contact validation', () => {
     hasError(validateEmailValue(''));
     assert.equal(validateEmailValue('', { required: false }), '');
     hasError(validateEmailValue('person@example'));
+    hasError(validateEmailValue('person\u0000@example.com'));
     assert.equal(validateEmailValue(' person@example.com '), '');
     hasError(validateEmailValue(`${'a'.repeat(243)}@example.com`));
   });
@@ -31,6 +32,7 @@ describe('contact validation', () => {
     hasError(validateTelephoneValue('530+5394775'));
     hasError(validateTelephoneValue('+1+5305394775'));
     hasError(validateTelephoneValue('12345'));
+    hasError(validateTelephoneValue('+1' + ' '.repeat(30) + '5305394775'));
     hasError(validateTelephoneValue(`+${'1'.repeat(16)}`));
   });
 });

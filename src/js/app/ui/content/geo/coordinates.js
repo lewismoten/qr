@@ -1,4 +1,6 @@
 export function parseCoordinate(value) {
-  const parsed = Number.parseFloat(value.trim());
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? parsed : null;
 }

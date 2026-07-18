@@ -107,7 +107,8 @@ export function createContentSections({
       })),
     wifi: () =>
       Promise.all([wifiLoader.ensure(), import('./wifi/plugin.js')]).then(
-        ([section, { createWifiPlugin }]) => createWifiPlugin(section),
+        ([section, { createWifiPlugin }]) =>
+          createWifiPlugin({ document, section }),
       ),
     email: () =>
       Promise.all([sharedLoader.ensure(), import('./email/plugin.js')]).then(

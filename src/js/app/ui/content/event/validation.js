@@ -1,6 +1,8 @@
 import { lookup } from '../../../../i18n/index.js';
 import {
   getWebsiteValidationState,
+  isValidBulkDate,
+  isValidBulkTime,
   validateCalendarText,
 } from '../../../validation.js';
 
@@ -36,6 +38,14 @@ export function validateEvent(document, limits) {
       ),
     );
   }
+  if (!isValidBulkDate(startDate.value) || !isValidBulkDate(endDate.value)) {
+    return invalid(
+      lookup(
+        'validation.event.dates',
+        'Not valid for Event format yet: enter real dates using YYYY-MM-DD.',
+      ),
+    );
+  }
   if (allDay.checked && endDate.value < startDate.value) {
     return invalid(
       lookup(
@@ -50,6 +60,17 @@ export function validateEvent(document, limits) {
       lookup(
         `validation.event.${key}`,
         `Not valid for Event format yet: ${key} is required.`,
+      ),
+    );
+  }
+  if (
+    !allDay.checked &&
+    (!isValidBulkTime(startTime.value) || !isValidBulkTime(endTime.value))
+  ) {
+    return invalid(
+      lookup(
+        'validation.event.times',
+        'Not valid for Event format yet: enter real 24-hour times using HH:MM.',
       ),
     );
   }
