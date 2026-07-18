@@ -548,7 +548,19 @@
     "compressionUnsupported": "Este navegador no admite la compresión gzip. Desactívala para continuar.",
     "chunkFitError": "El protocolo de fragmentos no cabe en esta configuración QR.",
     "manifestFieldLimit": "El campo {type} del manifiesto supera el límite de 65.535 bytes.",
-    "metadataJson": "Los metadatos personalizados deben ser JSON válido."
+    "metadataJson": "Los metadatos personalizados deben ser JSON válido.",
+    "capacity": {
+      "download": "Cargados {loadedBytes} B ({loadedSize}) de unos {maxBytes} B ({maxSize}) como máximo ({percent}%). El QR guarda una URL de descarga compartible con los bytes, el nombre y el tipo MIME del archivo.",
+      "chooseDownload": "Elige un archivo para generar una URL de descarga compartible.",
+      "autoVersion": "V{version} uniforme seleccionada automáticamente",
+      "version": "V{version} uniforme",
+      "gzip": "la transferencia gzip ocupa {bytes} B ({size})",
+      "noCompression": "la compresión de transferencia está desactivada",
+      "chunked": "Cargados {loadedBytes} B ({loadedSize}); {transfer}, más un manifiesto de {manifestBytes} B. El fotograma {current} de {total} lleva {frameBytes} B con {limit}; los fotogramas completos usan {capacityBytes} B ({capacitySize}) de la capacidad del flujo.",
+      "chooseChunked": "Elige un archivo para dividirlo en cargas QR fragmentadas.",
+      "data": "Cargados {loadedBytes} B ({loadedSize}) de {maxBytes} B ({maxSize}) como máximo ({percent}%).",
+      "chooseData": "Elige un archivo para incrustarlo directamente como URL de datos."
+    }
   },
   "frame": {
     "message": "Mensaje del marco",

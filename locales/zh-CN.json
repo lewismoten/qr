@@ -534,7 +534,19 @@
     "compressionUnsupported": "此浏览器不支持 gzip 传输压缩，请关闭压缩后继续。",
     "chunkFitError": "当前二维码配置无法容纳分块协议。",
     "manifestFieldLimit": "清单字段 {type} 超过 65,535 字节限制。",
-    "metadataJson": "自定义文件元数据必须是有效的 JSON。"
+    "metadataJson": "自定义文件元数据必须是有效的 JSON。",
+    "capacity": {
+      "download": "已加载 {loadedBytes} B（{loadedSize}），最大约 {maxBytes} B（{maxSize}），占 {percent}%。二维码会保存包含文件字节、名称和 MIME 类型的可共享下载网址。",
+      "chooseDownload": "请选择文件以生成可共享的下载网址。",
+      "autoVersion": "自动选择统一版本 V{version}",
+      "version": "统一版本 V{version}",
+      "gzip": "gzip 传输为 {bytes} B（{size}）",
+      "noCompression": "传输压缩已关闭",
+      "chunked": "已加载 {loadedBytes} B（{loadedSize}）；{transfer}，另有 {manifestBytes} B 清单。第 {current}/{total} 帧携带 {frameBytes} B，限制为 {limit}；完整帧使用 {capacityBytes} B（{capacitySize}）的数据流容量。",
+      "chooseChunked": "请选择文件以拆分为多个二维码分块载荷。",
+      "data": "已加载 {loadedBytes} B（{loadedSize}），最大 {maxBytes} B（{maxSize}），占 {percent}%。",
+      "chooseData": "请选择文件，将其直接嵌入为数据网址。"
+    }
   },
   "frame": {
     "message": "边框文字",

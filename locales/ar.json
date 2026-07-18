@@ -541,7 +541,19 @@
     "compressionUnsupported": "لا يدعم هذا المتصفح ضغط نقل gzip. أوقف الضغط للمتابعة.",
     "chunkFitError": "تعذر احتواء بروتوكول الأجزاء في إعداد QR الحالي.",
     "manifestFieldLimit": "يتجاوز حقل البيان {type} حد 65,535 بايت.",
-    "metadataJson": "يجب أن تكون بيانات الملف الوصفية المخصصة JSON صالحًا."
+    "metadataJson": "يجب أن تكون بيانات الملف الوصفية المخصصة JSON صالحًا.",
+    "capacity": {
+      "download": "تم تحميل {loadedBytes} بايت ({loadedSize}) من حد أقصى يقارب {maxBytes} بايت ({maxSize})، بنسبة {percent}%. يخزن QR رابط تنزيل قابلًا للمشاركة يتضمن بايتات الملف واسمه ونوع MIME.",
+      "chooseDownload": "اختر ملفًا لإنشاء رابط تنزيل قابل للمشاركة.",
+      "autoVersion": "إصدار موحد V{version} محدد تلقائيًا",
+      "version": "إصدار موحد V{version}",
+      "gzip": "نقل gzip حجمه {bytes} بايت ({size})",
+      "noCompression": "ضغط النقل متوقف",
+      "chunked": "تم تحميل {loadedBytes} بايت ({loadedSize})؛ {transfer}، بالإضافة إلى بيان حجمه {manifestBytes} بايت. يحمل الإطار {current} من {total} مقدار {frameBytes} بايت ضمن {limit}؛ وتستخدم الإطارات الكاملة {capacityBytes} بايت ({capacitySize}) من سعة التدفق.",
+      "chooseChunked": "اختر ملفًا لتقسيمه إلى حمولات QR مجزأة.",
+      "data": "تم تحميل {loadedBytes} بايت ({loadedSize}) من حد أقصى {maxBytes} بايت ({maxSize})، بنسبة {percent}%.",
+      "chooseData": "اختر ملفًا لتضمينه مباشرة كرابط بيانات."
+    }
   },
   "frame": {
     "message": "رسالة الإطار",

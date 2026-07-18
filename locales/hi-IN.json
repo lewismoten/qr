@@ -539,7 +539,19 @@
     "compressionUnsupported": "यह ब्राउज़र gzip स्थानांतरण संपीड़न समर्थित नहीं करता। जारी रखने के लिए इसे बंद करें।",
     "chunkFitError": "वर्तमान क्यूआर विन्यास में खंड प्रोटोकॉल नहीं समा सका।",
     "manifestFieldLimit": "मैनिफ़ेस्ट फ़ील्ड {type} 65,535-बाइट सीमा से बड़ा है।",
-    "metadataJson": "कस्टम फ़ाइल मेटाडेटा मान्य JSON होना चाहिए।"
+    "metadataJson": "कस्टम फ़ाइल मेटाडेटा मान्य JSON होना चाहिए।",
+    "capacity": {
+      "download": "लगभग {maxBytes} B ({maxSize}) अधिकतम में से {loadedBytes} B ({loadedSize}) लोड हुआ ({percent}%)। क्यूआर फ़ाइल के बाइट, नाम और MIME प्रकार वाली साझा करने योग्य डाउनलोड यूआरएल रखता है।",
+      "chooseDownload": "साझा करने योग्य डाउनलोड यूआरएल बनाने के लिए फ़ाइल चुनें।",
+      "autoVersion": "स्वचालित रूप से चुना गया समान V{version}",
+      "version": "समान V{version}",
+      "gzip": "gzip स्थानांतरण {bytes} B ({size}) है",
+      "noCompression": "स्थानांतरण संपीड़न बंद है",
+      "chunked": "{loadedBytes} B ({loadedSize}) लोड हुआ; {transfer}, साथ में {manifestBytes} B मैनिफ़ेस्ट। {total} में से फ़्रेम {current}, {limit} के साथ {frameBytes} B रखता है; पूरे फ़्रेम स्ट्रीम क्षमता के {capacityBytes} B ({capacitySize}) उपयोग करते हैं।",
+      "chooseChunked": "फ़ाइल को खंडित क्यूआर पेलोड में बाँटने के लिए चुनें।",
+      "data": "{maxBytes} B ({maxSize}) अधिकतम में से {loadedBytes} B ({loadedSize}) लोड हुआ ({percent}%)।",
+      "chooseData": "फ़ाइल को सीधे डेटा यूआरएल के रूप में जोड़ने के लिए चुनें।"
+    }
   },
   "frame": {
     "message": "फ़्रेम संदेश",

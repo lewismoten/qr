@@ -125,6 +125,9 @@ assert.deepEqual(
 const runtimeDownloadKeys = Object.keys(englishMessages).filter((key) =>
   key.startsWith('download.'),
 );
+const fileCapacityKeys = Object.keys(englishMessages).filter((key) =>
+  key.startsWith('file.capacity.'),
+);
 const bulkProgressKeys = Object.keys(englishMessages).filter((key) =>
   key.startsWith('bulk.progress.'),
 );
@@ -159,6 +162,11 @@ for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
     runtimeDownloadKeys.filter((key) => !(key in localeMessages)),
     [],
     `${locale} is missing download status translations`,
+  );
+  assert.deepEqual(
+    fileCapacityKeys.filter((key) => !(key in localeMessages)),
+    [],
+    `${locale} is missing file capacity translations`,
   );
   assert.deepEqual(
     bulkProgressKeys.filter((key) => !(key in localeMessages)),
