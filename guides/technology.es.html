@@ -6,7 +6,7 @@
     <title>Tecnología, normas y licencias de generación de códigos QR</title>
     <meta
       name="description"
-      content="Tecnología, estándares, formatos, API de navegadores, algoritmos, servicios, patentes y licencias utilizadas por el Generador de Códigos QR."
+      content="Tecnologías, estándares, formatos, API del navegador, algoritmos, servicios, patentes y licencias utilizados por el generador de códigos QR."
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
@@ -34,14 +34,13 @@
         </header>
         <div class="info-dialog-content">
           <p id="technology-page-content" class="info-lead">
-            Un inventario transparente de módulos de primera parte,
-            características de la plataforma del navegador, estándares,
-            patentes, herramientas de desarrollo y servicios de red utilizados
-            por esta aplicación.
+            Un inventario transparente del código propio, las funciones de la
+            plataforma web, los estándares, las patentes, las herramientas de
+            desarrollo y los servicios de red que utiliza esta aplicación.
           </p>
 
           <section>
-            <h2>Implementación de QR de primera parte</h2>
+            <h2>Implementación propia de QR</h2>
             <div class="dependency-list">
               <article>
                 <div>
@@ -113,7 +112,7 @@
               <article>
                 <div>
                   <h3>Corrección de errores de Reed-Solomon</h3>
-                  <span class="version-badge">Algoritmo de primera parte</span>
+                  <span class="version-badge">Algoritmo propio</span>
                 </div>
                 <p>
                   Genera palabras código de corrección de errores QR sobre
@@ -394,12 +393,12 @@
                   >
                 </div>
                 <p>
-                  El escritor ZIP de primera parte crea encabezados locales, un
-                  directorio central y nombres de archivos UTF-8. Las entradas
+                  El generador ZIP propio crea encabezados locales, un
+                  directorio central y nombres de archivo UTF-8. Las entradas
                   utilizan deliberadamente el método de compresión 0, por lo que
                   el archivo es un contenedor ampliamente compatible sin
-                  compresión a nivel ZIP. Cada entrada local y del directorio
-                  central incluye el cómputo de verificación CRC-32 descrito a
+                  compresión ZIP. Cada entrada local y del directorio central
+                  incluye la suma de verificación CRC-32 descrita a
                   continuación.
                 </p>
                 <nav aria-label="Referencias ZIP">
@@ -494,12 +493,13 @@
                 </div>
                 <p>
                   La verificación SHA-256 y los identificadores de transferencia
-                  de 128 bits criptográficamente fuertes utilizan Web Crypto. La
-                  compresión de transferencia gzip opcional utiliza Compression
-                  Streams cuando el navegador lo proporciona; el hash subyacente
-                  y los formatos gzip siguen FIPS 180-4 y RFC 1952. SHA-256
-                  detecta el contenido de la transferencia cambiado, pero no es
-                  una firma y no demuestra quién creó un archivo.
+                  de 128 bits generados de forma criptográficamente segura
+                  utilizan Web Crypto. La compresión gzip opcional utiliza
+                  Compression Streams cuando el navegador ofrece esta API; los
+                  formatos de hash y gzip subyacentes siguen FIPS 180-4 y RFC
+                  1952. SHA-256 permite detectar cambios en el contenido
+                  transferido, pero no es una firma ni demuestra quién creó el
+                  archivo.
                 </p>
                 <nav aria-label="Referencias de integridad y compresión">
                   <a href="https://www.w3.org/TR/WebCryptoAPI/"
@@ -519,13 +519,12 @@
                   <span class="version-badge">Código propio + API web</span>
                 </div>
                 <p>
-                  Los fotogramas GIF animados se codifican directamente. La
-                  exportación MP4 dibuja fotogramas a un flujo de captura de
-                  lienzo y los registra a través de <code>MediaRecorder</code>;
-                  solo se ofrece cuando el navegador informa de la
-                  compatibilidad con un tipo de MIME MP4, y el códec AVC exacto
-                  y el comportamiento de sincronización dependen de ese
-                  navegador.
+                  Los fotogramas del GIF animado se codifican directamente. La
+                  exportación MP4 dibuja los fotogramas en un flujo de captura
+                  de Canvas y los graba mediante <code>MediaRecorder</code>;
+                  solo se ofrece cuando el navegador declara compatibilidad con
+                  algún tipo MIME de MP4. El códec AVC exacto y la temporización
+                  dependen del navegador.
                 </p>
                 <nav aria-label="Referencias de animación y grabación">
                   <a href="https://www.w3.org/TR/mediastream-recording/"
@@ -578,17 +577,17 @@
                   >
                 </div>
                 <p>
-                  Empaqueta y minimiza JavaScript y CSS modulares, crea mapas de
-                  origen, divide fragmentos alojados cargados de forma perezosa
-                  y emite el contenido independiente. <code>file:</code> para el
-                  uso mediante &lt;code&gt;file:&lt;/code&gt;. Es una
-                  dependencia de desarrollo con licencia MIT; no es una
-                  biblioteca que se ejecute en el navegador ni genera
-                  solicitudes de red en la aplicación publicada.
+                  Empaqueta y minifica el código JavaScript y CSS modular, crea
+                  mapas de código fuente, separa los fragmentos alojados que se
+                  cargan bajo demanda y genera la versión autocontenida para
+                  <code>file:</code> como alternativa. Es una dependencia de
+                  desarrollo con licencia MIT; no es una biblioteca que se
+                  ejecute en el navegador ni genera solicitudes de red en la
+                  aplicación publicada.
                 </p>
                 <nav aria-label="Enlaces de esbuild">
                   <a href="https://esbuild.github.io/">documentación</a
-                  ><a href="https://github.com/evanw/esbuild">depósito</a
+                  ><a href="https://github.com/evanw/esbuild">Repositorio</a
                   ><a
                     href="https://github.com/evanw/esbuild/blob/main/LICENSE.md"
                     >Licencia MIT</a
@@ -601,15 +600,15 @@
                   <span class="version-badge">Plataforma de desarrollo</span>
                 </div>
                 <p>
-                  Ejecuta el script de construcción local, las pruebas
-                  automatizadas, el generador de favicon y el servidor de
-                  desarrollo estático. El proyecto no fija una versión de
-                  Node.js ni envía Node.js a los visitantes; el código de la
-                  aplicación implementada se ejecuta en el navegador.
+                  Ejecuta el script de compilación local, las pruebas
+                  automatizadas, el generador del favicon y el servidor estático
+                  de desarrollo. El proyecto no fija una versión de Node.js ni
+                  distribuye Node.js a quienes visitan el sitio; el código
+                  publicado se ejecuta en el navegador.
                 </p>
                 <nav aria-label="Enlaces de Node.js">
                   <a href="https://nodejs.org/">página web</a
-                  ><a href="https://github.com/nodejs/node">depósito</a
+                  ><a href="https://github.com/nodejs/node">Repositorio</a
                   ><a href="https://github.com/nodejs/node/blob/main/LICENSE"
                     >Licencia y avisos incluidos</a
                   >
@@ -617,7 +616,7 @@
               </article>
               <article>
                 <div>
-                  <h3>Paquete de referencia de código QR de nodos</h3>
+                  <h3>Paquete de referencia node-qrcode</h3>
                   <span class="version-badge">1.5.0 solo para pruebas</span>
                 </div>
                 <p>
@@ -628,8 +627,9 @@
                   repositorio, no son dependencias de npm y nunca se incluyen en
                   las compilaciones de producción.
                 </p>
-                <nav aria-label="Enlaces de referencia de código QR de nodos">
-                  <a href="https://github.com/soldair/node-qrcode">depósito</a
+                <nav aria-label="Enlaces de referencia de node-qrcode">
+                  <a href="https://github.com/soldair/node-qrcode"
+                    >Repositorio</a
                   ><a href="https://www.npmjs.com/package/qrcode/v/1.5.0"
                     >npm 1.5.0</a
                   ><a

@@ -314,10 +314,10 @@
               aria-label="Detalle de los bits verdes de modo, seguidos por los bits naranjas de recuento de caracteres y los módulos azules de datos"
             ></canvas>
             <p>
-              El indicador de modo de 4 bits selecciona Numérico, Alfánumérico,
-              Byte o Kanji. El ancho del campo de conteo depende tanto del modo
-              como del rango de versiones; el modo Byte cuenta los bytes
-              codificados.
+              El indicador de modo de 4 bits selecciona el modo numérico,
+              alfanumérico, de bytes o Kanji. El ancho del campo de recuento
+              depende tanto del modo como del intervalo de versiones; en el modo
+              de bytes se cuentan los bytes codificados.
             </p>
           </article>
           <article class="visual-card payload-units-card">
@@ -760,7 +760,7 @@
         <div class="reference-links implementation-links">
           <a
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"
-            ><strong>Modos, anchuras de conteo y tablas de bloques</strong
+            ><strong>Modos, anchos de recuento y tablas de bloques</strong
             ><span
               ><code>constants.js</code> define los indicadores de modo, el
               alfabeto alfanumérico, el ancho de los recuentos de caracteres,
@@ -782,9 +782,9 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment-optimizer.js"
             ><strong>Optimización de modo mixto</strong
             ><span
-              ><code>segment-optimizer.js</code> Encuentra una secuencia de bajo
-              costo de segmentos numéricos, alfanuméricos y de bytes, incluyendo
-              cada modo repetido y encabezado de conteo.</span
+              ><code>segment-optimizer.js</code> encuentra una secuencia
+              eficiente de segmentos numéricos, alfanuméricos y de bytes,
+              incluidos los encabezados de modo y recuento que se repiten.</span
             ></a
           >
           <a
@@ -810,9 +810,10 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/reed-solomon.js"
             ><strong>Reed-Solomon e intercalado</strong
             ><span
-              ><code>reed-solomon.js</code> contiene multiplicación GF(256),
-              construcción de generador-divisor, generación de resto, división
-              de bloques cortos/largos e interposición de datos/EC.</span
+              ><code>reed-solomon.js</code> contiene la multiplicación en
+              GF(256), la construcción del polinomio generador, el cálculo del
+              resto, la división en bloques cortos y largos y el entrelazado de
+              datos y palabras de corrección de errores.</span
             ></a
           >
           <a
@@ -873,13 +874,13 @@
         <div class="implementation-warning">
           <strong>No implementado por este codificador</strong>
           <p>
-            La fuente actual tiene como objetivo los códigos QR estándar del
-            Modelo 2 en modos numéricos, alfanuméricos, de bytes y seleccionados
-            manualmente por Kanji. No es una referencia de implementación para
-            los segmentos ECI, Append Estructurado, FNC1/GS1, modo Hanzi, Micro
-            QR, Micro QR Rectangular, símbolos del Modelo 1 o decodificación de
-            QR. Consulte la especificación normativa aplicable antes de reclamar
-            compatibilidad más allá del alcance probado.
+            El código fuente actual genera códigos QR estándar Modelo 2 en los
+            modos numérico, alfanumérico, de bytes y Kanji seleccionado
+            manualmente. No sirve como referencia de implementación para
+            segmentos ECI, anexado estructurado, FNC1/GS1, modo Hanzi, Micro QR,
+            Micro QR rectangular, símbolos Modelo 1 ni descodificación QR.
+            Consulte la especificación normativa correspondiente antes de
+            afirmar compatibilidad más allá del alcance probado.
           </p>
         </div>
       </section>
@@ -919,7 +920,9 @@
           >
           <a href="https://doi.org/10.1109/PGEC.1960.22230"
             ><strong>Reed y Solomon, 1960</strong
-            ><span>Papel original del código de corrección de errores</span></a
+            ><span
+              >Artículo original sobre códigos de corrección de errores</span
+            ></a
           >
         </div>
       </section>
