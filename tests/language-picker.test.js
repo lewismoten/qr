@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getActiveLocale, initializeLanguage } from '../src/js/i18n/index.js';
 import {
+  getSavedLocale,
   LOCALE_STORAGE_KEY,
+  prioritizeLocales,
   setupLanguagePicker,
 } from '../src/js/i18n/picker.js';
 
@@ -158,8 +160,13 @@ test('language picker renders, switches, persists, and closes', async () => {
 
   const document = new Document();
   const saved = [];
+  let storageFailure = false;
+  let localeFailure = false;
   const storage = {
-    setItem: (...values) => saved.push(values),
+    setItem(...values) {
+      saved.push(values);
+      if (storageFailure) throw new Error('Storage write failed');
+    },
   };
   const previousAnimationFrame = globalThis.requestAnimationFrame;
   globalThis.requestAnimationFrame = (callback) => callback();
@@ -169,8 +176,10 @@ test('language picker renders, switches, persists, and closes', async () => {
       document,
       storage,
       languages: ['es-MX'],
-      onLocaleChange: (locale) =>
-        initializeLanguage({ locale, baseUrl, fetcher }),
+      onLocaleChange(locale) {
+        if (localeFailure) throw new Error('Locale change failed');
+        return initializeLanguage({ locale, baseUrl, fetcher });
+      },
     });
     const picker = document.getElementById('language-picker');
     const trigger = document.getElementById('language-picker-trigger');
@@ -201,6 +210,32 @@ test('language picker renders, switches, persists, and closes', async () => {
     assert.equal(picker.classList.contains('is-loading'), false);
 
     trigger.dispatchEvent(new Event('click'));
+    grid.children[0].dispatchEvent(new Event('click'));
+    assert.equal(panel.hidden, true);
+    assert.equal(trigger.focused, true);
+
+    storageFailure = true;
+    trigger.dispatchEvent(new Event('click'));
+    grid.children[1].dispatchEvent(new Event('click'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(getActiveLocale(), 'en-US');
+    assert.equal(trigger.disabled, false);
+
+    localeFailure = true;
+    const originalError = console.error;
+    let errors = 0;
+    console.error = () => {
+      errors += 1;
+    };
+    trigger.dispatchEvent(new Event('click'));
+    grid.children[0].dispatchEvent(new Event('click'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    console.error = originalError;
+    assert.equal(errors, 1);
+    assert.equal(getActiveLocale(), 'en-US');
+    assert.equal(trigger.disabled, false);
+
+    trigger.dispatchEvent(new Event('click'));
     document.dispatchEvent(new Event('pointerdown'));
     assert.equal(panel.hidden, true);
 
@@ -219,4 +254,42 @@ test('language picker tolerates missing markup', () => {
   assert.doesNotThrow(() =>
     setupLanguagePicker({ document: { getElementById: () => null } }),
   );
+});
+
+test('locale priority and storage tolerate invalid platform data', () => {
+  assert.deepEqual(
+    prioritizeLocales(
+      [
+        { code: 'invalid_locale' },
+        { code: 'en-XA' },
+        { code: 'fr' },
+        { code: 'en-US' },
+      ],
+      'invalid_locale',
+    ).map(({ code }) => code),
+    ['invalid_locale', 'fr', 'en-US', 'en-XA'],
+  );
+
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'localStorage',
+  );
+  try {
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: { getItem: () => 'fr' },
+    });
+    assert.equal(getSavedLocale(), 'fr');
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new Error('Storage unavailable');
+      },
+    });
+    assert.equal(getSavedLocale(), undefined);
+  } finally {
+    if (descriptor)
+      Object.defineProperty(globalThis, 'localStorage', descriptor);
+    else delete globalThis.localStorage;
+  }
 });

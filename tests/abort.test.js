@@ -38,4 +38,11 @@ const activeController = new AbortController();
 assert.doesNotThrow(() => throwIfAborted(activeController.signal));
 assert.doesNotThrow(() => throwIfAborted());
 
+const stringController = new AbortController();
+stringController.abort('plain reason');
+assert.throws(
+  () => throwIfAborted(stringController.signal),
+  (error) => isAbortError(error),
+);
+
 console.log('Abortable export operation tests passed.');

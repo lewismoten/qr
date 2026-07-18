@@ -60,6 +60,8 @@ long.finish({ completed: true });
 assert.equal(elements.meter.value, 100);
 assert.equal(elements.phase.textContent, 'Completed');
 assert.equal(elements.cancel.disabled, true);
+elements.cancel.dispatchEvent(new Event('click'));
+assert.equal(long.signal.aborted, false);
 assert.equal(
   elements.dialog.open,
   true,
@@ -92,6 +94,8 @@ assert.equal(
   true,
   'a new task should abort the old one',
 );
+replaced.update(0.5, 'Ignored stale update');
+replaced.finish({ completed: true });
 replacement.finish();
 
 const incomplete = progress.start({ title: 'Incomplete', phase: 'Working' });

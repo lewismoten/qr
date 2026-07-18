@@ -21,7 +21,7 @@ if (requested.has('--coverage')) {
     '--test-coverage-exclude=src/js/main.js',
     '--test-coverage-exclude=src/js/spec/**',
     '--test-coverage-lines=95',
-    '--test-coverage-branches=92',
+    '--test-coverage-branches=96',
     '--test-coverage-functions=95',
   );
 }

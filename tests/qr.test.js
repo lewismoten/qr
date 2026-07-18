@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { BitBuffer } from '../src/js/qr/bit-buffer.js';
+import { isMaskActive } from '../src/js/qr/mask.js';
 import NativeQRCode from '../src/js/qr/matrix-encoder.js';
+import { makeSegment } from '../src/js/qr/segment.js';
 
 function matrixSignature(definition) {
   return Buffer.from(definition.modules.data).toString('base64');
@@ -76,6 +78,9 @@ function testEveryVersionAndCorrectionLevel() {
 }
 
 function testModesAndUtf8() {
+  assert.equal(makeSegment('123').mode, 'numeric');
+  assert.equal(makeSegment('HELLO').mode, 'alphanumeric');
+  assert.equal(makeSegment('lowercase').mode, 'byte');
   assert.equal(NativeQRCode.create('12345').segments[0].mode, 'numeric');
   assert.equal(
     NativeQRCode.create('HELLO WORLD').segments[0].mode,
@@ -185,6 +190,7 @@ function testMasksAndDeterminism() {
   }
   assert.equal(signatures.size, 8);
   assert.ok(NativeQRCode.create('AUTO MASK').maskPattern >= 0);
+  assert.equal(isMaskActive(99, 0, 0), false);
 
   for (const maskPattern of [-1, 8, 1.5]) {
     assert.throws(

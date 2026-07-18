@@ -48,6 +48,12 @@ assert.equal(
   getErrorText(new Error('Technical browser failure'), 'Localized failure'),
   'Localized failure',
 );
+assert.equal(getErrorText(new Error('Raw failure')), 'Raw failure');
+assert.equal(getErrorText(null), '');
+assert.equal(
+  createLocalizedError('test.missing', 'Missing {value}', {}).message,
+  'Missing {value}',
+);
 
 assert.equal(
   getSavedLocale({
