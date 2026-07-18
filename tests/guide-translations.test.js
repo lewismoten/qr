@@ -238,7 +238,12 @@ test('Spanish specification uses fluent technical language', async () => {
   assert.match(copy, /Matriz real de la versión 7/i);
   assert.match(copy, /ahorro de bits en los datos/i);
   assert.match(copy, /Se repite para cada segmento optimizado/i);
-  assert.match(copy, /Cómo elige el modo automático la máscara/i);
+  assert.match(copy, /Cómo se selecciona automáticamente la máscara/i);
+  assert.match(copy, /0, 3, 4 o 7 bits/i);
+  assert.match(copy, /se muestran en oscuro como referencia/i);
+  assert.match(copy, />Numérico</i);
+  assert.match(copy, />Alfanumérico</i);
+  assert.match(copy, />Modo de bytes</i);
   assert.match(copy, /registra la máscara seleccionada/i);
   assert.match(copy, /Decodifica la información de formato/i);
 });

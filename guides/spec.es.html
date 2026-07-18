@@ -305,7 +305,7 @@
               ><span>intercaladas</span>
             </div>
             <div class="bit-field remainder">
-              <strong>Bits restantes</strong><span>0–7 bits</span>
+              <strong>Bits restantes</strong><span>0, 3, 4 o 7 bits</span>
             </div>
           </div>
         </div>
@@ -347,7 +347,7 @@
                 data-unit-value="123"
               >
                 <header>
-                  <strong>numérico</strong><code>123</code
+                  <strong>Numérico</strong><code>123</code
                   ><span>3 dígitos</span>
                 </header>
                 <div
@@ -372,7 +372,7 @@
                 data-unit-value="AB"
               >
                 <header>
-                  <strong>alfanumérico</strong><code>AB</code
+                  <strong>Alfanumérico</strong><code>AB</code
                   ><span>2 caracteres</span>
                 </header>
                 <div
@@ -397,7 +397,8 @@
                 data-unit-value="é"
               >
                 <header>
-                  <strong>byte</strong><code>é</code><span>2 bytes UTF-8</span>
+                  <strong>Modo de bytes</strong><code>é</code
+                  ><span>2 bytes UTF-8</span>
                 </header>
                 <div
                   class="unit-stream"
@@ -589,8 +590,8 @@
               Para cada módulo de datos situado en la fila <code>r</code> y la
               columna <code>c</code>, cuando la fórmula se cumple se invierte el
               bit almacenado. El azul indica dónde se activa cada fórmula. Los
-              patrones de posición, alineación y temporización permanecen
-              oscuros como referencia porque la máscara nunca los modifica.
+              patrones de posición, alineación y temporización se muestran en
+              oscuro como referencia porque la máscara nunca los modifica.
             </p>
           </div>
           <div class="mask-formula-grid">
@@ -680,7 +681,7 @@
             </figure>
           </div>
           <div class="mask-penalties">
-            <strong>Cómo elige el modo automático la máscara</strong>
+            <strong>Cómo se selecciona automáticamente la máscara</strong>
             <span>1. Penalizar las secuencias largas del mismo color.</span>
             <span>2. Penalizar los bloques sólidos de 2 por 2.</span>
             <span

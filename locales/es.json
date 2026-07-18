@@ -759,7 +759,7 @@
       "numeric": "{value} se almacena como un único número binario de {bits} bits.",
       "alphanumeric": "A × 45 + B = 461, que se almacena en {bits} bits.",
       "byte": "El carácter visible se codifica en UTF-8 como C3 A9, por lo que el recuento es 2 y los datos ocupan 16 bits.",
-      "kanji": "El valor {value} de Shift JIS se transforma en un valor Kanji QR de 13 bits."
+      "kanji": "El valor {value} de Shift JIS se transforma en un valor Kanji de 13 bits para el código QR."
     },
     "modes": {
       "numeric": "Numérico",

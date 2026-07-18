@@ -53,6 +53,11 @@ describe('specification guide', () => {
     assert.match(source, /lookup\(\s*'spec\.units\.numeric'/);
     assert.equal(locale.spec.mixed.segment, 'Segmento {number}');
     assert.equal(locale.spec.modes.byte, 'Modo de bytes');
+    assert.equal(
+      locale.spec.units.kanji,
+      'El valor {value} de Shift JIS se transforma en un valor Kanji de 13 bits ' +
+        'para el código QR.',
+    );
     assert.match(locale.spec.units.byte, /los datos ocupan 16 bits/);
     assert.match(locale.spec.mixed.savings, /usando únicamente/);
   });
