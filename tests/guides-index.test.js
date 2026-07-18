@@ -27,9 +27,15 @@ describe('guide index', () => {
       listGuidePages(),
     ]);
     assert.equal(pages.length, 21);
-    pages.forEach((page) => {
-      assert.match(index, new RegExp(`href="${page.replace('.', '\\.')}"`));
-    });
+    await Promise.all(
+      pages.map(async (page) => {
+        assert.match(index, new RegExp(`href="${page.replace('.', '\\.')}"`));
+        const source = await readFile(new URL(page, guideRoot), 'utf8');
+        const guideIndex = page.includes('/') ? '../index.html' : 'index.html';
+        assert.match(source, /<footer[\s>]/);
+        assert.match(source, new RegExp(`href="${guideIndex}"`));
+      }),
+    );
   });
 
   test('is canonical and included in the sitemap', async () => {
