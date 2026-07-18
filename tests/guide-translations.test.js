@@ -80,7 +80,7 @@ test('reviewed guide translations override machine output', async () => {
   const unknown = Object.keys(reviewed).filter((key) => !(key in machine));
   assert.deepEqual(unknown, []);
   assert.equal(translations.Mask, 'Máscara');
-  assert.equal(translations['Open generator'], 'Abrir generador');
+  assert.equal(translations['Open generator'], 'Abrir el generador');
 });
 
 test('Spanish inline prose remains grammatical after HTML assembly', async () => {
@@ -119,10 +119,21 @@ test('Spanish guides use native QR and interface terminology', async () => {
     /formato Geo/i,
     /datos sin enmascarar/i,
     /Volver a la parte superior/i,
+    /Abrir generador/i,
+    /flujo más corto/i,
+    /Una máscara obligatoria/i,
+    /elige la puntuación de penalización más baja/i,
+    /orden de colocación(?! de los módulos)/i,
+    /tolerancia del escaneo/i,
+    /La representación de códigos QR/i,
+    /a su propio servidor/i,
+    /hasta que se abre Geo/i,
   ];
 
   machinePhrases.forEach((phrase) => assert.doesNotMatch(source, phrase));
   assert.match(source, /niveles de corrección de errores/i);
   assert.match(source, /palabras de código/i);
   assert.match(source, /URL de objeto Blob/i);
+  assert.match(source, /secuencia de bits más corta/i);
+  assert.match(source, /menor puntuación de\s+penalización/i);
 });
