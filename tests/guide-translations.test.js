@@ -149,3 +149,35 @@ test('Spanish guides use native QR and interface terminology', async () => {
     /los mosaicos visibles del mapa se solicitan directamente/i,
   );
 });
+
+test('Spanish guide index uses polished interface copy', async () => {
+  const source = await readFile('guides/index.es.html', 'utf8');
+  const copy = source.replaceAll(/\s+/g, ' ');
+  const translatedPhrases = [
+    'Guarde directamente',
+    'número de teléfono validado',
+    'fragmentos QR ordenados',
+    'rótulo útil',
+    'Patrones de máscaras',
+    'Seleccione unas coordenadas',
+    'formato portátil vCard',
+    'fragmentos que puedan recopilarse',
+    'etiqueta útil alrededor',
+    'Prepare un correo con destinatario',
+    'máscaras disponibles para los códigos QR',
+  ];
+
+  translatedPhrases.forEach((phrase) =>
+    assert.doesNotMatch(copy, new RegExp(phrase, 'i')),
+  );
+  assert.match(copy, /notas, mensajes y otros textos/i);
+  assert.match(copy, /número de teléfono válido para iniciar una llamada/i);
+  assert.match(copy, /Seleccione las coordenadas mediante los campos/i);
+  assert.match(copy, /información de contacto en formato vCard/i);
+  assert.match(copy, /fragmentos distribuidos entre varios códigos QR/i);
+  assert.match(copy, /etiqueta útil al marco de la imagen generada/i);
+  assert.match(copy, /Máscaras QR/);
+  assert.match(copy, /correo electrónico con destinatario, asunto y mensaje/i);
+  assert.match(copy, /ocho máscaras definidas por la especificación QR/i);
+  assert.match(copy, /varios códigos QR/);
+});
