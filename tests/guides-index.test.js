@@ -26,7 +26,7 @@ describe('guide index', () => {
       readFile(new URL('index.html', guideRoot), 'utf8'),
       listGuidePages(),
     ]);
-    assert.equal(pages.length, 19);
+    assert.equal(pages.length, 21);
     pages.forEach((page) => {
       assert.match(index, new RegExp(`href="${page.replace('.', '\\.')}"`));
     });

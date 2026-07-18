@@ -6,17 +6,20 @@
     <title>QR Generator Technology, Standards and Licenses</title>
     <meta name="description" content="Technology, standards, formats, browser APIs, algorithms, services, patents and licenses used by the QR Code Generator." />
     <meta name="robots" content="index, follow" />
-    <link rel="icon" href="favicon.ico" sizes="any" />
-    <link rel="canonical" href="https://qr.lewismoten.com/technology.html" />
+    <link rel="icon" href="../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/technology.html"
+    />
     <script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('is-embedded');</script>
-    <link rel="stylesheet" href="dist/app.min.css" />
+    <link rel="stylesheet" href="../dist/app.min.css" />
   </head>
   <body class="info-page-body">
     <main class="standalone-info-page">
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div><p class="info-kicker">Technology inventory</p><h1 id="technology-page-title">Technology, standards and licenses</h1></div>
-          <a class="info-page-back" href="index.html">Open generator</a>
+          <a class="info-page-back" href="../index.html">Open generator</a>
         </header>
         <div class="info-dialog-content">
           <p id="technology-page-content" class="info-lead">A transparent inventory of first-party modules, browser platform features, standards, patents, development tools and network services used by this application.</p>
@@ -78,7 +81,7 @@
               <article>
                 <div><h3>FILE:1 binary transport</h3><span class="version-badge">First-party protocol</span></div>
                 <p>The application-defined <code>FILE:1</code> format carries a single file or random-order chunks. Its readable header identifies single/chunk mode, manifest presence, a 128-bit random transfer ID encoded as 22 Base64url characters, extension hint, byte offset and total transfer length. An optional typed manifest can include filename, MIME type, modified time, original size, JSON metadata and SHA-256 validation; a flag records optional gzip transfer encoding. This is not an ISO, IETF or established scanner standard, so receiving it requires compatible software.</p>
-                <nav aria-label="FILE protocol references"><a href="README.md#file-chunked-transport">Protocol documentation</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64url</a><a href="https://www.rfc-editor.org/info/rfc8259">RFC 8259 JSON</a><a href="https://www.rfc-editor.org/info/rfc1952">RFC 1952 gzip</a></nav>
+                <nav aria-label="FILE protocol references"><a href="../README.md#file-chunked-transport">Protocol documentation</a><a href="https://www.rfc-editor.org/info/rfc4648">RFC 4648 Base64url</a><a href="https://www.rfc-editor.org/info/rfc8259">RFC 8259 JSON</a><a href="https://www.rfc-editor.org/info/rfc1952">RFC 1952 gzip</a></nav>
               </article>
             </div>
           </section>
@@ -156,7 +159,7 @@
               <article>
                 <div><h3>node-qrcode reference bundle</h3><span class="version-badge">1.5.0 test-only</span></div>
                 <p>The optional parity test can load manually downloaded browser bundles from the MIT-licensed <code>qrcode</code> package and compare the first-party encoder against 1,287 reference matrices. These files stay outside the repository, are not npm dependencies, and are never included in production builds.</p>
-                <nav aria-label="node-qrcode reference links"><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">npm 1.5.0</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a><a href="README.md#first-party-qr-encoder">Parity-test setup</a></nav>
+                <nav aria-label="node-qrcode reference links"><a href="https://github.com/soldair/node-qrcode">Repository</a><a href="https://www.npmjs.com/package/qrcode/v/1.5.0">npm 1.5.0</a><a href="https://github.com/soldair/node-qrcode/blob/master/license">MIT license</a><a href="../README.md#first-party-qr-encoder">Parity-test setup</a></nav>
               </article>
             </div>
           </section>
@@ -176,10 +179,10 @@
         </div>
         <footer class="info-page-footer">
           <span>QR Code Generator</span>
-          <nav aria-label="Technology page navigation"><a href="index.html">Generator</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#technology-page-content">Back to top</a></nav>
+          <nav aria-label="Technology page navigation"><a href="../index.html">Generator</a><a href="https://git.lewismoten.com/lewismoten/qr">Source</a><a href="#technology-page-content">Back to top</a></nav>
         </footer>
       </article>
     </main>
-    <script type="module" src="dist/info.min.js"></script>
+    <script type="module" src="../dist/info.min.js"></script>
   </body>
 </html>
