@@ -1746,7 +1746,7 @@
                 >
                   <button
                     type="button"
-                    class="subtab-button is-active"
+                    class="subtab-button debug-subtab-button is-active"
                     data-subtab="encoding"
                     data-i18n="debugUi.tabs.encoding"
                   >
@@ -1754,7 +1754,7 @@
                   </button>
                   <button
                     type="button"
-                    class="subtab-button"
+                    class="subtab-button debug-subtab-button"
                     data-subtab="mask"
                     data-i18n="debugUi.tabs.mask"
                   >
@@ -1762,7 +1762,7 @@
                   </button>
                   <button
                     type="button"
-                    class="subtab-button"
+                    class="subtab-button debug-subtab-button"
                     data-subtab="payload"
                     data-i18n="debugUi.tabs.payload"
                   >
@@ -1770,7 +1770,7 @@
                   </button>
                   <button
                     type="button"
-                    class="subtab-button"
+                    class="subtab-button debug-subtab-button"
                     data-subtab="overlay"
                     data-i18n="debugUi.tabs.overlay"
                   >
@@ -1780,7 +1780,7 @@
 
                 <div class="subtab-panels">
                   <section
-                    class="subtab-panel is-active"
+                    class="subtab-panel debug-subtab-panel is-active"
                     data-subtab-panel="encoding"
                   >
                     <fieldset class="option-group encoding-control-group">
@@ -2010,7 +2010,11 @@
                     </fieldset>
                   </section>
 
-                  <section class="subtab-panel" data-subtab-panel="mask" hidden>
+                  <section
+                    class="subtab-panel debug-subtab-panel"
+                    data-subtab-panel="mask"
+                    hidden
+                  >
                     <fieldset class="option-group">
                       <legend data-i18n="debugUi.mask.legend">
                         Mask pattern
@@ -2032,7 +2036,7 @@
                   </section>
 
                   <section
-                    class="subtab-panel"
+                    class="subtab-panel debug-subtab-panel"
                     data-subtab-panel="payload"
                     hidden
                   >
@@ -2059,7 +2063,7 @@
                   </section>
 
                   <section
-                    class="subtab-panel"
+                    class="subtab-panel debug-subtab-panel"
                     data-subtab-panel="overlay"
                     hidden
                   >

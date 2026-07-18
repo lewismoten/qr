@@ -190,6 +190,20 @@ describe('application fragments', () => {
 });
 
 describe('fragment hash navigation', () => {
+  test('debug tab markup exposes every button and panel to setup', async () => {
+    const index = await readFile(new URL('../index.html', import.meta.url), {
+      encoding: 'utf8',
+    });
+    const buttons = index.match(/class="[^"]*debug-subtab-button[^"]*"/g);
+    const panels = index.match(/class="[^"]*debug-subtab-panel[^"]*"/g);
+    assert.equal(buttons?.length, 4);
+    assert.equal(panels?.length, 4);
+    for (const name of ['encoding', 'mask', 'payload', 'overlay']) {
+      assert.match(index, new RegExp(`data-subtab="${name}"`));
+      assert.match(index, new RegExp(`data-subtab-panel="${name}"`));
+    }
+  });
+
   test('parses valid targets and rejects unrelated hashes', () => {
     assert.deepEqual(readNavigationHash('#tab=style&subtab=colors'), {
       tab: 'style',
