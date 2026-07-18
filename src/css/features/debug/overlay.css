@@ -59,7 +59,7 @@
 .overlay-help-popover {
   position: absolute;
   top: 0.35rem;
-  right: 0.55rem;
+  inset-inline-end: 0.55rem;
 }
 
 .debug-outline-control {
