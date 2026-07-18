@@ -3,6 +3,7 @@ import { isFunctionModule } from '../../qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 
 const MASK_BLUE = '#2563eb';
+const MASK_PREVIEW_TEXT = 'MASK PREVIEW';
 
 function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
   const context = targetCanvas.getContext('2d');
@@ -128,14 +129,13 @@ export function createMaskSelector({
     }
   };
 
-  const renderPreviews = (encodedText, appliedDefinition) => {
+  const renderPreviews = (_encodedText, appliedDefinition) => {
     ensure();
     if (appliedDefinition) {
       if (input.value === '') updateAutoMask(appliedDefinition);
       return;
     }
-    const previewValue =
-      encodedText.trim() || lookup('common.preview', 'Preview');
+    const previewValue = MASK_PREVIEW_TEXT;
     try {
       updateAutoMask(encoder.create(previewValue, buildOptions('')));
     } catch (error) {

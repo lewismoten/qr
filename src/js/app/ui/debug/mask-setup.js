@@ -19,6 +19,7 @@ export function createDebugMaskSetup({
   const buildOptions = (value) => {
     const options = {
       errorCorrectionLevel: getErrorLevel().value,
+      version: 2,
       margin: 1,
       width: 72,
       color: getQrColors(),
