@@ -36,13 +36,14 @@ export function makeReedSolomonDivisor(degree) {
 
 export function getReedSolomonRemainder(data, divisor) {
   const result = Array(divisor.length).fill(0);
-  data.forEach((byte) => {
-    const factor = byte ^ result.shift();
-    result.push(0);
-    divisor.forEach((coefficient, index) => {
-      result[index] ^= multiply(coefficient, factor);
-    });
-  });
+  const last = result.length - 1;
+  for (const byte of data) {
+    const factor = byte ^ result[0];
+    for (let index = 0; index < last; index += 1) {
+      result[index] = result[index + 1] ^ multiply(divisor[index], factor);
+    }
+    result[last] = multiply(divisor[last], factor);
+  }
   return result;
 }
 

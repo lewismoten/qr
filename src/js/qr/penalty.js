@@ -37,12 +37,14 @@ export function getPenalty(modules) {
     result += scoreLine(modules, 0, column, 1, 0).penalty;
   }
   for (let row = 0; row < size - 1; row += 1) {
+    const currentRow = modules[row];
+    const nextRow = modules[row + 1];
     for (let column = 0; column < size - 1; column += 1) {
-      const color = modules[row][column];
+      const color = currentRow[column];
       if (
-        color === modules[row][column + 1] &&
-        color === modules[row + 1][column] &&
-        color === modules[row + 1][column + 1]
+        color === currentRow[column + 1] &&
+        color === nextRow[column] &&
+        color === nextRow[column + 1]
       )
         result += 3;
     }
