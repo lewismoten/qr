@@ -68,11 +68,12 @@
                   <span class="version-badge">Código propio</span>
                 </div>
                 <p>
-                  Implanta segmentación de modo mixto, datos numéricos,
-                  alfanuméricos, UTF-8 Byte y Shift JIS Kanji, versiones 1-40,
-                  corrección Reed-Solomon, interposición, patrones funcionales,
-                  ocultación y colocación de matrices. La implementación es
-                  local; el propio símbolo QR sigue la ISO/IEC 18004.
+                  Implementa la segmentación en modos mixtos; los modos
+                  numérico, alfanumérico, de bytes UTF-8 y Kanji Shift JIS; las
+                  versiones 1 a 40; la corrección Reed-Solomon; el entrelazado;
+                  los patrones funcionales; el enmascaramiento y la colocación
+                  en la matriz. La implementación es local; el símbolo QR se
+                  ajusta a ISO/IEC 18004.
                 </p>
                 <nav aria-label="Referencias del codificador QR propio">
                   <a href="https://www.iso.org/standard/83389.html"
@@ -292,7 +293,7 @@
               </article>
               <article>
                 <div>
-                  <h3>ARCHIVO: 1 transporte binario</h3>
+                  <h3>Transporte binario FILE:1</h3>
                   <span class="version-badge">Protocolo propio</span>
                 </div>
                 <p>
@@ -334,21 +335,21 @@
                   <span class="version-badge">Código propio + Canvas</span>
                 </div>
                 <p>
-                  PNG y JPEG utilizan los codificadores de lienzo del navegador:
-                  PNG preserva los píxeles sin pérdida y la transparencia,
-                  mientras que JPEG es de pérdida, honra la calidad seleccionada
-                  y aplana la transparencia sobre el blanco. El codificador
-                  GIF89a de primera parte cuantifica los colores a un cubo RGB
-                  fijo de 216 colores más la transparencia y escribe un flujo de
-                  imagen Lempel-Ziv-Welch (LZW) válido y orientado a la
-                  literalidad; favorece una pequeña implementación sobre una
-                  compresión fuerte. Los GIF animados utilizan la extensión de
-                  bucle de Netscape, bucle continuamente y expresan los retrasos
-                  de fotograma en centésimas de segundo. La exportación SVG
-                  rastrea el lienzo raster final en rutas rectangulares de mismo
-                  color fusionadas, incluyendo texto y obras de arte
-                  rasterizadas, en lugar de retener texto semántico o utilizar
-                  una biblioteca SVG.
+                  PNG y JPEG utilizan los codificadores de Canvas del navegador:
+                  PNG conserva los píxeles sin pérdida y la transparencia,
+                  mientras que JPEG aplica compresión con pérdida, respeta la
+                  calidad seleccionada y aplana la transparencia sobre blanco.
+                  El codificador GIF89a propio cuantifica los colores en un cubo
+                  RGB fijo de 216 colores más transparencia y escribe un flujo
+                  de imagen Lempel-Ziv-Welch (LZW) válido orientado a literales;
+                  prioriza una implementación pequeña frente a una compresión
+                  intensa. Los GIF animados utilizan la extensión de repetición
+                  de Netscape, se reproducen continuamente y expresan la
+                  duración de cada fotograma en centésimas de segundo. La
+                  exportación SVG traza el lienzo ráster final como trazados
+                  rectangulares combinados del mismo color, incluidos el texto y
+                  las ilustraciones rasterizados, en lugar de conservar texto
+                  semántico o utilizar una biblioteca SVG.
                 </p>
                 <nav aria-label="Referencias de formato de imagen">
                   <a href="https://www.w3.org/TR/png-3/">Especificación PNG</a
@@ -413,13 +414,13 @@
                   <span class="version-badge">Código propio</span>
                 </div>
                 <p>
-                  Los campos de integridad ZIP utilizan un CRC-32 basado en
-                  tablas implementado directamente con el reflejado
-                  <code>0xEDB88320</code> Valores iniciales y finales XOR
-                  polinómicos y estándar. CRC-32 detecta errores comunes de
-                  transmisión o almacenamiento accidentales, pero no es
-                  resistente a colisiones y no debe tratarse como un hash
-                  criptográfico, firma digital o prueba de autenticidad.
+                  Los campos de integridad ZIP utilizan una implementación
+                  propia de CRC-32 basada en tablas, con el polinomio reflejado
+                  <code>0xEDB88320</code> y los valores XOR inicial y final
+                  estándar. CRC-32 detecta errores accidentales habituales de
+                  transmisión o almacenamiento, pero no es resistente a
+                  colisiones y no debe considerarse un hash criptográfico, una
+                  firma digital ni una prueba de autenticidad.
                 </p>
                 <nav aria-label="Referencias CRC-32">
                   <a href="https://www.rfc-editor.org/rfc/rfc1952#section-8"
@@ -579,11 +580,11 @@
                 <p>
                   Empaqueta y minimiza JavaScript y CSS modulares, crea mapas de
                   origen, divide fragmentos alojados cargados de forma perezosa
-                  y emite el contenido independiente.
-                  <code>file:</code> fallback. Es una dependencia de desarrollo
-                  bajo la Licencia de MIT y no es una biblioteca de tiempo de
-                  ejecución del navegador ni una solicitud de red realizada por
-                  la aplicación implementada.
+                  y emite el contenido independiente. <code>file:</code> para el
+                  uso mediante &lt;code&gt;file:&lt;/code&gt;. Es una
+                  dependencia de desarrollo con licencia MIT; no es una
+                  biblioteca que se ejecute en el navegador ni genera
+                  solicitudes de red en la aplicación publicada.
                 </p>
                 <nav aria-label="Enlaces de esbuild">
                   <a href="https://esbuild.github.io/">documentación</a
@@ -620,12 +621,12 @@
                   <span class="version-badge">1.5.0 solo para pruebas</span>
                 </div>
                 <p>
-                  La prueba de paridad opcional puede cargar paquetes de
-                  navegador descargados manualmente desde el MIT-licenciado
-                  <code>qrcode</code> Empaquetar y comparar el codificador de
-                  primera parte con 1.287 matrices de referencia. Estos archivos
-                  permanecen fuera del repositorio, no son dependencias de npm y
-                  nunca se incluyen en las construcciones de producción.
+                  La prueba de paridad opcional puede cargar paquetes para
+                  navegador descargados manualmente del paquete con licencia MIT
+                  <code>qrcode</code> y comparar el codificador propio con 1.287
+                  matrices de referencia. Estos archivos permanecen fuera del
+                  repositorio, no son dependencias de npm y nunca se incluyen en
+                  las compilaciones de producción.
                 </p>
                 <nav aria-label="Enlaces de referencia de código QR de nodos">
                   <a href="https://github.com/soldair/node-qrcode">depósito</a

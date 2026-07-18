@@ -154,9 +154,10 @@
               aria-label="Detalle de un patrón de alineación amarillo"
             ></canvas>
             <p>
-              La versión 2 y posterior agregan objetivos más pequeños de 5 por
-              5. Su número aumenta con la versión, por lo que un lector puede
-              corregir la perspectiva y la distorsión superficial.
+              A partir de la versión 2 se añaden patrones de alineación más
+              pequeños, de 5 por 5 módulos. Su número aumenta con la versión
+              para que el lector pueda corregir la perspectiva y las
+              deformaciones de la superficie.
             </p>
           </article>
           <article class="visual-card">
@@ -170,9 +171,9 @@
               aria-label="Detalle de los patrones de temporización horizontal y vertical en cian"
             ></canvas>
             <p>
-              Los módulos oscuros y claros alternados en la fila 6 y la columna
-              6 establecen el ritmo del módulo y conectan las regiones de
-              búsqueda.
+              Los módulos oscuros y claros alternos de la fila 6 y la columna 6
+              establecen el ritmo de la cuadrícula y conectan las zonas de los
+              patrones de posición.
             </p>
           </article>
           <article class="visual-card">
@@ -187,8 +188,8 @@
             ></canvas>
             <p>
               Un módulo oscuro fijo se encuentra en la fila <code>4V + 9</code>,
-              columna 8. Siempre está encendida y está separada de la copia del
-              formato cercana.
+              columna 8. Siempre está oscuro y no forma parte de la copia
+              cercana de la información de formato.
             </p>
           </article>
         </div>
@@ -219,11 +220,10 @@
               aria-label="Detalle de los metadatos superiores izquierdos: bits rosados del nivel de corrección, bits azules de máscara y bits morados de formato protegido"
             ></canvas>
             <p>
-              El valor del formato de 15 bits contiene 2 bits de nivel de
-              corrección de errores y 3 bits de patrón de máscara. Se añaden
-              diez bits de protección BCH, luego el resultado se enmascara con
-              una máscara XOR con un patrón fijo. El mismo valor aparece en dos
-              ubicaciones.
+              El valor de formato de 15 bits contiene 2 bits del nivel de
+              corrección de errores y 3 bits del patrón de máscara. Se le añaden
+              diez bits de protección BCH y el resultado se combina mediante XOR
+              con un patrón fijo. El mismo valor se escribe en dos ubicaciones.
             </p>
           </article>
           <article class="visual-card">
@@ -323,7 +323,7 @@
           <article class="visual-card payload-units-card">
             <div class="visual-heading">
               <span class="color-dot data"></span>
-              <h3>Unidades de carga útil</h3>
+              <h3>Unidades de datos</h3>
             </div>
             <p>
               Cada ejemplo siguiente contiene el encabezado y los datos
@@ -443,7 +443,7 @@
                     class="mixed-qr-visual"
                     data-qr-visual="mixed"
                     role="img"
-                    aria-label="Código QR de la versión 1 para el ejemplo de modo mixto con superposiciones de depuración y el camino del flujo"
+                    aria-label="Código QR de versión 1 para el ejemplo de modo mixto, con las capas de depuración y el recorrido del flujo"
                   ></canvas>
                   <figcaption>
                     Los campos verdes de Modo y naranjas de Recuento se repiten
@@ -570,11 +570,11 @@
             <p class="section-number">Ocho candidatos a la máscara</p>
             <h3>La fórmula cambia; los puntos de referencia no lo hacen</h3>
             <p>
-              Para cada módulo no funcional en la fila <code>r</code> Y columna
-              <code>c</code>, una verdadera fórmula invierte el bit almacenado.
-              El azul muestra dónde está activa cada fórmula. Los patrones de
-              búsqueda, alineación y temporización permanecen como puntos de
-              referencia oscuros porque la máscara nunca los cambia.
+              Para cada módulo no funcional situado en la fila <code>r</code> Y
+              columna <code>c</code>, cuando la fórmula se cumple se invierte el
+              bit almacenado. El azul indica dónde se activa cada fórmula. Los
+              patrones de posición, alineación y temporización permanecen
+              oscuros como referencia porque la máscara nunca los modifica.
             </p>
           </div>
           <div class="mask-formula-grid">
@@ -700,9 +700,9 @@
             <div>
               <strong>Leer metadatos</strong>
               <p>
-                Decodificar la información del formato, seleccionar el nivel y
-                la máscara EC y leer la información de la versión cuando esté
-                presente.
+                Descodifique la información de formato, determine el nivel de
+                corrección de errores y la máscara, y lea la información de
+                versión cuando esté presente.
               </p>
             </div>
           </li>
@@ -774,8 +774,8 @@
             ><strong>Unidades de codificación</strong
             ><span
               ><code>segment.js</code> valida y convierte unidades numéricas,
-              alfanuméricas, UTF-8 Byte y Shift JIS Kanji en bits de carga
-              útil.</span
+              alfanuméricas, de bytes UTF-8 y Kanji Shift JIS en bits de
+              datos.</span
             ></a
           >
           <a
@@ -846,9 +846,9 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"
             ><strong>Conversión de Shift JIS Kanji</strong
             ><span
-              ><code>kanji.js</code> Crea el mapa Shift JIS compatible con el
-              navegador, valida las dos rangos de Kanji QR y transforma los
-              caracteres en valores de 13 bits.</span
+              ><code>kanji.js</code> crea el mapa Shift JIS compatible con el
+              navegador, valida los dos intervalos Kanji admitidos por QR y
+              transforma los caracteres en valores de 13 bits.</span
             ></a
           >
           <a
@@ -889,11 +889,10 @@
           <p class="section-number">Referencias primarias</p>
           <h2>Estándares y referencias de implementación</h2>
           <p>
-            Esta guía es explicativa, no es un sustituto del estándar normativo.
-            Las tablas de bloques exactas, las anchuras de conteo, las
-            penalizaciones por máscara y las reglas de codificación se
-            implementan por el generador y se prueban contra matrices de
-            referencia.
+            Esta guía tiene fines explicativos y no sustituye al estándar
+            normativo. El generador implementa las tablas exactas de bloques,
+            los anchos de recuento, las penalizaciones de máscara y las reglas
+            de codificación, y los verifica frente a matrices de referencia.
           </p>
         </div>
         <div class="reference-links">
