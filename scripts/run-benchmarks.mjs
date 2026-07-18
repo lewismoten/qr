@@ -150,9 +150,9 @@ const kanjiStartedAt = performance.now();
 initializeKanji();
 const kanjiInitializationMs = round(performance.now() - kanjiStartedAt);
 const scenarios = qrScenarios.map(measureScenario);
-const hotspots = profileEnabled
-  ? await profileQrFunctions(qrScenarios, quick ? 150 : 400)
-  : [];
+const cpuProfile = profileEnabled
+  ? await profileQrFunctions(qrScenarios, quick ? 5 : 15)
+  : { elapsedMs: 0, operationCount: 0, hotspots: [] };
 const report = {
   generatedAt: new Date().toISOString(),
   runtime: {
@@ -169,7 +169,7 @@ const report = {
   },
   kanjiInitializationMs,
   scenarios,
-  hotspots,
+  cpuProfile,
 };
 
 printBenchmarkReport(report);

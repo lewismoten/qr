@@ -87,7 +87,8 @@ npm run benchmark:quick
 ```
 
 The narrow report ranks scenarios from slowest to fastest and highlights sampled
-QR functions with the highest self-time. It covers representative QR versions,
+QR functions with the highest self-time over a fixed workload. It covers
+representative QR versions,
 fixed and automatic masks, mixed segmentation, and Kanji. Metrics include median
 and 95th-percentile generation time, throughput, estimated peak heap per
 operation, retained heap, and one-time Kanji initialization. Pass `--no-profile`

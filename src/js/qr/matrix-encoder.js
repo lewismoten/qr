@@ -7,7 +7,7 @@ import {
   makeReedSolomonDivisor,
 } from './reed-solomon.js';
 import { toShiftJis } from './kanji.js';
-import { isMaskActive } from './mask.js';
+import { getMaskMap } from './mask.js';
 import { getPenalty } from './penalty.js';
 import {
   makeDataCodewords,
@@ -160,12 +160,16 @@ class MatrixBuilder {
       );
   }
 
-  applyMask(mask) {
+  transitionMask(previousMask, nextMask) {
+    const previous =
+      previousMask === undefined ? null : getMaskMap(this.size, previousMask);
+    const next = getMaskMap(this.size, nextMask);
     for (let row = 0; row < this.size; row += 1) {
       for (let column = 0; column < this.size; column += 1) {
+        const index = row * this.size + column;
         if (
           !this.functionModules[row][column] &&
-          isMaskActive(mask, row, column)
+          Boolean(previous?.[index]) !== Boolean(next[index])
         ) {
           this.modules[row][column] = !this.modules[row][column];
         }
@@ -175,17 +179,18 @@ class MatrixBuilder {
 
   finish(requestedMask) {
     let mask = requestedMask;
+    let appliedMask;
     if (mask === undefined) {
       let minimumPenalty = Infinity;
       for (let candidate = 0; candidate < 8; candidate += 1) {
-        this.applyMask(candidate);
+        this.transitionMask(appliedMask, candidate);
+        appliedMask = candidate;
         this.drawFormatBits(candidate);
         const penalty = getPenalty(this.modules);
         if (penalty < minimumPenalty) {
           mask = candidate;
           minimumPenalty = penalty;
         }
-        this.applyMask(candidate);
       }
     }
     if (!Number.isInteger(mask) || mask < 0 || mask > 7)
@@ -195,7 +200,7 @@ class MatrixBuilder {
         undefined,
         RangeError,
       );
-    this.applyMask(mask);
+    this.transitionMask(appliedMask, mask);
     this.drawFormatBits(mask);
     return mask;
   }
