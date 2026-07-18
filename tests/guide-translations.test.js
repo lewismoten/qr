@@ -241,10 +241,17 @@ test('Spanish specification uses fluent technical language', async () => {
     copy,
     /El optimizador solo cambia de modo cuando el ahorro de bits en los datos/i,
   );
-  assert.match(copy, /Se repite para cada segmento optimizado/i);
+  assert.match(
+    copy,
+    /Esta estructura se repite para cada segmento optimizado\./i,
+  );
   assert.match(copy, /Cómo se selecciona automáticamente la máscara/i);
   assert.match(copy, /0, 3, 4 o 7 bits/i);
-  assert.match(copy, /Alineación a byte.*?0–7 bits/i);
+  assert.match(copy, /Bits de alineación a byte.*?0–7 bits/i);
+  assert.match(
+    copy,
+    /Penalizar el desequilibrio entre módulos oscuros y claros\./i,
+  );
   assert.match(copy, /se muestran en oscuro como referencia/i);
   assert.match(copy, />Numérico</i);
   assert.match(copy, />Alfanumérico</i);
