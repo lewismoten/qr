@@ -1,18 +1,17 @@
-const readInteger = (input, fallback) => {
-  const value = Number.parseInt(input.value, 10);
-  return Number.isNaN(value) ? fallback : value;
-};
-
 export function createLazyStyleSetup(options) {
-  const { elements: e, colorWithTransparency } = options;
   let controller = null;
+  let featureElements = null;
   let request = null;
   const ensure = () => {
     if (controller) return Promise.resolve(controller);
     if (!request) {
-      request = import('./setup.js')
-        .then(({ createStyleSetup }) => {
-          controller = createStyleSetup(options);
+      request = Promise.all([import('./setup.js'), import('./elements.js')])
+        .then(([{ createStyleSetup }, { getStyleElements }]) => {
+          featureElements = getStyleElements(options.document);
+          controller = createStyleSetup({
+            ...options,
+            elements: featureElements,
+          });
           return controller;
         })
         .catch((error) => {
@@ -28,19 +27,19 @@ export function createLazyStyleSetup(options) {
       sync: () => controller?.modules.sync(),
       getOptions: () =>
         controller?.modules.getOptions() ?? {
-          type: e.moduleShape.value,
-          rounding: readInteger(e.moduleRounding, 25),
-          inset: readInteger(e.moduleInset, 4),
-          rotation: readInteger(e.moduleRotation, 0),
+          type: 'square',
+          rounding: 25,
+          inset: 4,
+          rotation: 0,
         },
     },
     eyes: {
       sync: () => controller?.eyes.sync(),
       getOptions: () =>
         controller?.eyes.getOptions() ?? {
-          type: e.eyeShape.value,
-          outerRounding: readInteger(e.eyeOuterRounding, 20),
-          centerRounding: readInteger(e.eyeCenterRounding, 35),
+          type: 'default',
+          outerRounding: 20,
+          centerRounding: 35,
         },
     },
     colors: {
@@ -50,17 +49,38 @@ export function createLazyStyleSetup(options) {
         controller?.colors.applyRecommendedImageContrast(),
       getGradientOptions: () =>
         controller?.colors.getGradientOptions() ?? {
-          type: e.gradientType.value,
-          angle: readInteger(e.gradientAngle, 0),
-          endColor: colorWithTransparency(
-            e.colorGradientEnd.value.trim() || '#0f766e',
-            e.colorGradientEndTransparency,
-          ),
+          type: 'solid',
+          angle: 0,
+          endColor: '#0f766e',
         },
+      getQrColors: () => ({
+        dark: featureElements
+          ? options.colorWithTransparency(
+              featureElements.colorDark.value.trim() || '#111827',
+              featureElements.colorDarkTransparency,
+            )
+          : '#111827ff',
+        light: featureElements
+          ? options.colorWithTransparency(
+              featureElements.colorLight.value.trim() || '#ffffff',
+              featureElements.colorLightTransparency,
+            )
+          : '#ffffffff',
+      }),
     },
     artwork: {
       sync: () => controller?.artwork.sync(),
       syncEmoji: () => controller?.artwork.syncEmoji(),
+      getOptions: () => ({
+        mode: featureElements?.centerArtMode.value ?? 'none',
+        emoji: featureElements?.centerEmoji.value.trim() ?? '',
+        sizePercent: featureElements
+          ? Number.parseInt(featureElements.centerArtSize.value, 10) || 20
+          : 20,
+        protectBackground: featureElements?.centerArtBackground.checked ?? true,
+        matchModuleShape:
+          featureElements?.pixelArtMatchModuleShape.checked ?? false,
+      }),
     },
     pixelEditor: {
       initialize() {},
@@ -68,11 +88,16 @@ export function createLazyStyleSetup(options) {
       syncSizeLabel: () => controller?.pixelEditor.syncSizeLabel(),
       getState: () =>
         controller?.pixelEditor.getState() ?? {
-          size: readInteger(e.pixelArtSizeInput, 16),
-          pixels: Array(readInteger(e.pixelArtSizeInput, 16) ** 2).fill(null),
+          size: 16,
+          pixels: Array(256).fill(null),
         },
     },
     imageFill: { getImage: () => controller?.imageFill.getImage() ?? null },
     centerLogo: { getImage: () => controller?.centerLogo.getImage() ?? null },
+    getEyeColors: () => ({
+      enabled: featureElements?.eyeCustomColorsEnabled.checked ?? false,
+      outer: featureElements?.eyeOuterColor.value ?? '#0f766e',
+      center: featureElements?.eyeCenterColor.value ?? '#111827',
+    }),
   };
 }

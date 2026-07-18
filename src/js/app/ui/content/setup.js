@@ -110,6 +110,7 @@ export function createContentSections({
     getPreview: () => numberLoader.get()?.getPayload() ?? '[number]',
     getSequenceInfo: () =>
       numberLoader.get()?.getSequenceInfo() ?? { total: 1, current: 1 },
+    getIndexInput: () => numberLoader.get()?.getIndexInput() ?? null,
     getValidationState: () =>
       numberLoader.get()?.getValidationState() ?? {
         error: '',

@@ -3,7 +3,6 @@ export function createRuntimeHelpers({
   canvas,
   controls,
   errorLevels,
-  getDebugState,
 }) {
   function getDefaultUrl() {
     return window.location.protocol === 'file:'
@@ -38,21 +37,12 @@ export function createRuntimeHelpers({
     return controls.modeAuto.checked ? undefined : controls.encodingMode.value;
   }
 
-  function isDebugOverlayActive() {
-    const state = getDebugState();
-    return (
-      (state.tab === 'debug' && state.subtab === 'overlay') ||
-      controls.debugEnabled.checked
-    );
-  }
-
   return {
     clearCanvas,
     getDefaultUrl,
     getEncodingMode,
     getErrorLevel,
     getShareableUrl,
-    isDebugOverlayActive,
     readInteger,
   };
 }

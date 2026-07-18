@@ -43,10 +43,6 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel }) {
     actions.syncGradientControls();
     actions.syncNumberSequenceControls();
     actions.syncFrameMessageControls();
-    e.frameMessageCenterArt.checked = e.frameMessageCenter.checked;
-    e.frameLineHeightValue.textContent = lookup('units.pixels', '{value} px', {
-      value: e.frameLineHeight.value,
-    });
     actions.syncModuleShapeControls();
     actions.syncEyeShapeControls();
     actions.syncCenterArtworkControls();

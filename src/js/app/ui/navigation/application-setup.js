@@ -7,6 +7,7 @@ export function createApplicationNavigation({
   prepareDebug,
   prepareStyle,
   prepareDownload,
+  prepareContent,
   state,
 }) {
   return createNavigation({
@@ -29,6 +30,7 @@ export function createApplicationNavigation({
     prepareDebug,
     prepareStyle,
     prepareDownload,
+    prepareContent,
     setActiveTab: state.setActiveTab,
     setActiveDebugSubtab: state.setActiveDebugSubtab,
   });

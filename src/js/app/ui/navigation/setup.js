@@ -13,6 +13,7 @@ export function createNavigation({
   prepareDebug,
   prepareStyle,
   prepareDownload,
+  prepareContent,
   setActiveTab,
   setActiveDebugSubtab,
 }) {
@@ -33,6 +34,7 @@ export function createNavigation({
   const loadDebug = (name) => load(prepareDebug, name);
   const loadStyle = (name) => load(prepareStyle, name);
   const loadDownload = (name) => load(prepareDownload, name);
+  const loadContent = (name) => load(prepareContent, name);
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,
@@ -88,6 +90,7 @@ export function createNavigation({
     buttons: e.contentTabs,
     panels: e.contentPanels,
     onActivate(name) {
+      loadContent(name);
       if (name === 'data' && format.value === 'geo')
         window.requestAnimationFrame(updateMap);
     },

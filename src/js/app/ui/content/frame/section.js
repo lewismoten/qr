@@ -240,7 +240,10 @@ export function createFrameSection(options) {
   const setCentered = (enabled) => {
     options.centerCheckbox.checked = enabled;
     options.artCenterCheckbox.checked = enabled;
-    if (enabled && options.artMode.value !== 'none') options.onDisableArtwork();
+    if (enabled && options.artMode.value !== 'none') {
+      options.artMode.value = 'none';
+      options.onDisableArtwork();
+    }
   };
   const getFont = (size) =>
     ({
@@ -254,34 +257,10 @@ export function createFrameSection(options) {
   const sync = () => {
     options.customField.hidden = options.mode.value !== 'custom';
   };
-  return { getMessage, setCentered, getFont, sync };
-}
-
-export function createFrameSectionFromDocument(document, options) {
-  return createFrameSection({
-    ...options,
-    fileIndex: document.getElementById('file-chunk-index'),
-    values: {
-      url: document.getElementById('url-input'),
-      text: document.getElementById('text-input'),
-      wifi: document.getElementById('wifi-ssid'),
-      email: document.getElementById('email-to'),
-      phone: document.getElementById('phone-number'),
-      sms: document.getElementById('sms-number'),
-      geoLabel: document.getElementById('geo-query'),
-      latitude: document.getElementById('geo-latitude'),
-      longitude: document.getElementById('geo-longitude'),
-      vcardName: document.getElementById('vcard-name'),
-      vcardOrg: document.getElementById('vcard-org'),
-      vcardEmail: document.getElementById('vcard-email'),
-    },
-    event: {
-      title: document.getElementById('event-title'),
-      allDay: document.getElementById('event-all-day'),
-      startDate: document.getElementById('event-start-date'),
-      startTime: document.getElementById('event-start-time'),
-      endDate: document.getElementById('event-end-date'),
-      endTime: document.getElementById('event-end-time'),
-    },
+  const getRenderOptions = () => ({
+    centered: options.centerCheckbox.checked,
+    lineHeight: Number.parseInt(options.lineHeight.value, 10) || 18,
+    color: options.color.value,
   });
+  return { getMessage, setCentered, getFont, getRenderOptions, sync };
 }

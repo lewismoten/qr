@@ -1,0 +1,2 @@
+function t(d,m){let e=u=>d.getElementById(u);return{...m,maskGrid:e("mask-grid"),detectedMode:e("detected-mode"),segmentSummary:e("segment-summary"),versionSummary:e("version-summary"),unusedSummary:e("unused-summary"),modeValidation:e("mode-validation"),debugEnabled:e("debug-enabled"),debugUnmask:e("debug-unmask"),debugOutlineModeButtons:d.querySelectorAll(".outline-mode-button")}}export{t as getDebugElements};
+//# sourceMappingURL=elements-3HGA4EMH.js.map

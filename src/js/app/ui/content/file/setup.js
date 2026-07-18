@@ -4,6 +4,7 @@ import { createFileManifestController } from './manifest.js';
 import { createFilePayloadBuilder } from './payload.js';
 import { createFileSection } from './section.js';
 import { createFileSettings } from './settings.js';
+import { createFilePayloadPreview } from './preview.js';
 
 export function createFileSetup({
   elements: e,
@@ -96,5 +97,20 @@ export function createFileSetup({
     getCapacityInfo: capacity.getChunkInfo,
     syncCapacity: section.syncCapacity,
   });
-  return { cache, capacity, section, settings, payload, compressionEnabled };
+  const preview = createFilePayloadPreview({
+    getFile: cache.getFile,
+    getMode: section.getMode,
+    getCapacity: capacity.getChunkInfo,
+    includeManifest: e.includeManifest,
+  });
+  return {
+    cache,
+    capacity,
+    section,
+    settings,
+    payload,
+    preview,
+    elements: e,
+    compressionEnabled,
+  };
 }

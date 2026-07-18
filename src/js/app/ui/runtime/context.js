@@ -39,6 +39,9 @@ export function createRuntimeContext() {
     syncEmailLength: (...args) =>
       connected().contentEncoding.emailCapacity.sync(...args),
     syncEvent: (...args) => connected().contentSections.event.sync(...args),
+    setFrameCentered: (...args) =>
+      connected().contentEncoding.pipeline.frame.setCentered(...args),
+    formatVersion: (...args) => connected().output.formatVersion(...args),
     activateDownload: (...args) =>
       connected().navigation.activateDownload(...args),
   };

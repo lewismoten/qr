@@ -125,7 +125,13 @@ export function createNumberSection({
     return { error: '', warning: '' };
   };
 
-  return { getSequenceInfo, getPayload, sync, getValidationState };
+  return {
+    getSequenceInfo,
+    getPayload,
+    getIndexInput: () => indexInput,
+    sync,
+    getValidationState,
+  };
 }
 
 export function createNumberSectionFromDocument(document, options) {

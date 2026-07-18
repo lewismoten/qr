@@ -16,21 +16,8 @@ export function createQrRenderer(deps) {
     canvas,
     qrWidth,
     qrWidthAuto,
-    colorLight,
-    eyeCustomColorsEnabled,
-    eyeOuterColor,
-    eyeCenterColor,
     debugColors,
-    debugUnmask,
-    centerArtMode,
-    centerEmoji,
-    centerArtSize,
-    centerArtBackground,
-    pixelArtMatchModuleShape,
-    moduleShape,
-    frameMessageCenter,
-    frameLineHeight,
-    frameMessageColor,
+    isDebugUnmasked,
     maxTargetWidth: MAX_QR_TARGET_WIDTH,
     formatWidthLabel,
     getCurrentFrameMessage,
@@ -39,12 +26,14 @@ export function createQrRenderer(deps) {
     getCurrentModuleShapeOptions,
     getCurrentEyeShapeOptions,
     getCurrentGradientOptions,
+    getCurrentEyeColors,
+    getCurrentArtworkOptions,
+    getCurrentFrameOptions,
     imageFillController,
     getCodewordStyle,
     getModuleContrastColor,
     centerLogoController,
     pixelArtEditor,
-    readInteger,
     schedulePreviewViewportSync,
     setRenderMetrics,
     getActiveDebugOutlineMode,
@@ -90,8 +79,9 @@ export function createQrRenderer(deps) {
     const cellSize = canvasSize / totalModules;
     const context = canvas.getContext('2d');
     const frameMessageText = getCurrentFrameMessage();
-    const frameMessageIsCentered = frameMessageCenter.checked;
-    const captionLineHeight = Number.parseInt(frameLineHeight.value, 10) || 18;
+    const frameOptions = getCurrentFrameOptions();
+    const frameMessageIsCentered = frameOptions.centered;
+    const captionLineHeight = frameOptions.lineHeight;
     const captionPadding = Math.max(7, Math.min(14, canvasSize * 0.035));
     const qrDrawSize = moduleCount * cellSize;
     const frameMessageMaximumWidth = frameMessageIsCentered
@@ -123,11 +113,12 @@ export function createQrRenderer(deps) {
     const eyeShapeOptions = getCurrentEyeShapeOptions();
     const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
     const gradientOptions = getCurrentGradientOptions();
+    const eyeColors = getCurrentEyeColors();
     const imageFillImage = imageFillController.getImage();
     const imageFillActive =
       !debugActive && gradientOptions.type === 'image' && imageFillImage;
     const customEyeColorsActive =
-      !debugActive && !imageFillActive && eyeCustomColorsEnabled.checked;
+      !debugActive && !imageFillActive && eyeColors.enabled;
     const lightAlpha = getColorAlpha(options.color.light);
     const gradientHasTransparency =
       (gradientOptions.type === 'linear' ||
@@ -149,7 +140,7 @@ export function createQrRenderer(deps) {
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (imageFillActive) {
-      context.fillStyle = colorLight.value;
+      context.fillStyle = options.color.light;
       context.fillRect(0, 0, canvas.width, canvas.height);
       imageFillLayer = createQrImageLayer(
         context,
@@ -187,10 +178,10 @@ export function createQrRenderer(deps) {
       cellSize,
     );
     const eyeOuterFillStyle = customEyeColorsActive
-      ? eyeOuterColor.value
+      ? eyeColors.outer
       : moduleFillStyle;
     const eyeCenterFillStyle = customEyeColorsActive
-      ? eyeCenterColor.value
+      ? eyeColors.center
       : moduleFillStyle;
 
     drawQrMatrix({
@@ -203,7 +194,7 @@ export function createQrRenderer(deps) {
       debugRenderer,
       debugModel,
       debugColors,
-      debugUnmask,
+      debugUnmask: isDebugUnmasked(),
       customEyesActive,
       customEyeColorsActive,
       imageFillActive,
@@ -221,20 +212,22 @@ export function createQrRenderer(deps) {
       getModuleContrastColor,
     });
 
+    const artworkOptions = getCurrentArtworkOptions();
     drawCenterArtwork(
       context,
       marginModules * cellSize,
       moduleCount * cellSize,
       {
-        mode: centerArtMode.value,
+        mode: artworkOptions.mode,
         logo: centerLogoController.getImage(),
-        emoji: centerEmoji.value.trim(),
+        emoji: artworkOptions.emoji,
         pixelArt: pixelArtEditor.getState(),
-        sizePercent: readInteger(centerArtSize) ?? 20,
-        protectBackground: centerArtBackground.checked,
+        sizePercent: artworkOptions.sizePercent,
+        protectBackground: artworkOptions.protectBackground,
         lightColor: options.color.light,
         matchModuleShape:
-          pixelArtMatchModuleShape.checked && moduleShape.value !== 'square',
+          artworkOptions.matchModuleShape &&
+          moduleShapeOptions.type !== 'square',
         moduleShape: getCurrentModuleShapeOptions(),
       },
     );
@@ -246,7 +239,7 @@ export function createQrRenderer(deps) {
         frameMessageLayout.font,
         captionLineHeight,
         marginModules * cellSize + qrDrawSize / 2,
-        frameMessageColor.value,
+        frameOptions.color,
         options.color.light,
         cellSize,
       );
@@ -258,7 +251,7 @@ export function createQrRenderer(deps) {
         captionHeight,
         frameMessageLayout.font,
         captionLineHeight,
-        frameMessageColor.value,
+        frameOptions.color,
       );
     }
 

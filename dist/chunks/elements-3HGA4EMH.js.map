@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/debug/elements.js"],
+  "sourcesContent": ["export function getDebugElements(document, core) {\n  const id = (name) => document.getElementById(name);\n  return {\n    ...core,\n    maskGrid: id('mask-grid'),\n    detectedMode: id('detected-mode'),\n    segmentSummary: id('segment-summary'),\n    versionSummary: id('version-summary'),\n    unusedSummary: id('unused-summary'),\n    modeValidation: id('mode-validation'),\n    debugEnabled: id('debug-enabled'),\n    debugUnmask: id('debug-unmask'),\n    debugOutlineModeButtons: document.querySelectorAll('.outline-mode-button'),\n  };\n}\n"],
+  "mappings": "AAAO,SAASA,EAAiBC,EAAUC,EAAM,CAC/C,IAAMC,EAAMC,GAASH,EAAS,eAAeG,CAAI,EACjD,MAAO,CACL,GAAGF,EACH,SAAUC,EAAG,WAAW,EACxB,aAAcA,EAAG,eAAe,EAChC,eAAgBA,EAAG,iBAAiB,EACpC,eAAgBA,EAAG,iBAAiB,EACpC,cAAeA,EAAG,gBAAgB,EAClC,eAAgBA,EAAG,iBAAiB,EACpC,aAAcA,EAAG,eAAe,EAChC,YAAaA,EAAG,cAAc,EAC9B,wBAAyBF,EAAS,iBAAiB,sBAAsB,CAC3E,CACF",
+  "names": ["getDebugElements", "document", "core", "id", "name"]
+}

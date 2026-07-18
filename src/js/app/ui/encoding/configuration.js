@@ -12,14 +12,7 @@ export function createQrConfiguration({
       margin: helpers.readInteger(e.qrMargin) ?? 1,
       scale: helpers.readInteger(e.qrScale) ?? 4,
       color: {
-        dark: helpers.colorWithTransparency(
-          e.colorDark.value.trim() || '#111827',
-          e.colorDarkTransparency,
-        ),
-        light: helpers.colorWithTransparency(
-          e.colorLight.value.trim() || '#ffffff',
-          e.colorLightTransparency,
-        ),
+        ...helpers.getQrColors(),
       },
     };
     if (!e.qrWidthAuto.checked)

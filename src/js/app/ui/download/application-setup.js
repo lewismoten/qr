@@ -31,6 +31,22 @@ export function createApplicationDownloadSetup({
     animation?.sync();
   };
 
+  e.downloadQuality.addEventListener('input', syncControls);
+  for (const input of [
+    e.animationMinutes,
+    e.animationSeconds,
+    e.animationMilliseconds,
+  ]) {
+    input.addEventListener('input', () => animation?.sync());
+  }
+  document.getElementById('qr-form').addEventListener('click', (event) => {
+    const button = event.target.closest('.choice-button');
+    if (!button) return;
+    const target = document.getElementById(button.dataset.choiceTarget);
+    if (target === e.downloadFormat) syncControls();
+    if (target === e.animationTimingMode) animation?.sync();
+  });
+
   const ensureImage = () =>
     import('./image/section.js').then(({ createDownloadImageSection }) => {
       image ??= createDownloadImageSection({

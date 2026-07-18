@@ -1,4 +1,3 @@
-import { colorWithTransparency } from '../../colors.js';
 import { createMaskSelector } from './mask-selector.js';
 
 function moduleIsDark(qrDefinition, row, column) {
@@ -14,6 +13,7 @@ export function createDebugMaskSetup({
   config,
   encoder,
   getErrorLevel,
+  getQrColors,
   render,
 }) {
   const buildOptions = (value) => {
@@ -21,16 +21,7 @@ export function createDebugMaskSetup({
       errorCorrectionLevel: getErrorLevel().value,
       margin: 1,
       width: 72,
-      color: {
-        dark: colorWithTransparency(
-          e.colorDark.value.trim() || '#111827',
-          e.colorDarkTransparency,
-        ),
-        light: colorWithTransparency(
-          e.colorLight.value.trim() || '#ffffff',
-          e.colorLightTransparency,
-        ),
-      },
+      color: getQrColors(),
     };
     if (value !== '') options.maskPattern = Number.parseInt(value, 10);
     return options;

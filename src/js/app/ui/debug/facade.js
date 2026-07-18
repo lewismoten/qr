@@ -9,6 +9,7 @@ function moduleIsDark(qrDefinition, row, column) {
 
 export function createDebugFacade(options) {
   const colors = {};
+  let featureElements = null;
   let controller = null;
   let request = null;
   const ensure = () => {
@@ -17,15 +18,27 @@ export function createDebugFacade(options) {
       request = Promise.all([
         import('./lazy-setup.js'),
         import('../help-popovers.js'),
+        import('./elements.js'),
       ])
-        .then(([{ createLazyDebugSetup }, { initializeHelpPopovers }]) => {
-          initializeHelpPopovers();
-          controller = createLazyDebugSetup({
-            ...options,
-            colorElements: colors,
-          });
-          return controller;
-        })
+        .then(
+          ([
+            { createLazyDebugSetup },
+            { initializeHelpPopovers },
+            { getDebugElements },
+          ]) => {
+            initializeHelpPopovers();
+            featureElements = getDebugElements(
+              options.document,
+              options.elements,
+            );
+            controller = createLazyDebugSetup({
+              ...options,
+              elements: featureElements,
+              colorElements: colors,
+            });
+            return controller;
+          },
+        )
         .catch((error) => {
           request = null;
           throw error;
@@ -35,6 +48,15 @@ export function createDebugFacade(options) {
   };
   return {
     colors,
+    isOverlayActive() {
+      const state = options.runtime.getDebugState();
+      return (
+        (state.tab === 'debug' && state.subtab === 'overlay') ||
+        (featureElements?.debugEnabled.checked ?? false)
+      );
+    },
+    isUnmasked: () => featureElements?.debugUnmask.checked ?? false,
+    getModeError: () => featureElements?.modeValidation.textContent ?? '',
     load: (name) => ensure().then((system) => system.load(name)),
     diagnostics: {
       setValidation: (...args) =>

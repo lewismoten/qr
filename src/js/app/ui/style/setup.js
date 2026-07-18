@@ -13,11 +13,22 @@ export function createStyleSetup({
   elements: e,
   render,
   colorWithTransparency,
+  setFrameCentered,
 }) {
   let modulesSystem = null;
   let colorsSystem = null;
   let artworkSystem = null;
   const requests = new Map();
+
+  const syncChoice = (target, value) => {
+    if (target === e.gradientType) colors.sync();
+    if (target === e.moduleShape) modules.sync();
+    if (target === e.eyeShape) eyes.sync();
+    if (target === e.centerArtMode) {
+      if (value !== 'none') setFrameCentered(false);
+      artwork.sync();
+    }
+  };
 
   const loadOnce = (name, loader) => {
     if (!requests.has(name)) {
@@ -235,6 +246,24 @@ export function createStyleSetup({
     if (name === 'colors') await loadColors();
     if (name === 'artwork') await loadArtwork();
   };
+
+  e.imageFillRecommended.addEventListener('click', () => {
+    colors.applyRecommendedImageContrast();
+    render();
+  });
+  e.emojiOptions.forEach((button) =>
+    button.addEventListener('click', () => {
+      e.centerEmoji.value = button.dataset.emoji || '';
+      artwork.syncEmoji();
+      render();
+    }),
+  );
+  document.getElementById('qr-form').addEventListener('click', (event) => {
+    const button = event.target.closest('.choice-button');
+    if (!button) return;
+    const target = document.getElementById(button.dataset.choiceTarget);
+    if (target) syncChoice(target, button.dataset.choiceValue);
+  });
 
   return {
     load,

@@ -13,6 +13,61 @@ const EMPTY_CHUNK_INFO = Object.freeze({
   isSingleFrame: true,
 });
 
+function bindFileEvents(file, e, runtime, protocol) {
+  e.input.addEventListener('change', () => {
+    file.settings.resetCache();
+    e.chunkIndex.value = '1';
+    file.section.syncCapacity();
+    runtime.render();
+  });
+  e.clearButton.addEventListener('click', () => {
+    file.section.clear();
+    runtime.render();
+  });
+  for (const input of [
+    e.includeManifest,
+    e.compressTransfer,
+    e.customMetadata,
+  ]) {
+    input.addEventListener('input', () => {
+      file.settings.resetDerived();
+      file.settings.schedule({ resetChunkIndex: true });
+    });
+  }
+  e.chunkIndex.addEventListener('input', () => {
+    file.capacity.invalidate();
+    file.section.syncCapacity();
+    runtime.render();
+  });
+  e.chunkVersionAuto.addEventListener('change', () => {
+    e.versionAuto.checked = e.chunkVersionAuto.checked;
+    if (e.chunkVersionAuto.checked) {
+      e.qrVersion.value = String(protocol.defaultChunkVersion);
+    }
+    runtime.formatVersion();
+    file.settings.syncVersion();
+    file.settings.schedule({ resetChunkIndex: true, delay: 0 });
+  });
+  e.chunkVersion.addEventListener('input', () => {
+    e.qrVersion.value = e.chunkVersion.value;
+    runtime.formatVersion();
+    file.settings.syncVersion();
+    file.settings.schedule({ resetChunkIndex: true });
+  });
+  document
+    .querySelectorAll('[data-choice-target="file-encoding-mode"]')
+    .forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.dataset.choiceValue === 'chunked' && e.versionAuto.checked) {
+          e.qrVersion.value = String(protocol.defaultChunkVersion);
+        }
+        file.settings.syncVersion();
+        runtime.formatVersion();
+        file.settings.schedule({ resetChunkIndex: true, delay: 0 });
+      });
+    });
+}
+
 export function createContentDataSetup({
   document,
   elements: e,
@@ -34,32 +89,21 @@ export function createContentDataSetup({
     if (fileRequest) return fileRequest;
     fileRequest = loading
       .track(
-        Promise.all([import('./file/setup.js'), import('./file/protocol.js')]),
+        Promise.all([
+          import('./file/setup.js'),
+          import('./file/protocol.js'),
+          import('./file/elements.js'),
+        ]),
       )
       .then(
         ([
           { createFileSetup },
           { arrayBufferToBase64, createCompactFileId },
+          { getFileElements },
         ]) => {
+          const fileElements = getFileElements(document, e);
           file = createFileSetup({
-            elements: {
-              input: e.fileInput,
-              format: e.qrFormat,
-              mode: e.fileEncodingMode,
-              capacityHint: e.fileCapacityHint,
-              clearButton: e.clearFileButton,
-              chunkControls: e.fileChunkControls,
-              chunkVersionAuto: e.fileChunkVersionAuto,
-              chunkVersion: e.fileChunkVersion,
-              chunkVersionValue: e.fileChunkVersionValue,
-              includeManifest: e.fileIncludeManifest,
-              compressTransfer: e.fileCompressTransfer,
-              customMetadata: e.fileCustomMetadata,
-              chunkIndex: e.fileChunkIndex,
-              chunkIndexValue: e.fileChunkIndexValue,
-              versionAuto: e.versionAuto,
-              qrVersion: e.qrVersion,
-            },
+            elements: fileElements,
             encoder,
             protocol,
             createId: createCompactFileId,
@@ -74,6 +118,7 @@ export function createContentDataSetup({
               render: runtime.render,
             },
           });
+          bindFileEvents(file, fileElements, runtime, protocol);
           return file;
         },
       )
@@ -145,14 +190,13 @@ export function createContentDataSetup({
 
   const isFileFormat = () => e.qrFormat.value === 'file';
   const isBulkMode = () => e.bulkEnabled.checked && !isFileFormat();
-  const getFileMode = () => e.fileEncodingMode.value || 'data';
+  const getFileMode = () => file?.section.getMode() ?? 'data';
   const getChunkVersion = () =>
-    Number.parseInt(e.fileChunkVersion.value, 10) ||
-    protocol.defaultChunkVersion;
+    file?.settings.getVersion() ?? protocol.defaultChunkVersion;
 
   const fileFacade = {
     cache: {
-      getFile: () => file?.cache.getFile() ?? e.fileInput.files?.[0] ?? null,
+      getFile: () => file?.cache.getFile() ?? null,
     },
     capacity: {
       invalidate: () => {
@@ -178,6 +222,7 @@ export function createContentDataSetup({
       },
       clear: () =>
         runFile((system) => system.section.clear(), { render: true }),
+      getChunkIndex: () => file?.elements.chunkIndex ?? null,
     },
     settings: {
       getVersion: () => file?.settings.getVersion() ?? getChunkVersion(),
@@ -199,12 +244,11 @@ export function createContentDataSetup({
     },
     payload: {
       build: () => ensureFile().then((system) => system.payload.build()),
+      preview: () => file?.preview() ?? '[file content]',
     },
   };
 
-  const preloadFile = () => ensureFile().catch(console.error);
   const preloadBulk = () => ensureBulk().catch(console.error);
-  e.fileInput.addEventListener('pointerdown', preloadFile, { once: true });
   e.bulkFileInput.addEventListener('pointerdown', preloadBulk, { once: true });
   e.bulkFileInput.addEventListener('change', () => {
     if (bulk) return;

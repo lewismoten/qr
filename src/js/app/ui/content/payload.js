@@ -1,9 +1,3 @@
-import {
-  encodeStreamPosition,
-  getCompactFileExtension,
-  getFileManifestFlag,
-} from './file/protocol.js';
-
 export function createContentPayload({
   elements: e,
   bulk,
@@ -73,32 +67,4 @@ export function createContentPayload({
   };
 
   return { build, preview };
-}
-
-export function createFilePayloadPreview({
-  getFile,
-  getMode,
-  getCapacity,
-  includeManifest,
-}) {
-  return () => {
-    const file = getFile();
-    const mode = getMode();
-    if (!file)
-      return mode === 'chunked'
-        ? 'FILE:1:S:M:[base64url-data]'
-        : mode === 'blob'
-          ? '[shareable download URL]'
-          : '[data URL for a selected file]';
-    if (mode === 'blob') return `[shareable download URL for ${file.name}]`;
-    if (mode !== 'chunked') return `[data URL for ${file.name}]`;
-    const { chunkCapacity, currentChunk, streamLength, isSingleFrame } =
-      getCapacity(file);
-    if (isSingleFrame)
-      return includeManifest.checked
-        ? 'FILE:1:S:M:[base64url-data]'
-        : `FILE:1:S:-:${getCompactFileExtension(file.name)}:[base64url-data]`;
-    const offset = Math.max(0, currentChunk - 1) * chunkCapacity;
-    return `FILE:1:C:${getFileManifestFlag(includeManifest.checked)}:[base64url-id]:${getCompactFileExtension(file.name)}:${encodeStreamPosition(offset, streamLength)}:${streamLength}:[base64url-data]`;
-  };
 }

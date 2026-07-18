@@ -7,9 +7,9 @@ export function createFrameNavigation({
   bulkRowIndex,
   syncBulkStatus,
   getFileEncodingMode,
-  fileChunkIndex,
+  getFileChunkIndex,
   syncFileChunkLabel,
-  numberSequenceIndex,
+  getNumberSequenceIndex,
   getNumberSequenceInfo,
   syncNumberSequenceControls,
   maxNumberFrames,
@@ -22,7 +22,8 @@ export function createFrameNavigation({
   const getFrameCount = () => {
     if (isBulkMode()) return Math.max(1, getBulkRowCount());
     if (format.value === 'file' && getFileEncodingMode() === 'chunked') {
-      return Math.max(1, Number.parseInt(fileChunkIndex.max, 10) || 1);
+      const input = getFileChunkIndex();
+      return Math.max(1, Number.parseInt(input?.max, 10) || 1);
     }
     if (format.value === 'number') {
       const total = getNumberSequenceInfo().total;
@@ -35,7 +36,10 @@ export function createFrameNavigation({
     if (isBulkMode())
       return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
     const input =
-      format.value === 'number' ? numberSequenceIndex : fileChunkIndex;
+      format.value === 'number'
+        ? getNumberSequenceIndex()
+        : getFileChunkIndex();
+    if (!input) return 1;
     return Math.max(1, Number.parseInt(input.value, 10) || 1);
   };
 
@@ -48,11 +52,15 @@ export function createFrameNavigation({
       return;
     }
     if (format.value === 'number') {
-      numberSequenceIndex.value = String(frame);
+      const input = getNumberSequenceIndex();
+      if (!input) return;
+      input.value = String(frame);
       syncNumberSequenceControls();
       return;
     }
-    fileChunkIndex.value = String(frame);
+    const input = getFileChunkIndex();
+    if (!input) return;
+    input.value = String(frame);
     syncFileChunkLabel();
   };
 

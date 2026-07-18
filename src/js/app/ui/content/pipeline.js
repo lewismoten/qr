@@ -1,4 +1,4 @@
-import { createContentPayload, createFilePayloadPreview } from './payload.js';
+import { createContentPayload } from './payload.js';
 
 export function createContentPipeline({
   document,
@@ -22,15 +22,8 @@ export function createContentPipeline({
     getNumberPayload: number.getPayload,
     getActiveFile: file.getActive,
     getFileMode: file.getMode,
-    mode: e.frameMode,
-    customField: e.customFrameField,
-    customMessage: e.customFrameMessage,
-    centerCheckbox: e.frameCenter,
-    artCenterCheckbox: e.frameCenterArt,
-    artMode: e.artMode,
-    font: e.frameFont,
+    render: runtime.render,
     onDisableArtwork() {
-      e.artMode.value = 'none';
       runtime.syncChoices();
       runtime.syncArtwork();
     },
@@ -40,7 +33,7 @@ export function createContentPipeline({
   const ensureFrame = () => {
     if (frameController) return Promise.resolve(frameController);
     if (!frameRequest) {
-      frameRequest = import('./frame/section.js')
+      frameRequest = import('./frame/document-section.js')
         .then(({ createFrameSectionFromDocument }) => {
           frameController = createFrameSectionFromDocument(
             document,
@@ -57,27 +50,24 @@ export function createContentPipeline({
   };
   const frame = {
     getMessage() {
-      if (e.frameMode.value === 'none') return '';
-      if (frameController) return frameController.getMessage();
-      ensureFrame().then(runtime.render).catch(console.error);
-      return '';
+      return frameController?.getMessage() ?? '';
     },
     setCentered(enabled) {
-      e.frameCenter.checked = enabled;
-      e.frameCenterArt.checked = enabled;
-      if (enabled && e.artMode.value !== 'none') {
-        frameOptions.onDisableArtwork();
-      }
+      ensureFrame()
+        .then((controller) => controller.setCentered(enabled))
+        .catch(console.error);
     },
     getFont: (size) =>
       frameController?.getFont(size) ??
       `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`,
-    sync() {
-      e.customFrameField.hidden = e.frameMode.value !== 'custom';
-      if (e.frameMode.value === 'auto') {
-        ensureFrame().then(runtime.render).catch(console.error);
-      }
-    },
+    getRenderOptions: () =>
+      frameController?.getRenderOptions() ?? {
+        centered: false,
+        lineHeight: 18,
+        color: '#111827',
+      },
+    sync: () => frameController?.sync(),
+    load: () => ensureFrame(),
   };
   const payload = createContentPayload({
     elements: {
@@ -89,12 +79,7 @@ export function createContentPipeline({
     builders,
     previews: builders.previews,
     file: {
-      preview: createFilePayloadPreview({
-        getFile: file.getActive,
-        getMode: file.getMode,
-        getCapacity: file.getCapacity,
-        includeManifest: e.includeManifest,
-      }),
+      preview: file.preview,
     },
   });
   return { frame, payload, buildBulkText };

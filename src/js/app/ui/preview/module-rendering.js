@@ -63,7 +63,7 @@ export function drawQrMatrix(state) {
           row,
           column,
           debugActive,
-          debugUnmask.checked,
+          debugUnmask,
         )
       ) {
         continue;

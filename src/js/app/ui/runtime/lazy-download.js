@@ -12,6 +12,7 @@ export function createLazyDownloadSetup({
   maxNumberFrames,
   getPrintWidth,
   syncPrint,
+  connectPrintElements,
 }) {
   let controller = null;
   let request = null;
@@ -22,9 +23,9 @@ export function createLazyDownloadSetup({
     bulkRowIndex: e.bulkRowIndex,
     syncBulkStatus: bulk.syncStatus,
     getFileEncodingMode: file.getMode,
-    fileChunkIndex: e.fileChunkIndex,
+    getFileChunkIndex: file.getIndex,
     syncFileChunkLabel: file.syncChunkLabel,
-    numberSequenceIndex: document.getElementById('number-sequence-index'),
+    getNumberSequenceIndex: number.getIndex,
     getNumberSequenceInfo: number.getInfo,
     syncNumberSequenceControls: number.sync,
     maxNumberFrames,
@@ -41,18 +42,23 @@ export function createLazyDownloadSetup({
       request = Promise.all([
         loadFeatureStylesheet('download'),
         import('../download/application-setup.js'),
+        import('../download/elements.js'),
       ])
-        .then(([, { createApplicationDownloadSetup }]) => {
-          controller = createApplicationDownloadSetup({
-            elements: e,
-            frames,
-            runtime,
-            getPrintWidth,
-            syncPrint,
-            taskProgress,
-          });
-          return controller;
-        })
+        .then(
+          ([, { createApplicationDownloadSetup }, { getDownloadElements }]) => {
+            const downloadElements = getDownloadElements(document, e);
+            connectPrintElements(downloadElements);
+            controller = createApplicationDownloadSetup({
+              elements: downloadElements,
+              frames,
+              runtime,
+              getPrintWidth,
+              syncPrint,
+              taskProgress,
+            });
+            return controller;
+          },
+        )
         .catch((error) => {
           request = null;
           throw error;

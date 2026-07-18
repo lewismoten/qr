@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/download/print-elements.js"],
+  "sourcesContent": ["export function getPrintElements(document) {\n  return {\n    printWidthAuto: document.getElementById('print-width-auto'),\n    printWidth: document.getElementById('print-width'),\n    printWidthValue: document.getElementById('print-width-value'),\n  };\n}\n"],
+  "mappings": "AAAO,SAASA,EAAiBC,EAAU,CACzC,MAAO,CACL,eAAgBA,EAAS,eAAe,kBAAkB,EAC1D,WAAYA,EAAS,eAAe,aAAa,EACjD,gBAAiBA,EAAS,eAAe,mBAAmB,CAC9D,CACF",
+  "names": ["getPrintElements", "document"]
+}

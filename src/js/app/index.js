@@ -50,7 +50,6 @@ const runtimeHelpers = createRuntimeHelpers({
   canvas: elements.canvas,
   errorLevels: ERROR_LEVELS,
   controls: elements,
-  getDebugState: runtime.getDebugState,
 });
 
 const contentData = createContentDataSetup({
@@ -68,12 +67,14 @@ const contentData = createContentDataSetup({
     cancelRender: runtime.cancelRender,
     render: runtime.render,
     syncChoices: runtime.syncChoices,
+    formatVersion: runtime.formatVersion,
   },
 });
 
 const styleSetup = createLazyStyleSetup({
-  elements,
+  document,
   render: runtime.render,
+  setFrameCentered: (...args) => runtime.setFrameCentered(...args),
   colorWithTransparency,
 });
 
@@ -115,10 +116,12 @@ const download = createLazyDownloadSetup({
   },
   file: {
     getMode: contentData.getSelectedFileEncodingMode,
+    getIndex: contentData.file.section.getChunkIndex,
     syncChunkLabel: contentData.file.settings.syncChunkLabel,
   },
   number: {
     getInfo: contentSections.number.getSequenceInfo,
+    getIndex: contentSections.number.getIndexInput,
     sync: contentSections.number.sync,
   },
   runtime: {
@@ -128,6 +131,7 @@ const download = createLazyDownloadSetup({
   maxNumberFrames: LIMITS.numberFrames,
   getPrintWidth: previewControls.getPrintWidth,
   syncPrint: previewControls.syncPrint,
+  connectPrintElements: previewControls.connectPrintElements,
 });
 
 const contentEncoding = createContentEncodingSetup({
@@ -146,6 +150,7 @@ const contentEncoding = createContentEncodingSetup({
     getActive: contentData.getActiveFile,
     getMode: contentData.getSelectedFileEncodingMode,
     getCapacity: contentData.getChunkedFileCapacityInfo,
+    preview: contentData.file.payload.preview,
     getChunkVersion: contentData.file.settings.getVersion,
     buildPayload: contentData.file.payload.build,
   },
@@ -160,6 +165,7 @@ const contentEncoding = createContentEncodingSetup({
     getErrorLevel: runtimeHelpers.getErrorLevel,
     readInteger: runtimeHelpers.readInteger,
     colorWithTransparency,
+    getQrColors: styleSetup.colors.getQrColors,
     getEncodingMode: runtimeHelpers.getEncodingMode,
   },
   config: {
@@ -186,9 +192,11 @@ const output = createOutputSetup({
     contentData,
   },
   getErrorLevel: runtimeHelpers.getErrorLevel,
+  getQrColors: styleSetup.colors.getQrColors,
 });
 
 const debugSetup = createDebugFacade({
+  document,
   elements,
   encoder: qrEncoder,
   config: {
@@ -214,6 +222,10 @@ const navigation = createApplicationNavigation({
   prepareStyle: (name) =>
     name === 'size' ? previewControls.loadSize() : styleSetup.load(name),
   prepareDownload: download.load,
+  prepareContent: (name) =>
+    name === 'frame'
+      ? contentEncoding.pipeline.frame.load()
+      : Promise.resolve(),
   state: {
     setActiveTab: runtime.setActiveTab,
     setActiveDebugSubtab: runtime.setActiveDebugSubtab,
@@ -243,7 +255,7 @@ const preview = createPreviewSetup({
     updateMap: contentSections.geo.update,
   },
   runtime: {
-    isDebugOverlayActive: runtimeHelpers.isDebugOverlayActive,
+    isDebugOverlayActive: debugSetup.isOverlayActive,
     getOutlineMode: runtime.getOutlineMode,
   },
 });
