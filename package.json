@@ -21,7 +21,7 @@
     "lint:format": "prettier --check \"src/js/**/*.js\" \"scripts/**/*.mjs\" \"benchmarks/**/*.mjs\" \"tests/**/*.js\" \"*.mjs\" \"eslint.config.js\"",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"styles.css\" \"src/css/**/*.css\" && node scripts/lint-css-limits.mjs",
-    "lint:html": "htmlhint \"*.html\" \"fragments/**/*.html\"",
+    "lint:html": "htmlhint \"*.html\" \"guides/**/*.html\"",
     "lint:json": "node scripts/lint-json.mjs",
     "lint:markdown": "markdownlint-cli2 \"README.md\"",
     "lint:web-metadata": "node scripts/lint-web-metadata.mjs",

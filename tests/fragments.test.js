@@ -28,7 +28,7 @@ function createEnvironment() {
   };
   const panel = {
     ownerDocument: document,
-    dataset: { fragmentUrl: 'fragments/style/modules.html' },
+    dataset: { fragmentUrl: 'guides/style/modules.html' },
     attributes: new Map(),
     children: [],
     setAttribute(name, value) {
@@ -51,7 +51,7 @@ describe('application fragments', () => {
     let fetches = 0;
     const fetcher = async (url) => {
       fetches += 1;
-      assert.equal(url.href, 'https://qr.test/fragments/style/modules.html');
+      assert.equal(url.href, 'https://qr.test/guides/style/modules.html');
       return { ok: true, text: async () => '<html></html>' };
     };
     const node = { id: 'module-shape' };
@@ -155,7 +155,7 @@ describe('application fragments', () => {
       ['download/animation', 'tab=download&amp;subtab=animation'],
     ];
     for (const [path, hash] of definitions) {
-      const relative = 'fragments/' + path + '.html';
+      const relative = 'guides/' + path + '.html';
       assert.match(index, new RegExp('data-fragment-url="' + relative + '"'));
       const page = await readFile(new URL('../' + relative, import.meta.url), {
         encoding: 'utf8',

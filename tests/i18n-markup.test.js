@@ -20,10 +20,10 @@ const flattenMessages = (value, prefix = '', result = {}) => {
 
 const markupUrls = [
   '../index.html',
-  '../fragments/content/frame.html',
-  '../fragments/style/modules.html',
-  '../fragments/style/colors.html',
-  '../fragments/style/artwork.html',
+  '../guides/content/frame.html',
+  '../guides/style/modules.html',
+  '../guides/style/colors.html',
+  '../guides/style/artwork.html',
 ];
 const html = (
   await Promise.all(

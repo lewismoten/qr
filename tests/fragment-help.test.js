@@ -51,7 +51,7 @@ function createEnvironment() {
   const link = createElement('a');
   const panel = {
     ownerDocument: document,
-    dataset: { fragmentUrl: 'fragments/content/frame.html' },
+    dataset: { fragmentUrl: 'guides/content/frame.html' },
     children: [],
     querySelector: () => link,
     setAttribute() {},
