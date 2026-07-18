@@ -34,5 +34,30 @@ assert.equal(textLoads, 1);
 assert.equal(registry.preview(), 'loaded text preview');
 await registry.ensure('text');
 assert.equal(textLoads, 1);
+assert.equal(await registry.ensure('unknown'), null);
+assert.equal(registry.get('unknown'), null);
+
+let failures = 0;
+const failing = createContentPluginRegistry({
+  format: { value: 'broken' },
+  initial: {},
+  loaders: {
+    broken: async () => {
+      failures += 1;
+      throw new Error('Plugin failed');
+    },
+  },
+});
+await assert.rejects(failing.build(), /Plugin failed/);
+await assert.rejects(failing.ensure(), /Plugin failed/);
+assert.equal(failures, 2, 'a failed plugin request should be retryable');
+
+const empty = createContentPluginRegistry({
+  format: { value: 'empty' },
+  initial: { empty: {} },
+  loaders: {},
+});
+assert.equal(await empty.build(), '');
+assert.match(empty.preview(), /preview loads/i);
 
 console.log('Lazy content plugin registry tests passed.');

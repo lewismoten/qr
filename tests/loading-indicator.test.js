@@ -33,6 +33,7 @@ const region = {
 };
 
 const loading = createLoadingIndicator({ region });
+assert.equal(await createLoadingIndicator({}).track('ready'), 'ready');
 assert.equal(
   createLoadingIndicator({ region }),
   loading,
@@ -56,6 +57,10 @@ assert.equal(
 
 second.resolve();
 await secondRequest;
+assert.equal(indicator.hidden, true);
+assert.equal(attributes.has('aria-busy'), false);
+
+await assert.rejects(loading.track(Promise.reject(new Error('failed'))));
 assert.equal(indicator.hidden, true);
 assert.equal(attributes.has('aria-busy'), false);
 

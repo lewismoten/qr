@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { createTaskProgress } from '../src/js/app/ui/download/progress.js';
+import {
+  createTaskProgress,
+  createTaskProgressFromDocument,
+} from '../src/js/app/ui/download/progress.js';
 
 class Control extends EventTarget {
   constructor() {
@@ -20,7 +23,7 @@ class Dialog extends EventTarget {
   }
 }
 
-const elements = {
+const createElements = () => ({
   dialog: new Dialog(),
   title: new Control(),
   phase: new Control(),
@@ -30,7 +33,8 @@ const elements = {
   remaining: new Control(),
   completion: new Control(),
   cancel: new Control(),
-};
+});
+const elements = createElements();
 const wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
 const progress = createTaskProgress(elements, () => performance.now(), {
@@ -99,5 +103,63 @@ assert.equal(
   false,
   'an incomplete task should close without the completion hold',
 );
+
+let clock = 0;
+const timedElements = createElements();
+const timedProgress = createTaskProgress(timedElements, () => clock, {
+  showDelay: 0,
+  completionHold: 0,
+  windowObject: globalThis,
+  ensureStyles: () => Promise.resolve(),
+});
+const timed = timedProgress.start({ title: 'Timed', phase: 'Estimating' });
+await wait(1);
+clock = 120_000;
+timed.update(0.5);
+assert.equal(timedElements.elapsed.textContent, '2 min 0 sec');
+assert.equal(timedElements.remaining.textContent, '2 min 0 sec');
+const cancelEvent = new Event('cancel', { cancelable: true });
+assert.equal(timedElements.dialog.dispatchEvent(cancelEvent), false);
+assert.equal(timed.signal.aborted, true);
+assert.equal(timedElements.cancel.disabled, true);
+timedElements.cancel.dispatchEvent(new Event('click'));
+timed.finish();
+
+const documentElements = createElements();
+const previousWindow = globalThis.window;
+globalThis.window = globalThis;
+try {
+  const fromDocument = createTaskProgressFromDocument({
+    getElementById(id) {
+      return documentElements[id.replace('task-progress-', '')];
+    },
+  });
+  const documentTask = fromDocument.start({
+    title: 'Document',
+    phase: 'Ready',
+  });
+  documentTask.finish();
+} finally {
+  globalThis.window = previousWindow;
+}
+
+const originalError = console.error;
+let styleErrors = 0;
+console.error = () => {
+  styleErrors += 1;
+};
+try {
+  const failedStyles = createTaskProgress(createElements(), undefined, {
+    showDelay: 0,
+    windowObject: globalThis,
+    ensureStyles: () => Promise.reject(new Error('CSS failed')),
+  });
+  const failedTask = failedStyles.start({ title: 'CSS', phase: 'Loading' });
+  await wait(1);
+  failedTask.finish();
+  assert.equal(styleErrors, 1);
+} finally {
+  console.error = originalError;
+}
 
 console.log('Task progress timing tests passed.');

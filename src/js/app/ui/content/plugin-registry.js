@@ -27,10 +27,10 @@ export function createContentPluginRegistry({ format, initial, loaders }) {
 
   const build = async () => {
     const plugin = await ensure();
-    return plugin?.build() ?? '';
+    return plugin?.build?.() ?? '';
   };
   const preview = () =>
-    plugins.get(format.value)?.preview() ??
+    plugins.get(format.value)?.preview?.() ??
     lookup(
       'content.preview.loading',
       '[Content preview loads after selecting this format]',

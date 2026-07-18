@@ -3,7 +3,7 @@ export const DEFAULT_LOCALE = 'en-US';
 export function canonicalizeLocale(locale) {
   if (typeof locale !== 'string' || !locale.trim()) return undefined;
   try {
-    return Intl.getCanonicalLocales(locale)[0];
+    return Intl.getCanonicalLocales(locale.trim())[0];
   } catch {
     return undefined;
   }
