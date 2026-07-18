@@ -147,6 +147,7 @@
       "legend": "导出图像",
       "format": "图像格式",
       "quality": "JPG 质量",
+      "download": "下载",
       "current": "下载当前图像",
       "allZip": "全部下载为 ZIP",
       "svgHint": "SVG 将整个画布转换为路径，包括边框文字。"
@@ -155,6 +156,7 @@
       "legend": "PDF 文档",
       "autoSize": "根据像素和版本自动调整打印二维码",
       "printedWidth": "打印宽度",
+      "download": "下载 PDF",
       "current": "将当前二维码下载为 PDF",
       "allPdf": "全部下载为 PDF",
       "hint": "自动打印宽度按每英寸 192 像素计算，并避免高版本二维码模块过小。PDF 页面会按所选物理宽度排列尽可能多的二维码。"

@@ -153,6 +153,7 @@
       "legend": "Export image",
       "format": "Image format",
       "quality": "JPG quality",
+      "download": "Download",
       "current": "Download current image",
       "allZip": "Download all as ZIP",
       "svgHint": "SVG traces the complete canvas into paths only, including frame text."
@@ -161,6 +162,7 @@
       "legend": "PDF document",
       "autoSize": "Auto-size printed QR from pixels and version",
       "printedWidth": "Printed width",
+      "download": "Download PDF",
       "current": "Download current as PDF",
       "allPdf": "Download all as PDF",
       "hint": "Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows."

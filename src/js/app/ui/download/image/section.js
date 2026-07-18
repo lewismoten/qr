@@ -1,6 +1,7 @@
 import { lookup } from '../../../../i18n/index.js';
 
 export function createDownloadImageSection({
+  current,
   format,
   qualityControls,
   quality,
@@ -14,6 +15,10 @@ export function createDownloadImageSection({
       value: quality.value,
     });
     const count = getFrameCount();
+    current.textContent =
+      count > 1
+        ? lookup('downloadUi.image.current', 'Download current image')
+        : lookup('downloadUi.image.download', 'Download');
     zip.hidden = count <= 1;
     if (count > 1)
       zip.textContent = lookup(

@@ -50,6 +50,7 @@ export function createApplicationDownloadSetup({
   const ensureImage = () =>
     import('./image/section.js').then(({ createDownloadImageSection }) => {
       image ??= createDownloadImageSection({
+        current: e.downloadCurrent,
         format: e.downloadFormat,
         qualityControls: e.downloadQualityControls,
         quality: e.downloadQuality,
@@ -65,6 +66,7 @@ export function createApplicationDownloadSetup({
       ({ createDownloadDocumentSection }) => {
         documentSection ??= createDownloadDocumentSection({
           allPdf: e.downloadAllPdf,
+          currentPdf: e.downloadCurrentPdf,
           getFrameCount: frames.getFrameCount,
           syncPrint,
         });

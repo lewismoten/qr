@@ -153,6 +153,7 @@
       "legend": "Exportar imagen",
       "format": "Formato de imagen",
       "quality": "Calidad JPG",
+      "download": "Descargar",
       "current": "Descargar imagen actual",
       "allZip": "Descargar todo como ZIP",
       "svgHint": "SVG convierte todo el lienzo en trazados, incluido el texto del marco."
@@ -161,6 +162,7 @@
       "legend": "Documento PDF",
       "autoSize": "Ajustar el QR impreso según los píxeles y la versión",
       "printedWidth": "Ancho impreso",
+      "download": "Descargar PDF",
       "current": "Descargar actual como PDF",
       "allPdf": "Descargar todo como PDF",
       "hint": "El ancho automático usa 192 píxeles por pulgada y evita que los módulos de versiones altas sean demasiado pequeños. Las hojas PDF colocan tantos códigos como permite el ancho físico seleccionado."
