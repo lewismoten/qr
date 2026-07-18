@@ -1,4 +1,5 @@
 import { lookup } from '../../../i18n/index.js';
+import { ensurePanelFragment } from '../fragment-loader.js';
 import { createLoadingIndicator } from '../loading-indicator.js';
 
 const EMPTY_CHUNK_INFO = Object.freeze({
@@ -51,7 +52,11 @@ export function createContentDataSetup(options) {
     if (bulk) return Promise.resolve(bulk);
     if (!bulkRequest) {
       bulkRequest = loading
-        .track(import('./bulk/lazy-setup.js'))
+        .track(
+          ensurePanelFragment(document.getElementById('bulk-fields')).then(
+            () => import('./bulk/lazy-setup.js'),
+          ),
+        )
         .then(({ createLazyBulkSystem }) =>
           createLazyBulkSystem({
             document,
