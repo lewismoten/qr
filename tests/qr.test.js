@@ -99,6 +99,9 @@ function testModesAndUtf8() {
   assert.equal(utf8.segments[0].characterCount, 13);
   assert.equal(utf8.segments[0].getBitsLength(), 104);
   assert.equal(utf8.segments[0].getLength(), 13);
+  const utf8Widths = NativeQRCode.create('é世😀');
+  assert.equal(utf8Widths.segments[0].characterCount, 9);
+  assert.equal(utf8Widths.segments[0].getBitsLength(), 72);
   assert.throws(
     () => NativeQRCode.create([{ data: '12-A', mode: 'numeric' }]),
     /only accepts digits/,

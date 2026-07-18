@@ -143,11 +143,13 @@ export function makeDataCodewords(segments, version, errorLevel) {
   for (let pad = 0xec; buffer.bits.length < capacity; pad ^= 0xec ^ 0x11)
     buffer.append(pad, 8);
 
-  const result = [];
-  for (let index = 0; index < buffer.bits.length; index += 8) {
-    result.push(
-      Number.parseInt(buffer.bits.slice(index, index + 8).join(''), 2),
-    );
+  const result = new Array(buffer.bits.length / 8);
+  for (let byte = 0; byte < result.length; byte += 1) {
+    const offset = byte * 8;
+    let value = 0;
+    for (let bit = 0; bit < 8; bit += 1)
+      value = (value << 1) | buffer.bits[offset + bit];
+    result[byte] = value;
   }
   return result;
 }

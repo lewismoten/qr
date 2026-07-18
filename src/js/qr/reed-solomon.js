@@ -5,14 +5,22 @@ import {
 import { getRawDataModules } from './capacity.js';
 
 const divisorCache = new Map();
+const fieldExponents = new Uint8Array(512);
+const fieldLogarithms = new Uint8Array(256);
+
+let fieldValue = 1;
+for (let exponent = 0; exponent < 255; exponent += 1) {
+  fieldExponents[exponent] = fieldValue;
+  fieldLogarithms[fieldValue] = exponent;
+  fieldValue <<= 1;
+  if (fieldValue & 0x100) fieldValue ^= 0x11d;
+}
+for (let exponent = 255; exponent < fieldExponents.length; exponent += 1)
+  fieldExponents[exponent] = fieldExponents[exponent - 255];
 
 function multiply(x, y) {
-  let result = 0;
-  for (let index = 7; index >= 0; index -= 1) {
-    result = (result << 1) ^ ((result >>> 7) * 0x11d);
-    result ^= ((y >>> index) & 1) * x;
-  }
-  return result;
+  if (x === 0 || y === 0) return 0;
+  return fieldExponents[fieldLogarithms[x] + fieldLogarithms[y]];
 }
 
 export function makeReedSolomonDivisor(degree) {
