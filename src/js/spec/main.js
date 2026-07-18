@@ -1,12 +1,10 @@
-import qrEncoder from '../qr/matrix-encoder.js';
+import qrEncoder, { COUNT_BITS, MODE_BITS, isMaskActive } from '@lewismoten/qr';
 import {
   buildDebugOverlayModel,
   getDebugCategory,
   moduleIsDark,
 } from '../app/ui/debug/model.js';
 import { isFunctionModule } from '../app/qr-regions.js';
-import { COUNT_BITS, MODE_BITS } from '../qr/constants.js';
-import { isMaskActive } from '../qr/mask.js';
 import { setupExternalLinks } from '../external-links.js';
 import { COLORS, MIXED_TEXT, getVisuals } from './visual-models.js';
 

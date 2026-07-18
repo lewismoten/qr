@@ -1,5 +1,4 @@
-import { getRawDataModules } from '../qr/capacity.js';
-import { COUNT_BITS } from '../qr/constants.js';
+import { COUNT_BITS, getRawDataModules } from '@lewismoten/qr';
 import { normalizeModeName } from './modes.js';
 
 function getCharCountBits(mode, version) {

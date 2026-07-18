@@ -25,7 +25,7 @@ import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
 import { createPreviewSetup } from './ui/preview/setup.js';
 import { createLazyStyleSetup } from './ui/style/lazy-setup.js';
 import { createTaskProgressFromDocument } from './ui/download/progress.js';
-import qrEncoder from '../qr/matrix-encoder.js';
+import qrEncoder from '@lewismoten/qr';
 
 const elements = getApplicationElements(document);
 const taskProgress = createTaskProgressFromDocument(document);

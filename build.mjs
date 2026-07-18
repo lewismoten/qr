@@ -1,7 +1,18 @@
 import { build, context } from 'esbuild';
 import { rm } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
 const watch = process.argv.includes('--watch');
+const qrPackageName = '@lewismoten/qr';
+const qrSource = fileURLToPath(new URL('./src/js/qr-api.js', import.meta.url));
+const localQrPlugin = {
+  name: 'local-qr-package',
+  setup(buildContext) {
+    buildContext.onResolve({ filter: /^@lewismoten\/qr$/ }, () => ({
+      path: qrSource,
+    }));
+  },
+};
 const shared = {
   bundle: true,
   minify: true,
@@ -15,6 +26,13 @@ const shared = {
 const builds = [
   {
     ...shared,
+    entryPoints: ['src/js/qr-api.js'],
+    outfile: 'dist/qr.min.js',
+    format: 'esm',
+    platform: 'browser',
+  },
+  {
+    ...shared,
     entryPoints: ['src/js/main.js'],
     outdir: 'dist',
     entryNames: 'app.min',
@@ -22,6 +40,7 @@ const builds = [
     format: 'esm',
     platform: 'browser',
     splitting: true,
+    external: [qrPackageName],
   },
   {
     ...shared,
@@ -29,6 +48,7 @@ const builds = [
     outfile: 'dist/app.file.js',
     format: 'iife',
     platform: 'browser',
+    plugins: [localQrPlugin],
   },
   {
     ...shared,
@@ -57,6 +77,7 @@ const builds = [
     outfile: 'dist/spec.min.js',
     format: 'esm',
     platform: 'browser',
+    external: [qrPackageName],
   },
   {
     ...shared,

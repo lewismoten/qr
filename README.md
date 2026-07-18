@@ -22,11 +22,21 @@ npm run build
 ```
 
 The JavaScript entry point is `src/js/main.js` and the CSS entry point is
-`src/css/main.css`. Browser code is organized under `src/js/app` and the native
+`src/css/main.css`. Browser code is organized under `src/js/app` and the QR
 encoder under `src/js/qr`; add feature modules or component styles through
-those entry points. The build emits minified `dist/app.min.js` and
-`dist/app.min.css` files, plus external source maps for each. `index.html`
-references only these compiled assets.
+those entry points. The build emits minified `dist/app.min.js`,
+`dist/qr.min.js`, and `dist/app.min.css` files, plus external source maps.
+
+`dist/qr.min.js` is a stable, self-contained ES module. The application reuses
+that file rather than embedding the encoder in a hashed application chunk. It
+can also be downloaded or imported independently:
+
+```js
+import QRCode, { create } from './dist/qr.min.js';
+
+const qr = create('https://qr.lewismoten.com');
+const sameQr = QRCode.create('https://qr.lewismoten.com');
+```
 
 During development, rebuild automatically when JavaScript or CSS changes:
 

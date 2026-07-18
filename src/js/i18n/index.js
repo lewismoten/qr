@@ -54,6 +54,12 @@ export function lookup(key, defaultText = '', options) {
 }
 
 export function getErrorText(error, defaultText = '') {
+  if (error?.source === 'qr' && error?.key)
+    return lookup(
+      `qr.errors.${error.key}`,
+      error.message || defaultText,
+      error.details,
+    );
   if (error?.i18nKey)
     return lookup(
       error.i18nKey,

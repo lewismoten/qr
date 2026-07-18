@@ -13,8 +13,7 @@ import {
   classifyTraversalBits,
   summarizeCodewordRoles,
 } from '../../qr-stream.js';
-import qrEncoder from '../../../qr/matrix-encoder.js';
-import { isMaskActive } from '../../../qr/mask.js';
+import qrEncoder, { isMaskActive } from '@lewismoten/qr';
 
 export function moduleIsDark(qrDefinition, row, column) {
   if (typeof qrDefinition.modules.get === 'function')

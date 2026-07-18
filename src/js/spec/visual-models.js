@@ -3,7 +3,7 @@ import {
   getAlignmentPatternCenters,
   getDataTraversal,
 } from '../app/qr-regions.js';
-import qrEncoder from '../qr/matrix-encoder.js';
+import qrEncoder from '@lewismoten/qr';
 
 export const COLORS = {
   finder: '#ef4444',

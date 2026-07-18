@@ -1,4 +1,4 @@
-import { isMaskActive } from '../../../qr/mask.js';
+import { isMaskActive } from '@lewismoten/qr';
 import { isFunctionModule } from '../../qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 

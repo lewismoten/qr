@@ -112,7 +112,7 @@ function testModesAndUtf8() {
   );
   assert.throws(
     () => NativeQRCode.create([{ data: 'anything', mode: 'imaginary' }]),
-    (error) => error.i18nKey === 'qr.errors.modeUnsupported',
+    (error) => error.source === 'qr' && error.key === 'modeUnsupported',
   );
 }
 
@@ -127,8 +127,7 @@ function testBitBufferLimits() {
   ]) {
     assert.throws(
       () => buffer.append(value, length),
-      (error) =>
-        error instanceof RangeError && error.i18nKey === 'qr.errors.bitLength',
+      (error) => error instanceof RangeError && error.key === 'bitLength',
     );
   }
 }
@@ -143,7 +142,7 @@ function testKanjiAndMixedModes() {
   try {
     assert.throws(
       () => getQrKanjiValue('あ'),
-      (error) => error.i18nKey === 'qr.errors.kanjiUnsupported',
+      (error) => error.key === 'kanjiUnsupported',
     );
   } finally {
     globalThis.TextDecoder = OriginalTextDecoder;
@@ -219,9 +218,7 @@ function testMasksAndDeterminism() {
   for (const maskPattern of [-1, 8, 1.5]) {
     assert.throws(
       () => NativeQRCode.create('INVALID MASK', { maskPattern }),
-      (error) =>
-        error instanceof RangeError &&
-        error.i18nKey === 'qr.errors.maskPattern',
+      (error) => error instanceof RangeError && error.key === 'maskPattern',
     );
   }
 }
@@ -230,7 +227,7 @@ function testInvalidConfiguration() {
   const { MatrixBuilder } = NativeQRCode.internals;
   assert.throws(
     () => new MatrixBuilder(1, 'L', new Uint8Array(100)),
-    (error) => error.i18nKey === 'qr.errors.matrixBits',
+    (error) => error.key === 'matrixBits',
   );
   assert.throws(
     () =>
@@ -238,15 +235,12 @@ function testInvalidConfiguration() {
         errorCorrectionLevel: 'unknown',
       }),
     (error) =>
-      error.i18nKey === 'qr.errors.errorCorrectionLevel' &&
-      error.i18nOptions.level === 'UNKNOWN',
+      error.key === 'errorCorrectionLevel' && error.details.level === 'UNKNOWN',
   );
   for (const version of [0, 1.5, 41]) {
     assert.throws(
       () => NativeQRCode.create('INVALID VERSION', { version }),
-      (error) =>
-        error instanceof RangeError &&
-        error.i18nKey === 'qr.errors.versionRange',
+      (error) => error instanceof RangeError && error.key === 'versionRange',
     );
   }
   assert.throws(
@@ -254,7 +248,7 @@ function testInvalidConfiguration() {
       NativeQRCode.create([{ data: '123', mode: 'numeric' }], {
         version: 0,
       }),
-    (error) => error.i18nKey === 'qr.errors.versionRange',
+    (error) => error.key === 'versionRange',
   );
   assert.equal(
     NativeQRCode.create([{ data: '123', mode: { id: 'numeric' } }], {

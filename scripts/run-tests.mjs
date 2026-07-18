@@ -21,7 +21,7 @@ if (coverageRequested && requested.has('--watch')) {
   throw new Error('Coverage and watch modes cannot run together.');
 }
 
-const nodeOptions = ['--test', '--test-reporter=spec'];
+const nodeOptions = ['--test', '--test-concurrency=8', '--test-reporter=spec'];
 
 if (requested.has('--watch')) nodeOptions.push('--watch');
 if (coverageRequested) {

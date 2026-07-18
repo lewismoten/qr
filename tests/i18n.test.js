@@ -137,6 +137,15 @@ assert.equal(
   }),
   'La version minimale est 9.',
 );
+assert.equal(
+  getErrorText({
+    source: 'qr',
+    key: 'minimumVersion',
+    details: { version: 10 },
+    message: 'Minimum version is 10.',
+  }),
+  'La version minimale est 10.',
+);
 
 await initializeLanguage({
   locale: 'en-GB',
