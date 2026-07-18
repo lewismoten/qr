@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="hi-IN" data-guide-locale="hi-IN" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR module and finder-eye styles | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Customize QR code module shapes and finder-pattern corner eyes."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/style/modules.hi-IN.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../dist/chunks/style-modules.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>QR module and finder-eye styles</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=style&amp;subtab=modules"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Shape the QR matrix</h2>
+            <p>
+              Modules are the small dark and light cells that carry QR data.
+              Square modules preserve the standard geometry; rounded, dotted,
+              diamond, and custom modules trade some scanning tolerance for a
+              more distinctive appearance.
+            </p>
+            <p>
+              Corner eyes are the three large finder patterns scanners use to
+              locate and orient the code. Their outer rings and center blocks
+              can be styled separately, but their overall contrast and
+              recognizable structure should remain strong.
+            </p>
+          </section>
+          <section data-app-fragment="tab=style&amp;subtab=modules">
+            <fieldset class="option-group">
+              <legend data-i18n="style.modules.legend">
+                Modules &amp; corner eyes
+              </legend>
+
+              <div class="module-shape-field">
+                <span
+                  class="field-label"
+                  id="module-shape-label"
+                  data-i18n="style.modules.shape"
+                  >Module shape</span
+                >
+                <div
+                  class="choice-grid module-shape-grid"
+                  role="group"
+                  aria-labelledby="module-shape-label"
+                >
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button is-active"
+                    data-choice-target="module-shape"
+                    data-choice-value="square"
+                    aria-pressed="true"
+                  >
+                    <span
+                      class="module-shape-icon shape-square"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.square">Square</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="rounded"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-rounded"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.rounded">Rounded</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="dots"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-dots"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.dots">Dots</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="diamond"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-diamond"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.diamond">Diamond</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button module-shape-button"
+                    data-choice-target="module-shape"
+                    data-choice-value="custom"
+                    aria-pressed="false"
+                  >
+                    <span
+                      class="module-shape-icon shape-custom"
+                      aria-hidden="true"
+                    ></span
+                    ><span data-i18n="style.values.custom">Custom</span>
+                  </button>
+                </div>
+                <select
+                  id="module-shape"
+                  name="module-shape"
+                  class="sr-only"
+                  aria-labelledby="module-shape-label"
+                >
+                  <option
+                    value="square"
+                    selected
+                    data-i18n="style.values.square"
+                  >
+                    Square
+                  </option>
+                  <option value="rounded" data-i18n="style.values.rounded">
+                    Rounded
+                  </option>
+                  <option value="dots" data-i18n="style.values.dots">
+                    Dots
+                  </option>
+                  <option value="diamond" data-i18n="style.values.diamond">
+                    Diamond
+                  </option>
+                  <option value="custom" data-i18n="style.values.custom">
+                    Custom
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="module-custom-controls"
+                class="module-custom-controls"
+                data-guide-reveal
+                data-guide-section
+                hidden
+              >
+                <label class="slider-field" for="module-rounding">
+                  <span data-i18n="style.modules.cornerRounding"
+                    >Corner rounding</span
+                  >
+                  <output id="module-rounding-value" for="module-rounding"
+                    >25%</output
+                  >
+                </label>
+                <input
+                  id="module-rounding"
+                  name="module-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="25"
+                />
+
+                <label class="slider-field" for="module-inset">
+                  <span data-i18n="style.modules.spacing">Spacing</span>
+                  <output id="module-inset-value" for="module-inset">4%</output>
+                </label>
+                <input
+                  id="module-inset"
+                  name="module-inset"
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value="4"
+                />
+
+                <label class="slider-field" for="module-rotation">
+                  <span data-i18n="style.modules.rotation">Rotation</span>
+                  <output id="module-rotation-value" for="module-rotation"
+                    >0 degrees</output
+                  >
+                </label>
+                <input
+                  id="module-rotation"
+                  name="module-rotation"
+                  type="range"
+                  min="-45"
+                  max="45"
+                  step="1"
+                  value="0"
+                />
+              </div>
+
+              <div class="eye-shape-field">
+                <span
+                  class="field-label"
+                  id="eye-shape-label"
+                  data-i18n="style.modules.eyes"
+                  >Corner eyes</span
+                >
+                <div
+                  class="choice-grid eye-shape-grid"
+                  role="group"
+                  aria-labelledby="eye-shape-label"
+                >
+                  <button
+                    type="button"
+                    class="choice-button is-active"
+                    data-choice-target="eye-shape"
+                    data-choice-value="default"
+                    aria-pressed="true"
+                    data-i18n="style.values.default"
+                  >
+                    Default
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="square"
+                    aria-pressed="false"
+                    data-i18n="style.values.square"
+                  >
+                    Square
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="rounded"
+                    aria-pressed="false"
+                    data-i18n="style.values.rounded"
+                  >
+                    Rounded
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="circle"
+                    aria-pressed="false"
+                    data-i18n="style.values.circle"
+                  >
+                    Circle
+                  </button>
+                  <button
+                    type="button"
+                    class="choice-button"
+                    data-choice-target="eye-shape"
+                    data-choice-value="custom"
+                    aria-pressed="false"
+                    data-i18n="style.values.custom"
+                  >
+                    Custom
+                  </button>
+                </div>
+                <select
+                  id="eye-shape"
+                  name="eye-shape"
+                  class="sr-only"
+                  aria-labelledby="eye-shape-label"
+                >
+                  <option
+                    value="default"
+                    selected
+                    data-i18n="style.values.defaultModules"
+                  >
+                    Default modules
+                  </option>
+                  <option value="square" data-i18n="style.values.square">
+                    Square
+                  </option>
+                  <option value="rounded" data-i18n="style.values.rounded">
+                    Rounded
+                  </option>
+                  <option value="circle" data-i18n="style.values.circle">
+                    Circle
+                  </option>
+                  <option value="custom" data-i18n="style.values.custom">
+                    Custom
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="eye-custom-controls"
+                class="module-custom-controls"
+                data-guide-reveal
+                data-guide-section
+                hidden
+              >
+                <label class="slider-field" for="eye-outer-rounding">
+                  <span data-i18n="style.modules.outerRounding"
+                    >Outer rounding</span
+                  >
+                  <output id="eye-outer-rounding-value" for="eye-outer-rounding"
+                    >20%</output
+                  >
+                </label>
+                <input
+                  id="eye-outer-rounding"
+                  name="eye-outer-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="20"
+                />
+
+                <label class="slider-field" for="eye-center-rounding">
+                  <span data-i18n="style.modules.centerRounding"
+                    >Center rounding</span
+                  >
+                  <output
+                    id="eye-center-rounding-value"
+                    for="eye-center-rounding"
+                    >35%</output
+                  >
+                </label>
+                <input
+                  id="eye-center-rounding"
+                  name="eye-center-rounding"
+                  type="range"
+                  min="0"
+                  max="50"
+                  step="1"
+                  value="35"
+                />
+              </div>
+
+              <p class="hint module-shape-hint" data-i18n="style.modules.hint">
+                Decorative modules can reduce scanning reliability. Test the
+                finished code at its intended size.
+              </p>
+            </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>What the custom controls change</h2>
+            <p>
+              <strong>Rounding</strong> softens corners,
+              <strong>inset</strong> creates space between neighboring cells,
+              and <strong>rotation</strong> turns each module. Larger insets and
+              extreme rotations remove more dark area and can make dense or
+              physically small codes harder to scan.
+            </p>
+            <p>
+              Custom eye colors apply only when enabled. Test the final export
+              at its intended printed or displayed size, especially when using
+              center artwork, transparency, or a background image as well.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=style&amp;subtab=modules"
+              >Open this tool</a
+            >
+            <a href="../about.hi-IN.html">About</a>
+            <a href="../index.hi-IN.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

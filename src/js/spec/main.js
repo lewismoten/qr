@@ -6,7 +6,18 @@ import {
 } from '../app/ui/debug/model.js';
 import { isFunctionModule } from '../app/qr-regions.js';
 import { setupExternalLinks } from '../external-links.js';
+import { initializeLanguage, translateDocument } from '../i18n/index.js';
 import { COLORS, MIXED_TEXT, getVisuals } from './visual-models.js';
+
+const guideLocale = document.documentElement.dataset.guideLocale;
+if (guideLocale) {
+  const localeBase = document.documentElement.dataset.localeBase || 'locales/';
+  await initializeLanguage({
+    locale: guideLocale,
+    baseUrl: new URL(localeBase, document.baseURI),
+  });
+  translateDocument(document);
+}
 
 setupExternalLinks();
 

@@ -15,6 +15,7 @@
     "benchmark": "node --expose-gc scripts/run-benchmarks.mjs",
     "benchmark:quick": "node --expose-gc scripts/run-benchmarks.mjs --quick",
     "favicon": "node scripts/generate-favicon.mjs",
+    "guides:localize": "node scripts/generate-localized-guides.mjs",
     "serve": "node serve.mjs",
     "dev": "node serve.mjs",
     "lint": "npm run lint:format && npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:json && npm run lint:markdown && npm run lint:web-metadata",

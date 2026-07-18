@@ -1,10 +1,18 @@
+import { getActiveLocale } from '../../i18n/index.js';
+import { getLocalizedGuidePath } from '../../i18n/guide-path.js';
+
 export function initializeDialogs({ document, window }) {
   const dialogs = document.querySelectorAll('.info-dialog');
 
   const loadDialogContent = (dialog) => {
     dialog.querySelectorAll('[data-dialog-src]').forEach((element) => {
-      if (!element.hasAttribute('src'))
-        element.setAttribute('src', element.dataset.dialogSrc);
+      const source = getLocalizedGuidePath(
+        element.dataset.dialogSrc,
+        getActiveLocale(),
+      );
+      if (element.getAttribute('src') !== source) {
+        element.setAttribute('src', source);
+      }
     });
   };
 
@@ -63,5 +71,10 @@ export function initializeDialogs({ document, window }) {
     });
   });
   window.addEventListener('hashchange', syncFromHash);
+  document.addEventListener('languagechange', () => {
+    dialogs.forEach((dialog) => {
+      if (dialog.open) loadDialogContent(dialog);
+    });
+  });
   return { open, syncFromHash };
 }

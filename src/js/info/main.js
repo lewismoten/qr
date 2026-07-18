@@ -1,4 +1,15 @@
 import { setupExternalLinks } from '../external-links.js';
+import { initializeLanguage, translateDocument } from '../i18n/index.js';
+
+const guideLocale = document.documentElement.dataset.guideLocale;
+if (guideLocale) {
+  const localeBase = document.documentElement.dataset.localeBase || 'locales/';
+  await initializeLanguage({
+    locale: guideLocale,
+    baseUrl: new URL(localeBase, document.baseURI),
+  });
+  translateDocument(document);
+}
 
 const isEmbedded = new URLSearchParams(window.location.search).has('embed');
 if (isEmbedded && window.parent !== window) {

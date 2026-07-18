@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-guide-locale="ar" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone QR codes | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Create validated phone-call QR codes in common formats."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/content/phone.ar.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>Phone QR codes</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=content&amp;subtab=data"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Make a number scannable</h2>
+            <p>
+              Phone QR codes use a telephone URI so supported scanners can
+              offer to call the number after the user confirms it.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.phone">Phone</legend>
+            <label for="phone-number" data-i18n="fields.telephoneNumber"
+              >Phone number</label
+            >
+            <input
+              id="phone-number"
+              name="phone-number"
+              type="tel"
+              maxlength="40"
+              placeholder="+15551234567"
+              value="+15305394775"
+              data-i18n-placeholder="form.placeholders.phone"
+              data-i18n-value="form.defaults.phone"
+            />
+            <label data-i18n="content.format">Format</label>
+            <div
+              class="choice-grid choice-grid-compact phone-format-grid"
+              role="group"
+              aria-label="Phone number format"
+              data-i18n-aria-label="form.data.phoneFormat"
+            >
+              <button
+                type="button"
+                class="choice-button phone-format-button is-active"
+                data-phone-format="usa"
+                aria-pressed="true"
+                data-i18n="form.data.usa"
+              >
+                USA
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="international"
+                aria-pressed="false"
+                data-i18n="form.data.international"
+              >
+                Intl
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="e164"
+                aria-pressed="false"
+                data-i18n="form.data.e164"
+              >
+                E.164
+              </button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="digits"
+                aria-pressed="false"
+                data-i18n="form.data.digits"
+              >
+                Digits
+              </button>
+            </div>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Shared contact value</h2>
+            <p>
+              The selected number and display format stay synchronized with
+              SMS and vCard phone fields while the app is open.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=content&amp;subtab=data"
+              >Open this tool</a
+            >
+            <a href="../about.ar.html">About</a>
+            <a href="../index.ar.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

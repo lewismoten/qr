@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN" data-guide-locale="zh-CN" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SMS QR codes | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Create SMS QR codes with a phone number and short message."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/content/sms.zh-CN.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>SMS QR codes</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=content&amp;subtab=data"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Prepare a text message</h2>
+            <p>
+              SMS QR codes open a compatible messaging application with a
+              recipient and optional message ready for review.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.sms">SMS</legend>
+            <label for="sms-number" data-i18n="fields.telephoneNumber"
+              >Phone number</label
+            >
+            <input
+              id="sms-number"
+              name="sms-number"
+              type="tel"
+              maxlength="40"
+              placeholder="+15551234567"
+              value="+15305394775"
+              data-i18n-placeholder="form.placeholders.phone"
+              data-i18n-value="form.defaults.phone"
+            />
+            <label data-i18n="content.format">Format</label>
+            <div
+              class="choice-grid choice-grid-compact phone-format-grid"
+              role="group"
+              aria-label="SMS phone number format"
+              data-i18n-aria-label="form.data.smsPhoneFormat"
+            >
+              <button
+                type="button"
+                class="choice-button phone-format-button is-active"
+                data-phone-format="usa"
+                aria-pressed="true"
+                data-i18n="form.data.usa"
+              >USA</button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="international"
+                aria-pressed="false"
+                data-i18n="form.data.international"
+              >Intl</button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="e164"
+                aria-pressed="false"
+                data-i18n="form.data.e164"
+              >E.164</button>
+              <button
+                type="button"
+                class="choice-button phone-format-button"
+                data-phone-format="digits"
+                aria-pressed="false"
+                data-i18n="form.data.digits"
+              >Digits</button>
+            </div>
+            <label for="sms-body" data-i18n="fields.message">Message</label>
+            <textarea
+              id="sms-body"
+              name="sms-body"
+              rows="3"
+              maxlength="160"
+              placeholder="Text message"
+              data-i18n-placeholder="form.data.textMessage"
+            ></textarea>
+            <p id="sms-length-hint" class="hint">0 / 160</p>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Message limits</h2>
+            <p>
+              The live counter keeps the message within 160 characters for
+              broad SMS compatibility. Sending still requires confirmation.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=content&amp;subtab=data"
+              >Open this tool</a
+            >
+            <a href="../about.zh-CN.html">About</a>
+            <a href="../index.zh-CN.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

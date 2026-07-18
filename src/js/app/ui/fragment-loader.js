@@ -1,4 +1,9 @@
-import { lookup, translateDocument } from '../../i18n/index.js';
+import {
+  getActiveLocale,
+  lookup,
+  translateDocument,
+} from '../../i18n/index.js';
+import { getLocalizedGuidePath } from '../../i18n/guide-path.js';
 
 const requests = new WeakMap();
 let helpDialogId = 0;
@@ -63,7 +68,8 @@ export function ensurePanelFragment(
       if (typeof fetcher !== 'function') {
         throw new Error('Fetch is unavailable.');
       }
-      return fetcher(new URL(url, document.baseURI));
+      const localizedUrl = getLocalizedGuidePath(url, getActiveLocale());
+      return fetcher(new URL(localizedUrl, document.baseURI));
     })
     .then((response) => {
       if (!response.ok) {

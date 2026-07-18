@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-guide-locale="ar" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bulk QR code import | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Generate multiple QR codes by importing structured rows from a CSV file."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/content/bulk-import.ar.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>Bulk QR code import</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=content&amp;subtab=data"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Create many codes from CSV</h2>
+            <p>
+              Bulk Import reads one QR code per nonempty CSV row. The first row
+              names fields for the selected content format. Blank column names
+              and their values are ignored, as are completely blank rows.
+            </p>
+          </section>
+          <fieldset
+            id="bulk-fields"
+            class="option-group bulk-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="form.format.bulkImport">Bulk Import</legend>
+            <p class="hint" data-i18n="form.data.bulkFileUnavailable">
+              File format is unavailable in Bulk Import. Use the dedicated File
+              format for binary data.
+            </p>
+            <p class="hint" data-i18n="form.data.bulkHeaders">
+              The first row must contain these field names:
+            </p>
+            <code id="bulk-expected-fields" class="bulk-expected-fields"
+              >url</code
+            >
+            <p
+              id="bulk-required-fields"
+              class="hint"
+              data-i18n="bulk.requiredValues"
+            >
+              Required values: url
+            </p>
+            <div class="file-picker">
+              <input
+                id="bulk-file-input"
+                class="file-picker-input"
+                name="bulk-file-input"
+                type="file"
+                accept=".csv,text/csv"
+                aria-describedby="bulk-file-selection"
+              />
+              <label
+                class="file-picker-button"
+                for="bulk-file-input"
+                data-i18n="form.data.chooseCsv"
+                >Choose a CSV file</label
+              >
+              <span
+                id="bulk-file-selection"
+                class="file-picker-selection"
+                data-file-picker-status
+                data-i18n="common.noFileSelected"
+                >No file selected</span
+              >
+            </div>
+            <input
+              id="bulk-row-index"
+              name="bulk-row-index"
+              type="hidden"
+              value="1"
+            />
+            <div class="file-status-row">
+              <p id="bulk-status" class="hint file-capacity-hint">
+                No CSV loaded.
+              </p>
+              <button
+                id="bulk-clear"
+                type="button"
+                class="secondary-button"
+                disabled
+                data-i18n="form.data.clearCsv"
+              >
+                Clear CSV
+              </button>
+            </div>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Headers and validation</h2>
+            <p>
+              Expected and required fields change with the selected format. Rows
+              are validated before export, and malformed, oversized, or
+              unexpectedly structured files are rejected with a clear error.
+              Binary File transfers use their dedicated format instead.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=content&amp;subtab=data"
+              >Open this tool</a
+            >
+            <a href="../about.ar.html">About</a>
+            <a href="../index.ar.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

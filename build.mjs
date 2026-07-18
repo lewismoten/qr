@@ -1,8 +1,10 @@
 import { build, context } from 'esbuild';
 import { rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { generateLocalizedGuides } from './scripts/generate-localized-guides.mjs';
 
 const watch = process.argv.includes('--watch');
+await generateLocalizedGuides();
 const qrPackageName = '@lewismoten/qr';
 const qrSource = fileURLToPath(new URL('./src/js/qr-api.js', import.meta.url));
 const localQrPlugin = {

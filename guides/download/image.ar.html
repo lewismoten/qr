@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-guide-locale="ar" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download QR images | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Download QR codes as PNG, JPG, GIF, SVG, or ZIP images."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/download/image.ar.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+    <link rel="stylesheet" href="../../dist/chunks/download.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>Download QR images</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=download&amp;subtab=image"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Choose an image format</h2>
+            <p>
+              PNG is lossless and broadly supported. JPG can make photographic
+              backgrounds smaller but may soften module edges. GIF supports a
+              compact indexed palette, while SVG preserves scalable vector paths
+              for print and editing workflows.
+            </p>
+          </section>
+          <section data-app-fragment="tab=download&amp;subtab=image">
+            <fieldset class="option-group">
+              <legend data-i18n="downloadUi.image.legend">Export image</legend>
+              <div
+                class="choice-grid download-format-grid"
+                role="group"
+                aria-label="Image format"
+                data-i18n-aria-label="downloadUi.image.format"
+              >
+                <button
+                  type="button"
+                  class="choice-button is-active"
+                  data-choice-target="download-format"
+                  data-choice-value="png"
+                  aria-pressed="true"
+                >
+                  PNG
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="download-format"
+                  data-choice-value="jpg"
+                  aria-pressed="false"
+                >
+                  JPG
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="download-format"
+                  data-choice-value="gif"
+                  aria-pressed="false"
+                >
+                  GIF
+                </button>
+                <button
+                  type="button"
+                  class="choice-button"
+                  data-choice-target="download-format"
+                  data-choice-value="svg"
+                  aria-pressed="false"
+                >
+                  SVG
+                </button>
+              </div>
+              <select
+                id="download-format"
+                name="download-format"
+                class="sr-only"
+                aria-label="Image format"
+                data-i18n-aria-label="downloadUi.image.format"
+              >
+                <option value="png" selected>PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="gif">GIF</option>
+                <option value="svg">SVG</option>
+              </select>
+              <div
+                id="download-quality-controls"
+                data-guide-reveal
+                data-guide-section
+                hidden
+              >
+                <label class="slider-field" for="download-quality">
+                  <span data-i18n="downloadUi.image.quality">JPG quality</span>
+                  <output id="download-quality-value" for="download-quality"
+                    >92%</output
+                  >
+                </label>
+                <input
+                  id="download-quality"
+                  name="download-quality"
+                  type="range"
+                  min="40"
+                  max="100"
+                  step="1"
+                  value="92"
+                />
+              </div>
+              <div class="download-actions">
+                <button
+                  id="download-current"
+                  type="button"
+                  class="secondary-button"
+                  data-i18n="downloadUi.image.download"
+                >
+                  Download
+                </button>
+                <button
+                  id="download-zip"
+                  type="button"
+                  class="secondary-button"
+                  hidden
+                  data-i18n="downloadUi.image.allZip"
+                >
+                  Download all as ZIP
+                </button>
+              </div>
+              <p class="hint" data-i18n="downloadUi.image.svgHint">
+                SVG traces the complete canvas into paths only, including frame
+                text.
+              </p>
+            </fieldset>
+          </section>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Current image or complete collection</h2>
+            <p>
+              Download current exports the QR code visible in the preview. When
+              a number range, bulk import, or chunked file creates multiple QR
+              codes, ZIP packages every rendered image into one download.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=download&amp;subtab=image"
+              >Open this tool</a
+            >
+            <a href="../about.ar.html">About</a>
+            <a href="../index.ar.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>

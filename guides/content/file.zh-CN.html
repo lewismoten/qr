@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN" data-guide-locale="zh-CN" data-locale-base="../../locales/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File transfer QR codes | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Transfer files through data URLs, browser blob URLs, or verifiable multi-QR chunks."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/content/file.zh-CN.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>File transfer QR codes</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=content&amp;subtab=data"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Choose a file transport</h2>
+            <p>
+              Data URLs place a small file in one QR code. Blob URLs refer to
+              browser memory and generally work only in the creating browser.
+              Chunked transfer divides larger files into an ordered, verifiable
+              set of QR codes.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-format-fields="file"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend data-i18n="formats.file">File</legend>
+            <label for="file-encoding-mode" data-i18n="form.data.transport"
+              >Transport</label
+            >
+            <div
+              id="file-encoding-mode-buttons"
+              class="choice-grid choice-grid-compact file-mode-grid"
+              role="radiogroup"
+              aria-label="File transport mode"
+              data-i18n-aria-label="form.data.fileTransportMode"
+            >
+              <button
+                type="button"
+                class="choice-button is-active"
+                data-choice-target="file-encoding-mode"
+                data-choice-value="data"
+                aria-pressed="true"
+                data-i18n="content.data"
+              >
+                Data
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-choice-target="file-encoding-mode"
+                data-choice-value="blob"
+                aria-pressed="false"
+                data-i18n="form.data.blobUrl"
+              >
+                Blob URL
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-choice-target="file-encoding-mode"
+                data-choice-value="chunked"
+                aria-pressed="false"
+                data-i18n="form.data.chunked"
+              >
+                Chunked
+              </button>
+            </div>
+            <select
+              id="file-encoding-mode"
+              name="file-encoding-mode"
+              class="sr-only"
+              aria-hidden="true"
+              tabindex="-1"
+            >
+              <option value="data" data-i18n="form.data.dataUrl">
+                Data URL
+              </option>
+              <option value="blob" data-i18n="form.data.blobUrl">
+                Blob URL
+              </option>
+              <option value="chunked" data-i18n="form.data.chunkedProtocol">
+                Chunked protocol
+              </option>
+            </select>
+            <div class="file-picker">
+              <input
+                id="file-input"
+                class="file-picker-input"
+                name="file-input"
+                type="file"
+                aria-describedby="file-selection"
+              />
+              <label
+                class="file-picker-button"
+                for="file-input"
+                data-i18n="form.data.chooseFile"
+                >Choose a file</label
+              >
+              <span
+                id="file-selection"
+                class="file-picker-selection"
+                data-file-picker-status
+                data-i18n="common.noFileSelected"
+                >No file selected</span
+              >
+            </div>
+            <div
+              id="file-chunk-controls"
+              class="chunk-controls"
+              data-guide-reveal
+              data-guide-section
+              hidden
+            >
+              <label class="toggle-field">
+                <input
+                  id="file-chunk-version-auto"
+                  name="file-chunk-version-auto"
+                  type="checkbox"
+                  checked
+                />
+                <span data-i18n="form.data.autoPickVersion"
+                  >Auto-pick version</span
+                >
+              </label>
+              <label class="slider-field" for="file-chunk-version">
+                <span data-i18n="form.data.chunkVersionTarget"
+                  >Chunk version target</span
+                >
+                <output id="file-chunk-version-value" for="file-chunk-version"
+                  >V8</output
+                >
+              </label>
+              <input
+                id="file-chunk-version"
+                name="file-chunk-version"
+                type="range"
+                min="1"
+                max="40"
+                step="1"
+                value="8"
+              />
+              <label class="toggle-field">
+                <input
+                  id="file-include-manifest"
+                  name="file-include-manifest"
+                  type="checkbox"
+                  checked
+                />
+                <span data-i18n="form.data.includeManifest"
+                  >Include manifest</span
+                >
+              </label>
+              <label class="toggle-field">
+                <input
+                  id="file-compress-transfer"
+                  name="file-compress-transfer"
+                  type="checkbox"
+                  checked
+                />
+                <span data-i18n="form.data.compressTransfer"
+                  >Compress for transfer (gzip)</span
+                >
+              </label>
+              <label
+                for="file-custom-metadata"
+                data-i18n="form.data.customMetadata"
+                >Custom metadata (optional JSON)</label
+              >
+              <textarea
+                id="file-custom-metadata"
+                name="file-custom-metadata"
+                rows="3"
+                placeholder='{"collection":"scavenger-hunt"}'
+                data-i18n-placeholder="form.placeholders.metadata"
+              ></textarea>
+              <label class="slider-field" for="file-chunk-index">
+                <span data-i18n="form.data.chunk">Chunk</span>
+                <output id="file-chunk-index-value" for="file-chunk-index"
+                  >1 / 1</output
+                >
+              </label>
+              <input
+                id="file-chunk-index"
+                name="file-chunk-index"
+                type="range"
+                min="1"
+                max="1"
+                step="1"
+                value="1"
+              />
+              <p class="hint" data-i18n="form.data.fileProtocolHint">
+                FILE:1:S is a complete single QR. Multi-QR transfers use
+                FILE:1:C chunks with an ID, byte offset, and total length.
+              </p>
+            </div>
+            <div class="file-status-row">
+              <p id="file-capacity-hint" class="hint file-capacity-hint">
+                Loaded 0 B of 0 B max (0%).
+              </p>
+              <button
+                id="clear-file-button"
+                type="button"
+                class="secondary-button"
+                disabled
+                data-i18n="form.data.clearFile"
+              >
+                Clear file
+              </button>
+            </div>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Chunk manifests and verification</h2>
+            <p>
+              The FILE protocol identifies each transfer and byte range.
+              Optional manifests describe the file, while hashes detect missing
+              or modified data after every chunk is collected. Compression can
+              reduce the number of QR codes without changing the restored file.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=content&amp;subtab=data"
+              >Open this tool</a
+            >
+            <a href="../about.zh-CN.html">About</a>
+            <a href="../index.zh-CN.html">Guides</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+      <script type="module" src="../../dist/info.min.js"></script>
+  </body>
+</html>
