@@ -35,7 +35,10 @@ export function validateEmail(document, capacity, limits) {
         lookup(
           'validation.email.capacity',
           'Not valid for Email format yet: body exceeds the current QR capacity ({current} / {max}).',
-          capacity,
+          {
+            current: capacity.current,
+            max: capacity.max,
+          },
         ),
       )
     : { error: '', warning: '' };

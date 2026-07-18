@@ -39,7 +39,7 @@ export function createSharedFieldsSection({
     serializeEmail({
       email:
         emailInputs[0].value.trim() ||
-        lookup('content.preview.email', '[Recipient email]'),
+        lookup('content.preview.email', '[Email address]'),
       subject:
         emailSubject.value.trim() ||
         lookup('content.preview.subject', '[Subject]'),
