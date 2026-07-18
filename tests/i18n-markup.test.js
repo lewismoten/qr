@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import {
   validateGeoLabel,
   validatePrintableText,
@@ -77,6 +77,27 @@ const englishMessages = flattenMessages(
   JSON.parse(
     await readFile(new URL('../locales/en-US.json', import.meta.url), 'utf8'),
   ),
+);
+const qrDirectory = new URL('../src/js/qr/', import.meta.url);
+const qrFiles = (await readdir(qrDirectory)).filter((name) =>
+  name.endsWith('.js'),
+);
+const qrSource = (
+  await Promise.all(
+    qrFiles.map((name) => readFile(new URL(name, qrDirectory), 'utf8')),
+  )
+).join('\n');
+const qrErrorKeys = [
+  ...new Set(
+    [...qrSource.matchAll(/createQrError\(\s*['"]([^'"]+)/g)].map(
+      (match) => `qr.errors.${match[1]}`,
+    ),
+  ),
+];
+assert.deepEqual(
+  qrErrorKeys.filter((key) => !(key in englishMessages)),
+  [],
+  'Every QR error key must have an English translation',
 );
 const runtimeDownloadKeys = Object.keys(englishMessages).filter((key) =>
   key.startsWith('download.'),

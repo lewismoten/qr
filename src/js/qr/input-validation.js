@@ -7,16 +7,18 @@ const MAX_SEGMENTS = Math.floor((getDataCodewords(40, 'L') * 8) / 12);
 export function assertContentLength(length) {
   if (length > MAX_CONTENT_CHARACTERS)
     throw createQrError(
-      'tooLarge',
-      'The content is too large for a version 40 QR Code.',
+      'contentTooLong',
+      'Content exceeds the QR input limit of {maximum} characters.',
+      { maximum: MAX_CONTENT_CHARACTERS },
     );
 }
 
 export function assertSegmentCount(count) {
   if (count > MAX_SEGMENTS)
     throw createQrError(
-      'tooLarge',
-      'The content is too large for a version 40 QR Code.',
+      'tooManySegments',
+      'The segment list exceeds the safe QR input limit of {maximum}.',
+      { maximum: MAX_SEGMENTS },
     );
 }
 

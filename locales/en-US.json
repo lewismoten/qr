@@ -745,6 +745,8 @@
       "versionRange": "QR version must be an integer from 1 through 40.",
       "minimumVersion": "The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.",
       "tooLarge": "The content is too large for a version 40 QR Code.",
+      "contentTooLong": "Content exceeds the QR input limit of {maximum} characters.",
+      "tooManySegments": "The segment list exceeds the safe QR input limit of {maximum}.",
       "bitLength": "A value does not fit in the requested QR bit length.",
       "matrixBits": "The QR matrix could not place every encoded bit.",
       "maskPattern": "Mask pattern must be an integer from 0 through 7.",

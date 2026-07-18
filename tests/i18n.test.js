@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createLocalizedError } from '../src/js/localized-error.js';
+import { createQrError } from '../src/js/qr/error.js';
 import {
   getActiveLocale,
   getAvailableLocales,
@@ -138,12 +139,11 @@ assert.equal(
   'La version minimale est 9.',
 );
 assert.equal(
-  getErrorText({
-    source: 'qr',
-    key: 'minimumVersion',
-    details: { version: 10 },
-    message: 'Minimum version is 10.',
-  }),
+  getErrorText(
+    createQrError('minimumVersion', 'Minimum version is {version}.', {
+      version: 10,
+    }),
+  ),
   'La version minimale est 10.',
 );
 

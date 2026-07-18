@@ -165,6 +165,7 @@
     "alphanumericCharacters": "El modo alfanumérico contiene caracteres no compatibles.", "kanjiCharacters": "El modo Kanji contiene caracteres fuera de los rangos Shift JIS de QR.",
     "kanjiUnsupported": "El modo Kanji nativo requiere compatibilidad del navegador con Shift JIS.", "versionRange": "La versión QR debe ser un entero del 1 al 40.",
     "minimumVersion": "La versión QR elegida no admite estos datos. La versión mínima necesaria es {version}.", "tooLarge": "El contenido es demasiado grande para un código QR versión 40.",
+    "contentTooLong": "El contenido supera el límite de entrada QR de {maximum} caracteres.", "tooManySegments": "La lista de segmentos supera el límite seguro de entrada QR de {maximum}.",
     "bitLength": "Un valor no cabe en la longitud de bits QR solicitada.", "matrixBits": "La matriz QR no pudo colocar todos los bits codificados.", "maskPattern": "El patrón de máscara debe ser un entero del 0 al 7.", "errorCorrectionLevel": "Nivel de corrección de errores QR desconocido: {level}."
   } }
 }

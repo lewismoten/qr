@@ -196,7 +196,9 @@ function testVersion40CapacityLimits() {
           ],
           { errorCorrectionLevel: 'L' },
         ),
-      /too large/,
+      (error) =>
+        error.source === 'qr' &&
+        ['contentTooLong', 'tooLarge'].includes(error.key),
     );
   });
 }

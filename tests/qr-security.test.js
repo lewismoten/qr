@@ -30,7 +30,7 @@ test('oversized QR inputs fail before expensive encoding', () => {
   const oversizedText = '1'.repeat(100_000);
   assert.throws(
     () => QrCode.create(oversizedText),
-    (error) => error.source === 'qr' && error.key === 'tooLarge',
+    (error) => error.source === 'qr' && error.key === 'contentTooLong',
   );
 
   const excessiveSegments = Array.from({ length: 10_000 }, () => ({
@@ -39,7 +39,7 @@ test('oversized QR inputs fail before expensive encoding', () => {
   }));
   assert.throws(
     () => QrCode.create(excessiveSegments),
-    (error) => error.source === 'qr' && error.key === 'tooLarge',
+    (error) => error.source === 'qr' && error.key === 'tooManySegments',
   );
 
   const excessiveCombinedLength = [
@@ -48,7 +48,7 @@ test('oversized QR inputs fail before expensive encoding', () => {
   ];
   assert.throws(
     () => QrCode.create(excessiveCombinedLength),
-    (error) => error.source === 'qr' && error.key === 'tooLarge',
+    (error) => error.source === 'qr' && error.key === 'contentTooLong',
   );
 });
 

@@ -139,6 +139,6 @@
     "modeUnsupported": "尚不支持此原生二维码模式：{mode}。", "numericCharacters": "数字模式只接受 0-9。", "alphanumericCharacters": "字母数字模式包含不支持的字符。",
     "kanjiCharacters": "汉字模式包含二维码 Shift JIS 范围之外的字符。", "kanjiUnsupported": "原生汉字模式需要浏览器支持 Shift JIS 解码。",
     "versionRange": "二维码版本必须是 1 到 40 之间的整数。", "minimumVersion": "所选二维码版本无法容纳这些数据，最低需要版本 {version}。",
-    "tooLarge": "内容过大，无法放入版本 40 的二维码。", "bitLength": "值无法放入请求的二维码位长度。", "matrixBits": "二维码矩阵无法放置所有编码位。", "maskPattern": "掩码图案必须是 0 到 7 之间的整数。", "errorCorrectionLevel": "未知的二维码纠错级别：{level}。"
+    "tooLarge": "内容过大，无法放入版本 40 的二维码。", "contentTooLong": "内容超过二维码输入上限 {maximum} 个字符。", "tooManySegments": "分段列表超过二维码安全输入上限 {maximum}。", "bitLength": "值无法放入请求的二维码位长度。", "matrixBits": "二维码矩阵无法放置所有编码位。", "maskPattern": "掩码图案必须是 0 到 7 之间的整数。", "errorCorrectionLevel": "未知的二维码纠错级别：{level}。"
   } }
 }
