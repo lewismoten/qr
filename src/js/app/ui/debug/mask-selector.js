@@ -136,10 +136,12 @@ export function createMaskSelector({
       return;
     }
     const previewValue = MASK_PREVIEW_TEXT;
-    try {
-      updateAutoMask(encoder.create(previewValue, buildOptions('')));
-    } catch (error) {
-      console.error(error);
+    if (input.value === '') {
+      try {
+        updateAutoMask(encoder.create(previewValue, buildOptions('')));
+      } catch (error) {
+        console.error(error);
+      }
     }
     grid.querySelectorAll('.mask-option').forEach((button) => {
       const previewCanvas = button.querySelector('canvas');
