@@ -67,7 +67,7 @@ export async function writeGuideSitemap(config) {
   const directory = path.join(config.outputRoot, 'sitemaps');
   await mkdir(directory, { recursive: true });
   const siteFile = 'sitemaps/site.xml';
-  const simple = ['', 'privacy.html'].map((value) =>
+  const simple = [''].map((value) =>
     [
       '  <url>',
       `    <loc>${new URL(value, SITE_URL).href}</loc>`,

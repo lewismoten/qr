@@ -68,4 +68,14 @@ describe('guide index', () => {
     assert.match(sitemap, /\/es\/guias\/especificacion-qr\.html/);
     assert.match(sitemap, /xmlns:xhtml=/);
   });
+
+  test('privacy has a separate native page for every locale', async () => {
+    for (const locale of translatedLocales) {
+      const file = generatedPath('privacy', locale);
+      const source = await readFile(file, 'utf8');
+      assert.match(source, new RegExp(`lang="${locale}"`));
+      assert.match(source, /class="guide-language-switcher"/);
+      assert.match(source, /rel="canonical"/);
+    }
+  });
 });

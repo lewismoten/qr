@@ -18,10 +18,10 @@ deployment:
     to: locales
 pages:
   index.html: index.html
-  privacy.html: privacy.html
 guides:
   index: guides/index.html
   about: guides/about.html
+  privacy: guides/privacy.html
   spec: guides/spec.html
   technology: guides/technology.html
   content/frame: guides/content/frame.html
@@ -77,6 +77,7 @@ segments:
     modules: modulos
     number: numeros
     phone: telefono
+    privacy: privacidad
     spec: especificacion-qr
     style: diseno
     technology: tecnologia
@@ -101,6 +102,7 @@ segments:
     modules: وحدات
     number: أرقام
     phone: هاتف
+    privacy: الخصوصية
     spec: مواصفات-qr
     style: تصميم
     technology: تقنية
@@ -125,6 +127,7 @@ segments:
     modules: मॉड्यूल
     number: संख्याएं
     phone: फ़ोन
+    privacy: गोपनीयता
     spec: क्यूआर-विनिर्देश
     style: डिज़ाइन
     technology: तकनीक
@@ -149,6 +152,7 @@ segments:
     modules: 模块
     number: 数字
     phone: 电话
+    privacy: 隐私
     spec: 二维码规范
     style: 样式
     technology: 技术

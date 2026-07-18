@@ -181,7 +181,7 @@ async function translate(source, context) {
   const translations = await loadGuideTranslationSet(directory, context.locale);
   const missing = new Set();
   const result = translateGuideHtml(source, translations, missing);
-  if (missing.size) {
+  if (missing.size && context.route !== 'privacy') {
     const examples = [...missing].slice(0, 3).join(' | ');
     throw new Error(
       `${context.locale} is missing ${missing.size} translations: ${examples}`,

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator Privacy</title>
+    <meta
+      name="description"
+      content="Privacy information for the QR Code Generator, including local storage, cookies, local file processing, server logs, OpenStreetMap tiles and external links."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/privacy.html"
+    />
+    <script>
+      if (new URLSearchParams(location.search).has('embed'))
+        document.documentElement.classList.add('is-embedded');
+    </script>
+    <link rel="stylesheet" href="../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">Privacy and data use</p>
+            <h1 id="privacy-page-title">
+              How this site handles your information
+            </h1>
+          </div>
+          <a class="info-page-back" href="../index.html">Open generator</a>
+        </header>
+        <div class="info-dialog-content">
+          <p id="privacy-page-content" class="info-lead">
+            The QR Code Generator is designed to do its work in your browser. It
+            has no user accounts, advertising, behavioral analytics or
+            application database, and it does not intentionally upload the
+            content you enter or the files you select to its own server.
+          </p>
+          <p><strong>Last updated:</strong> July 17, 2026</p>
+
+          <section>
+            <h2>Information stored in your browser</h2>
+            <p>
+              The application uses local storage for one preference:
+              <code>qr.locale</code> records the language you select, including
+              the translation-debug language. Local storage persists across
+              browser sessions for this site until you clear site data or choose
+              another language. If storage is blocked or unavailable, the site
+              still works but the preference may not persist.
+            </p>
+            <p>
+              The application reads the browser's preferred language list to
+              choose and prioritize available translations. It does not submit
+              that complete list as form or analytics data. When hosted over
+              HTTP or HTTPS, it requests the selected same-origin language JSON
+              file; as with any requested path, that locale filename may appear
+              in ordinary server logs and can indicate the selected or matched
+              language.
+            </p>
+            <p>
+              QR inputs, passwords, selected files, generated images, temporary
+              object URLs, map position and other working state remain in
+              browser memory. They are not intentionally written to local
+              storage, session storage, IndexedDB or a service-worker cache by
+              this application. Reloading or closing the page normally clears
+              that working state.
+            </p>
+          </section>
+
+          <section>
+            <h2>Cookies and tracking</h2>
+            <p>
+              The application code does not set, read or require cookies. It
+              does not include advertising pixels, social-media trackers or
+              third-party analytics. The static hosting provider, reverse proxy,
+              security service or network operator may independently add headers
+              or use operational controls outside this repository; your
+              browser's developer tools and site-data controls show what a
+              particular deployment actually receives.
+            </p>
+          </section>
+
+          <section>
+            <h2>QR content and files</h2>
+            <p>
+              Text, URLs, contact details, Wi-Fi passwords, calendar events,
+              geographic coordinates, artwork and files are processed locally
+              with browser APIs. Downloads are assembled locally. Blob URLs are
+              temporary references within the current browser session, while
+              data URLs and the custom <code>FILE:1</code> format place file
+              information into the generated QR payload itself.
+            </p>
+            <p>
+              Anyone who can view or scan a QR code can potentially read its
+              payload. Do not place secrets in a QR code unless you understand
+              how it will be displayed, shared and stored. Hiding a password in
+              the on-screen payload preview does not encrypt the generated QR
+              code.
+            </p>
+          </section>
+
+          <section>
+            <h2>Server and network logs</h2>
+            <p>
+              Like most websites, the web server, hosting provider,
+              content-delivery network, firewall or reverse proxy may record
+              basic request information. Logs can include your public IP
+              address, request date and time, requested path, response status,
+              transferred bytes, browser user-agent, referrer and diagnostic or
+              security information. These records may be used to operate, secure
+              and troubleshoot the site. Their exact contents and retention
+              depend on the production hosting configuration rather than the
+              browser application code.
+            </p>
+            <p>
+              The included local development server serves static files and does
+              not intentionally create request-log files or set cookies. That
+              does not control logging performed by an operating system,
+              network, proxy or production host.
+            </p>
+          </section>
+
+          <section>
+            <h2>Third-party requests</h2>
+            <div class="dependency-list">
+              <article>
+                <div>
+                  <h3>OpenStreetMap map tiles</h3>
+                  <span class="version-badge">Only after opening Geo</span>
+                </div>
+                <p>
+                  Opening the Geo format loads visible raster map tiles from
+                  <code>tile.openstreetmap.org</code>. When the generator is
+                  hosted over HTTP or HTTPS, tile requests include the site's
+                  origin in the <code>Referer</code> request header as required
+                  by the tile policy. OpenStreetMap's infrastructure also
+                  receives normal request information such as your IP address,
+                  browser headers and the tile coordinates requested, which can
+                  indicate the approximate map area being viewed. The QR
+                  application does not contact OpenStreetMap before the Geo
+                  interface is opened.
+                </p>
+                <nav aria-label="OpenStreetMap privacy references">
+                  <a href="https://osmfoundation.org/wiki/Privacy_Policy"
+                    >OSMF privacy policy</a
+                  ><a
+                    href="https://operations.osmfoundation.org/policies/tiles/"
+                    >Tile usage policy</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>External links</h3>
+                  <span class="version-badge">Only when selected</span>
+                </div>
+                <p>
+                  Documentation links can take you to standards organizations,
+                  repositories and other websites. Those sites receive your IP
+                  address and ordinary browser request information when you open
+                  them and apply their own privacy practices. External links
+                  open in a new tab with <code>noopener</code> and
+                  <code>noreferrer</code> protections.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <h2>Same-origin resources and browser features</h2>
+            <p>
+              Application scripts, styles, language JSON files, About, Privacy,
+              Technology and QR specification content are loaded from the same
+              site. Browser features such as Canvas, Web Crypto, Compression
+              Streams, MediaRecorder, file selection and local downloads operate
+              on the device; using those APIs does not by itself send their
+              contents to this site's server.
+            </p>
+            <p>
+              When <code>index.html</code> is opened directly from a filesystem
+              with a <code>file:</code> URL, browser security rules generally
+              prevent the language JSON requests. The application then uses
+              embedded English labels and JavaScript fallback text. QR
+              generation remains available, but non-English localization and
+              restoration of a saved language may not work reliably until the
+              files are served over HTTP or HTTPS.
+            </p>
+          </section>
+
+          <section>
+            <h2>Your choices</h2>
+            <p>
+              You can clear the saved language through your browser's site-data
+              settings, block local storage, avoid opening Geo, avoid external
+              links, or use the application from a locally served or downloaded
+              copy. Browser privacy controls, extensions, firewalls and network
+              settings may provide additional control over requests.
+            </p>
+            <p>
+              Questions or corrections can be raised through the
+              <a href="https://git.lewismoten.com/lewismoten/qr"
+                >project source repository</a
+              >.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Privacy page navigation">
+            <a href="../index.html">Generator</a
+            ><a href="./index.html">Guides</a
+            ><a href="https://git.lewismoten.com/lewismoten/qr">Source</a
+            ><a href="#privacy-page-content">Back to top</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+    <script type="module" src="../dist/info.min.js"></script>
+  </body>
+</html>
