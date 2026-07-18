@@ -73,8 +73,9 @@ Coverage includes exercised modules under `src/js`, excluding the browser entry
 point and specification-page scripts. The command fails below 95% line, 96%
 branch, or 95% function coverage. These conservative repository-wide floors
 protect the current baseline. It also requires every included file to exceed
-95% line, branch, and function coverage. `npm run verify` enforces the same
-coverage thresholds.
+95% line, branch, and function coverage. Every module under `src/js/qr` must
+appear in the report and maintain 100% for all three metrics. `npm run verify`
+enforces the same coverage thresholds.
 
 ## Locales
 

@@ -19,7 +19,6 @@ function getModeUnitCount(mode, character) {
 function getIncrementalPayloadBits(mode, previousCount, unitCount) {
   if (mode === 'numeric') return previousCount % 3 === 0 ? 4 : 3;
   if (mode === 'alphanumeric') return previousCount % 2 === 0 ? 6 : 5;
-  if (mode === 'kanji') return 13;
   return unitCount * 8;
 }
 

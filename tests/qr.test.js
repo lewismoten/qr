@@ -79,6 +79,10 @@ function testEveryVersionAndCorrectionLevel() {
 }
 
 function testModesAndUtf8() {
+  const empty = NativeQRCode.create('');
+  assert.equal(empty.segments.length, 1);
+  assert.equal(empty.segments[0].mode, 'byte');
+  assert.equal(empty.segments[0].data, '');
   assert.equal(makeSegment('123').mode, 'numeric');
   assert.equal(makeSegment('HELLO').mode, 'alphanumeric');
   assert.equal(makeSegment('lowercase').mode, 'byte');
@@ -220,6 +224,11 @@ function testMasksAndDeterminism() {
 }
 
 function testInvalidConfiguration() {
+  const { MatrixBuilder } = NativeQRCode.internals;
+  assert.throws(
+    () => new MatrixBuilder(1, 'L', new Uint8Array(100)),
+    (error) => error.i18nKey === 'qr.errors.matrixBits',
+  );
   assert.throws(
     () =>
       NativeQRCode.create('INVALID LEVEL', {

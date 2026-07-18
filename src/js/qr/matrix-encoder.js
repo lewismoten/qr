@@ -285,10 +285,11 @@ function create(payload, options = {}) {
   };
 }
 
-const api = {
+export default {
   create,
   toSJIS: toShiftJis,
   internals: {
+    MatrixBuilder,
     getDataCodewords,
     getRawDataModules,
     makeReedSolomonDivisor,
@@ -297,4 +298,3 @@ const api = {
   },
 };
 export { create, toShiftJis as toSJIS };
-export default api;
