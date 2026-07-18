@@ -26,7 +26,7 @@ describe('guide index', () => {
       readFile(new URL('index.html', guideRoot), 'utf8'),
       listGuidePages(),
     ]);
-    assert.equal(pages.length, 21);
+    assert.equal(pages.length, 22);
     await Promise.all(
       pages.map(async (page) => {
         assert.match(index, new RegExp(`href="${page.replace('.', '\\.')}"`));
