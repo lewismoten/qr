@@ -20,6 +20,14 @@ export function drawFinderEyes(...args) {
   shapeDrawing?.drawFinderEyes(...args);
 }
 
+export function isFinderPattern(...args) {
+  return shapeDrawing?.isFinderPattern(...args) ?? false;
+}
+
+export function getFinderPatternPart(...args) {
+  return shapeDrawing?.getFinderPatternPart(...args) ?? null;
+}
+
 export function createQrImageLayer(...args) {
   return shapeDrawing?.createQrImageLayer(...args) ?? null;
 }

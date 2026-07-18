@@ -1,10 +1,10 @@
 import { hexToRgba } from '../../colors.js';
 import {
+  drawFinderEyes,
+  drawQrModule,
   getFinderPatternPart,
-  getModuleCategory,
   isFinderPattern,
-} from '../../qr-regions.js';
-import { drawFinderEyes, drawQrModule } from './style-drawing.js';
+} from './style-drawing.js';
 
 export function drawQrMatrix(state) {
   const {
@@ -72,18 +72,17 @@ export function drawQrMatrix(state) {
         continue;
       }
 
-      const category = debugActive
-        ? debugRenderer.getCategory(
-            row,
-            column,
-            qrDefinition,
-            debugModel,
-            'overlay',
-          )
-        : getModuleCategory(qrDefinition, row, column);
-      let fillStyle = debugActive
-        ? hexToRgba(debugColors[category].value, 1)
-        : moduleFillStyle;
+      let fillStyle = moduleFillStyle;
+      if (debugActive) {
+        const category = debugRenderer.getCategory(
+          row,
+          column,
+          qrDefinition,
+          debugModel,
+          'overlay',
+        );
+        fillStyle = hexToRgba(debugColors[category].value, 1);
+      }
       if (customEyeColorsActive) {
         const eyePart = getFinderPatternPart(moduleCount, row, column);
         if (eyePart === 'outer') fillStyle = eyeOuterFillStyle;

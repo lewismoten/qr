@@ -238,3 +238,9 @@ export function createQrModuleFill(
   gradient.addColorStop(1, options.endColor);
   return gradient;
 }
+import {
+  getFinderPatternPart,
+  isFinderPattern,
+} from '../../../qr-finder-regions.js';
+
+export { getFinderPatternPart, isFinderPattern };
