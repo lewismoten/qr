@@ -450,6 +450,11 @@
       "latitudeRange": "Aún no es válido para Geo: la latitud debe estar entre -90 y 90.",
       "longitudeRange": "Aún no es válido para Geo: la longitud debe estar entre -180 y 180."
     },
+    "vcard": {
+      "required": "Aún no es válido para vCard: {label} es obligatorio.",
+      "length": "Aún no es válido para vCard: {label} debe tener como máximo {maxLength} caracteres.",
+      "characters": "Aún no es válido para vCard: {label} solo admite letras, números, espacios y puntuación común."
+    },
     "website": {
       "required": "Aún no es válido para {context}: el sitio web es obligatorio.",
       "length": "Aún no es válido para {context}: el sitio web no debe superar 2048 caracteres.",
@@ -484,7 +489,16 @@
       "length": "Aún no es válido para SMS: el mensaje debe tener {maxLength} caracteres o menos."
     },
     "file": {
-      "required": "Aún no es válido para Archivo: elige un archivo para codificar."
+      "required": "Aún no es válido para Archivo: elige un archivo para codificar.",
+      "embeddedWarning": "Advertencia para Archivo: esta URL compartible contiene directamente los bytes del archivo, por lo que los archivos grandes agotarán pronto la capacidad QR.",
+      "chunksWarning": "Advertencia para Archivo: este flujo FILE compacto se divide entre {totalChunks} códigos QR. Cada lectura necesita el mismo ID de archivo y todos los fragmentos para reconstruirlo."
+    },
+    "number": {
+      "start": "Aún no es válido para Número: el inicio debe ser un entero.",
+      "end": "Aún no es válido para Número: el final debe ser un entero.",
+      "step": "Aún no es válido para Número: el paso debe ser un entero positivo.",
+      "range": "Aún no es válido para Número: el intervalo crea {total} códigos QR; limítalo a {maxFrames} o menos.",
+      "fieldLabel": "Aún no es válido para Número: {label}"
     }
   },
   "common": {
@@ -495,6 +509,7 @@
     "none": "ninguno",
     "preview": "Vista previa",
     "loading": "Cargando...",
+    "loadError": "No se pudo cargar el generador de códigos QR.",
     "fragmentLoadError": "No se pudo cargar esta sección. Comprueba tu conexión e inténtalo de nuevo.",
     "noFileSelected": "Ningún archivo seleccionado",
     "sequence": "{current} de {total}",
@@ -587,6 +602,9 @@
     "location": "Ubicación {location}",
     "contact": "Contacto {contact}",
     "sequence": "{current} de {total}"
+  },
+  "number": {
+    "status": "{current} / {total} - {value}"
   },
   "encoding": {
     "invalidPositions": "{message} Posiciones: {positions}{suffix}.",
