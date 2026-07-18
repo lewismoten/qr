@@ -1,3 +1,3 @@
 import { runParityRange } from './helpers/qr-parity.js';
 
-runParityRange('L', 33, 40);
+runParityRange('H', 26, 32);

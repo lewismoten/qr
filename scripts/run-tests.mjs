@@ -7,6 +7,7 @@ const supported = new Set(['--coverage', '--watch']);
 const unknown = [...requested].filter((option) => !supported.has(option));
 const coverageRequested = requested.has('--coverage');
 const minimumFileCoverage = 95;
+const maximumTestFileDurationMs = 1000;
 const qrFiles = new Set(
   readdirSync(new URL('../src/js/qr/', import.meta.url)).filter((file) =>
     file.endsWith('.js'),
@@ -67,8 +68,20 @@ function findFileCoverageFailures(output) {
   return [...missingQrFiles, ...metricFailures];
 }
 
+function findTestDurationFailures(output) {
+  const plainOutput = stripVTControlCharacters(output);
+  const durationPattern = /^.*?(tests\/[\w./-]+\.test\.js) \(([\d.]+)ms\)$/gm;
+  return [...plainOutput.matchAll(durationPattern)]
+    .filter(([, , duration]) => Number(duration) > maximumTestFileDurationMs)
+    .map(
+      ([, file, duration]) =>
+        `${file}: ${Number(duration).toFixed(2)}ms exceeds ` +
+        `${maximumTestFileDurationMs}ms`,
+    );
+}
+
 let output = '';
-const stdio = coverageRequested ? ['inherit', 'pipe', 'pipe'] : 'inherit';
+const stdio = ['inherit', 'pipe', 'pipe'];
 const environment =
   coverageRequested && !('NO_COLOR' in process.env)
     ? { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR || '1' }
@@ -77,22 +90,26 @@ const child = spawn(process.execPath, nodeOptions, {
   stdio,
   env: environment,
 });
-if (coverageRequested) {
-  for (const [stream, destination] of [
-    [child.stdout, process.stdout],
-    [child.stderr, process.stderr],
-  ]) {
-    stream.on('data', (chunk) => {
-      output += chunk;
-      destination.write(chunk);
-    });
-  }
+for (const [stream, destination] of [
+  [child.stdout, process.stdout],
+  [child.stderr, process.stderr],
+]) {
+  stream.on('data', (chunk) => {
+    output += chunk;
+    destination.write(chunk);
+  });
 }
 const result = await new Promise((resolve) => child.once('exit', resolve));
-const failures = result === 0 ? findFileCoverageFailures(output) : [];
+const failures =
+  result === 0
+    ? [
+        ...(coverageRequested ? findFileCoverageFailures(output) : []),
+        ...findTestDurationFailures(output),
+      ]
+    : [];
 if (failures.length) {
   console.error(
-    'Coverage requirements failed:\n' +
+    'Test requirements failed:\n' +
       failures.map((failure) => `- ${failure}`).join('\n'),
   );
 }
