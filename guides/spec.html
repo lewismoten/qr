@@ -74,7 +74,7 @@
         <span style="--swatch:#06b6d4">Timing</span>
         <span style="--swatch:#8b5cf6">Format</span>
         <span style="--swatch:#ec4899">EC level</span>
-        <span style="--swatch:#2563eb">Mask</span>
+        <span style="--swatch:#60a5fa">Mask</span>
         <span style="--swatch:#10b981">Version</span>
         <span style="--swatch:#0f766e">Mode</span>
         <span style="--swatch:#f97316">Character count</span>
@@ -312,14 +312,17 @@
 
         <div class="reference-links implementation-links">
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"><strong>Modes, count widths and block tables</strong><span><code>constants.js</code> defines mode indicators, the alphanumeric alphabet, character-count widths, EC-level format values, EC codewords per block and block counts for versions 1–40.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"><strong>Segments and data codewords</strong><span><code>segments.js</code> implements Numeric, Alphanumeric, UTF-8 Byte and Kanji payload bits, mixed-mode optimization, version selection, terminators, byte alignment and alternating pad words.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment.js"><strong>Encoding units</strong><span><code>segment.js</code> validates and converts Numeric, Alphanumeric, UTF-8 Byte and Shift JIS Kanji units into payload bits.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segment-optimizer.js"><strong>Mixed-mode optimization</strong><span><code>segment-optimizer.js</code> finds a low-cost sequence of Numeric, Alphanumeric and Byte segments, including each repeated mode and count header.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"><strong>Version and data codewords</strong><span><code>segments.js</code> selects a fitting version and writes segment headers, payload, terminator, byte alignment and alternating pad words.</span></a>
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"><strong>Capacity and remainder geometry</strong><span><code>capacity.js</code> calculates raw data modules, character-count widths and usable data codewords from version, recovery level and block structure.</span></a>
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/reed-solomon.js"><strong>Reed-Solomon and interleaving</strong><span><code>reed-solomon.js</code> contains GF(256) multiplication, generator-divisor construction, remainder generation, short/long block division and data/EC interleaving.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/matrix-encoder.js"><strong>Matrix, metadata and placement</strong><span><code>matrix-encoder.js</code> places finder, separator, timing and alignment patterns; writes BCH-protected format/version data; traverses codeword bits; scores masks; and produces the final matrix.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/matrix-encoder.js"><strong>Matrix, metadata and placement</strong><span><code>matrix-encoder.js</code> places functional patterns, writes BCH-protected metadata, traverses codeword bits and produces each mask candidate.</span></a>
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"><strong>Eight mask formulas</strong><span><code>mask.js</code> gives the exact row/column predicate used by every mask candidate.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/penalty.js"><strong>Mask penalty scoring</strong><span><code>penalty.js</code> scores runs, blocks, finder-like sequences and dark/light imbalance to select the automatic mask.</span></a>
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"><strong>Shift JIS Kanji conversion</strong><span><code>kanji.js</code> builds the browser-supported Shift JIS map, validates the two QR Kanji ranges and transforms characters into 13-bit values.</span></a>
           <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/qr.test.js"><strong>Structural and capacity tests</strong><span><code>tests/qr.test.js</code> exercises versions, modes, capacities, masks, codewords and expected matrices.</span></a>
-          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/qr-parity.test.js"><strong>Reference parity tests</strong><span><code>tests/qr-parity.test.js</code> compares the first-party encoder against 1,287 reference matrices when the optional reference bundle is available.</span></a>
+          <a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"><strong>Reference parity harness</strong><span><code>tests/helpers/qr-parity.js</code> compares each split parity range against an optional node-qrcode reference bundle.</span></a>
         </div>
 
         <div class="implementation-warning">

@@ -15,7 +15,7 @@
   --timing: #06b6d4;
   --format: #8b5cf6;
   --ec-level: #ec4899;
-  --mask: #2563eb;
+  --mask: #60a5fa;
   --version: #10b981;
   --dark-module: #4c1d95;
   --mode: #0f766e;
@@ -38,6 +38,7 @@ html {
 body {
   min-width: 18rem;
   margin: 0;
+  padding-bottom: 5rem;
   background:
     radial-gradient(
       circle at 10% 4%,
@@ -66,6 +67,7 @@ body::before {
 
 .is-embedded body {
   min-width: 0;
+  padding-bottom: 0;
 }
 
 .is-embedded .spec-header,

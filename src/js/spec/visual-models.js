@@ -11,7 +11,7 @@ export const COLORS = {
   timing: '#06b6d4',
   format: '#8b5cf6',
   ecLevel: '#ec4899',
-  mask: '#2563eb',
+  mask: '#60a5fa',
   version: '#10b981',
   darkModule: '#4c1d95',
   mode: '#0f766e',
@@ -21,7 +21,7 @@ export const COLORS = {
   padding: '#cbd5e1',
   errorCorrection: '#111827',
   remainder: '#14b8a6',
-  maskEffect: '#2563eb',
+  maskEffect: '#60a5fa',
 };
 export const MIXED_TEXT = '1234567890HELLO-world';
 
