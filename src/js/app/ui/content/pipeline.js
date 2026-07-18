@@ -30,6 +30,7 @@ export function createContentPipeline({
   };
   let frameController = null;
   let frameRequest = null;
+  let pendingCentered = null;
   const ensureFrame = () => {
     if (frameController) return Promise.resolve(frameController);
     if (!frameRequest) {
@@ -39,6 +40,9 @@ export function createContentPipeline({
             document,
             frameOptions,
           );
+          if (pendingCentered !== null) {
+            frameController.setCentered(pendingCentered);
+          }
           return frameController;
         })
         .catch((error) => {
@@ -53,9 +57,8 @@ export function createContentPipeline({
       return frameController?.getMessage() ?? '';
     },
     setCentered(enabled) {
-      ensureFrame()
-        .then((controller) => controller.setCentered(enabled))
-        .catch(console.error);
+      pendingCentered = enabled;
+      frameController?.setCentered(enabled);
     },
     getFont: (size) =>
       frameController?.getFont(size) ??
