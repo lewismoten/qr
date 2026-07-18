@@ -2,18 +2,24 @@ import { BitBuffer } from './bit-buffer.js';
 import { getCountBitLength, getDataCodewords } from './capacity.js';
 import { MODE_BITS } from './constants.js';
 import { createQrError } from './error.js';
+import { assertContentLength, assertSegmentCount } from './input-validation.js';
 import { makeSegment } from './segment.js';
 import { optimizeSegments } from './segment-optimizer.js';
 
 export { optimizeSegments } from './segment-optimizer.js';
 
 function normalizeSegments(payload) {
-  return payload.map((part) =>
-    makeSegment(
-      part.data,
+  assertSegmentCount(payload.length);
+  let totalLength = 0;
+  return payload.map((part) => {
+    const data = String(part.data);
+    totalLength += data.length;
+    assertContentLength(totalLength);
+    return makeSegment(
+      data,
       typeof part.mode === 'string' ? part.mode : part.mode?.id,
-    ),
-  );
+    );
+  });
 }
 
 function getRequiredBits(segments, version) {
@@ -77,6 +83,7 @@ export function selectVersionAndSegments(
   }
 
   const text = String(payload);
+  assertContentLength(text.length);
   const optimizedByBucket = new Map();
   const getOptimized = (version) => {
     const bucketVersion = version <= 9 ? 1 : version <= 26 ? 10 : 27;

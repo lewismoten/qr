@@ -15,7 +15,8 @@ async function findJavaScriptFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const nested = await Promise.all(
     entries.map((entry) => {
-      const url = new URL(entry.name, directory);
+      const suffix = entry.isDirectory() ? '/' : '';
+      const url = new URL(`${entry.name}${suffix}`, directory);
       if (entry.isDirectory()) return findJavaScriptFiles(url);
       return entry.isFile() && entry.name.endsWith('.js') ? [url] : [];
     }),

@@ -87,6 +87,28 @@ protect the current baseline. It also requires every included file to exceed
 appear in the report and maintain 100% for all three metrics. `npm run verify`
 enforces the same coverage thresholds.
 
+## Security
+
+Run the focused security and module-boundary tests with:
+
+```sh
+npm run test:security
+```
+
+These checks exercise oversized and hostile QR input, prototype-polluted
+options, allocation boundaries, and script-like payloads. They also prevent QR
+modules from importing application code and reject executable-string or HTML
+injection sinks in browser source.
+
+Check the locked dependency tree against npm's current advisories separately:
+
+```sh
+npm run audit:dependencies
+```
+
+The advisory check requires network access, so it is intentionally not part of
+the offline `verify` command.
+
 ## Performance
 
 Run the QR speed and memory benchmarks with exposed garbage collection:

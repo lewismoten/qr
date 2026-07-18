@@ -1,6 +1,7 @@
 import { getDataCodewords, getRawDataModules } from './capacity.js';
 import { FORMAT_ECL_BITS } from './constants.js';
 import { createQrError } from './error.js';
+import { assertVersion, getOwnOption } from './input-validation.js';
 import {
   addErrorCorrection,
   getReedSolomonRemainder,
@@ -29,6 +30,7 @@ function getAlignmentPositions(version) {
 
 class MatrixBuilder {
   constructor(version, errorLevel, codewords) {
+    assertVersion(version);
     this.version = version;
     this.errorLevel = errorLevel;
     this.size = version * 4 + 17;
@@ -237,7 +239,10 @@ class MatrixBuilder {
 }
 
 function create(payload, options = {}) {
-  const errorLevel = String(options.errorCorrectionLevel || 'M').toUpperCase();
+  const settings = options ?? {};
+  const errorLevel = String(
+    getOwnOption(settings, 'errorCorrectionLevel', 'M') || 'M',
+  ).toUpperCase();
   if (!Object.hasOwn(FORMAT_ECL_BITS, errorLevel))
     throw createQrError(
       'errorCorrectionLevel',
@@ -247,12 +252,12 @@ function create(payload, options = {}) {
   const { segments, version } = selectVersionAndSegments(
     payload,
     errorLevel,
-    options.version,
+    getOwnOption(settings, 'version'),
   );
   const data = makeDataCodewords(segments, version, errorLevel);
   const codewords = addErrorCorrection(data, version, errorLevel);
   const builder = new MatrixBuilder(version, errorLevel, codewords);
-  const maskPattern = builder.finish(options.maskPattern);
+  const maskPattern = builder.finish(getOwnOption(settings, 'maskPattern'));
   const flatModules = new Uint8Array(builder.size * builder.size);
   let moduleIndex = 0;
   for (const row of builder.modules) {
