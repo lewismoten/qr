@@ -40,7 +40,7 @@
 .info-dialog-header h1 {
   margin: 0.15rem 0 0;
   color: #071827;
-  font-family: "DIN Alternate", "Avenir Next", sans-serif;
+  font-family: 'DIN Alternate', 'Avenir Next', sans-serif;
   font-size: clamp(1.45rem, 4vw, 2.35rem);
   line-height: 1.04;
   letter-spacing: -0.025em;
@@ -84,7 +84,7 @@
 .info-dialog-content h2 {
   margin: 0 0 0.65rem;
   color: #0b4f4a;
-  font-family: "DIN Alternate", "Avenir Next", sans-serif;
+  font-family: 'DIN Alternate', 'Avenir Next', sans-serif;
   font-size: 1.2rem;
   line-height: 1.15;
 }
@@ -103,6 +103,30 @@
   color: #132235 !important;
   font-size: 1.04rem;
   font-weight: 650;
+}
+
+.guide-callout {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  border-radius: 1rem;
+  background: rgba(204, 251, 241, 0.42);
+}
+
+.guide-callout strong,
+.guide-callout a {
+  color: #0b4f4a;
+  font-weight: 900;
+}
+
+.guide-callout strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.guide-callout a:hover,
+.guide-callout a:focus-visible {
+  color: #0f766e;
 }
 
 .fact-grid,
