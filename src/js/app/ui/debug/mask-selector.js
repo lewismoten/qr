@@ -2,7 +2,7 @@ import { isMaskActive } from '@lewismoten/qr';
 import { isFunctionModule } from '../../qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 
-const MASK_BLUE = '#2563eb';
+const MASK_BLUE = '#60a5fa';
 const MASK_PREVIEW_TEXT = 'MASK PREVIEW';
 
 function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
