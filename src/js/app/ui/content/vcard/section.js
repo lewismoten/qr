@@ -29,3 +29,14 @@ export function createVCardSection({
 
   return { buildPayload, buildPreview };
 }
+
+export function createVCardSectionFromDocument(document) {
+  return createVCardSection({
+    name: document.getElementById('vcard-name'),
+    organization: document.getElementById('vcard-org'),
+    title: document.getElementById('vcard-title'),
+    phone: document.getElementById('vcard-phone'),
+    email: document.getElementById('vcard-email'),
+    website: document.getElementById('vcard-url'),
+  });
+}

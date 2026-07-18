@@ -1,6 +1,7 @@
 import { createContentPayload, createFilePayloadPreview } from './payload.js';
 
 export function createContentPipeline({
+  document,
   elements: e,
   bulk,
   number,
@@ -21,7 +22,6 @@ export function createContentPipeline({
     getNumberPayload: number.getPayload,
     getActiveFile: file.getActive,
     getFileMode: file.getMode,
-    fileIndex: e.fileIndex,
     mode: e.frameMode,
     customField: e.customFrameField,
     customMessage: e.customFrameMessage,
@@ -29,21 +29,6 @@ export function createContentPipeline({
     artCenterCheckbox: e.frameCenterArt,
     artMode: e.artMode,
     font: e.frameFont,
-    values: {
-      url: e.url,
-      text: e.text,
-      wifi: e.wifi,
-      email: e.email,
-      phone: e.phone,
-      sms: e.sms,
-      geoLabel: e.geoLabel,
-      latitude: e.latitude,
-      longitude: e.longitude,
-      vcardName: e.vcardName,
-      vcardOrg: e.vcardOrg,
-      vcardEmail: e.vcardEmail,
-    },
-    event: e.event,
     onDisableArtwork() {
       e.artMode.value = 'none';
       runtime.syncChoices();
@@ -56,8 +41,11 @@ export function createContentPipeline({
     if (frameController) return Promise.resolve(frameController);
     if (!frameRequest) {
       frameRequest = import('./frame/section.js')
-        .then(({ createFrameSection }) => {
-          frameController = createFrameSection(frameOptions);
+        .then(({ createFrameSectionFromDocument }) => {
+          frameController = createFrameSectionFromDocument(
+            document,
+            frameOptions,
+          );
           return frameController;
         })
         .catch((error) => {
@@ -96,25 +84,6 @@ export function createContentPipeline({
       qrFormat: e.format,
       urlInput: e.url,
       textInput: e.text,
-      phoneNumber: e.phone,
-      smsNumber: e.sms,
-      smsBody: e.smsBody,
-      wifiEncryption: e.wifiEncryption,
-      wifiSsid: e.wifi,
-      wifiPassword: e.wifiPassword,
-      wifiHidden: e.wifiHidden,
-      emailTo: e.email,
-      emailSubject: e.emailSubject,
-      emailBody: e.emailBody,
-      geoLatitude: e.latitude,
-      geoLongitude: e.longitude,
-      geoQuery: e.geoLabel,
-      vcardName: e.vcardName,
-      vcardOrg: e.vcardOrg,
-      vcardTitle: e.vcardTitle,
-      vcardPhone: e.vcardPhone,
-      vcardEmail: e.vcardEmail,
-      vcardUrl: e.vcardUrl,
     },
     bulk: { isMode: bulk.isMode, build: buildBulkText },
     builders,

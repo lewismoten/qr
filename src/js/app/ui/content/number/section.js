@@ -127,3 +127,16 @@ export function createNumberSection({
 
   return { getSequenceInfo, getPayload, sync, getValidationState };
 }
+
+export function createNumberSectionFromDocument(document, options) {
+  return createNumberSection({
+    startInput: document.getElementById('number-start'),
+    endInput: document.getElementById('number-end'),
+    stepInput: document.getElementById('number-step'),
+    prefixInput: document.getElementById('number-prefix'),
+    suffixInput: document.getElementById('number-suffix'),
+    indexInput: document.getElementById('number-sequence-index'),
+    statusElement: document.getElementById('number-sequence-value'),
+    ...options,
+  });
+}

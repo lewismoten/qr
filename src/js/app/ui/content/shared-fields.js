@@ -49,3 +49,19 @@ export function createSharedFieldsSection({
     buildEmailPreview,
   };
 }
+
+export function createSharedFieldsSectionFromDocument(document, options) {
+  return createSharedFieldsSection({
+    emailInputs: [
+      document.getElementById('email-to'),
+      document.getElementById('vcard-email'),
+    ],
+    messageInputs: [
+      document.getElementById('text-input'),
+      document.getElementById('sms-body'),
+      document.getElementById('email-body'),
+    ],
+    emailSubject: document.getElementById('email-subject'),
+    ...options,
+  });
+}

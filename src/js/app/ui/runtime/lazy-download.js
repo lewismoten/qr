@@ -2,6 +2,7 @@ import { createFrameNavigation } from '../preview/frame-navigation.js';
 import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 export function createLazyDownloadSetup({
+  document,
   elements: e,
   bulk,
   file,
@@ -23,7 +24,7 @@ export function createLazyDownloadSetup({
     getFileEncodingMode: file.getMode,
     fileChunkIndex: e.fileChunkIndex,
     syncFileChunkLabel: file.syncChunkLabel,
-    numberSequenceIndex: e.numberSequenceIndex,
+    numberSequenceIndex: document.getElementById('number-sequence-index'),
     getNumberSequenceInfo: number.getInfo,
     syncNumberSequenceControls: number.sync,
     maxNumberFrames,

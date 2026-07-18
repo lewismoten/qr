@@ -1,6 +1,7 @@
 import { createLazySection } from './lazy-section.js';
 
 export function createContentSections({
+  document,
   elements: e,
   runtime,
   limits,
@@ -11,19 +12,8 @@ export function createContentSections({
   const eventLoader = createLazySection({
     region,
     load: () => import('./event/section.js'),
-    create: ({ createEventSection }) => {
-      const section = createEventSection({
-        title: e.eventTitle,
-        allDay: e.eventAllDay,
-        startDate: e.eventStartDate,
-        startTime: e.eventStartTime,
-        endDate: e.eventEndDate,
-        endTime: e.eventEndTime,
-        location: e.eventLocation,
-        description: e.eventDescription,
-        url: e.eventUrl,
-        timeFields: e.eventTimeFields,
-      });
+    create: ({ createEventSectionFromDocument }) => {
+      const section = createEventSectionFromDocument(document);
       section.initialize();
       section.sync();
       return section;
@@ -32,12 +22,8 @@ export function createContentSections({
   const geoLoader = createLazySection({
     region,
     load: () => import('./geo/section.js'),
-    create: ({ createGeoSection }) =>
-      createGeoSection({
-        latitudeInput: e.geoLatitude,
-        longitudeInput: e.geoLongitude,
-        labelInput: e.geoQuery,
-        mapElement: e.geoMapElement,
+    create: ({ createGeoSectionFromDocument }) =>
+      createGeoSectionFromDocument(document, {
         isActive: () => e.qrFormat.value === 'geo',
         onChange: () => runtime.render(),
       }),
@@ -45,15 +31,8 @@ export function createContentSections({
   const numberLoader = createLazySection({
     region,
     load: () => import('./number/section.js'),
-    create: ({ createNumberSection }) => {
-      const section = createNumberSection({
-        startInput: e.numberStart,
-        endInput: e.numberEnd,
-        stepInput: e.numberStep,
-        prefixInput: e.numberPrefix,
-        suffixInput: e.numberSuffix,
-        indexInput: e.numberSequenceIndex,
-        statusElement: e.numberSequenceValue,
+    create: ({ createNumberSectionFromDocument }) => {
+      const section = createNumberSectionFromDocument(document, {
         maxFrames: limits.numberFrames,
         alphanumericCharacters,
         validatePrintableText,
@@ -65,14 +44,10 @@ export function createContentSections({
   const phoneLoader = createLazySection({
     region,
     load: () => import('./phone/section.js'),
-    create: ({ createPhoneSection }) => {
-      const section = createPhoneSection({
-        buttons: e.phoneFormatButtons,
-        inputs: [e.phoneNumber, e.smsNumber, e.vcardPhone],
-        phoneInput: e.phoneNumber,
-        smsInput: e.smsNumber,
-        smsBody: e.smsBody,
+    create: ({ createPhoneSectionFromDocument }) => {
+      const section = createPhoneSectionFromDocument(document, {
         onChange: () => runtime.render(),
+        smsMaxLength: limits.sms,
       });
       section.initialize();
       return section;
@@ -81,11 +56,8 @@ export function createContentSections({
   const sharedLoader = createLazySection({
     region,
     load: () => import('./shared-fields.js'),
-    create: ({ createSharedFieldsSection }) => {
-      const section = createSharedFieldsSection({
-        emailInputs: [e.emailTo, e.vcardEmail],
-        messageInputs: [e.textInput, e.smsBody, e.emailBody],
-        emailSubject: e.emailSubject,
+    create: ({ createSharedFieldsSectionFromDocument }) => {
+      const section = createSharedFieldsSectionFromDocument(document, {
         onMessageChange() {
           runtime.syncSmsLength();
           runtime.syncEmailLength();
@@ -98,13 +70,8 @@ export function createContentSections({
   const wifiLoader = createLazySection({
     region,
     load: () => import('./wifi/section.js'),
-    create: ({ createWifiSection }) => {
-      const section = createWifiSection({
-        ssid: e.wifiSsid,
-        password: e.wifiPassword,
-        encryption: e.wifiEncryption,
-        hidden: e.wifiHidden,
-        revealSecrets: e.payloadRevealSecrets,
+    create: ({ createWifiSectionFromDocument }) => {
+      const section = createWifiSectionFromDocument(document, {
         onChange() {
           runtime.syncChoices();
           runtime.render();
@@ -117,15 +84,8 @@ export function createContentSections({
   const vcardLoader = createLazySection({
     region,
     load: () => import('./vcard/section.js'),
-    create: ({ createVCardSection }) =>
-      createVCardSection({
-        name: e.vcardName,
-        organization: e.vcardOrg,
-        title: e.vcardTitle,
-        phone: e.vcardPhone,
-        email: e.vcardEmail,
-        website: e.vcardUrl,
-      }),
+    create: ({ createVCardSectionFromDocument }) =>
+      createVCardSectionFromDocument(document),
   });
 
   const event = {
@@ -190,6 +150,7 @@ export function createContentSections({
       phoneLoader.get()?.buildPhonePreview() ?? 'tel:[phone-number]',
     buildSmsPreview: () =>
       phoneLoader.get()?.buildSmsPreview() ?? 'SMSTO:[phone-number]:[message]',
+    syncSmsLength: () => phoneLoader.get()?.syncSmsLength(),
   };
   const ensureFormat = (format) => {
     const loaders = {

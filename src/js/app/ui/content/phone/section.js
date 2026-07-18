@@ -1,5 +1,6 @@
 import { formatPhoneNumberForDisplay } from '../../../phone.js';
 import { serializePhone, serializeSms } from '../../../content-formats.js';
+import { lookup } from '../../../../i18n/index.js';
 
 export function createPhoneSection({
   buttons,
@@ -9,6 +10,8 @@ export function createPhoneSection({
   smsBody,
   defaultFormat = 'usa',
   onChange,
+  smsLengthHint,
+  smsMaxLength,
 }) {
   let format = defaultFormat;
 
@@ -74,6 +77,13 @@ export function createPhoneSection({
       number: smsInput.value,
       message: smsBody.value || '[message]',
     }).replace('SMSTO::', 'SMSTO:[phone-number]:');
+  const syncSmsLength = () => {
+    if (!smsLengthHint) return;
+    smsLengthHint.textContent = lookup('common.count', '{current} / {total}', {
+      current: smsBody.value.length,
+      total: smsMaxLength,
+    });
+  };
 
   return {
     initialize,
@@ -81,5 +91,21 @@ export function createPhoneSection({
     buildSmsPayload,
     buildPhonePreview,
     buildSmsPreview,
+    syncSmsLength,
   };
+}
+
+export function createPhoneSectionFromDocument(document, options) {
+  const phone = document.getElementById('phone-number');
+  const sms = document.getElementById('sms-number');
+  const vcard = document.getElementById('vcard-phone');
+  return createPhoneSection({
+    buttons: document.querySelectorAll('.phone-format-button'),
+    inputs: [phone, sms, vcard],
+    phoneInput: phone,
+    smsInput: sms,
+    smsBody: document.getElementById('sms-body'),
+    smsLengthHint: document.getElementById('sms-length-hint'),
+    ...options,
+  });
 }

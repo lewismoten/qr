@@ -95,7 +95,7 @@ export function bindApplicationEvents({
         if (value !== 'none') a.setFrameCentered(false);
         a.syncArtwork();
       }
-      if (target === e.wifiEncryption) a.syncWifi();
+      if (target.id === 'wifi-encryption') a.syncWifi();
       if (target === e.qrFormat) {
         a.syncFormat();
         a.activateContent('data');

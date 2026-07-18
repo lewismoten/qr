@@ -51,3 +51,18 @@ export function createEventSection({
 
   return { initialize, sync, buildPayload };
 }
+
+export function createEventSectionFromDocument(document) {
+  return createEventSection({
+    title: document.getElementById('event-title'),
+    allDay: document.getElementById('event-all-day'),
+    startDate: document.getElementById('event-start-date'),
+    startTime: document.getElementById('event-start-time'),
+    endDate: document.getElementById('event-end-date'),
+    endTime: document.getElementById('event-end-time'),
+    location: document.getElementById('event-location'),
+    description: document.getElementById('event-description'),
+    url: document.getElementById('event-url'),
+    timeFields: document.querySelectorAll('.event-time-field'),
+  });
+}

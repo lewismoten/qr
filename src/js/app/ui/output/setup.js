@@ -1,11 +1,6 @@
 import { lookup } from '../../../i18n/index.js';
 
-export function createOutputSetup({
-  elements: e,
-  systems,
-  getErrorLevel,
-  smsMaxLength,
-}) {
+export function createOutputSetup({ elements: e, systems, getErrorLevel }) {
   const actions = {
     syncSizeLabels: systems.previewControls.syncLabels,
     formatColorTransparency: systems.style.colors.formatTransparency,
@@ -39,14 +34,7 @@ export function createOutputSetup({
   }
 
   function syncSmsLength() {
-    e.smsLengthHint.textContent = lookup(
-      'common.count',
-      '{current} / {total}',
-      {
-        current: e.smsBody.value.length,
-        total: smsMaxLength,
-      },
-    );
+    systems.contentSections.phone.syncSmsLength();
   }
 
   function sync() {

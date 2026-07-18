@@ -45,3 +45,14 @@ export function createWifiSection({
   return { sync, buildPayload, buildPreview, maskPayload };
 }
 import { lookup } from '../../../../i18n/index.js';
+
+export function createWifiSectionFromDocument(document, options) {
+  return createWifiSection({
+    ssid: document.getElementById('wifi-ssid'),
+    password: document.getElementById('wifi-password'),
+    encryption: document.getElementById('wifi-encryption'),
+    hidden: document.getElementById('wifi-hidden'),
+    revealSecrets: document.getElementById('payload-reveal-secrets'),
+    ...options,
+  });
+}

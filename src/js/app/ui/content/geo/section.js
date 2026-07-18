@@ -98,3 +98,13 @@ export function createGeoSection({
   return { buildPayload, buildPreview, getCoordinates, update };
 }
 import { lookup } from '../../../../i18n/index.js';
+
+export function createGeoSectionFromDocument(document, options) {
+  return createGeoSection({
+    latitudeInput: document.getElementById('geo-latitude'),
+    longitudeInput: document.getElementById('geo-longitude'),
+    labelInput: document.getElementById('geo-query'),
+    mapElement: document.getElementById('geo-map'),
+    ...options,
+  });
+}

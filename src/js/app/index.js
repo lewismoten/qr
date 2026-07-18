@@ -78,6 +78,7 @@ const styleSetup = createLazyStyleSetup({
 });
 
 const contentSections = createContentSections({
+  document,
   elements,
   runtime: {
     render: runtime.render,
@@ -85,7 +86,7 @@ const contentSections = createContentSections({
     syncSmsLength: runtime.syncSmsLength,
     syncEmailLength: runtime.syncEmailLength,
   },
-  limits: { numberFrames: LIMITS.numberFrames },
+  limits: { numberFrames: LIMITS.numberFrames, sms: LIMITS.sms },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
 });
@@ -104,6 +105,7 @@ const setFormatVisibility = createFormatVisibility({
 });
 
 const download = createLazyDownloadSetup({
+  document,
   elements,
   taskProgress,
   bulk: {
@@ -129,6 +131,7 @@ const download = createLazyDownloadSetup({
 });
 
 const contentEncoding = createContentEncodingSetup({
+  document,
   e: elements,
   encoder: qrEncoder,
   bulk: {
@@ -183,7 +186,6 @@ const output = createOutputSetup({
     contentData,
   },
   getErrorLevel: runtimeHelpers.getErrorLevel,
-  smsMaxLength: LIMITS.sms,
 });
 
 const debugSetup = createDebugFacade({

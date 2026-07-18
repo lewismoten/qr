@@ -82,3 +82,11 @@ export function createEmailCapacity({
   };
   return { getInfo, sync };
 }
+
+export function createEmailCapacityFromDocument(document, options) {
+  return createEmailCapacity({
+    body: document.getElementById('email-body'),
+    hint: document.getElementById('email-body-length-hint'),
+    ...options,
+  });
+}

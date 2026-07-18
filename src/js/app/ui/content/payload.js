@@ -31,9 +31,7 @@ export function createContentPayload({
       case 'event':
         return builders.event();
       case 'geo':
-        return e.geoLatitude.value.trim() && e.geoLongitude.value.trim()
-          ? builders.geo()
-          : '';
+        return builders.geo();
       case 'vcard':
         return builders.vcard();
       case 'file':

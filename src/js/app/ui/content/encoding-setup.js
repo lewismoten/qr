@@ -4,6 +4,7 @@ import { createQrConfiguration } from '../encoding/configuration.js';
 import { createLoadingIndicator } from '../loading-indicator.js';
 
 export function createContentEncodingSetup({
+  document,
   e,
   encoder,
   bulk,
@@ -14,6 +15,7 @@ export function createContentEncodingSetup({
   config,
 }) {
   const pipeline = createContentPipeline({
+    document,
     elements: {
       format: e.qrFormat,
       fileIndex: e.fileChunkIndex,
@@ -26,34 +28,7 @@ export function createContentEncodingSetup({
       frameFont: e.frameFont,
       url: e.urlInput,
       text: e.textInput,
-      wifi: e.wifiSsid,
-      email: e.emailTo,
-      phone: e.phoneNumber,
-      sms: e.smsNumber,
-      smsBody: e.smsBody,
-      geoLabel: e.geoQuery,
-      latitude: e.geoLatitude,
-      longitude: e.geoLongitude,
-      vcardName: e.vcardName,
-      vcardOrg: e.vcardOrg,
-      vcardTitle: e.vcardTitle,
-      vcardPhone: e.vcardPhone,
-      vcardEmail: e.vcardEmail,
-      vcardUrl: e.vcardUrl,
-      wifiEncryption: e.wifiEncryption,
-      wifiPassword: e.wifiPassword,
-      wifiHidden: e.wifiHidden,
-      emailSubject: e.emailSubject,
-      emailBody: e.emailBody,
       includeManifest: e.fileIncludeManifest,
-      event: {
-        title: e.eventTitle,
-        allDay: e.eventAllDay,
-        startDate: e.eventStartDate,
-        startTime: e.eventStartTime,
-        endDate: e.eventEndDate,
-        endTime: e.eventEndTime,
-      },
     },
     bulk: { isMode: bulk.isMode, getRow: bulk.getRow, build: bulk.build },
     number: { getPayload: sections.number.getPayload },
@@ -121,8 +96,6 @@ export function createContentEncodingSetup({
     region: e.tabPanels[0]?.parentElement,
   });
   const emailCapacityOptions = {
-    body: e.emailBody,
-    hint: e.emailBodyLengthHint,
     encoder,
     buildOptions: qr.buildOptions,
     buildPayload: qr.buildPayload,
@@ -138,8 +111,11 @@ export function createContentEncodingSetup({
     if (!emailCapacityRequest) {
       emailCapacityRequest = loading
         .track(import('./email/capacity.js'))
-        .then(({ createEmailCapacity }) => {
-          emailCapacityController = createEmailCapacity(emailCapacityOptions);
+        .then(({ createEmailCapacityFromDocument }) => {
+          emailCapacityController = createEmailCapacityFromDocument(
+            document,
+            emailCapacityOptions,
+          );
           return emailCapacityController;
         });
     }
@@ -148,7 +124,7 @@ export function createContentEncodingSetup({
   const emailCapacity = {
     getInfo: () =>
       emailCapacityController?.getInfo() ?? {
-        current: e.emailBody.value.length,
+        current: document.getElementById('email-body')?.value.length ?? 0,
         max: 0,
       },
     sync() {
@@ -158,70 +134,62 @@ export function createContentEncodingSetup({
         .catch(console.error);
     },
   };
-  const validationOptions = {
-    elements: {
-      qrFormat: e.qrFormat,
-      urlInput: e.urlInput,
-      emailTo: e.emailTo,
-      emailSubject: e.emailSubject,
-      emailBody: e.emailBody,
-      phoneNumber: e.phoneNumber,
-      smsNumber: e.smsNumber,
-      smsBody: e.smsBody,
-      geoLatitude: e.geoLatitude,
-      geoLongitude: e.geoLongitude,
-      geoQuery: e.geoQuery,
-      vcardName: e.vcardName,
-      vcardOrg: e.vcardOrg,
-      vcardTitle: e.vcardTitle,
-      vcardPhone: e.vcardPhone,
-      vcardEmail: e.vcardEmail,
-      vcardUrl: e.vcardUrl,
-      eventTitle: e.eventTitle,
-      eventAllDay: e.eventAllDay,
-      eventStartDate: e.eventStartDate,
-      eventStartTime: e.eventStartTime,
-      eventEndDate: e.eventEndDate,
-      eventEndTime: e.eventEndTime,
-      eventLocation: e.eventLocation,
-      eventDescription: e.eventDescription,
-      eventUrl: e.eventUrl,
-    },
-    bulk: {
-      isMode: bulk.isMode,
-      getFrameIndex: runtime.getFrameIndex,
-      getValidationState: bulk.getValidationState,
-    },
-    numberSection: sections.number,
-    file: {
-      getActive: file.getActive,
-      getMode: file.getMode,
-      getCapacity: file.getCapacity,
-    },
-    getEmailCapacity: emailCapacity.getInfo,
-    limits: config.validationLimits,
+  const validatorLoaders = {
+    email: () => import('./email/validation.js'),
+    event: () => import('./event/validation.js'),
+    file: () => import('./file/validation.js'),
+    geo: () => import('./geo/validation.js'),
+    phone: () => import('./phone/validation.js'),
+    sms: () => import('./phone/validation.js'),
+    vcard: () => import('./vcard/validation.js'),
   };
-  let validator = null;
-  let validatorRequest = null;
-  const ensureValidator = () => {
-    if (validator) return Promise.resolve(validator);
-    if (!validatorRequest) {
-      validatorRequest = loading
-        .track(import('./validation.js'))
-        .then(({ createFormatValidator }) => {
-          validator = createFormatValidator(validationOptions);
-          return validator;
-        });
+  const validatorRequests = new Map();
+  const loadValidator = (format) => {
+    if (!validatorRequests.has(format)) {
+      validatorRequests.set(format, loading.track(validatorLoaders[format]()));
     }
-    return validatorRequest;
+    return validatorRequests.get(format);
   };
   const validation = async () => {
-    if (e.qrFormat.value === 'url' && !bulk.isMode()) {
+    if (bulk.isMode()) {
+      return bulk.getValidationState({
+        rowNumber: runtime.getFrameIndex() + 1,
+        limits: config.validationLimits,
+      });
+    }
+    const format = e.qrFormat.value;
+    if (format === 'url') {
       return validateUrl(e.urlInput.value);
     }
-    if (e.qrFormat.value === 'email') await ensureEmailCapacity();
-    const getValidation = await ensureValidator();
-    return getValidation();
+    if (format === 'number') {
+      await sections.ensureFormat(format);
+      return sections.number.getValidationState();
+    }
+    if (!validatorLoaders[format]) return { error: '', warning: '' };
+    if (format === 'email') await ensureEmailCapacity();
+    const validator = await loadValidator(format);
+    if (format === 'email') {
+      return validator.validateEmail(
+        document,
+        emailCapacity.getInfo(),
+        config.validationLimits,
+      );
+    }
+    if (format === 'event') {
+      return validator.validateEvent(document, config.validationLimits);
+    }
+    if (format === 'file') {
+      return validator.validateFile({
+        getActive: file.getActive,
+        getMode: file.getMode,
+        getCapacity: file.getCapacity,
+      });
+    }
+    if (format === 'geo') return validator.validateGeo(document);
+    if (format === 'phone' || format === 'sms') {
+      return validator.validatePhone(document, format, config.validationLimits);
+    }
+    return validator.validateVCard(document);
   };
   const updateTextPreview = (text) => {
     const debugState = runtime.getDebugState();

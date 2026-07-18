@@ -256,3 +256,32 @@ export function createFrameSection(options) {
   };
   return { getMessage, setCentered, getFont, sync };
 }
+
+export function createFrameSectionFromDocument(document, options) {
+  return createFrameSection({
+    ...options,
+    fileIndex: document.getElementById('file-chunk-index'),
+    values: {
+      url: document.getElementById('url-input'),
+      text: document.getElementById('text-input'),
+      wifi: document.getElementById('wifi-ssid'),
+      email: document.getElementById('email-to'),
+      phone: document.getElementById('phone-number'),
+      sms: document.getElementById('sms-number'),
+      geoLabel: document.getElementById('geo-query'),
+      latitude: document.getElementById('geo-latitude'),
+      longitude: document.getElementById('geo-longitude'),
+      vcardName: document.getElementById('vcard-name'),
+      vcardOrg: document.getElementById('vcard-org'),
+      vcardEmail: document.getElementById('vcard-email'),
+    },
+    event: {
+      title: document.getElementById('event-title'),
+      allDay: document.getElementById('event-all-day'),
+      startDate: document.getElementById('event-start-date'),
+      startTime: document.getElementById('event-start-time'),
+      endDate: document.getElementById('event-end-date'),
+      endTime: document.getElementById('event-end-time'),
+    },
+  });
+}
