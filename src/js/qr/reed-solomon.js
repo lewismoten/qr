@@ -5,6 +5,7 @@ import {
 import { getRawDataModules } from './capacity.js';
 
 const divisorCache = new Map();
+const divisorLogarithmCache = new WeakMap();
 const fieldExponents = new Uint8Array(512);
 const fieldLogarithms = new Uint8Array(256);
 
@@ -39,18 +40,31 @@ export function makeReedSolomonDivisor(degree) {
   }
   const divisor = Object.freeze(result);
   divisorCache.set(degree, divisor);
+  divisorLogarithmCache.set(
+    divisor,
+    Uint8Array.from(divisor, (value) => fieldLogarithms[value]),
+  );
   return divisor;
 }
 
 export function getReedSolomonRemainder(data, divisor) {
-  const result = Array(divisor.length).fill(0);
+  const result = new Uint8Array(divisor.length);
+  const divisorLogarithms = divisorLogarithmCache.get(divisor);
   const last = result.length - 1;
   for (const byte of data) {
     const factor = byte ^ result[0];
-    for (let index = 0; index < last; index += 1) {
-      result[index] = result[index + 1] ^ multiply(divisor[index], factor);
+    if (factor === 0) {
+      result.copyWithin(0, 1);
+      result[last] = 0;
+      continue;
     }
-    result[last] = multiply(divisor[last], factor);
+    const factorLogarithm = fieldLogarithms[factor];
+    for (let index = 0; index < last; index += 1) {
+      const product =
+        fieldExponents[divisorLogarithms[index] + factorLogarithm];
+      result[index] = result[index + 1] ^ product;
+    }
+    result[last] = fieldExponents[divisorLogarithms[last] + factorLogarithm];
   }
   return result;
 }

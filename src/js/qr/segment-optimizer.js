@@ -2,13 +2,15 @@ import { getCountBitLength } from './capacity.js';
 import { ALPHANUMERIC } from './constants.js';
 import { makeSegment } from './segment.js';
 
+const NUMERIC_MODES = ['numeric', 'alphanumeric', 'byte'];
+const ALPHANUMERIC_MODES = ['alphanumeric', 'byte'];
+const BYTE_MODES = ['byte'];
+
 function getCharacterModes(character) {
-  const modes = [];
   const codePoint = character.codePointAt(0);
-  if (codePoint >= 0x30 && codePoint <= 0x39) modes.push('numeric');
-  if (ALPHANUMERIC.includes(character)) modes.push('alphanumeric');
-  modes.push('byte');
-  return modes;
+  if (codePoint >= 0x30 && codePoint <= 0x39) return NUMERIC_MODES;
+  if (ALPHANUMERIC.includes(character)) return ALPHANUMERIC_MODES;
+  return BYTE_MODES;
 }
 
 function getModeUnitCount(mode, character) {
@@ -26,10 +28,10 @@ function getIncrementalPayloadBits(mode, previousCount, unitCount) {
   return unitCount * 8;
 }
 
-function getOptimizationKey(mode, count) {
-  if (mode === 'numeric') return `${mode}:${count % 3}`;
-  if (mode === 'alphanumeric') return `${mode}:${count % 2}`;
-  return mode;
+function getOptimizationIndex(mode, count) {
+  if (mode === 'numeric') return count % 3;
+  if (mode === 'alphanumeric') return 3 + (count % 2);
+  return 5;
 }
 
 function addCandidate(
@@ -47,8 +49,8 @@ function addCandidate(
     (previous ? previous.cost : 0) +
     (continuing ? 0 : 4 + countBits) +
     getIncrementalPayloadBits(mode, previousCount, unitCount);
-  const key = getOptimizationKey(mode, segmentCount);
-  const existing = states.get(key);
+  const index = getOptimizationIndex(mode, segmentCount);
+  const existing = states[index];
   const prefersSpecializedBoundary =
     existing &&
     cost === existing.cost &&
@@ -56,14 +58,14 @@ function addCandidate(
     !existing.startsSegment;
   if (existing && cost > existing.cost) return;
   if (existing && cost === existing.cost && !prefersSpecializedBoundary) return;
-  states.set(key, {
+  states[index] = {
     cost,
     mode,
     segmentCount,
     character,
     startsSegment: !continuing,
     previous,
-  });
+  };
 }
 
 export function optimizeSegments(text, version) {
@@ -72,7 +74,7 @@ export function optimizeSegments(text, version) {
   let states = [];
 
   for (const character of characters) {
-    const nextStates = new Map();
+    const nextStates = new Array(6);
     const availableModes = getCharacterModes(character);
     const previousStates = states.length ? states : [null];
     for (const previous of previousStates) {
@@ -105,18 +107,14 @@ export function optimizeSegments(text, version) {
           );
       }
     }
-    states = [...nextStates.values()];
+    states = [];
+    for (const state of nextStates) {
+      if (state) states.push(state);
+    }
   }
 
-  const preference = { numeric: 0, alphanumeric: 1, kanji: 2, byte: 3 };
   let current = states.reduce(
-    (best, state) =>
-      !best ||
-      state.cost < best.cost ||
-      (state.cost === best.cost &&
-        preference[state.mode] < preference[best.mode])
-        ? state
-        : best,
+    (best, state) => (!best || state.cost < best.cost ? state : best),
     null,
   );
   const encodedCharacters = [];
