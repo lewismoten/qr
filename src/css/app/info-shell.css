@@ -65,6 +65,35 @@
   overflow-y: auto;
 }
 
+.guide-only {
+  display: none;
+}
+
+.info-page-body .guide-only {
+  display: block;
+}
+
+.info-page-body [data-app-fragment].format-fields {
+  display: grid;
+}
+
+.info-page-body [data-guide-reveal][hidden] {
+  display: grid;
+}
+
+.info-page-body [data-guide-section] {
+  padding: 0.8rem;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 0.9rem;
+  background: rgba(240, 253, 250, 0.62);
+}
+
+.info-page-body .guide-control-heading {
+  margin: 0 0 0.2rem;
+  color: #0f615c;
+  font-size: 0.9rem;
+}
+
 .info-page-header {
   position: sticky;
   z-index: 2;

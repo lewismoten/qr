@@ -122,7 +122,15 @@
                 </option>
               </select>
 
-              <div id="center-art-controls" class="center-art-controls" hidden>
+              <div
+                id="center-art-controls"
+                class="center-art-controls"
+                data-guide-reveal
+                hidden
+              >
+                <h2 class="guide-only guide-control-heading">
+                  Artwork size and protection
+                </h2>
                 <label class="slider-field" for="center-art-size">
                   <span data-i18n="style.art.size">Artwork size</span>
                   <output id="center-art-size-value" for="center-art-size"
@@ -155,8 +163,11 @@
                 <div
                   id="center-logo-controls"
                   class="center-art-mode-controls"
+                  data-guide-reveal
+                  data-guide-section
                   hidden
                 >
+                  <h3 class="guide-only guide-control-heading">Logo</h3>
                   <div class="file-picker">
                     <input
                       id="center-logo-input"
@@ -193,8 +204,11 @@
                 <div
                   id="center-emoji-controls"
                   class="center-art-mode-controls"
+                  data-guide-reveal
+                  data-guide-section
                   hidden
                 >
+                  <h3 class="guide-only guide-control-heading">Emoji</h3>
                   <label for="center-emoji" data-i18n="style.art.emoji"
                     >Emoji</label
                   >
@@ -440,8 +454,11 @@
                 <div
                   id="center-pixel-controls"
                   class="center-art-mode-controls"
+                  data-guide-reveal
+                  data-guide-section
                   hidden
                 >
+                  <h3 class="guide-only guide-control-heading">Pixel art</h3>
                   <label class="slider-field" for="pixel-art-size">
                     <span data-i18n="style.art.canvasWidth">Canvas width</span>
                     <output id="pixel-art-size-value" for="pixel-art-size"
