@@ -10,6 +10,7 @@ const readInteger = (input, fallback) => {
 };
 
 export function createStyleSetup({
+  document,
   elements: e,
   render,
   colorWithTransparency,
@@ -191,6 +192,11 @@ export function createStyleSetup({
         onUpdate: render,
       });
       artworkSystem = { artwork, centerLogo, pixelEditor };
+      const frameCenter = document.getElementById('frame-message-center-art');
+      frameCenter.addEventListener('input', () => {
+        setFrameCentered(frameCenter.checked);
+        render();
+      });
       e.emojiOptions.forEach((button) =>
         button.addEventListener('click', () => {
           e.centerEmoji.value = button.dataset.emoji || '';

@@ -3,6 +3,22 @@ import { createFrameSection } from './section.js';
 
 export function createFrameSectionFromDocument(document, options) {
   const id = (name) => document.getElementById(name);
+  const deferredControl = (name, fallback) => ({
+    get checked() {
+      return id(name)?.checked ?? fallback;
+    },
+    set checked(value) {
+      const control = id(name);
+      if (control) control.checked = value;
+    },
+    get value() {
+      return id(name)?.value ?? fallback;
+    },
+    set value(value) {
+      const control = id(name);
+      if (control) control.value = value;
+    },
+  });
   const lineHeight = id('frame-line-height');
   const lineHeightValue = id('frame-line-height-value');
   const section = createFrameSection({
@@ -11,8 +27,8 @@ export function createFrameSectionFromDocument(document, options) {
     customField: id('custom-frame-message-field'),
     customMessage: id('custom-frame-message'),
     centerCheckbox: id('frame-message-center'),
-    artCenterCheckbox: id('frame-message-center-art'),
-    artMode: id('center-art-mode'),
+    artCenterCheckbox: deferredControl('frame-message-center-art', false),
+    artMode: deferredControl('center-art-mode', 'none'),
     font: id('frame-font'),
     lineHeight,
     color: id('frame-message-color'),
@@ -41,13 +57,8 @@ export function createFrameSectionFromDocument(document, options) {
     },
   });
   const center = id('frame-message-center');
-  const artCenter = id('frame-message-center-art');
   center.addEventListener('input', () => {
     section.setCentered(center.checked);
-    options.render();
-  });
-  artCenter.addEventListener('input', () => {
-    section.setCentered(artCenter.checked);
     options.render();
   });
   lineHeightValue.textContent = lookup('units.pixels', '{value} px', {
