@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { profileQrFunctions } from '../benchmarks/cpu-profile.mjs';
 import { initializeKanji, qrScenarios } from '../benchmarks/qr-scenarios.mjs';
+import { printBenchmarkReport } from '../benchmarks/report.mjs';
 
 const argumentsList = process.argv.slice(2);
 
@@ -22,12 +24,13 @@ function getPositiveNumber(name, fallback) {
 }
 
 const quick = argumentsList.includes('--quick');
+const profileEnabled = !argumentsList.includes('--no-profile');
 const savePath = getOption('save');
 const baselinePath = getOption('baseline');
 const sampleCount = Math.floor(getPositiveNumber('samples', quick ? 3 : 9));
 const iterationScale = getPositiveNumber('scale', quick ? 0.25 : 1);
 const threshold = getPositiveNumber('threshold', 20);
-const knownOptions = new Set(['--quick']);
+const knownOptions = new Set(['--quick', '--no-profile']);
 const knownPrefixes = [
   '--save=',
   '--baseline=',
@@ -81,7 +84,10 @@ function measureMemory(scenario, iterations) {
     const peak = process.memoryUsage().heapUsed;
     collectGarbage();
     const after = process.memoryUsage().heapUsed;
-    peakHeapBytes = Math.max(peakHeapBytes, peak - before);
+    peakHeapBytes = Math.max(
+      peakHeapBytes,
+      Math.max(0, peak - before) / iterations,
+    );
     retainedSamples.push(after - before);
   }
   return {
@@ -102,27 +108,6 @@ function measureScenario(scenario) {
     ...measureTime(scenario, iterations),
     ...measureMemory(scenario, iterations),
   };
-}
-
-function formatBytes(value) {
-  const absolute = Math.abs(value);
-  if (absolute < 1024) return `${value} B`;
-  if (absolute < 1024 ** 2) return `${round(value / 1024, 1)} KiB`;
-  return `${round(value / 1024 ** 2, 1)} MiB`;
-}
-
-function printResults(results) {
-  console.table(
-    results.map((result) => ({
-      scenario: result.name,
-      iterations: result.iterations,
-      'median ms': result.medianMs,
-      'p95 ms': result.p95Ms,
-      'ops/sec': result.operationsPerSecond,
-      'peak heap': formatBytes(result.peakHeapBytes),
-      retained: formatBytes(result.retainedHeapBytes),
-    })),
-  );
 }
 
 async function saveReport(path, report) {
@@ -165,6 +150,9 @@ const kanjiStartedAt = performance.now();
 initializeKanji();
 const kanjiInitializationMs = round(performance.now() - kanjiStartedAt);
 const scenarios = qrScenarios.map(measureScenario);
+const hotspots = profileEnabled
+  ? await profileQrFunctions(qrScenarios, quick ? 150 : 400)
+  : [];
 const report = {
   generatedAt: new Date().toISOString(),
   runtime: {
@@ -173,13 +161,18 @@ const report = {
     architecture: process.arch,
     garbageCollectionExposed: typeof globalThis.gc === 'function',
   },
-  configuration: { sampleCount, iterationScale, threshold },
+  configuration: {
+    sampleCount,
+    iterationScale,
+    threshold,
+    profileEnabled,
+  },
   kanjiInitializationMs,
   scenarios,
+  hotspots,
 };
 
-console.log(`Kanji first-use initialization: ${kanjiInitializationMs} ms`);
-printResults(scenarios);
+printBenchmarkReport(report);
 if (!globalThis.gc) {
   console.warn('Run Node with --expose-gc for stable retained-memory results.');
 }

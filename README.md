@@ -86,9 +86,12 @@ npm run benchmark
 npm run benchmark:quick
 ```
 
-The report covers representative QR versions, fixed and automatic masks, mixed
-segmentation, and Kanji. It reports median and 95th-percentile generation time,
-throughput, peak heap growth, retained heap, and one-time Kanji initialization.
+The narrow report ranks scenarios from slowest to fastest and highlights sampled
+QR functions with the highest self-time. It covers representative QR versions,
+fixed and automatic masks, mixed segmentation, and Kanji. Metrics include median
+and 95th-percentile generation time, throughput, estimated peak heap per
+operation, retained heap, and one-time Kanji initialization. Pass `--no-profile`
+to skip function-level CPU sampling.
 
 Save a machine-specific baseline and compare later runs against it:
 

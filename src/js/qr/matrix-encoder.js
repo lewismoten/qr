@@ -8,6 +8,7 @@ import {
 } from './reed-solomon.js';
 import { toShiftJis } from './kanji.js';
 import { isMaskActive } from './mask.js';
+import { getPenalty } from './penalty.js';
 import {
   makeDataCodewords,
   optimizeSegments,
@@ -172,55 +173,6 @@ class MatrixBuilder {
     }
   }
 
-  getPenalty() {
-    let result = 0;
-    let darkCount = 0;
-
-    const scoreLine = (getModule) => {
-      let run = 1;
-      let pattern = getModule(0) ? 1 : 0;
-      for (let index = 1; index <= this.size; index += 1) {
-        if (index < this.size && getModule(index) === getModule(index - 1)) {
-          run += 1;
-        } else {
-          if (run >= 5) result += run - 2;
-          run = 1;
-        }
-
-        if (index < this.size) {
-          pattern = ((pattern << 1) | (getModule(index) ? 1 : 0)) & 0x7ff;
-          if (index >= 10 && (pattern === 0x05d || pattern === 0x5d0))
-            result += 40;
-        }
-      }
-    };
-
-    for (let row = 0; row < this.size; row += 1) {
-      scoreLine((column) => this.modules[row][column]);
-      for (let column = 0; column < this.size; column += 1) {
-        if (this.modules[row][column]) darkCount += 1;
-      }
-    }
-    for (let column = 0; column < this.size; column += 1) {
-      scoreLine((row) => this.modules[row][column]);
-    }
-
-    for (let row = 0; row < this.size - 1; row += 1) {
-      for (let column = 0; column < this.size - 1; column += 1) {
-        const color = this.modules[row][column];
-        if (
-          color === this.modules[row][column + 1] &&
-          color === this.modules[row + 1][column] &&
-          color === this.modules[row + 1][column + 1]
-        )
-          result += 3;
-      }
-    }
-    const darkPercentage = (darkCount * 100) / (this.size * this.size);
-    result += Math.floor(Math.abs(darkPercentage - 50) / 5) * 10;
-    return result;
-  }
-
   finish(requestedMask) {
     let mask = requestedMask;
     if (mask === undefined) {
@@ -228,7 +180,7 @@ class MatrixBuilder {
       for (let candidate = 0; candidate < 8; candidate += 1) {
         this.applyMask(candidate);
         this.drawFormatBits(candidate);
-        const penalty = this.getPenalty();
+        const penalty = getPenalty(this.modules);
         if (penalty < minimumPenalty) {
           mask = candidate;
           minimumPenalty = penalty;
