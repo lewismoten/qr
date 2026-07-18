@@ -1,5 +1,3 @@
-import { parseBoolean } from '../../csv.js';
-import { createFrameSection } from './frame/section.js';
 import { createContentPayload, createFilePayloadPreview } from './payload.js';
 
 export function createContentPipeline({
@@ -16,11 +14,10 @@ export function createContentPipeline({
       frameIndex: runtime.getFrameIndex(),
       alphanumericCharacters,
     });
-  const frame = createFrameSection({
+  const frameOptions = {
     format: e.format,
     isBulkMode: bulk.isMode,
     getBulkRow: bulk.getRow,
-    parseBoolean,
     getNumberPayload: number.getPayload,
     getActiveFile: file.getActive,
     getFileMode: file.getMode,
@@ -52,7 +49,48 @@ export function createContentPipeline({
       runtime.syncChoices();
       runtime.syncArtwork();
     },
-  });
+  };
+  let frameController = null;
+  let frameRequest = null;
+  const ensureFrame = () => {
+    if (frameController) return Promise.resolve(frameController);
+    if (!frameRequest) {
+      frameRequest = import('./frame/section.js')
+        .then(({ createFrameSection }) => {
+          frameController = createFrameSection(frameOptions);
+          return frameController;
+        })
+        .catch((error) => {
+          frameRequest = null;
+          throw error;
+        });
+    }
+    return frameRequest;
+  };
+  const frame = {
+    getMessage() {
+      if (e.frameMode.value === 'none') return '';
+      if (frameController) return frameController.getMessage();
+      ensureFrame().then(runtime.render).catch(console.error);
+      return '';
+    },
+    setCentered(enabled) {
+      e.frameCenter.checked = enabled;
+      e.frameCenterArt.checked = enabled;
+      if (enabled && e.artMode.value !== 'none') {
+        frameOptions.onDisableArtwork();
+      }
+    },
+    getFont: (size) =>
+      frameController?.getFont(size) ??
+      `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`,
+    sync() {
+      e.customFrameField.hidden = e.frameMode.value !== 'custom';
+      if (e.frameMode.value === 'auto') {
+        ensureFrame().then(runtime.render).catch(console.error);
+      }
+    },
+  };
   const payload = createContentPayload({
     elements: {
       qrFormat: e.format,

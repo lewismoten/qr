@@ -10,7 +10,7 @@ function moduleIsDark(qrDefinition, row, column) {
 
 export function createLazyDebugSetup(options) {
   const requests = new Map();
-  const colorElements = {};
+  const colorElements = options.colorElements ?? {};
   let diagnostics = null;
   let masks = null;
   let overlay = null;

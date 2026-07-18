@@ -1,7 +1,7 @@
-import { createEmailCapacity } from './email/capacity.js';
 import { createContentPipeline } from './pipeline.js';
-import { createFormatValidator } from './validation.js';
+import { validateUrl } from './url-validation.js';
 import { createQrConfiguration } from '../encoding/configuration.js';
+import { createLoadingIndicator } from '../loading-indicator.js';
 
 export function createContentEncodingSetup({
   e,
@@ -117,7 +117,10 @@ export function createContentEncodingSetup({
     },
     alphanumericCharacters: config.alphanumericCharacters,
   });
-  const emailCapacity = createEmailCapacity({
+  const loading = createLoadingIndicator({
+    region: e.tabPanels[0]?.parentElement,
+  });
+  const emailCapacityOptions = {
     body: e.emailBody,
     hint: e.emailBodyLengthHint,
     encoder,
@@ -125,8 +128,37 @@ export function createContentEncodingSetup({
     buildPayload: qr.buildPayload,
     buildEmail: sections.shared.buildEmailPayloadWithBody,
     isActive: () => e.qrFormat.value === 'email',
-  });
-  const validation = createFormatValidator({
+  };
+  let emailCapacityController = null;
+  let emailCapacityRequest = null;
+  const ensureEmailCapacity = () => {
+    if (emailCapacityController) {
+      return Promise.resolve(emailCapacityController);
+    }
+    if (!emailCapacityRequest) {
+      emailCapacityRequest = loading
+        .track(import('./email/capacity.js'))
+        .then(({ createEmailCapacity }) => {
+          emailCapacityController = createEmailCapacity(emailCapacityOptions);
+          return emailCapacityController;
+        });
+    }
+    return emailCapacityRequest;
+  };
+  const emailCapacity = {
+    getInfo: () =>
+      emailCapacityController?.getInfo() ?? {
+        current: e.emailBody.value.length,
+        max: 0,
+      },
+    sync() {
+      if (e.qrFormat.value !== 'email') return;
+      ensureEmailCapacity()
+        .then((controller) => controller.sync())
+        .catch(console.error);
+    },
+  };
+  const validationOptions = {
     elements: {
       qrFormat: e.qrFormat,
       urlInput: e.urlInput,
@@ -168,7 +200,29 @@ export function createContentEncodingSetup({
     },
     getEmailCapacity: emailCapacity.getInfo,
     limits: config.validationLimits,
-  });
+  };
+  let validator = null;
+  let validatorRequest = null;
+  const ensureValidator = () => {
+    if (validator) return Promise.resolve(validator);
+    if (!validatorRequest) {
+      validatorRequest = loading
+        .track(import('./validation.js'))
+        .then(({ createFormatValidator }) => {
+          validator = createFormatValidator(validationOptions);
+          return validator;
+        });
+    }
+    return validatorRequest;
+  };
+  const validation = async () => {
+    if (e.qrFormat.value === 'url' && !bulk.isMode()) {
+      return validateUrl(e.urlInput.value);
+    }
+    if (e.qrFormat.value === 'email') await ensureEmailCapacity();
+    const getValidation = await ensureValidator();
+    return getValidation();
+  };
   const updateTextPreview = (text) => {
     const debugState = runtime.getDebugState();
     if (debugState.tab !== 'debug' || debugState.subtab !== 'payload') return;

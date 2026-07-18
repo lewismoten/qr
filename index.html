@@ -434,14 +434,14 @@
                   <fieldset class="option-group">
                     <legend data-i18n="frame.message">Frame message</legend>
                     <div class="choice-grid frame-message-mode-grid" role="group" aria-label="Frame message mode" data-i18n-aria-label="frame.mode">
-                      <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="true" data-i18n="common.auto">Auto</button>
+                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="auto" aria-pressed="false" data-i18n="common.auto">Auto</button>
                       <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="custom" aria-pressed="false" data-i18n="style.values.custom">Custom</button>
-                      <button type="button" class="choice-button" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="false" data-i18n="common.none">None</button>
+                      <button type="button" class="choice-button is-active" data-choice-target="frame-message-mode" data-choice-value="none" aria-pressed="true" data-i18n="common.none">None</button>
                     </div>
                     <select id="frame-message-mode" name="frame-message-mode" class="sr-only" aria-label="Frame message mode" data-i18n-aria-label="frame.mode">
-                      <option value="auto" selected data-i18n="frame.automaticShort">Automatic short value</option>
+                      <option value="auto" data-i18n="frame.automaticShort">Automatic short value</option>
                       <option value="custom" data-i18n="frame.customMessage">Custom message</option>
-                      <option value="none" data-i18n="frame.noMessage">No message</option>
+                      <option value="none" selected data-i18n="frame.noMessage">No message</option>
                     </select>
                     <div id="custom-frame-message-field" class="custom-frame-message-field" hidden>
                       <label for="custom-frame-message" data-i18n="frame.customMessage">Custom message</label>

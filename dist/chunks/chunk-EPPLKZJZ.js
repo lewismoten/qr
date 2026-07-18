@@ -1,0 +1,4 @@
+import{a,c as h}from"./chunk-ENMH3JE5.js";import{a as f}from"./chunk-FKLVHI3P.js";function w(n,{allowBlank:u=!0}={}){let o=String(n??"").trim().toLowerCase();return!o&&u?!1:["true","1","yes","y"].includes(o)?!0:["false","0","no","n"].includes(o)?!1:null}async function v(n,{signal:u,onProgress:o,yieldEvery:c=32768}={}){let t=[],s=[],r="",i=!1;for(let e=0;e<n.length;e+=1){let l=n[e];i?l==='"'&&n[e+1]==='"'?(r+='"',e+=1):l==='"'?i=!1:r+=l:l==='"'&&r===""?i=!0:l===","?(s.push(r),r=""):l===`
+`||l==="\r"?(l==="\r"&&n[e+1]===`
+`&&(e+=1),s.push(r),t.push(s),s=[],r=""):r+=l,e>0&&e%c===0&&(o?.(e,n.length),await h(0,u))}if(a(u),o?.(n.length,n.length),i)throw new Error(f("bulk.csv.unclosedQuote","The CSV contains an unclosed quoted value."));for((r||s.length)&&(s.push(r),t.push(s));t.length&&t.at(-1).every(e=>!e.trim());)t.pop();return t}export{w as a,v as b};
+//# sourceMappingURL=chunk-EPPLKZJZ.js.map

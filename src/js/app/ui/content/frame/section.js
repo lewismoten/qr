@@ -1,4 +1,5 @@
 import { getActiveLocale, lookup } from '../../../../i18n/index.js';
+import { parseBoolean } from '../../../csv.js';
 
 function shorten(value, maximumLength = 64) {
   const normalized = String(value || '')
@@ -122,7 +123,7 @@ export function createFrameSection(options) {
           row.start_date === row.end_date
             ? row.start_date
             : `${row.start_date} - ${row.end_date}`;
-        const times = options.parseBoolean(row.all_day)
+        const times = parseBoolean(row.all_day)
           ? lookup('frame.allDay', 'All day')
           : `${row.start_time} - ${row.end_time}`;
         return joinMessageLines(

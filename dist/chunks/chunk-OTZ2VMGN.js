@@ -1,0 +1,2 @@
+var e=null,o=null,u=r=>{e=r},w=r=>{o=r};function d(r,t,a,n,l){if(e){e.drawQrModule(r,t,a,n,l);return}r.fillRect(t,a,Math.ceil(n),Math.ceil(n))}function c(...r){e?.drawFinderEyes(...r)}function p(...r){return e?.createQrImageLayer(...r)??null}function f(r,t,a,n,l,i){return e?.createQrModuleFill(r,t,a,n,l,i)??t}function g(...r){o?.drawCenterArtwork(...r)}export{u as a,w as b,d as c,c as d,p as e,f,g};
+//# sourceMappingURL=chunk-OTZ2VMGN.js.map

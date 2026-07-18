@@ -13,7 +13,7 @@ import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createContentDataSetup } from './ui/content/data-setup.js';
 import { createContentSections } from './ui/content/setup.js';
-import { createLazyDebugSetup } from './ui/debug/lazy-setup.js';
+import { createDebugFacade } from './ui/debug/facade.js';
 import { createLazyDownloadSetup } from './ui/runtime/lazy-download.js';
 import { getApplicationElements } from './ui/elements.js';
 import { createApplicationNavigation } from './ui/navigation/application-setup.js';
@@ -23,7 +23,7 @@ import { createRuntimeHelpers } from './ui/runtime/helpers.js';
 import { startApplication } from './ui/runtime/startup.js';
 import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
 import { createPreviewSetup } from './ui/preview/setup.js';
-import { createStyleSetup } from './ui/style/setup.js';
+import { createLazyStyleSetup } from './ui/style/lazy-setup.js';
 import { createTaskProgress } from './ui/download/progress.js';
 import qrEncoder from '../qr/matrix-encoder.js';
 
@@ -71,7 +71,7 @@ const contentData = createContentDataSetup({
   },
 });
 
-const styleSetup = createStyleSetup({
+const styleSetup = createLazyStyleSetup({
   elements,
   render: runtime.render,
   colorWithTransparency,
@@ -186,7 +186,7 @@ const output = createOutputSetup({
   smsMaxLength: LIMITS.sms,
 });
 
-const debugSetup = createLazyDebugSetup({
+const debugSetup = createDebugFacade({
   elements,
   encoder: qrEncoder,
   config: {

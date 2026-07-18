@@ -1,6 +1,5 @@
 import { initializeDialogs } from '../dialogs.js';
 import { bindApplicationEvents } from '../events.js';
-import { initializeHelpPopovers } from '../help-popovers.js';
 
 export function startApplication({
   document,
@@ -50,7 +49,6 @@ export function startApplication({
     defaultChunkVersion,
   });
   const dialogs = initializeDialogs({ document, window });
-  initializeHelpPopovers({ document, window });
 
   systems.contentSections.event.initialize();
   elements.urlInput.value = runtime.getDefaultUrl();
