@@ -101,7 +101,7 @@ test('Spanish inline prose remains grammatical after HTML assembly', async () =>
   );
   assert.match(
     specification,
-    /<code>0x11<\/code>\s+para completar la capacidad\s+de datos/,
+    /<code>0x11<\/code>\s+para completar la\s+capacidad\s+de datos/,
   );
 });
 
@@ -197,6 +197,15 @@ test('Spanish specification uses fluent technical language', async () => {
     'Micro QR rectangular',
     'cantidad de bloques',
     'el modo Byte',
+    'Cómo se ensambla',
+    'versiones inferiores',
+    'El optimizador conserva un cambio',
+    'debe solicitarse expresamente',
+    'copia cercana de la información',
+    'ritmo de la cuadrícula',
+    'Desentrelazar',
+    'bits cero de terminación',
+    'Proceso conceptual de un lector',
   ];
 
   literalPhrases.forEach((phrase) =>
@@ -210,4 +219,9 @@ test('Spanish specification uses fluent technical language', async () => {
   assert.match(copy, /concatenación estructurada/i);
   assert.match(copy, /QR rectangular \(rMQR\)/);
   assert.match(copy, /no sustituye a la norma ISO\/IEC 18004/i);
+  assert.match(copy, /Cómo se construye y se lee un código QR/i);
+  assert.match(copy, /versiones 1 a 6/i);
+  assert.match(copy, /solo cambia de modo cuando la reducción/i);
+  assert.match(copy, /Desintercalar y corregir/i);
+  assert.match(copy, /se intercalan antes de colocarse/i);
 });

@@ -68,7 +68,7 @@
       <section class="hero" aria-labelledby="guide-title">
         <div class="hero-copy">
           <p class="eyebrow">El interior de la matriz</p>
-          <h1 id="guide-title">Cómo se ensambla y lee un código QR</h1>
+          <h1 id="guide-title">Cómo se construye y se lee un código QR</h1>
           <p class="hero-lead">
             Un código QR no es un cuadrado de píxeles arbitrarios. Los patrones
             fijos orientan al lector; los metadatos indican cómo descodificarlo;
@@ -117,12 +117,12 @@
         <div class="section-intro">
           <p class="section-number">01 / Anatomía</p>
           <h2>
-            Los patrones de referencia indican al lector dónde está la
+            Los patrones de referencia permiten al lector localizar la
             cuadrícula
           </h2>
           <p>
-            Los patrones funcionales se reservan antes de colocar el flujo
-            codificado. No contienen datos y el recorrido del flujo los rodea.
+            Los patrones funcionales se reservan antes de distribuir el flujo
+            codificado. No contienen datos; la ruta de lectura los omite.
           </p>
         </div>
 
@@ -138,9 +138,9 @@
               aria-label="Detalle de un patrón de posición rojo y su separador"
             ></canvas>
             <p>
-              Tres patrones de 7 por 7 identifican el símbolo y su rotación. Un
-              separador claro de un módulo aísla cada patrón de los módulos
-              cercanos.
+              Tres patrones de 7 por 7 permiten localizar el símbolo y
+              determinar su orientación. Un separador claro de un módulo aísla
+              cada patrón de los módulos cercanos.
             </p>
           </article>
           <article class="visual-card">
@@ -188,8 +188,8 @@
             ></canvas>
             <p>
               Un módulo oscuro fijo se encuentra en la fila <code>4V + 9</code>,
-              columna 8. Este módulo siempre está oscuro y no forma parte de la
-              copia cercana de la información de formato.
+              columna 8. Este módulo siempre está oscuro y es independiente de
+              la copia adyacente de la información de formato.
             </p>
           </article>
         </div>
@@ -242,8 +242,8 @@
             ></canvas>
             <p>
               Las versiones 7 a 40 almacenan un valor de versión protegido de 18
-              bits en dos áreas de 3 por 6 módulos. En las versiones inferiores,
-              el tamaño se deduce directamente de las dimensiones de la matriz.
+              bits en dos áreas de 3 por 6 módulos. En las versiones 1 a 6, el
+              tamaño se deduce directamente de las dimensiones de la matriz.
             </p>
           </article>
         </div>
@@ -256,10 +256,10 @@
             Los encabezados y los datos son campos de bits, no siempre bytes
           </h2>
           <p>
-            La segmentación automática puede cambiar de modo cuando el ahorro de
-            datos compensa el coste de otro encabezado de modo y recuento. Cada
-            segmento comienza con sus propios campos de modo y recuento de
-            caracteres.
+            La segmentación automática puede cambiar de modo cuando la reducción
+            de los datos compensa los bits adicionales de un nuevo encabezado de
+            modo y recuento. Cada segmento comienza con sus propios campos de
+            modo y recuento de caracteres.
           </p>
         </div>
 
@@ -463,11 +463,11 @@
                 ></div>
               </div>
               <p>
-                Cada bloque de color es un segmento independiente con su propio
-                indicador de modo de 4 bits y campo de recuento. El optimizador
-                conserva un cambio de modo solo cuando el ahorro de datos
-                compensa el coste del encabezado. La detección automática no
-                selecciona Kanji; debe solicitarse expresamente.
+                Cada bloque de color representa un segmento independiente, con
+                su propio indicador de modo de 4 bits y su campo de recuento. El
+                optimizador solo cambia de modo cuando la reducción de los datos
+                compensa el coste del nuevo encabezado. La detección automática
+                no selecciona el modo Kanji; debe elegirse manualmente.
               </p>
             </div>
           </article>
@@ -483,11 +483,11 @@
               aria-label="Detalle de los bits verdes del terminador y de los módulos grises de alineación y relleno de bytes"
             ></canvas>
             <p>
-              Tras el último segmento se añaden hasta cuatro bits cero de
-              terminación. Después se agregan más ceros hasta completar un byte;
-              a continuación se alternan las palabras de código
-              <code>0xEC</code> y <code>0x11</code> para completar la capacidad
-              de datos.
+              Tras el último segmento se añaden hasta cuatro bits cero como
+              terminador. Después se añaden los ceros necesarios para completar
+              el byte; a continuación se alternan las palabras de código de
+              relleno <code>0xEC</code> y <code>0x11</code> para completar la
+              capacidad de datos.
             </p>
           </article>
           <article class="visual-card">
@@ -517,10 +517,10 @@
             Las palabras de código se protegen, intercalan, colocan y enmascaran
           </h2>
           <p>
-            La corrección de errores no ocupa una esquina rectangular
-            independiente. Después de intercalar los bloques, las palabras de
-            código de datos y de corrección de errores siguen la misma ruta de
-            colocación en zigzag de dos columnas.
+            Los datos de corrección de errores no se concentran en una esquina
+            rectangular. Después de intercalar los bloques, sus palabras de
+            código siguen la misma ruta de colocación en zigzag de dos columnas
+            que las palabras de código de datos.
           </p>
         </div>
         <div class="visual-grid">
@@ -539,10 +539,11 @@
             ></canvas>
             <p>
               La versión y el nivel de corrección de errores seleccionados
-              definen uno o varios bloques Reed–Solomon sobre GF(256). Antes de
-              colocarlas, las palabras de código de datos y de corrección de
-              errores se intercalan entre los bloques, lo que distribuye los
-              daños localizados entre símbolos recuperables.
+              definen uno o varios bloques Reed–Solomon sobre GF(256). Las
+              palabras de código de datos y de corrección de errores se
+              intercalan antes de colocarse. Así, los daños concentrados afectan
+              a símbolos de distintos bloques y resultan más fáciles de
+              corregir.
             </p>
             <div
               class="level-row"
@@ -582,10 +583,10 @@
               iguales
             </h3>
             <p>
-              Para cada módulo no funcional situado en la fila <code>r</code> y
-              la columna <code>c</code>, cuando la fórmula se cumple se invierte
-              el bit almacenado. El azul indica dónde se activa cada fórmula.
-              Los patrones de posición, alineación y temporización permanecen
+              Para cada módulo de datos situado en la fila <code>r</code> y la
+              columna <code>c</code>, cuando la fórmula se cumple se invierte el
+              bit almacenado. El azul indica dónde se activa cada fórmula. Los
+              patrones de posición, alineación y temporización permanecen
               oscuros como referencia porque la máscara nunca los modifica.
             </p>
           </div>
@@ -676,7 +677,7 @@
             </figure>
           </div>
           <div class="mask-penalties">
-            <strong>Cómo elige el modo automático</strong>
+            <strong>Cómo selecciona la máscara el modo automático</strong>
             <span>1. Penalizar las secuencias largas del mismo color.</span>
             <span>2. Penalizar los bloques sólidos de 2 por 2.</span>
             <span
@@ -703,7 +704,7 @@
               <strong>Localizar y muestrear</strong>
               <p>
                 Utilice los patrones de posición, separación, temporización y
-                alineación para determinar la cuadrícula de módulos.
+                alineación para reconstruir la cuadrícula de módulos.
               </p>
             </div>
           </li>
@@ -732,7 +733,7 @@
           <li>
             <span>4</span>
             <div>
-              <strong>Desentrelazar y corregir</strong>
+              <strong>Desintercalar y corregir</strong>
               <p>
                 Reconstruya los bloques Reed–Solomon, detecte los errores y
                 recupere las palabras de código cuando la redundancia lo
@@ -796,7 +797,8 @@
             ><span
               ><code>segment-optimizer.js</code> encuentra una secuencia
               eficiente de segmentos numéricos, alfanuméricos y de bytes,
-              incluidos los encabezados de modo y recuento que se repiten.</span
+              teniendo en cuenta los encabezados de modo y recuento de cada
+              segmento.</span
             ></a
           >
           <a
@@ -812,10 +814,10 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"
             ><strong>Capacidad y geometría de los bits restantes</strong
             ><span
-              ><code>capacity.js</code> calcula los módulos de datos sin
-              procesar, el ancho del recuento de caracteres y las palabras de
-              código de datos disponibles a partir de la versión, el nivel de
-              corrección de errores y la estructura de bloques.</span
+              ><code>capacity.js</code> calcula el número de módulos disponibles
+              para datos, los anchos de los campos de recuento y las palabras de
+              código utilizables a partir de la versión, el nivel de corrección
+              de errores y la estructura de bloques.</span
             ></a
           >
           <a
@@ -824,7 +826,7 @@
             ><span
               ><code>reed-solomon.js</code> contiene la multiplicación en
               GF(256), la construcción del polinomio generador, el cálculo del
-              resto, la división en bloques cortos y largos y el entrelazado de
+              resto, la división en bloques cortos y largos y el intercalado de
               las palabras de código de datos y de corrección de errores.</span
             ></a
           >
@@ -841,8 +843,8 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"
             ><strong>Ocho fórmulas de máscara</strong
             ><span
-              ><code>mask.js</code> define la condición exacta de fila y columna
-              que utiliza cada máscara candidata.</span
+              ><code>mask.js</code> define la condición exacta basada en la fila
+              y la columna que utiliza cada máscara candidata.</span
             ></a
           >
           <a
@@ -859,9 +861,10 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"
             ><strong>Conversión de Shift JIS Kanji</strong
             ><span
-              ><code>kanji.js</code> crea el mapa Shift JIS compatible con el
-              navegador, valida los dos intervalos Kanji admitidos por QR y
-              transforma los caracteres en valores de 13 bits.</span
+              ><code>kanji.js</code> crea en el navegador la tabla de
+              correspondencias Shift JIS, valida los dos intervalos Kanji
+              admitidos por los códigos QR y transforma los caracteres en
+              valores de 13 bits.</span
             ></a
           >
           <a
@@ -877,9 +880,9 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"
             ><strong>Pruebas de paridad con la referencia</strong
             ><span
-              ><code>tests/helpers/qr-parity.js</code> compara cada intervalo de
-              paridad con un paquete de referencia opcional de
-              node-qrcode.</span
+              ><code>tests/helpers/qr-parity.js</code> compara las matrices de
+              cada intervalo de versiones con un paquete de referencia opcional
+              de node-qrcode.</span
             ></a
           >
         </div>
