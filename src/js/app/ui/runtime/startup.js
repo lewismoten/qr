@@ -26,7 +26,6 @@ export function startApplication({
     resetFileCache: file.settings.resetCache,
     clearFile: systems.contentData.clearLoadedFile,
     syncChoices: systems.navigation.syncChoices,
-    syncWifi: systems.contentSections.wifi.sync,
     isBulkMode: systems.contentData.isBulkMode,
     setFrameCentered: systems.contentEncoding.pipeline.frame.setCentered,
     syncGradient: systems.style.colors.sync,
@@ -55,7 +54,6 @@ export function startApplication({
   systems.output.sync();
   systems.syncFormat();
   systems.navigation.syncChoices();
-  systems.contentSections.wifi.sync();
   systems.contentSections.phone.initialize();
   systems.contentData.syncFileCapacityHint();
   file.settings.syncVersion();

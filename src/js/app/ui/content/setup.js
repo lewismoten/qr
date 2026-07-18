@@ -76,12 +76,7 @@ export function createContentSections({
     region,
     load: () => import('./wifi/section.js'),
     create: ({ createWifiSectionFromDocument }) => {
-      const section = createWifiSectionFromDocument(document, {
-        onChange() {
-          runtime.syncChoices();
-          runtime.render();
-        },
-      });
+      const section = createWifiSectionFromDocument(document);
       section.sync();
       return section;
     },
@@ -204,14 +199,6 @@ export function createContentSections({
       registry.get('number')?.validate?.() ?? { error: '', warning: '' },
     sync: () => numberLoader.get()?.sync(),
   };
-  const wifi = {
-    sync: () => {
-      if (e.qrFormat.value === 'wifi') void wifiLoader.run('sync');
-    },
-    buildPayload: () =>
-      registry.ensure('wifi').then((plugin) => plugin.build()),
-    buildPreview: () => registry.get('wifi')?.preview() ?? loadingPreview(),
-  };
   const shared = {
     initialize() {},
     buildEmailPayload: () =>
@@ -244,7 +231,6 @@ export function createContentSections({
     phone,
     shared,
     vcard,
-    wifi,
     plugins: registry,
     ensureFormat,
   };

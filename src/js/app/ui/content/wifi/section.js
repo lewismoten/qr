@@ -6,7 +6,6 @@ export function createWifiSection({
   encryption,
   hidden,
   revealSecrets,
-  onChange,
 }) {
   const sync = () => {
     const open = encryption.value === 'nopass';
@@ -42,7 +41,6 @@ export function createWifiSection({
 
   encryption.addEventListener('change', () => {
     sync();
-    onChange();
   });
 
   return { sync, buildPayload, buildPreview, maskPayload };

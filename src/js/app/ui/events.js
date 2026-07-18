@@ -18,7 +18,6 @@ export function bindApplicationEvents({
   e.qrFormat.addEventListener('change', () => {
     a.syncFormat();
     a.syncChoices();
-    a.syncWifi();
     a.activateContent('data');
     a.render();
   });
@@ -28,12 +27,9 @@ export function bindApplicationEvents({
       const value = button.dataset.choiceValue;
       if (!target || target.value === value) return;
       target.value = value;
+      target.dispatchEvent(new Event('change', { bubbles: true }));
+      if (target === e.qrFormat) return;
       a.syncChoices();
-      if (target.id === 'wifi-encryption') a.syncWifi();
-      if (target === e.qrFormat) {
-        a.syncFormat();
-        a.activateContent('data');
-      }
       a.render();
     }),
   );
