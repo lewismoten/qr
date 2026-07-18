@@ -147,10 +147,15 @@ describe('application fragments', () => {
     });
     const definitions = [
       ['content/frame', 'tab=content&amp;subtab=frame'],
+      ['content/text', 'tab=content&amp;subtab=data'],
       ['content/number', 'tab=content&amp;subtab=data'],
       ['content/wifi', 'tab=content&amp;subtab=data'],
+      ['content/email', 'tab=content&amp;subtab=data'],
+      ['content/phone', 'tab=content&amp;subtab=data'],
+      ['content/sms', 'tab=content&amp;subtab=data'],
       ['content/geo', 'tab=content&amp;subtab=data'],
       ['content/event', 'tab=content&amp;subtab=data'],
+      ['content/vcard', 'tab=content&amp;subtab=data'],
       ['content/file', 'tab=content&amp;subtab=data'],
       ['content/bulk-import', 'tab=content&amp;subtab=data'],
       ['style/modules', 'tab=style&amp;subtab=modules'],
@@ -159,6 +164,7 @@ describe('application fragments', () => {
       ['download/image', 'tab=download&amp;subtab=image'],
       ['download/document', 'tab=download&amp;subtab=document'],
       ['download/animation', 'tab=download&amp;subtab=animation'],
+      ['debug/mask', 'tab=debug&amp;subtab=mask'],
     ];
     for (const [path, hash] of definitions) {
       const relative = 'guides/' + path + '.html';
@@ -189,15 +195,20 @@ describe('application fragments', () => {
     assert.doesNotMatch(index, /id="color-dark"/);
     assert.doesNotMatch(index, /id="center-art-mode"/);
     assert.doesNotMatch(index, /id="frame-message-mode"/);
+    assert.doesNotMatch(index, /id="text-input"/);
     assert.doesNotMatch(index, /id="number-start"/);
     assert.doesNotMatch(index, /id="wifi-ssid"/);
+    assert.doesNotMatch(index, /id="email-to"/);
+    assert.doesNotMatch(index, /id="phone-number"/);
+    assert.doesNotMatch(index, /id="sms-number"/);
     assert.doesNotMatch(index, /id="geo-latitude"/);
     assert.doesNotMatch(index, /id="event-title"/);
+    assert.doesNotMatch(index, /id="vcard-name"/);
     assert.doesNotMatch(index, /id="file-input"/);
     assert.doesNotMatch(index, /id="bulk-file-input"/);
-    assert.doesNotMatch(index, /id="download-format"/);
-    assert.doesNotMatch(index, /id="print-width-auto"/);
+    assert.doesNotMatch(index, /id="(?:download-format|print-width-auto)"/);
     assert.doesNotMatch(index, /id="animation-timing-mode"/);
+    assert.doesNotMatch(index, /id="mask-grid"/);
     assert.doesNotMatch(index, /class="info-dialog-shell" hidden/);
   });
 });

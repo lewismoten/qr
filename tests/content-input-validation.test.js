@@ -135,7 +135,11 @@ describe('structured input validation', () => {
     const sources = [
       '../index.html',
       '../guides/content/wifi.html',
+      '../guides/content/email.html',
+      '../guides/content/phone.html',
+      '../guides/content/sms.html',
       '../guides/content/geo.html',
+      '../guides/content/vcard.html',
     ];
     const html = (
       await Promise.all(

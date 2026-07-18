@@ -25,6 +25,10 @@
     <lastmod>2026-07-18</lastmod>
   </url>
   <url>
+    <loc>https://qr.lewismoten.com/guides/content/text.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
     <loc>https://qr.lewismoten.com/guides/content/number.html</loc>
     <lastmod>2026-07-18</lastmod>
   </url>
@@ -33,11 +37,27 @@
     <lastmod>2026-07-18</lastmod>
   </url>
   <url>
+    <loc>https://qr.lewismoten.com/guides/content/email.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://qr.lewismoten.com/guides/content/phone.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://qr.lewismoten.com/guides/content/sms.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
     <loc>https://qr.lewismoten.com/guides/content/geo.html</loc>
     <lastmod>2026-07-18</lastmod>
   </url>
   <url>
     <loc>https://qr.lewismoten.com/guides/content/event.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://qr.lewismoten.com/guides/content/vcard.html</loc>
     <lastmod>2026-07-18</lastmod>
   </url>
   <url>
@@ -70,6 +90,10 @@
   </url>
   <url>
     <loc>https://qr.lewismoten.com/guides/download/animation.html</loc>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://qr.lewismoten.com/guides/debug/mask.html</loc>
     <lastmod>2026-07-18</lastmod>
   </url>
 </urlset>

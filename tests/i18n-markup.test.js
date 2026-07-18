@@ -21,15 +21,21 @@ const flattenMessages = (value, prefix = '', result = {}) => {
 const markupUrls = [
   '../index.html',
   '../guides/content/frame.html',
+  '../guides/content/text.html',
   '../guides/content/number.html',
   '../guides/content/wifi.html',
+  '../guides/content/email.html',
+  '../guides/content/phone.html',
+  '../guides/content/sms.html',
   '../guides/content/geo.html',
   '../guides/content/event.html',
+  '../guides/content/vcard.html',
   '../guides/content/file.html',
   '../guides/content/bulk-import.html',
   '../guides/style/modules.html',
   '../guides/style/colors.html',
   '../guides/style/artwork.html',
+  '../guides/debug/mask.html',
 ];
 const html = (
   await Promise.all(

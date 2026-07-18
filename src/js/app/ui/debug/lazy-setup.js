@@ -47,6 +47,8 @@ export function createLazyDebugSetup(options) {
         loadFeatureStylesheet('debug-mask'),
         import('./mask-setup.js'),
       ]).then(([, { createDebugMaskSetup }]) => {
+        options.elements.maskGrid =
+          options.document.getElementById('mask-grid');
         masks = createDebugMaskSetup({
           ...options,
           render: options.runtime.render,

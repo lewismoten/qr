@@ -94,9 +94,28 @@ export function createContentSections({
       'content.preview.loading',
       '[Content preview loads after selecting this format]',
     );
+  const sharedMarkupFormats = new Set([
+    'text',
+    'email',
+    'phone',
+    'sms',
+    'vcard',
+  ]);
+  const ensureMarkup = (format) => {
+    const formats = sharedMarkupFormats.has(format)
+      ? sharedMarkupFormats
+      : [format];
+    return Promise.all(
+      [...formats].map((name) => {
+        const fieldset = document.querySelector(
+          `[data-format-fields="${name}"]`,
+        );
+        return ensurePanelFragment(fieldset);
+      }),
+    );
+  };
   const withMarkup = (format, load) => async () => {
-    const fieldset = document.querySelector(`[data-format-fields="${format}"]`);
-    await ensurePanelFragment(fieldset);
+    await ensureMarkup(format);
     return load();
   };
   let registry;

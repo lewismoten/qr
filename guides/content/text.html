@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text QR codes | QR Code Generator</title>
+    <meta
+      name="description"
+      content="Create QR codes for plain text messages and notes."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="../../favicon.ico" sizes="any" />
+    <link
+      rel="canonical"
+      href="https://qr.lewismoten.com/guides/content/text.html"
+    />
+    <link rel="stylesheet" href="../../dist/app.min.css" />
+  </head>
+  <body class="info-page-body">
+    <main class="standalone-info-page">
+      <article class="info-dialog-shell">
+        <header class="info-dialog-header info-page-header">
+          <div>
+            <p class="info-kicker">QR Code Generator</p>
+            <h1>Text QR codes</h1>
+          </div>
+          <a
+            class="info-page-back"
+            href="../../index.html#tab=content&amp;subtab=data"
+            >Open in generator</a
+          >
+        </header>
+        <div class="info-dialog-content">
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Encode a message directly</h2>
+            <p>
+              Text QR codes store notes, instructions, identifiers, and other
+              printable content without requiring a website or network.
+            </p>
+          </section>
+          <fieldset
+            class="option-group format-fields"
+            data-app-fragment="tab=content&amp;subtab=data"
+          >
+            <legend class="sr-only" data-i18n="form.data.textContent">
+              Text content
+            </legend>
+            <label
+              class="sr-only"
+              for="text-input"
+              data-i18n="form.data.textPayload"
+              >Text payload</label
+            >
+            <textarea
+              id="text-input"
+              name="text-input"
+              rows="4"
+              maxlength="7089"
+              placeholder="Enter any text"
+              data-i18n-placeholder="form.data.enterText"
+            ></textarea>
+          </fieldset>
+          <section class="fragment-help-copy" data-fragment-help>
+            <h2>Encoding behavior</h2>
+            <p>
+              The generator automatically chooses efficient numeric,
+              alphanumeric, or byte segments unless a manual mode is selected.
+            </p>
+          </section>
+        </div>
+        <footer class="info-page-footer">
+          <span>QR Code Generator</span>
+          <nav aria-label="Guide page navigation">
+            <a href="../../index.html#tab=content&amp;subtab=data"
+              >Open this tool</a
+            >
+            <a href="../../about.html">About</a>
+            <a href="../../privacy.html">Privacy</a>
+          </nav>
+        </footer>
+      </article>
+    </main>
+  </body>
+</html>
