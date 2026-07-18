@@ -34,7 +34,8 @@ During development, rebuild automatically when JavaScript or CSS changes:
 npm run build:watch
 ```
 
-Run the QR encoder tests and a production build together with:
+Run linting, tests with coverage thresholds, and a production build together
+with:
 
 ```sh
 npm run verify
@@ -50,6 +51,29 @@ npm run lint
 Authored JavaScript is formatted to an 80-column target and limited to 300
 physical lines per module. URLs, regular expressions and indivisible translated
 strings may exceed the column target without weakening the module-size limit.
+
+## Testing
+
+Tests run on Node's built-in test platform. It discovers every
+`tests/**/*.test.js` file and isolates test files from one another. Run the fast
+suite once or keep it active while editing:
+
+```sh
+npm test
+npm run test:watch
+```
+
+Generate the native V8 coverage report with:
+
+```sh
+npm run test:coverage
+```
+
+Coverage includes exercised modules under `src/js`, excluding the browser entry
+point and specification-page scripts. The command fails below 65% line, 80%
+branch, or 80% function coverage. These conservative repository-wide floors
+protect the current baseline while browser-heavy UI modules gain focused DOM
+integration tests. `npm run verify` enforces the same coverage thresholds.
 
 ## Locales
 
