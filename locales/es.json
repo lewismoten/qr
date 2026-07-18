@@ -1,7 +1,7 @@
 {
   "page": { "title": "Generador, diseñador y depurador de códigos QR gratuito" },
   "navigation": { "content": "Contenido", "style": "Estilo", "download": "Descargar", "debug": "Depurar" },
-  "content": { "data": "Datos", "format": "Formato", "frame": "Marco", "tools": "Herramientas de contenido" },
+  "content": { "data": "Datos", "format": "Formato", "frame": "Marco", "tools": "Herramientas de contenido", "preview": { "loading": "[La vista previa se carga al seleccionar este formato]", "url": "[Introduce una URL HTTPS completa]", "text": "[Introduce texto]", "bulkRow": "[Fila de datos importada]", "networkName": "[Nombre de red]", "password": "[Contraseña]", "email": "[Dirección de correo]", "subject": "[Asunto]", "message": "[Mensaje]", "phoneNumber": "[Número de teléfono]", "latitude": "[Latitud]", "longitude": "[Longitud]", "fullName": "[Nombre completo]", "organization": "[Organización]", "title": "[Cargo]", "website": "[Sitio web]", "file": "[Contenido del archivo seleccionado]" } },
   "formats": { "url": "URL", "event": "Evento", "vcard": "vCard", "sms": "SMS", "email": "Correo", "phone": "Teléfono", "text": "Texto", "number": "Número", "numberRange": "Rango numérico", "wifi": "Wi-Fi", "calendarEvent": "Evento de calendario", "geo": "Geo", "file": "Archivo" },
   "form": {
     "format": { "payloadFormat": "Formato de contenido", "qrFormat": "Formato QR", "bulkImport": "Importación masiva" },

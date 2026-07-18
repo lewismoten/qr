@@ -244,7 +244,9 @@ export function createContentDataSetup({
     },
     payload: {
       build: () => ensureFile().then((system) => system.payload.build()),
-      preview: () => file?.preview() ?? '[file content]',
+      preview: () =>
+        file?.preview() ??
+        lookup('content.preview.file', '[Selected file content]'),
     },
   };
 

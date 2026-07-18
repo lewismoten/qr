@@ -1,4 +1,6 @@
 import { createLazySection } from './lazy-section.js';
+import { createContentPluginRegistry } from './plugin-registry.js';
+import { lookup } from '../../../i18n/index.js';
 
 export function createContentSections({
   document,
@@ -7,6 +9,7 @@ export function createContentSections({
   limits,
   alphanumericCharacters,
   validatePrintableText,
+  file,
 }) {
   const region = e.tabPanels[0]?.parentElement;
   const eventLoader = createLazySection({
@@ -88,26 +91,103 @@ export function createContentSections({
       createVCardSectionFromDocument(document),
   });
 
+  const loadingPreview = () =>
+    lookup(
+      'content.preview.loading',
+      '[Content preview loads after selecting this format]',
+    );
+  let registry;
+  const pluginLoaders = {
+    text: () =>
+      import('./text/plugin.js').then(({ createTextPlugin }) =>
+        createTextPlugin(document),
+      ),
+    number: () =>
+      numberLoader.ensure().then((section) => ({
+        build: section.getPayload,
+        preview: section.getPayload,
+      })),
+    wifi: () =>
+      wifiLoader.ensure().then((section) => ({
+        build: section.buildPayload,
+        preview: section.buildPreview,
+      })),
+    email: () =>
+      sharedLoader.ensure().then((section) => ({
+        build: section.buildEmailPayload,
+        preview: section.buildEmailPreview,
+      })),
+    phone: () =>
+      phoneLoader.ensure().then((section) => ({
+        build: section.buildPhonePayload,
+        preview: section.buildPhonePreview,
+      })),
+    sms: () =>
+      Promise.all([phoneLoader.ensure(), sharedLoader.ensure()]).then(
+        ([section]) => ({
+          build: section.buildSmsPayload,
+          preview: section.buildSmsPreview,
+        }),
+      ),
+    event: () =>
+      eventLoader.ensure().then((section) => ({
+        build: section.buildPayload,
+        preview: section.buildPayload,
+      })),
+    geo: () =>
+      geoLoader.ensure().then((section) => ({
+        build: section.buildPayload,
+        preview: section.buildPreview,
+      })),
+    vcard: () =>
+      Promise.all([
+        phoneLoader.ensure(),
+        sharedLoader.ensure(),
+        vcardLoader.ensure(),
+      ]).then(([, , section]) => ({
+        build: section.buildPayload,
+        preview: section.buildPreview,
+      })),
+    file: () =>
+      Promise.resolve({
+        build: file.build,
+        preview: file.preview,
+      }),
+  };
+  registry = createContentPluginRegistry({
+    format: e.qrFormat,
+    initial: {
+      url: {
+        build: () => e.urlInput.value.trim(),
+        preview: () =>
+          e.urlInput.value ||
+          lookup('content.preview.url', '[Enter a complete HTTPS URL]'),
+      },
+    },
+    loaders: pluginLoaders,
+  });
+
   const event = {
     initialize() {},
     sync: () => {
       if (e.qrFormat.value === 'event') void eventLoader.run('sync');
     },
-    buildPayload: () => eventLoader.run('buildPayload'),
-    buildPreview: () => eventLoader.get()?.buildPayload() ?? '[calendar event]',
+    buildPayload: () =>
+      registry.ensure('event').then((plugin) => plugin.build()),
+    buildPreview: () => registry.get('event')?.preview() ?? loadingPreview(),
   };
   const geo = {
     update: () => {
       if (e.qrFormat.value === 'geo') void geoLoader.run('update');
     },
-    buildPayload: () => geoLoader.run('buildPayload'),
-    buildPreview: () =>
-      geoLoader.get()?.buildPreview() ?? 'geo:[latitude],[longitude]',
+    buildPayload: () => registry.ensure('geo').then((plugin) => plugin.build()),
+    buildPreview: () => registry.get('geo')?.preview() ?? loadingPreview(),
   };
   const number = {
     getPayload: () =>
-      numberLoader.get()?.getPayload() ?? numberLoader.run('getPayload'),
-    getPreview: () => numberLoader.get()?.getPayload() ?? '[number]',
+      registry.get('number')?.build() ??
+      registry.ensure('number').then((plugin) => plugin.build()),
+    getPreview: () => registry.get('number')?.preview() ?? loadingPreview(),
     getSequenceInfo: () =>
       numberLoader.get()?.getSequenceInfo() ?? { total: 1, current: 1 },
     getIndexInput: () => numberLoader.get()?.getIndexInput() ?? null,
@@ -122,53 +202,37 @@ export function createContentSections({
     sync: () => {
       if (e.qrFormat.value === 'wifi') void wifiLoader.run('sync');
     },
-    buildPayload: () => wifiLoader.run('buildPayload'),
-    buildPreview: () =>
-      wifiLoader.get()?.buildPreview() ?? 'WIFI:S:[network-name];;',
+    buildPayload: () =>
+      registry.ensure('wifi').then((plugin) => plugin.build()),
+    buildPreview: () => registry.get('wifi')?.preview() ?? loadingPreview(),
     maskPayload: (payload) => wifiLoader.get()?.maskPayload(payload) ?? payload,
   };
   const shared = {
     initialize() {},
     buildEmailPayload: () =>
-      sharedLoader.get()?.buildEmailPayload() ??
-      sharedLoader.run('buildEmailPayload'),
+      registry.ensure('email').then((plugin) => plugin.build()),
     buildEmailPayloadWithBody: (body) =>
       sharedLoader.get()?.buildEmailPayloadWithBody(body) ?? '',
     buildEmailPreview: () =>
-      sharedLoader.get()?.buildEmailPreview() ??
-      'mailto:[recipient@example.com]',
+      registry.get('email')?.preview() ?? loadingPreview(),
   };
   const vcard = {
-    buildPayload: () => vcardLoader.run('buildPayload'),
-    buildPreview: () =>
-      vcardLoader.get()?.buildPreview() ?? 'BEGIN:VCARD\nEND:VCARD',
+    buildPayload: () =>
+      registry.ensure('vcard').then((plugin) => plugin.build()),
+    buildPreview: () => registry.get('vcard')?.preview() ?? loadingPreview(),
   };
   const phone = {
     initialize() {},
-    buildPhonePayload: () => phoneLoader.run('buildPhonePayload'),
-    buildSmsPayload: () => phoneLoader.run('buildSmsPayload'),
+    buildPhonePayload: () =>
+      registry.ensure('phone').then((plugin) => plugin.build()),
+    buildSmsPayload: () =>
+      registry.ensure('sms').then((plugin) => plugin.build()),
     buildPhonePreview: () =>
-      phoneLoader.get()?.buildPhonePreview() ?? 'tel:[phone-number]',
-    buildSmsPreview: () =>
-      phoneLoader.get()?.buildSmsPreview() ?? 'SMSTO:[phone-number]:[message]',
+      registry.get('phone')?.preview() ?? loadingPreview(),
+    buildSmsPreview: () => registry.get('sms')?.preview() ?? loadingPreview(),
     syncSmsLength: () => phoneLoader.get()?.syncSmsLength(),
   };
-  const ensureFormat = (format) => {
-    const loaders = {
-      text: [sharedLoader],
-      phone: [phoneLoader],
-      sms: [phoneLoader, sharedLoader],
-      email: [sharedLoader],
-      event: [eventLoader],
-      geo: [geoLoader],
-      number: [numberLoader],
-      wifi: [wifiLoader],
-      vcard: [phoneLoader, sharedLoader, vcardLoader],
-    }[format];
-    return loaders
-      ? Promise.all(loaders.map((loader) => loader.ensure()))
-      : Promise.resolve();
-  };
+  const ensureFormat = (format) => registry.ensure(format);
 
   return {
     event,
@@ -178,6 +242,7 @@ export function createContentSections({
     shared,
     vcard,
     wifi,
+    plugins: registry,
     ensureFormat,
   };
 }

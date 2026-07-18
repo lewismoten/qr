@@ -12,7 +12,26 @@
     "data": "Data",
     "format": "Format",
     "frame": "Frame",
-    "tools": "Content tools"
+    "tools": "Content tools",
+    "preview": {
+      "loading": "[Content preview loads after selecting this format]",
+      "url": "[Enter a complete HTTPS URL]",
+      "text": "[Enter text]",
+      "bulkRow": "[Imported data row]",
+      "networkName": "[Network name]",
+      "password": "[Password]",
+      "email": "[Email address]",
+      "subject": "[Subject]",
+      "message": "[Message]",
+      "phoneNumber": "[Phone number]",
+      "latitude": "[Latitude]",
+      "longitude": "[Longitude]",
+      "fullName": "[Full name]",
+      "organization": "[Organization]",
+      "title": "[Title]",
+      "website": "[Website]",
+      "file": "[Selected file content]"
+    }
   },
   "formats": {
     "url": "URL",
@@ -36,14 +55,26 @@
       "bulkImport": "Bulk Import"
     },
     "placeholders": {
-      "numberPrefix": "ITEM-", "numberSuffix": "-A", "email": "name@example.com", "phone": "+15551234567",
-      "eventWebsite": "https://example.com/event", "personName": "Taylor Example", "organization": "OpenAI",
-      "jobTitle": "Engineer", "website": "https://example.com", "metadata": "{\"collection\":\"scavenger-hunt\"}"
+      "numberPrefix": "ITEM-",
+      "numberSuffix": "-A",
+      "email": "name@example.com",
+      "phone": "+15551234567",
+      "eventWebsite": "https://example.com/event",
+      "personName": "Taylor Example",
+      "organization": "OpenAI",
+      "jobTitle": "Engineer",
+      "website": "https://example.com",
+      "metadata": "{\"collection\":\"scavenger-hunt\"}"
     },
     "defaults": {
-      "eventTitle": "New event", "geoLabel": "Front Royal, VA", "vcardName": "Lewis Moten III",
-      "vcardOrganization": "LewisMoten.com", "vcardTitle": "Owner", "phone": "+15305394775",
-      "vcardEmail": "lewismoten@gmail.com", "vcardWebsite": "https://lewismoten.com"
+      "eventTitle": "New event",
+      "geoLabel": "Front Royal, VA",
+      "vcardName": "Lewis Moten III",
+      "vcardOrganization": "LewisMoten.com",
+      "vcardTitle": "Owner",
+      "phone": "+15305394775",
+      "vcardEmail": "lewismoten@gmail.com",
+      "vcardWebsite": "https://lewismoten.com"
     },
     "data": {
       "bulkFileUnavailable": "File format is unavailable in Bulk Import. Use the dedicated File format for binary data.",
@@ -112,55 +143,217 @@
     }
   },
   "downloadUi": {
-    "tools": "Download type", "tabs": { "image": "Image", "document": "Document", "animation": "Animation" },
-    "image": { "legend": "Export image", "format": "Image format", "quality": "JPG quality", "current": "Download current image", "allZip": "Download all as ZIP", "svgHint": "SVG traces the complete canvas into paths only, including frame text." },
-    "document": { "legend": "PDF document", "autoSize": "Auto-size printed QR from pixels and version", "printedWidth": "Printed width", "current": "Download current as PDF", "allPdf": "Download all as PDF", "hint": "Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows." },
-    "animation": { "legend": "Animation timing", "mode": "Animation timing mode", "perImage": "Per image", "totalDuration": "Total duration", "minutes": "Minutes", "seconds": "Seconds", "milliseconds": "Milliseconds", "initialSummary": "1.000 seconds per image - 8.000 seconds total.", "gif": "Download animated GIF", "mp4": "Download MP4", "hint": "GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time." }
+    "tools": "Download type",
+    "tabs": {
+      "image": "Image",
+      "document": "Document",
+      "animation": "Animation"
+    },
+    "image": {
+      "legend": "Export image",
+      "format": "Image format",
+      "quality": "JPG quality",
+      "current": "Download current image",
+      "allZip": "Download all as ZIP",
+      "svgHint": "SVG traces the complete canvas into paths only, including frame text."
+    },
+    "document": {
+      "legend": "PDF document",
+      "autoSize": "Auto-size printed QR from pixels and version",
+      "printedWidth": "Printed width",
+      "current": "Download current as PDF",
+      "allPdf": "Download all as PDF",
+      "hint": "Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows."
+    },
+    "animation": {
+      "legend": "Animation timing",
+      "mode": "Animation timing mode",
+      "perImage": "Per image",
+      "totalDuration": "Total duration",
+      "minutes": "Minutes",
+      "seconds": "Seconds",
+      "milliseconds": "Milliseconds",
+      "initialSummary": "1.000 seconds per image - 8.000 seconds total.",
+      "gif": "Download animated GIF",
+      "mp4": "Download MP4",
+      "hint": "GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time."
+    }
   },
   "debugUi": {
-    "tools": "Debug tools", "tabs": { "encoding": "Encoding", "mask": "Mask", "payload": "Payload", "overlay": "Overlay" },
-    "encoding": { "errorCorrection": "Error correction", "aboutErrorCorrection": "About error correction", "damageRecovery": "Damage recovery", "inputMode": "Input mode", "aboutInputModes": "About input modes", "encodingModes": "Encoding modes", "autoHelp": "Auto-detect chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.", "manualHelp": "Manual forces the selected mode and flags incompatible characters.", "autoDetect": "Auto-detect (excludes Kanji)", "manual": "Manual", "alphanumericShort": "A-Z / 0-9", "mode": "Mode", "version": "Version", "autoVersion": "Auto-pick QR version", "versionLabel": "Version:", "target": "Target" },
+    "tools": "Debug tools",
+    "tabs": {
+      "encoding": "Encoding",
+      "mask": "Mask",
+      "payload": "Payload",
+      "overlay": "Overlay"
+    },
+    "encoding": {
+      "errorCorrection": "Error correction",
+      "aboutErrorCorrection": "About error correction",
+      "damageRecovery": "Damage recovery",
+      "inputMode": "Input mode",
+      "aboutInputModes": "About input modes",
+      "encodingModes": "Encoding modes",
+      "autoHelp": "Auto-detect chooses Numeric, Alphanumeric, or Byte segments using total bit cost. Kanji remains manual.",
+      "manualHelp": "Manual forces the selected mode and flags incompatible characters.",
+      "autoDetect": "Auto-detect (excludes Kanji)",
+      "manual": "Manual",
+      "alphanumericShort": "A-Z / 0-9",
+      "mode": "Mode",
+      "version": "Version",
+      "autoVersion": "Auto-pick QR version",
+      "versionLabel": "Version:",
+      "target": "Target"
+    },
     "mask": { "legend": "Mask pattern", "choices": "Mask pattern choices" },
-    "payload": { "legend": "Encoded payload", "reveal": "Reveal passwords and secrets in preview" },
-    "overlay": { "legend": "Debug overlay", "about": "About debug overlays", "controls": "Overlay controls", "persistHelp": "Persist keeps overlays enabled while visiting other tabs.", "unmaskHelp": "Unmask shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.", "persistAria": "Persist overlays in other tabs", "persist": "Persist", "unmaskAria": "Show unmasked data modules", "unmask": "Unmask", "segments": "Segments", "unused": "Unused", "unusedCapacity": "Unused capacity", "outlineGrouping": "Outline grouping", "aboutOutline": "About outline grouping", "groupMarks": "How groups are marked", "dotHelp": "Solid dots start outline groups; ringed dots start encoded fields.", "unitsHelp": "Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.", "codewords": "Codewords", "stream": "Stream", "units": "Units", "encodingUnits": "Encoding units", "metadata": "Metadata" },
-    "colors": { "data": "Data stream", "mode": "Mode bits", "characterCount": "Char count", "ecLevel": "EC level bits", "mask": "Mask bits", "ecWords": "EC words", "ecWordsAria": "Error correction codewords color", "remainder": "Remainder", "remainderAria": "Remainder bits color", "padding": "Padding", "paddingAria": "Pad-to-byte and pad codewords color", "terminator": "Terminator", "finder": "Finder", "alignment": "Alignment", "timing": "Timing", "format": "Format", "darkModule": "Dark module", "version": "Version (v7+)" }
+    "payload": {
+      "legend": "Encoded payload",
+      "reveal": "Reveal passwords and secrets in preview"
+    },
+    "overlay": {
+      "legend": "Debug overlay",
+      "about": "About debug overlays",
+      "controls": "Overlay controls",
+      "persistHelp": "Persist keeps overlays enabled while visiting other tabs.",
+      "unmaskHelp": "Unmask shows data modules before the selected QR mask is applied. This affects the debug preview only; functional patterns and format information remain unchanged.",
+      "persistAria": "Persist overlays in other tabs",
+      "persist": "Persist",
+      "unmaskAria": "Show unmasked data modules",
+      "unmask": "Unmask",
+      "segments": "Segments",
+      "unused": "Unused",
+      "unusedCapacity": "Unused capacity",
+      "outlineGrouping": "Outline grouping",
+      "aboutOutline": "About outline grouping",
+      "groupMarks": "How groups are marked",
+      "dotHelp": "Solid dots start outline groups; ringed dots start encoded fields.",
+      "unitsHelp": "Units group 3 numeric digits, 2 alphanumeric characters, 1 Kanji character, or 1 encoded byte.",
+      "codewords": "Codewords",
+      "stream": "Stream",
+      "units": "Units",
+      "encodingUnits": "Encoding units",
+      "metadata": "Metadata"
+    },
+    "colors": {
+      "data": "Data stream",
+      "mode": "Mode bits",
+      "characterCount": "Char count",
+      "ecLevel": "EC level bits",
+      "mask": "Mask bits",
+      "ecWords": "EC words",
+      "ecWordsAria": "Error correction codewords color",
+      "remainder": "Remainder",
+      "remainderAria": "Remainder bits color",
+      "padding": "Padding",
+      "paddingAria": "Pad-to-byte and pad codewords color",
+      "terminator": "Terminator",
+      "finder": "Finder",
+      "alignment": "Alignment",
+      "timing": "Timing",
+      "format": "Format",
+      "darkModule": "Dark module",
+      "version": "Version (v7+)"
+    }
   },
   "style": {
     "tools": "Style tools",
-    "tabs": { "size": "Size", "modules": "Modules", "colors": "Colors", "art": "Art" },
+    "tabs": {
+      "size": "Size",
+      "modules": "Modules",
+      "colors": "Colors",
+      "art": "Art"
+    },
     "size": {
-      "legend": "Size & margin", "targetWidth": "Target width", "fromScale": "Size entirely from module scale",
-      "minimumPixels": "Minimum pixels per module", "margin": "Margin"
+      "legend": "Size & margin",
+      "targetWidth": "Target width",
+      "fromScale": "Size entirely from module scale",
+      "minimumPixels": "Minimum pixels per module",
+      "margin": "Margin"
     },
     "modules": {
-      "legend": "Modules & corner eyes", "shape": "Module shape", "cornerRounding": "Corner rounding",
-      "spacing": "Spacing", "rotation": "Rotation", "eyes": "Corner eyes", "outerRounding": "Outer rounding",
-      "centerRounding": "Center rounding", "hint": "Decorative modules can reduce scanning reliability. Test the finished code at its intended size."
+      "legend": "Modules & corner eyes",
+      "shape": "Module shape",
+      "cornerRounding": "Corner rounding",
+      "spacing": "Spacing",
+      "rotation": "Rotation",
+      "eyes": "Corner eyes",
+      "outerRounding": "Outer rounding",
+      "centerRounding": "Center rounding",
+      "hint": "Decorative modules can reduce scanning reliability. Test the finished code at its intended size."
     },
     "colors": {
-      "legend": "Colors & fills", "dark": "Dark", "light": "Light", "transparency": "Transparency",
-      "customEyes": "Use custom corner eye colors", "eyeOuter": "Eye outer ring", "eyeCenter": "Eye center",
-      "moduleFill": "Module fill", "gradientEnd": "Gradient end", "direction": "Direction",
-      "fillImage": "Custom fill image", "recommendedContrast": "Apply recommended contrast", "clearImage": "Clear image",
+      "legend": "Colors & fills",
+      "dark": "Dark",
+      "light": "Light",
+      "transparency": "Transparency",
+      "customEyes": "Use custom corner eye colors",
+      "eyeOuter": "Eye outer ring",
+      "eyeCenter": "Eye center",
+      "moduleFill": "Module fill",
+      "gradientEnd": "Gradient end",
+      "direction": "Direction",
+      "fillImage": "Custom fill image",
+      "recommendedContrast": "Apply recommended contrast",
+      "clearImage": "Clear image",
       "imageHint": "Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity."
     },
     "art": {
-      "legend": "Center artwork", "useFrameMessage": "Use frame message as center artwork", "type": "Center artwork type",
-      "logo": "Logo", "emoji": "Emoji", "pixelArt": "Pixel art", "size": "Artwork size", "logoImage": "Logo image",
-      "clearLogo": "Clear logo", "quickPicks": "Quick picks", "canvasWidth": "Canvas width", "customColor": "Custom color",
-      "clear": "Clear", "matchShape": "Match the QR module shape",
+      "legend": "Center artwork",
+      "useFrameMessage": "Use frame message as center artwork",
+      "type": "Center artwork type",
+      "logo": "Logo",
+      "emoji": "Emoji",
+      "pixelArt": "Pixel art",
+      "size": "Artwork size",
+      "logoImage": "Logo image",
+      "clearLogo": "Clear logo",
+      "quickPicks": "Quick picks",
+      "canvasWidth": "Canvas width",
+      "customColor": "Custom color",
+      "clear": "Clear",
+      "matchShape": "Match the QR module shape",
       "paintHint": "Choose a color or Transparent, then tap or drag across the canvas.",
       "icons": {
-        "link": "Link", "phone": "Phone", "envelope": "Envelope", "location": "Location pin", "home": "Home", "cart": "Shopping cart",
-        "gift": "Gift", "star": "Star", "heart": "Heart", "check": "Check mark", "rocket": "Rocket", "bulb": "Light bulb",
-        "globe": "Globe", "camera": "Camera", "music": "Music", "coffee": "Coffee", "key": "Key", "lock": "Lock",
-        "signal": "Signal bars", "book": "Book", "calendar": "Calendar", "ticket": "Ticket", "food": "Food", "smile": "Smile"
+        "link": "Link",
+        "phone": "Phone",
+        "envelope": "Envelope",
+        "location": "Location pin",
+        "home": "Home",
+        "cart": "Shopping cart",
+        "gift": "Gift",
+        "star": "Star",
+        "heart": "Heart",
+        "check": "Check mark",
+        "rocket": "Rocket",
+        "bulb": "Light bulb",
+        "globe": "Globe",
+        "camera": "Camera",
+        "music": "Music",
+        "coffee": "Coffee",
+        "key": "Key",
+        "lock": "Lock",
+        "signal": "Signal bars",
+        "book": "Book",
+        "calendar": "Calendar",
+        "ticket": "Ticket",
+        "food": "Food",
+        "smile": "Smile"
       }
     },
     "values": {
-      "square": "Square", "rounded": "Rounded", "dots": "Dots", "diamond": "Diamond", "custom": "Custom",
-      "default": "Default", "defaultModules": "Default modules", "circle": "Circle", "solid": "Solid",
-      "linear": "Linear", "radial": "Radial", "image": "Image", "customImage": "Custom image"
+      "square": "Square",
+      "rounded": "Rounded",
+      "dots": "Dots",
+      "diamond": "Diamond",
+      "custom": "Custom",
+      "default": "Default",
+      "defaultModules": "Default modules",
+      "circle": "Circle",
+      "solid": "Solid",
+      "linear": "Linear",
+      "radial": "Radial",
+      "image": "Image",
+      "customImage": "Custom image"
     }
   },
   "fields": {
@@ -309,7 +502,14 @@
       "empty": "No CSV loaded.",
       "loaded": "{count} rows loaded. Showing {current} of {count}."
     },
-    "progress": { "title": "Processing CSV file", "reading": "Reading {name}...", "readingBytes": "Reading {current} of {total}...", "parsing": "Parsing CSV data...", "loaded": "Loaded {count} rows.", "canceled": "CSV processing canceled." },
+    "progress": {
+      "title": "Processing CSV file",
+      "reading": "Reading {name}...",
+      "readingBytes": "Reading {current} of {total}...",
+      "parsing": "Parsing CSV data...",
+      "loaded": "Loaded {count} rows.",
+      "canceled": "CSV processing canceled."
+    },
     "csv": {
       "empty": "The CSV is empty.",
       "duplicateFields": "The first row contains duplicate field names.",
@@ -419,10 +619,22 @@
     "width": "{width} px · {scale} px/module · {inches} in at {ppi} ppi"
   },
   "errorCorrection": {
-    "L": { "label": "Low", "detail": "Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered." },
-    "M": { "label": "Medium", "detail": "Balances capacity and resilience, with recovery for about 15% of damaged or covered area." },
-    "Q": { "label": "Quartile", "detail": "Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion." },
-    "H": { "label": "High", "detail": "Uses the most correction data, so the code can often survive about 30% of its area being obscured." }
+    "L": {
+      "label": "Low",
+      "detail": "Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered."
+    },
+    "M": {
+      "label": "Medium",
+      "detail": "Balances capacity and resilience, with recovery for about 15% of damaged or covered area."
+    },
+    "Q": {
+      "label": "Quartile",
+      "detail": "Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion."
+    },
+    "H": {
+      "label": "High",
+      "detail": "Uses the most correction data, so the code can often survive about 30% of its area being obscured."
+    }
   },
   "map": {
     "zoomControls": "Map zoom controls",
@@ -441,11 +653,23 @@
     "editorLabel": "{width} by {height} pixel art editor",
     "pixelLabel": "Pixel {number}",
     "colors": {
-      "eraser": "Transparent / eraser", "black": "Black", "blue": "Blue", "green": "Green",
-      "cyan": "Cyan", "red": "Red", "magenta": "Magenta", "brown": "Brown",
-      "lightGray": "Light gray", "darkGray": "Dark gray", "brightBlue": "Bright blue",
-      "brightGreen": "Bright green", "brightCyan": "Bright cyan", "brightRed": "Bright red",
-      "brightMagenta": "Bright magenta", "yellow": "Yellow", "white": "White"
+      "eraser": "Transparent / eraser",
+      "black": "Black",
+      "blue": "Blue",
+      "green": "Green",
+      "cyan": "Cyan",
+      "red": "Red",
+      "magenta": "Magenta",
+      "brown": "Brown",
+      "lightGray": "Light gray",
+      "darkGray": "Dark gray",
+      "brightBlue": "Bright blue",
+      "brightGreen": "Bright green",
+      "brightCyan": "Bright cyan",
+      "brightRed": "Bright red",
+      "brightMagenta": "Bright magenta",
+      "yellow": "Yellow",
+      "white": "White"
     }
   },
   "units": {
@@ -455,11 +679,18 @@
     "percent": "{value}%"
   },
   "download": {
-    "creating": "Creating {format}...", "ready": "Download ready.", "error": "Unable to create download.",
-    "creatingPdf": "Creating PDF...", "pdfReady": "PDF ready.", "pdfError": "Unable to create PDF.",
-    "rendering": "Rendering {frame} of {total}...", "buildingZip": "Building ZIP...",
-    "zipReady": "ZIP ready with {total} files.", "zipError": "Unable to create ZIP.",
-    "renderingPdf": "Rendering PDF frame {frame} of {total}...", "layoutPdf": "Laying out PDF pages...",
+    "creating": "Creating {format}...",
+    "ready": "Download ready.",
+    "error": "Unable to create download.",
+    "creatingPdf": "Creating PDF...",
+    "pdfReady": "PDF ready.",
+    "pdfError": "Unable to create PDF.",
+    "rendering": "Rendering {frame} of {total}...",
+    "buildingZip": "Building ZIP...",
+    "zipReady": "ZIP ready with {total} files.",
+    "zipError": "Unable to create ZIP.",
+    "renderingPdf": "Rendering PDF frame {frame} of {total}...",
+    "layoutPdf": "Laying out PDF pages...",
     "pdfSheetReadyOne": "PDF ready with {total} QR codes on {pages} page.",
     "pdfSheetReadyMany": "PDF ready with {total} QR codes on {pages} pages.",
     "capturingFrame": "Capturing animation frame {frame} of {total}...",
@@ -467,23 +698,39 @@
     "durationMinimum": "Choose a duration that provides at least 10 milliseconds per image.",
     "gifDurationMaximum": "GIF supports at most 10 minutes 55.35 seconds per image.",
     "mp4DurationMinimum": "MP4 needs at least 16 milliseconds per image.",
-    "encodingGif": "Encoding animated GIF...", "gifReady": "Animated GIF ready - {duration} total.",
+    "encodingGif": "Encoding animated GIF...",
+    "gifReady": "Animated GIF ready - {duration} total.",
     "recordingMp4": "Recording MP4 in real time - {duration}...",
-    "recordingFrame": "Recording MP4 frame {frame} of {total}...", "mp4Ready": "MP4 ready.",
-    "animationError": "Unable to create {format} animation.", "seconds": "{seconds} seconds",
-    "durationSummary": "{perImage} per image - {total} total.", "mp4Title": "Download an MP4 animation",
+    "recordingFrame": "Recording MP4 frame {frame} of {total}...",
+    "mp4Ready": "MP4 ready.",
+    "animationError": "Unable to create {format} animation.",
+    "seconds": "{seconds} seconds",
+    "durationSummary": "{perImage} per image - {total} total.",
+    "mp4Title": "Download an MP4 animation",
     "mp4Unavailable": "MP4 encoding is not available in this browser; animated GIF remains available.",
-    "allZip": "Download all {count} as ZIP", "allPdf": "Download all {count} as PDF",
+    "allZip": "Download all {count} as ZIP",
+    "allPdf": "Download all {count} as PDF",
     "toolsError": "Download tools could not be loaded: {message}",
     "mp4EncoderUnavailable": "This browser does not provide an MP4 encoder. Animated GIF is available instead.",
     "mp4EncodeError": "Unable to encode MP4.",
     "imageError": "Unable to create {type} image.",
     "progress": {
-      "working": "Task in progress", "titleGif": "Creating animated GIF", "titleMp4": "Creating MP4 animation",
-      "preparing": "Preparing animation...", "encodingFrame": "Encoding GIF frame {frame} of {total}...",
-      "elapsed": "Elapsed", "remaining": "Estimated remaining", "completion": "Estimated completion",
-      "estimating": "Estimating...", "seconds": "{count} seconds", "minutes": "{minutes} min {seconds} sec",
-      "now": "Now", "cancel": "Cancel", "canceling": "Canceling...", "completed": "Completed", "canceled": "Animation export canceled."
+      "working": "Task in progress",
+      "titleGif": "Creating animated GIF",
+      "titleMp4": "Creating MP4 animation",
+      "preparing": "Preparing animation...",
+      "encodingFrame": "Encoding GIF frame {frame} of {total}...",
+      "elapsed": "Elapsed",
+      "remaining": "Estimated remaining",
+      "completion": "Estimated completion",
+      "estimating": "Estimating...",
+      "seconds": "{count} seconds",
+      "minutes": "{minutes} min {seconds} sec",
+      "now": "Now",
+      "cancel": "Cancel",
+      "canceling": "Canceling...",
+      "completed": "Completed",
+      "canceled": "Animation export canceled."
     }
   },
   "qr": {

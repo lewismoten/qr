@@ -1,4 +1,5 @@
 import { serializeVCard } from '../../../content-formats.js';
+import { lookup } from '../../../../i18n/index.js';
 
 export function createVCardSection({
   name,
@@ -19,12 +20,20 @@ export function createVCardSection({
     });
   const buildPreview = () =>
     serializeVCard({
-      name: name.value.trim() || '[full-name]',
-      organization: organization.value.trim() || '[organization]',
-      title: title.value.trim() || '[title]',
-      phone: phone.value.trim() || '[phone-number]',
-      email: email.value.trim() || '[email]',
-      url: website.value.trim() || '[website]',
+      name:
+        name.value.trim() || lookup('content.preview.fullName', '[Full name]'),
+      organization:
+        organization.value.trim() ||
+        lookup('content.preview.organization', '[Organization]'),
+      title: title.value.trim() || lookup('content.preview.title', '[Title]'),
+      phone:
+        phone.value.trim() ||
+        lookup('content.preview.phoneNumber', '[Phone number]'),
+      email:
+        email.value.trim() ||
+        lookup('content.preview.email', '[Email address]'),
+      url:
+        website.value.trim() || lookup('content.preview.website', '[Website]'),
     });
 
   return { buildPayload, buildPreview };

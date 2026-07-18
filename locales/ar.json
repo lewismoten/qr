@@ -1,7 +1,7 @@
 {
   "page": { "title": "مولّد ومصمم ومصحح رموز QR مجاني" },
   "navigation": { "content": "المحتوى", "style": "النمط", "download": "تنزيل", "debug": "التصحيح" },
-  "content": { "data": "البيانات", "format": "التنسيق", "frame": "الإطار", "tools": "أدوات المحتوى" },
+  "content": { "data": "البيانات", "format": "التنسيق", "frame": "الإطار", "tools": "أدوات المحتوى", "preview": { "loading": "[تُحمّل المعاينة بعد اختيار هذا التنسيق]", "url": "[أدخل رابط HTTPS كاملاً]", "text": "[أدخل نصًا]", "bulkRow": "[صف بيانات مستورد]", "networkName": "[اسم الشبكة]", "password": "[كلمة المرور]", "email": "[عنوان البريد الإلكتروني]", "subject": "[الموضوع]", "message": "[الرسالة]", "phoneNumber": "[رقم الهاتف]", "latitude": "[خط العرض]", "longitude": "[خط الطول]", "fullName": "[الاسم الكامل]", "organization": "[المؤسسة]", "title": "[المسمى الوظيفي]", "website": "[الموقع الإلكتروني]", "file": "[محتوى الملف المحدد]" } },
   "formats": { "url": "رابط", "event": "حدث", "vcard": "بطاقة اتصال", "sms": "رسالة نصية", "email": "بريد إلكتروني", "phone": "هاتف", "text": "نص", "number": "رقم", "numberRange": "نطاق أرقام", "wifi": "واي فاي", "calendarEvent": "حدث تقويم", "geo": "موقع جغرافي", "file": "ملف" },
   "form": {
     "format": { "payloadFormat": "تنسيق المحتوى", "qrFormat": "تنسيق QR", "bulkImport": "استيراد مجمع" },

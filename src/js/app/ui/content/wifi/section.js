@@ -27,8 +27,11 @@ export function createWifiSection({
   const buildPreview = () =>
     serializeWifi({
       security: encryption.value || 'WPA',
-      ssid: ssid.value.trim() || '[network-name]',
-      password: password.value || '[password]',
+      ssid:
+        ssid.value.trim() ||
+        lookup('content.preview.networkName', '[Network name]'),
+      password:
+        password.value || lookup('content.preview.password', '[Password]'),
       hidden: hidden.checked,
     });
 

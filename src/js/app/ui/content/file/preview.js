@@ -3,6 +3,7 @@ import {
   getCompactFileExtension,
   getFileManifestFlag,
 } from './protocol.js';
+import { lookup } from '../../../../i18n/index.js';
 
 export function createFilePayloadPreview({
   getFile,
@@ -15,12 +16,15 @@ export function createFilePayloadPreview({
     const mode = getMode();
     if (!file) {
       if (mode === 'chunked') return 'FILE:1:S:M:[base64url-data]';
-      return mode === 'blob'
-        ? '[shareable download URL]'
-        : '[data URL for a selected file]';
+      return lookup('content.preview.file', '[Selected file content]');
     }
-    if (mode === 'blob') return `[shareable download URL for ${file.name}]`;
-    if (mode !== 'chunked') return `[data URL for ${file.name}]`;
+    if (mode !== 'chunked') {
+      const selected = lookup(
+        'content.preview.file',
+        '[Selected file content]',
+      );
+      return `${selected} ${file.name}`;
+    }
     const { chunkCapacity, currentChunk, streamLength, isSingleFrame } =
       getCapacity(file);
     if (isSingleFrame) {

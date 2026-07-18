@@ -1,7 +1,7 @@
 {
   "page": { "title": "मुफ़्त क्यूआर कोड जनरेटर, डिज़ाइनर और डीबगर" },
   "navigation": { "content": "सामग्री", "style": "शैली", "download": "डाउनलोड", "debug": "डीबग" },
-  "content": { "data": "डेटा", "format": "प्रारूप", "frame": "फ़्रेम", "tools": "सामग्री उपकरण" },
+  "content": { "data": "डेटा", "format": "प्रारूप", "frame": "फ़्रेम", "tools": "सामग्री उपकरण", "preview": { "loading": "[यह प्रारूप चुनने के बाद पूर्वावलोकन लोड होगा]", "url": "[पूरा HTTPS यूआरएल दर्ज करें]", "text": "[पाठ दर्ज करें]", "bulkRow": "[आयातित डेटा पंक्ति]", "networkName": "[नेटवर्क नाम]", "password": "[पासवर्ड]", "email": "[ईमेल पता]", "subject": "[विषय]", "message": "[संदेश]", "phoneNumber": "[फ़ोन नंबर]", "latitude": "[अक्षांश]", "longitude": "[देशांतर]", "fullName": "[पूरा नाम]", "organization": "[संगठन]", "title": "[पद]", "website": "[वेबसाइट]", "file": "[चुनी गई फ़ाइल की सामग्री]" } },
   "formats": { "url": "यूआरएल", "event": "कार्यक्रम", "vcard": "वीकार्ड", "sms": "एसएमएस", "email": "ईमेल", "phone": "फ़ोन", "text": "पाठ", "number": "संख्या", "numberRange": "संख्या सीमा", "wifi": "वाई-फ़ाई", "calendarEvent": "कैलेंडर कार्यक्रम", "geo": "भौगोलिक स्थान", "file": "फ़ाइल" },
   "form": {
     "format": { "payloadFormat": "सामग्री प्रारूप", "qrFormat": "क्यूआर प्रारूप", "bulkImport": "बल्क आयात" },

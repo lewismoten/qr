@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/js/app/ui/content/text/plugin.js"],
+  "sourcesContent": ["import { lookup } from '../../../../i18n/index.js';\n\nexport function createTextPlugin(document) {\n  const input = document.getElementById('text-input');\n  return {\n    build: () => input.value,\n    preview: () =>\n      input.value || lookup('content.preview.text', '[Enter text]'),\n  };\n}\n"],
+  "mappings": "wCAEO,SAASA,EAAiBC,EAAU,CACzC,IAAMC,EAAQD,EAAS,eAAe,YAAY,EAClD,MAAO,CACL,MAAO,IAAMC,EAAM,MACnB,QAAS,IACPA,EAAM,OAASC,EAAO,uBAAwB,cAAc,CAChE,CACF",
+  "names": ["createTextPlugin", "document", "input", "lookup"]
+}

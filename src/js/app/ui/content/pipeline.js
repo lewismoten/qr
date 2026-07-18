@@ -6,7 +6,7 @@ export function createContentPipeline({
   bulk,
   number,
   file,
-  builders,
+  plugins,
   runtime,
   alphanumericCharacters,
 }) {
@@ -70,17 +70,8 @@ export function createContentPipeline({
     load: () => ensureFrame(),
   };
   const payload = createContentPayload({
-    elements: {
-      qrFormat: e.format,
-      urlInput: e.url,
-      textInput: e.text,
-    },
     bulk: { isMode: bulk.isMode, build: buildBulkText },
-    builders,
-    previews: builders.previews,
-    file: {
-      preview: file.preview,
-    },
+    plugins,
   });
   return { frame, payload, buildBulkText };
 }

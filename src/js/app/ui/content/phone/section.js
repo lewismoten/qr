@@ -71,12 +71,16 @@ export function createPhoneSection({
       ? ''
       : serializeSms({ number: smsInput.value, message: smsBody.value });
   const buildPhonePreview = () =>
-    serializePhone(phoneInput.value) || 'tel:[phone-number]';
+    serializePhone(phoneInput.value) ||
+    `tel:${lookup('content.preview.phoneNumber', '[Phone number]')}`;
   const buildSmsPreview = () =>
     serializeSms({
       number: smsInput.value,
-      message: smsBody.value || '[message]',
-    }).replace('SMSTO::', 'SMSTO:[phone-number]:');
+      message: smsBody.value || lookup('content.preview.message', '[Message]'),
+    }).replace(
+      'SMSTO::',
+      `SMSTO:${lookup('content.preview.phoneNumber', '[Phone number]')}:`,
+    );
   const syncSmsLength = () => {
     if (!smsLengthHint) return;
     smsLengthHint.textContent = lookup('common.count', '{current} / {total}', {

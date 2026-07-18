@@ -37,8 +37,12 @@ export function createGeoSection({
     });
   const buildPreview = () =>
     serializeGeo({
-      latitude: latitudeInput.value.trim() || '[latitude]',
-      longitude: longitudeInput.value.trim() || '[longitude]',
+      latitude:
+        latitudeInput.value.trim() ||
+        lookup('content.preview.latitude', '[Latitude]'),
+      longitude:
+        longitudeInput.value.trim() ||
+        lookup('content.preview.longitude', '[Longitude]'),
       label: labelInput.value,
     });
 

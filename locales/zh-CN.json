@@ -1,7 +1,7 @@
 {
   "page": { "title": "免费二维码生成器、设计器和调试器" },
   "navigation": { "content": "内容", "style": "样式", "download": "下载", "debug": "调试" },
-  "content": { "data": "数据", "format": "格式", "frame": "边框", "tools": "内容工具" },
+  "content": { "data": "数据", "format": "格式", "frame": "边框", "tools": "内容工具", "preview": { "loading": "[选择此格式后加载内容预览]", "url": "[输入完整的 HTTPS 网址]", "text": "[输入文本]", "bulkRow": "[导入的数据行]", "networkName": "[网络名称]", "password": "[密码]", "email": "[电子邮件地址]", "subject": "[主题]", "message": "[消息]", "phoneNumber": "[电话号码]", "latitude": "[纬度]", "longitude": "[经度]", "fullName": "[姓名]", "organization": "[组织]", "title": "[职位]", "website": "[网站]", "file": "[所选文件内容]" } },
   "formats": { "url": "网址", "event": "日历事件", "vcard": "电子名片", "sms": "短信", "email": "电子邮件", "phone": "电话", "text": "文本", "number": "数字", "numberRange": "数字范围", "wifi": "Wi-Fi", "calendarEvent": "日历事件", "geo": "地理位置", "file": "文件" },
   "form": {
     "format": { "payloadFormat": "内容格式", "qrFormat": "二维码格式", "bulkImport": "批量导入" },

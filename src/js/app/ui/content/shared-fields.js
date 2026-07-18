@@ -1,4 +1,5 @@
 import { serializeEmail } from '../../content-formats.js';
+import { lookup } from '../../../i18n/index.js';
 
 export function createSharedFieldsSection({
   emailInputs,
@@ -36,9 +37,15 @@ export function createSharedFieldsSection({
   };
   const buildEmailPreview = () =>
     serializeEmail({
-      email: emailInputs[0].value.trim() || '[recipient@example.com]',
-      subject: emailSubject.value.trim() || '[subject]',
-      body: messageInputs.at(-1).value.trim() || '[message]',
+      email:
+        emailInputs[0].value.trim() ||
+        lookup('content.preview.email', '[Recipient email]'),
+      subject:
+        emailSubject.value.trim() ||
+        lookup('content.preview.subject', '[Subject]'),
+      body:
+        messageInputs.at(-1).value.trim() ||
+        lookup('content.preview.message', '[Message]'),
     });
 
   return {

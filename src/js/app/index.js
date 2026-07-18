@@ -77,7 +77,6 @@ const styleSetup = createLazyStyleSetup({
   setFrameCentered: (...args) => runtime.setFrameCentered(...args),
   colorWithTransparency,
 });
-
 const contentSections = createContentSections({
   document,
   elements,
@@ -90,6 +89,10 @@ const contentSections = createContentSections({
   limits: { numberFrames: LIMITS.numberFrames, sms: LIMITS.sms },
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
+  file: {
+    build: contentData.file.payload.build,
+    preview: contentData.file.payload.preview,
+  },
 });
 
 const setFormatVisibility = createFormatVisibility({
