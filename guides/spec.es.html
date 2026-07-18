@@ -53,7 +53,7 @@
   </head>
   <body>
     <header class="spec-header">
-      <a class="back-link" href="../index.html">Generador de QR</a>
+      <a class="back-link" href="../index.html">Generador de códigos QR</a>
       <nav aria-label="Secciones de la guía">
         <a href="#anatomy">Anatomía</a>
         <a href="#stream">Flujo de datos</a>
@@ -122,7 +122,7 @@
           </h2>
           <p>
             Los patrones funcionales se reservan antes de colocar el flujo
-            codificado. No son bytes de datos y el recorrido los evita.
+            codificado. No contienen datos y el recorrido del flujo los rodea.
           </p>
         </div>
 
@@ -172,7 +172,7 @@
             ></canvas>
             <p>
               Los módulos oscuros y claros alternos de la fila 6 y la columna 6
-              establecen el ritmo de la cuadrícula y conectan las zonas de los
+              marcan el espaciado de la cuadrícula y conectan las zonas de los
               patrones de posición.
             </p>
           </article>
@@ -188,8 +188,8 @@
             ></canvas>
             <p>
               Un módulo oscuro fijo se encuentra en la fila <code>4V + 9</code>,
-              columna 8. Siempre está oscuro y no forma parte de la copia
-              cercana de la información de formato.
+              columna 8. Este módulo siempre está oscuro y no forma parte de la
+              copia cercana de la información de formato.
             </p>
           </article>
         </div>
@@ -198,12 +198,14 @@
       <section class="guide-section metadata-section">
         <div class="section-intro">
           <p class="section-number">02 / Metadatos</p>
-          <h2>El decodificador recibe instrucciones antes del contenido</h2>
+          <h2>
+            Los metadatos indican al decodificador cómo interpretar el contenido
+          </h2>
           <p>
-            La información de formato y versión se codifica con protección de
-            errores BCH. La información de formato se escribe dos veces para que
-            los daños próximos a un patrón de posición no eliminen las
-            instrucciones de descodificación.
+            La información de formato y versión se codifica con protección BCH
+            contra errores. La información de formato se escribe dos veces para
+            conservar las instrucciones de descodificación aunque se produzcan
+            daños cerca de un patrón de posición.
           </p>
         </div>
         <div class="visual-grid metadata-grid">
@@ -249,7 +251,7 @@
 
       <section id="stream" class="guide-section stream-section">
         <div class="section-intro">
-          <p class="section-number">03 / Flujo codificado</p>
+          <p class="section-number">03 / Flujo de bits codificado</p>
           <h2>
             Los encabezados y los datos son campos de bits, no siempre bytes
           </h2>
@@ -268,8 +270,8 @@
         >
           <div class="segment-cycle">
             <header>
-              <strong>Segmento 1…N</strong
-              ><span>Repita una vez por cada segmento optimizado</span>
+              <strong>Segmentos 1…N</strong
+              ><span>Se repite por cada segmento optimizado</span>
             </header>
             <div class="segment-fields">
               <div class="bit-field mode">
@@ -289,10 +291,11 @@
               <strong>Terminador</strong><span>hasta 4 bits</span>
             </div>
             <div class="bit-field padding">
-              <strong>Límite de byte</strong><span>0 bits</span>
+              <strong>Alineación a byte</strong><span>0 bits</span>
             </div>
             <div class="bit-field padding">
-              <strong>Palabras de relleno</strong><span>EC / 11</span>
+              <strong>Palabras de código de relleno</strong
+              ><span>0xEC / 0x11</span>
             </div>
             <div class="bit-field ec">
               <strong>Palabras de código de corrección</strong
@@ -319,8 +322,8 @@
             <p>
               El indicador de modo de 4 bits selecciona el modo numérico,
               alfanumérico, de bytes o Kanji. El ancho del campo de recuento
-              depende tanto del modo como del intervalo de versiones; en el modo
-              de bytes se cuentan los bytes codificados.
+              depende del modo y del intervalo de versiones; el modo de bytes
+              cuenta los bytes codificados.
             </p>
           </article>
           <article class="visual-card payload-units-card">
@@ -331,7 +334,7 @@
             <p>
               Cada ejemplo siguiente contiene el encabezado y los datos
               completos de un segmento de versión 1. El ancho del campo de
-              recuento cambia según el modo; el modo Byte cuenta bytes
+              recuento cambia según el modo; el modo de bytes cuenta bytes
               codificados, no caracteres visibles.
             </p>
             <div class="unit-example-grid">
@@ -495,13 +498,13 @@
             <canvas
               data-qr-visual="remainder"
               role="img"
-              aria-label="Detalle de los módulos turquesa restantes después de la última palabra código"
+              aria-label="Detalle de los módulos turquesa restantes después de la última palabra de código"
             ></canvas>
             <p>
-              Algunas versiones dejan 3, 4 o 7 módulos disponibles después de
-              todas las palabras de código completas. Estos bits restantes con
-              valor cero completan la geometría de la matriz; no son datos ni
-              corrección de errores.
+              Algunas versiones dejan 3, 4 o 7 posiciones de módulo disponibles
+              para el recorrido después de todas las palabras de código
+              completas. Estos bits restantes, cuyo valor es cero, completan la
+              geometría de la matriz; no son datos ni corrección de errores.
             </p>
           </article>
         </div>
@@ -525,7 +528,9 @@
             <div class="visual-heading multi-dot">
               <span class="color-dot data"></span
               ><span class="color-dot ec-words"></span>
-              <h3>Datos y palabras de código de corrección Reed–Solomon</h3>
+              <h3>
+                Datos y palabras de código de corrección de errores Reed–Solomon
+              </h3>
             </div>
             <canvas
               data-qr-visual="error-correction"
@@ -536,8 +541,8 @@
               La versión y el nivel de corrección de errores seleccionados
               definen uno o varios bloques Reed–Solomon sobre GF(256). Antes de
               colocarlas, las palabras de código de datos y de corrección de
-              errores se intercalan entre los bloques, de modo que los daños
-              localizados se repartan entre símbolos recuperables.
+              errores se intercalan entre los bloques, lo que distribuye los
+              daños localizados entre símbolos recuperables.
             </p>
             <div
               class="level-row"
@@ -560,11 +565,11 @@
               aria-label="Detalle de los módulos azules afectados por la máscara QR seleccionada"
             ></canvas>
             <p>
-              Una de ocho fórmulas invierte determinados módulos no funcionales.
+              Una de las ocho fórmulas invierte determinados módulos de datos.
               El codificador puntúa cada candidata según las secuencias largas,
               los bloques de 2 por 2, los patrones similares a los de posición y
               el equilibrio entre módulos oscuros y claros; después registra la
-              ganadora en la información de formato.
+              máscara ganadora en la información de formato.
             </p>
           </article>
         </div>
@@ -572,7 +577,10 @@
         <div id="masks" class="mask-guide">
           <div class="mask-guide-intro">
             <p class="section-number">Ocho máscaras candidatas</p>
-            <h3>La fórmula cambia; los patrones de referencia no</h3>
+            <h3>
+              La fórmula cambia, pero los patrones de referencia permanecen
+              iguales
+            </h3>
             <p>
               Para cada módulo no funcional situado en la fila <code>r</code> y
               la columna <code>c</code>, cuando la fórmula se cumple se invierte
@@ -686,7 +694,7 @@
       <section class="guide-section reading-section">
         <div class="section-intro">
           <p class="section-number">05 / Orden de descodificación</p>
-          <h2>Proceso conceptual de un lector</h2>
+          <h2>Pasos conceptuales que sigue un lector</h2>
         </div>
         <ol class="process-list">
           <li>
@@ -715,7 +723,7 @@
             <div>
               <strong>Desenmascarar y recorrer</strong>
               <p>
-                Invierta la máscara seleccionada en los módulos no funcionales y
+                Deshaga la máscara seleccionada en los módulos de datos y
                 recopile los bits de las palabras de código siguiendo la ruta en
                 zigzag de dos columnas.
               </p>
@@ -738,8 +746,8 @@
               <strong>Analizar segmentos</strong>
               <p>
                 Lea el encabezado de modo y recuento de cada segmento y
-                descodifique sus unidades de datos hasta llegar al terminador o
-                completar la capacidad.
+                descodifique sus unidades de datos hasta encontrar el terminador
+                o agotar la capacidad de datos.
               </p>
             </div>
           </li>
@@ -749,17 +757,15 @@
       <section id="implementation" class="guide-section implementation-section">
         <div class="section-intro">
           <p class="section-number">06 / Límites de implementación</p>
-          <h2>
-            Utilice la guía para aprender; utilice la fuente para reproducir
-          </h2>
+          <h2>Aprenda con la guía; implemente con el código fuente</h2>
           <p>
             Esta guía visual explica la estructura y el orden de lectura, pero
             no reproduce todas las tablas normativas, los polinomios, las
-            coordenadas, las reglas de ancho de bits ni los casos límite
-            necesarios para crear un codificador conforme. Los enlaces
-            siguientes muestran dónde implementa el generador esos detalles. Son
-            referencias legibles de la implementación, no sustituyen a ISO/IEC
-            18004.
+            coordenadas, las reglas sobre el ancho de los campos ni los casos
+            límite necesarios para crear un codificador conforme. Los enlaces
+            siguientes indican dónde se implementan esos detalles en el
+            generador. El código fuente sirve como referencia práctica, pero no
+            sustituye a la norma ISO/IEC 18004.
           </p>
         </div>
 
@@ -771,8 +777,8 @@
               ><code>constants.js</code> define los indicadores de modo, el
               alfabeto alfanumérico, los anchos del recuento de caracteres, los
               valores de formato del nivel de corrección de errores, las
-              palabras de código de corrección por bloque y la cantidad de
-              bloques para las versiones 1 a 40.</span
+              palabras de código de corrección de errores por bloque y el número
+              de bloques para las versiones 1 a 40.</span
             ></a
           >
           <a
@@ -819,7 +825,7 @@
               ><code>reed-solomon.js</code> contiene la multiplicación en
               GF(256), la construcción del polinomio generador, el cálculo del
               resto, la división en bloques cortos y largos y el entrelazado de
-              datos y palabras de corrección de errores.</span
+              las palabras de código de datos y de corrección de errores.</span
             ></a
           >
           <a
@@ -841,7 +847,7 @@
           >
           <a
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/penalty.js"
-            ><strong>Cálculo de penalización de máscaras</strong
+            ><strong>Cálculo de la penalización de las máscaras</strong
             ><span
               ><code>penalty.js</code> puntúa las secuencias, los bloques, los
               patrones similares a los de posición y el desequilibrio entre
@@ -881,13 +887,14 @@
         <div class="implementation-warning">
           <strong>No implementado por este codificador</strong>
           <p>
-            El código fuente actual genera códigos QR estándar Modelo 2 en los
-            modos numérico, alfanumérico, de bytes y Kanji seleccionado
-            manualmente. No sirve como referencia de implementación para
-            segmentos ECI, anexado estructurado, FNC1/GS1, modo Hanzi, Micro QR,
-            Micro QR rectangular, símbolos Modelo 1 ni descodificación QR.
-            Consulte la especificación normativa correspondiente antes de
-            afirmar compatibilidad más allá del alcance probado.
+            El código fuente actual genera códigos QR estándar de Modelo 2 en
+            los modos numérico, alfanumérico y de bytes, además del modo Kanji
+            cuando se selecciona manualmente. No sirve como referencia de
+            implementación para segmentos ECI, concatenación estructurada,
+            FNC1/GS1, modo Hanzi, Micro QR, QR rectangular (rMQR), símbolos de
+            Modelo 1 ni descodificación de códigos QR. Consulte la
+            especificación normativa correspondiente antes de afirmar
+            compatibilidad más allá del alcance comprobado.
           </p>
         </div>
       </section>
@@ -897,29 +904,27 @@
           <p class="section-number">Referencias primarias</p>
           <h2>Estándares y referencias de implementación</h2>
           <p>
-            Esta guía tiene fines explicativos y no sustituye al estándar
-            normativo. El generador implementa las tablas exactas de bloques,
-            los anchos de recuento, las penalizaciones de máscara y las reglas
-            de codificación, y los verifica frente a matrices de referencia.
+            Esta guía tiene fines explicativos y no sustituye a la norma. El
+            generador implementa las tablas exactas de bloques, los anchos de
+            recuento, las penalizaciones de máscara y las reglas de
+            codificación, que se verifican mediante matrices de referencia.
           </p>
         </div>
         <div class="reference-links">
           <a href="https://www.iso.org/standard/83389.html"
             ><strong>ISO/IEC 18004:2024</strong
-            ><span
-              >Especificación de la simbología normativa del código QR</span
-            ></a
+            ><span>Especificación normativa de la simbología QR</span></a
           >
           <a href="https://www.qrcode.com/en/about/standards.html"
             ><strong>Historia de los estándares DENSO WAVE</strong
             ><span>Desarrollo y estandarización del código QR</span></a
           >
           <a href="https://www.qrcode.com/en/howto/cell.html"
-            ><strong>Configuración del módulo DENSO</strong
-            ><span>Visión general del patrón funcional</span></a
+            ><strong>Configuración de módulos según DENSO WAVE</strong
+            ><span>Descripción general de los patrones funcionales</span></a
           >
           <a href="https://www.qrcode.com/en/about/error_correction.html"
-            ><strong>Corrección de errores DENSO</strong
+            ><strong>Corrección de errores según DENSO WAVE</strong
             ><span
               >Relación entre los niveles de corrección de errores y la
               capacidad del símbolo</span

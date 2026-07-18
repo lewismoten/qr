@@ -181,3 +181,33 @@ test('Spanish guide index uses polished interface copy', async () => {
   assert.match(copy, /ocho máscaras definidas por la especificación QR/i);
   assert.match(copy, /varios códigos QR/);
 });
+
+test('Spanish specification uses fluent technical language', async () => {
+  const source = await readFile('guides/spec.es.html', 'utf8');
+  const copy = source.replaceAll(/\s+/g, ' ');
+  const literalPhrases = [
+    'Generador de QR',
+    'palabra código',
+    'Una de ocho fórmulas',
+    'módulos no funcionales',
+    'utilice la fuente para reproducir',
+    'referencias legibles de la implementación',
+    'anexado estructurado',
+    'Kanji seleccionado manualmente',
+    'Micro QR rectangular',
+    'cantidad de bloques',
+    'el modo Byte',
+  ];
+
+  literalPhrases.forEach((phrase) =>
+    assert.doesNotMatch(copy, new RegExp(phrase, 'i')),
+  );
+  assert.match(copy, /Generador de códigos QR/);
+  assert.match(copy, /Segmentos 1…N/);
+  assert.match(copy, /palabras de código de corrección de errores/i);
+  assert.match(copy, /Una de las ocho fórmulas/i);
+  assert.match(copy, /Aprenda con la guía; implemente con el código fuente/i);
+  assert.match(copy, /concatenación estructurada/i);
+  assert.match(copy, /QR rectangular \(rMQR\)/);
+  assert.match(copy, /no sustituye a la norma ISO\/IEC 18004/i);
+});
