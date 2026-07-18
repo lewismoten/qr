@@ -25,7 +25,7 @@
       <article class="info-dialog-shell">
         <header class="info-dialog-header info-page-header">
           <div>
-            <p class="info-kicker">Inventario de tecnología</p>
+            <p class="info-kicker">Inventario tecnológico</p>
             <h1 id="technology-page-title">
               Tecnología, estándares y licencias
             </h1>
@@ -44,7 +44,7 @@
             <div class="dependency-list">
               <article>
                 <div>
-                  <h3>Fuente del proyecto</h3>
+                  <h3>Código fuente del proyecto</h3>
                   <span class="version-badge">Repositorio canónico</span>
                 </div>
                 <p>
@@ -53,7 +53,7 @@
                   web permite consultar el proyecto; la <code>.git</code> es la
                   URL HTTPS canónica para clonar el repositorio.
                 </p>
-                <nav aria-label="Enlaces de la fuente del proyecto">
+                <nav aria-label="Enlaces al código fuente del proyecto">
                   <a href="https://git.lewismoten.com/lewismoten/qr"
                     >Explorar el repositorio</a
                   ><a href="https://git.lewismoten.com/lewismoten/qr.git"
@@ -150,18 +150,18 @@
             <div class="dependency-list">
               <article>
                 <div>
-                  <h3>Texto bruto, números, URL y URL de datos</h3>
+                  <h3>Texto sin formato, números, URL y URL de datos</h3>
                   <span class="version-badge">Datos de texto QR</span>
                 </div>
                 <p>
-                  Los formatos de texto y número colocan sus caracteres
-                  resultantes directamente en uno o más segmentos de datos QR
-                  sin un envoltorio adicional. Los códigos de sitios web llevan
-                  una URL HTTP o HTTPS absoluta. El modo de datos de archivo
-                  único utiliza un <code>data:</code> una URL con Base64
-                  estándar, mientras que el protocolo propio de fragmentos
-                  utiliza Base64url sin relleno para transportar datos binarios
-                  de forma compacta.
+                  Los formatos de texto y número colocan el contenido
+                  directamente en uno o varios segmentos de datos QR, sin una
+                  envoltura adicional. Los códigos para sitios web contienen una
+                  URL absoluta HTTP o HTTPS. El modo Datos para un solo archivo
+                  utiliza una URL <code>data:</code> con Base64 estándar,
+                  mientras que el protocolo propio de fragmentos utiliza
+                  Base64url sin relleno para transportar datos binarios de forma
+                  compacta.
                 </p>
                 <nav aria-label="Referencias de datos sin procesar">
                   <a href="https://www.rfc-editor.org/info/rfc3986"
@@ -175,22 +175,22 @@
               </article>
               <article>
                 <div>
-                  <h3>Contactos y eventos del calendario</h3>
+                  <h3>Contactos y eventos de calendario</h3>
                   <span class="version-badge">Formatos IETF</span>
                 </div>
                 <p>
-                  Los códigos de contacto utilizan un subconjunto
-                  deliberadamente pequeño al estilo vCard 3.0 que contiene
-                  <code>FN</code> Y propiedades de organización, título,
-                  teléfono, correo electrónico y URL opcionales. Se dirige al
-                  comportamiento común de los escáneres, pero no implementa
-                  todas las reglas de escapamiento, plegado o propiedad de RFC
-                  2426; RFC 6350 define el formato más reciente de vCard 4.0.
-                  Los códigos de calendario son objetos iCalendar 2.0 que
-                  contienen un <code>VEVENT</code>, UID, hora y fecha, fechas o
-                  fechas y horas locales flotantes, resumen y detalles
-                  opcionales según RFC 5545. Estas son convenciones de carga
-                  útil de texto, no tipos alternativos de símbolos QR.
+                  Los códigos de contacto utilizan deliberadamente un
+                  subconjunto reducido, basado en vCard 3.0, que contiene
+                  <code>FN</code> y propiedades opcionales de organización,
+                  cargo, teléfono, correo electrónico y URL. Está pensado para
+                  el comportamiento habitual de los lectores, pero no implementa
+                  todas las reglas de escape, plegado y propiedades de RFC 2426;
+                  RFC 6350 define el formato vCard 4.0 más reciente. Los códigos
+                  de calendario son objetos iCalendar 2.0 que contienen un
+                  <code>VEVENT</code>, UID, marca de tiempo, fechas o fechas y
+                  horas locales sin zona horaria, resumen y detalles opcionales
+                  conforme a RFC 5545. Se trata de convenciones para datos de
+                  texto, no de tipos alternativos de símbolos QR.
                 </p>
                 <nav
                   aria-label="Referencias de formatos de contacto y calendario"
@@ -213,12 +213,12 @@
                   El correo electrónico utiliza el esquema
                   <code>mailto:</code> de URI; los números de teléfono utilizan
                   <code>tel:</code>, y las coordenadas geográficas utilizan
-                  <code>geo:</code> con latitud y longitud WGS 84. Las etiquetas
-                  Geo se añaden mediante el parámetro reconocido habitualmente
-                  <code>q</code> como convención de consulta, en lugar de un
-                  campo de etiqueta específico de RFC 5870. El reconocimiento y
-                  la acción ofrecida después del escaneo siguen dependiendo de
-                  la aplicación receptora.
+                  <code>geo:</code> con latitud y longitud WGS 84. Se puede
+                  añadir una etiqueta Geo mediante el parámetro
+                  <code>q</code> como convención de consulta habitual, en lugar
+                  de utilizar un campo de etiqueta específico de RFC 5870. El
+                  reconocimiento y la acción propuesta después de leer el código
+                  siguen dependiendo de la aplicación receptora.
                 </p>
                 <nav aria-label="Referencias de URI de datos">
                   <a href="https://www.rfc-editor.org/info/rfc3986"
@@ -241,12 +241,12 @@
                   Las credenciales Wi-Fi utilizan la convención de texto
                   ampliamente implementada
                   <code>WIFI:T:...;S:...;P:...;;</code> catalogada por ZXing,
-                  incluidos el escape y la indicación de red oculta. Los SMS
-                  utilizan el formato reconocido habitualmente
-                  <code>SMSTO:</code> . Ninguno de estos formatos está definido
-                  por ISO/IEC 18004 ni por un estándar IETF de datos QR, y la
-                  compatibilidad de los lectores puede variar según la
-                  plataforma.
+                  incluidos los caracteres de escape y la indicación de red
+                  oculta. Los SMS utilizan la convención
+                  <code>SMSTO:</code> para preparar mensajes. Ninguna de estas
+                  convenciones está definida por ISO/IEC 18004 ni por un
+                  estándar IETF de datos QR, y su compatibilidad con los
+                  lectores puede variar según la plataforma.
                 </p>
                 <nav
                   aria-label="Referencias de convenciones de datos para lectores"
@@ -286,7 +286,7 @@
                     href="https://www.iana.org/assignments/media-types/text/csv"
                     >Registro de texto/csv IANA</a
                   ><a href="https://www.w3.org/TR/FileAPI/#dom-blob-text"
-                    >Archivo API Blob.text()</a
+                    >API File: Blob.text()</a
                   >
                 </nav>
               </article>
@@ -296,19 +296,19 @@
                   <span class="version-badge">Protocolo propio</span>
                 </div>
                 <p>
-                  Definido por la aplicación <code>FILE:1</code> transporta un
-                  archivo único o fragmentos que pueden recibirse en cualquier
-                  orden. Su encabezado legible identifica el modo de archivo
-                  único o fragmentado, la presencia del manifiesto, un
-                  identificador aleatorio de transferencia de 128 bits
-                  codificado con 22 caracteres Base64url, una indicación de
-                  extensión, el desplazamiento en bytes y la longitud total. Un
-                  manifiesto tipado opcional puede incluir el nombre, el tipo
-                  MIME, la fecha de modificación, el tamaño original, metadatos
-                  JSON y una validación SHA-256; una marca registra la
-                  codificación gzip opcional. No es un estándar ISO, IETF ni un
-                  formato establecido para lectores, por lo que requiere
-                  software receptor compatible.
+                  El formato propio <code>FILE:1</code> transporta un archivo
+                  único o fragmentos que pueden recibirse en cualquier orden. Su
+                  encabezado legible identifica el modo de archivo único o
+                  fragmentado, la presencia del manifiesto, un identificador
+                  aleatorio de transferencia de 128 bits codificado con 22
+                  caracteres Base64url, una indicación de extensión, el
+                  desplazamiento en bytes y la longitud total. Un manifiesto
+                  tipado opcional puede incluir el nombre, el tipo MIME, la
+                  fecha de modificación, el tamaño original, metadatos JSON y
+                  una validación SHA-256; una marca registra la codificación
+                  gzip opcional. No es un estándar ISO, IETF ni un formato
+                  establecido para lectores, por lo que requiere software
+                  receptor compatible.
                 </p>
                 <nav aria-label="Referencias de protocolos de archivos">
                   <a href="../README.md#file-chunked-transport"
@@ -330,7 +330,7 @@
             <div class="dependency-list">
               <article>
                 <div>
-                  <h3>Imágenes raster y vectoriales</h3>
+                  <h3>Imágenes ráster y vectoriales</h3>
                   <span class="version-badge">Código propio + Canvas</span>
                 </div>
                 <p>
@@ -376,7 +376,7 @@
                   imágenes las distribuyen en páginas Carta de EE. UU. con
                   márgenes de media pulgada.
                 </p>
-                <nav aria-label="Referencias en PDF">
+                <nav aria-label="Referencias de PDF">
                   <a
                     href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.4.pdf"
                     >Referencia PDF 1.4</a
@@ -409,7 +409,7 @@
               </article>
               <article>
                 <div>
-                  <h3>Suma de verificación CRC-32</h3>
+                  <h3>Sumas de verificación CRC-32</h3>
                   <span class="version-badge">Código propio</span>
                 </div>
                 <p>
@@ -433,7 +433,7 @@
           </section>
 
           <section>
-            <h2>Funciones de la plataforma del navegador</h2>
+            <h2>Funciones de la plataforma web</h2>
             <div class="dependency-list">
               <article>
                 <div>
@@ -477,7 +477,7 @@
                   archivo en los datos QR; el transporte FILE personalizado
                   descrito anteriormente es un formato propio independiente.
                 </p>
-                <nav aria-label="Referencias de archivos y URL de la API">
+                <nav aria-label="Referencias de las API File y URL">
                   <a href="https://www.w3.org/TR/FileAPI/">API de archivos</a
                   ><a href="https://url.spec.whatwg.org/">Estándar de URL</a
                   ><a
@@ -507,7 +507,7 @@
                   ><a href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final"
                     >FIPS 180-4</a
                   ><a href="https://compression.spec.whatwg.org/"
-                    >Streams de compresión</a
+                    >API Compression Streams</a
                   ><a href="https://www.rfc-editor.org/rfc/rfc1952"
                     >RFC 1952 gzip</a
                   >
@@ -567,7 +567,7 @@
           </section>
 
           <section>
-            <h2>Software de desarrollo y prueba</h2>
+            <h2>Software de desarrollo y pruebas</h2>
             <div class="dependency-list">
               <article>
                 <div>
@@ -586,7 +586,7 @@
                   aplicación publicada.
                 </p>
                 <nav aria-label="Enlaces de esbuild">
-                  <a href="https://esbuild.github.io/">documentación</a
+                  <a href="https://esbuild.github.io/">Documentación</a
                   ><a href="https://github.com/evanw/esbuild">Repositorio</a
                   ><a
                     href="https://github.com/evanw/esbuild/blob/main/LICENSE.md"
@@ -607,7 +607,7 @@
                   publicado se ejecuta en el navegador.
                 </p>
                 <nav aria-label="Enlaces de Node.js">
-                  <a href="https://nodejs.org/">página web</a
+                  <a href="https://nodejs.org/">Sitio web</a
                   ><a href="https://github.com/nodejs/node">Repositorio</a
                   ><a href="https://github.com/nodejs/node/blob/main/LICENSE"
                     >Licencia y avisos incluidos</a
@@ -649,7 +649,7 @@
               <article>
                 <div>
                   <h3>OpenStreetMap</h3>
-                  <span class="version-badge">Datos en vivo</span>
+                  <span class="version-badge">Datos en directo</span>
                 </div>
                 <p>
                   Sirve teselas de mapa ráster estándar directamente a la vista
@@ -659,7 +659,7 @@
                   atribución obligatoria a las personas colaboradoras.
                 </p>
                 <nav aria-label="Enlaces de OpenStreetMap">
-                  <a href="https://www.openstreetmap.org/">página web</a
+                  <a href="https://www.openstreetmap.org/">Sitio web</a
                   ><a
                     href="https://github.com/openstreetmap/openstreetmap-website"
                     >Repositorio del sitio web</a
@@ -697,7 +697,7 @@
           <nav aria-label="Navegación de la página de tecnología">
             <a href="../index.html">Generador</a
             ><a href="index.es.html">Guías</a
-            ><a href="https://git.lewismoten.com/lewismoten/qr">fuente</a
+            ><a href="https://git.lewismoten.com/lewismoten/qr">Código fuente</a
             ><a href="#technology-page-content">Volver a la parte superior</a>
           </nav>
         </footer>

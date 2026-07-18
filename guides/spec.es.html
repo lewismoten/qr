@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Guía visual de especificaciones del código QR</title>
+    <title>Guía visual de la especificación de códigos QR</title>
     <meta
       name="description"
       content="Una guía visual de la estructura de los códigos QR: patrones de posición y alineación, bits de modo y recuento de caracteres, datos, corrección de errores, máscaras, información de formato, relleno y bits restantes."
@@ -54,7 +54,7 @@
   <body>
     <header class="spec-header">
       <a class="back-link" href="../index.html">Generador de QR</a>
-      <nav aria-label="Secciones de guía">
+      <nav aria-label="Secciones de la guía">
         <a href="#anatomy">Anatomía</a>
         <a href="#stream">Flujo de datos</a>
         <a href="#masks">Máscaras</a>
@@ -84,7 +84,7 @@
           <canvas
             data-qr-visual="overview"
             role="img"
-            aria-label="Un verdadero código QR de versión 7 con todas las regiones funcionales y de datos coloreadas utilizando la paleta de superposición de depuración del generador"
+            aria-label="Un código QR real de versión 7 con todas las regiones funcionales y de datos coloreadas mediante la paleta de capas de depuración del generador"
           ></canvas>
           <figcaption>
             Matriz real de versión 7, coloreada con las mismas categorías de
@@ -238,8 +238,8 @@
             ></canvas>
             <p>
               Las versiones 7 a 40 almacenan un valor de versión protegido de 18
-              bits en dos áreas de 3 por 6. Las versiones más pequeñas comunican
-              su tamaño directamente a través de las dimensiones de la matriz.
+              bits en dos áreas de 3 por 6 módulos. En las versiones inferiores,
+              el tamaño se deduce directamente de las dimensiones de la matriz.
             </p>
           </article>
         </div>
@@ -266,7 +266,7 @@
         >
           <div class="segment-cycle">
             <header>
-              <strong>Segmento 1...N</strong
+              <strong>Segmento 1…N</strong
               ><span>Repita una vez por cada segmento optimizado</span>
             </header>
             <div class="segment-fields">
@@ -275,7 +275,7 @@
               </div>
               <div class="bit-field count">
                 <strong>Recuento de caracteres</strong
-                ><span>La anchura varía</span>
+                ><span>ancho variable</span>
               </div>
               <div class="bit-field data">
                 <strong>Datos</strong><span>según el modo</span>
@@ -284,7 +284,7 @@
           </div>
           <div class="post-segment-fields">
             <div class="bit-field terminator">
-              <strong>Terminador</strong><span>Hasta 4 bits</span>
+              <strong>Terminador</strong><span>hasta 4 bits</span>
             </div>
             <div class="bit-field padding">
               <strong>Límite de byte</strong><span>0 bits</span>
@@ -296,7 +296,7 @@
               <strong>Palabras de corrección</strong><span>intercaladas</span>
             </div>
             <div class="bit-field remainder">
-              <strong>Bits restantes</strong><span>0-7 bits</span>
+              <strong>Bits restantes</strong><span>0–7 bits</span>
             </div>
           </div>
         </div>
@@ -306,7 +306,7 @@
             <div class="visual-heading multi-dot">
               <span class="color-dot mode"></span
               ><span class="color-dot count"></span>
-              <h3>Modo y número de caracteres</h3>
+              <h3>Modo y recuento de caracteres</h3>
             </div>
             <canvas
               data-qr-visual="header"
@@ -390,7 +390,10 @@
                 <header>
                   <strong>byte</strong><code>é</code><span>2 bytes UTF-8</span>
                 </header>
-                <div class="unit-stream" aria-label="Bits del segmento de byte">
+                <div
+                  class="unit-stream"
+                  aria-label="Bits del segmento de bytes"
+                >
                   <span class="mode"
                     ><small>Modo</small><code data-mode-bits>0100</code></span
                   >
@@ -411,10 +414,7 @@
                 <header>
                   <strong>Kanji</strong><code>漢</code><span>1 carácter</span>
                 </header>
-                <div
-                  class="unit-stream"
-                  aria-label="Bits de segmentos de Kanji"
-                >
+                <div class="unit-stream" aria-label="Bits del segmento Kanji">
                   <span class="mode"
                     ><small>Modo</small><code data-mode-bits>1000</code></span
                   >
@@ -477,10 +477,10 @@
               aria-label="Detalle de los bits verdes del terminador y de los módulos grises de alineación y relleno de bytes"
             ></canvas>
             <p>
-              Después del último segmento, se agregan hasta cuatro bits
-              terminadores de cero. Más bits de cero alcanzan el límite de un
-              byte; alternando <code>0xEC</code> y <code>0x11</code> las
-              palabras código de relleno completan la capacidad de datos.
+              Tras el último segmento se añaden hasta cuatro bits cero de
+              terminación. Después se agregan más ceros hasta completar un byte;
+              a continuación se alternan las palabras código <code>0xEC</code> y
+              <code>0x11</code> para completar la capacidad de datos.
             </p>
           </article>
           <article class="visual-card">
@@ -567,13 +567,13 @@
 
         <div id="masks" class="mask-guide">
           <div class="mask-guide-intro">
-            <p class="section-number">Ocho candidatos a la máscara</p>
-            <h3>La fórmula cambia; los puntos de referencia no lo hacen</h3>
+            <p class="section-number">Ocho máscaras candidatas</p>
+            <h3>La fórmula cambia; los patrones de referencia no</h3>
             <p>
-              Para cada módulo no funcional situado en la fila <code>r</code> Y
-              columna <code>c</code>, cuando la fórmula se cumple se invierte el
-              bit almacenado. El azul indica dónde se activa cada fórmula. Los
-              patrones de posición, alineación y temporización permanecen
+              Para cada módulo no funcional situado en la fila <code>r</code> y
+              la columna <code>c</code>, cuando la fórmula se cumple se invierte
+              el bit almacenado. El azul indica dónde se activa cada fórmula.
+              Los patrones de posición, alineación y temporización permanecen
               oscuros como referencia porque la máscara nunca los modifica.
             </p>
           </div>
@@ -688,7 +688,7 @@
           <li>
             <span>1</span>
             <div>
-              <strong>Localizar y tomar muestras</strong>
+              <strong>Localizar y muestrear</strong>
               <p>
                 Utilice los patrones de posición, separación, temporización y
                 alineación para determinar la cuadrícula de módulos.
@@ -709,7 +709,7 @@
           <li>
             <span>3</span>
             <div>
-              <strong>Desmascarar y atravesar</strong>
+              <strong>Desenmascarar y recorrer</strong>
               <p>
                 Invierta la máscara seleccionada en los módulos no funcionales y
                 recopile los bits de las palabras código siguiendo la ruta en
@@ -749,11 +749,12 @@
           </h2>
           <p>
             Esta guía visual explica la estructura y el orden de lectura, pero
-            no reproduce todas las tablas normativas, polinomios, coordenadas,
-            reglas de anchura de bit o casos límite necesarios para construir un
-            codificador conforme. Los enlaces a continuación muestran dónde este
-            generador implementa esos detalles. Son referencias de
-            implementación legibles, no sustitutos de ISO/IEC 18004.
+            no reproduce todas las tablas normativas, los polinomios, las
+            coordenadas, las reglas de ancho de bits ni los casos límite
+            necesarios para crear un codificador conforme. Los enlaces
+            siguientes muestran dónde implementa el generador esos detalles. Son
+            referencias legibles de la implementación, no sustituyen a ISO/IEC
+            18004.
           </p>
         </div>
 
@@ -798,7 +799,7 @@
           >
           <a
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"
-            ><strong>Capacidad y geometría del residuo</strong
+            ><strong>Capacidad y geometría de los bits restantes</strong
             ><span
               ><code>capacity.js</code> calcula los módulos de datos sin
               procesar, el ancho del recuento de caracteres y las palabras
@@ -829,8 +830,8 @@
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"
             ><strong>Ocho fórmulas de máscara</strong
             ><span
-              ><code>mask.js</code> Da el predicado exacto de fila/columna
-              utilizado por cada candidato a máscara.</span
+              ><code>mask.js</code> define la condición exacta de fila y columna
+              que utiliza cada máscara candidata.</span
             ></a
           >
           <a
@@ -914,7 +915,7 @@
           <a href="https://www.qrcode.com/en/about/error_correction.html"
             ><strong>Corrección de errores DENSO</strong
             ><span
-              >Niveles de recuperación y compromisos de capacidad de
+              >Equilibrio entre los niveles de recuperación y la capacidad del
               símbolo</span
             ></a
           >
@@ -929,10 +930,10 @@
     </main>
 
     <footer class="spec-footer">
-      <span>Guía visual de especificaciones del código QR</span>
+      <span>Guía visual de la especificación de códigos QR</span>
       <nav aria-label="Pie de página de la guía">
         <a href="../index.html">Generador</a><a href="index.es.html">Guías</a
-        ><a href="https://git.lewismoten.com/lewismoten/qr">fuente</a
+        ><a href="https://git.lewismoten.com/lewismoten/qr">Código fuente</a
         ><a href="#guide-title">Volver a la parte superior</a>
       </nav>
     </footer>

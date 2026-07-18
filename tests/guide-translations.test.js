@@ -82,3 +82,25 @@ test('reviewed guide translations override machine output', async () => {
   assert.equal(translations.Mask, 'Máscara');
   assert.equal(translations['Open generator'], 'Abrir generador');
 });
+
+test('Spanish inline prose remains grammatical after HTML assembly', async () => {
+  const technology = await readFile('guides/technology.es.html', 'utf8');
+  const specification = await readFile('guides/spec.es.html', 'utf8');
+
+  assert.match(
+    technology,
+    /utiliza una URL <code>data:<\/code> con Base64 estándar/,
+  );
+  assert.match(
+    technology,
+    /parámetro\s+<code>q<\/code> como convención de consulta habitual/,
+  );
+  assert.match(
+    technology,
+    /convención\s+<code>SMSTO:<\/code> para preparar mensajes/,
+  );
+  assert.match(
+    specification,
+    /<code>0x11<\/code> para completar la capacidad de datos/,
+  );
+});
