@@ -81,6 +81,10 @@
   display: grid;
 }
 
+.info-page-body [data-app-only] {
+  display: none;
+}
+
 .info-page-body [data-guide-section] {
   padding: 0.8rem;
   border: 1px solid rgba(15, 118, 110, 0.18);
@@ -92,6 +96,44 @@
   margin: 0 0 0.2rem;
   color: #0f615c;
   font-size: 0.9rem;
+}
+
+.info-page-body .guide-pixel-palette {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.info-page-body .guide-pixel-swatch {
+  min-width: 0;
+  min-height: 2.75rem;
+  overflow: hidden;
+  border: 2px solid rgba(19, 34, 53, 0.16);
+  border-radius: 0.65rem;
+  background: var(--palette-color);
+  color: transparent;
+  font-size: 0;
+}
+
+.info-page-body .guide-pixel-swatch.is-eraser {
+  background:
+    linear-gradient(45deg, transparent 43%, #dc2626 44% 56%, transparent 57%),
+    repeating-conic-gradient(#e2e8f0 0 25%, #fff 0 50%) 0 0 / 0.75rem 0.75rem;
+}
+
+.info-page-body .guide-pixel-sample {
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  justify-self: center;
+  border: 2px solid rgba(19, 34, 53, 0.2);
+  border-radius: 0.7rem;
+  image-rendering: pixelated;
+}
+
+@media (max-width: 34rem) {
+  .info-page-body .guide-pixel-palette {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
 
 .info-page-header {

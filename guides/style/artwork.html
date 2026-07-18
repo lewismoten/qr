@@ -495,9 +495,95 @@
                       Clear
                     </button>
                   </div>
+                  <div class="guide-only guide-pixel-palette">
+                    <span class="guide-pixel-swatch is-eraser"
+                      >Transparent</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #000000"
+                      >Black</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #0000aa"
+                      >Blue</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #00aa00"
+                      >Green</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #00aaaa"
+                      >Cyan</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #aa0000"
+                      >Red</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #aa00aa"
+                      >Magenta</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #aa5500"
+                      >Brown</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #aaaaaa"
+                      >Light gray</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #555555"
+                      >Dark gray</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #5555ff"
+                      >Bright blue</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #55ff55"
+                      >Bright green</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #55ffff"
+                      >Bright cyan</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #ff5555"
+                      >Bright red</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #ff55ff"
+                      >Bright magenta</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #ffff55"
+                      >Yellow</span
+                    >
+                    <span
+                      class="guide-pixel-swatch"
+                      style="--palette-color: #ffffff"
+                      >White</span
+                    >
+                  </div>
                   <div
                     id="pixel-art-palette"
                     class="pixel-art-palette"
+                    data-app-only
                     role="group"
                     aria-label="EGA paint colors"
                   ></div>
@@ -511,9 +597,41 @@
                       >Match the QR module shape</span
                     >
                   </label>
+                  <svg
+                    class="guide-only guide-pixel-sample"
+                    viewBox="0 0 16 16"
+                    role="img"
+                    aria-label="Sample 16 by 16 pixel editor heart"
+                    shape-rendering="crispEdges"
+                  >
+                    <title>Sample 16 by 16 pixel editor heart</title>
+                    <defs>
+                      <pattern
+                        id="pixel-editor-checker"
+                        width="2"
+                        height="2"
+                        patternUnits="userSpaceOnUse"
+                      >
+                        <path fill="#ffffff" d="M0 0h1v1H0zM1 1h1v1H1z" />
+                        <path fill="#e2e8f0" d="M1 0h1v1H1zM0 1h1v1H0z" />
+                      </pattern>
+                    </defs>
+                    <path fill="url(#pixel-editor-checker)" d="M0 0h16v16H0z" />
+                    <path
+                      fill="#aa0000"
+                      d="M3 2h4v1h2V2h4v1h2v6h-1v2h-2v2h-2v2H6v-2H4v-2H2V9H1V3h2z"
+                    />
+                    <path
+                      fill="#ff5555"
+                      d="M3 3h4v2h2V3h4v1h1v5h-2v2h-2v2H6v-2H4V9H2V4h1z"
+                    />
+                    <path fill="#ffffff" d="M3 4h2v1H3z" />
+                    <path fill="#ffff55" d="M4 5h1v1H4z" />
+                  </svg>
                   <div
                     id="pixel-art-grid"
                     class="pixel-art-grid"
+                    data-app-only
                     role="grid"
                     aria-label="16 by 16 pixel art editor"
                   ></div>
