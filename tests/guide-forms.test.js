@@ -44,6 +44,7 @@ describe('standalone guide forms', () => {
     const artwork = await read('guides/style/artwork.html');
     const controls = await read('src/js/app/ui/style/art/controls.js');
     const css = await read('src/css/app/info-shell.css');
+    const featureCss = await read('src/css/features/style/artwork.css');
 
     for (const name of ['Logo', 'Emoji', 'Pixel art']) {
       assert.match(artwork, new RegExp(`guide-control-heading[^>]*>${name}<`));
@@ -56,6 +57,11 @@ describe('standalone guide forms', () => {
     assert.equal(artwork.match(/guide-pixel-sample"/g)?.length, 1);
     assert.doesNotMatch(artwork, /guide-pixel-example/);
     assert.match(css, /\.info-page-body \[data-app-only\]/);
+    assert.match(css, /\.guide-pixel-swatch\.is-eraser[\s\S]*grid-row: span 2/);
+    assert.match(
+      featureCss,
+      /\.pixel-palette-button\.is-eraser[\s\S]*grid-row: span 2/,
+    );
     assert.match(
       artwork,
       /id="pixel-art-palette"[\s\S]*?data-app-only[\s\S]*?aria-label="EGA paint colors"\s*><\/div>/,

@@ -115,6 +115,7 @@
 }
 
 .pixel-palette-button.is-eraser {
+  grid-row: span 2;
   background:
     linear-gradient(
       45deg,
