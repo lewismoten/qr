@@ -1,4 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
+import { setupFilePicker } from '../../file-picker.js';
 
 const EMPTY_CHUNK_INFO = Object.freeze({
   totalChunks: 1,
@@ -80,6 +81,7 @@ export async function createLazyFileSystem({
     import('./elements.js'),
   ]);
   const fileElements = elementsModule.getFileElements(document, elements);
+  setupFilePicker(fileElements.input);
   const file = setupModule.createFileSetup({
     elements: fileElements,
     encoder,

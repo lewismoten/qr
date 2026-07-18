@@ -1,6 +1,7 @@
 import { lookup } from '../../i18n/index.js';
 
 const SYNC_EVENT = 'file-picker:sync';
+const initializedInputs = new WeakSet();
 
 function sync(input) {
   const status = input
@@ -14,12 +15,12 @@ function sync(input) {
   status.classList.toggle('has-file', Boolean(fileName));
 }
 
-export function setupFilePickers(document = globalThis.document) {
-  document?.querySelectorAll('.file-picker-input').forEach((input) => {
-    input.addEventListener('change', () => sync(input));
-    input.addEventListener(SYNC_EVENT, () => sync(input));
-    sync(input);
-  });
+export function setupFilePicker(input) {
+  if (!input || initializedInputs.has(input)) return;
+  initializedInputs.add(input);
+  input.addEventListener('change', () => sync(input));
+  input.addEventListener(SYNC_EVENT, () => sync(input));
+  sync(input);
 }
 
 export function refreshFilePicker(input) {

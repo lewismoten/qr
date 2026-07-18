@@ -1,5 +1,6 @@
 import { createBulkImportSection } from './section.js';
 import { getBulkElements } from './elements.js';
+import { setupFilePicker } from '../../file-picker.js';
 
 export function createLazyBulkSystem({
   document,
@@ -9,6 +10,7 @@ export function createLazyBulkSystem({
   runtime,
 }) {
   const elements = getBulkElements(document);
+  setupFilePicker(elements.fileInput);
   const section = createBulkImportSection({
     enabled,
     format,

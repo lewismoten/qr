@@ -1,5 +1,4 @@
 import { setupExternalLinks } from './external-links.js';
-import { setupFilePickers } from './app/ui/file-picker.js';
 import {
   initializeLanguage,
   isDebugLanguage,
@@ -87,7 +86,6 @@ async function start() {
   await completeMilestone('localization');
   await ensureDebugTooltip();
   translateDocument(document);
-  setupFilePickers(document);
   setupExternalLinks();
   setupLanguagePicker({ onLocaleChange: changeLocale });
   application = await import('./app/index.js');

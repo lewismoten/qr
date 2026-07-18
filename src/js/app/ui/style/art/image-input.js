@@ -1,6 +1,7 @@
-import { refreshFilePicker } from '../../file-picker.js';
+import { refreshFilePicker, setupFilePicker } from '../../file-picker.js';
 
 export function createImageInputController({ input, clearButton, onUpdate }) {
+  setupFilePicker(input);
   let image = null;
   let objectUrl = '';
   let loadRequest = 0;
