@@ -293,6 +293,7 @@
   "EC / 11": "ईसी / 11",
   "interleaved": "अंतःस्थापित",
   "0–7 bits": "0-7 बिट्स",
+  "0, 3, 4, or 7 bits": "0, 3, 4 या 7 बिट्स",
   "Mode and character count": "मोड़ और वर्ण गणना",
   "Close-up of green mode bits followed by orange character-count bits and blue payload modules": "नारंगी वर्ण-गणना बिट्स और नीले पेलोड मॉड्यूल के बाद हरे रंग के मोड़ बिट्स का क्लोज़-अप",
   "The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or Kanji. Count-field width depends on both mode and version range; Byte mode counts encoded bytes.": "4-बिट मोड़ संकेतक न्यूमेरिक, अल्फ़ान्यूमेरिक, बाइट या कांजी का चयन करता है। काउंट-फील्ड चौड़ाई मोड़ और संस्करण रेंज दोनों पर निर्भर करती है; बाइट मोड़ एन्कोडेड बाइट्स की गणना करता है।",

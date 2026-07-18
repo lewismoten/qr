@@ -293,6 +293,7 @@
   "EC / 11": "EC / 11",
   "interleaved": "entrecortado",
   "0–7 bits": "0-7 bits",
+  "0, 3, 4, or 7 bits": "0, 3, 4 o 7 bits",
   "Mode and character count": "Modo y número de caracteres",
   "Close-up of green mode bits followed by orange character-count bits and blue payload modules": "Encuentro de bits de modo verde, seguido de bits de conteo de caracteres naranjas y módulos de carga útil azules.",
   "The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or Kanji. Count-field width depends on both mode and version range; Byte mode counts encoded bytes.": "El indicador de modo de 4 bits selecciona Numérico, Alfánumérico, Byte o Kanji. El ancho del campo de conteo depende tanto del modo como del rango de versiones; el modo Byte cuenta los bytes codificados.",

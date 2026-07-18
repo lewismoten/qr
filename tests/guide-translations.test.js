@@ -216,6 +216,7 @@ test('Spanish specification uses fluent technical language', async () => {
     'Deshaga la máscara',
     'Reconstruya los bloques',
     'Lea el encabezado',
+    'solo cambia de modo cuando la reducción',
   ];
 
   literalPhrases.forEach((phrase) =>
@@ -231,15 +232,19 @@ test('Spanish specification uses fluent technical language', async () => {
   assert.match(copy, /no sustituye a la norma ISO\/IEC 18004/i);
   assert.match(copy, /Cómo se construye y se lee un código QR/i);
   assert.match(copy, /versiones 1 a 6/i);
-  assert.match(copy, /solo cambia de modo cuando la reducción/i);
   assert.match(copy, /Desintercalar y corregir/i);
   assert.match(copy, /se intercalan antes de colocarse/i);
   assert.match(copy, /conjunto arbitrario de píxeles/i);
   assert.match(copy, /Matriz real de la versión 7/i);
   assert.match(copy, /ahorro de bits en los datos/i);
+  assert.match(
+    copy,
+    /El optimizador solo cambia de modo cuando el ahorro de bits en los datos/i,
+  );
   assert.match(copy, /Se repite para cada segmento optimizado/i);
   assert.match(copy, /Cómo se selecciona automáticamente la máscara/i);
   assert.match(copy, /0, 3, 4 o 7 bits/i);
+  assert.match(copy, /Alineación a byte.*?0–7 bits/i);
   assert.match(copy, /se muestran en oscuro como referencia/i);
   assert.match(copy, />Numérico</i);
   assert.match(copy, />Alfanumérico</i);

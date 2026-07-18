@@ -294,7 +294,7 @@
               <strong>Terminador</strong><span>hasta 4 bits</span>
             </div>
             <div class="bit-field padding">
-              <strong>Alineación a byte</strong><span>0 bits</span>
+              <strong>Alineación a byte</strong><span>0–7 bits</span>
             </div>
             <div class="bit-field padding">
               <strong>Palabras de código de relleno</strong
@@ -469,9 +469,10 @@
               <p>
                 Cada bloque de color representa un segmento independiente, con
                 su propio indicador de modo de 4 bits y su campo de recuento. El
-                optimizador solo cambia de modo cuando la reducción de los datos
-                compensa el coste del nuevo encabezado. La detección automática
-                no selecciona el modo Kanji; debe elegirse manualmente.
+                optimizador solo cambia de modo cuando el ahorro de bits en los
+                datos compensa el coste del nuevo encabezado. La detección
+                automática no selecciona el modo Kanji; debe elegirse
+                manualmente.
               </p>
             </div>
           </article>

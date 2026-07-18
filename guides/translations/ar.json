@@ -293,6 +293,7 @@
   "EC / 11": "EC / 11",
   "interleaved": "متداخل",
   "0–7 bits": "0-7 بتات",
+  "0, 3, 4, or 7 bits": "0 أو 3 أو 4 أو 7 بتات",
   "Mode and character count": "الوضع وعدد الأحرف",
   "Close-up of green mode bits followed by orange character-count bits and blue payload modules": "صورة مقربة لبتات الوضع الأخضر متبوعة بتات عدد الأحرف البرتقالية ووحدات الحمولة الزرقاء",
   "The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or Kanji. Count-field width depends on both mode and version range; Byte mode counts encoded bytes.": "يحدد مؤشر الوضع المكون من 4 بت رقمي أو أبجدي رقمي أو بايت أو كانجي. يعتمد عرض حقل العد على كل من الوضع ونطاق الإصدار؛ يحسب وضع البايت وحدات البايت المشفرة.",

@@ -293,6 +293,7 @@
   "EC / 11": "EC / 11",
   "interleaved": "交错的",
   "0–7 bits": "0-7位",
+  "0, 3, 4, or 7 bits": "0、3、4 或 7 位",
   "Mode and character count": "模式和字符计数",
   "Close-up of green mode bits followed by orange character-count bits and blue payload modules": "绿色模式位片的特写，接着是橙色字符计数位片和蓝色有效载荷模块",
   "The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or Kanji. Count-field width depends on both mode and version range; Byte mode counts encoded bytes.": "4位模式指示器选择数字、字母数字、字节或汉字。计数字段宽度取决于模式和版本范围；字节模式计数编码字节。",

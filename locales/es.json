@@ -770,7 +770,7 @@
     "mixed": {
       "segment": "Segmento {number}",
       "fields": "modo {mode} | recuento {count} | datos: {bits} bits",
-      "savings": "{mixed} bits frente a {bytes} usando únicamente el modo de bytes"
+      "savings": "{mixed} bits frente a {bytes} si se utiliza únicamente el modo de bytes"
     }
   },
   "qr": {
