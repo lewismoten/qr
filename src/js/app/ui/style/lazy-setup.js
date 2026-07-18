@@ -85,6 +85,12 @@ export function createLazyStyleSetup(options) {
           : 20,
         protectBackground:
           featureElements?.centerArtBackground?.checked ?? true,
+        outlinePercent: featureElements?.centerArtOutlineThickness
+          ? Number.parseInt(
+              featureElements.centerArtOutlineThickness.value,
+              10,
+            ) || 25
+          : 25,
         matchModuleShape:
           featureElements?.pixelArtMatchModuleShape?.checked ?? false,
       }),

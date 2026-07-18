@@ -650,6 +650,7 @@
   "art": {
     "protectOutline": "使用浅色轮廓保护",
     "protectBackground": "使用浅色背景保护",
+    "outlineThickness": "轮廓粗细",
     "editorLabel": "{width} × {height} 像素画编辑器",
     "pixelLabel": "像素 {number}",
     "colors": {

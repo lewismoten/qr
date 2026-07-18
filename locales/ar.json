@@ -663,6 +663,7 @@
   "art": {
     "protectOutline": "حماية بحد فاتح",
     "protectBackground": "حماية بخلفية فاتحة",
+    "outlineThickness": "سُمك الحد",
     "editorLabel": "محرر رسم بكسل {width} في {height}",
     "pixelLabel": "بكسل {number}",
     "colors": {

@@ -224,6 +224,7 @@ export function createQrRenderer(deps) {
         pixelArt: pixelArtEditor.getState(),
         sizePercent: artworkOptions.sizePercent,
         protectBackground: artworkOptions.protectBackground,
+        outlinePercent: artworkOptions.outlinePercent,
         lightColor: options.color.light,
         matchModuleShape:
           artworkOptions.matchModuleShape &&

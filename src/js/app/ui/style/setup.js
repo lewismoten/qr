@@ -180,7 +180,11 @@ export function createStyleSetup({
           pixelControls: e.centerPixelControls,
           size: e.centerArtSize,
           sizeValue: e.centerArtSizeValue,
+          background: e.centerArtBackground,
           backgroundLabel: e.centerArtBackgroundLabel,
+          outlineControls: e.centerArtOutlineControls,
+          outlineThickness: e.centerArtOutlineThickness,
+          outlineThicknessValue: e.centerArtOutlineThicknessValue,
           emoji: e.centerEmoji,
           emojiOptions: e.emojiOptions,
         },
@@ -193,6 +197,11 @@ export function createStyleSetup({
       });
       artworkSystem = { artwork, centerLogo, pixelEditor };
       const frameCenter = document.getElementById('frame-message-center-art');
+      e.centerArtBackground.addEventListener('input', artwork.syncOutline);
+      e.centerArtOutlineThickness.addEventListener(
+        'input',
+        artwork.syncOutline,
+      );
       frameCenter.addEventListener('input', () => {
         setFrameCentered(frameCenter.checked);
         render();

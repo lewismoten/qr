@@ -668,6 +668,7 @@
   "art": {
     "protectOutline": "Protect with a light outline",
     "protectBackground": "Protect with a light background",
+    "outlineThickness": "Outline thickness",
     "editorLabel": "{width} by {height} pixel art editor",
     "pixelLabel": "Pixel {number}",
     "colors": {

@@ -668,6 +668,7 @@
   "art": {
     "protectOutline": "Proteger con un contorno claro",
     "protectBackground": "Proteger con un fondo claro",
+    "outlineThickness": "Grosor del contorno",
     "editorLabel": "Editor de pixel art de {width} por {height}",
     "pixelLabel": "Píxel {number}",
     "colors": {

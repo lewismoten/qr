@@ -1,8 +1,16 @@
 import { getOpaqueArtworkBackground } from '../../../frame-text.js';
 import { drawQrModule, fillEyeShape } from '../drawing/shapes.js';
+import { getPixelArtLayout } from './pixel-layout.js';
 
-function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
-  const outlineWidth = Math.max(1.5, artSize * 0.065);
+function drawOutlinedEmoji(
+  context,
+  emoji,
+  center,
+  artSize,
+  outlineColor,
+  outlinePercent = 25,
+) {
+  const outlineWidth = Math.max(1.5, artSize * (outlinePercent / 400));
   const bufferSize = Math.ceil(artSize + outlineWidth * 6);
   const emojiCanvas = document.createElement('canvas');
   const maskCanvas = document.createElement('canvas');
@@ -43,6 +51,56 @@ function drawOutlinedEmoji(context, emoji, center, artSize, outlineColor) {
   context.drawImage(emojiCanvas, target, target);
 }
 
+function getPixelBounds(artX, artY, pixelSize, row, column) {
+  const left = Math.round(artX + column * pixelSize);
+  const top = Math.round(artY + row * pixelSize);
+  const right = Math.round(artX + (column + 1) * pixelSize);
+  const bottom = Math.round(artY + (row + 1) * pixelSize);
+  return { left, top, right, bottom };
+}
+
+function drawPixelShape(context, geometry, options, expansion = 0) {
+  const { artX, artY, pixelSize, row, column } = geometry;
+  if (options.matchModuleShape) {
+    drawQrModule(
+      context,
+      artX + column * pixelSize - expansion,
+      artY + row * pixelSize - expansion,
+      pixelSize + expansion * 2,
+      options.moduleShape,
+    );
+    return;
+  }
+  const bounds = getPixelBounds(artX, artY, pixelSize, row, column);
+  context.fillRect(
+    bounds.left - expansion,
+    bounds.top - expansion,
+    bounds.right - bounds.left + expansion * 2,
+    bounds.bottom - bounds.top + expansion * 2,
+  );
+}
+
+function drawPixelArt(context, center, artSize, options) {
+  const layout = getPixelArtLayout(
+    center,
+    artSize,
+    options.pixelArt,
+    options.outlinePercent,
+  );
+
+  context.imageSmoothingEnabled = false;
+  if (options.protectBackground) {
+    context.fillStyle = getOpaqueArtworkBackground(options.lightColor);
+    layout.pixels.forEach((pixel) => {
+      drawPixelShape(context, pixel, options, layout.outline);
+    });
+  }
+  layout.pixels.forEach((pixel) => {
+    context.fillStyle = pixel.color;
+    drawPixelShape(context, pixel, options);
+  });
+}
+
 export function drawCenterArtwork(context, qrStart, qrSize, options) {
   const hasArtwork =
     (options.mode === 'logo' && options.logo) ||
@@ -54,7 +112,11 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
   const artPadding = options.protectBackground ? badgeSize * 0.13 : 0;
   const artSize = badgeSize - artPadding * 2;
   context.save();
-  if (options.protectBackground && options.mode !== 'emoji') {
+  if (
+    options.protectBackground &&
+    options.mode !== 'emoji' &&
+    options.mode !== 'pixel'
+  ) {
     fillEyeShape(
       context,
       center - badgeSize / 2,
@@ -88,6 +150,7 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
         center,
         artSize,
         getOpaqueArtworkBackground(options.lightColor),
+        options.outlinePercent,
       );
     } else {
       context.font = `${artSize * 0.82}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
@@ -95,32 +158,6 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
       context.textBaseline = 'middle';
       context.fillText(options.emoji, center, center + artSize * 0.04);
     }
-  } else {
-    const pixelSize = artSize / options.pixelArt.size;
-    const artX = center - artSize / 2;
-    const artY = center - artSize / 2;
-    context.imageSmoothingEnabled = false;
-    options.pixelArt.pixels.forEach((color, index) => {
-      if (!color) return;
-      const row = Math.floor(index / options.pixelArt.size);
-      const column = index % options.pixelArt.size;
-      context.fillStyle = color;
-      if (options.matchModuleShape) {
-        drawQrModule(
-          context,
-          artX + column * pixelSize,
-          artY + row * pixelSize,
-          pixelSize,
-          options.moduleShape,
-        );
-      } else {
-        const left = Math.round(artX + column * pixelSize);
-        const top = Math.round(artY + row * pixelSize);
-        const right = Math.round(artX + (column + 1) * pixelSize);
-        const bottom = Math.round(artY + (row + 1) * pixelSize);
-        context.fillRect(left, top, right - left, bottom - top);
-      }
-    });
-  }
+  } else drawPixelArt(context, center, artSize, options);
   context.restore();
 }

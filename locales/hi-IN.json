@@ -659,6 +659,7 @@
   "art": {
     "protectOutline": "हल्की रूपरेखा से सुरक्षित करें",
     "protectBackground": "हल्की पृष्ठभूमि से सुरक्षित करें",
+    "outlineThickness": "रूपरेखा की मोटाई",
     "editorLabel": "{width} गुणा {height} पिक्सेल कला संपादक",
     "pixelLabel": "पिक्सेल {number}",
     "colors": {

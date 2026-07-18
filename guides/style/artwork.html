@@ -41,9 +41,11 @@
               a modest artwork size improve the chance of recovery.
             </p>
             <p>
-              A protective background creates separation around logos and emoji.
-              Pixel art can instead follow the selected module shape so its
-              cells share the QR code’s visual language.
+              Logos can use a protective background. Emoji and pixel art use a
+              light outline around only their opaque artwork, allowing QR
+              modules to remain visible through transparent areas. Pixel art can
+              also follow the selected module shape so its cells share the QR
+              code’s visual language.
             </p>
           </section>
           <section data-app-fragment="tab=style&amp;subtab=artwork">
@@ -159,6 +161,31 @@
                     >Protect with a light background</span
                   >
                 </label>
+
+                <div id="center-art-outline-controls" data-guide-reveal hidden>
+                  <label
+                    class="slider-field"
+                    for="center-art-outline-thickness"
+                  >
+                    <span data-i18n="art.outlineThickness"
+                      >Outline thickness</span
+                    >
+                    <output
+                      id="center-art-outline-thickness-value"
+                      for="center-art-outline-thickness"
+                      >25%</output
+                    >
+                  </label>
+                  <input
+                    id="center-art-outline-thickness"
+                    name="center-art-outline-thickness"
+                    type="range"
+                    min="10"
+                    max="200"
+                    step="5"
+                    value="25"
+                  />
+                </div>
 
                 <div
                   id="center-logo-controls"
