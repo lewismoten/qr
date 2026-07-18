@@ -7,7 +7,7 @@ const read = (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
 describe('specification guide', () => {
   test('keeps the footer visible without covering page content', async () => {
     const [html, base, references] = await Promise.all([
-      read('guides/spec.html'),
+      read('src/html/guides/spec.html'),
       read('src/css/spec/base.css'),
       read('src/css/spec/references.css'),
     ]);
@@ -20,7 +20,7 @@ describe('specification guide', () => {
 
   test('shares the mask-preview blue throughout its visuals', async () => {
     const sources = await Promise.all([
-      read('guides/spec.html'),
+      read('src/html/guides/spec.html'),
       read('src/css/spec/base.css'),
       read('src/js/spec/visual-models.js'),
       read('src/js/app/ui/debug/mask-selector.js'),
@@ -30,7 +30,7 @@ describe('specification guide', () => {
   });
 
   test('links only to repository source files that exist', async () => {
-    const html = await read('guides/spec.html');
+    const html = await read('src/html/guides/spec.html');
     const prefix = 'https://git.lewismoten.com/lewismoten/qr/src/branch/main/';
     const paths = [...html.matchAll(/href="([^"]+)"/g)]
       .map((match) => match[1])

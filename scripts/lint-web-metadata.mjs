@@ -1,5 +1,9 @@
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
+
+import { generateLocalizedGuides } from './generate-localized-guides.mjs';
+import { loadHtmlConfig } from './html-config.mjs';
 
 function parseXml(source, file) {
   const validation = XMLValidator.validate(source);
@@ -17,21 +21,25 @@ function validateUrl(loc, file, index) {
   return url;
 }
 
-const sitemapSource = await readFile('sitemap.xml', 'utf8');
-const sitemap = parseXml(sitemapSource, 'sitemap.xml');
+const config = await loadHtmlConfig();
+await generateLocalizedGuides({ clean: true });
+const sitemapPath = path.join(config.outputRoot, 'sitemap.xml');
+const sitemapSource = await readFile(sitemapPath, 'utf8');
+const sitemap = parseXml(sitemapSource, sitemapPath);
 const sitemapFiles = [].concat(sitemap.sitemapindex?.sitemap || []);
 const entries = [].concat(sitemap.urlset?.url || []);
 for (const [index, entry] of sitemapFiles.entries()) {
-  const url = validateUrl(entry.loc, 'sitemap.xml', index);
+  const url = validateUrl(entry.loc, sitemapPath, index);
   const file = decodeURIComponent(url.pathname.replace(/^\//, ''));
-  const source = await readFile(file, 'utf8');
-  const child = parseXml(source, file);
+  const outputFile = path.join(config.outputRoot, file);
+  const source = await readFile(outputFile, 'utf8');
+  const child = parseXml(source, outputFile);
   entries.push(...[].concat(child.urlset?.url || []));
 }
 if (!entries.length) {
-  throw new Error('sitemap.xml: expected at least one URL entry.');
+  throw new Error(`${sitemapPath}: expected at least one URL entry.`);
 }
-entries.forEach(({ loc }, index) => validateUrl(loc, 'sitemap.xml', index));
+entries.forEach(({ loc }, index) => validateUrl(loc, sitemapPath, index));
 
 const robotsSource = await readFile('robots.txt', 'utf8');
 const directives = robotsSource

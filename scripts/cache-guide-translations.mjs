@@ -56,7 +56,7 @@ const translations = Object.fromEntries(
   }),
 );
 
-const directory = path.join('guides', 'translations');
+const directory = path.join('src', 'html', 'guides', 'translations');
 await mkdir(directory, { recursive: true });
 await writeFile(
   path.join(directory, `${locale}.json`),

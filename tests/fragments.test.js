@@ -7,6 +7,9 @@ import {
   readNavigationHash,
 } from '../src/js/app/ui/navigation/location.js';
 
+const readHtml = (file) =>
+  readFile(new URL(`../src/html/${file}`, import.meta.url), 'utf8');
+
 function createEnvironment() {
   const imported = [];
   const document = {
@@ -142,9 +145,7 @@ describe('application fragments', () => {
   });
 
   test('keeps standalone pages and app placeholders in sync', async () => {
-    const index = await readFile(new URL('../index.html', import.meta.url), {
-      encoding: 'utf8',
-    });
+    const index = await readHtml('index.html');
     const definitions = [
       ['content/frame', 'tab=content&amp;subtab=frame'],
       ['content/text', 'tab=content&amp;subtab=data'],
@@ -169,9 +170,7 @@ describe('application fragments', () => {
     for (const [path, hash] of definitions) {
       const relative = 'guides/' + path + '.html';
       assert.match(index, new RegExp('data-fragment-url="' + relative + '"'));
-      const page = await readFile(new URL('../' + relative, import.meta.url), {
-        encoding: 'utf8',
-      });
+      const page = await readHtml(relative);
       assert.match(page, /<header[\s>]/);
       assert.match(page, /<footer[\s>]/);
       assert.match(page, /data-app-fragment=/);
@@ -215,9 +214,7 @@ describe('application fragments', () => {
 
 describe('fragment hash navigation', () => {
   test('debug tab markup exposes every button and panel to setup', async () => {
-    const index = await readFile(new URL('../index.html', import.meta.url), {
-      encoding: 'utf8',
-    });
+    const index = await readHtml('index.html');
     const buttons = index.match(/class="[^"]*debug-subtab-button[^"]*"/g);
     const panels = index.match(/class="[^"]*debug-subtab-panel[^"]*"/g);
     assert.equal(buttons?.length, 4);

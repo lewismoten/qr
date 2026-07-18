@@ -1,10 +1,12 @@
 import { build, context } from 'esbuild';
-import { rm } from 'node:fs/promises';
+import { cp, mkdir, rm } from 'node:fs/promises';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLocalizedGuides } from './scripts/generate-localized-guides.mjs';
+import { loadHtmlConfig } from './scripts/html-config.mjs';
 
 const watch = process.argv.includes('--watch');
-await generateLocalizedGuides();
+const htmlConfig = await loadHtmlConfig();
 const qrPackageName = '@lewismoten/qr';
 const qrSource = fileURLToPath(new URL('./src/js/qr-api.js', import.meta.url));
 const localQrPlugin = {
@@ -98,9 +100,22 @@ const builds = [
 if (!watch) await rm('dist/chunks', { recursive: true, force: true });
 
 if (watch) {
+  await generateLocalizedGuides({ clean: true });
   const contexts = await Promise.all(builds.map((options) => context(options)));
   await Promise.all(contexts.map((buildContext) => buildContext.watch()));
   console.log('Watching JavaScript and CSS sources...');
 } else {
   await Promise.all(builds.map((options) => build(options)));
+  await generateLocalizedGuides({ clean: true });
+  await mkdir(htmlConfig.outputRoot, { recursive: true });
+  await Promise.all([
+    cp('dist', path.join(htmlConfig.outputRoot, 'dist'), {
+      recursive: true,
+    }),
+    cp('locales', path.join(htmlConfig.outputRoot, 'locales'), {
+      recursive: true,
+    }),
+    cp('favicon.ico', path.join(htmlConfig.outputRoot, 'favicon.ico')),
+    cp('robots.txt', path.join(htmlConfig.outputRoot, 'robots.txt')),
+  ]);
 }

@@ -2,6 +2,8 @@ import { spawn } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { stripVTControlCharacters } from 'node:util';
 
+import { generateLocalizedGuides } from './generate-localized-guides.mjs';
+
 const requested = new Set(process.argv.slice(2));
 const supported = new Set(['--coverage', '--watch']);
 const unknown = [...requested].filter((option) => !supported.has(option));
@@ -20,6 +22,8 @@ if (unknown.length) {
 if (coverageRequested && requested.has('--watch')) {
   throw new Error('Coverage and watch modes cannot run together.');
 }
+
+await generateLocalizedGuides({ clean: true });
 
 const nodeOptions = ['--test', '--test-concurrency=8', '--test-reporter=spec'];
 

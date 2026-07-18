@@ -1,45 +1,34 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 
-import {
-  GUIDE_LOCALES,
-  GUIDE_ROUTES,
-  getGuidePublicPath,
-} from '../src/js/i18n/guide-routes.js';
+import { GUIDE_LOCALES } from '../src/js/i18n/guide-routes.js';
+import { configuredGuidePath } from './html-config.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
 const PAGE_LOCALES = ['en-US', 'es', 'ar', 'hi-IN', 'zh-CN'];
 
-function absoluteGuideUrl(route, locale) {
-  return new URL(getGuidePublicPath(route, locale), SITE_URL).href;
+function guideUrl(config, route, locale) {
+  const output = configuredGuidePath(config, route, locale);
+  const publicPath =
+    route === 'index' ? output.replace(/index\.html$/, '') : output;
+  return new URL(publicPath, SITE_URL).href;
 }
 
-function alternateLinks(route) {
-  const links = GUIDE_LOCALES.map((locale) => {
-    const href = absoluteGuideUrl(route, locale);
-    return `    <xhtml:link rel="alternate" hreflang="${locale}" href="${href}" />`;
-  });
-  links.push(
-    '    <xhtml:link rel="alternate" hreflang="x-default" ' +
-      `href="${absoluteGuideUrl(route, 'en-US')}" />`,
+function guideEntry(config, route, locale, date) {
+  const alternates = GUIDE_LOCALES.map(
+    (alternate) =>
+      `    <xhtml:link rel="alternate" hreflang="${alternate}" ` +
+      `href="${guideUrl(config, route, alternate)}" />`,
   );
-  return links.join('\n');
-}
-
-function guideEntry(route, locale, date) {
+  alternates.push(
+    '    <xhtml:link rel="alternate" hreflang="x-default" ' +
+      `href="${guideUrl(config, route, 'en-US')}" />`,
+  );
   return [
     '  <url>',
-    `    <loc>${absoluteGuideUrl(route, locale)}</loc>`,
+    `    <loc>${guideUrl(config, route, locale)}</loc>`,
     `    <lastmod>${date}</lastmod>`,
-    alternateLinks(route),
-    '  </url>',
-  ].join('\n');
-}
-
-function simpleEntry(path, date) {
-  return [
-    '  <url>',
-    `    <loc>${new URL(path, SITE_URL).href}</loc>`,
-    `    <lastmod>${date}</lastmod>`,
+    ...alternates,
     '  </url>',
   ].join('\n');
 }
@@ -73,23 +62,32 @@ function sitemapIndex(files, date) {
   ].join('\n');
 }
 
-export async function writeGuideSitemap(file = 'sitemap.xml') {
+export async function writeGuideSitemap(config) {
   const date = new Date().toISOString().slice(0, 10);
-  await mkdir('sitemaps', { recursive: true });
+  const directory = path.join(config.outputRoot, 'sitemaps');
+  await mkdir(directory, { recursive: true });
   const siteFile = 'sitemaps/site.xml';
-  await writeFile(
-    siteFile,
-    urlSet([simpleEntry('', date), simpleEntry('privacy.html', date)]),
+  const simple = ['', 'privacy.html'].map((value) =>
+    [
+      '  <url>',
+      `    <loc>${new URL(value, SITE_URL).href}</loc>`,
+      `    <lastmod>${date}</lastmod>`,
+      '  </url>',
+    ].join('\n'),
   );
+  await writeFile(path.join(config.outputRoot, siteFile), urlSet(simple));
   const localeFiles = await Promise.all(
     PAGE_LOCALES.map(async (locale) => {
-      const localeFile = `sitemaps/guides-${locale}.xml`;
-      const entries = GUIDE_ROUTES.map((route) =>
-        guideEntry(route, locale, date),
+      const file = `sitemaps/guides-${locale}.xml`;
+      const entries = Object.keys(config.guides).map((route) =>
+        guideEntry(config, route, locale, date),
       );
-      await writeFile(localeFile, urlSet(entries));
-      return localeFile;
+      await writeFile(path.join(config.outputRoot, file), urlSet(entries));
+      return file;
     }),
   );
-  await writeFile(file, sitemapIndex([siteFile, ...localeFiles], date));
+  await writeFile(
+    path.join(config.outputRoot, 'sitemap.xml'),
+    sitemapIndex([siteFile, ...localeFiles], date),
+  );
 }

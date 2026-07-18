@@ -1,0 +1,155 @@
+sourceRoot: src/html
+outputRoot: build/site
+server:
+  root: src/html
+  generatedRoot: build/site
+deployment:
+  html:
+    from: src/html
+    include: **/*.html
+    to: .
+  assets:
+    from: dist
+    include: **/*
+    to: dist
+  locales:
+    from: locales
+    include: **/*.json
+    to: locales
+pages:
+  index.html: index.html
+  privacy.html: privacy.html
+guides:
+  index: guides/index.html
+  about: guides/about.html
+  spec: guides/spec.html
+  technology: guides/technology.html
+  content/frame: guides/content/frame.html
+  content/text: guides/content/text.html
+  content/number: guides/content/number.html
+  content/wifi: guides/content/wifi.html
+  content/email: guides/content/email.html
+  content/phone: guides/content/phone.html
+  content/sms: guides/content/sms.html
+  content/geo: guides/content/geo.html
+  content/event: guides/content/event.html
+  content/vcard: guides/content/vcard.html
+  content/file: guides/content/file.html
+  content/bulk-import: guides/content/bulk-import.html
+  style/modules: guides/style/modules.html
+  style/colors: guides/style/colors.html
+  style/artwork: guides/style/artwork.html
+  download/image: guides/download/image.html
+  download/document: guides/download/document.html
+  download/animation: guides/download/animation.html
+  debug/mask: guides/debug/mask.html
+locales:
+  en-US:
+    root: guides
+  en-GB:
+    root: guides
+  es:
+    root: es/guias
+  ar:
+    root: ar/أدلة
+  hi-IN:
+    root: hi-IN/मार्गदर्शिकाएं
+  zh-CN:
+    root: zh-CN/指南
+segments:
+  es:
+    about: acerca-de
+    animation: animacion
+    artwork: ilustraciones
+    bulk-import: importacion-masiva
+    colors: colores
+    content: contenido
+    debug: depuracion
+    document: documentos
+    download: descargas
+    email: correo-electronico
+    event: eventos
+    file: archivos
+    frame: texto-del-marco
+    geo: ubicacion-geografica
+    image: imagenes
+    mask: mascaras
+    modules: modulos
+    number: numeros
+    phone: telefono
+    spec: especificacion-qr
+    style: diseno
+    technology: tecnologia
+    text: texto
+  ar:
+    about: حول
+    animation: رسوم-متحركة
+    artwork: رسومات
+    bulk-import: استيراد-مجمع
+    colors: ألوان
+    content: محتوى
+    debug: تصحيح
+    document: مستندات
+    download: تنزيلات
+    email: بريد-إلكتروني
+    event: أحداث
+    file: ملفات
+    frame: نص-الإطار
+    geo: موقع-جغرافي
+    image: صور
+    mask: أقنعة
+    modules: وحدات
+    number: أرقام
+    phone: هاتف
+    spec: مواصفات-qr
+    style: تصميم
+    technology: تقنية
+    text: نص
+  hi-IN:
+    about: परिचय
+    animation: ऐनिमेशन
+    artwork: कलाकृति
+    bulk-import: थोक-आयात
+    colors: रंग
+    content: सामग्री
+    debug: डीबग
+    document: दस्तावेज
+    download: डाउनलोड
+    email: ईमेल
+    event: कार्यक्रम
+    file: फ़ाइलें
+    frame: फ़्रेम-पाठ
+    geo: भौगोलिक-स्थान
+    image: चित्र
+    mask: मास्क
+    modules: मॉड्यूल
+    number: संख्याएं
+    phone: फ़ोन
+    spec: क्यूआर-विनिर्देश
+    style: डिज़ाइन
+    technology: तकनीक
+    text: पाठ
+  zh-CN:
+    about: 关于
+    animation: 动画
+    artwork: 图稿
+    bulk-import: 批量导入
+    colors: 颜色
+    content: 内容
+    debug: 调试
+    document: 文档
+    download: 下载
+    email: 电子邮件
+    event: 事件
+    file: 文件
+    frame: 边框文字
+    geo: 地理位置
+    image: 图像
+    mask: 掩码
+    modules: 模块
+    number: 数字
+    phone: 电话
+    spec: 二维码规范
+    style: 样式
+    technology: 技术
+    text: 文本

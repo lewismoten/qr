@@ -133,13 +133,13 @@ describe('structured input validation', () => {
 
   test('declares matching browser-side length limits', async () => {
     const sources = [
-      '../index.html',
-      '../guides/content/wifi.html',
-      '../guides/content/email.html',
-      '../guides/content/phone.html',
-      '../guides/content/sms.html',
-      '../guides/content/geo.html',
-      '../guides/content/vcard.html',
+      '../src/html/index.html',
+      '../src/html/guides/content/wifi.html',
+      '../src/html/guides/content/email.html',
+      '../src/html/guides/content/phone.html',
+      '../src/html/guides/content/sms.html',
+      '../src/html/guides/content/geo.html',
+      '../src/html/guides/content/vcard.html',
     ];
     const html = (
       await Promise.all(

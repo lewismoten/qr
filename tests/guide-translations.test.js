@@ -14,6 +14,11 @@ import {
 
 const locales = ['ar', 'es', 'hi-IN', 'zh-CN'];
 const localizedName = /\.(?:ar|es|hi-IN|zh-CN)\.html$/;
+const sourceRoot = 'src/html/guides';
+
+function generatedGuide(route, locale) {
+  return `build/site/${getGuideOutputPath(route, locale)}`;
+}
 
 function stripGeneratedMarkup(source) {
   return source
@@ -27,7 +32,7 @@ function stripGeneratedMarkup(source) {
     );
 }
 
-async function listEnglishGuides(directory = 'guides') {
+async function listEnglishGuides(directory = sourceRoot) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = await Promise.all(
     entries.map((entry) => {
@@ -75,7 +80,7 @@ test('every supported locale translates all long-form guide prose', async () => 
 
   for (const locale of locales) {
     const translations = await loadGuideTranslationSet(
-      'guides/translations',
+      `${sourceRoot}/translations`,
       locale,
     );
     const missing = [...required].filter((value) => {
@@ -88,13 +93,13 @@ test('every supported locale translates all long-form guide prose', async () => 
 
 test('reviewed guide translations override machine output', async () => {
   const machine = JSON.parse(
-    await readFile('guides/translations/es.json', 'utf8'),
+    await readFile(`${sourceRoot}/translations/es.json`, 'utf8'),
   );
   const reviewed = JSON.parse(
-    await readFile('guides/translations/es.reviewed.json', 'utf8'),
+    await readFile(`${sourceRoot}/translations/es.reviewed.json`, 'utf8'),
   );
   const translations = await loadGuideTranslationSet(
-    'guides/translations',
+    `${sourceRoot}/translations`,
     'es',
   );
 
@@ -105,14 +110,8 @@ test('reviewed guide translations override machine output', async () => {
 });
 
 test('Spanish inline prose remains grammatical after HTML assembly', async () => {
-  const technology = await readFile(
-    getGuideOutputPath('technology', 'es'),
-    'utf8',
-  );
-  const specification = await readFile(
-    getGuideOutputPath('spec', 'es'),
-    'utf8',
-  );
+  const technology = await readFile(generatedGuide('technology', 'es'), 'utf8');
+  const specification = await readFile(generatedGuide('spec', 'es'), 'utf8');
 
   assert.match(
     technology,
@@ -136,8 +135,10 @@ test('Spanish guides use native QR and interface terminology', async () => {
   const files = await listEnglishGuides();
   const pages = await Promise.all(
     files.map((file) => {
-      const route = getGuideRouteFromPath(file);
-      return readFile(getGuideOutputPath(route, 'es'), 'utf8');
+      const route = getGuideRouteFromPath(
+        file.replace(`${sourceRoot}/`, 'guides/'),
+      );
+      return readFile(generatedGuide(route, 'es'), 'utf8');
     }),
   );
   const source = pages.join('\n');
@@ -181,7 +182,7 @@ test('Spanish guides use native QR and interface terminology', async () => {
 });
 
 test('Spanish guide index uses polished interface copy', async () => {
-  const source = await readFile(getGuideOutputPath('index', 'es'), 'utf8');
+  const source = await readFile(generatedGuide('index', 'es'), 'utf8');
   const copy = source.replaceAll(/\s+/g, ' ');
   const translatedPhrases = [
     'Guarde directamente',
@@ -213,7 +214,7 @@ test('Spanish guide index uses polished interface copy', async () => {
 });
 
 test('Spanish specification uses fluent technical language', async () => {
-  const source = await readFile(getGuideOutputPath('spec', 'es'), 'utf8');
+  const source = await readFile(generatedGuide('spec', 'es'), 'utf8');
   const copy = source.replaceAll(/\s+/g, ' ');
   const literalPhrases = [
     'Generador de QR',

@@ -10,6 +10,10 @@ import {
 
 const translatedLocales = ['ar', 'es', 'hi-IN', 'zh-CN'];
 
+function generatedPath(route, locale) {
+  return `build/site/${getGuideOutputPath(route, locale)}`;
+}
+
 function escapedRelative(from, target) {
   const fromParts = from.split('/');
   fromParts.pop();
@@ -25,10 +29,10 @@ function escapedRelative(from, target) {
 
 describe('guide index', () => {
   test('English index links to every standalone guide page', async () => {
-    const indexPath = getGuideOutputPath('index', 'en-US');
+    const indexPath = generatedPath('index', 'en-US');
     const index = await readFile(indexPath, 'utf8');
     for (const route of GUIDE_ROUTES.filter((value) => value !== 'index')) {
-      const output = getGuideOutputPath(route, 'en-US');
+      const output = generatedPath(route, 'en-US');
       const relative = escapedRelative(indexPath, output);
       assert.match(index, new RegExp(`href="${relative}"`));
       const source = await readFile(output, 'utf8');
@@ -39,10 +43,10 @@ describe('guide index', () => {
 
   test('localized indexes use native paths and equivalent links', async () => {
     for (const locale of translatedLocales) {
-      const indexPath = getGuideOutputPath('index', locale);
+      const indexPath = generatedPath('index', locale);
       const index = await readFile(indexPath, 'utf8');
       for (const route of GUIDE_ROUTES.filter((value) => value !== 'index')) {
-        const output = getGuideOutputPath(route, locale);
+        const output = generatedPath(route, locale);
         const relative = escapedRelative(indexPath, output);
         assert.match(index, new RegExp(`href="${relative}"`));
       }
@@ -54,11 +58,13 @@ describe('guide index', () => {
 
   test('canonicals and sitemap expose native localized routes', async () => {
     const [spanish, sitemap] = await Promise.all([
-      readFile(getGuideOutputPath('spec', 'es'), 'utf8'),
-      readFile('sitemaps/guides-es.xml', 'utf8'),
+      readFile(generatedPath('spec', 'es'), 'utf8'),
+      readFile('build/site/sitemaps/guides-es.xml', 'utf8'),
     ]);
     assert.match(spanish, /\/es\/guias\/especificacion-qr\.html/);
     assert.match(spanish, /hreflang="x-default"/);
+    assert.match(spanish, /"@lewismoten\/qr": "\.\.\/\.\.\/dist\/qr\.min\.js"/);
+    assert.doesNotMatch(spanish, /"@lewismoten\/qr": "\.\.\/dist\//);
     assert.match(sitemap, /\/es\/guias\/especificacion-qr\.html/);
     assert.match(sitemap, /xmlns:xhtml=/);
   });
