@@ -17,22 +17,22 @@ export function bindApplicationEvents({
   });
   e.qrFormat.addEventListener('change', () => {
     a.syncFormat();
-    a.syncChoices();
+    a.syncChoices(e.qrFormat.id);
     a.activateContent('data');
     a.render();
   });
-  e.choiceButtons.forEach((button) =>
-    button.addEventListener('click', () => {
-      const target = document.getElementById(button.dataset.choiceTarget);
-      const value = button.dataset.choiceValue;
-      if (!target || target.value === value) return;
-      target.value = value;
-      target.dispatchEvent(new Event('change', { bubbles: true }));
-      if (target === e.qrFormat) return;
-      a.syncChoices();
-      a.render();
-    }),
-  );
+  e.form.addEventListener('click', (event) => {
+    const button = event.target.closest('.choice-button');
+    if (!button) return;
+    const target = document.getElementById(button.dataset.choiceTarget);
+    const value = button.dataset.choiceValue;
+    if (!target || target.value === value) return;
+    target.value = value;
+    target.dispatchEvent(new Event('change', { bubbles: true }));
+    if (target === e.qrFormat) return;
+    a.syncChoices(target.id);
+    a.render();
+  });
 
   e.chunkPreviewPrev.addEventListener('click', () => {
     const current = a.getCurrentFrame();

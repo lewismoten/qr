@@ -16,8 +16,6 @@ export function createContentEncodingSetup({
     document,
     elements: {
       format: e.qrFormat,
-      url: e.urlInput,
-      text: e.textInput,
     },
     bulk: { isMode: bulk.isMode, getRow: bulk.getRow, build: bulk.build },
     number: { getPayload: sections.number.getPayload },

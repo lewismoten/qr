@@ -1,6 +1,7 @@
 import { createNavigation } from './setup.js';
 
 export function createApplicationNavigation({
+  document,
   elements: e,
   render,
   updateMap,
@@ -14,16 +15,11 @@ export function createApplicationNavigation({
     elements: {
       tabs: e.tabButtons,
       tabPanels: e.tabPanels,
-      debugTabs: e.debugSubtabButtons,
-      debugPanels: e.debugSubtabPanels,
-      styleTabs: e.styleSubtabButtons,
-      stylePanels: e.styleSubtabPanels,
-      downloadTabs: e.downloadSubtabButtons,
-      downloadPanels: e.downloadSubtabPanels,
       contentTabs: e.contentSubtabButtons,
       contentPanels: e.contentSubtabPanels,
-      choices: e.choiceButtons,
+      form: e.form,
     },
+    document,
     format: e.qrFormat,
     render,
     updateMap,

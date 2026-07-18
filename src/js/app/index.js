@@ -24,23 +24,14 @@ import { startApplication } from './ui/runtime/startup.js';
 import { createPreviewControlsSetup } from './ui/preview/controls-setup.js';
 import { createPreviewSetup } from './ui/preview/setup.js';
 import { createLazyStyleSetup } from './ui/style/lazy-setup.js';
-import { createTaskProgress } from './ui/download/progress.js';
+import { createTaskProgressFromDocument } from './ui/download/progress.js';
 import qrEncoder from '../qr/matrix-encoder.js';
 
 const elements = getApplicationElements(document);
-const taskProgress = createTaskProgress({
-  dialog: elements.taskProgressDialog,
-  title: elements.taskProgressTitle,
-  phase: elements.taskProgressPhase,
-  meter: elements.taskProgressMeter,
-  percent: elements.taskProgressPercent,
-  elapsed: elements.taskProgressElapsed,
-  remaining: elements.taskProgressRemaining,
-  completion: elements.taskProgressCompletion,
-  cancel: elements.taskProgressCancel,
-});
+const taskProgress = createTaskProgressFromDocument(document);
 const runtime = createRuntimeContext();
 const previewControls = createPreviewControlsSetup({
+  document,
   elements,
   pixelsPerInch: LIMITS.printPixelsPerInch,
   minPrintModuleInches: LIMITS.minPrintModuleInches,
@@ -102,11 +93,10 @@ const contentSections = createContentSections({
 });
 
 const setFormatVisibility = createFormatVisibility({
+  document,
   elements: {
     format: elements.qrFormat,
-    fieldsets: elements.formatFieldsets,
     bulkEnabled: elements.bulkEnabled,
-    secretToggle: elements.payloadRevealToggle,
   },
   syncBulk: contentData.syncBulkControls,
   syncFile: contentData.syncFileModeVisibility,
@@ -217,6 +207,7 @@ const debugSetup = createDebugFacade({
   },
 });
 const navigation = createApplicationNavigation({
+  document,
   elements,
   render: runtime.render,
   updateMap: contentSections.geo.update,
@@ -293,7 +284,6 @@ export const applicationReady = startApplication({
 
 export function refreshLanguage() {
   output.sync();
-  navigation.syncChoices();
   setFormatVisibility();
   return preview.render();
 }

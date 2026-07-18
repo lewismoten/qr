@@ -1,12 +1,10 @@
 import { createContentSubtabs } from '../content/subtabs.js';
-import { createDownloadSubtabs } from './download-subtabs.js';
-import { createStyleSubtabs } from '../style/subtabs.js';
 import { createPrimaryTabs } from '../navigation.js';
-import { createTabSet } from '../tab-set.js';
 import { createLoadingIndicator } from '../loading-indicator.js';
 
 export function createNavigation({
   elements: e,
+  document,
   format,
   render,
   updateMap,
@@ -20,6 +18,7 @@ export function createNavigation({
   let activeStyleSubtab = 'size';
   let activeDownloadSubtab = 'image';
   let activeDebugSubtab = 'encoding';
+  const subtabRequests = new Map();
   const loading = createLoadingIndicator({
     region: e.tabPanels[0]?.parentElement,
   });
@@ -35,21 +34,78 @@ export function createNavigation({
   const loadStyle = (name) => load(prepareStyle, name);
   const loadDownload = (name) => load(prepareDownload, name);
   const loadContent = (name) => load(prepareContent, name);
+  const getSubtabElements = (name) => ({
+    buttons: document.querySelectorAll(`.${name}-subtab-button`),
+    panels: document.querySelectorAll(`.${name}-subtab-panel`),
+  });
+  const ensureSubtabs = (name, importer, create) => {
+    if (!subtabRequests.has(name)) {
+      subtabRequests.set(
+        name,
+        importer().then((module) => create(module, getSubtabElements(name))),
+      );
+    }
+    return subtabRequests.get(name);
+  };
+  const ensureDebugSubtabs = () =>
+    ensureSubtabs(
+      'debug',
+      () => import('../tab-set.js'),
+      (module, elements) =>
+        module.createTabSet({
+          ...elements,
+          buttonData: 'subtab',
+          panelData: 'subtabPanel',
+          defaultValue: 'encoding',
+          setAriaPressed: false,
+          onActivate(name) {
+            activeDebugSubtab = name;
+            setActiveDebugSubtab(name);
+            loadDebug(name);
+          },
+        }),
+    );
+  const ensureStyleSubtabs = () =>
+    ensureSubtabs(
+      'style',
+      () => import('../style/subtabs.js'),
+      (module, elements) =>
+        module.createStyleSubtabs({
+          ...elements,
+          onActivate(name) {
+            activeStyleSubtab = name;
+            loadStyle(name);
+          },
+        }),
+    );
+  const ensureDownloadSubtabs = () =>
+    ensureSubtabs(
+      'download',
+      () => import('./download-subtabs.js'),
+      (module, elements) =>
+        module.createDownloadSubtabs({
+          ...elements,
+          onActivate(name) {
+            activeDownloadSubtab = name;
+            loadDownload(name);
+          },
+        }),
+    );
   const activateTab = createPrimaryTabs({
     buttons: e.tabs,
     panels: e.tabPanels,
     onActivate(name) {
       setActiveTab(name);
       if (name === 'debug') {
-        loadDebug(activeDebugSubtab);
+        ensureDebugSubtabs().then(() => loadDebug(activeDebugSubtab));
         return;
       }
       if (name === 'style') {
-        loadStyle(activeStyleSubtab);
+        ensureStyleSubtabs().then(() => loadStyle(activeStyleSubtab));
         return;
       }
       if (name === 'download') {
-        loadDownload(activeDownloadSubtab);
+        ensureDownloadSubtabs().then(() => loadDownload(activeDownloadSubtab));
         return;
       }
       if (name === 'content' && format.value === 'geo')
@@ -57,35 +113,12 @@ export function createNavigation({
       render();
     },
   });
-  const activateDebug = createTabSet({
-    buttons: e.debugTabs,
-    panels: e.debugPanels,
-    buttonData: 'subtab',
-    panelData: 'subtabPanel',
-    defaultValue: 'encoding',
-    setAriaPressed: false,
-    onActivate(name) {
-      activeDebugSubtab = name;
-      setActiveDebugSubtab(name);
-      loadDebug(name);
-    },
-  });
-  const activateStyle = createStyleSubtabs({
-    buttons: e.styleTabs,
-    panels: e.stylePanels,
-    onActivate(name) {
-      activeStyleSubtab = name;
-      loadStyle(name);
-    },
-  });
-  const activateDownload = createDownloadSubtabs({
-    buttons: e.downloadTabs,
-    panels: e.downloadPanels,
-    onActivate(name) {
-      activeDownloadSubtab = name;
-      loadDownload(name);
-    },
-  });
+  const activateDebug = (name) =>
+    ensureDebugSubtabs().then((activate) => activate(name));
+  const activateStyle = (name) =>
+    ensureStyleSubtabs().then((activate) => activate(name));
+  const activateDownload = (name) =>
+    ensureDownloadSubtabs().then((activate) => activate(name));
   const activateContent = createContentSubtabs({
     buttons: e.contentTabs,
     panels: e.contentPanels,
@@ -95,14 +128,18 @@ export function createNavigation({
         window.requestAnimationFrame(updateMap);
     },
   });
-  const syncChoices = () =>
-    e.choices.forEach((button) => {
+  const syncChoices = (targetName) => {
+    const selector = targetName
+      ? `.choice-button[data-choice-target="${targetName}"]`
+      : '.choice-button';
+    e.form.querySelectorAll(selector).forEach((button) => {
       const target = document.getElementById(button.dataset.choiceTarget);
       const active =
         Boolean(target) && target.value === button.dataset.choiceValue;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+  };
   return {
     activateTab,
     activateDebug,

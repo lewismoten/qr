@@ -2,6 +2,7 @@ import { createPreviewViewport } from './viewport.js';
 import { lookup } from '../../../i18n/index.js';
 
 export function createPreviewControlsSetup({
+  document,
   elements: e,
   pixelsPerInch,
   minPrintModuleInches,
@@ -21,12 +22,12 @@ export function createPreviewControlsSetup({
   let sizeRequest = null;
   const getSizeElements = () => ({
     width: e.qrWidth,
-    widthValue: e.qrWidthValue,
+    widthValue: document.getElementById('qr-width-value'),
     widthAuto: e.qrWidthAuto,
     scale: e.qrScale,
-    scaleValue: e.qrScaleValue,
+    scaleValue: document.getElementById('qr-scale-value'),
     margin: e.qrMargin,
-    marginValue: e.qrMarginValue,
+    marginValue: document.getElementById('qr-margin-value'),
     printAuto: printElements.printWidthAuto,
     printWidth: printElements.printWidth,
     printValue: printElements.printWidthValue,

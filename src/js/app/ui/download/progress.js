@@ -5,6 +5,23 @@ const clamp = (value) => Math.min(1, Math.max(0, value));
 const SHOW_DELAY_MS = 400;
 const COMPLETION_HOLD_MS = 2000;
 
+export function createTaskProgressFromDocument(document) {
+  return createTaskProgress(() => {
+    const id = (name) => document.getElementById(name);
+    return {
+      dialog: id('task-progress-dialog'),
+      title: id('task-progress-title'),
+      phase: id('task-progress-phase'),
+      meter: id('task-progress-meter'),
+      percent: id('task-progress-percent'),
+      elapsed: id('task-progress-elapsed'),
+      remaining: id('task-progress-remaining'),
+      completion: id('task-progress-completion'),
+      cancel: id('task-progress-cancel'),
+    };
+  });
+}
+
 function formatDuration(milliseconds) {
   const seconds = Math.max(0, Math.round(milliseconds / 1000));
   if (seconds < 60)
@@ -20,7 +37,7 @@ function formatDuration(milliseconds) {
 }
 
 export function createTaskProgress(
-  elements,
+  elementsOrFactory,
   now = () => performance.now(),
   {
     showDelay = SHOW_DELAY_MS,
@@ -29,7 +46,21 @@ export function createTaskProgress(
     ensureStyles = () => loadFeatureStylesheet('task-progress'),
   } = {},
 ) {
+  let elements = null;
   let active = null;
+  const initialize = () => {
+    if (elements) return elements;
+    elements =
+      typeof elementsOrFactory === 'function'
+        ? elementsOrFactory()
+        : elementsOrFactory;
+    elements.cancel.addEventListener('click', cancel);
+    elements.dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      cancel();
+    });
+    return elements;
+  };
 
   const renderTime = () => {
     if (!active) return;
@@ -66,13 +97,8 @@ export function createTaskProgress(
     );
     active.controller.abort();
   };
-  elements.cancel.addEventListener('click', cancel);
-  elements.dialog.addEventListener('cancel', (event) => {
-    event.preventDefault();
-    cancel();
-  });
-
   const start = ({ title, phase }) => {
+    initialize();
     const styleRequest = ensureStyles().catch((error) => {
       console.error(error);
     });

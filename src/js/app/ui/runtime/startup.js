@@ -53,7 +53,6 @@ export function startApplication({
   elements.urlInput.value = runtime.getDefaultUrl();
   systems.output.sync();
   systems.syncFormat();
-  systems.navigation.syncChoices();
   systems.contentSections.phone.initialize();
   systems.contentData.syncFileCapacityHint();
   file.settings.syncVersion();
