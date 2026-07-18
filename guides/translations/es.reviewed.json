@@ -7,7 +7,7 @@
   "The decoder receives instructions before content": "Los metadatos indican al decodificador cómo interpretar el contenido",
   "03 / Encoded stream": "03 / Flujo de bits codificado",
   "Repeat once for every optimized segment": "Esta estructura se repite para cada segmento optimizado.",
-  "Byte boundary": "Bits de alineación a byte",
+  "Byte boundary": "Bits de alineación de bytes",
   "Pad words": "Palabras de código de relleno",
   "EC / 11": "0xEC / 0x11",
   "Use the guide to learn; use the source to reproduce": "Aprenda con la guía; implemente con el código fuente",

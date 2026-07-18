@@ -247,7 +247,7 @@ test('Spanish specification uses fluent technical language', async () => {
   );
   assert.match(copy, /Cómo se selecciona automáticamente la máscara/i);
   assert.match(copy, /0, 3, 4 o 7 bits/i);
-  assert.match(copy, /Bits de alineación a byte.*?0–7 bits/i);
+  assert.match(copy, /Bits de alineación de bytes.*?0–7 bits/i);
   assert.match(
     copy,
     /Penalizar el desequilibrio entre módulos oscuros y claros\./i,
