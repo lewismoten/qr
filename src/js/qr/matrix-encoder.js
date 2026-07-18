@@ -32,11 +32,13 @@ class MatrixBuilder {
     this.version = version;
     this.errorLevel = errorLevel;
     this.size = version * 4 + 17;
-    this.modules = Array.from({ length: this.size }, () =>
-      Array(this.size).fill(false),
+    this.modules = Array.from(
+      { length: this.size },
+      () => new Uint8Array(this.size),
     );
-    this.functionModules = Array.from({ length: this.size }, () =>
-      Array(this.size).fill(false),
+    this.functionModules = Array.from(
+      { length: this.size },
+      () => new Uint8Array(this.size),
     );
     this.drawFunctionPatterns();
     this.drawCodewords(codewords);
@@ -53,8 +55,8 @@ class MatrixBuilder {
   }
 
   setFunction(row, column, dark) {
-    this.modules[row][column] = dark;
-    this.functionModules[row][column] = true;
+    this.modules[row][column] = dark ? 1 : 0;
+    this.functionModules[row][column] = 1;
   }
 
   drawFunctionPatterns() {
@@ -158,7 +160,7 @@ class MatrixBuilder {
           )
             continue;
           this.modules[row][column] =
-            ((codewords[bitIndex >>> 3] >>> (7 - (bitIndex & 7))) & 1) !== 0;
+            (codewords[bitIndex >>> 3] >>> (7 - (bitIndex & 7))) & 1;
           bitIndex += 1;
         }
       }
@@ -180,8 +182,7 @@ class MatrixBuilder {
         const functions = this.functionModules[row];
         const offset = row * this.size;
         for (let column = 0; column < this.size; column += 1) {
-          if (!functions[column] && next[offset + column])
-            modules[column] = !modules[column];
+          if (!functions[column] && next[offset + column]) modules[column] ^= 1;
         }
       }
       return;
@@ -193,14 +194,13 @@ class MatrixBuilder {
       if (previous === null) {
         for (let item = 0; item < columns.length; item += 1) {
           const column = columns[item];
-          if (next[offset + column]) modules[column] = !modules[column];
+          if (next[offset + column]) modules[column] ^= 1;
         }
       } else {
         for (let item = 0; item < columns.length; item += 1) {
           const column = columns[item];
           const index = offset + column;
-          if (previous[index] !== next[index])
-            modules[column] = !modules[column];
+          if (previous[index] !== next[index]) modules[column] ^= 1;
         }
       }
     }
@@ -256,10 +256,8 @@ function create(payload, options = {}) {
   const flatModules = new Uint8Array(builder.size * builder.size);
   let moduleIndex = 0;
   for (const row of builder.modules) {
-    for (const dark of row) {
-      flatModules[moduleIndex] = dark ? 1 : 0;
-      moduleIndex += 1;
-    }
+    flatModules.set(row, moduleIndex);
+    moduleIndex += builder.size;
   }
 
   return {
