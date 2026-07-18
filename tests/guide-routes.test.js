@@ -14,10 +14,7 @@ test('guide route helpers cover native, default, and legacy paths', () => {
     getGuideOutputPath('content/wifi', 'es'),
     'es/guias/contenido/wifi.html',
   );
-  assert.equal(
-    getGuideRouteFromPath('/es/guias/especificacion-qr.html'),
-    'spec',
-  );
+  assert.equal(getGuideRouteFromPath('/es/especificacion-qr.html'), 'spec');
   assert.equal(getGuideRouteFromPath('./guides/'), 'index');
   assert.equal(getGuideRouteFromPath('guides/spec.es.html'), 'spec');
   assert.equal(getGuideRouteFromPath('guides/unknown.es.html'), null);

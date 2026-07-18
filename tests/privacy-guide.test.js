@@ -9,6 +9,7 @@ import {
 import { getGuideOutputPath } from '../src/js/i18n/guide-routes.js';
 
 const sourceRoot = 'src/html/guides';
+const privacySource = 'src/html/privacy.html';
 
 function stripLanguageSwitcher(source) {
   return source.replace(
@@ -28,11 +29,9 @@ test('reviewed translations include only known or privacy prose', async () => {
     `${sourceRoot}/translations`,
     'es',
   );
-  const privacySource = await readFile(`${sourceRoot}/privacy.html`, 'utf8');
+  const privacy = await readFile(privacySource, 'utf8');
   const privacyKeys = new Set(
-    collectGuideText(privacySource).map((key) =>
-      key.replace(/\s+/g, ' ').trim(),
-    ),
+    collectGuideText(privacy).map((key) => key.replace(/\s+/g, ' ').trim()),
   );
   const unknown = Object.keys(reviewed).filter(
     (key) =>
@@ -45,9 +44,7 @@ test('reviewed translations include only known or privacy prose', async () => {
 });
 
 test('Spanish privacy guide uses complete reviewed prose', async () => {
-  const source = stripLanguageSwitcher(
-    await readFile(`${sourceRoot}/privacy.html`, 'utf8'),
-  );
+  const source = stripLanguageSwitcher(await readFile(privacySource, 'utf8'));
   const translations = await loadGuideTranslationSet(
     `${sourceRoot}/translations`,
     'es',
@@ -76,11 +73,11 @@ test('Spanish privacy guide uses complete reviewed prose', async () => {
 });
 
 test('privacy source exposes both English language flags', async () => {
-  const source = await readFile(`${sourceRoot}/privacy.html`, 'utf8');
+  const source = await readFile(privacySource, 'utf8');
 
   assert.match(source, /🇺🇸<\/span> English \(US\)/);
   assert.match(source, /🇬🇧<\/span> English \(UK\)/);
   assert.match(source, /hreflang="en-US"/);
   assert.match(source, /hreflang="en-GB"/);
-  assert.match(source, /en-GB\/guides\/privacy\.html/);
+  assert.match(source, /en-GB\/privacy\.html/);
 });

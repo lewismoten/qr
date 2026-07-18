@@ -11,6 +11,10 @@ export function configuredGuidePath(config, route, locale = 'en-US') {
   const segments = route === 'index' ? [] : route.split('/');
   const translated = config.segments?.[locale] || {};
   const parts = segments.map((part) => translated[part] || part);
+  if (config.standalone?.[route]) {
+    const prefix = locale === 'en-US' ? [] : [locale];
+    return [...prefix, ...parts].join('/') + '.html';
+  }
   const base = [localeConfig.root, ...parts].join('/');
   return route === 'index' ? `${base}/index.html` : `${base}.html`;
 }

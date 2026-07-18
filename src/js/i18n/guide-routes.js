@@ -24,7 +24,7 @@ export const GUIDE_ROUTES = Object.freeze([
   'download/animation',
   'debug/mask',
 ]);
-
+const STANDALONE_ROUTES = new Set(['about', 'privacy', 'spec', 'technology']);
 const NATIVE_ROUTES = Object.freeze({
   es: {
     root: ['es', 'guias'],
@@ -143,15 +143,18 @@ const NATIVE_ROUTES = Object.freeze({
     },
   },
 });
-
 export const GUIDE_LOCALES = Object.freeze([
   'en-US',
   'en-GB',
   ...Object.keys(NATIVE_ROUTES),
 ]);
-
 function translatedRoute(route, locale) {
   const segments = route === 'index' ? [] : route.split('/');
+  if (STANDALONE_ROUTES.has(route)) {
+    const config = NATIVE_ROUTES[locale];
+    const translated = segments.map((part) => config?.segments[part] || part);
+    return locale === 'en-US' ? translated : [locale, ...translated];
+  }
   if (locale === 'en-GB') return ['en-GB', 'guides', ...segments];
   const config = NATIVE_ROUTES[locale];
   if (!config) {
@@ -162,13 +165,11 @@ function translatedRoute(route, locale) {
     ...segments.map((part) => config.segments[part] || part),
   ];
 }
-
 export function getGuideOutputPath(route, locale = 'en-US') {
   const parts = translatedRoute(route, locale);
   if (route === 'index') return [...parts, 'index.html'].join('/');
   return parts.join('/') + '.html';
 }
-
 export function getGuidePublicPath(route, locale = 'en-US') {
   const output = getGuideOutputPath(route, locale);
   return route === 'index' ? output.replace(/index\.html$/, '') : output;

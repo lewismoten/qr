@@ -14,24 +14,24 @@ test('guide paths select translated copies and preserve fallbacks', () => {
   );
   assert.equal(
     getLocalizedGuidePath('guides/about.html?embed=1', 'ar'),
-    'ar/أدلة/حول.html?embed=1',
+    'ar/حول.html?embed=1',
   );
   assert.equal(
-    getLocalizedGuidePath('zh-CN/指南/二维码规范.html', 'zh-CN'),
-    'zh-CN/指南/二维码规范.html',
+    getLocalizedGuidePath('zh-CN/二维码规范.html', 'zh-CN'),
+    'zh-CN/二维码规范.html',
   );
   assert.equal(
     getLocalizedGuidePath('guides/spec.html', 'en-GB'),
-    'en-GB/guides/spec.html',
+    'en-GB/spec.html',
   );
   assert.equal(getLocalizedGuidePath('guides/', 'es'), 'es/guias/');
   assert.equal(
-    getLocalizedGuidePath('es/guias/acerca-de.html', 'zh-CN'),
-    'zh-CN/指南/关于.html',
+    getLocalizedGuidePath('es/acerca-de.html', 'zh-CN'),
+    'zh-CN/关于.html',
   );
   assert.equal(
-    getLocalizedGuidePath('es/guias/acerca-de.html', 'en-US'),
-    'guides/about.html',
+    getLocalizedGuidePath('es/acerca-de.html', 'en-US'),
+    'about.html',
   );
   assert.equal(
     getLocalizedGuidePath('guides/?view=all', 'hi-IN'),
@@ -40,9 +40,9 @@ test('guide paths select translated copies and preserve fallbacks', () => {
   assert.equal(getLocalizedGuidePath('guides/', 'en-US'), 'guides/');
   assert.equal(
     getLocalizedGuidePath('/guides/spec.html', 'es'),
-    'es/guias/especificacion-qr.html',
+    'es/especificacion-qr.html',
   );
-  assert.equal(getLocalizedGuidePath('guides/spec.html'), 'guides/spec.html');
+  assert.equal(getLocalizedGuidePath('guides/spec.html'), 'spec.html');
   assert.equal(getLocalizedGuidePath('not-a-guide', 'es'), 'not-a-guide');
   assert.equal(getLocalizedGuidePath(undefined, 'es'), undefined);
 });
@@ -81,12 +81,12 @@ test('guide links follow the active application locale', () => {
 
   localizeGuideLinks(document, 'es');
   assert.equal(links[0].href, 'es/guias/');
-  assert.equal(links[1].href, 'es/guias/acerca-de.html');
-  assert.equal(links[2].href, 'privacy.html');
+  assert.equal(links[1].href, 'es/acerca-de.html');
+  assert.equal(links[2].href, 'es/privacidad.html');
 
   localizeGuideLinks(document, 'ar');
   assert.equal(links[0].href, 'ar/أدلة/');
-  assert.equal(links[1].href, 'ar/أدلة/حول.html');
+  assert.equal(links[1].href, 'ar/حول.html');
 
   localizeGuideLinks(undefined, 'es');
   localizeGuideLinks({}, 'es');

@@ -15,6 +15,12 @@ import {
 const locales = ['ar', 'es', 'hi-IN', 'zh-CN'];
 const localizedName = /\.(?:ar|es|hi-IN|zh-CN)\.html$/;
 const sourceRoot = 'src/html/guides';
+const standaloneGuides = new Map([
+  ['src/html/about.html', 'about'],
+  ['src/html/privacy.html', 'privacy'],
+  ['src/html/spec.html', 'spec'],
+  ['src/html/technology.html', 'technology'],
+]);
 
 function generatedGuide(route, locale) {
   return `build/site/${getGuideOutputPath(route, locale)}`;
@@ -43,7 +49,17 @@ async function listEnglishGuides(directory = sourceRoot) {
       return file.endsWith('.html') && !localizedName.test(file) ? [file] : [];
     }),
   );
-  return files.flat();
+  const result = files.flat();
+  return directory === sourceRoot
+    ? [...standaloneGuides.keys(), ...result]
+    : result;
+}
+
+function routeFromSource(file) {
+  return (
+    standaloneGuides.get(file) ||
+    getGuideRouteFromPath(file.replace(`${sourceRoot}/`, 'guides/'))
+  );
 }
 
 test('guide translation preserves code and keyed UI content', () => {
@@ -120,9 +136,7 @@ test('Spanish guides use native QR and interface terminology', async () => {
   );
   const pages = await Promise.all(
     files.map((file) => {
-      const route = getGuideRouteFromPath(
-        file.replace(`${sourceRoot}/`, 'guides/'),
-      );
+      const route = routeFromSource(file);
       return readFile(generatedGuide(route, 'es'), 'utf8');
     }),
   );

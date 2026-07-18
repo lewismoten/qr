@@ -61,11 +61,11 @@ describe('guide index', () => {
       readFile(generatedPath('spec', 'es'), 'utf8'),
       readFile('build/site/sitemaps/guides-es.xml', 'utf8'),
     ]);
-    assert.match(spanish, /\/es\/guias\/especificacion-qr\.html/);
+    assert.match(spanish, /\/es\/especificacion-qr\.html/);
     assert.match(spanish, /hreflang="x-default"/);
-    assert.match(spanish, /"@lewismoten\/qr": "\.\.\/\.\.\/dist\/qr\.min\.js"/);
-    assert.doesNotMatch(spanish, /"@lewismoten\/qr": "\.\.\/dist\//);
-    assert.match(sitemap, /\/es\/guias\/especificacion-qr\.html/);
+    assert.match(spanish, /"@lewismoten\/qr": "\.\.\/dist\/qr\.min\.js"/);
+    assert.doesNotMatch(spanish, /"@lewismoten\/qr": "\.\.\/\.\.\/dist\//);
+    assert.match(sitemap, /\/es\/especificacion-qr\.html/);
     assert.match(sitemap, /xmlns:xhtml=/);
   });
 

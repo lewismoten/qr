@@ -20,10 +20,10 @@ pages:
   index.html: index.html
 guides:
   index: guides/index.html
-  about: guides/about.html
-  privacy: guides/privacy.html
-  spec: guides/spec.html
-  technology: guides/technology.html
+  about: about.html
+  privacy: privacy.html
+  spec: spec.html
+  technology: technology.html
   content/frame: guides/content/frame.html
   content/text: guides/content/text.html
   content/number: guides/content/number.html
@@ -43,6 +43,11 @@ guides:
   download/document: guides/download/document.html
   download/animation: guides/download/animation.html
   debug/mask: guides/debug/mask.html
+standalone:
+  about: about
+  privacy: privacy
+  spec: spec
+  technology: technology
 locales:
   en-US:
     root: guides

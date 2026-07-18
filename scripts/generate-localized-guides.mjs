@@ -79,7 +79,7 @@ function rewriteLocalUrls(source, context) {
     },
   );
   return attributes.replace(
-    /(["'])((?:\.\.\/)+dist\/[^"']+)\1/g,
+    /(["'])((?:(?:\.\.\/)+)?dist\/[^"']+)\1/g,
     (match, quote, value) => {
       const target = resolveSourceTarget(context.file, value);
       return `${quote}${relativeUrl(context.output, target)}${quote}`;
