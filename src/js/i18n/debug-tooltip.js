@@ -97,6 +97,7 @@ export function setupTranslationDebugTooltip({
   };
 
   const show = async (element) => {
+    if (!document.documentElement.classList.contains('i18n-debug')) return;
     const key = getKey(element);
     if (!key) return;
     activeElement = element;
@@ -144,5 +145,6 @@ export function setupTranslationDebugTooltip({
   });
   window.addEventListener('resize', position);
   window.addEventListener('scroll', position, true);
+  document.addEventListener('languagechange', hide);
   preloadTranslationEntries();
 }

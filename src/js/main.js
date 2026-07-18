@@ -52,25 +52,45 @@ function waitForApplicationStyles() {
   });
 }
 
+let application;
+let debugTooltip;
+let debugTooltipInitialized = false;
+
+async function ensureDebugTooltip() {
+  if (!isDebugLanguage()) return;
+  const [, module] = await Promise.all([
+    loadFeatureStylesheet('i18n-debug').catch(console.error),
+    debugTooltip
+      ? Promise.resolve(debugTooltip)
+      : import('./i18n/debug-tooltip.js'),
+  ]);
+  debugTooltip = module;
+  if (!debugTooltipInitialized) {
+    debugTooltip.setupTranslationDebugTooltip();
+    debugTooltipInitialized = true;
+  }
+}
+
+async function changeLocale(locale) {
+  await initializeLanguage({ locale });
+  translateDocument(document);
+  document.dispatchEvent(new Event('languagechange'));
+  await ensureDebugTooltip();
+  await application?.refreshLanguage();
+}
+
 async function start() {
   const stylesReady = waitForApplicationStyles().then(() => {
     return completeMilestone('stylesheet');
   });
   await initializeLanguage({ locale: getSavedLocale() });
   await completeMilestone('localization');
-  let debugTooltip;
-  if (isDebugLanguage()) {
-    [, debugTooltip] = await Promise.all([
-      loadFeatureStylesheet('i18n-debug').catch(console.error),
-      import('./i18n/debug-tooltip.js'),
-    ]);
-  }
+  await ensureDebugTooltip();
   translateDocument(document);
   setupFilePickers(document);
   setupExternalLinks();
-  setupLanguagePicker();
-  debugTooltip?.setupTranslationDebugTooltip();
-  const application = await import('./app/index.js');
+  setupLanguagePicker({ onLocaleChange: changeLocale });
+  application = await import('./app/index.js');
   await completeMilestone('application');
   await application.applicationReady;
   await completeMilestone('render');

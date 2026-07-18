@@ -274,3 +274,10 @@ export const applicationReady = startApplication({
   },
   runtime: { getDefaultUrl: runtimeHelpers.getDefaultUrl },
 });
+
+export function refreshLanguage() {
+  output.sync();
+  navigation.syncChoices();
+  setFormatVisibility();
+  return preview.render();
+}

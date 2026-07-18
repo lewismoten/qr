@@ -1,4 +1,10 @@
-import { getActiveLocale, getAvailableLocales, lookup } from './index.js';
+import {
+  getActiveLocale,
+  getAvailableLocales,
+  initializeLanguage,
+  lookup,
+  translateDocument,
+} from './index.js';
 
 export const LOCALE_STORAGE_KEY = 'qr.locale';
 
@@ -100,7 +106,10 @@ export function setupLanguagePicker({
   languages = globalThis.navigator?.languages || [
     globalThis.navigator?.language,
   ],
-  reload = () => globalThis.location?.reload(),
+  onLocaleChange = async (locale) => {
+    await initializeLanguage({ locale });
+    translateDocument(document);
+  },
 } = {}) {
   const picker = document?.getElementById('language-picker');
   const trigger = document?.getElementById('language-picker-trigger');
@@ -108,10 +117,6 @@ export function setupLanguagePicker({
   const grid = document?.getElementById('language-picker-grid');
   if (!picker || !trigger || !panel || !grid) return;
 
-  const activeLocale = getActiveLocale();
-  const locales = prioritizeLocales(getAvailableLocales(), languages);
-  const active =
-    locales.find(({ code }) => code === activeLocale) || locales[0];
   const close = ({ focus = false } = {}) => {
     panel.hidden = true;
     trigger.setAttribute('aria-expanded', 'false');
@@ -123,48 +128,64 @@ export function setupLanguagePicker({
     grid.querySelector('[aria-current="true"]')?.focus();
   };
 
-  trigger.textContent = active?.flag || '🏳️';
-  trigger.classList.toggle('is-debug-language', isDebugLocale(active));
-  trigger.setAttribute(
-    'aria-label',
-    lookup('language.current', 'Language: {language}. Choose language.', {
-      language: () => getLanguageName(activeLocale, activeLocale),
-    }),
-  );
-  grid.replaceChildren();
-  locales.forEach((locale) => {
-    const { code, flag, name, nativeName: configuredNativeName } = locale;
-    const translatedName = name || getLanguageName(code, activeLocale);
-    const nativeName = configuredNativeName || getLanguageName(code, code);
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `language-option${isDebugLocale(locale) ? ' language-option-debug' : ''}`;
-    button.lang = code;
-    button.setAttribute('role', 'option');
-    button.setAttribute('aria-current', String(code === activeLocale));
-    button.setAttribute('aria-selected', String(code === activeLocale));
-    const flagElement = document.createElement('span');
-    flagElement.className = 'language-option-flag';
-    flagElement.setAttribute('aria-hidden', 'true');
-    flagElement.textContent = flag;
-    const names = document.createElement('span');
-    names.className = 'language-option-names';
-    const translated = document.createElement('strong');
-    translated.textContent = translatedName;
-    const native = document.createElement('small');
-    native.textContent = nativeName;
-    names.append(translated, native);
-    button.append(flagElement, names);
-    button.addEventListener('click', () => {
-      if (code === activeLocale) {
-        close({ focus: true });
-        return;
-      }
-      saveLocale(storage || getDefaultStorage(), code);
-      reload();
+  const render = () => {
+    const activeLocale = getActiveLocale();
+    const locales = prioritizeLocales(getAvailableLocales(), languages);
+    const active =
+      locales.find(({ code }) => code === activeLocale) || locales[0];
+    trigger.textContent = active?.flag || '🏳️';
+    trigger.classList.toggle('is-debug-language', isDebugLocale(active));
+    trigger.setAttribute(
+      'aria-label',
+      lookup('language.current', 'Language: {language}. Choose language.', {
+        language: () => getLanguageName(activeLocale, activeLocale),
+      }),
+    );
+    grid.replaceChildren();
+    locales.forEach((locale) => {
+      const { code, flag, name, nativeName: configuredNativeName } = locale;
+      const translatedName = name || getLanguageName(code, activeLocale);
+      const nativeName = configuredNativeName || getLanguageName(code, code);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `language-option${isDebugLocale(locale) ? ' language-option-debug' : ''}`;
+      button.lang = code;
+      button.setAttribute('role', 'option');
+      button.setAttribute('aria-current', String(code === activeLocale));
+      button.setAttribute('aria-selected', String(code === activeLocale));
+      const flagElement = document.createElement('span');
+      flagElement.className = 'language-option-flag';
+      flagElement.setAttribute('aria-hidden', 'true');
+      flagElement.textContent = flag;
+      const names = document.createElement('span');
+      names.className = 'language-option-names';
+      const translated = document.createElement('strong');
+      translated.textContent = translatedName;
+      const native = document.createElement('small');
+      native.textContent = nativeName;
+      names.append(translated, native);
+      button.append(flagElement, names);
+      button.addEventListener('click', async () => {
+        if (code === getActiveLocale()) {
+          close({ focus: true });
+          return;
+        }
+        close();
+        trigger.setAttribute('aria-busy', 'true');
+        try {
+          await onLocaleChange(code);
+          saveLocale(storage || getDefaultStorage(), getActiveLocale());
+          render();
+          close({ focus: true });
+        } catch (error) {
+          console.error(error);
+        } finally {
+          trigger.removeAttribute('aria-busy');
+        }
+      });
+      grid.appendChild(button);
     });
-    grid.appendChild(button);
-  });
+  };
 
   trigger.addEventListener('click', () => (panel.hidden ? open() : close()));
   document.addEventListener('pointerdown', (event) => {
@@ -173,4 +194,5 @@ export function setupLanguagePicker({
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !panel.hidden) close({ focus: true });
   });
+  render();
 }
