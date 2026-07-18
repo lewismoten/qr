@@ -70,7 +70,6 @@ const contentData = createContentDataSetup({
     formatVersion: runtime.formatVersion,
   },
 });
-
 const styleSetup = createLazyStyleSetup({
   document,
   render: runtime.render,
@@ -115,6 +114,7 @@ const download = createLazyDownloadSetup({
   bulk: {
     isMode: contentData.isBulkMode,
     getRowCount: contentData.getBulkRowCount,
+    getRowIndex: contentData.getBulkRowIndex,
     syncStatus: contentData.syncBulkStatus,
   },
   file: {

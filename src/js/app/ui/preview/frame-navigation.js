@@ -4,7 +4,7 @@ export function createFrameNavigation({
   format,
   isBulkMode,
   getBulkRowCount,
-  bulkRowIndex,
+  getBulkRowIndex,
   syncBulkStatus,
   getFileEncodingMode,
   getFileChunkIndex,
@@ -33,8 +33,10 @@ export function createFrameNavigation({
   };
 
   const getCurrentFrame = () => {
-    if (isBulkMode())
-      return Math.max(1, Number.parseInt(bulkRowIndex.value, 10) || 1);
+    if (isBulkMode()) {
+      const input = getBulkRowIndex();
+      return Math.max(1, Number.parseInt(input?.value, 10) || 1);
+    }
     const input =
       format.value === 'number'
         ? getNumberSequenceIndex()
@@ -45,7 +47,9 @@ export function createFrameNavigation({
 
   const setCurrentFrame = (frame) => {
     if (isBulkMode()) {
-      bulkRowIndex.value = String(
+      const input = getBulkRowIndex();
+      if (!input) return;
+      input.value = String(
         Math.min(Math.max(1, frame), Math.max(1, getBulkRowCount())),
       );
       syncBulkStatus();

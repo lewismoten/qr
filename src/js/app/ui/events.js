@@ -8,11 +8,9 @@ export function bindApplicationEvents({
     if (event.target === e.bulkEnabled) {
       a.syncFormat();
       a.activateContent('data');
-      if (e.bulkEnabled.checked && e.bulkFileInput.files?.[0]) a.loadBulkFile();
-      else a.render();
+      a.render();
       return;
     }
-    if (event.target === e.bulkFileInput) return;
     a.syncSmsLength();
     a.syncEmailLength();
     a.render();
@@ -22,8 +20,7 @@ export function bindApplicationEvents({
     a.syncChoices();
     a.syncWifi();
     a.activateContent('data');
-    if (a.isBulkMode() && e.bulkFileInput.files?.[0]) a.loadBulkFile();
-    else a.render();
+    a.render();
   });
   e.choiceButtons.forEach((button) =>
     button.addEventListener('click', () => {
@@ -36,10 +33,6 @@ export function bindApplicationEvents({
       if (target === e.qrFormat) {
         a.syncFormat();
         a.activateContent('data');
-        if (a.isBulkMode() && e.bulkFileInput.files?.[0]) {
-          a.loadBulkFile();
-          return;
-        }
       }
       a.render();
     }),

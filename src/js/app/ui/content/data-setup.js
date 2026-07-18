@@ -13,283 +13,135 @@ const EMPTY_CHUNK_INFO = Object.freeze({
   isSingleFrame: true,
 });
 
-function bindFileEvents(file, e, runtime, protocol) {
-  e.input.addEventListener('change', () => {
-    file.settings.resetCache();
-    e.chunkIndex.value = '1';
-    file.section.syncCapacity();
-    runtime.render();
-  });
-  e.clearButton.addEventListener('click', () => {
-    file.section.clear();
-    runtime.render();
-  });
-  for (const input of [
-    e.includeManifest,
-    e.compressTransfer,
-    e.customMetadata,
-  ]) {
-    input.addEventListener('input', () => {
-      file.settings.resetDerived();
-      file.settings.schedule({ resetChunkIndex: true });
-    });
-  }
-  e.chunkIndex.addEventListener('input', () => {
-    file.capacity.invalidate();
-    file.section.syncCapacity();
-    runtime.render();
-  });
-  e.chunkVersionAuto.addEventListener('change', () => {
-    e.versionAuto.checked = e.chunkVersionAuto.checked;
-    if (e.chunkVersionAuto.checked) {
-      e.qrVersion.value = String(protocol.defaultChunkVersion);
-    }
-    runtime.formatVersion();
-    file.settings.syncVersion();
-    file.settings.schedule({ resetChunkIndex: true, delay: 0 });
-  });
-  e.chunkVersion.addEventListener('input', () => {
-    e.qrVersion.value = e.chunkVersion.value;
-    runtime.formatVersion();
-    file.settings.syncVersion();
-    file.settings.schedule({ resetChunkIndex: true });
-  });
-  document
-    .querySelectorAll('[data-choice-target="file-encoding-mode"]')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        if (button.dataset.choiceValue === 'chunked' && e.versionAuto.checked) {
-          e.qrVersion.value = String(protocol.defaultChunkVersion);
-        }
-        file.settings.syncVersion();
-        runtime.formatVersion();
-        file.settings.schedule({ resetChunkIndex: true, delay: 0 });
-      });
-    });
-}
-
-export function createContentDataSetup({
-  document,
-  elements: e,
-  encoder,
-  protocol,
-  runtime,
-  taskProgress,
-}) {
-  let file = null;
-  let bulk = null;
-  let fileRequest = null;
-  let bulkRequest = null;
+export function createContentDataSetup(options) {
+  const { document, elements: e, protocol, runtime, taskProgress } = options;
   const loading = createLoadingIndicator({
     region: e.tabPanels[0]?.parentElement,
   });
+  let file;
+  let bulk;
+  let fileRequest;
+  let bulkRequest;
 
   const ensureFile = () => {
     if (file) return Promise.resolve(file);
-    if (fileRequest) return fileRequest;
-    fileRequest = loading
-      .track(
-        Promise.all([
-          import('./file/setup.js'),
-          import('./file/protocol.js'),
-          import('./file/elements.js'),
-        ]),
-      )
-      .then(
-        ([
-          { createFileSetup },
-          { arrayBufferToBase64, createCompactFileId },
-          { getFileElements },
-        ]) => {
-          const fileElements = getFileElements(document, e);
-          file = createFileSetup({
-            elements: fileElements,
-            encoder,
-            protocol,
-            createId: createCompactFileId,
-            encodeBase64: arrayBufferToBase64,
-            runtime: {
-              buildOptions: runtime.buildOptions,
-              buildPayload: runtime.buildPayload,
-              getEncodingMode: runtime.getEncodingMode,
-              getShareableAppUrl: runtime.getShareableAppUrl,
-              syncNavigation: runtime.syncNavigation,
-              cancelRender: runtime.cancelRender,
-              render: runtime.render,
-            },
-          });
-          bindFileEvents(file, fileElements, runtime, protocol);
-          return file;
-        },
-      )
-      .catch((error) => {
-        fileRequest = null;
-        throw error;
-      });
+    if (!fileRequest) {
+      fileRequest = loading
+        .track(import('./file/lazy-setup.js'))
+        .then(({ createLazyFileSystem }) => createLazyFileSystem(options))
+        .then((system) => {
+          file = system;
+          return system;
+        })
+        .catch((error) => {
+          fileRequest = null;
+          throw error;
+        });
+    }
     return fileRequest;
   };
-
   const ensureBulk = () => {
     if (bulk) return Promise.resolve(bulk);
-    if (bulkRequest) return bulkRequest;
-    bulkRequest = loading
-      .track(import('./bulk/section.js'))
-      .then(({ createBulkImportSection }) => {
-        bulk = createBulkImportSection({
-          enabled: e.bulkEnabled,
-          format: e.qrFormat,
-          fields: e.bulkFields,
-          expectedFields: e.bulkExpectedFields,
-          requiredFields: e.bulkRequiredFields,
-          fileInput: e.bulkFileInput,
-          rowIndex: e.bulkRowIndex,
-          status: e.bulkStatus,
-          clearButton: e.bulkClear,
-          fileFormatButton: document.querySelector(
-            '[data-choice-target="qr-format"][data-choice-value="file"]',
-          ),
-          taskProgress,
-          onFormatFallback: runtime.syncChoices,
-          onChange: runtime.render,
+    if (!bulkRequest) {
+      bulkRequest = loading
+        .track(import('./bulk/lazy-setup.js'))
+        .then(({ createLazyBulkSystem }) =>
+          createLazyBulkSystem({
+            document,
+            enabled: e.bulkEnabled,
+            format: e.qrFormat,
+            taskProgress,
+            runtime,
+          }),
+        )
+        .then((system) => {
+          bulk = system;
+          return system;
+        })
+        .catch((error) => {
+          bulkRequest = null;
+          throw error;
         });
-        return bulk;
-      })
-      .catch((error) => {
-        bulkRequest = null;
-        throw error;
-      });
+    }
     return bulkRequest;
   };
-
-  const runFile = (
-    action,
-    { render = false, renderWhenLoaded = false } = {},
-  ) => {
-    const wasReady = Boolean(file);
-    return ensureFile()
+  const run = (ensure, action, renderWhenLoaded = false) => {
+    const wasReady = ensure === ensureFile ? Boolean(file) : Boolean(bulk);
+    return ensure()
       .then((system) => {
         const result = action(system);
-        if (render || (renderWhenLoaded && !wasReady)) runtime.render();
+        if (renderWhenLoaded && !wasReady) runtime.render();
         return result;
       })
       .catch(console.error);
   };
-  const runBulk = (
-    action,
-    { render = false, renderWhenLoaded = false } = {},
-  ) => {
-    const wasReady = Boolean(bulk);
-    return ensureBulk()
-      .then((system) => {
-        const result = action(system);
-        if (render || (renderWhenLoaded && !wasReady)) runtime.render();
-        return result;
-      })
-      .catch(console.error);
-  };
-
-  const isFileFormat = () => e.qrFormat.value === 'file';
-  const isBulkMode = () => e.bulkEnabled.checked && !isFileFormat();
-  const getFileMode = () => file?.section.getMode() ?? 'data';
-  const getChunkVersion = () =>
-    file?.settings.getVersion() ?? protocol.defaultChunkVersion;
-
+  const isFile = () => e.qrFormat.value === 'file';
+  const isBulkMode = () => e.bulkEnabled.checked && !isFile();
+  const fileAction = (action, render) => run(ensureFile, action, render);
+  const bulkAction = (action, render) => run(ensureBulk, action, render);
   const fileFacade = {
-    cache: {
-      getFile: () => file?.cache.getFile() ?? null,
-    },
+    cache: { getFile: () => file?.getActive() ?? null },
     capacity: {
-      invalidate: () => {
-        if (file) file.capacity.invalidate();
-      },
-      getChunkInfo: () => file?.capacity.getChunkInfo() ?? EMPTY_CHUNK_INFO,
+      invalidate: () => file?.invalidateCapacity(),
+      getChunkInfo: () => file?.getCapacity() ?? EMPTY_CHUNK_INFO,
     },
     section: {
-      getMode: getFileMode,
-      syncMode: () => {
-        if (isFileFormat()) {
-          runFile((system) => system.section.syncMode(), {
-            renderWhenLoaded: true,
-          });
-        }
-      },
-      syncCapacity: () => {
-        if (isFileFormat()) {
-          runFile((system) => system.section.syncCapacity(), {
-            renderWhenLoaded: true,
-          });
-        }
-      },
-      clear: () =>
-        runFile((system) => system.section.clear(), { render: true }),
-      getChunkIndex: () => file?.elements.chunkIndex ?? null,
+      getMode: () => file?.getMode() ?? 'data',
+      syncMode: () =>
+        isFile() && fileAction((system) => system.syncMode(), true),
+      syncCapacity: () =>
+        isFile() && fileAction((system) => system.syncCapacity(), true),
+      clear: () => fileAction((system) => system.clear()),
+      getChunkIndex: () => file?.getIndex() ?? null,
     },
     settings: {
-      getVersion: () => file?.settings.getVersion() ?? getChunkVersion(),
-      syncVersion: () => {
-        if (isFileFormat()) runFile((system) => system.settings.syncVersion());
-      },
-      syncChunkLabel: () => {
-        if (isFileFormat() && getFileMode() === 'chunked') {
-          runFile((system) => system.settings.syncChunkLabel());
-        }
-      },
-      resetDerived: () => runFile((system) => system.settings.resetDerived()),
-      resetCache: (options) =>
-        runFile((system) => system.settings.resetCache(options), {
-          render: true,
-        }),
-      schedule: (options) =>
-        runFile((system) => system.settings.schedule(options)),
+      getVersion: () => file?.getVersion() ?? protocol.defaultChunkVersion,
+      syncVersion: () =>
+        isFile() && fileAction((system) => system.syncVersion()),
+      syncChunkLabel: () => file?.syncChunkLabel(),
+      resetDerived: () => file?.resetDerived(),
+      resetCache: (value) => fileAction((system) => system.resetCache(value)),
+      schedule: (value) => fileAction((system) => system.schedule(value)),
     },
     payload: {
-      build: () => ensureFile().then((system) => system.payload.build()),
+      build: () => ensureFile().then((system) => system.build()),
       preview: () =>
         file?.preview() ??
         lookup('content.preview.file', '[Selected file content]'),
     },
   };
 
-  const preloadBulk = () => ensureBulk().catch(console.error);
-  e.bulkFileInput.addEventListener('pointerdown', preloadBulk, { once: true });
-  e.bulkFileInput.addEventListener('change', () => {
-    if (bulk) return;
-    ensureBulk()
-      .then((system) => system.load())
-      .catch(console.error);
-  });
-
   return {
     file: fileFacade,
-    bulk: { load: ensureBulk },
     getActiveFile: fileFacade.cache.getFile,
     invalidateChunkCapacityCache: fileFacade.capacity.invalidate,
     getChunkedFileCapacityInfo: fileFacade.capacity.getChunkInfo,
-    getSelectedFileEncodingMode: getFileMode,
+    getSelectedFileEncodingMode: fileFacade.section.getMode,
     syncFileModeVisibility: fileFacade.section.syncMode,
     syncFileCapacityHint: fileFacade.section.syncCapacity,
     clearLoadedFile: fileFacade.section.clear,
-    getBulkSchema: () => bulk?.getSchema() ?? null,
     isBulkMode,
+    getBulkSchema: () => bulk?.getSchema() ?? null,
     getBulkCurrentRow: () => bulk?.getCurrentRow() ?? null,
     getBulkRowCount: () => bulk?.getRowCount() ?? 0,
+    getBulkRowIndex: () => bulk?.getRowIndex() ?? null,
     getBulkParseError: () => bulk?.getError() ?? '',
-    buildBulkPayload: (options) =>
-      ensureBulk().then((system) => system.buildPayload(options)),
-    getBulkValidationState: (options) =>
-      bulk?.getValidationState(options) ?? {
+    buildBulkPayload: (value) =>
+      ensureBulk().then((system) => system.buildPayload(value)),
+    getBulkValidationState: (value) =>
+      bulk?.getValidationState(value) ?? {
         error: lookup('bulk.loading', 'Bulk Import tools are loading.'),
         warning: '',
       },
-    syncBulkStatus: () => {
-      if (bulk) bulk.syncStatus();
-    },
+    syncBulkStatus: () => bulk?.syncStatus(),
     syncBulkControls: () => {
       if (isBulkMode()) {
-        runBulk((system) => system.syncControls(), { renderWhenLoaded: true });
-      } else if (bulk) bulk.syncControls();
+        bulkAction((system) => system.syncControls(), true);
+      } else {
+        bulk?.syncControls();
+      }
     },
-    clearBulkData: () => runBulk((system) => system.clear(), { render: true }),
-    loadBulkFile: () => runBulk((system) => system.load()),
+    clearBulkData: () => bulkAction((system) => system.clear(), true),
+    loadBulkFile: () => bulkAction((system) => system.load()),
   };
 }

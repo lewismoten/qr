@@ -20,7 +20,7 @@ export function createLazyDownloadSetup({
     format: e.qrFormat,
     isBulkMode: bulk.isMode,
     getBulkRowCount: bulk.getRowCount,
-    bulkRowIndex: e.bulkRowIndex,
+    getBulkRowIndex: bulk.getRowIndex,
     syncBulkStatus: bulk.syncStatus,
     getFileEncodingMode: file.getMode,
     getFileChunkIndex: file.getIndex,

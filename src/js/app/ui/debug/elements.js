@@ -8,6 +8,7 @@ export function getDebugElements(document, core) {
     versionSummary: id('version-summary'),
     unusedSummary: id('unused-summary'),
     modeValidation: id('mode-validation'),
+    bulkFields: id('bulk-fields'),
     debugEnabled: id('debug-enabled'),
     debugUnmask: id('debug-unmask'),
     debugOutlineModeButtons: document.querySelectorAll('.outline-mode-button'),
