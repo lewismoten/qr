@@ -76,7 +76,7 @@ function getTagDetails(token) {
 
 export function translateGuideHtml(source, translations, missing) {
   const stack = [];
-  return source
+  const translated = source
     .split(/(<!--[\s\S]*?-->|<[^>]+>)/g)
     .map((token) => {
       if (!token) return token;
@@ -115,6 +115,8 @@ export function translateGuideHtml(source, translations, missing) {
       return keyed ? token : translateAttributes(token, translations, missing);
     })
     .join('');
+
+  return translated.replace(/<\/code>\s+([,.;:])/g, '</code>$1');
 }
 
 export function collectGuideText(source) {
