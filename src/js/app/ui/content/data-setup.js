@@ -14,7 +14,14 @@ const EMPTY_CHUNK_INFO = Object.freeze({
 });
 
 export function createContentDataSetup(options) {
-  const { document, elements: e, protocol, runtime, taskProgress } = options;
+  const {
+    document,
+    elements: e,
+    protocol,
+    runtime,
+    taskProgress,
+    limits,
+  } = options;
   const loading = createLoadingIndicator({
     region: e.tabPanels[0]?.parentElement,
   });
@@ -129,7 +136,7 @@ export function createContentDataSetup(options) {
     buildBulkPayload: (value) =>
       ensureBulk().then((system) => system.buildPayload(value)),
     getBulkValidationState: (value) =>
-      bulk?.getValidationState(value) ?? {
+      bulk?.getValidationState({ ...value, limits }) ?? {
         error: lookup('bulk.loading', 'Bulk Import tools are loading.'),
         warning: '',
       },

@@ -58,6 +58,7 @@ const contentData = createContentDataSetup({
   taskProgress,
   encoder: qrEncoder,
   protocol: FILE_PROTOCOL,
+  limits: { ...LIMITS, byteCapacity: MODE_CAPACITY.byte.L },
   runtime: {
     buildOptions: runtime.buildOptions,
     buildPayload: runtime.buildPayload,
@@ -81,16 +82,22 @@ const contentSections = createContentSections({
   elements,
   runtime: {
     render: runtime.render,
+    buildOptions: runtime.buildOptions,
+    buildPayload: runtime.buildPayload,
     syncChoices: runtime.syncChoices,
     syncSmsLength: runtime.syncSmsLength,
     syncEmailLength: runtime.syncEmailLength,
   },
-  limits: { numberFrames: LIMITS.numberFrames, sms: LIMITS.sms },
+  limits: { ...LIMITS, byteCapacity: MODE_CAPACITY.byte.L },
+  encoder: qrEncoder,
   alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
   file: {
     build: contentData.file.payload.build,
     preview: contentData.file.payload.preview,
+    getActive: contentData.getActiveFile,
+    getMode: contentData.getSelectedFileEncodingMode,
+    getCapacity: contentData.getChunkedFileCapacityInfo,
   },
 });
 
@@ -173,14 +180,6 @@ const contentEncoding = createContentEncodingSetup({
   },
   config: {
     alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
-    validationLimits: {
-      emailSubject: LIMITS.emailSubject,
-      byteCapacity: MODE_CAPACITY.byte.L,
-      sms: LIMITS.sms,
-      calendarTitle: LIMITS.calendarTitle,
-      calendarLocation: LIMITS.calendarLocation,
-      calendarDescription: LIMITS.calendarDescription,
-    },
   },
 });
 

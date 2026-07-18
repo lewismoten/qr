@@ -1,7 +1,5 @@
 import { createContentPipeline } from './pipeline.js';
-import { validateUrl } from './url-validation.js';
 import { createQrConfiguration } from '../encoding/configuration.js';
-import { createLoadingIndicator } from '../loading-indicator.js';
 
 export function createContentEncodingSetup({
   document,
@@ -59,113 +57,32 @@ export function createContentEncodingSetup({
     },
     alphanumericCharacters: config.alphanumericCharacters,
   });
-  const loading = createLoadingIndicator({
-    region: e.tabPanels[0]?.parentElement,
-  });
-  const emailCapacityOptions = {
-    encoder,
-    buildOptions: qr.buildOptions,
-    buildPayload: qr.buildPayload,
-    buildEmail: sections.shared.buildEmailPayloadWithBody,
-    isActive: () => e.qrFormat.value === 'email',
-  };
-  let emailCapacityController = null;
-  let emailCapacityRequest = null;
-  const ensureEmailCapacity = () => {
-    if (emailCapacityController) {
-      return Promise.resolve(emailCapacityController);
-    }
-    if (!emailCapacityRequest) {
-      emailCapacityRequest = loading
-        .track(import('./email/capacity.js'))
-        .then(({ createEmailCapacityFromDocument }) => {
-          emailCapacityController = createEmailCapacityFromDocument(
-            document,
-            emailCapacityOptions,
-          );
-          return emailCapacityController;
-        });
-    }
-    return emailCapacityRequest;
-  };
   const emailCapacity = {
     getInfo: () =>
-      emailCapacityController?.getInfo() ?? {
-        current: document.getElementById('email-body')?.value.length ?? 0,
-        max: 0,
-      },
+      sections.plugins.get('email')?.getCapacity?.() ?? { current: 0, max: 0 },
     sync() {
       if (e.qrFormat.value !== 'email') return;
-      ensureEmailCapacity()
-        .then((controller) => controller.sync())
+      sections
+        .ensureFormat('email')
+        .then((plugin) => plugin?.syncCapacity?.())
         .catch(console.error);
     },
-  };
-  const validatorLoaders = {
-    email: () => import('./email/validation.js'),
-    event: () => import('./event/validation.js'),
-    file: () => import('./file/validation.js'),
-    geo: () => import('./geo/validation.js'),
-    phone: () => import('./phone/validation.js'),
-    sms: () => import('./phone/validation.js'),
-    vcard: () => import('./vcard/validation.js'),
-  };
-  const validatorRequests = new Map();
-  const loadValidator = (format) => {
-    if (!validatorRequests.has(format)) {
-      validatorRequests.set(format, loading.track(validatorLoaders[format]()));
-    }
-    return validatorRequests.get(format);
   };
   const validation = async () => {
     if (bulk.isMode()) {
       return bulk.getValidationState({
         rowNumber: runtime.getFrameIndex() + 1,
-        limits: config.validationLimits,
       });
     }
-    const format = e.qrFormat.value;
-    if (format === 'url') {
-      return validateUrl(e.urlInput.value);
-    }
-    if (format === 'number') {
-      await sections.ensureFormat(format);
-      return sections.number.getValidationState();
-    }
-    if (!validatorLoaders[format]) return { error: '', warning: '' };
-    if (format === 'email') await ensureEmailCapacity();
-    const validator = await loadValidator(format);
-    if (format === 'email') {
-      return validator.validateEmail(
-        document,
-        emailCapacity.getInfo(),
-        config.validationLimits,
-      );
-    }
-    if (format === 'event') {
-      return validator.validateEvent(document, config.validationLimits);
-    }
-    if (format === 'file') {
-      return validator.validateFile({
-        getActive: file.getActive,
-        getMode: file.getMode,
-        getCapacity: file.getCapacity,
-      });
-    }
-    if (format === 'geo') return validator.validateGeo(document);
-    if (format === 'phone' || format === 'sms') {
-      return validator.validatePhone(document, format, config.validationLimits);
-    }
-    return validator.validateVCard(document);
+    const plugin = await sections.ensureFormat(e.qrFormat.value);
+    return plugin?.validate?.() ?? { error: '', warning: '' };
   };
   const updateTextPreview = (text) => {
     const debugState = runtime.getDebugState();
     if (debugState.tab !== 'debug' || debugState.subtab !== 'payload') return;
     const preview = text || pipeline.payload.preview();
-    e.encodedPreview.textContent =
-      e.qrFormat.value === 'wifi'
-        ? sections.wifi.maskPayload(preview)
-        : preview;
+    const plugin = sections.plugins.get();
+    e.encodedPreview.textContent = plugin?.maskPreview?.(preview) ?? preview;
   };
   return { pipeline, qr, emailCapacity, validation, updateTextPreview };
 }
