@@ -710,10 +710,12 @@
     "mp4Unavailable": "MP4 encoding is not available in this browser; animated GIF remains available.",
     "allZip": "Download all {count} as ZIP",
     "allPdf": "Download all {count} as PDF",
-    "toolsError": "Download tools could not be loaded: {message}",
+    "toolsError": "Download tools could not be loaded.",
     "mp4EncoderUnavailable": "This browser does not provide an MP4 encoder. Animated GIF is available instead.",
     "mp4EncodeError": "Unable to encode MP4.",
     "imageError": "Unable to create {type} image.",
+    "lzwCodeSize": "GIF compression requires a code size from 2 through 8.",
+    "lzwPaletteIndex": "GIF palette index must be between 0 and {maximum}.",
     "progress": {
       "working": "Task in progress",
       "titleGif": "Creating animated GIF",
@@ -742,7 +744,11 @@
       "kanjiUnsupported": "Native Kanji mode requires browser Shift JIS decoding support.",
       "versionRange": "QR version must be an integer from 1 through 40.",
       "minimumVersion": "The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.",
-      "tooLarge": "The content is too large for a version 40 QR Code."
+      "tooLarge": "The content is too large for a version 40 QR Code.",
+      "bitLength": "A value does not fit in the requested QR bit length.",
+      "matrixBits": "The QR matrix could not place every encoded bit.",
+      "maskPattern": "Mask pattern must be an integer from 0 through 7.",
+      "errorCorrectionLevel": "Unknown QR error correction level: {level}."
     }
   }
 }

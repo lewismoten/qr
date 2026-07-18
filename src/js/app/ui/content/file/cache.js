@@ -1,4 +1,4 @@
-import { lookup } from '../../../../i18n/index.js';
+import { createLocalizedError } from '../../../../localized-error.js';
 import { refreshFilePicker } from '../../file-picker.js';
 
 export function createFileCache({
@@ -81,11 +81,9 @@ export function createFileCache({
       return originalBytes;
     }
     if (typeof CompressionStream !== 'function') {
-      throw new Error(
-        lookup(
-          'file.compressionUnsupported',
-          'Gzip transfer compression is not supported by this browser. Turn compression off to continue.',
-        ),
+      throw createLocalizedError(
+        'file.compressionUnsupported',
+        'Gzip transfer compression is not supported by this browser. Turn compression off to continue.',
       );
     }
 

@@ -1,4 +1,4 @@
-import { lookup } from '../i18n/index.js';
+import { createLocalizedError } from '../localized-error.js';
 
 export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
   return new Promise((resolve, reject) => {
@@ -18,10 +18,10 @@ export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
           resolve(blob);
         } else {
           reject(
-            new Error(
-              lookup('download.imageError', 'Unable to create {type} image.', {
-                type,
-              }),
+            createLocalizedError(
+              'download.imageError',
+              'Unable to create {type} image.',
+              { type },
             ),
           );
         }

@@ -1,5 +1,6 @@
 import { getDataCodewords, getRawDataModules } from './capacity.js';
 import { FORMAT_ECL_BITS } from './constants.js';
+import { createQrError } from './error.js';
 import {
   addErrorCorrection,
   getReedSolomonRemainder,
@@ -152,7 +153,10 @@ class MatrixBuilder {
       }
     }
     if (bitIndex !== codewords.length * 8)
-      throw new Error('Native QR matrix did not consume every codeword bit.');
+      throw createQrError(
+        'matrixBits',
+        'The QR matrix could not place every encoded bit.',
+      );
   }
 
   applyMask(mask) {
@@ -233,7 +237,12 @@ class MatrixBuilder {
       }
     }
     if (!Number.isInteger(mask) || mask < 0 || mask > 7)
-      throw new RangeError('Mask pattern must be from 0 through 7.');
+      throw createQrError(
+        'maskPattern',
+        'Mask pattern must be an integer from 0 through 7.',
+        undefined,
+        RangeError,
+      );
     this.applyMask(mask);
     this.drawFormatBits(mask);
     return mask;
@@ -243,7 +252,11 @@ class MatrixBuilder {
 function create(payload, options = {}) {
   const errorLevel = String(options.errorCorrectionLevel || 'M').toUpperCase();
   if (!Object.hasOwn(FORMAT_ECL_BITS, errorLevel))
-    throw new Error(`Unknown error correction level: ${errorLevel}.`);
+    throw createQrError(
+      'errorCorrectionLevel',
+      'Unknown QR error correction level: {level}.',
+      { level: errorLevel },
+    );
   const { segments, version } = selectVersionAndSegments(
     payload,
     errorLevel,

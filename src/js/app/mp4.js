@@ -1,6 +1,6 @@
 import { createAnimationStage, drawAnimationStageFrame } from './gif.js';
 import { getSupportedMp4MimeType } from './media-support.js';
-import { lookup } from '../i18n/index.js';
+import { createLocalizedError } from '../localized-error.js';
 import { throwIfAborted, waitFor } from './abort.js';
 
 export async function createAnimatedMp4Blob(
@@ -10,11 +10,9 @@ export async function createAnimatedMp4Blob(
 ) {
   const mimeType = getSupportedMp4MimeType();
   if (!mimeType) {
-    throw new Error(
-      lookup(
-        'download.mp4EncoderUnavailable',
-        'This browser does not provide an MP4 encoder. Animated GIF is available instead.',
-      ),
+    throw createLocalizedError(
+      'download.mp4EncoderUnavailable',
+      'This browser does not provide an MP4 encoder. Animated GIF is available instead.',
     );
   }
 
@@ -41,8 +39,9 @@ export async function createAnimatedMp4Blob(
         () =>
           reject(
             recorder.error ||
-              new Error(
-                lookup('download.mp4EncodeError', 'Unable to encode MP4.'),
+              createLocalizedError(
+                'download.mp4EncodeError',
+                'Unable to encode MP4.',
               ),
           ),
         {

@@ -1,3 +1,5 @@
+import { createLocalizedError } from '../../localized-error.js';
+
 /**
  * Packs palette indexes as a GIF-compatible LZW stream.
  *
@@ -10,8 +12,11 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
     minimumCodeSize < 2 ||
     minimumCodeSize > 8
   ) {
-    throw new RangeError(
+    throw createLocalizedError(
+      'download.lzwCodeSize',
       'GIF LZW minimum code size must be an integer from 2 through 8.',
+      undefined,
+      RangeError,
     );
   }
 
@@ -37,8 +42,11 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
   writeCode(clearCode);
   indexes.forEach((index) => {
     if (!Number.isInteger(index) || index < 0 || index >= clearCode) {
-      throw new RangeError(
-        `GIF palette index must be between 0 and ${clearCode - 1}.`,
+      throw createLocalizedError(
+        'download.lzwPaletteIndex',
+        'GIF palette index must be between 0 and {maximum}.',
+        { maximum: clearCode - 1 },
+        RangeError,
       );
     }
     writeCode(index);

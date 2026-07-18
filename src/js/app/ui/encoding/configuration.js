@@ -1,4 +1,4 @@
-import { lookup } from '../../../i18n/index.js';
+import { createLocalizedError } from '../../../localized-error.js';
 
 export function createQrConfiguration({
   elements: e,
@@ -52,11 +52,9 @@ export function createQrConfiguration({
 
   const createDefinition = (payload, options) => {
     if (typeof encoder?.create !== 'function')
-      throw new Error(
-        lookup(
-          'preview.encoderError',
-          'The first-party QR encoder did not load.',
-        ),
+      throw createLocalizedError(
+        'preview.encoderError',
+        'The first-party QR encoder did not load.',
       );
     return encoder.create(payload, options);
   };

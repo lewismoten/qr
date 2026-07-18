@@ -84,6 +84,18 @@ const runtimeDownloadKeys = Object.keys(englishMessages).filter((key) =>
 const bulkProgressKeys = Object.keys(englishMessages).filter((key) =>
   key.startsWith('bulk.progress.'),
 );
+const runtimeErrorKeys = Object.keys(englishMessages).filter(
+  (key) =>
+    key.startsWith('qr.errors.') ||
+    key.startsWith('bulk.csv.') ||
+    key.startsWith('bulk.validation.') ||
+    [
+      'file.compressionUnsupported',
+      'file.chunkFitError',
+      'file.manifestFieldLimit',
+      'file.metadataJson',
+    ].includes(key),
+);
 for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
   const localeMessages = flattenMessages(
     JSON.parse(
@@ -108,6 +120,11 @@ for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
     bulkProgressKeys.filter((key) => !(key in localeMessages)),
     [],
     `${locale} is missing CSV progress translations`,
+  );
+  assert.deepEqual(
+    runtimeErrorKeys.filter((key) => !(key in localeMessages)),
+    [],
+    `${locale} is missing runtime error translations`,
   );
 }
 

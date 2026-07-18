@@ -60,7 +60,7 @@ export function getErrorText(error, defaultText = '') {
       error.message || defaultText,
       error.i18nOptions,
     );
-  return error?.message || defaultText;
+  return defaultText || error?.message || '';
 }
 
 export function getActiveLocale() {

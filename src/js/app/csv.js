@@ -1,4 +1,4 @@
-import { lookup } from '../i18n/index.js';
+import { createLocalizedError } from '../localized-error.js';
 import { throwIfAborted, waitFor } from './abort.js';
 
 export function parseBoolean(value, { allowBlank = true } = {}) {
@@ -48,11 +48,9 @@ export function parseCsv(text) {
   }
 
   if (quoted)
-    throw new Error(
-      lookup(
-        'bulk.csv.unclosedQuote',
-        'The CSV contains an unclosed quoted value.',
-      ),
+    throw createLocalizedError(
+      'bulk.csv.unclosedQuote',
+      'The CSV contains an unclosed quoted value.',
     );
   if (value || row.length) {
     row.push(value);
@@ -100,11 +98,9 @@ export async function parseCsvAsync(
   throwIfAborted(signal);
   onProgress?.(text.length, text.length);
   if (quoted)
-    throw new Error(
-      lookup(
-        'bulk.csv.unclosedQuote',
-        'The CSV contains an unclosed quoted value.',
-      ),
+    throw createLocalizedError(
+      'bulk.csv.unclosedQuote',
+      'The CSV contains an unclosed quoted value.',
     );
   if (value || row.length) {
     row.push(value);

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createLocalizedError } from '../src/js/localized-error.js';
 import {
   getActiveLocale,
   getAvailableLocales,
@@ -29,6 +30,24 @@ function createFetcher(resources) {
 }
 
 const baseUrl = new URL('https://example.test/locales/');
+
+const localizedRangeError = createLocalizedError(
+  'qr.errors.maskPattern',
+  'Mask pattern must be from 0 through {maximum}.',
+  { maximum: 7 },
+  RangeError,
+);
+assert.ok(localizedRangeError instanceof RangeError);
+assert.equal(
+  localizedRangeError.message,
+  'Mask pattern must be from 0 through 7.',
+);
+assert.equal(localizedRangeError.i18nKey, 'qr.errors.maskPattern');
+assert.deepEqual(localizedRangeError.i18nOptions, { maximum: 7 });
+assert.equal(
+  getErrorText(new Error('Technical browser failure'), 'Localized failure'),
+  'Localized failure',
+);
 
 assert.equal(
   getSavedLocale({

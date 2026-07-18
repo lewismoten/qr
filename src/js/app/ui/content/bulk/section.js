@@ -1,7 +1,8 @@
 import { formatBytes } from '../../../bytes.js';
 import { parseCsvAsync } from '../../../csv.js';
 import { validateBulkImport } from './validation.js';
-import { lookup } from '../../../../i18n/index.js';
+import { getErrorText, lookup } from '../../../../i18n/index.js';
+import { createLocalizedError } from '../../../../localized-error.js';
 import { refreshFilePicker } from '../../file-picker.js';
 import { isAbortError, readCsvText, throwIfAborted } from './csv-reader.js';
 import { serializeBulkRow } from './payload.js';
@@ -53,7 +54,7 @@ export function createBulkImportSection({
         ),
     });
     if (!schema || parsedRows.length === 0)
-      throw new Error(lookup('bulk.csv.empty', 'The CSV is empty.'));
+      throw createLocalizedError('bulk.csv.empty', 'The CSV is empty.');
     const headers = parsedRows[0].map((header) =>
       String(header)
         .replace(/^\uFEFF/, '')
@@ -62,39 +63,34 @@ export function createBulkImportSection({
     );
     const namedHeaders = headers.filter(Boolean);
     if (new Set(namedHeaders).size !== namedHeaders.length) {
-      throw new Error(
-        lookup(
-          'bulk.csv.duplicateFields',
-          'The first row contains duplicate field names.',
-        ),
+      throw createLocalizedError(
+        'bulk.csv.duplicateFields',
+        'The first row contains duplicate field names.',
       );
     }
     const missingHeaders = schema.fields.filter(
       (field) => !namedHeaders.includes(field),
     );
     if (missingHeaders.length)
-      throw new Error(
-        lookup(
-          'bulk.csv.missingFields',
-          'The first row is missing: {fields}.',
-          { fields: missingHeaders.join(', ') },
-        ),
+      throw createLocalizedError(
+        'bulk.csv.missingFields',
+        'The first row is missing: {fields}.',
+        { fields: missingHeaders.join(', ') },
       );
     const dataRows = parsedRows
       .slice(1)
       .filter((cells) => cells.some((cell) => cell.trim()));
     if (dataRows.length > MAX_BULK_ROWS) {
-      throw new Error(
-        lookup(
-          'bulk.csv.rowLimit',
-          'Bulk imports are limited to {maxRows} data rows.',
-          { maxRows: MAX_BULK_ROWS.toLocaleString() },
-        ),
+      throw createLocalizedError(
+        'bulk.csv.rowLimit',
+        'Bulk imports are limited to {maxRows} data rows.',
+        { maxRows: MAX_BULK_ROWS.toLocaleString() },
       );
     }
     if (!dataRows.length)
-      throw new Error(
-        lookup('bulk.csv.noRows', 'The CSV has a header row but no data rows.'),
+      throw createLocalizedError(
+        'bulk.csv.noRows',
+        'The CSV has a header row but no data rows.',
       );
     return dataRows.map((cells) =>
       Object.fromEntries(
@@ -189,8 +185,10 @@ export function createBulkImportSection({
         if (request !== loadRequest) return;
         parseError = isAbortError(error)
           ? lookup('bulk.progress.canceled', 'CSV processing canceled.')
-          : error.message ||
-            lookup('bulk.csv.readError', 'Unable to read this CSV.');
+          : getErrorText(
+              error,
+              lookup('bulk.csv.readError', 'Unable to read this CSV.'),
+            );
       } finally {
         if (activeTask === task) activeTask = null;
         task.finish({ completed });

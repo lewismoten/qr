@@ -6,7 +6,7 @@ import {
   getFileDataUrlPrefix,
   getFileDownloadUrlPrefix,
 } from './protocol.js';
-import { lookup } from '../../../../i18n/index.js';
+import { createLocalizedError } from '../../../../localized-error.js';
 
 function assembleChunk(manifestBytes, transferBytes, start, end) {
   const chunkBytes = new Uint8Array(end - start);
@@ -69,11 +69,9 @@ export function createFilePayloadBuilder({
     const { chunkCapacity, totalChunks, streamLength, isSingleFrame } =
       getCapacityInfo(file);
     if (chunkCapacity <= 0) {
-      throw new Error(
-        lookup(
-          'file.chunkFitError',
-          'Unable to fit the current chunk protocol into this QR configuration.',
-        ),
+      throw createLocalizedError(
+        'file.chunkFitError',
+        'Unable to fit the current chunk protocol into this QR configuration.',
       );
     }
 

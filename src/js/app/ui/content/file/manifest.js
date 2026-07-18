@@ -1,5 +1,5 @@
 import { hexToBytes, uint64Bytes } from '../../../bytes.js';
-import { lookup } from '../../../../i18n/index.js';
+import { createLocalizedError } from '../../../../localized-error.js';
 
 export function buildManifestFields({
   file,
@@ -64,12 +64,10 @@ export function serializeManifest({
   let offset = headerBytes;
   fields.forEach((field) => {
     if (field.value.length > 0xffff) {
-      throw new Error(
-        lookup(
-          'file.manifestFieldLimit',
-          'Manifest field {type} exceeds the 65,535-byte limit.',
-          { type: field.type },
-        ),
+      throw createLocalizedError(
+        'file.manifestFieldLimit',
+        'Manifest field {type} exceeds the 65,535-byte limit.',
+        { type: field.type },
       );
     }
     manifest[offset] = field.type;
@@ -95,15 +93,12 @@ export function createFileManifestController({
       return JSON.stringify(JSON.parse(value));
     } catch (error) {
       if (validate) {
-        throw new Error(
-          lookup(
-            'file.metadataJson',
-            'Custom file metadata must be valid JSON.',
-          ),
-          {
-            cause: error,
-          },
+        const localizedError = createLocalizedError(
+          'file.metadataJson',
+          'Custom file metadata must be valid JSON.',
         );
+        localizedError.cause = error;
+        throw localizedError;
       }
       return value;
     }

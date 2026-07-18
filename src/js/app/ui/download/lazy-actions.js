@@ -1,4 +1,4 @@
-import { lookup } from '../../../i18n/index.js';
+import { getErrorText, lookup } from '../../../i18n/index.js';
 
 export function setupLazyDownloadActions(options) {
   const buttons = [
@@ -42,10 +42,9 @@ export function setupLazyDownloadActions(options) {
         button.click();
       } catch (error) {
         console.error(error);
-        options.status.textContent = lookup(
-          'download.toolsError',
-          'Download tools could not be loaded: {message}',
-          { message: error.message },
+        options.status.textContent = getErrorText(
+          error,
+          lookup('download.toolsError', 'Download tools could not be loaded.'),
         );
       }
     });
