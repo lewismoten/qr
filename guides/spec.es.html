@@ -10,7 +10,7 @@
     />
     <meta
       name="keywords"
-      content="especificación de códigos QR, estructura de códigos QR, bits de modo QR, recuento de caracteres QR, palabras código de corrección de errores QR, patrón de máscara QR, patrón de posición, patrón de alineación, bits de formato QR"
+      content="especificación de códigos QR, estructura de códigos QR, bits de modo QR, recuento de caracteres QR, palabras de código de corrección de errores QR, patrón de máscara QR, patrón de posición, patrón de alineación, bits de formato QR"
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="../favicon.ico" sizes="any" />
@@ -58,7 +58,7 @@
         <a href="#anatomy">Anatomía</a>
         <a href="#stream">Flujo de datos</a>
         <a href="#masks">Máscaras</a>
-        <a href="#recovery">Recuperación</a>
+        <a href="#recovery">Corrección de errores</a>
         <a href="#implementation">Implementación</a>
         <a href="#references">Referencias</a>
       </nav>
@@ -67,7 +67,7 @@
     <main>
       <section class="hero" aria-labelledby="guide-title">
         <div class="hero-copy">
-          <p class="eyebrow">Dentro de la matriz</p>
+          <p class="eyebrow">El interior de la matriz</p>
           <h1 id="guide-title">Cómo se ensambla y lee un código QR</h1>
           <p class="hero-lead">
             Un código QR no es un cuadrado de píxeles arbitrarios. Los patrones
@@ -479,8 +479,9 @@
             <p>
               Tras el último segmento se añaden hasta cuatro bits cero de
               terminación. Después se agregan más ceros hasta completar un byte;
-              a continuación se alternan las palabras código <code>0xEC</code> y
-              <code>0x11</code> para completar la capacidad de datos.
+              a continuación se alternan las palabras de código
+              <code>0xEC</code> y <code>0x11</code> para completar la capacidad
+              de datos.
             </p>
           </article>
           <article class="visual-card">
@@ -495,7 +496,7 @@
             ></canvas>
             <p>
               Algunas versiones dejan 3, 4 o 7 módulos disponibles después de
-              todas las palabras código completas. Estos bits restantes con
+              todas las palabras de código completas. Estos bits restantes con
               valor cero completan la geometría de la matriz; no son datos ni
               corrección de errores.
             </p>
@@ -505,15 +506,15 @@
 
       <section id="recovery" class="guide-section recovery-section">
         <div class="section-intro">
-          <p class="section-number">04 / Recuperación y colocación</p>
+          <p class="section-number">04 / Corrección de errores y colocación</p>
           <h2>
-            Las palabras código se protegen, intercalan, colocan y enmascaran
+            Las palabras de código se protegen, intercalan, colocan y enmascaran
           </h2>
           <p>
-            La corrección de errores no ocupa simplemente una esquina
-            rectangular. Después de intercalar los bloques, las palabras código
-            de datos y recuperación siguen la misma ruta de colocación en zigzag
-            de dos columnas.
+            La corrección de errores no ocupa una esquina rectangular
+            independiente. Después de intercalar los bloques, las palabras de
+            código de datos y de corrección de errores siguen la misma ruta de
+            colocación en zigzag de dos columnas.
           </p>
         </div>
         <div class="visual-grid">
@@ -526,18 +527,18 @@
             <canvas
               data-qr-visual="error-correction"
               role="img"
-              aria-label="Detalle de la matriz que contrasta las palabras código de datos azules con las palabras de corrección Reed-Solomon de color oscuro"
+              aria-label="Detalle de la matriz que contrasta las palabras de código de datos azules con las palabras de código de corrección de errores Reed-Solomon de color oscuro"
             ></canvas>
             <p>
-              La versión y el nivel de recuperación seleccionados definen uno o
-              más bloques Reed-Solomon sobre GF(256). Antes de colocarlas, las
-              palabras código de datos y corrección se intercalan entre los
-              bloques, distribuyendo los daños localizados entre símbolos
-              recuperables.
+              La versión y el nivel de corrección de errores seleccionados
+              definen uno o varios bloques Reed-Solomon sobre GF(256). Antes de
+              colocarlas, las palabras de código de datos y de corrección de
+              errores se intercalan entre los bloques, de modo que los daños
+              localizados se repartan entre símbolos recuperables.
             </p>
             <div
               class="level-row"
-              aria-label="Niveles aproximados de recuperación"
+              aria-label="Capacidad aproximada de recuperación ante daños"
             >
               <span><b>L</b> Alrededor del 7 %</span
               ><span><b>M</b> Alrededor del 15 %</span
@@ -712,7 +713,7 @@
               <strong>Desenmascarar y recorrer</strong>
               <p>
                 Invierta la máscara seleccionada en los módulos no funcionales y
-                recopile los bits de las palabras código siguiendo la ruta en
+                recopile los bits de las palabras de código siguiendo la ruta en
                 zigzag de dos columnas.
               </p>
             </div>
@@ -723,7 +724,8 @@
               <strong>Desentrelazar y corregir</strong>
               <p>
                 Reconstruya los bloques Reed-Solomon, detecte los errores y
-                recupere las palabras código cuando la redundancia lo permita.
+                recupere las palabras de código cuando la redundancia lo
+                permita.
               </p>
             </div>
           </li>
@@ -790,7 +792,7 @@
           >
           <a
             href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments.js"
-            ><strong>Versión y palabras código de datos</strong
+            ><strong>Versión y palabras de código de datos</strong
             ><span
               ><code>segments.js</code> selecciona una versión adecuada y
               escribe los encabezados de segmento, los datos, el terminador, la
@@ -802,9 +804,9 @@
             ><strong>Capacidad y geometría de los bits restantes</strong
             ><span
               ><code>capacity.js</code> calcula los módulos de datos sin
-              procesar, el ancho del recuento de caracteres y las palabras
-              código de datos utilizables a partir de la versión, el nivel de
-              recuperación y la estructura de bloques.</span
+              procesar, el ancho del recuento de caracteres y las palabras de
+              código de datos disponibles a partir de la versión, el nivel de
+              corrección de errores y la estructura de bloques.</span
             ></a
           >
           <a
@@ -823,7 +825,7 @@
             ><span
               ><code>matrix-encoder.js</code> coloca los patrones funcionales,
               escribe los metadatos protegidos con BCH, recorre los bits de las
-              palabras código y produce cada máscara candidata.</span
+              palabras de código y genera cada máscara candidata.</span
             ></a
           >
           <a
@@ -858,7 +860,8 @@
             ><strong>Pruebas estructurales y de capacidad</strong
             ><span
               ><code>tests/qr.test.js</code> comprueba versiones, modos,
-              capacidades, máscaras, palabras código y matrices esperadas.</span
+              capacidades, máscaras, palabras de código y matrices
+              esperadas.</span
             ></a
           >
           <a
@@ -915,8 +918,8 @@
           <a href="https://www.qrcode.com/en/about/error_correction.html"
             ><strong>Corrección de errores DENSO</strong
             ><span
-              >Equilibrio entre los niveles de recuperación y la capacidad del
-              símbolo</span
+              >Relación entre los niveles de corrección de errores y la
+              capacidad del símbolo</span
             ></a
           >
           <a href="https://doi.org/10.1109/PGEC.1960.22230"
@@ -934,7 +937,7 @@
       <nav aria-label="Pie de página de la guía">
         <a href="../index.html">Generador</a><a href="index.es.html">Guías</a
         ><a href="https://git.lewismoten.com/lewismoten/qr">Código fuente</a
-        ><a href="#guide-title">Volver a la parte superior</a>
+        ><a href="#guide-title">Volver arriba</a>
       </nav>
     </footer>
     <script type="module" src="../dist/spec.min.js"></script>
