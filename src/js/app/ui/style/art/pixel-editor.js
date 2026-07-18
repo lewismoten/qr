@@ -155,6 +155,7 @@ export function createPixelArtEditor({
   paletteElement.addEventListener('click', (event) => {
     const button = event.target.closest('.pixel-palette-button');
     if (!button) return;
+    event.preventDefault();
     activeColor = button.dataset.pixelColor || null;
     syncPalette();
   });
@@ -182,9 +183,12 @@ export function createPixelArtEditor({
     if (cell && grid.contains(cell)) paintCell(cell);
   });
   grid.addEventListener('click', (event) => {
+    const cell = event.target.closest('.pixel-art-cell');
+    if (!cell) return;
+    event.preventDefault();
     if (event.detail !== 0) return;
     paintValue = activeColor;
-    paintCell(event.target.closest('.pixel-art-cell'));
+    paintCell(cell);
   });
   window.addEventListener('pointerup', () => {
     painting = false;
