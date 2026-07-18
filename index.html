@@ -796,125 +796,19 @@
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="event"
+                      data-fragment-url="guides/content/event.html"
                       hidden
                     >
-                      <legend data-i18n="formats.calendarEvent">
-                        Calendar event
-                      </legend>
-                      <label for="event-title" data-i18n="fields.title"
-                        >Title</label
-                      >
-                      <input
-                        id="event-title"
-                        name="event-title"
-                        type="text"
-                        maxlength="120"
-                        value="New event"
-                        data-i18n-value="form.defaults.eventTitle"
-                      />
-                      <label class="toggle-field">
-                        <input
-                          id="event-all-day"
-                          name="event-all-day"
-                          type="checkbox"
-                        />
-                        <span data-i18n="form.data.allDayEvent"
-                          >All-day event</span
-                        >
-                      </label>
-                      <div class="event-date-grid">
-                        <div>
-                          <label
-                            for="event-start-date"
-                            data-i18n="form.data.startDate"
-                            >Start date</label
-                          >
-                          <input
-                            id="event-start-date"
-                            name="event-start-date"
-                            type="date"
-                          />
-                        </div>
-                        <div class="event-time-field">
-                          <label
-                            for="event-start-time"
-                            data-i18n="form.data.startTime"
-                            >Start time</label
-                          >
-                          <input
-                            id="event-start-time"
-                            name="event-start-time"
-                            type="time"
-                            step="60"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            for="event-end-date"
-                            data-i18n="form.data.endDate"
-                            >End date</label
-                          >
-                          <input
-                            id="event-end-date"
-                            name="event-end-date"
-                            type="date"
-                          />
-                        </div>
-                        <div class="event-time-field">
-                          <label
-                            for="event-end-time"
-                            data-i18n="form.data.endTime"
-                            >End time</label
-                          >
-                          <input
-                            id="event-end-time"
-                            name="event-end-time"
-                            type="time"
-                            step="60"
-                          />
-                        </div>
+                      <div class="fragment-loading" role="status">
+                        <span data-i18n="common.loading">Loading...</span>
                       </div>
-                      <label
-                        for="event-location"
-                        data-i18n="form.data.locationOptional"
-                        >Location (optional)</label
+                      <a
+                        href="guides/content/event.html"
+                        class="fragment-help-link"
+                        data-fragment-help-link
+                        data-i18n="common.help"
+                        >Help</a
                       >
-                      <input
-                        id="event-location"
-                        name="event-location"
-                        type="text"
-                        maxlength="160"
-                      />
-                      <label
-                        for="event-description"
-                        data-i18n="form.data.descriptionOptional"
-                        >Description (optional)</label
-                      >
-                      <textarea
-                        id="event-description"
-                        name="event-description"
-                        rows="3"
-                        maxlength="500"
-                      ></textarea>
-                      <label
-                        for="event-url"
-                        data-i18n="form.data.websiteOptional"
-                        >Website (optional)</label
-                      >
-                      <input
-                        id="event-url"
-                        name="event-url"
-                        type="url"
-                        inputmode="url"
-                        maxlength="2048"
-                        placeholder="https://example.com/event"
-                        data-i18n-placeholder="form.placeholders.eventWebsite"
-                      />
-                      <p class="hint" data-i18n="form.data.eventTimeHint">
-                        Timed events use the scanner's local time zone. For
-                        all-day events, the selected end date is treated as the
-                        last included day.
-                      </p>
                     </fieldset>
 
                     <fieldset
@@ -1029,203 +923,19 @@
                     <fieldset
                       class="option-group format-fields"
                       data-format-fields="file"
+                      data-fragment-url="guides/content/file.html"
                       hidden
                     >
-                      <legend data-i18n="formats.file">File</legend>
-                      <label
-                        for="file-encoding-mode"
-                        data-i18n="form.data.transport"
-                        >Transport</label
-                      >
-                      <div
-                        id="file-encoding-mode-buttons"
-                        class="choice-grid choice-grid-compact file-mode-grid"
-                        role="radiogroup"
-                        aria-label="File transport mode"
-                        data-i18n-aria-label="form.data.fileTransportMode"
-                      >
-                        <button
-                          type="button"
-                          class="choice-button is-active"
-                          data-choice-target="file-encoding-mode"
-                          data-choice-value="data"
-                          aria-pressed="true"
-                          data-i18n="content.data"
-                        >
-                          Data
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="file-encoding-mode"
-                          data-choice-value="blob"
-                          aria-pressed="false"
-                          data-i18n="form.data.blobUrl"
-                        >
-                          Blob URL
-                        </button>
-                        <button
-                          type="button"
-                          class="choice-button"
-                          data-choice-target="file-encoding-mode"
-                          data-choice-value="chunked"
-                          aria-pressed="false"
-                          data-i18n="form.data.chunked"
-                        >
-                          Chunked
-                        </button>
+                      <div class="fragment-loading" role="status">
+                        <span data-i18n="common.loading">Loading...</span>
                       </div>
-                      <select
-                        id="file-encoding-mode"
-                        name="file-encoding-mode"
-                        class="sr-only"
-                        aria-hidden="true"
-                        tabindex="-1"
+                      <a
+                        href="guides/content/file.html"
+                        class="fragment-help-link"
+                        data-fragment-help-link
+                        data-i18n="common.help"
+                        >Help</a
                       >
-                        <option value="data" data-i18n="form.data.dataUrl">
-                          Data URL
-                        </option>
-                        <option value="blob" data-i18n="form.data.blobUrl">
-                          Blob URL
-                        </option>
-                        <option
-                          value="chunked"
-                          data-i18n="form.data.chunkedProtocol"
-                        >
-                          Chunked protocol
-                        </option>
-                      </select>
-                      <div class="file-picker">
-                        <input
-                          id="file-input"
-                          class="file-picker-input"
-                          name="file-input"
-                          type="file"
-                          aria-describedby="file-selection"
-                        />
-                        <label
-                          class="file-picker-button"
-                          for="file-input"
-                          data-i18n="form.data.chooseFile"
-                          >Choose a file</label
-                        >
-                        <span
-                          id="file-selection"
-                          class="file-picker-selection"
-                          data-file-picker-status
-                          data-i18n="common.noFileSelected"
-                          >No file selected</span
-                        >
-                      </div>
-                      <div
-                        id="file-chunk-controls"
-                        class="chunk-controls"
-                        hidden
-                      >
-                        <label class="toggle-field">
-                          <input
-                            id="file-chunk-version-auto"
-                            name="file-chunk-version-auto"
-                            type="checkbox"
-                            checked
-                          />
-                          <span data-i18n="form.data.autoPickVersion"
-                            >Auto-pick version</span
-                          >
-                        </label>
-                        <label class="slider-field" for="file-chunk-version">
-                          <span data-i18n="form.data.chunkVersionTarget"
-                            >Chunk version target</span
-                          >
-                          <output
-                            id="file-chunk-version-value"
-                            for="file-chunk-version"
-                            >V8</output
-                          >
-                        </label>
-                        <input
-                          id="file-chunk-version"
-                          name="file-chunk-version"
-                          type="range"
-                          min="1"
-                          max="40"
-                          step="1"
-                          value="8"
-                        />
-                        <label class="toggle-field">
-                          <input
-                            id="file-include-manifest"
-                            name="file-include-manifest"
-                            type="checkbox"
-                            checked
-                          />
-                          <span data-i18n="form.data.includeManifest"
-                            >Include manifest</span
-                          >
-                        </label>
-                        <label class="toggle-field">
-                          <input
-                            id="file-compress-transfer"
-                            name="file-compress-transfer"
-                            type="checkbox"
-                            checked
-                          />
-                          <span data-i18n="form.data.compressTransfer"
-                            >Compress for transfer (gzip)</span
-                          >
-                        </label>
-                        <label
-                          for="file-custom-metadata"
-                          data-i18n="form.data.customMetadata"
-                          >Custom metadata (optional JSON)</label
-                        >
-                        <textarea
-                          id="file-custom-metadata"
-                          name="file-custom-metadata"
-                          rows="3"
-                          placeholder='{"collection":"scavenger-hunt"}'
-                          data-i18n-placeholder="form.placeholders.metadata"
-                        ></textarea>
-                        <label class="slider-field" for="file-chunk-index">
-                          <span data-i18n="form.data.chunk">Chunk</span>
-                          <output
-                            id="file-chunk-index-value"
-                            for="file-chunk-index"
-                            >1 / 1</output
-                          >
-                        </label>
-                        <input
-                          id="file-chunk-index"
-                          name="file-chunk-index"
-                          type="range"
-                          min="1"
-                          max="1"
-                          step="1"
-                          value="1"
-                        />
-                        <p class="hint" data-i18n="form.data.fileProtocolHint">
-                          FILE:1:S is a complete single QR. Multi-QR transfers
-                          use FILE:1:C chunks with an ID, byte offset, and total
-                          length.
-                        </p>
-                      </div>
-                      <div class="file-status-row">
-                        <p
-                          id="file-capacity-hint"
-                          class="hint file-capacity-hint"
-                        >
-                          Loaded 0 B of 0 B max (0%).
-                        </p>
-                        <button
-                          id="clear-file-button"
-                          type="button"
-                          class="secondary-button"
-                          disabled
-                          data-i18n="form.data.clearFile"
-                        >
-                          Clear file
-                        </button>
-                      </div>
                     </fieldset>
 
                     <div

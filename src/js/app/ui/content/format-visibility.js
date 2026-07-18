@@ -11,7 +11,12 @@ export function createFormatVisibility({
   return function sync() {
     syncBulk();
     const format = e.format.value;
-    void prepareFormat(format).catch(console.error);
+    void prepareFormat(format)
+      .then(() => {
+        syncFile();
+        syncEvent();
+      })
+      .catch(console.error);
     const nextFieldset = e.bulkEnabled.checked
       ? null
       : document.querySelector(`[data-format-fields="${format}"]`);
@@ -34,7 +39,5 @@ export function createFormatVisibility({
       secretToggle.hidden = !showSecrets;
       secretToggle.setAttribute('aria-hidden', String(!showSecrets));
     }
-    syncFile();
-    syncEvent();
   };
 }

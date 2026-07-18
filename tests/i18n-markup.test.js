@@ -24,6 +24,8 @@ const markupUrls = [
   '../guides/content/number.html',
   '../guides/content/wifi.html',
   '../guides/content/geo.html',
+  '../guides/content/event.html',
+  '../guides/content/file.html',
   '../guides/style/modules.html',
   '../guides/style/colors.html',
   '../guides/style/artwork.html',
