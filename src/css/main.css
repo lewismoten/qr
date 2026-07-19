@@ -1,3 +1,4 @@
 /* Shared app CSS; feature styles are emitted as lazy chunks. */
 @import './styles.css';
 @import './components/language-picker.css';
+@import './components/resource-language.css';

@@ -1,4 +1,5 @@
 @import './spec/base.css';
+@import './components/resource-language.css';
 @import './spec/shell.css';
 @import './spec/visuals.css';
 @import './spec/payload-units.css';

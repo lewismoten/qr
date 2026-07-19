@@ -9,6 +9,28 @@ import {
 } from '../../src/js/i18n/guide-routes.js';
 
 const translatedLocales = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
+const siteOrigin = 'https://qr.lewismoten.com';
+
+function attributesOf(source) {
+  return Object.fromEntries(
+    [...source.matchAll(/([\w-]+)=(['"])(.*?)\2/g)].map((match) => [
+      match[1],
+      match[3],
+    ]),
+  );
+}
+
+function externalLinks(source) {
+  return [...source.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi)]
+    .map((match) => ({
+      attributes: attributesOf(match[1]),
+      content: match[2],
+    }))
+    .filter(({ attributes }) => {
+      if (!/^https?:\/\//.test(attributes.href || '')) return false;
+      return new URL(attributes.href).origin !== siteOrigin;
+    });
+}
 
 function generatedPath(route, locale) {
   return `build/site/${getGuideOutputPath(route, locale)}`;
@@ -77,5 +99,44 @@ describe('guide index', () => {
       assert.match(source, /class="guide-language-switcher"/);
       assert.match(source, /rel="canonical"/);
     }
+  });
+
+  test('external resources identify their content language', async () => {
+    for (const locale of GUIDE_LOCALES) {
+      for (const route of GUIDE_ROUTES) {
+        const source = await readFile(generatedPath(route, locale), 'utf8');
+        for (const link of externalLinks(source)) {
+          const language = link.attributes.hreflang;
+          assert.ok(language, `${locale}/${route}: ${link.attributes.href}`);
+          assert.equal(link.attributes['data-resource-language'], language);
+          const mismatched = !locale.startsWith('en') && language !== locale;
+          assert.equal(
+            link.content.includes('resource-language-indicator'),
+            mismatched,
+            `${locale}/${route}: ${link.attributes.href}`,
+          );
+        }
+      }
+    }
+  });
+
+  test('known resources use verified native-language pages', async () => {
+    const spanish = await readFile(generatedPath('technology', 'es'), 'utf8');
+    const arabic = await readFile(generatedPath('technology', 'ar'), 'utf8');
+    const hindi = await readFile(generatedPath('technology', 'hi-IN'), 'utf8');
+    const chinese = await readFile(
+      generatedPath('technology', 'zh-CN'),
+      'utf8',
+    );
+
+    assert.match(spanish, /iso\.org\/es\/contents\/data\/standard/);
+    assert.match(spanish, /openstreetmap\.org\/copyright\/es/);
+    assert.match(arabic, /openstreetmap\.org\/copyright\/ar/);
+    assert.match(chinese, /openstreetmap\.org\/copyright\/zh-CN/);
+    const hindiCopyright = externalLinks(hindi).find(({ attributes }) =>
+      attributes.href.includes('openstreetmap.org/copyright'),
+    );
+    assert.equal(hindiCopyright.attributes.hreflang, 'en');
+    assert.match(hindiCopyright.content, /resource-language-indicator/);
   });
 });

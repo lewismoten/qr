@@ -1,0 +1,16 @@
+.resource-language-indicator {
+  display: inline-block;
+  margin-inline-start: 0.35rem;
+  padding: 0.08rem 0.3rem;
+  border: 1px solid rgba(180, 83, 9, 0.32);
+  border-radius: 999px;
+  background: #fff7e0;
+  color: #92400e;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-decoration: none;
+  vertical-align: 0.12em;
+  white-space: nowrap;
+}

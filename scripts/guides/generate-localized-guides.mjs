@@ -20,6 +20,7 @@ import {
 } from './guide-translations.mjs';
 import { writeGuideSitemap } from './guide-sitemap.mjs';
 import { updatePrivacyRevision } from './privacy-revision.mjs';
+import { annotateExternalResourceLanguages } from './links/resource-language.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
 const GENERATED_LOCALES = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
@@ -220,6 +221,7 @@ async function writeGuide(source, context) {
   result = localizeDocumentDates(result, context);
   result = localizeMetadata(result, context);
   result = rewriteLocalUrls(result, context);
+  result = annotateExternalResourceLanguages(result, context.locale);
   result = result.replace('</footer>', `${languageSwitcher(context)}</footer>`);
   result = await format(result, {
     parser: 'html',
