@@ -262,6 +262,7 @@ describe('SVG map tile rendering', () => {
     const countyTile = renderTile({ zoom: 7, x: 64, y: 64 }, collections);
     assert.match(countyTile, /class="state-boundary"/);
     assert.doesNotMatch(countyTile, /class="region"/);
+    assert.doesNotMatch(countyTile, /class="city"/);
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });
 

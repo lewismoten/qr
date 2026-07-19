@@ -80,7 +80,7 @@ export const MAP_SOURCES = {
     file: 'ne_50m_populated_places_simple.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_populated_places_simple.geojson`,
     minimumZoom: 4,
-    maximumZoom: 19,
+    maximumZoom: 6,
     kind: 'point',
   },
 };
