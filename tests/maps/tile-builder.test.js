@@ -133,6 +133,49 @@ describe('SVG map tile rendering', () => {
         ],
       },
     },
+    regions: {
+      minimumZoom: 4,
+      maximumZoom: 7,
+      collection: {
+        features: [
+          {
+            type: 'Feature',
+            properties: { ADM0_A3: 'USA' },
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-1, -1],
+                [1, 1],
+              ],
+            },
+          },
+        ],
+      },
+    },
+    states: {
+      minimumZoom: 7,
+      maximumZoom: 7,
+      collection: {
+        features: [
+          {
+            type: 'Feature',
+            properties: { GEOID: '51' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [-1, -1],
+                  [1, -1],
+                  [1, 1],
+                  [-1, 1],
+                  [-1, -1],
+                ],
+              ],
+            },
+          },
+        ],
+      },
+    },
     subdivisions: {
       minimumZoom: 7,
       maximumZoom: 7,
@@ -170,6 +213,9 @@ describe('SVG map tile rendering', () => {
       renderTile({ zoom: 7, x: 64, y: 64 }, collections),
       /class="subdivision"/,
     );
+    const countyTile = renderTile({ zoom: 7, x: 64, y: 64 }, collections);
+    assert.match(countyTile, /class="state-boundary"/);
+    assert.doesNotMatch(countyTile, /class="region"/);
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });
 

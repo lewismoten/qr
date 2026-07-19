@@ -174,6 +174,15 @@ function activeFeatures(collections, name, zoom) {
   return layer.features;
 }
 
+function isUnitedStatesRegion(feature) {
+  const properties = feature.properties ?? {};
+  return (
+    properties.ADM0_A3 === 'USA' ||
+    properties.adm0_a3 === 'USA' ||
+    properties.ADM0_NAME === 'United States of America'
+  );
+}
+
 export function renderTile(tile, collections, tolerance = 0.45) {
   const countries = renderPaths(
     activeFeatures(collections, 'countries', tile.zoom),
@@ -181,32 +190,38 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'country',
     tolerance,
   );
-  const regions = renderPaths(
-    activeFeatures(collections, 'regions', tile.zoom),
-    tile,
-    'region',
-    tolerance,
+  const stateFeatures = activeFeatures(collections, 'states', tile.zoom);
+  const regionFeatures = activeFeatures(
+    collections,
+    'regions',
+    tile.zoom,
+  ).filter(
+    (feature) => !stateFeatures.length || !isUnitedStatesRegion(feature),
   );
+  const regions = renderPaths(regionFeatures, tile, 'region', tolerance);
   const subdivisions = renderPaths(
     activeFeatures(collections, 'subdivisions', tile.zoom),
     tile,
     'subdivision',
     tolerance,
   );
+  const states = renderPaths(stateFeatures, tile, 'state-boundary', tolerance);
   const cities = renderCities(
     activeFeatures(collections, 'cities', tile.zoom),
     tile,
   );
-  if (!countries && !regions && !subdivisions && !cities) return '';
+  if (!countries && !regions && !subdivisions && !states && !cities) return '';
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
     '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
     '.region{fill:none;stroke:#8a9d75;stroke-width:.7}' +
     '.subdivision{fill:none;stroke:#aab59a;stroke-width:.45}' +
+    '.state-boundary{fill:none;stroke:#7d916f;stroke-width:.8}' +
     '.city{fill:#e11d48;stroke:#fff;stroke-width:.7}</style>' +
     countries +
     regions +
     subdivisions +
+    states +
     cities +
     '</svg>\n'
   );

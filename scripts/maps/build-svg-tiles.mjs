@@ -29,7 +29,7 @@ if (has('help')) {
 
 Options:
   --zoom 1-7            Generate one zoom or an inclusive range
-  --layers a,b          countries, regions, subdivisions, and/or cities
+  --layers a,b          countries, regions, states, subdivisions, cities
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
   --max-tile-kib 24     Simplify tiles larger than this target

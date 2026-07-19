@@ -74,10 +74,10 @@ npm run maps:build -- --zoom 1-7 --jobs 8
 ```
 
 Natural Earth 5.1.2 supplies the global layers. The U.S. Census Bureau's 2024
-generalized 20M GeoJSON supplies county and county-equivalent boundaries at
-zoom 7. Downloads are cached under `.cache/maps`. Generated tiles are written
-to `build/maps/tiles`, skipped when present, and copied to `/maps/tiles` during
-the site build. Add `--force` to replace them.
+generalized 20M GeoJSON supplies matching state, county, and county-equivalent
+boundaries at zoom 7. Downloads are cached under `.cache/maps`. Generated tiles
+are written to `build/maps/tiles`, skipped when present, and copied to
+`/maps/tiles` during the site build. Add `--force` to replace them.
 
 Worldwide builds at zoom 8 or higher require explicit geographic bounds:
 
