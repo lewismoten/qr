@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { parentPort, workerData } from 'node:worker_threads';
 
-import { prepareCollections, renderTile } from './tile-renderer.mjs';
+import { prepareCollections, renderTileWithinSize } from './tile-renderer.mjs';
 
 const collections = prepareCollections(
   Object.fromEntries(
@@ -21,5 +21,8 @@ const collections = prepareCollections(
 );
 
 parentPort.on('message', (tile) => {
-  parentPort.postMessage({ tile, svg: renderTile(tile, collections) });
+  parentPort.postMessage({
+    tile,
+    ...renderTileWithinSize(tile, collections, workerData.maximumTileBytes),
+  });
 });

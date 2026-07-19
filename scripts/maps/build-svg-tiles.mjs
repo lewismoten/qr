@@ -32,6 +32,7 @@ Options:
   --layers a,b          countries, regions, and/or cities
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
+  --max-tile-kib 48     Simplify tiles larger than this target
   --output path         Tile output directory
   --cache path          Download cache directory
   --plan                Show counts and estimates without downloading
@@ -49,10 +50,15 @@ const jobs = Math.max(
   1,
   Number(option('jobs', Math.min(8, availableParallelism() - 1))),
 );
+const maximumTileKiB = Number(option('max-tile-kib', '48'));
+const maximumTileBytes = maximumTileKiB * 1024;
 const force = has('force');
 const planOnly = has('plan');
 
 if (!Number.isInteger(jobs)) throw new Error('Jobs must be an integer.');
+if (!Number.isFinite(maximumTileKiB) || maximumTileKiB <= 0) {
+  throw new Error('Maximum tile size must be a positive number.');
+}
 
 if (zoom.maximum >= 7 && boundsValue === 'world') {
   throw new Error(
@@ -70,6 +76,7 @@ const estimates = [20 * 1024, 150 * 1024].map(
 console.log(`Zoom: ${zoom.minimum}-${zoom.maximum}`);
 console.log(`Bounds: ${boundsValue}`);
 console.log(`Layers: ${layers.join(', ')}`);
+console.log(`Target maximum: ${formatBytes(maximumTileBytes)} per tile`);
 for (const level of plan.levels) {
   console.log(`  z${level.zoom}: ${level.tiles.toLocaleString()} tiles`);
 }
@@ -130,8 +137,11 @@ let written = 0;
 let available = 0;
 let bytes = 0;
 let nextTile = 0;
+let simplified = 0;
+let bytesBeforeSimplification = 0;
+const levels = new Map();
 
-async function saveResult({ tile, svg }) {
+async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const current = ++completed;
   if (svg) {
     const directory = path.join(output, String(tile.zoom), String(tile.x));
@@ -152,6 +162,20 @@ async function saveResult({ tile, svg }) {
       bytes += existing.size;
     }
     available += 1;
+    bytesBeforeSimplification += originalBytes;
+    if (tolerance > 0.45) simplified += 1;
+    const level = levels.get(tile.zoom) ?? {
+      tiles: 0,
+      bytes: 0,
+      simplified: 0,
+      largestTileBytes: 0,
+    };
+    const tileBytes = Buffer.byteLength(svg);
+    level.tiles += 1;
+    level.bytes += tileBytes;
+    level.simplified += tolerance > 0.45 ? 1 : 0;
+    level.largestTileBytes = Math.max(level.largestTileBytes, tileBytes);
+    levels.set(tile.zoom, level);
   }
   const interval = Math.max(1, Math.floor(plan.tiles.length / 100));
   if (current % interval === 0 || current === plan.tiles.length) {
@@ -167,7 +191,7 @@ async function saveResult({ tile, svg }) {
 function runWorker() {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./tile-worker.mjs', import.meta.url), {
-      workerData: { sources: sourceFiles },
+      workerData: { sources: sourceFiles, maximumTileBytes },
     });
     worker.on('message', async (result) => {
       try {
@@ -205,6 +229,12 @@ const manifest = {
   tiles: available,
   writtenThisRun: written,
   bytes,
+  bytesBeforeSimplification,
+  maximumTileBytes,
+  simplified,
+  levels: Object.fromEntries(
+    [...levels].sort(([left], [right]) => left - right),
+  ),
   attribution: SOURCE_ATTRIBUTION,
   sources: sources.map(({ name, source }) => ({
     name,

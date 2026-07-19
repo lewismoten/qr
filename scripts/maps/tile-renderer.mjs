@@ -1,5 +1,6 @@
 const TILE_SIZE = 256;
 const MAX_LATITUDE = 85.05112878;
+const SIMPLIFICATION_STEPS = [0.45, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16];
 
 const clamp = (value, minimum, maximum) =>
   Math.min(maximum, Math.max(minimum, value));
@@ -14,7 +15,7 @@ function project([longitude, latitude], zoom) {
   ];
 }
 
-function projectedPath(coordinates, tile, close = false) {
+function projectedPath(coordinates, tile, close, tolerance) {
   const originX = tile.x * TILE_SIZE;
   const originY = tile.y * TILE_SIZE;
   let previous = null;
@@ -24,11 +25,13 @@ function projectedPath(coordinates, tile, close = false) {
     const point = [worldX - originX, worldY - originY];
     if (
       previous &&
-      Math.hypot(point[0] - previous[0], point[1] - previous[1]) < 0.45
+      Math.hypot(point[0] - previous[0], point[1] - previous[1]) < tolerance
     ) {
       continue;
     }
-    values.push(`${point[0].toFixed(1)} ${point[1].toFixed(1)}`);
+    const x = tolerance >= 1 ? Math.round(point[0]) : point[0].toFixed(1);
+    const y = tolerance >= 1 ? Math.round(point[1]) : point[1].toFixed(1);
+    values.push(`${x} ${y}`);
     previous = point;
   }
   if (values.length < 2) return '';
@@ -47,19 +50,21 @@ function coordinateBounds(coordinates) {
   );
 }
 
-function visiblePath(coordinates, tile, close = false) {
+function visiblePath(coordinates, tile, close, tolerance) {
   return tileIntersectsBounds(tile, coordinateBounds(coordinates))
-    ? projectedPath(coordinates, tile, close)
+    ? projectedPath(coordinates, tile, close, tolerance)
     : '';
 }
 
-function pathsForGeometry(geometry, tile) {
+function pathsForGeometry(geometry, tile, tolerance) {
   if (!geometry) return [];
   if (geometry.type === 'LineString') {
-    return [visiblePath(geometry.coordinates, tile)];
+    return [visiblePath(geometry.coordinates, tile, false, tolerance)];
   }
   if (geometry.type === 'MultiLineString') {
-    return geometry.coordinates.map((line) => visiblePath(line, tile));
+    return geometry.coordinates.map((line) =>
+      visiblePath(line, tile, false, tolerance),
+    );
   }
   const polygons =
     geometry.type === 'Polygon'
@@ -68,7 +73,7 @@ function pathsForGeometry(geometry, tile) {
         ? geometry.coordinates
         : [];
   return polygons.flatMap((polygon) =>
-    polygon.map((ring) => visiblePath(ring, tile, true)),
+    polygon.map((ring) => visiblePath(ring, tile, true, tolerance)),
   );
 }
 
@@ -98,10 +103,10 @@ function featureBounds(feature) {
   return coordinateBounds(points);
 }
 
-function renderPaths(features, tile, className) {
+function renderPaths(features, tile, className, tolerance) {
   const path = features
     .filter((feature) => tileIntersectsBounds(tile, feature._bounds))
-    .flatMap((feature) => pathsForGeometry(feature.geometry, tile))
+    .flatMap((feature) => pathsForGeometry(feature.geometry, tile, tolerance))
     .filter(Boolean)
     .join('');
   return path ? `<path class="${className}" d="${path}"/>` : '';
@@ -151,16 +156,18 @@ function activeFeatures(collections, name, zoom) {
   return layer.features;
 }
 
-export function renderTile(tile, collections) {
+export function renderTile(tile, collections, tolerance = 0.45) {
   const countries = renderPaths(
     activeFeatures(collections, 'countries', tile.zoom),
     tile,
     'country',
+    tolerance,
   );
   const regions = renderPaths(
     activeFeatures(collections, 'regions', tile.zoom),
     tile,
     'region',
+    tolerance,
   );
   const cities = renderCities(
     activeFeatures(collections, 'cities', tile.zoom),
@@ -177,4 +184,20 @@ export function renderTile(tile, collections) {
     cities +
     '</svg>\n'
   );
+}
+
+export function renderTileWithinSize(tile, collections, maximumBytes) {
+  let tolerance = SIMPLIFICATION_STEPS[0];
+  let svg = renderTile(tile, collections, tolerance);
+  const original = svg;
+  for (const next of SIMPLIFICATION_STEPS.slice(1)) {
+    if (!svg || svg.length <= maximumBytes) break;
+    tolerance = next;
+    svg = renderTile(tile, collections, tolerance);
+  }
+  return {
+    svg,
+    tolerance,
+    originalBytes: original.length,
+  };
 }

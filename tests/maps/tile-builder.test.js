@@ -10,6 +10,7 @@ import {
 import {
   prepareCollections,
   renderTile,
+  renderTileWithinSize,
 } from '../../scripts/maps/tile-renderer.mjs';
 
 describe('SVG map tile planning', () => {
@@ -97,5 +98,18 @@ describe('SVG map tile rendering', () => {
       2,
     );
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
+  });
+
+  test('simplifies only tiles that exceed their byte target', () => {
+    const tile = { zoom: 4, x: 8, y: 8 };
+    const original = renderTile(tile, collections);
+    const unchanged = renderTileWithinSize(tile, collections, original.length);
+    const simplified = renderTileWithinSize(tile, collections, 1);
+
+    assert.equal(unchanged.tolerance, 0.45);
+    assert.equal(unchanged.svg, original);
+    assert.equal(simplified.tolerance, 16);
+    assert.ok(simplified.svg.length <= original.length);
+    assert.equal(simplified.originalBytes, original.length);
   });
 });
