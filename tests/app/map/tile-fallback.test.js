@@ -5,6 +5,7 @@ import {
   getFallbackTile,
   loadLocalTileRange,
 } from '../../../src/js/app/ui/content/geo/tile-fallback.js';
+import { renderTile } from '../../../src/js/app/ui/content/geo/data/tile-rendering.js';
 
 assert.deepEqual(getFallbackTile({ zoom: 8, x: 73, y: 99 }, 6), {
   zoom: 6,
@@ -67,20 +68,56 @@ Object.defineProperty(globalThis, 'document', {
     },
   },
 });
+let loaded = 0;
 const fallbackElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
   minimumSourceZoom: 5,
   maximumSourceZoom: 6,
+  onLoad: () => (loaded += 1),
 });
 const fallbackImage = fallbackElement.children[0];
 assert.equal(fallbackImage.src, '/maps/tiles/6/18/24.svg');
 assert.equal(fallbackImage.style.width, '1024px');
 assert.equal(fallbackImage.style.left, '-256px');
+fallbackImage.dispatch('load');
+assert.equal(fallbackElement.classList.values.has('is-loaded'), true);
+assert.equal(loaded, 1);
 fallbackImage.dispatch('error');
 assert.equal(fallbackImage.src, '/maps/tiles/5/9/12.svg');
 fallbackImage.dispatch('error');
 assert.equal(fallbackElement.classList.values.has('is-missing'), true);
+
+const renderedTiles = new Map();
+const renderedChildren = [];
+const renderedLayer = {
+  classList: { contains: () => false },
+  appendChild: (element) => renderedChildren.push(element),
+};
+const renderOptions = {
+  tiles: renderedTiles,
+  key: '6:18:24',
+  layer: renderedLayer,
+  template: '/maps/tiles/{z}/{x}/{y}.svg',
+  tile: { zoom: 6, x: 18, y: 24 },
+  minimumSourceZoom: 1,
+  maximumSourceZoom: 6,
+  origin: { x: 4500, y: 6100 },
+};
+const renderedTile = renderTile(renderOptions);
+assert.equal(renderedChildren.length, 1);
+assert.equal(renderedTile.style.left, '108px');
+assert.equal(renderedTile.style.top, '44px');
+renderedTile.children[0].dispatch('load');
+assert.equal(renderTile(renderOptions), renderedTile);
+assert.equal(renderedChildren.length, 1);
+const defaultLoadTile = createFallbackTile({
+  template: '/maps/tiles/{z}/{x}/{y}.svg',
+  tile: { zoom: 1, x: 0, y: 0 },
+  minimumSourceZoom: 1,
+  maximumSourceZoom: 1,
+});
+defaultLoadTile.children[0].dispatch('load');
 Object.defineProperty(
   globalThis,
   'document',

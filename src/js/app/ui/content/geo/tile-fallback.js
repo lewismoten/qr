@@ -28,6 +28,7 @@ export function createFallbackTile({
   tile,
   minimumSourceZoom,
   maximumSourceZoom,
+  onLoad = () => {},
 }) {
   const element = document.createElement('div');
   const image = document.createElement('img');
@@ -56,6 +57,10 @@ export function createFallbackTile({
     } else {
       element.classList.add('is-missing');
     }
+  });
+  image.addEventListener('load', () => {
+    element.classList.add('is-loaded');
+    onLoad();
   });
   load();
   return element;

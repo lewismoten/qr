@@ -7,14 +7,13 @@ import {
   unprojectPoint,
 } from './projection.js';
 import { createElement } from './slippy-elements.js';
-import { createFallbackTile } from './tile-fallback.js';
-import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
+import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
+import { transitionTileLayer } from './interaction/tile-transition.js';
 import { createDynamicAttribution } from './data/attribution.js';
 import { positionMarker } from './data/marker-position.js';
+import { renderTile } from './data/tile-rendering.js';
 
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-export { projectCoordinates, unprojectPoint } from './projection.js';
 
 export function createSlippyMap(
   container,
@@ -47,7 +46,7 @@ export function createSlippyMap(
   container.classList.add('slippy-map');
   container.tabIndex = 0;
   container.setAttribute('role', 'region');
-  const tileLayer = createElement('div', 'slippy-map-tiles', {
+  let tileLayer = createElement('div', 'slippy-map-tiles', {
     'aria-hidden': 'true',
   });
   const marker = createElement('div', 'slippy-map-marker', {
@@ -110,19 +109,16 @@ export function createSlippyMap(
         for (let tileX = firstX; tileX <= lastX; tileX += 1) {
           const key = `${currentZoom}:${tileX}:${tileY}`;
           visible.add(key);
-          let element = tiles.get(key);
-          if (!element) {
-            element = createFallbackTile({
-              template: tileUrl,
-              tile: { zoom: currentZoom, x: tileX, y: tileY },
-              minimumSourceZoom,
-              maximumSourceZoom,
-            });
-            tiles.set(key, element);
-            tileLayer.appendChild(element);
-          }
-          element.style.left = `${Math.round(tileX * TILE_SIZE - origin.x)}px`;
-          element.style.top = `${Math.round(tileY * TILE_SIZE - origin.y)}px`;
+          renderTile({
+            tiles,
+            key,
+            layer: tileLayer,
+            template: tileUrl,
+            tile: { zoom: currentZoom, x: tileX, y: tileY },
+            minimumSourceZoom,
+            maximumSourceZoom,
+            origin,
+          });
         }
       }
       tiles.forEach((element, key) => {
@@ -158,8 +154,9 @@ export function createSlippyMap(
       if (value < minimumZoom) onMinimumZoomOut?.();
       return;
     }
+    const scale = 2 ** (next - currentZoom);
     currentZoom = next;
-    tiles.forEach((element) => element.remove());
+    tileLayer = transitionTileLayer(container, tileLayer, marker, scale);
     tiles.clear();
     scheduleRender();
   };
@@ -179,10 +176,10 @@ export function createSlippyMap(
 
   zoomIn.addEventListener('click', () => setZoom(currentZoom + 1));
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
-  container.addEventListener(
-    'wheel',
-    createWheelZoomHandler((step) => setZoom(currentZoom + step)),
-    { passive: false },
+  attachSmoothWheelZoom(
+    container,
+    () => tileLayer,
+    (step) => setZoom(currentZoom + step),
   );
   container.addEventListener('keydown', (event) => {
     if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))

@@ -1,3 +1,5 @@
+@import './geo-zoom.css';
+
 .geo-map-card {
   display: grid;
   gap: 0.55rem;

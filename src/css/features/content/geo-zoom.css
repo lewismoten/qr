@@ -1,0 +1,42 @@
+.slippy-map-tiles {
+  transform: scale(var(--slippy-preview-scale, 1));
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.slippy-map-tiles.is-zoom-entering {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.slippy-map-tiles.is-zoom-ready {
+  opacity: 1;
+}
+
+.slippy-map-tiles.is-zoom-leaving {
+  z-index: 1;
+  transition:
+    opacity 340ms ease,
+    transform 340ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.slippy-map-tiles.is-zoom-active {
+  opacity: 0;
+  transform: scale(var(--slippy-target-scale, 1));
+}
+
+.slippy-map-tile {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.slippy-map-tile.is-loaded {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slippy-map-tiles,
+  .slippy-map-tile {
+    transition: none;
+  }
+}

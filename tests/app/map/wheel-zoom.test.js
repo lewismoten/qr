@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict';
+import {
+  attachSmoothWheelZoom,
+  createSmoothWheelZoomHandler,
+} from '../../../src/js/app/ui/content/geo/interaction/smooth-wheel-zoom.js';
 import { createWheelZoomHandler } from '../../../src/js/app/ui/content/geo/interaction/wheel-zoom.js';
 
 const wheelSteps = [];
@@ -29,5 +33,69 @@ reversedWheel(wheelEvent(20, Number.NaN));
 reversedWheel(wheelEvent(-20, 10));
 reversedWheel(wheelEvent(-20, 20));
 assert.deepEqual(reversedSteps, [1]);
+
+const previews = [];
+const commits = [];
+let pending;
+let cancelled = 0;
+const smoothWheel = createSmoothWheelZoomHandler(
+  {
+    onPreview: (scale) => previews.push(scale),
+    onCommit: (step) => commits.push(step),
+  },
+  {
+    sensitivity: 320,
+    settleDelay: 50,
+    commitThreshold: 0.75,
+    schedule: (callback) => {
+      pending = callback;
+      return 1;
+    },
+    cancel: () => (cancelled += 1),
+  },
+);
+smoothWheel(wheelEvent(-80, 0));
+smoothWheel(wheelEvent(-80, 10));
+assert.ok(previews[1] > previews[0]);
+assert.equal(cancelled, 1);
+pending();
+assert.deepEqual(commits, [1]);
+assert.equal(previews.at(-1), 1);
+smoothWheel(wheelEvent(0, 20));
+pending();
+assert.deepEqual(commits, [1]);
+smoothWheel(wheelEvent(1000, 30));
+assert.ok(previews.at(-2) < 1);
+assert.equal(previews.at(-1), 1);
+assert.deepEqual(commits, [1, -1]);
+smoothWheel(wheelEvent(80, 40));
+pending();
+assert.deepEqual(commits, [1, -1, -1]);
+
+const properties = new Map();
+const propertyValues = [];
+let attachedHandler;
+const layer = {
+  style: {
+    setProperty(name, value) {
+      properties.set(name, value);
+      propertyValues.push(value);
+    },
+  },
+};
+attachSmoothWheelZoom(
+  {
+    addEventListener(name, handler, options) {
+      assert.equal(name, 'wheel');
+      assert.deepEqual(options, { passive: false });
+      attachedHandler = handler;
+    },
+  },
+  () => layer,
+  (step) => commits.push(step),
+);
+attachedHandler(wheelEvent(-320, 30));
+assert.ok(propertyValues.some((value) => value > 1));
+assert.equal(properties.get('--slippy-preview-scale'), 1);
 
 console.log('Map wheel zoom tests passed.');
