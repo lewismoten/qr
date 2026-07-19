@@ -1,4 +1,5 @@
 import { getFallbackTile } from '../tile-fallback.js';
+import { setTileDebugCoordinates } from '../data/tile-debug.js';
 import { renderMvt } from '../mvt/render.js';
 import { TILE_SIZE } from '../projection.js';
 
@@ -23,9 +24,13 @@ export function createPmtilesTile({
   const tone = (((tile.x + tile.y) % 4) + 4) % 4;
   element.classList.add(`tile-tone-${tone}`);
   element.slippySourceZoom = sourceZoom;
-  element.dataset.wanted = `z${tile.zoom}/${tile.x}/${tile.y}`;
-  element.dataset.shown = `z${sourceTile.zoom}/${sourceTile.x}/${sourceTile.y}`;
-  element.classList.toggle('is-fallback', sourceZoom < tile.zoom);
+  const fallback = sourceZoom < tile.zoom;
+  setTileDebugCoordinates(element, {
+    wanted: tile,
+    shown: sourceTile,
+    fallback,
+  });
+  element.classList.toggle('is-fallback', fallback);
   onSourceChange?.(sourceZoom);
 
   source

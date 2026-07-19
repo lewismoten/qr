@@ -26,7 +26,7 @@
   border: 2px solid var(--tile-debug-border);
   background: var(--tile-debug-fill);
   color: #132235;
-  content: 'want ' attr(data-wanted) '\A show ' attr(data-shown);
+  content: attr(data-overlay);
   font: 800 0.68rem/1 'Avenir Next', sans-serif;
   place-items: center;
   pointer-events: none;
