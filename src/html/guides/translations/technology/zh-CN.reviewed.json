@@ -10,7 +10,7 @@
   "Map data and services": "地图数据与服务",
   "Natural Earth": "Natural Earth",
   "5.1.2 · public domain": "5.1.2 · 公有领域",
-  "Supplies the simplified world overview and the global country, first-level administrative boundary, and populated-place data used to generate local SVG tiles. Coastlines and borders are deliberately generalized: these maps provide enough context to recognize an area while keeping downloads small. They must not be used for surveying, navigation, or authoritative boundary decisions.": "Natural Earth 提供简化的世界概览图，以及用于生成本地 SVG 图块的全球国家、一级行政区边界和聚居地数据。海岸线与边界经过有意概化，以便在控制下载大小的同时提供足以辨认大致位置的背景信息。这些地图不得用于测绘、导航或权威性的边界判定。",
+  "Supplies the simplified world overview; global country, first-level administrative boundary, and populated-place data; and North American roads outside the United States used to generate local SVG tiles. The road layer adds coverage for Canada, Mexico, Central America, and parts of the Caribbean at zooms 6 through 8; U.S. roads come exclusively from the Census Bureau. Coastlines, borders, and roads are deliberately generalized: these maps provide enough context to recognize an area while keeping downloads small. They must not be used for surveying, navigation, or authoritative boundary decisions.": "Natural Earth 提供简化的世界概览图、全球国家与一级行政区边界及聚居地数据，并提供美国境外的北美道路数据，用于生成本地 SVG 图块。道路图层在缩放级别 6 至 8 覆盖加拿大、墨西哥、中美洲和加勒比地区的部分区域；美国道路仅采用美国人口普查局的数据。海岸线、边界和道路经过有意概化，以便在控制下载大小的同时提供足以辨认大致位置的背景信息。这些地图不得用于测绘、导航或权威性的边界判定。",
   "Natural Earth links": "Natural Earth 相关链接",
   "Data downloads": "数据下载",
   "Data repository": "数据仓库",

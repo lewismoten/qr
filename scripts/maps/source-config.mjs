@@ -3,6 +3,7 @@ export const DEFAULT_LAYERS = [
   'regions',
   'primaryRoadsOverview',
   'primaryRoads',
+  'naturalEarthRoads',
   'states',
   'subdivisions',
   'cities',
@@ -61,6 +62,17 @@ export const MAP_SOURCES = {
     minimumZoom: 8,
     maximumZoom: 8,
     kind: 'line',
+  },
+  naturalEarthRoads: {
+    file: 'ne_10m_roads.geojson',
+    url: `${NATURAL_EARTH_ROOT}ne_10m_roads.geojson`,
+    minimumZoom: 6,
+    maximumZoom: 8,
+    kind: 'line',
+    featureFilter: {
+      property: 'sov_a3',
+      exclude: ['USA'],
+    },
   },
   states: {
     file: 'census_2024_states_20m.geojson',

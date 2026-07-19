@@ -7,12 +7,13 @@ const collections = prepareCollections(
   Object.fromEntries(
     await Promise.all(
       workerData.sources.map(
-        async ({ name, path, minimumZoom, maximumZoom }) => [
+        async ({ name, path, minimumZoom, maximumZoom, featureFilter }) => [
           name,
           {
             collection: JSON.parse(await readFile(path, 'utf8')),
             minimumZoom,
             maximumZoom,
+            featureFilter,
           },
         ],
       ),

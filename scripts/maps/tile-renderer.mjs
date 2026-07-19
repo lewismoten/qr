@@ -159,10 +159,17 @@ export function prepareCollections(collections) {
       {
         minimumZoom: value.minimumZoom,
         maximumZoom: value.maximumZoom,
-        features: value.collection.features.map((feature) => ({
-          ...feature,
-          _bounds: featureBounds(feature),
-        })),
+        features: value.collection.features
+          .filter((feature) => {
+            const filter = value.featureFilter;
+            if (!filter) return true;
+            const propertyValue = feature.properties?.[filter.property];
+            return !filter.exclude.includes(propertyValue);
+          })
+          .map((feature) => ({
+            ...feature,
+            _bounds: featureBounds(feature),
+          })),
       },
     ]),
   );
@@ -172,6 +179,13 @@ function activeFeatures(collections, name, zoom) {
   const layer = collections[name];
   if (!layer || zoom < layer.minimumZoom || zoom > layer.maximumZoom) return [];
   return layer.features;
+}
+
+function rankedFeatures(collections, name, zoom) {
+  return activeFeatures(collections, name, zoom).filter((feature) => {
+    const minimumZoom = Number(feature.properties?.min_zoom ?? 0);
+    return minimumZoom <= zoom;
+  });
 }
 
 function isUnitedStatesRegion(feature) {
@@ -203,6 +217,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     [
       ...activeFeatures(collections, 'primaryRoadsOverview', tile.zoom),
       ...activeFeatures(collections, 'primaryRoads', tile.zoom),
+      ...rankedFeatures(collections, 'naturalEarthRoads', tile.zoom),
     ],
     tile,
     'primary-road',

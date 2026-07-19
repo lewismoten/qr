@@ -125,6 +125,7 @@ const sourceFiles = sources.map(({ name, path: sourcePath }) => ({
   path: sourcePath,
   minimumZoom: MAP_SOURCES[name].minimumZoom,
   maximumZoom: MAP_SOURCES[name].maximumZoom,
+  featureFilter: MAP_SOURCES[name].featureFilter,
 }));
 const started = Date.now();
 let completed = 0;

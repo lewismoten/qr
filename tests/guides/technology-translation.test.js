@@ -41,10 +41,10 @@ test('localized technology pages explain every map source', async () => {
   const expectations = {
     'en-US': /deliberately generalized/,
     'en-GB': /deliberately generalised/,
-    ar: /جرى تعميم السواحل والحدود عمدًا/,
+    ar: /جرى تعميم السواحل والحدود والطرق عمدًا/,
     es: /se han generalizado deliberadamente/,
     'hi-IN': /जानबूझकर सामान्यीकृत किया गया है/,
-    'zh-CN': /海岸线与边界经过有意概化/,
+    'zh-CN': /海岸线、边界和道路经过有意概化/,
   };
 
   for (const [locale, wording] of Object.entries(expectations)) {
