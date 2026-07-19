@@ -9,6 +9,33 @@ const STYLES = {
   waterway: { stroke: '#75adbd', width: 0.45 },
 };
 const ORDER = ['land', 'park', 'water', 'waterway', 'road', 'boundary'];
+const PLACE_LIMITS = [
+  [8, 6],
+  [9, 8],
+  [10, 14],
+  [11, 24],
+];
+
+export function getPlaceLimit(zoom) {
+  return PLACE_LIMITS.find(([maximum]) => zoom <= maximum)?.[1] ?? 32;
+}
+
+export function sortPlaces(features) {
+  const number = (value, fallback) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  return [...features].sort((left, right) => {
+    const population =
+      number(right.properties.population, -1) -
+      number(left.properties.population, -1);
+    if (population) return population;
+    return (
+      number(left.properties.rank, Number.MAX_SAFE_INTEGER) -
+      number(right.properties.rank, Number.MAX_SAFE_INTEGER)
+    );
+  });
+}
 
 export function getLabelPlacement(x, y, textWidth, size) {
   const width = textWidth + 6;
@@ -73,14 +100,15 @@ function drawLayer(context, layer) {
   }
 }
 
-function drawPlaces(context, layer) {
+function drawPlaces(context, layer, zoom) {
   if (!layer) return;
   const scale = context.canvas.width / layer.extent;
   const language = document.documentElement.lang.split('-')[0];
   context.font = '600 9px sans-serif';
   context.textBaseline = 'middle';
   const occupied = [];
-  for (const feature of layer.features) {
+  for (const feature of sortPlaces(layer.features)) {
+    if (occupied.length >= getPlaceLimit(zoom)) break;
     const point = feature.geometry[0]?.points[0];
     if (!point) continue;
     const x = point.x * scale;
@@ -92,10 +120,6 @@ function drawPlaces(context, layer) {
       y >= context.canvas.height
     )
       continue;
-    context.beginPath();
-    context.arc(x, y, 2, 0, Math.PI * 2);
-    context.fillStyle = '#e11d48';
-    context.fill();
     const name =
       feature.properties[`name_${language}`] ?? feature.properties.name;
     if (!name) continue;
@@ -116,6 +140,10 @@ function drawPlaces(context, layer) {
     );
     if (overlaps) continue;
     occupied.push(box);
+    context.beginPath();
+    context.arc(x, y, 2, 0, Math.PI * 2);
+    context.fillStyle = '#e11d48';
+    context.fill();
     context.textAlign = placement.textAlign;
     context.lineWidth = 2.5;
     context.strokeStyle = 'rgba(255,255,255,.92)';
@@ -125,12 +153,12 @@ function drawPlaces(context, layer) {
   }
 }
 
-export function renderMvt(bytes, canvas) {
+export function renderMvt(bytes, canvas, { zoom = 0 } = {}) {
   const context = canvas.getContext('2d');
   const layers = decodeMvt(bytes);
   const byName = new Map(layers.map((layer) => [layer.name, layer]));
   context.clearRect(0, 0, canvas.width, canvas.height);
   for (const name of ORDER) drawLayer(context, byName.get(name));
-  drawPlaces(context, byName.get('place'));
+  drawPlaces(context, byName.get('place'), zoom);
   return layers;
 }

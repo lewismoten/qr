@@ -10,13 +10,18 @@ export function createPmtilesTile({
   onUnavailable = () => {},
   onSourceChange,
 }) {
-  const element = document.createElement('canvas');
+  const element = document.createElement('div');
+  const canvas = document.createElement('canvas');
   const sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
   const sourceTile = getFallbackTile(tile, sourceZoom);
   const scale = sourceTile.scale;
-  element.className = 'slippy-map-tile slippy-map-vector-tile';
-  element.width = TILE_SIZE;
-  element.height = TILE_SIZE;
+  element.className = 'slippy-map-tile';
+  canvas.className = 'slippy-map-vector-tile';
+  canvas.width = TILE_SIZE;
+  canvas.height = TILE_SIZE;
+  element.append(canvas);
+  const tone = (((tile.x + tile.y) % 4) + 4) % 4;
+  element.classList.add(`tile-tone-${tone}`);
   element.slippySourceZoom = sourceZoom;
   element.dataset.wanted = `z${tile.zoom}/${tile.x}/${tile.y}`;
   element.dataset.shown = `z${sourceTile.zoom}/${sourceTile.x}/${sourceTile.y}`;
@@ -30,13 +35,13 @@ export function createPmtilesTile({
         onUnavailable();
         return;
       }
-      if (scale === 1) renderMvt(bytes, element);
+      if (scale === 1) renderMvt(bytes, canvas, { zoom: sourceTile.zoom });
       else {
         const parent = document.createElement('canvas');
         parent.width = TILE_SIZE;
         parent.height = TILE_SIZE;
-        renderMvt(bytes, parent);
-        const context = element.getContext('2d');
+        renderMvt(bytes, parent, { zoom: sourceTile.zoom });
+        const context = canvas.getContext('2d');
         context.imageSmoothingEnabled = true;
         context.drawImage(
           parent,

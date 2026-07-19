@@ -23,6 +23,7 @@ test('normalizes map properties and feature zoom hints', () => {
     },
   });
   assert.deepEqual(feature.properties, {
+    class: 'town',
     name: 'Example',
     population: 1200,
   });

@@ -31,6 +31,9 @@ const firstValue = (properties, keys) =>
   keys.map((key) => properties[key]).find((value) => value != null);
 
 function sourceClass(name, properties) {
+  if (name === 'cities') return 'city';
+  if (name === 'settlements') return 'settlement';
+  if (name === 'towns') return 'town';
   if (name === 'subdivisions') return 'county';
   if (name === 'states') return 'state';
   if (name === 'regions') return 'region';

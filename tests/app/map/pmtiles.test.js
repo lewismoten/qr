@@ -17,7 +17,9 @@ import { decodeMvt } from '../../../src/js/app/ui/content/geo/mvt/decode.js';
 import { decodeGeometry } from '../../../src/js/app/ui/content/geo/mvt/geometry.js';
 import {
   getLabelPlacement,
+  getPlaceLimit,
   renderMvt,
+  sortPlaces,
 } from '../../../src/js/app/ui/content/geo/mvt/render.js';
 
 function varint(value) {
@@ -203,4 +205,21 @@ test('keeps map labels inside their owning vector tile', () => {
   });
   assert.equal(getLabelPlacement(-1, 20, 40, 256), null);
   assert.equal(getLabelPlacement(20, 3, 40, 256), null);
+});
+
+test('limits dense places by zoom and orders them by population', () => {
+  const places = [
+    { properties: { name: 'Town', population: 500, rank: 1 } },
+    { properties: { name: 'City', population: 50_000, rank: 4 } },
+    { properties: { name: 'Village', rank: 2 } },
+  ];
+  assert.deepEqual(
+    sortPlaces(places).map((place) => place.properties.name),
+    ['City', 'Town', 'Village'],
+  );
+  assert.equal(getPlaceLimit(8), 6);
+  assert.equal(getPlaceLimit(9), 8);
+  assert.equal(getPlaceLimit(10), 14);
+  assert.equal(getPlaceLimit(11), 24);
+  assert.equal(getPlaceLimit(12), 32);
 });
