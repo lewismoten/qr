@@ -1,5 +1,10 @@
 .slippy-map-tiles {
-  transform: scale(var(--slippy-preview-scale, 1));
+  transform:
+    translate(
+      var(--slippy-offset-x, 0),
+      var(--slippy-offset-y, 0)
+    )
+    scale(var(--slippy-preview-scale, 1));
   transform-origin: center;
   will-change: transform, opacity;
 }
@@ -22,7 +27,12 @@
 
 .slippy-map-tiles.is-zoom-active {
   opacity: 0;
-  transform: scale(var(--slippy-target-scale, 1));
+  transform:
+    translate(
+      var(--slippy-offset-x, 0),
+      var(--slippy-offset-y, 0)
+    )
+    scale(var(--slippy-target-scale, 1));
 }
 
 .slippy-map-tile {

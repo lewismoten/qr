@@ -7,7 +7,10 @@ import {
 } from './projection.js';
 import { createElement } from './slippy-elements.js';
 import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
-import { transitionTileLayer } from './interaction/tile-transition.js';
+import {
+  syncTileLayerView,
+  transitionTileLayer,
+} from './interaction/tile-transition.js';
 import { createDynamicAttribution } from './data/attribution.js';
 import { positionMarker } from './data/marker-position.js';
 import { renderTileLayer } from './data/tile-layer.js';
@@ -82,12 +85,12 @@ export function createSlippyMap(
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
+      syncTileLayerView(tileLayer, currentCenter, currentZoom, centerPoint);
       dynamicAttribution.update({
         center: currentCenter,
         zoom: currentZoom,
         width,
         height,
-        scale: tileScale,
       });
       const origin = {
         x: centerPoint.x - width / 2,
@@ -116,6 +119,7 @@ export function createSlippyMap(
         worldSize,
         width,
         height,
+        scale: tileScale,
       });
     });
   };

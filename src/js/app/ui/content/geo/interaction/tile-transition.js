@@ -1,3 +1,5 @@
+import { getWorldSize, projectCoordinates } from '../projection.js';
+
 const TRANSITION_DURATION = 360;
 const LOAD_FALLBACK_DELAY = 3000;
 
@@ -24,6 +26,24 @@ export function setTileLayerCoverage(layer, visible, tiles) {
   revealTileLayer(layer);
 }
 
+export function syncTileLayerView(layer, center, zoom, centerPoint) {
+  layer.slippyView = { centerPoint, zoom };
+  const previous = layer.slippyPreviousLayer;
+  const view = previous?.slippyView;
+  if (!view) return;
+  const point = projectCoordinates(center, view.zoom);
+  const worldSize = getWorldSize(view.zoom);
+  let deltaX = view.centerPoint.x - point.x;
+  if (deltaX > worldSize / 2) deltaX -= worldSize;
+  if (deltaX < -worldSize / 2) deltaX += worldSize;
+  const scale = previous.slippyTargetScale;
+  previous.style.setProperty('--slippy-offset-x', `${deltaX * scale}px`);
+  previous.style.setProperty(
+    '--slippy-offset-y',
+    `${(view.centerPoint.y - point.y) * scale}px`,
+  );
+}
+
 export function transitionTileLayer(
   container,
   current,
@@ -37,6 +57,8 @@ export function transitionTileLayer(
   next.setAttribute('aria-hidden', 'true');
   next.slippyPreviousLayer = current;
   next.style.setProperty('--slippy-preview-scale', nextScale);
+  current.slippyTargetScale = scale;
+  current.style.setProperty('--slippy-preview-scale', scale);
   current.style.setProperty('--slippy-target-scale', scale);
   current.classList.add('is-zoom-leaving');
   container.insertBefore(next, before);
