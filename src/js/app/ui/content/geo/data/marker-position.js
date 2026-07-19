@@ -10,6 +10,7 @@ export function positionMarker({
   width,
   height,
   scale = 1,
+  projectPoint = (point) => point,
 }) {
   if (!coordinates) {
     marker.hidden = true;
@@ -20,11 +21,13 @@ export function positionMarker({
   let deltaX = point.x - centerPoint.x;
   if (deltaX > worldSize / 2) deltaX -= worldSize;
   if (deltaX < -worldSize / 2) deltaX += worldSize;
-  const left = width / 2 + deltaX * scale;
-  const top = height / 2 + (point.y - centerPoint.y) * scale;
+  const screenPoint = projectPoint({
+    x: width / 2 + deltaX * scale,
+    y: height / 2 + (point.y - centerPoint.y) * scale,
+  });
   marker.hidden = false;
-  marker.style.left = `${left}px`;
-  marker.style.top = `${top}px`;
-  label.style.left = `${left}px`;
-  label.style.top = `${top}px`;
+  marker.style.left = `${screenPoint.x}px`;
+  marker.style.top = `${screenPoint.y}px`;
+  label.style.left = `${screenPoint.x}px`;
+  label.style.top = `${screenPoint.y}px`;
 }

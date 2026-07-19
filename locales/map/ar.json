@@ -12,6 +12,8 @@
   "zoomControls": "عناصر تكبير الخريطة",
   "zoomIn": "تكبير",
   "zoomOut": "تصغير",
+  "pitchEnable": "تفعيل منظور الخريطة التلقائي",
+  "pitchDisable": "تعطيل منظور الخريطة التلقائي",
   "zoomProgress": "الطبقة {layer}؛ التكبير {zoom}؛ {percent}% من المستوى {lower} إلى {upper}.",
   "zoomFallback": "بعض مربعات الخريطة الظاهرة مكبرة من طبقة سابقة.",
   "tileOverlayShow": "إظهار حدود مربعات الخريطة",

@@ -7,6 +7,8 @@ import {
 } from './projection.js';
 import { createElement } from './slippy-elements.js';
 import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
+import { createMapPitch } from './interaction/map-pitch.js';
+import { attachMapPointerDrag } from './interaction/pointer-drag.js';
 import {
   centerZoomAtEvent,
   coordinatesAtPointer,
@@ -42,13 +44,10 @@ export function createSlippyMap(
   },
 ) {
   const tiles = new Map();
-  const pointers = new Map();
   let currentCenter = { ...center };
   let currentZoom = clamp(zoom, minimumZoom, maximumZoom);
   let markerCoordinates = null;
   let frameRequest = 0;
-  let drag = null;
-  let pinchDistance = 0;
   let tileScale = 1;
   container.replaceChildren();
   container.classList.add('slippy-map');
@@ -73,7 +72,14 @@ export function createSlippyMap(
     additional: additionalAttributions,
   });
   const attribution = dynamicAttribution.element;
-  container.append(tileLayer, marker, label, controls, attribution);
+  const mapPitch = createMapPitch({
+    container,
+    controls,
+    initialLayer: tileLayer,
+    maximumZoom,
+    minimumZoom,
+  });
+  container.append(mapPitch.camera, marker, label, controls, attribution);
   const scheduleRender = () => {
     if (frameRequest) return;
     frameRequest = requestAnimationFrame(() => {
@@ -113,6 +119,7 @@ export function createSlippyMap(
       });
       const sourceZoom = renderingLayer.slippySourceZoom;
       zoomChrome.update(currentZoom, tileScale, sourceZoom);
+      mapPitch.update(currentZoom, tileScale);
       positionMarker({
         marker,
         label,
@@ -123,6 +130,7 @@ export function createSlippyMap(
         width,
         height,
         scale: tileScale,
+        projectPoint: mapPitch.projectPoint,
       });
     });
   };
@@ -135,7 +143,10 @@ export function createSlippyMap(
     scheduleRender();
   };
   const centerAtPointer = (nextZoom, nextScale, event) => {
-    currentCenter = centerZoomAtEvent(container, event, {
+    const mapEvent = event
+      ? mapPitch.toMapClient(event.clientX, event.clientY)
+      : event;
+    currentCenter = centerZoomAtEvent(container, mapEvent, {
       center: currentCenter,
       scale: tileScale,
       zoom: currentZoom,
@@ -154,23 +165,25 @@ export function createSlippyMap(
     currentZoom = next;
     tileScale = nextScale;
     tileLayer = transitionTileLayer(
-      container,
+      mapPitch.camera,
       tileLayer,
-      marker,
+      null,
       scale * nextScale,
       nextScale,
     );
     tiles.clear();
     scheduleRender();
   };
-  const selectAt = (clientX, clientY) =>
+  const selectAt = (clientX, clientY) => {
+    const point = mapPitch.toMapClient(clientX, clientY);
     onSelect?.(
-      coordinatesAtPointer(container, clientX, clientY, {
+      coordinatesAtPointer(container, point.clientX, point.clientY, {
         center: currentCenter,
         scale: tileScale,
         zoom: currentZoom,
       }),
     );
+  };
   zoomIn.addEventListener('click', () => setZoom(currentZoom + 1));
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
   attachSmoothWheelZoom(
@@ -204,74 +217,18 @@ export function createSlippyMap(
     } else return;
     event.preventDefault();
   });
-  container.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
-    if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))
-      return;
-    container.setPointerCapture(event.pointerId);
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pointers.size === 1) {
-      drag = {
-        id: event.pointerId,
-        x: event.clientX,
-        y: event.clientY,
-        center: projectCoordinates(currentCenter, currentZoom),
-        moved: false,
-      };
-      container.classList.add('is-dragging');
-    } else if (pointers.size === 2) {
-      const [first, second] = [...pointers.values()];
-      pinchDistance = Math.hypot(second.x - first.x, second.y - first.y);
-    }
-  });
-  container.addEventListener('pointermove', (event) => {
-    if (!pointers.has(event.pointerId)) return;
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pointers.size === 1 && drag?.id === event.pointerId) {
-      const deltaX = event.clientX - drag.x;
-      const deltaY = event.clientY - drag.y;
-      if (Math.hypot(deltaX, deltaY) > 4) drag.moved = true;
+  attachMapPointerDrag(container, {
+    getCenterPoint: () => projectCoordinates(currentCenter, currentZoom),
+    onPan(centerPoint, deltaX, deltaY) {
       setCenterFromPoint({
-        x: drag.center.x - deltaX / tileScale,
-        y: drag.center.y - deltaY / tileScale,
+        x: centerPoint.x - deltaX / tileScale,
+        y: centerPoint.y - deltaY / tileScale,
       });
-    } else if (pointers.size === 2) {
-      const [first, second] = [...pointers.values()];
-      const distance = Math.hypot(second.x - first.x, second.y - first.y);
-      if (distance > pinchDistance * 1.35) {
-        setZoom(currentZoom + 1);
-        pinchDistance = distance;
-      } else if (distance < pinchDistance * 0.74) {
-        setZoom(currentZoom - 1);
-        pinchDistance = distance;
-      }
-    }
+    },
+    onSelect: selectAt,
+    onZoom: (step) => setZoom(currentZoom + step),
+    toMapClient: mapPitch.toMapClient,
   });
-  const finishPointer = (event, cancelled = false) => {
-    if (!pointers.has(event.pointerId)) return;
-    const select =
-      !cancelled &&
-      pointers.size === 1 &&
-      drag?.id === event.pointerId &&
-      !drag.moved;
-    pointers.delete(event.pointerId);
-    if (select) selectAt(event.clientX, event.clientY);
-    const remaining = [...pointers.entries()][0];
-    drag = remaining
-      ? {
-          id: remaining[0],
-          x: remaining[1].x,
-          y: remaining[1].y,
-          center: projectCoordinates(currentCenter, currentZoom),
-          moved: true,
-        }
-      : null;
-    if (!remaining) container.classList.remove('is-dragging');
-  };
-  container.addEventListener('pointerup', (event) => finishPointer(event));
-  container.addEventListener('pointercancel', (event) =>
-    finishPointer(event, true),
-  );
   const resizeObserver = new ResizeObserver(scheduleRender);
   resizeObserver.observe(container);
   scheduleRender();

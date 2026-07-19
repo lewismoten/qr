@@ -12,6 +12,8 @@
   "zoomControls": "Map zoom controls",
   "zoomIn": "Zoom in",
   "zoomOut": "Zoom out",
+  "pitchEnable": "Enable automatic map perspective",
+  "pitchDisable": "Disable automatic map perspective",
   "zoomProgress": "Layer {layer}; zoom {zoom}; {percent}% from level {lower} to {upper}.",
   "zoomFallback": "Some visible map tiles are enlarged from an earlier layer.",
   "tileOverlayShow": "Show map tile boundaries",

@@ -12,6 +12,8 @@
   "zoomControls": "地图缩放控件",
   "zoomIn": "放大",
   "zoomOut": "缩小",
+  "pitchEnable": "启用自动地图透视",
+  "pitchDisable": "停用自动地图透视",
   "zoomProgress": "图层 {layer}；缩放 {zoom}；从级别 {lower} 到 {upper} 的 {percent}%。",
   "zoomFallback": "部分可见地图瓦片由较早的图层放大显示。",
   "tileOverlayShow": "显示地图瓦片边界",

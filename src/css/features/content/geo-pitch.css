@@ -1,0 +1,49 @@
+.slippy-map-camera {
+  position: absolute;
+  inset: 0;
+  transform: perspective(720px) rotateX(var(--slippy-map-pitch, 0deg));
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.slippy-map-camera.is-pitch-transitioning {
+  transition: transform 520ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
+.slippy-map-pitch-control {
+  position: relative;
+}
+
+.slippy-map-pitch-icon {
+  display: block;
+  width: 1.05rem;
+  height: 0.72rem;
+  margin: auto;
+  border: 0.12rem solid currentcolor;
+  border-radius: 0.16rem;
+  transform: perspective(1.2rem) rotateX(48deg);
+  transition: transform 420ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
+.slippy-map-pitch-control:not(.is-active) .slippy-map-pitch-icon {
+  transform: rotateX(0deg);
+}
+
+.slippy-map-pitch-control.is-active {
+  background: #dff7f3;
+  color: #087b72;
+}
+
+.slippy-map.has-map-pitch {
+  background:
+    linear-gradient(#b8dce7 0 48%, #dbe4e8 72%),
+    #dbe4e8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slippy-map-camera,
+  .slippy-map-pitch-icon {
+    transition: none;
+  }
+}

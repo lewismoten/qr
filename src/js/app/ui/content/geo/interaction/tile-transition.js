@@ -61,7 +61,8 @@ export function transitionTileLayer(
   current.style.setProperty('--slippy-preview-scale', scale);
   current.style.setProperty('--slippy-target-scale', scale);
   current.classList.add('is-zoom-leaving');
-  container.insertBefore(next, before);
+  if (before) container.insertBefore(next, before);
+  else container.append(next);
   setTimeout(() => revealTileLayer(next, true), LOAD_FALLBACK_DELAY);
   return next;
 }

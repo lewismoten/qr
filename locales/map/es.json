@@ -12,6 +12,8 @@
   "zoomControls": "Controles de zoom del mapa",
   "zoomIn": "Acercar",
   "zoomOut": "Alejar",
+  "pitchEnable": "Activar la perspectiva automática del mapa",
+  "pitchDisable": "Desactivar la perspectiva automática del mapa",
   "zoomProgress": "Capa {layer}; zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
   "zoomFallback": "Algunos mosaicos visibles están ampliados desde una capa anterior.",
   "tileOverlayShow": "Mostrar los límites de los mosaicos del mapa",
