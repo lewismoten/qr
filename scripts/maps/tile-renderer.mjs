@@ -1,3 +1,5 @@
+import { clipPolygon, clipPolyline } from './geometry-clip.mjs';
+
 const TILE_SIZE = 256;
 const MAX_LATITUDE = 85.05112878;
 const SIMPLIFICATION_STEPS = [
@@ -17,27 +19,41 @@ function project([longitude, latitude], zoom) {
   ];
 }
 
-function projectedPath(coordinates, tile, close, tolerance) {
-  const originX = tile.x * TILE_SIZE;
-  const originY = tile.y * TILE_SIZE;
+function simplifyPoints(points, tolerance) {
+  const output = [];
   let previous = null;
-  const values = [];
-  for (const coordinate of coordinates) {
-    const [worldX, worldY] = project(coordinate, tile.zoom);
-    const point = [worldX - originX, worldY - originY];
+  for (const point of points) {
     if (
       previous &&
       Math.hypot(point[0] - previous[0], point[1] - previous[1]) < tolerance
     ) {
       continue;
     }
-    const x = tolerance >= 1 ? Math.round(point[0]) : point[0].toFixed(1);
-    const y = tolerance >= 1 ? Math.round(point[1]) : point[1].toFixed(1);
-    values.push(`${x} ${y}`);
+    output.push(point);
     previous = point;
   }
+  return output;
+}
+
+function pathForPoints(points, close, tolerance) {
+  const values = simplifyPoints(points, tolerance).map((point) => {
+    const x = tolerance >= 1 ? Math.round(point[0]) : point[0].toFixed(1);
+    const y = tolerance >= 1 ? Math.round(point[1]) : point[1].toFixed(1);
+    return `${x} ${y}`;
+  });
   if (values.length < 2) return '';
   return `M${values.join(' ')}${close ? 'Z' : ''}`;
+}
+
+function projectedPaths(coordinates, tile, close, tolerance) {
+  const originX = tile.x * TILE_SIZE;
+  const originY = tile.y * TILE_SIZE;
+  const points = coordinates.map((coordinate) => {
+    const [worldX, worldY] = project(coordinate, tile.zoom);
+    return [worldX - originX, worldY - originY];
+  });
+  const groups = close ? [clipPolygon(points)] : clipPolyline(points);
+  return groups.map((group) => pathForPoints(group, close, tolerance));
 }
 
 function coordinateBounds(coordinates) {
@@ -54,17 +70,17 @@ function coordinateBounds(coordinates) {
 
 function visiblePath(coordinates, tile, close, tolerance) {
   return tileIntersectsBounds(tile, coordinateBounds(coordinates))
-    ? projectedPath(coordinates, tile, close, tolerance)
-    : '';
+    ? projectedPaths(coordinates, tile, close, tolerance)
+    : [];
 }
 
 function pathsForGeometry(geometry, tile, tolerance) {
   if (!geometry) return [];
   if (geometry.type === 'LineString') {
-    return [visiblePath(geometry.coordinates, tile, false, tolerance)];
+    return visiblePath(geometry.coordinates, tile, false, tolerance);
   }
   if (geometry.type === 'MultiLineString') {
-    return geometry.coordinates.map((line) =>
+    return geometry.coordinates.flatMap((line) =>
       visiblePath(line, tile, false, tolerance),
     );
   }
@@ -75,7 +91,7 @@ function pathsForGeometry(geometry, tile, tolerance) {
         ? geometry.coordinates
         : [];
   return polygons.flatMap((polygon) =>
-    polygon.map((ring) => visiblePath(ring, tile, true, tolerance)),
+    polygon.flatMap((ring) => visiblePath(ring, tile, true, tolerance)),
   );
 }
 

@@ -1,5 +1,5 @@
 import { availableParallelism } from 'node:os';
-import { mkdir, rename, stat, writeFile } from 'node:fs/promises';
+import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
 
@@ -143,9 +143,9 @@ const levels = new Map();
 
 async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const current = ++completed;
+  const directory = path.join(output, String(tile.zoom), String(tile.x));
+  const destination = path.join(directory, `${tile.y}.svg`);
   if (svg) {
-    const directory = path.join(output, String(tile.zoom), String(tile.x));
-    const destination = path.join(directory, `${tile.y}.svg`);
     let existing = null;
     try {
       existing = await stat(destination);
@@ -176,6 +176,8 @@ async function saveResult({ tile, svg, tolerance, originalBytes }) {
     level.simplified += tolerance > 0.45 ? 1 : 0;
     level.largestTileBytes = Math.max(level.largestTileBytes, tileBytes);
     levels.set(tile.zoom, level);
+  } else if (force) {
+    await rm(destination, { force: true });
   }
   const interval = Math.max(1, Math.floor(plan.tiles.length / 100));
   if (current % interval === 0 || current === plan.tiles.length) {

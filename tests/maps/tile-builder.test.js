@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
 import {
+  clipPolygon,
+  clipPolyline,
+} from '../../scripts/maps/geometry-clip.mjs';
+import {
   createTilePlan,
   formatBytes,
   parseBounds,
@@ -35,6 +39,52 @@ describe('SVG map tile planning', () => {
     assert.throws(() => parseBounds('1,2,3'), /Bounds must be/);
     assert.throws(() => parseBounds('-181,0,1,2'), /outside valid/);
     assert.throws(() => parseBounds('5,0,1,2'), /must increase/);
+  });
+});
+
+describe('SVG map geometry clipping', () => {
+  test('clips polygons and lines to the tile boundary', () => {
+    const bounds = {
+      minimumX: 0,
+      minimumY: 0,
+      maximumX: 10,
+      maximumY: 10,
+    };
+    assert.deepEqual(
+      clipPolygon(
+        [
+          [-5, -5],
+          [15, -5],
+          [15, 15],
+          [-5, 15],
+          [-5, -5],
+        ],
+        bounds,
+      ),
+      [
+        [0, 10],
+        [0, 0],
+        [10, 0],
+        [10, 10],
+      ],
+    );
+    assert.deepEqual(
+      clipPolyline(
+        [
+          [-5, 5],
+          [5, 5],
+          [15, 5],
+        ],
+        bounds,
+      ),
+      [
+        [
+          [0, 5],
+          [5, 5],
+          [10, 5],
+        ],
+      ],
+    );
   });
 });
 
