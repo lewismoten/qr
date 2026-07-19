@@ -23,6 +23,11 @@ test('Spanish technology copy uses reviewed technical terminology', async () => 
   assert.match(copy, /Implementación propia del código QR/);
   assert.match(copy, /Algoritmo implementado para el proyecto/);
   assert.match(copy, /Formatos de datos y transferencia/);
+  assert.match(copy, /Formatos del IETF/);
+  assert.match(copy, /<code>tel:<\/code> y las coordenadas/);
+  assert.match(copy, /<code>TextDecoder<\/code> y muestra un error/);
+  assert.match(copy, /un estándar del IETF específico/);
+  assert.match(copy, /Un manifiesto opcional puede incluir/);
   assert.match(copy, /Servicios de datos y distribución/);
   assert.doesNotMatch(copy, />Código propio</);
 });
