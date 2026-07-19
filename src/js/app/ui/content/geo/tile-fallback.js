@@ -41,6 +41,7 @@ export function createFallbackTile({
   let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
   element.className = 'slippy-map-tile';
   element.dataset.tile = `${tile.zoom}/${tile.x}/${tile.y}`;
+  element.dataset.wanted = `z${tile.zoom}/${tile.x}/${tile.y}`;
   const tone = (((tile.x + tile.y) % 4) + 4) % 4;
   element.classList.add(`tile-tone-${tone}`);
   image.className = 'slippy-map-tile-source';
@@ -71,7 +72,8 @@ export function createFallbackTile({
       source = getFallbackTile(tile, sourceZoom);
     }
     element.slippySourceZoom = sourceZoom;
-    if (sourceZoom < tile.zoom) element.classList.add('is-fallback');
+    element.dataset.shown = `z${source.zoom}/${source.x}/${source.y}`;
+    element.classList.toggle('is-fallback', sourceZoom < tile.zoom);
     onSourceChange?.(sourceZoom);
     const bundle = getTileBundle?.(source);
     const bundleSize = bundle?.size ?? 1;

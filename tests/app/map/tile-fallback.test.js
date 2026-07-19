@@ -98,6 +98,10 @@ Object.defineProperty(globalThis, 'document', {
           add(value) {
             this.values.add(value);
           },
+          toggle(value, enabled) {
+            if (enabled) this.values.add(value);
+            else this.values.delete(value);
+          },
         },
         addEventListener(name, handler) {
           listeners[name] = handler;
@@ -126,6 +130,8 @@ const fallbackElement = createFallbackTile({
 });
 const fallbackImage = fallbackElement.children[0];
 assert.equal(fallbackElement.dataset.tile, '8/73/99');
+assert.equal(fallbackElement.dataset.wanted, 'z8/73/99');
+assert.equal(fallbackElement.dataset.shown, 'z6/18/24');
 assert.equal(fallbackElement.classList.values.has('tile-tone-0'), true);
 assert.equal(fallbackImage.src, '/maps/tiles/6/18/24.svg');
 assert.equal(fallbackImage.style.width, '1024px');
@@ -137,6 +143,7 @@ assert.equal(fallbackElement.classList.values.has('is-loaded'), true);
 assert.equal(loaded, 1);
 fallbackImage.dispatch('error');
 assert.equal(fallbackImage.src, '/maps/tiles/5/9/12.svg');
+assert.equal(fallbackElement.dataset.shown, 'z5/9/12');
 assert.deepEqual(sourceChanges, [6, 5]);
 fallbackImage.dispatch('error');
 assert.equal(fallbackElement.classList.values.has('is-missing'), true);

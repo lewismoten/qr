@@ -19,7 +19,6 @@ import {
 import { createDynamicAttribution } from './data/attribution.js';
 import { positionMarker } from './data/marker-position.js';
 import { renderTileLayer } from './data/tile-layer.js';
-
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 export function createSlippyMap(
   container,
@@ -38,6 +37,7 @@ export function createSlippyMap(
     attributionUrl = 'https://www.openstreetmap.org/copyright',
     secondaryAttribution,
     showSecondaryAttribution,
+    additionalAttributions,
     onMinimumZoomOut,
   },
 ) {
@@ -70,6 +70,7 @@ export function createSlippyMap(
     url: attributionUrl,
     secondary: secondaryAttribution,
     showSecondary: showSecondaryAttribution,
+    additional: additionalAttributions,
   });
   const attribution = dynamicAttribution.element;
   container.append(tileLayer, marker, label, controls, attribution);

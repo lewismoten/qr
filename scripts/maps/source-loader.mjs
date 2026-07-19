@@ -1,6 +1,8 @@
 import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { parseGeoNames } from './sources/geonames.mjs';
+
 function parseCollection(content, url) {
   let collection;
   try {
@@ -60,7 +62,14 @@ async function downloadCollection(name, source, formatBytes) {
       name,
       formatBytes,
     );
-    return { collection: parseCollection(content, source.url), content };
+    const collection =
+      source.format === 'geonames'
+        ? parseGeoNames(content, source.cacheVersion)
+        : parseCollection(content, source.url);
+    return {
+      collection,
+      content: Buffer.from(JSON.stringify(collection)),
+    };
   }
   const collection = { type: 'FeatureCollection', features: [] };
   let offset = 0;
@@ -89,11 +98,14 @@ async function downloadCollection(name, source, formatBytes) {
   return { collection, content: Buffer.from(JSON.stringify(collection)) };
 }
 
-async function validCache(file) {
+async function validCache(file, source) {
   try {
     await stat(file);
-    parseCollection(await readFile(file), file);
-    return true;
+    const collection = parseCollection(await readFile(file), file);
+    return (
+      !source.cacheVersion ||
+      collection.features[0]?.properties?.source_version === source.cacheVersion
+    );
   } catch {
     return false;
   }
@@ -101,7 +113,7 @@ async function validCache(file) {
 
 export async function obtainMapSource({ name, source, cache, formatBytes }) {
   const file = path.join(cache, source.file);
-  if (await validCache(file)) return { name, path: file, source };
+  if (await validCache(file, source)) return { name, path: file, source };
   await mkdir(path.dirname(file), { recursive: true });
   console.log(`Downloading ${name}...`);
   const { content, collection } = await downloadCollection(

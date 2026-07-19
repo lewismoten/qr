@@ -74,12 +74,13 @@ npm run maps:build -- --zoom 1-9 --plan
 npm run maps:build -- --zoom 1-9 --jobs 8
 ```
 
-Natural Earth 5.1.2 supplies the global layers. The U.S. Census Bureau's 2024
-generalized 20M GeoJSON supplies matching state, county, and county-equivalent
-boundaries. TIGERweb supplies U.S. roads, while Natural Earth supplies global
-roads, water and progressively ranked populated places. `maps:download`
-retrieves every configured raw source without rendering tiles. `maps:build`
-also downloads any missing source automatically.
+Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
+ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
+U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
+county, and county-equivalent boundaries. TIGERweb supplies U.S. roads, while
+Natural Earth supplies global roads and water. `maps:download` retrieves every
+configured raw source without rendering tiles. `maps:build` also downloads any
+missing source automatically.
 
 Downloads are cached under `.cache/maps`. Generated tiles are written to
 `build/maps/tiles` and copied to `/maps/tiles` during the site build. By
@@ -96,7 +97,8 @@ npm run maps:build -- --zoom 9 --extend
 Worldwide builds at zoom 10 or higher require explicit geographic bounds.
 
 Use `npm run maps:build -- --help` for all options. Natural Earth data is in
-the public domain; the generated manifest records source URLs and attribution.
+the public domain, GeoNames is CC BY 4.0, and U.S. Census data is a U.S.
+government work. The generated manifest records source URLs and attribution.
 
 ## Testing
 

@@ -250,10 +250,10 @@ describe('SVG map tile rendering', () => {
     assert.match(countyTile, /class="state-boundary"/);
     assert.doesNotMatch(countyTile, /class="region"/);
     assert.equal(countyTile.match(/class="city"/g)?.length, 1);
-    assert.match(countyTile, /r="1\.1"/);
+    assert.match(countyTile, /r="1\.4"/);
     const townTile = renderTile({ zoom: 9, x: 256, y: 256 }, collections);
     assert.equal(townTile.match(/class="city"/g)?.length, 2);
-    assert.match(townTile, /r="0\.8"/);
+    assert.match(townTile, /r="1\.1"/);
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });
 

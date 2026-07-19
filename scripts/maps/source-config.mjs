@@ -16,6 +16,7 @@ export const DEFAULT_LAYERS = [
   'subdivisions',
   'cities',
   'settlements',
+  'towns',
 ];
 
 const NATURAL_EARTH_ROOT =
@@ -172,6 +173,15 @@ export const MAP_SOURCES = {
     maximumZoom: 9,
     kind: 'point',
   },
+  towns: {
+    file: 'cultural/geonames_cities1000.geojson',
+    url: 'https://download.geonames.org/export/dump/cities1000.zip',
+    format: 'geonames',
+    cacheVersion: 2,
+    minimumZoom: 7,
+    maximumZoom: 9,
+    kind: 'point',
+  },
 };
 
 export const SOURCE_ATTRIBUTION = [
@@ -186,5 +196,11 @@ export const SOURCE_ATTRIBUTION = [
     license: 'U.S. government work',
     website: 'https://www.census.gov/geographies/mapping-files.html',
     version: '2024 ACS boundaries and 2025 TIGERweb primary roads',
+  },
+  {
+    name: 'GeoNames',
+    license: 'Creative Commons Attribution 4.0',
+    website: 'https://www.geonames.org/',
+    version: 'cities1000 gazetteer extract',
   },
 ];

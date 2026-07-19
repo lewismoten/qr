@@ -246,9 +246,9 @@ smoothWheel(wheelEvent(0, 20));
 assert.deepEqual(commits, []);
 const commitEvent = wheelEvent(1000, 30);
 smoothWheel(commitEvent);
-assert.ok(previews.at(-1) > 1);
+assert.equal(previews.at(-1), 1);
 assert.equal(commits[0].step, -1);
-assert.ok(commits[0].scale > 1);
+assert.equal(commits[0].scale, 1);
 assert.equal(commitEvents[0], commitEvent);
 smoothWheel(wheelEvent(80, 40));
 assert.equal(commits.length, 1);
@@ -281,7 +281,7 @@ attachSmoothWheelZoom(
 );
 const attachedEvent = wheelEvent(-320, 30);
 attachedHandler(attachedEvent);
-assert.ok(properties.get('--slippy-preview-scale') < 1);
+assert.equal(properties.get('--slippy-preview-scale'), 1);
 assert.deepEqual(attachedPreviews, [properties.get('--slippy-preview-scale')]);
 assert.deepEqual(attachedPreviewEvents, [attachedEvent]);
 

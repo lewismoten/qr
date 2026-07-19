@@ -7,7 +7,7 @@ export function renderCities(features, tile, project, tileSize) {
   return features
     .filter((feature) => minimumZoom(feature) <= tile.zoom)
     .map((feature) => {
-      const radius = Math.max(0.8, 2.2 - minimumZoom(feature) * 0.16);
+      const radius = Math.max(1.15, 2.4 - minimumZoom(feature) * 0.14);
       const [x, y] = project(feature.geometry.coordinates, tile.zoom);
       const localX = x - tile.x * tileSize;
       const localY = y - tile.y * tileSize;

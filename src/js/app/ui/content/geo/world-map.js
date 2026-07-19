@@ -78,6 +78,12 @@ export function createWorldMap(
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
             attributionText: 'Natural Earth',
             attributionUrl: 'https://www.naturalearthdata.com/',
+            additionalAttributions: [
+              {
+                text: 'GeoNames',
+                url: 'https://www.geonames.org/',
+              },
+            ],
             secondaryAttribution: {
               text: 'U.S. Census Bureau',
               url: 'https://www.census.gov/geographies/mapping-files.html',

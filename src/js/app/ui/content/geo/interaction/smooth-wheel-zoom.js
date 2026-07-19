@@ -5,15 +5,15 @@ const clamp = (value, minimum, maximum) =>
 
 export function createSmoothWheelZoomHandler(
   { onPreview, onCommit },
-  { sensitivity = 240, commitThreshold = 0.5 } = {},
+  { sensitivity = 120, commitThreshold = 1 } = {},
 ) {
   let amount = 0;
   return (event) => {
     event.preventDefault();
     amount = clamp(
       amount - normalizeWheelDelta(event, sensitivity) / sensitivity,
-      -0.85,
-      0.85,
+      -1,
+      1,
     );
     if (Math.abs(amount) >= commitThreshold) {
       const step = amount > 0 ? 1 : -1;

@@ -50,24 +50,29 @@ export function createDynamicAttribution({
   url,
   secondary,
   showSecondary,
+  additional = [],
 }) {
   const element = createAttribution(text, url);
-  let secondaryElement = null;
-  if (secondary) {
-    secondaryElement = document.createElement('span');
-    secondaryElement.hidden = true;
+  const entries = [
+    ...(secondary ? [{ ...secondary, visible: showSecondary }] : []),
+    ...additional,
+  ];
+  const additionalElements = entries.map((entry) => {
+    const entryElement = document.createElement('span');
+    entryElement.hidden = Boolean(entry.visible);
     const link = document.createElement('a');
-    link.href = secondary.url;
-    link.textContent = secondary.text;
-    secondaryElement.append(' / ', link);
-    element.appendChild(secondaryElement);
-  }
+    link.href = entry.url;
+    link.textContent = entry.text;
+    entryElement.append(' / ', link);
+    element.appendChild(entryElement);
+    return { element: entryElement, visible: entry.visible };
+  });
   return {
     element,
     update(view) {
-      if (secondaryElement) {
-        secondaryElement.hidden = !showSecondary?.(view);
-      }
+      additionalElements.forEach((entry) => {
+        entry.element.hidden = entry.visible ? !entry.visible(view) : false;
+      });
     },
   };
 }

@@ -243,6 +243,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     [
       ...pointFeatures(collections, 'cities', tile, project, TILE_SIZE),
       ...pointFeatures(collections, 'settlements', tile, project, TILE_SIZE),
+      ...pointFeatures(collections, 'towns', tile, project, TILE_SIZE),
     ],
     tile,
     project,

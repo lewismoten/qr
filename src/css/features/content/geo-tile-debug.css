@@ -26,13 +26,19 @@
   border: 2px solid var(--tile-debug-border);
   background: var(--tile-debug-fill);
   color: #132235;
-  content: attr(data-tile);
+  content: 'want ' attr(data-wanted) '\A show ' attr(data-shown);
   font: 800 0.68rem/1 'Avenir Next', sans-serif;
   place-items: center;
   pointer-events: none;
+  text-align: center;
   text-shadow:
     0 1px #fff,
     1px 0 #fff,
     0 -1px #fff,
     -1px 0 #fff;
+  white-space: pre;
+}
+
+.slippy-map.show-tile-overlay .slippy-map-tile.is-fallback::after {
+  border-style: dashed;
 }
