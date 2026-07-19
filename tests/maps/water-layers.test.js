@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { MAP_SOURCES } from '../../scripts/maps/source-config.mjs';
 import {
   prepareCollections,
   renderTile,
-} from '../../scripts/maps/tile-renderer.mjs';
+} from '../../scripts/maps/rendering/tile-renderer.mjs';
+
+test('limits regional river supplements to zoom level eight', () => {
+  const names = ['riversNorthAmerica', 'riversEurope', 'riversAustralia'];
+  for (const name of names) {
+    assert.equal(MAP_SOURCES[name].minimumZoom, 8);
+    assert.equal(MAP_SOURCES[name].maximumZoom, 8);
+  }
+});
 
 const line = (minimumZoom) => ({
   properties: { min_zoom: minimumZoom },
@@ -47,6 +56,7 @@ test('switches ranked lake and river detail between zoom ranges', () => {
     riversOverview: layer(1, 5, line(2)),
     lakes: layer(6, 8, lake(7)),
     rivers: layer(6, 8, line(6)),
+    riversEurope: layer(8, 8, line(8)),
   });
 
   assert.equal(renderTile({ zoom: 1, x: 1, y: 1 }, water), '');
@@ -61,4 +71,9 @@ test('switches ranked lake and river detail between zoom ranges', () => {
   const zoomSeven = renderTile({ zoom: 7, x: 64, y: 64 }, water);
   assert.match(zoomSeven, /class="lake"/);
   assert.match(zoomSeven, /class="river"/);
+  assert.doesNotMatch(zoomSeven, /class="river-detail"/);
+
+  const zoomEight = renderTile({ zoom: 8, x: 128, y: 128 }, water);
+  assert.match(zoomEight, /class="river"/);
+  assert.match(zoomEight, /class="river-detail"/);
 });

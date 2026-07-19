@@ -1,10 +1,14 @@
-import { clipPolygon, clipPolyline } from './geometry-clip.mjs';
+import { clipPolygon, clipPolyline } from '../geometry-clip.mjs';
+import {
+  activeFeatures,
+  isNaturalEarthMinorRoad,
+  isUnitedStatesRegion,
+  MAP_TILE_STYLE,
+  rankedFeatures,
+  SIMPLIFICATION_STEPS,
+} from './tile-layer-support.mjs';
 
-const TILE_SIZE = 256;
-const MAX_LATITUDE = 85.05112878;
-const SIMPLIFICATION_STEPS = [
-  0.45, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48,
-];
+const [TILE_SIZE, MAX_LATITUDE] = [256, 85.05112878];
 
 const clamp = (value, minimum, maximum) =>
   Math.min(maximum, Math.max(minimum, value));
@@ -175,28 +179,6 @@ export function prepareCollections(collections) {
   );
 }
 
-function activeFeatures(collections, name, zoom) {
-  const layer = collections[name];
-  if (!layer || zoom < layer.minimumZoom || zoom > layer.maximumZoom) return [];
-  return layer.features;
-}
-
-function rankedFeatures(collections, name, zoom) {
-  return activeFeatures(collections, name, zoom).filter((feature) => {
-    const minimumZoom = Number(feature.properties?.min_zoom ?? 0);
-    return minimumZoom <= zoom;
-  });
-}
-
-function isUnitedStatesRegion(feature) {
-  const properties = feature.properties ?? {};
-  return (
-    properties.ADM0_A3 === 'USA' ||
-    properties.adm0_a3 === 'USA' ||
-    properties.ADM0_NAME === 'United States of America'
-  );
-}
-
 export function renderTile(tile, collections, tolerance = 0.45) {
   const countries = renderPaths(
     activeFeatures(collections, 'countries', tile.zoom),
@@ -222,6 +204,16 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'river',
     tolerance,
   );
+  const riverDetails = renderPaths(
+    [
+      ...rankedFeatures(collections, 'riversNorthAmerica', tile.zoom),
+      ...rankedFeatures(collections, 'riversEurope', tile.zoom),
+      ...rankedFeatures(collections, 'riversAustralia', tile.zoom),
+    ],
+    tile,
+    'river-detail',
+    tolerance,
+  );
   const stateFeatures = activeFeatures(collections, 'states', tile.zoom);
   const regionFeatures = activeFeatures(
     collections,
@@ -231,14 +223,32 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     (feature) => !stateFeatures.length || !isUnitedStatesRegion(feature),
   );
   const regions = renderPaths(regionFeatures, tile, 'region', tolerance);
+  const naturalEarthRoads = rankedFeatures(
+    collections,
+    'naturalEarthRoads',
+    tile.zoom,
+  );
   const roads = renderPaths(
     [
       ...activeFeatures(collections, 'primaryRoadsOverview', tile.zoom),
       ...activeFeatures(collections, 'primaryRoads', tile.zoom),
-      ...rankedFeatures(collections, 'naturalEarthRoads', tile.zoom),
+      ...naturalEarthRoads.filter(
+        (feature) => !isNaturalEarthMinorRoad(feature, tile.zoom),
+      ),
     ],
     tile,
     'primary-road',
+    tolerance,
+  );
+  const secondaryRoads = renderPaths(
+    [
+      ...activeFeatures(collections, 'secondaryRoads', tile.zoom),
+      ...naturalEarthRoads.filter((feature) =>
+        isNaturalEarthMinorRoad(feature, tile.zoom),
+      ),
+    ],
+    tile,
+    'secondary-road',
     tolerance,
   );
   const subdivisions = renderPaths(
@@ -252,25 +262,19 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     activeFeatures(collections, 'cities', tile.zoom),
     tile,
   );
-  const content = [countries, lakes, rivers, roads];
+  const content = [countries, lakes, rivers, riverDetails, roads];
+  content.push(secondaryRoads);
   content.push(regions, subdivisions, states, cities);
   if (!content.some(Boolean)) return '';
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
-    '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
-    '.lake{fill:#bfe3ed;stroke:#75adbd;stroke-width:.5}' +
-    '.river{fill:none;stroke:#75adbd;stroke-width:.45;' +
-    'stroke-linecap:round;stroke-linejoin:round}' +
-    '.primary-road{fill:none;stroke:#c56f43;stroke-width:.8;' +
-    'stroke-linecap:round;stroke-linejoin:round}' +
-    '.region{fill:none;stroke:#8a9d75;stroke-width:.7}' +
-    '.subdivision{fill:none;stroke:#aab59a;stroke-width:.45}' +
-    '.state-boundary{fill:none;stroke:#7d916f;stroke-width:.8}' +
-    '.city{fill:#e11d48;stroke:#fff;stroke-width:.7}</style>' +
+    MAP_TILE_STYLE +
     countries +
     lakes +
     rivers +
+    riverDetails +
     roads +
+    secondaryRoads +
     regions +
     subdivisions +
     states +

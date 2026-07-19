@@ -15,7 +15,7 @@ import {
   prepareCollections,
   renderTile,
   renderTileWithinSize,
-} from '../../scripts/maps/tile-renderer.mjs';
+} from '../../scripts/maps/rendering/tile-renderer.mjs';
 import {
   addAvailableTile,
   serializeTileAvailability,

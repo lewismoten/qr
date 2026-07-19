@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import { parentPort, workerData } from 'node:worker_threads';
 
-import { prepareCollections, renderTileWithinSize } from './tile-renderer.mjs';
+import {
+  prepareCollections,
+  renderTileWithinSize,
+} from './rendering/tile-renderer.mjs';
 
 const collections = prepareCollections(
   Object.fromEntries(
