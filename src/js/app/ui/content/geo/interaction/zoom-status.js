@@ -15,7 +15,7 @@ export function getZoomStatus(viewLayer, scale) {
   };
 }
 
-export function createZoomChrome() {
+export function createZoomChrome(onTileOverlayChange = () => {}) {
   const controls = createElement('div', 'slippy-map-controls', {
     'aria-label': lookup('map.zoomControls', 'Map zoom controls'),
   });
@@ -29,20 +29,30 @@ export function createZoomChrome() {
   });
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
-  const status = createElement('div', 'slippy-map-zoom-status', {
-    role: 'img',
+  const status = createElement('div', 'slippy-map-zoom-status');
+  const layer = createElement('button', 'slippy-map-zoom-layer', {
+    type: 'button',
+    'aria-pressed': 'false',
   });
-  const layer = createElement('strong');
+  let tileOverlay = false;
+  layer.addEventListener('click', () => {
+    tileOverlay = !tileOverlay;
+    layer.setAttribute('aria-pressed', String(tileOverlay));
+    status.classList.toggle('has-tile-overlay', tileOverlay);
+    onTileOverlayChange(tileOverlay);
+  });
   status.append(layer);
   controls.append(zoomIn, status, zoomOut);
 
-  const update = (viewLayer, scale, fallback = false) => {
+  const update = (viewLayer, scale, sourceZoom = viewLayer) => {
     const value = getZoomStatus(viewLayer, scale);
+    const fallback = Number.isInteger(sourceZoom) && sourceZoom < value.lower;
     layer.textContent = value.lower;
     status.className =
       'slippy-map-zoom-status' +
       (value.emptying ? ' is-emptying' : '') +
-      (fallback ? ' is-fallback' : '');
+      (fallback ? ' is-fallback' : '') +
+      (tileOverlay ? ' has-tile-overlay' : '');
     status.style.setProperty('--slippy-zoom-progress', `${value.percent}%`);
     status.setAttribute(
       'aria-label',
@@ -63,6 +73,13 @@ export function createZoomChrome() {
               'Some visible map tiles are enlarged from an earlier layer.',
             )}`
           : ''),
+    );
+    layer.setAttribute(
+      'aria-label',
+      lookup(
+        tileOverlay ? 'map.tileOverlayHide' : 'map.tileOverlayShow',
+        tileOverlay ? 'Hide map tile boundaries' : 'Show map tile boundaries',
+      ),
     );
   };
 

@@ -61,7 +61,9 @@ export function createSlippyMap(
     'aria-hidden': 'true',
   });
   const label = createElement('div', 'slippy-map-label');
-  const zoomChrome = createZoomChrome();
+  const zoomChrome = createZoomChrome((enabled) => {
+    container.classList.toggle('show-tile-overlay', enabled);
+  });
   const { controls, zoomIn, zoomOut } = zoomChrome;
   const dynamicAttribution = createDynamicAttribution({
     text: attributionText,
@@ -108,11 +110,8 @@ export function createSlippyMap(
         origin,
         onFallbackChange: scheduleRender,
       });
-      zoomChrome.update(
-        currentZoom,
-        tileScale,
-        renderingLayer.slippyUsesFallback,
-      );
+      const sourceZoom = renderingLayer.slippySourceZoom;
+      zoomChrome.update(currentZoom, tileScale, sourceZoom);
       positionMarker({
         marker,
         label,

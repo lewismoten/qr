@@ -1,0 +1,38 @@
+.slippy-map-tile.tile-tone-0 {
+  --tile-debug-border: #e11d48;
+  --tile-debug-fill: rgba(225, 29, 72, 0.1);
+}
+
+.slippy-map-tile.tile-tone-1 {
+  --tile-debug-border: #0284c7;
+  --tile-debug-fill: rgba(2, 132, 199, 0.1);
+}
+
+.slippy-map-tile.tile-tone-2 {
+  --tile-debug-border: #7c3aed;
+  --tile-debug-fill: rgba(124, 58, 237, 0.1);
+}
+
+.slippy-map-tile.tile-tone-3 {
+  --tile-debug-border: #ca8a04;
+  --tile-debug-fill: rgba(202, 138, 4, 0.1);
+}
+
+.slippy-map.show-tile-overlay .slippy-map-tile::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  border: 2px solid var(--tile-debug-border);
+  background: var(--tile-debug-fill);
+  color: #132235;
+  content: attr(data-tile);
+  font: 800 0.68rem/1 'Avenir Next', sans-serif;
+  place-items: center;
+  pointer-events: none;
+  text-shadow:
+    0 1px #fff,
+    1px 0 #fff,
+    0 -1px #fff,
+    -1px 0 #fff;
+}

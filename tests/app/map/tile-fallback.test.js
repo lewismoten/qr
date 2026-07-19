@@ -91,6 +91,7 @@ Object.defineProperty(globalThis, 'document', {
       return {
         tag,
         style: {},
+        dataset: {},
         children: [],
         classList: {
           values: new Set(),
@@ -124,6 +125,8 @@ const fallbackElement = createFallbackTile({
   onSourceChange: (sourceZoom) => sourceChanges.push(sourceZoom),
 });
 const fallbackImage = fallbackElement.children[0];
+assert.equal(fallbackElement.dataset.tile, '8/73/99');
+assert.equal(fallbackElement.classList.values.has('tile-tone-0'), true);
 assert.equal(fallbackImage.src, '/maps/tiles/6/18/24.svg');
 assert.equal(fallbackImage.style.width, '1024px');
 assert.equal(fallbackImage.style.left, '-256px');

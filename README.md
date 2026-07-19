@@ -69,23 +69,31 @@ The dependency-free overview map is available as the reusable public asset
 deeper zoom levels without contacting a tile provider at runtime:
 
 ```sh
-npm run maps:build -- --zoom 1-7 --plan
-npm run maps:build -- --zoom 1-7 --jobs 8
+npm run maps:download
+npm run maps:build -- --zoom 1-9 --plan
+npm run maps:build -- --zoom 1-9 --jobs 8
 ```
 
 Natural Earth 5.1.2 supplies the global layers. The U.S. Census Bureau's 2024
 generalized 20M GeoJSON supplies matching state, county, and county-equivalent
-boundaries at zoom 7. Downloads are cached under `.cache/maps`. Generated tiles
-are written to `build/maps/tiles` and copied to `/maps/tiles` during the site
-build. By default, zooms 6 and above use 4x4 SVG bundles to reduce request
-overhead. Use `--bundle-from` and `--bundle-size` to change that threshold and
-grouping; add `--force` to replace unbundled tiles that are already present.
+boundaries. TIGERweb supplies U.S. roads, while Natural Earth supplies global
+roads, water and progressively ranked populated places. `maps:download`
+retrieves every configured raw source without rendering tiles. `maps:build`
+also downloads any missing source automatically.
 
-Worldwide builds at zoom 8 or higher require explicit geographic bounds:
+Downloads are cached under `.cache/maps`. Generated tiles are written to
+`build/maps/tiles` and copied to `/maps/tiles` during the site build. By
+default, zooms 6 and above use 4x4 SVG bundles to reduce request overhead. Use
+`--bundle-from` and `--bundle-size` to change that threshold and grouping; add
+`--force` to replace unbundled tiles that are already present.
+
+An existing worldwide build can be extended from its indexed parent coverage:
 
 ```sh
-npm run maps:build -- --zoom 8 --bounds=-79,38,-77,40 --force
+npm run maps:build -- --zoom 9 --extend
 ```
+
+Worldwide builds at zoom 10 or higher require explicit geographic bounds.
 
 Use `npm run maps:build -- --help` for all options. Natural Earth data is in
 the public domain; the generated manifest records source URLs and attribution.

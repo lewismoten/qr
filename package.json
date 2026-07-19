@@ -18,6 +18,7 @@
     "guides:localize": "node scripts/guides/generate-localized-guides.mjs",
     "locales:build": "node scripts/locales/build.mjs",
     "locales:split": "node scripts/locales/split.mjs",
+    "maps:download": "node scripts/maps/sources/download.mjs",
     "maps:build": "node scripts/maps/build-svg-tiles.mjs",
     "serve": "node scripts/build.mjs && node scripts/serve.mjs",
     "dev": "node scripts/build.mjs && node scripts/serve.mjs",

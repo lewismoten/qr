@@ -40,6 +40,9 @@ export function createFallbackTile({
   const image = document.createElement('img');
   let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
   element.className = 'slippy-map-tile';
+  element.dataset.tile = `${tile.zoom}/${tile.x}/${tile.y}`;
+  const tone = (((tile.x + tile.y) % 4) + 4) % 4;
+  element.classList.add(`tile-tone-${tone}`);
   image.className = 'slippy-map-tile-source';
   image.alt = '';
   image.draggable = false;

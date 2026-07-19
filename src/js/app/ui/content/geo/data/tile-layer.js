@@ -27,13 +27,15 @@ export function renderTileLayer({
   });
   const visible = new Set();
   const syncFallback = () => {
-    const fallback = [...visible].some((key) => {
+    const sourceZoom = [...visible].reduce((lowest, key) => {
       const sourceZoom = tiles.get(key)?.slippySourceZoom;
-      return Number.isInteger(sourceZoom) && sourceZoom < zoom;
-    });
-    if (layer.slippyUsesFallback !== fallback) {
-      layer.slippyUsesFallback = fallback;
-      onFallbackChange?.(fallback);
+      return Number.isInteger(sourceZoom)
+        ? Math.min(lowest, sourceZoom)
+        : lowest;
+    }, zoom);
+    if (layer.slippySourceZoom !== sourceZoom) {
+      layer.slippySourceZoom = sourceZoom;
+      onFallbackChange?.(sourceZoom);
     }
   };
   layer.slippySourceChange = syncFallback;

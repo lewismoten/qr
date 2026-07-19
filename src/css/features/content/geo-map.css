@@ -1,4 +1,5 @@
 @import './geo-zoom.css';
+@import './geo-tile-debug.css';
 
 .geo-map-card {
   display: grid;

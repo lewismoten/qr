@@ -87,22 +87,33 @@
   );
 }
 
-.slippy-map-zoom-status strong {
+.slippy-map-zoom-layer {
   position: relative;
   z-index: 1;
   display: grid;
   width: 1.3rem;
+  padding: 0;
   border: 1px solid rgba(13, 148, 136, 0.45);
   border-radius: 50%;
   aspect-ratio: 1;
   place-items: center;
   background: rgba(255, 255, 255, 0.76);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  pointer-events: auto;
   box-shadow: 0 2px 7px rgba(19, 34, 53, 0.18);
 }
 
-.slippy-map-zoom-status.is-fallback strong {
+.slippy-map-zoom-status.is-fallback .slippy-map-zoom-layer {
   border-color: rgba(217, 119, 6, 0.65);
   color: #9a4d05;
+}
+
+.slippy-map-zoom-status.has-tile-overlay .slippy-map-zoom-layer {
+  box-shadow:
+    0 0 0 2px rgba(14, 116, 144, 0.34),
+    0 2px 7px rgba(19, 34, 53, 0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {

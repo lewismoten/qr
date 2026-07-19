@@ -209,6 +209,8 @@
     "zoomOut": "Alejar",
     "zoomProgress": "Capa {layer}; zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
     "zoomFallback": "Algunos mosaicos visibles están ampliados desde una capa anterior.",
+    "tileOverlayShow": "Mostrar los límites de los mosaicos del mapa",
+    "tileOverlayHide": "Ocultar los límites de los mosaicos del mapa",
     "attribution": "© colaboradores de OpenStreetMap",
     "loadError": "No se pudo iniciar la vista previa del mapa."
   },

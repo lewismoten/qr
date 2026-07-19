@@ -50,9 +50,17 @@ const documentDescriptor = Object.getOwnPropertyDescriptor(
 );
 globalThis.document = {
   createElement(tag) {
+    const listeners = {};
     return {
       attributes: {},
       children: [],
+      classList: {
+        values: new Set(),
+        toggle(name, enabled) {
+          if (enabled) this.values.add(name);
+          else this.values.delete(name);
+        },
+      },
       style: {
         setProperty(name, value) {
           this[name] = value;
@@ -62,13 +70,20 @@ globalThis.document = {
       append(...children) {
         this.children.push(...children);
       },
+      addEventListener(name, handler) {
+        listeners[name] = handler;
+      },
+      dispatch(name) {
+        listeners[name]();
+      },
       setAttribute(name, value) {
         this.attributes[name] = value;
       },
     };
   },
 };
-const chrome = createZoomChrome();
+const overlayChanges = [];
+const chrome = createZoomChrome((enabled) => overlayChanges.push(enabled));
 chrome.update(4, Math.SQRT2);
 assert.equal(chrome.controls.children.length, 3);
 assert.equal(chrome.status.children.length, 1);
@@ -83,12 +98,25 @@ chrome.update(3, Math.SQRT2);
 assert.equal(chrome.status.children[0].textContent, 3);
 assert.equal(chrome.status.className, 'slippy-map-zoom-status');
 assert.equal(chrome.status.style['--slippy-zoom-progress'], '50%');
-chrome.update(4, Math.SQRT2, true);
+chrome.update(4, Math.SQRT2, 3);
 assert.equal(
   chrome.status.className,
   'slippy-map-zoom-status is-emptying is-fallback',
 );
 assert.match(chrome.status.attributes['aria-label'], /enlarged from/);
+chrome.update(9, Math.SQRT2, 9);
+assert.equal(chrome.status.className, 'slippy-map-zoom-status');
+chrome.status.children[0].dispatch('click');
+assert.deepEqual(overlayChanges, [true]);
+assert.equal(chrome.status.children[0].attributes['aria-pressed'], 'true');
+chrome.update(10, 1, 9);
+assert.equal(
+  chrome.status.className,
+  'slippy-map-zoom-status is-emptying is-fallback has-tile-overlay',
+);
+chrome.status.children[0].dispatch('click');
+assert.deepEqual(overlayChanges, [true, false]);
+createZoomChrome().status.children[0].dispatch('click');
 Object.defineProperty(
   globalThis,
   'document',
