@@ -71,7 +71,12 @@ describe('SVG map tile rendering', () => {
         features: [
           {
             type: 'Feature',
-            properties: { SCALERANK: 1 },
+            properties: { min_zoom: 2.1, scalerank: 1 },
+            geometry: { type: 'Point', coordinates: [0, 0] },
+          },
+          {
+            type: 'Feature',
+            properties: { MIN_ZOOM: 5, SCALERANK: 4 },
             geometry: { type: 'Point', coordinates: [0, 0] },
           },
         ],
@@ -85,7 +90,12 @@ describe('SVG map tile rendering', () => {
 
     assert.match(low, /class="country"/);
     assert.doesNotMatch(low, /class="city"/);
-    assert.match(detailed, /class="city"/);
+    assert.equal(detailed.match(/class="city"/g)?.length, 1);
+    assert.equal(
+      renderTile({ zoom: 5, x: 16, y: 16 }, collections).match(/class="city"/g)
+        ?.length,
+      2,
+    );
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });
 });

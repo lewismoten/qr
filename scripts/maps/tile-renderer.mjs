@@ -108,11 +108,14 @@ function renderPaths(features, tile, className) {
 }
 
 function renderCities(features, tile) {
-  const maximumRank = Math.max(2, tile.zoom + 1);
   return features
-    .filter(
-      (feature) => Number(feature.properties?.SCALERANK ?? 99) <= maximumRank,
-    )
+    .filter((feature) => {
+      const properties = feature.properties ?? {};
+      const minimumZoom = Number(
+        properties.min_zoom ?? properties.MIN_ZOOM ?? 0,
+      );
+      return minimumZoom <= tile.zoom;
+    })
     .map((feature) => {
       const [x, y] = project(feature.geometry.coordinates, tile.zoom);
       const localX = x - tile.x * TILE_SIZE;
