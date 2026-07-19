@@ -16,6 +16,12 @@ deployment:
     from: locales
     include: **/*.json
     to: locales
+  favicon:
+    from: src/assets/favicon.ico
+    to: favicon.ico
+  robots:
+    from: src/web/robots.txt
+    to: robots.txt
 pages:
   index.html: index.html
 guides:

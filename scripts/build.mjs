@@ -2,13 +2,13 @@ import { build, context } from 'esbuild';
 import { cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generateLocalizedGuides } from './scripts/guides/generate-localized-guides.mjs';
-import { loadHtmlConfig } from './scripts/guides/html-config.mjs';
+import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
+import { loadHtmlConfig } from './guides/html-config.mjs';
 
 const watch = process.argv.includes('--watch');
 const htmlConfig = await loadHtmlConfig();
 const qrPackageName = '@lewismoten/qr';
-const qrSource = fileURLToPath(new URL('./src/js/qr-api.js', import.meta.url));
+const qrSource = fileURLToPath(new URL('../src/js/qr-api.js', import.meta.url));
 const localQrPlugin = {
   name: 'local-qr-package',
   setup(buildContext) {
@@ -115,7 +115,10 @@ if (watch) {
     cp('locales', path.join(htmlConfig.outputRoot, 'locales'), {
       recursive: true,
     }),
-    cp('favicon.ico', path.join(htmlConfig.outputRoot, 'favicon.ico')),
-    cp('robots.txt', path.join(htmlConfig.outputRoot, 'robots.txt')),
+    cp(
+      'src/assets/favicon.ico',
+      path.join(htmlConfig.outputRoot, 'favicon.ico'),
+    ),
+    cp('src/web/robots.txt', path.join(htmlConfig.outputRoot, 'robots.txt')),
   ]);
 }

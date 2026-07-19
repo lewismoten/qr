@@ -12,6 +12,10 @@ const mounts = new Map([
   ['dist', resolve(projectRoot, 'dist')],
   ['locales', resolve(projectRoot, 'locales')],
 ]);
+const publicFiles = new Map([
+  ['favicon.ico', resolve(projectRoot, 'src/assets/favicon.ico')],
+  ['robots.txt', resolve(projectRoot, 'src/web/robots.txt')],
+]);
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
   '.gif': 'image/gif',
@@ -44,9 +48,7 @@ function candidates(requestUrl) {
   if (mounts.has(prefix)) {
     return [safePath(mounts.get(prefix), rest.join('/'))].filter(Boolean);
   }
-  if (['favicon.ico', 'robots.txt'].includes(requested)) {
-    return [safePath(projectRoot, requested)].filter(Boolean);
-  }
+  if (publicFiles.has(requested)) return [publicFiles.get(requested)];
   return [
     safePath(htmlRoot, requested),
     safePath(generatedRoot, requested),

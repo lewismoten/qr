@@ -101,7 +101,9 @@ images.forEach(({ size, data }, index) => {
 });
 
 await writeFile(
-  'favicon.ico',
+  'src/assets/favicon.ico',
   Buffer.concat([header, ...images.map(({ data }) => data)]),
 );
-console.log(`Generated favicon.ico with ${sizes.join(', ')} px images.`);
+console.log(
+  `Generated src/assets/favicon.ico with ${sizes.join(', ')} px images.`,
+);

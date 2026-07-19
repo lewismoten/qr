@@ -41,7 +41,8 @@ if (!entries.length) {
 }
 entries.forEach(({ loc }, index) => validateUrl(loc, sitemapPath, index));
 
-const robotsSource = await readFile('robots.txt', 'utf8');
+const robotsPath = 'src/web/robots.txt';
+const robotsSource = await readFile(robotsPath, 'utf8');
 const directives = robotsSource
   .split(/\r?\n/)
   .map((line) => line.replace(/#.*$/, '').trim())
@@ -49,7 +50,7 @@ const directives = robotsSource
   .map((line) => {
     const separator = line.indexOf(':');
     if (separator < 1)
-      throw new Error(`robots.txt: invalid directive "${line}".`);
+      throw new Error(`${robotsPath}: invalid directive "${line}".`);
     return [
       line.slice(0, separator).trim().toLowerCase(),
       line.slice(separator + 1).trim(),
@@ -57,11 +58,11 @@ const directives = robotsSource
   });
 
 if (!directives.some(([name, value]) => name === 'user-agent' && value)) {
-  throw new Error('robots.txt: expected a User-agent directive.');
+  throw new Error(`${robotsPath}: expected a User-agent directive.`);
 }
 const sitemapDirective = directives.find(([name]) => name === 'sitemap');
 if (!sitemapDirective)
-  throw new Error('robots.txt: expected a Sitemap directive.');
+  throw new Error(`${robotsPath}: expected a Sitemap directive.`);
 new URL(sitemapDirective[1]);
 
 console.log(
