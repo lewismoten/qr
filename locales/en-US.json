@@ -197,6 +197,7 @@
     "viewTabs": "Map source",
     "world": "World",
     "worldLabel": "High-level world map. Click to choose coordinates.",
+    "overviewSource": "Simplified overview:",
     "privacyTitle": "Load OpenStreetMap?",
     "privacyMessage": "OpenStreetMap receives your IP address, browser request headers, this site's referrer, and the coordinates of visible map tiles.",
     "privacyLink": "Read the OpenStreetMap privacy policy",

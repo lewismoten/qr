@@ -197,6 +197,7 @@
     "viewTabs": "地图来源",
     "world": "世界地图",
     "worldLabel": "世界概览地图。点击以选择坐标。",
+    "overviewSource": "简化概览图：",
     "privacyTitle": "加载 OpenStreetMap？",
     "privacyMessage": "OpenStreetMap 将收到您的 IP 地址、浏览器请求标头、本网站的来源信息以及可见地图图块的坐标。",
     "privacyLink": "阅读 OpenStreetMap 隐私政策",

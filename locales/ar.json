@@ -197,6 +197,7 @@
     "viewTabs": "مصدر الخريطة",
     "world": "خريطة العالم",
     "worldLabel": "خريطة عالمية عامة. انقر لاختيار الإحداثيات.",
+    "overviewSource": "خريطة عامة مبسطة:",
     "privacyTitle": "هل تريد تحميل OpenStreetMap؟",
     "privacyMessage": "ستتلقى OpenStreetMap عنوان IP الخاص بك، وترويسات طلب المتصفح، ومُحيل هذا الموقع، وإحداثيات مربعات الخريطة الظاهرة.",
     "privacyLink": "قراءة سياسة خصوصية OpenStreetMap",

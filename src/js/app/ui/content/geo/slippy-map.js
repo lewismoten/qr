@@ -8,6 +8,7 @@ import {
 } from './projection.js';
 import { createAttribution, createElement } from './slippy-elements.js';
 import { createFallbackTile } from './tile-fallback.js';
+import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
 
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -170,10 +171,7 @@ export function createSlippyMap(
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
   container.addEventListener(
     'wheel',
-    (event) => {
-      event.preventDefault();
-      setZoom(currentZoom + (event.deltaY < 0 ? 1 : -1));
-    },
+    createWheelZoomHandler((step) => setZoom(currentZoom + step)),
     { passive: false },
   );
   container.addEventListener('keydown', (event) => {
@@ -268,6 +266,10 @@ export function createSlippyMap(
   scheduleRender();
 
   return {
+    getView: () => ({
+      center: { ...currentCenter },
+      zoom: currentZoom,
+    }),
     getZoom: () => currentZoom,
     setView(nextCenter, nextZoom = currentZoom) {
       currentCenter = {

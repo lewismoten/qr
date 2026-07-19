@@ -31,6 +31,7 @@ export function createWorldMap(
   const label = container.querySelector('#geo-world-label');
   const zoomControls = container.querySelector('#geo-world-zoom-controls');
   const zoomIn = container.querySelector('#geo-world-zoom-in');
+  const attribution = container.querySelector('#geo-world-attribution');
   const detail = container.querySelector('#geo-local-map');
   let detailMap = null;
   let detailRequest = null;
@@ -44,12 +45,15 @@ export function createWorldMap(
     if (!markerCoordinates) return;
     const point = coordinatesToWorldPoint(markerCoordinates);
     marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
+    label.style.left = `${(point.x / WIDTH) * 100}%`;
+    label.style.top = `${(point.y / HEIGHT) * 100}%`;
   };
 
   const showOverview = () => {
     surface.hidden = false;
     overlay.hidden = false;
     zoomControls.hidden = false;
+    attribution.hidden = false;
     detail.hidden = true;
     setOverviewMarker();
   };
@@ -80,16 +84,19 @@ export function createWorldMap(
     return detailRequest;
   };
 
-  const showDetail = () => {
+  const showDetail = (viewState = null) => {
     surface.hidden = true;
     overlay.hidden = true;
     zoomControls.hidden = true;
+    attribution.hidden = true;
     label.hidden = true;
     detail.hidden = false;
-    ensureDetailMap()
+    return ensureDetailMap()
       .then((map) => {
-        if (markerCoordinates) map.setView(markerCoordinates);
+        const center = viewState?.center || markerCoordinates;
+        if (center) map.setView(center, viewState?.zoom);
         map.setMarker(markerCoordinates, markerText);
+        return map;
       })
       .catch((error) => {
         detailRequest = null;
@@ -99,7 +106,10 @@ export function createWorldMap(
   };
 
   container.addEventListener('click', (event) => {
-    if (event.target?.closest?.('button, .geo-local-map')) return;
+    if (
+      event.target?.closest?.('button, .geo-local-map, .slippy-map-attribution')
+    )
+      return;
     const bounds = container.getBoundingClientRect();
     onSelect?.(
       worldPointToCoordinates({
@@ -108,9 +118,11 @@ export function createWorldMap(
       }),
     );
   });
-  zoomIn.addEventListener('click', showDetail);
+  zoomIn.addEventListener('click', () => showDetail());
 
   return {
+    getView: () => (!detail.hidden && detailMap ? detailMap.getView() : null),
+    showDetail,
     setMarker(coordinates, text = '') {
       markerCoordinates = coordinates ? { ...coordinates } : null;
       markerText = text;

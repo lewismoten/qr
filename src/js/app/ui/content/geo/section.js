@@ -94,17 +94,20 @@ export function createGeoSection({
     return mapRequest;
   };
 
-  const updateMap = () => {
+  const updateMap = (viewState = null) => {
     const coordinates = getCoordinates();
     const label = labelInput.value.trim();
     if (!coordinates) {
       map.setMarker(null);
-      map.setView(DEFAULT_CENTER, 13);
+      map.setView(viewState?.center || DEFAULT_CENTER, viewState?.zoom ?? 13);
       return;
     }
 
     map.setMarker(coordinates, label);
-    map.setView(coordinates, Math.max(15, map.getZoom()));
+    map.setView(
+      viewState?.center || coordinates,
+      viewState?.zoom ?? map.getZoom(),
+    );
   };
 
   const selectView = (nextView) => {
@@ -119,9 +122,10 @@ export function createGeoSection({
   };
 
   const activateOpenStreetMap = () => {
+    const worldView = world.getView();
     selectView('osm');
     ensureMap()
-      .then(updateMap)
+      .then(() => updateMap(worldView))
       .catch((error) => {
         mapElement.classList.add('has-load-error');
         mapElement.textContent = lookup(
@@ -141,7 +145,11 @@ export function createGeoSection({
     consentDialog.showModal();
   };
 
-  worldTab.addEventListener('click', () => selectView('world'));
+  worldTab.addEventListener('click', () => {
+    const osmView = view === 'osm' ? map?.getView() : null;
+    selectView('world');
+    if (osmView) world.showDetail(osmView);
+  });
   osmTab.addEventListener('click', requestOpenStreetMap);
   cancelButton.addEventListener('click', () => selectView('world'));
   proceedButton.addEventListener('click', () => {

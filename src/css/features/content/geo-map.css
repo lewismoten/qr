@@ -79,8 +79,7 @@
 
 .geo-world-label {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
+  z-index: 4;
   max-width: calc(100% - 1rem);
   overflow: hidden;
   padding: 0.25rem 0.5rem;
@@ -90,6 +89,7 @@
   font-size: 0.7rem;
   font-weight: 800;
   text-overflow: ellipsis;
+  transform: translate(-50%, calc(-100% - 0.8rem));
   white-space: nowrap;
 }
 

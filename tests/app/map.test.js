@@ -13,6 +13,7 @@ import {
   createWorldMap,
   worldPointToCoordinates,
 } from '../../src/js/app/ui/content/geo/world-map.js';
+import { createWheelZoomHandler } from '../../src/js/app/ui/content/geo/interaction/wheel-zoom.js';
 
 assert.deepEqual(projectCoordinates({ latitude: 0, longitude: 0 }, 0), {
   x: 128,
@@ -59,10 +60,11 @@ const marker = {
     this[name] = value;
   },
 };
-const label = { hidden: true, textContent: '' };
+const label = { hidden: true, style: {}, textContent: '' };
 const surface = { hidden: false };
 const overlay = { hidden: false };
 const zoomControls = { hidden: false };
+const attribution = { hidden: false };
 const zoomIn = {
   addEventListener(name, handler) {
     assert.equal(name, 'click');
@@ -71,13 +73,16 @@ const zoomIn = {
 };
 const detail = { hidden: true };
 const detailCalls = [];
+let detailView = { center: { latitude: 0, longitude: 0 }, zoom: 1 };
 let slippyOptions;
 const detailMap = {
+  getView: () => detailView,
   setMarker(...values) {
     detailCalls.push(['marker', ...values]);
   },
-  setView(...values) {
-    detailCalls.push(['view', ...values]);
+  setView(center, zoom = detailView.zoom) {
+    detailView = { center, zoom };
+    detailCalls.push(['view', center, zoom]);
   },
 };
 const container = {
@@ -98,6 +103,7 @@ const worldMap = createWorldMap(
         '#geo-world-label': label,
         '#geo-world-zoom-controls': zoomControls,
         '#geo-world-zoom-in': zoomIn,
+        '#geo-world-attribution': attribution,
         '#geo-local-map': detail,
       };
       return elements[selector];
@@ -123,11 +129,20 @@ clickHandler({
   target: { closest: () => true },
 });
 assert.deepEqual(selected, { latitude: 0, longitude: 0 });
+assert.equal(worldMap.getView(), null);
+zoomHandler();
+await new Promise((resolve) => setTimeout(resolve, 0));
+assert.deepEqual(slippyOptions.center, { latitude: 0, longitude: 0 });
+assert.equal(attribution.hidden, true);
+slippyOptions.onMinimumZoomOut();
+assert.equal(attribution.hidden, false);
 worldMap.setMarker(frontRoyal, 'Front Royal, VA');
 assert.equal(marker.hidden, false);
 assert.match(marker.transform, /^translate\(/);
 assert.equal(label.hidden, false);
 assert.equal(label.textContent, 'Front Royal, VA');
+assert.match(label.style.left, /%$/);
+assert.match(label.style.top, /%$/);
 zoomHandler();
 await new Promise((resolve) => setTimeout(resolve, 0));
 assert.equal(surface.hidden, true);
@@ -138,6 +153,13 @@ assert.equal(slippyOptions.minimumZoom, 1);
 assert.equal(slippyOptions.minimumSourceZoom, 1);
 assert.equal(slippyOptions.maximumSourceZoom, 6);
 assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
+assert.deepEqual(worldMap.getView(), { center: frontRoyal, zoom: 1 });
+const transferredView = {
+  center: { latitude: 40.7128, longitude: -74.006 },
+  zoom: 7,
+};
+await worldMap.showDetail(transferredView);
+assert.deepEqual(worldMap.getView(), transferredView);
 worldMap.setMarker(null);
 assert.deepEqual(detailCalls.at(-1), ['marker', null, '']);
 slippyOptions.onMinimumZoomOut();
@@ -158,6 +180,7 @@ const failedElements = {
   '#geo-world-marker': { hidden: true, setAttribute() {} },
   '#geo-world-label': { hidden: true, textContent: '' },
   '#geo-world-zoom-controls': { hidden: false },
+  '#geo-world-attribution': { hidden: false },
   '#geo-world-zoom-in': {
     addEventListener(_name, handler) {
       failedZoomHandler = handler;
@@ -230,5 +253,33 @@ const unavailableStorage = {
 };
 assert.equal(hasOpenStreetMapConsent(unavailableStorage), false);
 assert.equal(rememberOpenStreetMapConsent(unavailableStorage), false);
+
+const wheelSteps = [];
+let prevented = 0;
+const wheel = createWheelZoomHandler((step) => wheelSteps.push(step));
+const wheelEvent = (deltaY, timeStamp, deltaMode = 0) => ({
+  deltaMode,
+  deltaY,
+  preventDefault: () => (prevented += 1),
+  timeStamp,
+});
+wheel(wheelEvent(20, 0));
+wheel(wheelEvent(20, 10));
+wheel(wheelEvent(20, 20));
+wheel(wheelEvent(20, 30));
+wheel(wheelEvent(100, 40));
+wheel(wheelEvent(-1, 220, 2));
+wheel(wheelEvent(5, 450, 1));
+assert.deepEqual(wheelSteps, [-1, 1, -1]);
+assert.equal(prevented, 7);
+const reversedSteps = [];
+const reversedWheel = createWheelZoomHandler(
+  (step) => reversedSteps.push(step),
+  { threshold: 40, cooldown: 50 },
+);
+reversedWheel(wheelEvent(20, Number.NaN));
+reversedWheel(wheelEvent(-20, 10));
+reversedWheel(wheelEvent(-20, 20));
+assert.deepEqual(reversedSteps, [1]);
 
 console.log('Slippy map projection tests passed.');
