@@ -10,6 +10,26 @@ const STYLES = {
 };
 const ORDER = ['land', 'park', 'water', 'waterway', 'road', 'boundary'];
 
+export function getLabelPlacement(x, y, textWidth, size) {
+  const width = textWidth + 6;
+  if (x < 0 || x >= size || y < 6 || y > size - 6) return null;
+  if (x + width <= size) {
+    return {
+      box: { left: x + 2, right: x + width, top: y - 6, bottom: y + 6 },
+      textAlign: 'left',
+      textX: x + 4,
+    };
+  }
+  if (x - width >= 0) {
+    return {
+      box: { left: x - width, right: x - 2, top: y - 6, bottom: y + 6 },
+      textAlign: 'right',
+      textX: x - 4,
+    };
+  }
+  return null;
+}
+
 function traceFeature(context, feature, scale) {
   context.beginPath();
   for (const path of feature.geometry) {
@@ -65,6 +85,13 @@ function drawPlaces(context, layer) {
     if (!point) continue;
     const x = point.x * scale;
     const y = point.y * scale;
+    if (
+      x < 0 ||
+      x >= context.canvas.width ||
+      y < 0 ||
+      y >= context.canvas.height
+    )
+      continue;
     context.beginPath();
     context.arc(x, y, 2, 0, Math.PI * 2);
     context.fillStyle = '#e11d48';
@@ -72,13 +99,14 @@ function drawPlaces(context, layer) {
     const name =
       feature.properties[`name_${language}`] ?? feature.properties.name;
     if (!name) continue;
-    const width = context.measureText(name).width + 6;
-    const box = {
-      left: x + 2,
-      right: x + width,
-      top: y - 6,
-      bottom: y + 6,
-    };
+    const placement = getLabelPlacement(
+      x,
+      y,
+      context.measureText(name).width,
+      context.canvas.width,
+    );
+    if (!placement) continue;
+    const { box } = placement;
     const overlaps = occupied.some(
       (item) =>
         box.left < item.right &&
@@ -88,11 +116,12 @@ function drawPlaces(context, layer) {
     );
     if (overlaps) continue;
     occupied.push(box);
+    context.textAlign = placement.textAlign;
     context.lineWidth = 2.5;
     context.strokeStyle = 'rgba(255,255,255,.92)';
-    context.strokeText(name, x + 4, y);
+    context.strokeText(name, placement.textX, y);
     context.fillStyle = '#243547';
-    context.fillText(name, x + 4, y);
+    context.fillText(name, placement.textX, y);
   }
 }
 

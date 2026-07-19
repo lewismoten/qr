@@ -184,8 +184,14 @@
 
 .slippy-map-vector-tile {
   display: block;
+  width: 256px;
+  max-width: none;
+  height: 256px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  image-rendering: auto;
 }
-
 .slippy-map-tile.is-missing {
   visibility: hidden;
 }

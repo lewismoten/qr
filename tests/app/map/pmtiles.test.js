@@ -15,7 +15,10 @@ import { createPmtilesSource } from '../../../src/js/app/ui/content/geo/pmtiles/
 import { zxyToTileId } from '../../../src/js/app/ui/content/geo/pmtiles/tile-id.js';
 import { decodeMvt } from '../../../src/js/app/ui/content/geo/mvt/decode.js';
 import { decodeGeometry } from '../../../src/js/app/ui/content/geo/mvt/geometry.js';
-import { renderMvt } from '../../../src/js/app/ui/content/geo/mvt/render.js';
+import {
+  getLabelPlacement,
+  renderMvt,
+} from '../../../src/js/app/ui/content/geo/mvt/render.js';
 
 function varint(value) {
   const bytes = [];
@@ -185,4 +188,19 @@ test('renders sparse MVT tiles without requiring every map layer', () => {
   };
   assert.deepEqual(renderMvt(new Uint8Array(), canvas), []);
   assert.equal(cleared, true);
+});
+
+test('keeps map labels inside their owning vector tile', () => {
+  assert.deepEqual(getLabelPlacement(20, 20, 40, 256), {
+    box: { left: 22, right: 66, top: 14, bottom: 26 },
+    textAlign: 'left',
+    textX: 24,
+  });
+  assert.deepEqual(getLabelPlacement(240, 20, 40, 256), {
+    box: { left: 194, right: 238, top: 14, bottom: 26 },
+    textAlign: 'right',
+    textX: 236,
+  });
+  assert.equal(getLabelPlacement(-1, 20, 40, 256), null);
+  assert.equal(getLabelPlacement(20, 3, 40, 256), null);
 });
