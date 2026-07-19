@@ -23,7 +23,7 @@ export function worldPointToCoordinates({ x, y }) {
 
 export function createWorldMap(
   container,
-  { onSelect, onLoadError, loadSlippyMap },
+  { onSelect, onLoadError, loadSlippyMap, loadTileRange },
 ) {
   const surface = container.querySelector('.geo-world-surface');
   const overlay = container.querySelector('.geo-world-overlay');
@@ -57,20 +57,24 @@ export function createWorldMap(
   const ensureDetailMap = () => {
     if (detailMap) return Promise.resolve(detailMap);
     if (!detailRequest) {
-      detailRequest = loadSlippyMap().then(({ createSlippyMap }) => {
-        detailMap = createSlippyMap(detail, {
-          center: markerCoordinates || { latitude: 0, longitude: 0 },
-          zoom: 1,
-          minimumZoom: 1,
-          maximumZoom: 19,
-          tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
-          attributionText: 'Natural Earth',
-          attributionUrl: 'https://www.naturalearthdata.com/',
-          onMinimumZoomOut: showOverview,
-          onSelect,
-        });
-        return detailMap;
-      });
+      detailRequest = Promise.all([loadSlippyMap(), loadTileRange()]).then(
+        ([{ createSlippyMap }, tileRange]) => {
+          detailMap = createSlippyMap(detail, {
+            center: markerCoordinates || { latitude: 0, longitude: 0 },
+            zoom: 1,
+            minimumZoom: 1,
+            maximumZoom: 19,
+            minimumSourceZoom: tileRange.minimum,
+            maximumSourceZoom: tileRange.maximum,
+            tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
+            attributionText: 'Natural Earth',
+            attributionUrl: 'https://www.naturalearthdata.com/',
+            onMinimumZoomOut: showOverview,
+            onSelect,
+          });
+          return detailMap;
+        },
+      );
     }
     return detailRequest;
   };

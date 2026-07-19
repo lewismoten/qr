@@ -8,6 +8,7 @@ import {
   rememberOpenStreetMapConsent,
 } from './map-consent.js';
 import { createWorldMap } from './world-map.js';
+import { loadLocalTileRange } from './tile-fallback.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
 
@@ -43,6 +44,7 @@ export function createGeoSection({
   const world = createWorldMap(worldElement, {
     onSelect: selectCoordinates,
     loadSlippyMap: () => loading.track(import('./slippy-map.js')),
+    loadTileRange: loadLocalTileRange,
     onLoadError: (error) => {
       console.error(error);
     },

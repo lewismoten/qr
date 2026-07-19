@@ -148,6 +148,12 @@
   position: absolute;
   width: 256px;
   height: 256px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.slippy-map-tile-source {
+  position: absolute;
   max-width: none;
   pointer-events: none;
   -webkit-user-drag: none;
@@ -207,7 +213,9 @@
   border-radius: 0;
   background: transparent;
   color: #132235;
-  font: 900 1.25rem/1 "Avenir Next", sans-serif;
+  font:
+    900 1.25rem/1 'Avenir Next',
+    sans-serif;
 }
 
 .slippy-map-control + .slippy-map-control {

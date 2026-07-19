@@ -7,6 +7,7 @@ import {
   unprojectPoint,
 } from './projection.js';
 import { createAttribution, createElement } from './slippy-elements.js';
+import { createFallbackTile } from './tile-fallback.js';
 
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -21,6 +22,8 @@ export function createSlippyMap(
     tileUrl = DEFAULT_TILE_URL,
     minimumZoom = 0,
     maximumZoom = 19,
+    minimumSourceZoom = minimumZoom,
+    maximumSourceZoom = maximumZoom,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
     onMinimumZoomOut,
@@ -90,34 +93,24 @@ export function createSlippyMap(
         for (let tileX = firstX; tileX <= lastX; tileX += 1) {
           const key = `${currentZoom}:${tileX}:${tileY}`;
           visible.add(key);
-          let image = tiles.get(key);
-          if (!image) {
-            const wrappedX =
-              ((tileX % (maximumTile + 1)) + maximumTile + 1) %
-              (maximumTile + 1);
-            image = createElement('img', 'slippy-map-tile', {
-              alt: '',
-              draggable: 'false',
-              referrerpolicy: 'strict-origin-when-cross-origin',
+          let element = tiles.get(key);
+          if (!element) {
+            element = createFallbackTile({
+              template: tileUrl,
+              tile: { zoom: currentZoom, x: tileX, y: tileY },
+              minimumSourceZoom,
+              maximumSourceZoom,
             });
-            image.decoding = 'async';
-            image.addEventListener('error', () => {
-              image.classList.add('is-missing');
-            });
-            image.src = tileUrl
-              .replace('{z}', currentZoom)
-              .replace('{x}', wrappedX)
-              .replace('{y}', tileY);
-            tiles.set(key, image);
-            tileLayer.appendChild(image);
+            tiles.set(key, element);
+            tileLayer.appendChild(element);
           }
-          image.style.left = `${Math.round(tileX * TILE_SIZE - origin.x)}px`;
-          image.style.top = `${Math.round(tileY * TILE_SIZE - origin.y)}px`;
+          element.style.left = `${Math.round(tileX * TILE_SIZE - origin.x)}px`;
+          element.style.top = `${Math.round(tileY * TILE_SIZE - origin.y)}px`;
         }
       }
-      tiles.forEach((image, key) => {
+      tiles.forEach((element, key) => {
         if (visible.has(key)) return;
-        image.remove();
+        element.remove();
         tiles.delete(key);
       });
 
@@ -155,7 +148,7 @@ export function createSlippyMap(
       return;
     }
     currentZoom = next;
-    tiles.forEach((image) => image.remove());
+    tiles.forEach((element) => element.remove());
     tiles.clear();
     scheduleRender();
   };

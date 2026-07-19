@@ -50,7 +50,6 @@ assert.deepEqual(worldPointToCoordinates({ x: -10, y: 600 }), {
   latitude: -90,
   longitude: -180,
 });
-
 let clickHandler;
 let zoomHandler;
 let selected;
@@ -113,6 +112,7 @@ const worldMap = createWorldMap(
         return detailMap;
       },
     }),
+    loadTileRange: async () => ({ minimum: 1, maximum: 6 }),
   },
 );
 clickHandler({ clientX: 260, clientY: 145 });
@@ -135,6 +135,8 @@ assert.equal(overlay.hidden, true);
 assert.equal(detail.hidden, false);
 assert.equal(slippyOptions.tileUrl, '/maps/tiles/{z}/{x}/{y}.svg');
 assert.equal(slippyOptions.minimumZoom, 1);
+assert.equal(slippyOptions.minimumSourceZoom, 1);
+assert.equal(slippyOptions.maximumSourceZoom, 6);
 assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
 worldMap.setMarker(null);
 assert.deepEqual(detailCalls.at(-1), ['marker', null, '']);
@@ -173,6 +175,7 @@ createWorldMap(
     loadSlippyMap: async () => {
       throw new Error('offline');
     },
+    loadTileRange: async () => ({ minimum: 1, maximum: 6 }),
     onLoadError: (error) => {
       loadError = error;
     },
