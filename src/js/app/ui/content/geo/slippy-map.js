@@ -87,6 +87,7 @@ export function createSlippyMap(
         zoom: currentZoom,
         width,
         height,
+        scale: tileScale,
       });
       const origin = {
         x: centerPoint.x - width / 2,
@@ -152,8 +153,12 @@ export function createSlippyMap(
     onSelect?.(
       unprojectPoint(
         {
-          x: centerPoint.x + clientX - bounds.left - bounds.width / 2,
-          y: centerPoint.y + clientY - bounds.top - bounds.height / 2,
+          x:
+            centerPoint.x +
+            (clientX - bounds.left - bounds.width / 2) / tileScale,
+          y:
+            centerPoint.y +
+            (clientY - bounds.top - bounds.height / 2) / tileScale,
         },
         currentZoom,
       ),
@@ -185,7 +190,10 @@ export function createSlippyMap(
     else if (movements[event.key]) {
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
       const [x, y] = movements[event.key];
-      setCenterFromPoint({ x: centerPoint.x + x, y: centerPoint.y + y });
+      setCenterFromPoint({
+        x: centerPoint.x + x / tileScale,
+        y: centerPoint.y + y / tileScale,
+      });
     } else return;
     event.preventDefault();
   });
