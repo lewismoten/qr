@@ -29,7 +29,7 @@ async function findHtml(directory) {
   return files.flat();
 }
 
-test('HTML sources and native deployment routes follow site.yaml', async () => {
+test('HTML sources and native deployment routes follow site config', async () => {
   const config = await loadHtmlConfig();
   assert.equal(config.server.root, 'src/html');
   assert.equal(config.deployment.html.from, 'src/html');

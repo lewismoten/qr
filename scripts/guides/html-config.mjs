@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { loadSimpleYaml } from './simple-yaml.mjs';
 
-export async function loadHtmlConfig(file = 'src/html/site.yaml') {
+export async function loadHtmlConfig(file = 'config/site.yaml') {
   return loadSimpleYaml(file);
 }
 
