@@ -62,10 +62,10 @@ const marker = {
   },
 };
 const label = { hidden: true, style: {}, textContent: '' };
-const surface = { hidden: false };
-const overlay = { hidden: false };
-const zoomControls = { hidden: false };
-const attribution = { hidden: false };
+const surface = { hidden: true };
+const overlay = { hidden: true };
+const zoomControls = { hidden: true };
+const attribution = { hidden: true };
 const zoomIn = {
   addEventListener(name, handler) {
     assert.equal(name, 'click');
@@ -126,6 +126,11 @@ const worldMap = createWorldMap(
     loadTileRange: async () => ({ minimum: 1, maximum: 6 }),
   },
 );
+assert.equal(surface.hidden, false);
+assert.equal(overlay.hidden, false);
+assert.equal(zoomControls.hidden, false);
+assert.equal(attribution.hidden, false);
+assert.equal(detail.hidden, true);
 clickHandler({ clientX: 260, clientY: 145 });
 assert.deepEqual(selected, { latitude: 0, longitude: 0 });
 clickHandler({

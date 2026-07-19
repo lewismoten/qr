@@ -141,6 +141,7 @@ export function createWorldMap(
     { passive: false },
   );
   zoomIn.addEventListener('click', () => showDetail());
+  showOverview();
 
   return {
     getView: () => (!detail.hidden && detailMap ? detailMap.getView() : null),
