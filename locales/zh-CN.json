@@ -193,27 +193,6 @@
       "detail": "纠错能力最强，通常可承受约 30% 的遮挡。"
     }
   },
-  "map": {
-    "viewTabs": "地图来源",
-    "world": "世界地图",
-    "worldLabel": "世界概览地图。点击以选择坐标。",
-    "overviewSource": "简化概览图：",
-    "privacyTitle": "加载 OpenStreetMap？",
-    "privacyMessage": "OpenStreetMap 将收到您的 IP 地址、浏览器请求标头、本网站的来源信息以及可见地图图块的坐标。",
-    "privacyLink": "阅读 OpenStreetMap 隐私政策",
-    "neverAsk": "不再在此浏览器中询问",
-    "cancel": "取消",
-    "proceed": "加载地图",
-    "zoomControls": "地图缩放控件",
-    "zoomIn": "放大",
-    "zoomOut": "缩小",
-    "zoomProgress": "图层 {layer}；缩放 {zoom}；从级别 {lower} 到 {upper} 的 {percent}%。",
-    "zoomFallback": "部分可见地图瓦片由较早的图层放大显示。",
-    "tileOverlayShow": "显示地图瓦片边界",
-    "tileOverlayHide": "隐藏地图瓦片边界",
-    "attribution": "© OpenStreetMap 贡献者",
-    "loadError": "无法初始化地图预览。"
-  },
   "wifi": {
     "openPassword": "开放网络不使用密码",
     "password": "密码"

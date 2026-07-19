@@ -193,27 +193,6 @@
       "detail": "Usa la máxima corrección y puede tolerar cerca de un 30% de obstrucción."
     }
   },
-  "map": {
-    "viewTabs": "Fuente del mapa",
-    "world": "Mapa mundial",
-    "worldLabel": "Mapa mundial general. Haga clic para elegir las coordenadas.",
-    "overviewSource": "Vista general simplificada:",
-    "privacyTitle": "¿Cargar OpenStreetMap?",
-    "privacyMessage": "OpenStreetMap recibirá su dirección IP, los encabezados de la solicitud del navegador, la referencia de este sitio y las coordenadas de los mosaicos visibles.",
-    "privacyLink": "Leer la política de privacidad de OpenStreetMap",
-    "neverAsk": "No volver a preguntar en este navegador",
-    "cancel": "Cancelar",
-    "proceed": "Cargar el mapa",
-    "zoomControls": "Controles de zoom del mapa",
-    "zoomIn": "Acercar",
-    "zoomOut": "Alejar",
-    "zoomProgress": "Capa {layer}; zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
-    "zoomFallback": "Algunos mosaicos visibles están ampliados desde una capa anterior.",
-    "tileOverlayShow": "Mostrar los límites de los mosaicos del mapa",
-    "tileOverlayHide": "Ocultar los límites de los mosaicos del mapa",
-    "attribution": "© colaboradores de OpenStreetMap",
-    "loadError": "No se pudo iniciar la vista previa del mapa."
-  },
   "wifi": {
     "openPassword": "No se usa en redes abiertas",
     "password": "Contraseña"

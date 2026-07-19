@@ -1,0 +1,122 @@
+.geo-layer-reference {
+  margin-top: 1rem;
+}
+
+.geo-layer-table {
+  width: 100%;
+  border-spacing: 0 0.45rem;
+  table-layout: fixed;
+}
+
+.geo-layer-table th {
+  padding: 0.35rem 0.55rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.geo-layer-table th:first-child {
+  width: 4rem;
+}
+
+.geo-layer-table th:last-child {
+  width: 8rem;
+}
+
+.geo-layer-table td {
+  padding: 0.55rem;
+  border-block: 1px solid rgba(91, 112, 130, 0.2);
+  background: rgba(255, 255, 255, 0.72);
+  vertical-align: middle;
+}
+
+.geo-layer-table td:first-child {
+  border-inline-start: 1px solid rgba(91, 112, 130, 0.2);
+  border-radius: 0.75rem 0 0 0.75rem;
+  font:
+    800 1rem/1 'Avenir Next',
+    sans-serif;
+  text-align: center;
+}
+
+.geo-layer-table td:last-child {
+  border-inline-end: 1px solid rgba(91, 112, 130, 0.2);
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.geo-layer-table p {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.geo-layer-table small {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+}
+
+.geo-layer-sample {
+  position: relative;
+  width: 5.25rem;
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid rgba(91, 112, 130, 0.28);
+  border-radius: 0.55rem;
+  aspect-ratio: 1;
+  background: #dbeafe;
+}
+
+.geo-layer-sample img {
+  position: absolute;
+  width: calc(var(--sample-scale, 1) * 100%);
+  max-width: none;
+  height: calc(var(--sample-scale, 1) * 100%);
+  inset-block-start: calc(var(--sample-y, 0) * -100%);
+  left: calc(var(--sample-x, 0) * -100%);
+}
+
+.geo-layer-sample figcaption {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  padding: 0.2rem;
+  background: rgba(19, 34, 53, 0.82);
+  color: white;
+  font:
+    700 0.57rem/1.2 'Avenir Next',
+    sans-serif;
+  text-align: center;
+}
+
+.geo-layer-table .is-planned td {
+  background: rgba(255, 247, 237, 0.72);
+}
+
+@media (max-width: 560px) {
+  .geo-layer-table,
+  .geo-layer-table tbody {
+    display: block;
+  }
+
+  .geo-layer-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .geo-layer-table tr {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 5.25rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .geo-layer-table td {
+    display: grid;
+    padding: 0.42rem;
+    align-content: center;
+  }
+}

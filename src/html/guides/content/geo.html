@@ -17,14 +17,42 @@
     <link rel="stylesheet" href="../../dist/app.min.css" />
     <link rel="stylesheet" href="../../dist/chunks/geo-map.min.css" />
     <!-- generated-guide-alternates:start -->
-<link rel="alternate" hreflang="en-US" href="https://qr.lewismoten.com/guides/content/geo.html" />
-<link rel="alternate" hreflang="en-GB" href="https://qr.lewismoten.com/guides/content/geo.html" />
-<link rel="alternate" hreflang="es" href="https://qr.lewismoten.com/es/guias/contenido/ubicacion-geografica.html" />
-<link rel="alternate" hreflang="ar" href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/%D9%85%D9%88%D9%82%D8%B9-%D8%AC%D8%BA%D8%B1%D8%A7%D9%81%D9%8A.html" />
-<link rel="alternate" hreflang="hi-IN" href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/%E0%A4%AD%E0%A5%8C%E0%A4%97%E0%A5%8B%E0%A4%B2%E0%A4%BF%E0%A4%95-%E0%A4%B8%E0%A5%8D%E0%A4%A5%E0%A4%BE%E0%A4%A8.html" />
-<link rel="alternate" hreflang="zh-CN" href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE.html" />
-<link rel="alternate" hreflang="x-default" href="https://qr.lewismoten.com/guides/content/geo.html" />
-<!-- generated-guide-alternates:end -->
+    <link
+      rel="alternate"
+      hreflang="en-US"
+      href="https://qr.lewismoten.com/guides/content/geo.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="en-GB"
+      href="https://qr.lewismoten.com/guides/content/geo.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://qr.lewismoten.com/es/guias/contenido/ubicacion-geografica.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="ar"
+      href="https://qr.lewismoten.com/ar/%D8%A3%D8%AF%D9%84%D8%A9/%D9%85%D8%AD%D8%AA%D9%88%D9%89/%D9%85%D9%88%D9%82%D8%B9-%D8%AC%D8%BA%D8%B1%D8%A7%D9%81%D9%8A.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="hi-IN"
+      href="https://qr.lewismoten.com/hi-IN/%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A6%E0%A4%B0%E0%A5%8D%E0%A4%B6%E0%A4%BF%E0%A4%95%E0%A4%BE%E0%A4%8F%E0%A4%82/%E0%A4%B8%E0%A4%BE%E0%A4%AE%E0%A4%97%E0%A5%8D%E0%A4%B0%E0%A5%80/%E0%A4%AD%E0%A5%8C%E0%A4%97%E0%A5%8B%E0%A4%B2%E0%A4%BF%E0%A4%95-%E0%A4%B8%E0%A5%8D%E0%A4%A5%E0%A4%BE%E0%A4%A8.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="zh-CN"
+      href="https://qr.lewismoten.com/zh-CN/%E6%8C%87%E5%8D%97/%E5%86%85%E5%AE%B9/%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE.html"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://qr.lewismoten.com/guides/content/geo.html"
+    />
+    <!-- generated-guide-alternates:end -->
   </head>
   <body class="info-page-body">
     <main class="standalone-info-page">
@@ -152,10 +180,7 @@
                     <circle class="geo-world-marker-core" r="4" />
                   </g>
                 </svg>
-                <div
-                  id="geo-world-zoom-controls"
-                  class="slippy-map-controls"
-                >
+                <div id="geo-world-zoom-controls" class="slippy-map-controls">
                   <button
                     id="geo-world-zoom-in"
                     class="slippy-map-control"
@@ -168,10 +193,7 @@
                 </div>
                 <div id="geo-local-map" class="geo-local-map" hidden></div>
                 <output id="geo-world-label" class="geo-world-label"></output>
-                <div
-                  id="geo-world-attribution"
-                  class="slippy-map-attribution"
-                >
+                <div id="geo-world-attribution" class="slippy-map-attribution">
                   <span data-i18n="map.overviewSource"
                     >Simplified overview:</span
                   >
@@ -238,6 +260,425 @@
               </form>
             </dialog>
           </fieldset>
+          <section
+            class="fragment-help-copy geo-layer-reference"
+            data-fragment-help
+          >
+            <h2 data-i18n="map.guideLayers.title">Local map layers</h2>
+            <p data-i18n="map.guideLayers.intro">
+              These Front Royal samples show the detail currently generated at
+              each local layer and the intended direction for deeper layers.
+              Levels 10 through 19 are not generated yet, so the map enlarges
+              the matching level 9 tile instead.
+            </p>
+            <table class="geo-layer-table">
+              <thead>
+                <tr>
+                  <th scope="col" data-i18n="map.guideLayers.level">Layer</th>
+                  <th scope="col" data-i18n="map.guideLayers.contents">
+                    Displayed detail
+                  </th>
+                  <th scope="col" data-i18n="map.guideLayers.sample">
+                    Front Royal sample
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.overview">
+                      Countries, major lakes, and major rivers.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample">
+                      <img
+                        src="/maps/tiles/1/0/0.svg"
+                        alt=""
+                      />
+                      <figcaption>L1 · 0/0</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.overview">
+                      Countries, major lakes, and major rivers.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample">
+                      <img
+                        src="/maps/tiles/2/1/1.svg"
+                        alt=""
+                      />
+                      <figcaption>L2 · 1/1</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.overview">
+                      Countries, major lakes, and major rivers.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample">
+                      <img
+                        src="/maps/tiles/3/2/3.svg"
+                        alt=""
+                      />
+                      <figcaption>L3 · 2/3</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.regions">
+                      First-level regions and major populated places.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample">
+                      <img
+                        src="/maps/tiles/4/4/6.svg"
+                        alt=""
+                      />
+                      <figcaption>L4 · 4/6</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.regionalPlaces">
+                      More ranked cities, regions, water, and boundaries.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample">
+                      <img
+                        src="/maps/tiles/5/9/12.svg"
+                        alt=""
+                      />
+                      <figcaption>L5 · 9/12</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.roads">
+                      Detailed water and primary road networks.
+                    </p>
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-x: 2"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/6/4/6.svg"
+                        alt=""
+                      />
+                      <figcaption>L6 · 18/24</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.counties">
+                      States, counties, roads, and major settlements.
+                    </p>
+                  </td>
+                  <td>
+                    <figure class="geo-layer-sample" style="--sample-scale: 4">
+                      <img
+                        src="/maps/tiles/bundles/7/9/12.svg"
+                        alt=""
+                      />
+                      <figcaption>L7 · 36/48</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.cities">
+                      Regional cities, secondary roads, and finer rivers.
+                    </p>
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 1"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/8/18/24.svg"
+                        alt=""
+                      />
+                      <figcaption>L8 · 72/97</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.towns">
+                      Smaller cities, towns, detailed roads, and water.
+                    </p>
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L9 · 144/195</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>10</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.localRoutes">
+                      Planned: denser towns and local routes.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L10 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>11</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.townLabels">
+                      Planned: town labels and collector roads.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L11 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>12</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.localWater">
+                      Planned: local roads and smaller waterways.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L12 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>13</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.neighborhoods">
+                      Planned: neighborhoods and minor roads.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L13 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>14</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.streets">
+                      Planned: named streets and local context.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L14 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>15</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.blocks">
+                      Planned: blocks, paths, and detailed streets.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L15 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>16</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.buildings">
+                      Planned: building footprints and service roads.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L16 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>17</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.entrances">
+                      Planned: entrances, paths, and fine geometry.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L17 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>18</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.precise">
+                      Planned: precise structures and pedestrian detail.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L18 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+                <tr class="is-planned">
+                  <td>19</td>
+                  <td>
+                    <p data-i18n="map.guideLayers.maximum">
+                      Planned: maximum supported local detail.
+                    </p>
+                    <small data-i18n="map.guideLayers.fallback"
+                      >Currently displays the matching layer 9 tile.</small
+                    >
+                  </td>
+                  <td>
+                    <figure
+                      class="geo-layer-sample"
+                      style="--sample-scale: 4; --sample-y: 3"
+                    >
+                      <img
+                        src="/maps/tiles/bundles/9/36/48.svg"
+                        alt=""
+                      />
+                      <figcaption>L19 → L9</figcaption>
+                    </figure>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
           <section class="fragment-help-copy" data-fragment-help>
             <h2>Using the map</h2>
             <p>
@@ -260,7 +701,46 @@
             <a href="../about.html">About</a>
             <a href="../index.html">Guides</a>
             <a href="../privacy.html">Privacy</a>
-          </nav><!-- generated-guide-languages:start --><details class="guide-language-switcher"><summary aria-label="Languages"><span aria-hidden="true">🇺🇸</span> English (US)</summary><nav aria-label="Languages"><a href="./geo.html" hreflang="en-US" lang="en-US" aria-current="page"><span aria-hidden="true">🇺🇸</span> English (US)</a><a href="./geo.html" hreflang="en-GB" lang="en-GB"><span aria-hidden="true">🇬🇧</span> English (UK)</a><a href="../../es/guias/contenido/ubicacion-geografica.html" hreflang="es" lang="es"><span aria-hidden="true">🇪🇸</span> Español</a><a href="../../ar/أدلة/محتوى/موقع-جغرافي.html" hreflang="ar" lang="ar"><span aria-hidden="true">🇸🇦</span> العربية</a><a href="../../hi-IN/मार्गदर्शिकाएं/सामग्री/भौगोलिक-स्थान.html" hreflang="hi-IN" lang="hi-IN"><span aria-hidden="true">🇮🇳</span> हिन्दी</a><a href="../../zh-CN/指南/内容/地理位置.html" hreflang="zh-CN" lang="zh-CN"><span aria-hidden="true">🇨🇳</span> 简体中文</a></nav></details><!-- generated-guide-languages:end --></footer>
+          </nav>
+          <!-- generated-guide-languages:start -->
+          <details class="guide-language-switcher">
+            <summary aria-label="Languages">
+              <span aria-hidden="true">🇺🇸</span> English (US)
+            </summary>
+            <nav aria-label="Languages">
+              <a
+                href="./geo.html"
+                hreflang="en-US"
+                lang="en-US"
+                aria-current="page"
+                ><span aria-hidden="true">🇺🇸</span> English (US)</a
+              ><a href="./geo.html" hreflang="en-GB" lang="en-GB"
+                ><span aria-hidden="true">🇬🇧</span> English (UK)</a
+              ><a
+                href="../../es/guias/contenido/ubicacion-geografica.html"
+                hreflang="es"
+                lang="es"
+                ><span aria-hidden="true">🇪🇸</span> Español</a
+              ><a
+                href="../../ar/أدلة/محتوى/موقع-جغرافي.html"
+                hreflang="ar"
+                lang="ar"
+                ><span aria-hidden="true">🇸🇦</span> العربية</a
+              ><a
+                href="../../hi-IN/मार्गदर्शिकाएं/सामग्री/भौगोलिक-स्थान.html"
+                hreflang="hi-IN"
+                lang="hi-IN"
+                ><span aria-hidden="true">🇮🇳</span> हिन्दी</a
+              ><a
+                href="../../zh-CN/指南/内容/地理位置.html"
+                hreflang="zh-CN"
+                lang="zh-CN"
+                ><span aria-hidden="true">🇨🇳</span> 简体中文</a
+              >
+            </nav>
+          </details>
+          <!-- generated-guide-languages:end -->
+        </footer>
       </article>
     </main>
     <script type="module" src="../../dist/info.min.js"></script>

@@ -193,27 +193,6 @@
       "detail": "Uses the most correction data, so the code can often survive about 30% of its area being obscured."
     }
   },
-  "map": {
-    "viewTabs": "Map source",
-    "world": "World",
-    "worldLabel": "High-level world map. Click to choose coordinates.",
-    "overviewSource": "Simplified overview:",
-    "privacyTitle": "Load OpenStreetMap?",
-    "privacyMessage": "OpenStreetMap receives your IP address, browser request headers, this site's referrer, and the coordinates of visible map tiles.",
-    "privacyLink": "Read the OpenStreetMap privacy policy",
-    "neverAsk": "Do not ask again on this browser",
-    "cancel": "Cancel",
-    "proceed": "Load map",
-    "zoomControls": "Map zoom controls",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "zoomProgress": "Layer {layer}; zoom {zoom}; {percent}% from level {lower} to {upper}.",
-    "zoomFallback": "Some visible map tiles are enlarged from an earlier layer.",
-    "tileOverlayShow": "Show map tile boundaries",
-    "tileOverlayHide": "Hide map tile boundaries",
-    "attribution": "© OpenStreetMap contributors",
-    "loadError": "Unable to initialize the map preview."
-  },
   "wifi": {
     "openPassword": "Not used for open networks",
     "password": "Password"

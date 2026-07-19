@@ -193,27 +193,6 @@
       "detail": "أعلى تصحيح، ويمكنه غالبًا تحمل نحو 30% من الحجب."
     }
   },
-  "map": {
-    "viewTabs": "مصدر الخريطة",
-    "world": "خريطة العالم",
-    "worldLabel": "خريطة عالمية عامة. انقر لاختيار الإحداثيات.",
-    "overviewSource": "خريطة عامة مبسطة:",
-    "privacyTitle": "هل تريد تحميل OpenStreetMap؟",
-    "privacyMessage": "ستتلقى OpenStreetMap عنوان IP الخاص بك، وترويسات طلب المتصفح، ومُحيل هذا الموقع، وإحداثيات مربعات الخريطة الظاهرة.",
-    "privacyLink": "قراءة سياسة خصوصية OpenStreetMap",
-    "neverAsk": "عدم السؤال مرة أخرى في هذا المتصفح",
-    "cancel": "إلغاء",
-    "proceed": "تحميل الخريطة",
-    "zoomControls": "عناصر تكبير الخريطة",
-    "zoomIn": "تكبير",
-    "zoomOut": "تصغير",
-    "zoomProgress": "الطبقة {layer}؛ التكبير {zoom}؛ {percent}% من المستوى {lower} إلى {upper}.",
-    "zoomFallback": "بعض مربعات الخريطة الظاهرة مكبرة من طبقة سابقة.",
-    "tileOverlayShow": "إظهار حدود مربعات الخريطة",
-    "tileOverlayHide": "إخفاء حدود مربعات الخريطة",
-    "attribution": "© مساهمو OpenStreetMap",
-    "loadError": "تعذر تهيئة معاينة الخريطة."
-  },
   "wifi": {
     "openPassword": "غير مستخدمة للشبكات المفتوحة",
     "password": "كلمة المرور"

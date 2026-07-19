@@ -3,9 +3,6 @@
   "fields": {
     "organization": "organisation"
   },
-  "map": {
-    "loadError": "Unable to initialise the map preview."
-  },
   "art": {
     "colors": {
       "lightGray": "Light grey",

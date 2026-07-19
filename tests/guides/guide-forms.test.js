@@ -86,5 +86,10 @@ describe('standalone guide forms', () => {
     assert.match(geo, /id="geo-map"[\s\S]*?hidden/);
     assert.match(geo, /id="geo-map-consent"/);
     assert.match(geo, /id="geo-map-never-ask"/);
+    assert.match(geo, /class="geo-layer-table"/);
+    assert.equal(geo.match(/<td>\d{1,2}<\/td>/g)?.length, 19);
+    assert.match(geo, /maps\/tiles\/1\/0\/0\.svg/);
+    assert.match(geo, /maps\/tiles\/bundles\/9\/36\/48\.svg/);
+    assert.equal(geo.match(/<figcaption>L1\d → L9<\/figcaption>/g)?.length, 10);
   });
 });
