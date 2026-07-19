@@ -41,6 +41,7 @@ export function createSlippyMap(
     showSecondaryAttribution,
     additionalAttributions,
     onMinimumZoomOut,
+    tileFactory,
   },
 ) {
   const tiles = new Map();
@@ -119,6 +120,7 @@ export function createSlippyMap(
         origin,
         onFallbackChange: scheduleRender,
         viewportBounds: mapPitch.getViewportBounds(),
+        tileFactory,
       });
       const sourceZoom = renderingLayer.slippySourceZoom;
       zoomChrome.update(currentZoom, tileScale, sourceZoom);

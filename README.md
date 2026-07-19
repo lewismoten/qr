@@ -65,14 +65,14 @@ strings may exceed the column target without weakening the module-size limit.
 ## Local map assets
 
 The dependency-free overview map is available as the reusable public asset
-`/maps/world.svg`. Natural Earth SVG tiles can be planned or generated for
-deeper zoom levels without contacting a tile provider at runtime:
+`/maps/world.svg`. Deeper local levels are built as Mapbox Vector Tiles inside
+one range-addressable PMTiles v3 archive. This avoids millions of individual
+files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --zoom 1-9 --plan
-npm run maps:build -- --zoom 1-9 --jobs 8
-npm run maps:generate -- --jobs 8
+npm run maps:build -- --maximum-zoom 11 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 11 --max-tile-kib 16
 ```
 
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
@@ -80,35 +80,32 @@ ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads, while
 Natural Earth supplies global roads and water. `maps:download` retrieves every
-configured raw source without rendering tiles. `maps:build` also downloads any
-missing source automatically. Natural Earth also supplies U.S. National Park
-Service parks and protected lands as area, line, and point features.
+configured raw source without rendering tiles. Natural Earth also supplies
+U.S. National Park Service parks and protected lands as area, line, and point
+features.
 
-`maps:generate` performs the complete reproducible build: it downloads every
-source, rebuilds zooms 1 through 9, then extends indexed parent coverage through
-zooms 10 and 11. It forces a rebuild by default so newly configured layers are
-not omitted from old tiles. Pass `--resume` only when continuing an interrupted
-run and retaining completed output is more important than rebuilding old tiles.
+`maps:generate` performs the complete reproducible build. It downloads every
+source, removes unused source attributes, assigns feature zoom ranges, and asks
+Tippecanoe to build `build/maps/local.pmtiles`. Tippecanoe is a build-time tool;
+on macOS install it with `brew install tippecanoe`.
 
-Downloads are cached under `.cache/maps`. Generated tiles are written to
-`build/maps/tiles` and copied to `/maps/tiles` during the site build. By
-default, zooms 6 and above use 4x4 SVG bundles to reduce request overhead. Use
-`--bundle-from` and `--bundle-size` to change that threshold and grouping; add
-`--force` to replace unbundled tiles that are already present.
+Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
+is cached under `.cache/maps/vector-input`. The default 16 KiB limit applies to
+each compressed MVT tile. Dense tiles are intentionally lossy: Tippecanoe drops
+or simplifies the least-visible detail until the limit is met.
+The default `--detail 11` retains 1/8-pixel coordinate precision at the tile's
+native 256-pixel display size while using less detail at overview levels.
 
-An existing worldwide build can be extended from its indexed parent coverage:
+The former SVG pipeline remains available during migration:
 
 ```sh
-npm run maps:build -- --zoom 9 --extend
+npm run maps:build:svg -- --zoom 1-9 --jobs 8
+npm run maps:generate:svg -- --jobs 8
 ```
 
-Worldwide direct builds at zoom 10 or higher require explicit geographic
-bounds. `maps:generate` safely reaches those levels by extending only indexed
-parent coverage.
-
-Use `npm run maps:build -- --help` for all options. Natural Earth data is in
-the public domain, GeoNames is CC BY 4.0, and U.S. Census data is a U.S.
-government work. The generated manifest records source URLs and attribution.
+Use `npm run maps:build -- --help` for all PMTiles options. Natural Earth data
+is in the public domain, GeoNames is CC BY 4.0, and U.S. Census data is a U.S.
+government work. PMTiles v3 and MVT 2.1 are open specifications.
 
 ## Testing
 

@@ -1,10 +1,11 @@
 import { build, context } from 'esbuild';
-import { access, cp, mkdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
 import { loadHtmlConfig } from './guides/html-config.mjs';
 import { buildLocaleResources } from './locales/resources.mjs';
+import { publishDetailedMap } from './maps/vector/publish.mjs';
 
 const watch = process.argv.includes('--watch');
 const htmlConfig = await loadHtmlConfig();
@@ -27,15 +28,6 @@ const shared = {
   legalComments: 'none',
   logLevel: 'info',
 };
-
-async function copyIfPresent(source, destination) {
-  try {
-    await access(source);
-    await cp(source, destination, { recursive: true });
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-  }
-}
 
 const builds = [
   {
@@ -136,8 +128,5 @@ if (watch) {
   await cp('src/assets/maps', path.join(htmlConfig.outputRoot, 'maps'), {
     recursive: true,
   });
-  await copyIfPresent(
-    'build/maps/tiles',
-    path.join(htmlConfig.outputRoot, 'maps/tiles'),
-  );
+  await publishDetailedMap({ outputRoot: htmlConfig.outputRoot });
 }

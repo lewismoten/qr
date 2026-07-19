@@ -19,6 +19,7 @@ export function renderTileLayer({
   origin,
   onFallbackChange,
   viewportBounds,
+  tileFactory,
 }) {
   const range = getVisibleTileRange({
     center,
@@ -87,6 +88,7 @@ export function renderTileLayer({
         hasSourceTile,
         getTileBundle,
         origin,
+        tileFactory,
       });
     }
   }

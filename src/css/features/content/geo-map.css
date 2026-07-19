@@ -182,6 +182,10 @@
   -webkit-user-drag: none;
 }
 
+.slippy-map-vector-tile {
+  display: block;
+}
+
 .slippy-map-tile.is-missing {
   visibility: hidden;
 }

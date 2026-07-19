@@ -9,6 +9,11 @@ import {
   selectContentEncoding,
   shouldCompress,
 } from './server/compression.mjs';
+import {
+  createEntityTag,
+  matchesEntityTag,
+  parseByteRange,
+} from './server/range.mjs';
 
 const projectRoot = resolve(process.cwd());
 const htmlRoot = resolve(projectRoot, 'src/html');
@@ -41,6 +46,7 @@ const mimeTypes = {
   '.json': 'application/json; charset=utf-8',
   '.map': 'application/json; charset=utf-8',
   '.png': 'image/png',
+  '.pmtiles': 'application/vnd.pmtiles',
   '.svg': 'image/svg+xml',
   '.txt': 'text/plain; charset=utf-8',
   '.webp': 'image/webp',
@@ -98,27 +104,51 @@ const server = createServer(async (request, response) => {
     return;
   }
   const { filePath, fileStat } = match;
+  const entityTag = createEntityTag(fileStat);
+  if (!matchesEntityTag(request.headers['if-match'], entityTag)) {
+    response.writeHead(412, { ETag: entityTag }).end();
+    return;
+  }
   const contentType =
     mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream';
-  const encoding = shouldCompress(contentType, fileStat.size)
-    ? selectContentEncoding(request.headers['accept-encoding'])
-    : null;
+  const byteRange = parseByteRange(request.headers.range, fileStat.size);
+  if (byteRange?.unsatisfiable) {
+    response
+      .writeHead(416, {
+        'Content-Range': `bytes */${fileStat.size}`,
+      })
+      .end();
+    return;
+  }
+  const encoding =
+    !byteRange && shouldCompress(contentType, fileStat.size)
+      ? selectContentEncoding(request.headers['accept-encoding'])
+      : null;
   const headers = {
+    'Accept-Ranges': 'bytes',
     'Cache-Control': 'no-cache',
     'Content-Type': contentType,
+    ETag: entityTag,
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     Vary: 'Accept-Encoding',
     'X-Content-Type-Options': 'nosniff',
   };
+  if (byteRange) {
+    headers['Content-Length'] = byteRange.length;
+    headers['Content-Range'] =
+      `bytes ${byteRange.start}-${byteRange.end}/${fileStat.size}`;
+  }
   if (encoding) headers['Content-Encoding'] = encoding;
-  else headers['Content-Length'] = fileStat.size;
-  response.writeHead(200, headers);
+  else if (!byteRange) headers['Content-Length'] = fileStat.size;
+  response.writeHead(byteRange ? 206 : 200, headers);
   if (request.method === 'HEAD') response.end();
   else {
     const encoder = createContentEncoder(encoding);
-    const streams = encoder
-      ? [createReadStream(filePath), encoder, response]
-      : [createReadStream(filePath), response];
+    const source = createReadStream(
+      filePath,
+      byteRange ? { start: byteRange.start, end: byteRange.end } : {},
+    );
+    const streams = encoder ? [source, encoder, response] : [source, response];
     pipeline(...streams).catch((error) => response.destroy(error));
   }
 });

@@ -45,6 +45,13 @@ export function createGeoSection({
     onSelect: selectCoordinates,
     loadSlippyMap: () => loading.track(import('./slippy-map.js')),
     loadTileRange: loadLocalTileRange,
+    loadPmtiles: () =>
+      loading.track(
+        Promise.all([
+          import('./pmtiles/source.js'),
+          import('./pmtiles/tile.js'),
+        ]).then(([source, tile]) => ({ ...source, ...tile })),
+      ),
     onLoadError: (error) => {
       console.error(error);
     },

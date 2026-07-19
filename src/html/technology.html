@@ -547,14 +547,24 @@
                   visible-tile selection, fallback scaling, longitude wrapping,
                   panning, zooming, click-to-coordinate conversion, and marker
                   placement. It starts with a reusable SVG world overview and
-                  locally generated SVG tiles. OpenStreetMap raster tiles are
-                  requested only after the user selects that view and grants
-                  consent. No third-party mapping library is bundled.
+                  reads locally generated MVT 2.1 vector tiles from a
+                  range-addressable PMTiles v3 archive. The browser uses a
+                  first-party PMTiles reader, MVT decoder, and Canvas renderer;
+                  no third-party mapping library is bundled. Tippecanoe is a
+                  build-time tool only. OpenStreetMap raster tiles are requested
+                  only after the user selects that view and grants consent.
                 </p>
                 <nav aria-label="Map implementation references">
                   <a
                     href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames"
                     >Slippy map tile coordinates</a
+                  ><a
+                    href="https://github.com/protomaps/PMTiles/blob/master/spec/v3/spec.md"
+                    ><code>PMTiles v3</code></a
+                  ><a href="https://github.com/mapbox/vector-tile-spec"
+                    ><code>MVT 2.1</code></a
+                  ><a href="https://github.com/felt/tippecanoe"
+                    ><code>Tippecanoe</code></a
                   ><a
                     href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/scripts/maps"
                     >Local tile builder source</a
@@ -651,7 +661,7 @@
                   Supplies the simplified world overview; global country,
                   first-level administrative boundary, populated-place, lake,
                   and river-centerline data; and North American roads outside
-                  the United States used to generate local SVG tiles. The water
+                  the United States used to generate local MVT tiles. The water
                   layers switch from 1:50m overview data to ranked 1:10m detail
                   at zoom 6. At zoom 8, regional supplements add finer drainage
                   detail across North America, Europe, and Australia. The road
@@ -714,10 +724,10 @@
                   When a user needs more precise visual context, the
                   OpenStreetMap tab loads standard raster tiles for the visible
                   area after explicit consent. This view normally shows much
-                  more local detail than the bundled SVG tiles, but it sends the
-                  user's IP address, request headers, referrer, and requested
-                  tile coordinates to OpenStreetMap. Its database is licensed
-                  under ODbL, and hosted tiles follow separate usage
+                  more local detail than the bundled vector tiles, but it sends
+                  the user's IP address, request headers, referrer, and
+                  requested tile coordinates to OpenStreetMap. Its database is
+                  licensed under ODbL, and hosted tiles follow separate usage
                   requirements.
                 </p>
                 <nav aria-label="OpenStreetMap links">

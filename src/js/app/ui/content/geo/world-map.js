@@ -26,7 +26,13 @@ export function worldPointToCoordinates({ x, y }) {
 
 export function createWorldMap(
   container,
-  { onSelect, onLoadError, loadSlippyMap, loadTileRange },
+  {
+    onSelect,
+    onLoadError,
+    loadPmtiles = () => Promise.resolve(null),
+    loadSlippyMap,
+    loadTileRange,
+  },
 ) {
   const surface = container.querySelector('.geo-world-surface');
   const overlay = container.querySelector('.geo-world-overlay');
@@ -64,37 +70,56 @@ export function createWorldMap(
   const ensureDetailMap = () => {
     if (detailMap) return Promise.resolve(detailMap);
     if (!detailRequest) {
-      detailRequest = Promise.all([loadSlippyMap(), loadTileRange()]).then(
-        ([{ createSlippyMap }, tileRange]) => {
-          detailMap = createSlippyMap(detail, {
-            center: markerCoordinates || { latitude: 0, longitude: 0 },
-            zoom: 1,
-            minimumZoom: 1,
-            maximumZoom: 19,
-            minimumSourceZoom: tileRange.minimum,
-            maximumSourceZoom: tileRange.maximum,
-            hasSourceTile: tileRange.hasTile,
-            getTileBundle: tileRange.getTileBundle,
-            tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
-            attributionText: 'Natural Earth',
-            attributionUrl: 'https://www.naturalearthdata.com/',
-            additionalAttributions: [
-              {
-                text: 'GeoNames',
-                url: 'https://www.geonames.org/',
-              },
-            ],
-            secondaryAttribution: {
-              text: 'U.S. Census Bureau',
-              url: 'https://www.census.gov/geographies/mapping-files.html',
+      detailRequest = Promise.all([
+        loadSlippyMap(),
+        loadTileRange(),
+        loadPmtiles(),
+      ]).then(async ([{ createSlippyMap }, tileRange, pmtiles]) => {
+        let vector = null;
+        if (pmtiles) {
+          try {
+            const source = pmtiles.createPmtilesSource('/maps/local.pmtiles');
+            const header = await source.getHeader();
+            vector = { source, header };
+          } catch {
+            // Deployments can retain the SVG tiles during the transition.
+          }
+        }
+        detailMap = createSlippyMap(detail, {
+          center: markerCoordinates || { latitude: 0, longitude: 0 },
+          zoom: 1,
+          minimumZoom: 1,
+          maximumZoom: 19,
+          minimumSourceZoom: vector?.header.minimumZoom ?? tileRange.minimum,
+          maximumSourceZoom: vector?.header.maximumZoom ?? tileRange.maximum,
+          hasSourceTile: vector ? undefined : tileRange.hasTile,
+          getTileBundle: vector ? undefined : tileRange.getTileBundle,
+          tileFactory: vector
+            ? (options) =>
+                pmtiles.createPmtilesTile({
+                  ...options,
+                  source: vector.source,
+                })
+            : undefined,
+          tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
+          attributionText: 'Natural Earth',
+          attributionUrl: 'https://www.naturalearthdata.com/',
+          additionalAttributions: [
+            {
+              text: 'GeoNames',
+              url: 'https://www.geonames.org/',
             },
-            showSecondaryAttribution: hasVisibleCensusData,
-            onMinimumZoomOut: showOverview,
-            onSelect,
-          });
-          return detailMap;
-        },
-      );
+          ],
+          secondaryAttribution: {
+            text: 'U.S. Census Bureau',
+            url: 'https://www.census.gov/geographies/mapping-files.html',
+          },
+          showSecondaryAttribution: hasVisibleCensusData,
+          onMinimumZoomOut: showOverview,
+          onSelect,
+        });
+        return detailMap;
+      });
     }
     return detailRequest;
   };

@@ -13,6 +13,7 @@ export function renderTile({
   hasSourceTile,
   getTileBundle,
   origin,
+  tileFactory = createFallbackTile,
 }) {
   let element = tiles.get(key);
   if (!element) {
@@ -21,7 +22,7 @@ export function renderTile({
       layer.slippyPendingTiles?.delete(key);
       revealTileLayer(layer);
     };
-    element = createFallbackTile({
+    element = tileFactory({
       template,
       tile,
       minimumSourceZoom,
