@@ -108,7 +108,7 @@ describe('SVG map tile rendering', () => {
 
     assert.equal(unchanged.tolerance, 0.45);
     assert.equal(unchanged.svg, original);
-    assert.equal(simplified.tolerance, 16);
+    assert.equal(simplified.tolerance, 48);
     assert.ok(simplified.svg.length <= original.length);
     assert.equal(simplified.originalBytes, original.length);
   });

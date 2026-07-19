@@ -32,7 +32,7 @@ Options:
   --layers a,b          countries, regions, and/or cities
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
-  --max-tile-kib 48     Simplify tiles larger than this target
+  --max-tile-kib 24     Simplify tiles larger than this target
   --output path         Tile output directory
   --cache path          Download cache directory
   --plan                Show counts and estimates without downloading
@@ -50,7 +50,7 @@ const jobs = Math.max(
   1,
   Number(option('jobs', Math.min(8, availableParallelism() - 1))),
 );
-const maximumTileKiB = Number(option('max-tile-kib', '48'));
+const maximumTileKiB = Number(option('max-tile-kib', '24'));
 const maximumTileBytes = maximumTileKiB * 1024;
 const force = has('force');
 const planOnly = has('plan');

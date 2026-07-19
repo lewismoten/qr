@@ -1,6 +1,8 @@
 const TILE_SIZE = 256;
 const MAX_LATITUDE = 85.05112878;
-const SIMPLIFICATION_STEPS = [0.45, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16];
+const SIMPLIFICATION_STEPS = [
+  0.45, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48,
+];
 
 const clamp = (value, minimum, maximum) =>
   Math.min(maximum, Math.max(minimum, value));
@@ -35,7 +37,7 @@ function projectedPath(coordinates, tile, close, tolerance) {
     previous = point;
   }
   if (values.length < 2) return '';
-  return `M${values.join('L')}${close ? 'Z' : ''}`;
+  return `M${values.join(' ')}${close ? 'Z' : ''}`;
 }
 
 function coordinateBounds(coordinates) {
