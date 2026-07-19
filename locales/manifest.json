@@ -1,12 +1,42 @@
 {
   "defaultLocale": "en-US",
   "locales": [
-    { "code": "en-US", "flag": "🇺🇸" },
-    { "code": "en-GB", "flag": "🇬🇧" },
-    { "code": "zh-CN", "flag": "🇨🇳" },
-    { "code": "hi-IN", "flag": "🇮🇳" },
-    { "code": "es", "flag": "🇪🇸" },
-    { "code": "ar", "flag": "🇸🇦" },
-    { "code": "en-XA", "flag": "🐞", "name": "Debug", "nativeName": "Translation keys", "debug": true }
-  ]
+    {
+      "code": "en-US",
+      "flag": "🇺🇸"
+    },
+    {
+      "code": "en-GB",
+      "flag": "🇬🇧"
+    },
+    {
+      "code": "zh-CN",
+      "flag": "🇨🇳"
+    },
+    {
+      "code": "hi-IN",
+      "flag": "🇮🇳"
+    },
+    {
+      "code": "es",
+      "flag": "🇪🇸"
+    },
+    {
+      "code": "ar",
+      "flag": "🇸🇦"
+    },
+    {
+      "code": "en-XA",
+      "flag": "🐞",
+      "name": "Debug",
+      "nativeName": "Translation keys",
+      "debug": true
+    }
+  ],
+  "documents": {
+    "privacy": {
+      "contentHash": "17ffee610fb2659ce680badf897ab49dafdd0f54aa6e7b3841f4038da33a88b0",
+      "lastUpdated": "2026-07-19T00:01:45.833Z"
+    }
+  }
 }

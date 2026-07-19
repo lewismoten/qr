@@ -1,4 +1,5 @@
 import { setupExternalLinks } from '../external-links.js';
+import { localizeDates } from '../i18n/date.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
 
 function syncLanguageSwitcher(locale) {
@@ -25,6 +26,7 @@ if (guideLocale) {
     baseUrl: new URL(localeBase, document.baseURI),
   });
   translateDocument(document);
+  localizeDates(document, result.locale);
   syncLanguageSwitcher(result.locale);
 }
 

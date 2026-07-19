@@ -7,6 +7,7 @@ import {
   GUIDE_LANGUAGE_LABELS,
   GUIDE_LOCALES,
 } from '../src/js/i18n/guide-routes.js';
+import { formatLocalizedDate } from '../src/js/i18n/date.js';
 import { localizeNavigationHash } from '../src/js/i18n/guide-path.js';
 import {
   configuredGuidePath,
@@ -18,6 +19,7 @@ import {
   translateGuideHtml,
 } from './guide-translations.mjs';
 import { writeGuideSitemap } from './guide-sitemap.mjs';
+import { updatePrivacyRevision } from './privacy-revision.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
 const GENERATED_LOCALES = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
@@ -147,6 +149,25 @@ function localizeMetadata(source, context) {
     );
 }
 
+function localizeDocumentDates(source, context) {
+  return source.replace(
+    /<time\b([^>]*)>([\s\S]*?)<\/time>/g,
+    (element, attributes) => {
+      const key = attributes.match(
+        /\bdata-document-date=(['"])([^'"]+)\1/,
+      )?.[2];
+      const value = context.documentDates?.[key];
+      if (!value) return element;
+      const nextAttributes = attributes.replace(
+        /\s+datetime=(['"])[^'"]*\1/,
+        '',
+      );
+      const date = formatLocalizedDate(value, context.locale);
+      return `<time${nextAttributes} datetime="${value}">${date}</time>`;
+    },
+  );
+}
+
 function languageSwitcher(context) {
   const links = GUIDE_LOCALES.map((targetLocale) => {
     const [flag, name] = GUIDE_LANGUAGE_LABELS[targetLocale];
@@ -192,6 +213,7 @@ async function translate(source, context) {
 
 async function writeGuide(source, context) {
   let result = await translate(stripGeneratedMarkup(source), context);
+  result = localizeDocumentDates(result, context);
   result = localizeMetadata(result, context);
   result = rewriteLocalUrls(result, context);
   result = result.replace('</footer>', `${languageSwitcher(context)}</footer>`);
@@ -218,6 +240,7 @@ async function copyPages(config) {
 
 export async function generateLocalizedGuides(options = {}) {
   const config = await loadHtmlConfig();
+  const privacyRevision = await updatePrivacyRevision();
   if (options.clean) {
     await rm(config.outputRoot, { force: true, recursive: true });
   }
@@ -238,6 +261,7 @@ export async function generateLocalizedGuides(options = {}) {
       locales.map((locale) =>
         writeGuide(sources.get(route), {
           config,
+          documentDates: { privacy: privacyRevision.lastUpdated },
           file: config.guides[route],
           locale,
           output: configuredGuidePath(config, route, locale),
