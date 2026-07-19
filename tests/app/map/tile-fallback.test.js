@@ -35,6 +35,33 @@ assert.deepEqual(
   })),
   { minimum: 2, maximum: 8 },
 );
+const indexedRange = await loadLocalTileRange(async () => ({
+  ok: true,
+  json: async () => ({
+    zoom: { minimum: 1, maximum: 7 },
+    tileAvailability: { 5: { 9: [12, 13] } },
+  }),
+}));
+assert.equal(indexedRange.minimum, 1);
+assert.equal(indexedRange.maximum, 7);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 9, y: 12 }), true);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 41, y: 13 }), true);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 9, y: 14 }), false);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 9, y: -1 }), false);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 9, y: 32 }), false);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 10, y: 12 }), false);
+assert.equal(indexedRange.hasTile({ zoom: 5, x: 9.5, y: 12 }), false);
+assert.equal(indexedRange.hasTile({ zoom: 5.5, x: 9, y: 12 }), false);
+assert.deepEqual(
+  await loadLocalTileRange(async () => ({
+    ok: true,
+    json: async () => ({
+      zoom: { minimum: 1, maximum: 7 },
+      tileAvailability: 'invalid',
+    }),
+  })),
+  { minimum: 1, maximum: 7 },
+);
 
 const documentDescriptor = Object.getOwnPropertyDescriptor(
   globalThis,
@@ -90,6 +117,28 @@ assert.equal(fallbackImage.src, '/maps/tiles/5/9/12.svg');
 fallbackImage.dispatch('error');
 assert.equal(fallbackElement.classList.values.has('is-missing'), true);
 assert.equal(unavailable, 1);
+
+const indexedElement = createFallbackTile({
+  template: '/maps/tiles/{z}/{x}/{y}.svg',
+  tile: { zoom: 8, x: 73, y: 99 },
+  minimumSourceZoom: 5,
+  maximumSourceZoom: 6,
+  hasSourceTile: ({ zoom }) => zoom === 5,
+});
+assert.equal(indexedElement.children[0].src, '/maps/tiles/5/9/12.svg');
+
+let indexedUnavailable = 0;
+const absentElement = createFallbackTile({
+  template: '/maps/tiles/{z}/{x}/{y}.svg',
+  tile: { zoom: 8, x: 73, y: 99 },
+  minimumSourceZoom: 5,
+  maximumSourceZoom: 6,
+  hasSourceTile: () => false,
+  onUnavailable: () => (indexedUnavailable += 1),
+});
+assert.equal(absentElement.children[0].src, undefined);
+assert.equal(absentElement.classList.values.has('is-missing'), true);
+assert.equal(indexedUnavailable, 1);
 
 const renderedTiles = new Map();
 const renderedChildren = [];

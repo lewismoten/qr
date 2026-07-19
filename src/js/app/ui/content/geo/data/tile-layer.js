@@ -13,6 +13,7 @@ export function renderTileLayer({
   scale,
   minimumSourceZoom,
   maximumSourceZoom,
+  hasSourceTile,
   origin,
 }) {
   const range = getVisibleTileRange({
@@ -40,6 +41,7 @@ export function renderTileLayer({
         tile: { zoom, x, y },
         minimumSourceZoom,
         maximumSourceZoom,
+        hasSourceTile,
         origin,
       });
     }

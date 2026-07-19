@@ -27,6 +27,7 @@ export function createSlippyMap(
     maximumZoom = 19,
     minimumSourceZoom = minimumZoom,
     maximumSourceZoom = maximumZoom,
+    hasSourceTile,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
     secondaryAttribution,
@@ -107,9 +108,9 @@ export function createSlippyMap(
         scale: tileScale,
         minimumSourceZoom,
         maximumSourceZoom,
+        hasSourceTile,
         origin,
       });
-
       positionMarker({
         marker,
         label,

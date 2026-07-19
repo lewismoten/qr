@@ -1,4 +1,5 @@
 import { TILE_SIZE } from './projection.js';
+import { createTileAvailability } from './data/tile-availability.js';
 
 const DEFAULT_RANGE = { minimum: 1, maximum: 6 };
 
@@ -28,6 +29,7 @@ export function createFallbackTile({
   tile,
   minimumSourceZoom,
   maximumSourceZoom,
+  hasSourceTile,
   onLoad = () => {},
   onUnavailable,
 }) {
@@ -43,7 +45,16 @@ export function createFallbackTile({
   element.appendChild(image);
 
   const load = () => {
-    const source = getFallbackTile(tile, sourceZoom);
+    let source = getFallbackTile(tile, sourceZoom);
+    while (hasSourceTile && !hasSourceTile(source)) {
+      if (sourceZoom <= minimumSourceZoom) {
+        element.classList.add('is-missing');
+        onUnavailable?.();
+        return;
+      }
+      sourceZoom -= 1;
+      source = getFallbackTile(tile, sourceZoom);
+    }
     const size = TILE_SIZE * source.scale;
     image.style.width = `${size}px`;
     image.style.height = `${size}px`;
@@ -79,7 +90,8 @@ export async function loadLocalTileRange(fetcher = globalThis.fetch) {
     if (!Number.isInteger(minimum) || !Number.isInteger(maximum)) {
       return DEFAULT_RANGE;
     }
-    return { minimum, maximum };
+    const hasTile = createTileAvailability(manifest);
+    return hasTile ? { minimum, maximum, hasTile } : { minimum, maximum };
   } catch {
     return DEFAULT_RANGE;
   }

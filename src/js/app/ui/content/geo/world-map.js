@@ -73,6 +73,7 @@ export function createWorldMap(
             maximumZoom: 19,
             minimumSourceZoom: tileRange.minimum,
             maximumSourceZoom: tileRange.maximum,
+            hasSourceTile: tileRange.hasTile,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
             attributionText: 'Natural Earth',
             attributionUrl: 'https://www.naturalearthdata.com/',

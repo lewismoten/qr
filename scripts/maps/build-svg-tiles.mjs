@@ -14,6 +14,10 @@ import {
   parseBounds,
   parseZoomRange,
 } from './tile-plan.mjs';
+import {
+  addAvailableTile,
+  serializeTileAvailability,
+} from './tile-availability.mjs';
 
 function option(name, fallback) {
   const exact = process.argv.find((value) => value.startsWith(`--${name}=`));
@@ -140,12 +144,14 @@ let nextTile = 0;
 let simplified = 0;
 let bytesBeforeSimplification = 0;
 const levels = new Map();
+const tileAvailability = new Map();
 
 async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const current = ++completed;
   const directory = path.join(output, String(tile.zoom), String(tile.x));
   const destination = path.join(directory, `${tile.y}.svg`);
   if (svg) {
+    addAvailableTile(tileAvailability, tile);
     let existing = null;
     try {
       existing = await stat(destination);
@@ -237,6 +243,7 @@ const manifest = {
   levels: Object.fromEntries(
     [...levels].sort(([left], [right]) => left - right),
   ),
+  tileAvailability: serializeTileAvailability(tileAvailability),
   attribution: SOURCE_ATTRIBUTION,
   sources: sources.map(({ name, source }) => ({
     name,

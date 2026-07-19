@@ -16,6 +16,29 @@ import {
   renderTile,
   renderTileWithinSize,
 } from '../../scripts/maps/tile-renderer.mjs';
+import {
+  addAvailableTile,
+  serializeTileAvailability,
+} from '../../scripts/maps/tile-availability.mjs';
+
+describe('SVG map tile availability', () => {
+  test('compresses available rows into sorted inclusive ranges', () => {
+    const index = new Map();
+    for (const tile of [
+      { zoom: 4, x: 3, y: 7 },
+      { zoom: 4, x: 3, y: 5 },
+      { zoom: 4, x: 3, y: 6 },
+      { zoom: 4, x: 3, y: 10 },
+      { zoom: 2, x: 1, y: 1 },
+    ]) {
+      addAvailableTile(index, tile);
+    }
+    assert.deepEqual(serializeTileAvailability(index), {
+      2: { 1: [1, 1] },
+      4: { 3: [5, 7, 10, 10] },
+    });
+  });
+});
 
 describe('SVG map tile planning', () => {
   test('plans complete world zoom ranges', () => {
