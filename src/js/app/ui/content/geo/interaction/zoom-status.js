@@ -36,11 +36,13 @@ export function createZoomChrome() {
   status.append(layer);
   controls.append(zoomIn, status, zoomOut);
 
-  const update = (viewLayer, scale) => {
+  const update = (viewLayer, scale, fallback = false) => {
     const value = getZoomStatus(viewLayer, scale);
     layer.textContent = value.lower;
     status.className =
-      'slippy-map-zoom-status' + (value.emptying ? ' is-emptying' : '');
+      'slippy-map-zoom-status' +
+      (value.emptying ? ' is-emptying' : '') +
+      (fallback ? ' is-fallback' : '');
     status.style.setProperty('--slippy-zoom-progress', `${value.percent}%`);
     status.setAttribute(
       'aria-label',
@@ -54,7 +56,13 @@ export function createZoomChrome() {
           upper: value.upper,
           zoom: value.zoom,
         },
-      ),
+      ) +
+        (fallback
+          ? ` ${lookup(
+              'map.zoomFallback',
+              'Some visible map tiles are enlarged from an earlier layer.',
+            )}`
+          : ''),
     );
   };
 

@@ -208,6 +208,7 @@
     "zoomIn": "تكبير",
     "zoomOut": "تصغير",
     "zoomProgress": "الطبقة {layer}؛ التكبير {zoom}؛ {percent}% من المستوى {lower} إلى {upper}.",
+    "zoomFallback": "بعض مربعات الخريطة الظاهرة مكبرة من طبقة سابقة.",
     "attribution": "© مساهمو OpenStreetMap",
     "loadError": "تعذر تهيئة معاينة الخريطة."
   },

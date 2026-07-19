@@ -16,6 +16,7 @@ export function renderTileLayer({
   hasSourceTile,
   getTileBundle,
   origin,
+  onFallbackChange,
 }) {
   const range = getVisibleTileRange({
     center,
@@ -25,6 +26,17 @@ export function renderTileLayer({
     scale,
   });
   const visible = new Set();
+  const syncFallback = () => {
+    const fallback = [...visible].some((key) => {
+      const sourceZoom = tiles.get(key)?.slippySourceZoom;
+      return Number.isInteger(sourceZoom) && sourceZoom < zoom;
+    });
+    if (layer.slippyUsesFallback !== fallback) {
+      layer.slippyUsesFallback = fallback;
+      onFallbackChange?.(fallback);
+    }
+  };
+  layer.slippySourceChange = syncFallback;
   for (let y = range.firstY; y <= range.lastY; y += 1) {
     for (let x = range.firstX; x <= range.lastX; x += 1) {
       visible.add(`${zoom}:${x}:${y}`);
@@ -53,4 +65,5 @@ export function renderTileLayer({
     element.remove();
     tiles.delete(key);
   });
+  syncFallback();
 }

@@ -208,6 +208,7 @@
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "zoomProgress": "Capa {layer}; zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
+    "zoomFallback": "Algunos mosaicos visibles están ampliados desde una capa anterior.",
     "attribution": "© colaboradores de OpenStreetMap",
     "loadError": "No se pudo iniciar la vista previa del mapa."
   },

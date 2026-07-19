@@ -208,6 +208,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "zoomProgress": "Layer {layer}; zoom {zoom}; {percent}% from level {lower} to {upper}.",
+    "zoomFallback": "Some visible map tiles are enlarged from an earlier layer.",
     "attribution": "© OpenStreetMap contributors",
     "loadError": "Unable to initialize the map preview."
   },

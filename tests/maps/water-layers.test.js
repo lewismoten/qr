@@ -7,11 +7,11 @@ import {
   renderTile,
 } from '../../scripts/maps/rendering/tile-renderer.mjs';
 
-test('limits regional river supplements to zoom level eight', () => {
+test('keeps regional river supplements through zoom level nine', () => {
   const names = ['riversNorthAmerica', 'riversEurope', 'riversAustralia'];
   for (const name of names) {
     assert.equal(MAP_SOURCES[name].minimumZoom, 8);
-    assert.equal(MAP_SOURCES[name].maximumZoom, 8);
+    assert.equal(MAP_SOURCES[name].maximumZoom, 9);
   }
 });
 

@@ -7,9 +7,9 @@ import {
   renderTile,
 } from '../../scripts/maps/rendering/tile-renderer.mjs';
 
-test('limits secondary roads to the most detailed local zoom', () => {
+test('keeps secondary roads through the most detailed local zoom', () => {
   assert.equal(MAP_SOURCES.secondaryRoads.minimumZoom, 8);
-  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 8);
+  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 9);
   assert.match(MAP_SOURCES.secondaryRoads.url, /MapServer\/3\/query/);
 });
 
@@ -27,7 +27,7 @@ test('excludes configured countries and honors road zoom rankings', () => {
   const roads = prepareCollections({
     naturalEarthRoads: {
       minimumZoom: 6,
-      maximumZoom: 8,
+      maximumZoom: 9,
       featureFilter: { property: 'sov_a3', exclude: ['USA'] },
       collection: {
         features: [
@@ -39,7 +39,7 @@ test('excludes configured countries and honors road zoom rankings', () => {
     },
     secondaryRoads: {
       minimumZoom: 8,
-      maximumZoom: 8,
+      maximumZoom: 9,
       collection: { features: [road('USA', 8)] },
     },
   });
@@ -53,4 +53,7 @@ test('excludes configured countries and honors road zoom rankings', () => {
   const zoomEight = renderTile({ zoom: 8, x: 128, y: 128 }, roads);
   assert.match(zoomEight, /class="primary-road"/);
   assert.match(zoomEight, /class="secondary-road"/);
+  const zoomNine = renderTile({ zoom: 9, x: 256, y: 256 }, roads);
+  assert.match(zoomNine, /class="primary-road"/);
+  assert.match(zoomNine, /class="secondary-road"/);
 });

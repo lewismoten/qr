@@ -208,6 +208,7 @@
     "zoomIn": "ज़ूम इन",
     "zoomOut": "ज़ूम आउट",
     "zoomProgress": "परत {layer}; ज़ूम {zoom}; स्तर {lower} से {upper} तक {percent}%।",
+    "zoomFallback": "कुछ दिखाई देने वाली मानचित्र टाइलें पिछली परत से बड़ी की गई हैं।",
     "attribution": "© OpenStreetMap योगदानकर्ता",
     "loadError": "मानचित्र पूर्वावलोकन आरंभ नहीं हो सका।"
   },

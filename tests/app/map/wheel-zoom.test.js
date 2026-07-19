@@ -83,6 +83,12 @@ chrome.update(3, Math.SQRT2);
 assert.equal(chrome.status.children[0].textContent, 3);
 assert.equal(chrome.status.className, 'slippy-map-zoom-status');
 assert.equal(chrome.status.style['--slippy-zoom-progress'], '50%');
+chrome.update(4, Math.SQRT2, true);
+assert.equal(
+  chrome.status.className,
+  'slippy-map-zoom-status is-emptying is-fallback',
+);
+assert.match(chrome.status.attributes['aria-label'], /enlarged from/);
 Object.defineProperty(
   globalThis,
   'document',

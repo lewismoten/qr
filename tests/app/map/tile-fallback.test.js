@@ -113,6 +113,7 @@ Object.defineProperty(globalThis, 'document', {
 });
 let loaded = 0;
 let unavailable = 0;
+const sourceChanges = [];
 const fallbackElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
@@ -120,16 +121,20 @@ const fallbackElement = createFallbackTile({
   maximumSourceZoom: 6,
   onLoad: () => (loaded += 1),
   onUnavailable: () => (unavailable += 1),
+  onSourceChange: (sourceZoom) => sourceChanges.push(sourceZoom),
 });
 const fallbackImage = fallbackElement.children[0];
 assert.equal(fallbackImage.src, '/maps/tiles/6/18/24.svg');
 assert.equal(fallbackImage.style.width, '1024px');
 assert.equal(fallbackImage.style.left, '-256px');
+assert.equal(fallbackElement.slippySourceZoom, 6);
+assert.equal(fallbackElement.classList.values.has('is-fallback'), true);
 fallbackImage.dispatch('load');
 assert.equal(fallbackElement.classList.values.has('is-loaded'), true);
 assert.equal(loaded, 1);
 fallbackImage.dispatch('error');
 assert.equal(fallbackImage.src, '/maps/tiles/5/9/12.svg');
+assert.deepEqual(sourceChanges, [6, 5]);
 fallbackImage.dispatch('error');
 assert.equal(fallbackElement.classList.values.has('is-missing'), true);
 assert.equal(unavailable, 1);
@@ -191,6 +196,10 @@ const renderedTile = renderTile(renderOptions);
 assert.equal(renderedChildren.length, 1);
 assert.equal(renderedTile.style.left, '108px');
 assert.equal(renderedTile.style.top, '44px');
+let renderedSourceChanges = 0;
+renderedLayer.slippySourceChange = () => (renderedSourceChanges += 1);
+renderedTile.children[0].dispatch('error');
+assert.equal(renderedSourceChanges, 1);
 renderedTile.children[0].dispatch('load');
 assert.equal(renderedLayer.slippyPendingTiles.size, 0);
 assert.equal(renderTile(renderOptions), renderedTile);
@@ -205,6 +214,8 @@ const defaultLoadTile = createFallbackTile({
   minimumSourceZoom: 1,
   maximumSourceZoom: 1,
 });
+assert.equal(defaultLoadTile.slippySourceZoom, 1);
+assert.equal(defaultLoadTile.classList.values.has('is-fallback'), false);
 defaultLoadTile.children[0].dispatch('load');
 defaultLoadTile.children[0].dispatch('error');
 Object.defineProperty(

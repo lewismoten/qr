@@ -80,7 +80,6 @@ export function createSlippyMap(
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
-      zoomChrome.update(currentZoom, tileScale);
       syncTileLayerView(tileLayer, currentCenter, currentZoom, centerPoint);
       dynamicAttribution.update({
         center: currentCenter,
@@ -92,6 +91,7 @@ export function createSlippyMap(
         x: centerPoint.x - width / 2,
         y: centerPoint.y - height / 2,
       };
+      const renderingLayer = tileLayer;
       renderTileLayer({
         tiles,
         layer: tileLayer,
@@ -106,7 +106,13 @@ export function createSlippyMap(
         hasSourceTile,
         getTileBundle,
         origin,
+        onFallbackChange: scheduleRender,
       });
+      zoomChrome.update(
+        currentZoom,
+        tileScale,
+        renderingLayer.slippyUsesFallback,
+      );
       positionMarker({
         marker,
         label,

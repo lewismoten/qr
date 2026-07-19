@@ -1,5 +1,5 @@
 import { availableParallelism } from 'node:os';
-import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
 
@@ -9,6 +9,7 @@ import {
   SOURCE_ATTRIBUTION,
 } from './source-config.mjs';
 import {
+  createChildTilePlan,
   createTilePlan,
   formatBytes,
   parseBounds,
@@ -19,6 +20,7 @@ import {
   serializeTileAvailability,
 } from './tile-availability.mjs';
 import { writeTileBundles } from './tile-bundles.mjs';
+import { createTileManifest } from './tile-manifest.mjs';
 import { obtainMapSource } from './source-loader.mjs';
 
 function option(name, fallback) {
@@ -34,7 +36,7 @@ if (has('help')) {
   console.log(`Usage: npm run maps:build -- [options]
 
 Options:
-  --zoom 1-8            Generate one zoom or an inclusive range
+  --zoom 1-9            Generate one zoom or an inclusive range
   --layers a,b          Named layers from source-config.mjs
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
@@ -44,10 +46,11 @@ Options:
   --output path         Tile output directory
   --cache path          Download cache directory
   --plan                Show counts and estimates without downloading
+  --extend              Build one level from existing parent coverage
   --force               Replace tiles that already exist`);
   process.exit(0);
 }
-const zoom = parseZoomRange(option('zoom', '1-8'));
+const zoom = parseZoomRange(option('zoom', '1-9'));
 const boundsValue = option('bounds', 'world');
 const bounds = parseBounds(boundsValue);
 const layers = option('layers', DEFAULT_LAYERS.join(',')).split(',');
@@ -63,6 +66,24 @@ const bundleFrom = Number(option('bundle-from', '6'));
 const bundleSize = Number(option('bundle-size', '4'));
 const force = has('force');
 const planOnly = has('plan');
+const extend = has('extend');
+
+let previousManifest = null;
+if (extend) {
+  if (zoom.minimum !== zoom.maximum) {
+    throw new Error('An extended build must target exactly one zoom level.');
+  }
+  try {
+    previousManifest = JSON.parse(
+      await readFile(path.join(output, 'manifest.json'), 'utf8'),
+    );
+  } catch {
+    throw new Error('An extended build requires an existing tile manifest.');
+  }
+  if (previousManifest.zoom?.maximum !== zoom.minimum - 1) {
+    throw new Error('The existing manifest must end at the parent zoom level.');
+  }
+}
 
 if (!Number.isInteger(jobs)) throw new Error('Jobs must be an integer.');
 if (!Number.isFinite(maximumTileKiB) || maximumTileKiB <= 0) {
@@ -74,16 +95,18 @@ if (!Number.isInteger(bundleFrom) || bundleFrom < 0) {
 if (!Number.isInteger(bundleSize) || bundleSize < 1) {
   throw new Error('Bundle size must be a positive integer.');
 }
-if (zoom.maximum >= 9 && boundsValue === 'world') {
+if (zoom.maximum >= 10 && boundsValue === 'world') {
   throw new Error(
-    'Worldwide builds at zoom 9 or higher require explicit --bounds.',
+    'Worldwide builds at zoom 10 or higher require explicit --bounds.',
   );
 }
 for (const layer of layers) {
   if (!MAP_SOURCES[layer]) throw new Error(`Unknown map layer: ${layer}`);
 }
 
-const plan = createTilePlan({ zoom, bounds });
+const plan = extend
+  ? createChildTilePlan(previousManifest.tileAvailability, zoom.minimum - 1)
+  : createTilePlan({ zoom, bounds });
 const bundleLevels = Object.fromEntries(
   plan.levels
     .filter((level) => level.zoom >= bundleFrom && bundleSize > 1)
@@ -133,7 +156,6 @@ let written = 0;
 let available = 0;
 let bytes = 0;
 let nextTile = 0;
-let simplified = 0;
 let bytesBeforeSimplification = 0;
 const levels = new Map();
 const tileAvailability = new Map();
@@ -165,7 +187,6 @@ async function saveResult({ tile, svg, tolerance, originalBytes }) {
     }
     available += 1;
     bytesBeforeSimplification += originalBytes;
-    if (tolerance > 0.45) simplified += 1;
     const level = levels.get(tile.zoom) ?? {
       tiles: 0,
       bytes: 0,
@@ -237,33 +258,31 @@ for (const [levelZoom, bundleLevel] of Object.entries(bundleSummary.levels)) {
   level.bundles = bundleLevel.bundles;
 }
 process.stdout.write('\n');
-const manifest = {
-  generatedAt: new Date().toISOString(),
-  zoom,
-  bounds,
-  layers,
-  candidates: plan.tiles.length,
-  tiles: available,
-  writtenThisRun: written,
-  bytes,
-  bytesBeforeSimplification,
-  maximumTileBytes,
-  simplified,
-  levels: Object.fromEntries(
-    [...levels].sort(([left], [right]) => left - right),
-  ),
-  tileAvailability: serializeTileAvailability(tileAvailability),
-  tileBundles: {
-    template: '/maps/tiles/bundles/{z}/{x}/{y}.svg',
-    levels: bundleLevels,
+const currentLevels = Object.fromEntries(
+  [...levels].sort(([left], [right]) => left - right),
+);
+const manifest = createTileManifest({
+  previous: previousManifest,
+  levels: currentLevels,
+  availability: serializeTileAvailability(tileAvailability),
+  bundleLevels,
+  current: {
+    generatedAt: new Date().toISOString(),
+    zoom,
+    bounds,
+    layers,
+    candidates: plan.tiles.length,
+    writtenThisRun: written,
+    bytesBeforeSimplification,
+    maximumTileBytes,
+    attribution: SOURCE_ATTRIBUTION,
+    sources: sources.map(({ name, source }) => ({
+      name,
+      url: source.url,
+      file: source.file,
+    })),
   },
-  attribution: SOURCE_ATTRIBUTION,
-  sources: sources.map(({ name, source }) => ({
-    name,
-    url: source.url,
-    file: source.file,
-  })),
-};
+});
 await writeFile(
   path.join(output, 'manifest.json'),
   `${JSON.stringify(manifest, null, 2)}\n`,

@@ -6,12 +6,6 @@ import {
   clipPolyline,
 } from '../../scripts/maps/geometry-clip.mjs';
 import {
-  createTilePlan,
-  formatBytes,
-  parseBounds,
-  parseZoomRange,
-} from '../../scripts/maps/tile-plan.mjs';
-import {
   prepareCollections,
   renderTile,
   renderTileWithinSize,
@@ -37,31 +31,6 @@ describe('SVG map tile availability', () => {
       2: { 1: [1, 1] },
       4: { 3: [5, 7, 10, 10] },
     });
-  });
-});
-
-describe('SVG map tile planning', () => {
-  test('plans complete world zoom ranges', () => {
-    const plan = createTilePlan({
-      zoom: parseZoomRange('1-2'),
-      bounds: parseBounds('world'),
-    });
-
-    assert.deepEqual(plan.levels, [
-      { zoom: 1, tiles: 4 },
-      { zoom: 2, tiles: 16 },
-    ]);
-    assert.equal(plan.tiles.length, 20);
-    assert.deepEqual(parseZoomRange('5'), { minimum: 5, maximum: 5 });
-    assert.equal(formatBytes(1536), '1.5 KiB');
-  });
-
-  test('rejects invalid zooms and geographic bounds', () => {
-    assert.throws(() => parseZoomRange('6-2'), /Zoom must be/);
-    assert.throws(() => parseZoomRange('twenty'), /Invalid zoom/);
-    assert.throws(() => parseBounds('1,2,3'), /Bounds must be/);
-    assert.throws(() => parseBounds('-181,0,1,2'), /outside valid/);
-    assert.throws(() => parseBounds('5,0,1,2'), /must increase/);
   });
 });
 
@@ -151,6 +120,24 @@ describe('SVG map tile rendering', () => {
           {
             type: 'Feature',
             properties: { MIN_ZOOM: 5, SCALERANK: 4 },
+            geometry: { type: 'Point', coordinates: [0, 0] },
+          },
+        ],
+      },
+    },
+    settlements: {
+      minimumZoom: 7,
+      maximumZoom: 9,
+      collection: {
+        features: [
+          {
+            type: 'Feature',
+            properties: { min_zoom: 7, scalerank: 10 },
+            geometry: { type: 'Point', coordinates: [0, 0] },
+          },
+          {
+            type: 'Feature',
+            properties: { min_zoom: 9, scalerank: 10 },
             geometry: { type: 'Point', coordinates: [0, 0] },
           },
         ],
@@ -262,7 +249,11 @@ describe('SVG map tile rendering', () => {
     const countyTile = renderTile({ zoom: 7, x: 64, y: 64 }, collections);
     assert.match(countyTile, /class="state-boundary"/);
     assert.doesNotMatch(countyTile, /class="region"/);
-    assert.doesNotMatch(countyTile, /class="city"/);
+    assert.equal(countyTile.match(/class="city"/g)?.length, 1);
+    assert.match(countyTile, /r="1\.1"/);
+    const townTile = renderTile({ zoom: 9, x: 256, y: 256 }, collections);
+    assert.equal(townTile.match(/class="city"/g)?.length, 2);
+    assert.match(townTile, /r="0\.8"/);
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });
 

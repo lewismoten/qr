@@ -42,7 +42,7 @@
   position: relative;
   display: grid;
   width: 2.35rem;
-  min-height: 2.8rem;
+  min-height: 2.15rem;
   place-items: center;
   color: #132235;
   font-size: 0.65rem;
@@ -52,7 +52,7 @@
 
 .slippy-map-zoom-status::before {
   position: absolute;
-  width: 1.95rem;
+  width: 1.75rem;
   border-radius: 50%;
   aspect-ratio: 1;
   background: conic-gradient(
@@ -71,17 +71,38 @@
   );
 }
 
+.slippy-map-zoom-status.is-fallback::before {
+  background: conic-gradient(
+    from -90deg,
+    rgba(217, 119, 6, 0.92) 0 var(--slippy-zoom-progress),
+    rgba(251, 191, 36, 0.28) var(--slippy-zoom-progress) 100%
+  );
+}
+
+.slippy-map-zoom-status.is-emptying.is-fallback::before {
+  background: conic-gradient(
+    from -90deg,
+    rgba(251, 191, 36, 0.28) 0 var(--slippy-zoom-progress),
+    rgba(217, 119, 6, 0.92) var(--slippy-zoom-progress) 100%
+  );
+}
+
 .slippy-map-zoom-status strong {
   position: relative;
   z-index: 1;
   display: grid;
-  width: 1.5rem;
+  width: 1.3rem;
   border: 1px solid rgba(13, 148, 136, 0.45);
   border-radius: 50%;
   aspect-ratio: 1;
   place-items: center;
   background: rgba(255, 255, 255, 0.76);
   box-shadow: 0 2px 7px rgba(19, 34, 53, 0.18);
+}
+
+.slippy-map-zoom-status.is-fallback strong {
+  border-color: rgba(217, 119, 6, 0.65);
+  color: #9a4d05;
 }
 
 @media (prefers-reduced-motion: reduce) {

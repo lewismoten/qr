@@ -1,10 +1,10 @@
 import { clipPolygon, clipPolyline } from '../geometry-clip.mjs';
+import { pointFeatures, renderCities } from './city-layer.mjs';
+import { createFeatureSelector } from './feature-index.mjs';
 import {
-  activeFeatures,
   isNaturalEarthMinorRoad,
   isUnitedStatesRegion,
   MAP_TILE_STYLE,
-  rankedFeatures,
   SIMPLIFICATION_STEPS,
 } from './tile-layer-support.mjs';
 
@@ -22,6 +22,11 @@ function project([longitude, latitude], zoom) {
     ((1 - Math.asinh(Math.tan(radians)) / Math.PI) / 2) * scale,
   ];
 }
+
+const { featuresInTile, rankedTileFeatures } = createFeatureSelector(
+  project,
+  TILE_SIZE,
+);
 
 function simplifyPoints(points, tolerance) {
   const output = [];
@@ -134,28 +139,6 @@ function renderPaths(features, tile, className, tolerance) {
   return path ? `<path class="${className}" d="${path}"/>` : '';
 }
 
-function renderCities(features, tile) {
-  return features
-    .filter((feature) => {
-      const properties = feature.properties ?? {};
-      const minimumZoom = Number(
-        properties.min_zoom ?? properties.MIN_ZOOM ?? 0,
-      );
-      return minimumZoom <= tile.zoom;
-    })
-    .map((feature) => {
-      const [x, y] = project(feature.geometry.coordinates, tile.zoom);
-      const localX = x - tile.x * TILE_SIZE;
-      const localY = y - tile.y * TILE_SIZE;
-      if (localX < 0 || localX > 256 || localY < 0 || localY > 256) return '';
-      return (
-        `<circle class="city" cx="${localX.toFixed(1)}" ` +
-        `cy="${localY.toFixed(1)}" r="2"/>`
-      );
-    })
-    .join('');
-}
-
 export function prepareCollections(collections) {
   return Object.fromEntries(
     Object.entries(collections).map(([name, value]) => [
@@ -163,6 +146,8 @@ export function prepareCollections(collections) {
       {
         minimumZoom: value.minimumZoom,
         maximumZoom: value.maximumZoom,
+        pointIndexes: new Map(),
+        tileIndexes: new Map(),
         features: value.collection.features
           .filter((feature) => {
             const filter = value.featureFilter;
@@ -181,15 +166,15 @@ export function prepareCollections(collections) {
 
 export function renderTile(tile, collections, tolerance = 0.45) {
   const countries = renderPaths(
-    activeFeatures(collections, 'countries', tile.zoom),
+    featuresInTile(collections, 'countries', tile),
     tile,
     'country',
     tolerance,
   );
   const lakes = renderPaths(
     [
-      ...rankedFeatures(collections, 'lakesOverview', tile.zoom),
-      ...rankedFeatures(collections, 'lakes', tile.zoom),
+      ...rankedTileFeatures(collections, 'lakesOverview', tile),
+      ...rankedTileFeatures(collections, 'lakes', tile),
     ],
     tile,
     'lake',
@@ -197,8 +182,8 @@ export function renderTile(tile, collections, tolerance = 0.45) {
   );
   const rivers = renderPaths(
     [
-      ...rankedFeatures(collections, 'riversOverview', tile.zoom),
-      ...rankedFeatures(collections, 'rivers', tile.zoom),
+      ...rankedTileFeatures(collections, 'riversOverview', tile),
+      ...rankedTileFeatures(collections, 'rivers', tile),
     ],
     tile,
     'river',
@@ -206,32 +191,28 @@ export function renderTile(tile, collections, tolerance = 0.45) {
   );
   const riverDetails = renderPaths(
     [
-      ...rankedFeatures(collections, 'riversNorthAmerica', tile.zoom),
-      ...rankedFeatures(collections, 'riversEurope', tile.zoom),
-      ...rankedFeatures(collections, 'riversAustralia', tile.zoom),
+      ...rankedTileFeatures(collections, 'riversNorthAmerica', tile),
+      ...rankedTileFeatures(collections, 'riversEurope', tile),
+      ...rankedTileFeatures(collections, 'riversAustralia', tile),
     ],
     tile,
     'river-detail',
     tolerance,
   );
-  const stateFeatures = activeFeatures(collections, 'states', tile.zoom);
-  const regionFeatures = activeFeatures(
-    collections,
-    'regions',
-    tile.zoom,
-  ).filter(
+  const stateFeatures = featuresInTile(collections, 'states', tile);
+  const regionFeatures = featuresInTile(collections, 'regions', tile).filter(
     (feature) => !stateFeatures.length || !isUnitedStatesRegion(feature),
   );
   const regions = renderPaths(regionFeatures, tile, 'region', tolerance);
-  const naturalEarthRoads = rankedFeatures(
+  const naturalEarthRoads = rankedTileFeatures(
     collections,
     'naturalEarthRoads',
-    tile.zoom,
+    tile,
   );
   const roads = renderPaths(
     [
-      ...activeFeatures(collections, 'primaryRoadsOverview', tile.zoom),
-      ...activeFeatures(collections, 'primaryRoads', tile.zoom),
+      ...featuresInTile(collections, 'primaryRoadsOverview', tile),
+      ...featuresInTile(collections, 'primaryRoads', tile),
       ...naturalEarthRoads.filter(
         (feature) => !isNaturalEarthMinorRoad(feature, tile.zoom),
       ),
@@ -242,7 +223,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
   );
   const secondaryRoads = renderPaths(
     [
-      ...activeFeatures(collections, 'secondaryRoads', tile.zoom),
+      ...featuresInTile(collections, 'secondaryRoads', tile),
       ...naturalEarthRoads.filter((feature) =>
         isNaturalEarthMinorRoad(feature, tile.zoom),
       ),
@@ -252,15 +233,20 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     tolerance,
   );
   const subdivisions = renderPaths(
-    activeFeatures(collections, 'subdivisions', tile.zoom),
+    featuresInTile(collections, 'subdivisions', tile),
     tile,
     'subdivision',
     tolerance,
   );
   const states = renderPaths(stateFeatures, tile, 'state-boundary', tolerance);
   const cities = renderCities(
-    activeFeatures(collections, 'cities', tile.zoom),
+    [
+      ...pointFeatures(collections, 'cities', tile, project, TILE_SIZE),
+      ...pointFeatures(collections, 'settlements', tile, project, TILE_SIZE),
+    ],
     tile,
+    project,
+    TILE_SIZE,
   );
   const content = [countries, lakes, rivers, riverDetails, roads];
   content.push(secondaryRoads);

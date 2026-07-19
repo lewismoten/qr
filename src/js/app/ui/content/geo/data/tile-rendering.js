@@ -30,6 +30,7 @@ export function renderTile({
       getTileBundle,
       onLoad: settle,
       onUnavailable: settle,
+      onSourceChange: () => layer.slippySourceChange?.(),
     });
     tiles.set(key, element);
     layer.appendChild(element);

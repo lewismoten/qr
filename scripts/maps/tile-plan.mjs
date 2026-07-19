@@ -64,6 +64,29 @@ export function createTilePlan({ zoom, bounds }) {
   return { tiles, levels };
 }
 
+export function createChildTilePlan(availability, parentZoom) {
+  const tiles = [];
+  const zoom = parentZoom + 1;
+  const level = availability?.[parentZoom] ?? {};
+  for (const [xValue, ranges] of Object.entries(level)) {
+    const x = Number(xValue);
+    for (let index = 0; index < ranges.length; index += 2) {
+      for (let y = ranges[index]; y <= ranges[index + 1]; y += 1) {
+        for (let offsetY = 0; offsetY < 2; offsetY += 1) {
+          for (let offsetX = 0; offsetX < 2; offsetX += 1) {
+            tiles.push({
+              zoom,
+              x: x * 2 + offsetX,
+              y: y * 2 + offsetY,
+            });
+          }
+        }
+      }
+    }
+  }
+  return { tiles, levels: [{ zoom, tiles: tiles.length }] };
+}
+
 export function formatBytes(value) {
   const units = ['B', 'KiB', 'MiB', 'GiB'];
   let amount = value;

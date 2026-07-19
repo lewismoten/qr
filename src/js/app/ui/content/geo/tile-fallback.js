@@ -34,6 +34,7 @@ export function createFallbackTile({
   getTileBundle,
   onLoad = () => {},
   onUnavailable,
+  onSourceChange,
 }) {
   const element = document.createElement('div');
   const image = document.createElement('img');
@@ -66,6 +67,9 @@ export function createFallbackTile({
       sourceZoom -= 1;
       source = getFallbackTile(tile, sourceZoom);
     }
+    element.slippySourceZoom = sourceZoom;
+    if (sourceZoom < tile.zoom) element.classList.add('is-fallback');
+    onSourceChange?.(sourceZoom);
     const bundle = getTileBundle?.(source);
     const bundleSize = bundle?.size ?? 1;
     const size = TILE_SIZE * source.scale * bundleSize;
