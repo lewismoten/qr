@@ -199,7 +199,11 @@ function languageSwitcher(context) {
 async function translate(source, context) {
   if (['en-US', 'en-GB'].includes(context.locale)) return source;
   const directory = path.join(context.config.sourceRoot, 'guides/translations');
-  const translations = await loadGuideTranslationSet(directory, context.locale);
+  const translations = await loadGuideTranslationSet(
+    directory,
+    context.locale,
+    context.route,
+  );
   const missing = new Set();
   const result = translateGuideHtml(source, translations, missing);
   if (missing.size && context.route !== 'privacy') {

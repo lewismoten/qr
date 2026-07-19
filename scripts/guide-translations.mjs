@@ -138,17 +138,26 @@ function includeNormalizedKeys(translations) {
   );
 }
 
-export async function loadGuideTranslationSet(directory, locale) {
+async function loadOptionalTranslations(file) {
+  try {
+    return await loadGuideTranslations(file);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    return {};
+  }
+}
+
+export async function loadGuideTranslationSet(directory, locale, scope) {
   const translations = await loadGuideTranslations(
     `${directory}/${locale}.json`,
   );
-  try {
-    const reviewed = await loadGuideTranslations(
-      `${directory}/${locale}.reviewed.json`,
-    );
-    return includeNormalizedKeys({ ...translations, ...reviewed });
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-    return includeNormalizedKeys(translations);
-  }
+  const reviewed = await loadOptionalTranslations(
+    `${directory}/${locale}.reviewed.json`,
+  );
+  const scoped = scope
+    ? await loadOptionalTranslations(
+        `${directory}/${locale}.${scope.replaceAll('/', '-')}.reviewed.json`,
+      )
+    : {};
+  return includeNormalizedKeys({ ...translations, ...reviewed, ...scoped });
 }

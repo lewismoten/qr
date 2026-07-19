@@ -111,18 +111,19 @@ test('every supported locale translates all long-form guide prose', async () => 
 test('Spanish inline prose remains grammatical after HTML assembly', async () => {
   const technology = await readFile(generatedGuide('technology', 'es'), 'utf8');
   const specification = await readFile(generatedGuide('spec', 'es'), 'utf8');
+  const technologyCopy = technology.replaceAll(/\s+/g, ' ');
 
   assert.match(
-    technology,
-    /utiliza una URL <code>data:<\/code> con Base64 estándar/,
+    technologyCopy,
+    /utiliza una URL con el esquema <code>data:<\/code> y Base64 estándar/,
   );
   assert.match(
-    technology,
-    /parámetro\s+<code>q<\/code> como convención de consulta habitual/,
+    technologyCopy,
+    /parámetro de consulta <code>q<\/code>, siguiendo una convención habitual/,
   );
   assert.match(
-    technology,
-    /convención\s+<code>SMSTO:<\/code> para preparar mensajes/,
+    technologyCopy,
+    /convención <code>SMSTO:<\/code> para preparar el destinatario/,
   );
   assert.match(
     specification,
