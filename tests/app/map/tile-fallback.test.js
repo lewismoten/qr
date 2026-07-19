@@ -170,19 +170,6 @@ assert.equal(bundledImage.style.height, '4096px');
 assert.equal(bundledImage.style.left, '-2304px');
 assert.equal(bundledImage.style.top, '-768px');
 
-const cachedElement = createFallbackTile({
-  template: '/maps/tiles/{z}/{x}/{y}.svg',
-  tile: { zoom: 8, x: 73, y: 99 },
-  minimumSourceZoom: 5,
-  maximumSourceZoom: 6,
-  resolveTileSource: async (url) => {
-    if (url.includes('/6/')) throw new Error('missing');
-    return `blob:${url}`;
-  },
-});
-await new Promise((resolve) => setTimeout(resolve, 0));
-assert.equal(cachedElement.children[0].src, 'blob:/maps/tiles/5/9/12.svg');
-
 const renderedTiles = new Map();
 const renderedChildren = [];
 const renderedLayer = {

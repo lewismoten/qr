@@ -207,6 +207,10 @@
     "zoomControls": "Map zoom controls",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
+    "overviewLayer": "Overview",
+    "tileLayer": "Layer {layer}",
+    "zoomPosition": "Zoom {zoom}",
+    "zoomProgress": "Zoom {zoom}; {percent}% from level {lower} to {upper}.",
     "attribution": "© OpenStreetMap contributors",
     "loadError": "Unable to initialize the map preview."
   },

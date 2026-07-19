@@ -65,6 +65,7 @@ const label = { hidden: true, style: {}, textContent: '' };
 const surface = { hidden: true };
 const overlay = { hidden: true };
 const zoomControls = { hidden: true };
+const zoomStatus = { hidden: true };
 const attribution = { hidden: true };
 const zoomIn = {
   addEventListener(name, handler) {
@@ -109,6 +110,7 @@ const worldMap = createWorldMap(
         '#geo-world-zoom-controls': zoomControls,
         '#geo-world-zoom-in': zoomIn,
         '#geo-world-attribution': attribution,
+        '#geo-world-zoom-status': zoomStatus,
         '#geo-local-map': detail,
       };
       return elements[selector];
@@ -130,6 +132,7 @@ assert.equal(surface.hidden, false);
 assert.equal(overlay.hidden, false);
 assert.equal(zoomControls.hidden, false);
 assert.equal(attribution.hidden, false);
+assert.equal(zoomStatus.hidden, false);
 assert.equal(detail.hidden, true);
 clickHandler({ clientX: 260, clientY: 145 });
 assert.deepEqual(selected, { latitude: 0, longitude: 0 });
@@ -151,6 +154,7 @@ assert.deepEqual(slippyOptions.center, { latitude: 0, longitude: 0 });
 assert.equal(slippyOptions.zoom, 1);
 assert.equal(detailView.zoom, 2);
 assert.equal(attribution.hidden, true);
+assert.equal(zoomStatus.hidden, true);
 slippyOptions.onMinimumZoomOut();
 assert.equal(attribution.hidden, false);
 worldMap.setMarker(frontRoyal, 'Front Royal, VA');
@@ -169,6 +173,7 @@ assert.equal(slippyOptions.tileUrl, '/maps/tiles/{z}/{x}/{y}.svg');
 assert.equal(slippyOptions.minimumZoom, 1);
 assert.equal(slippyOptions.minimumSourceZoom, 1);
 assert.equal(slippyOptions.maximumSourceZoom, 6);
+assert.equal(slippyOptions.resolveTileSource, undefined);
 assert.equal(slippyOptions.attributionText, 'Natural Earth');
 assert.equal(slippyOptions.secondaryAttribution.text, 'U.S. Census Bureau');
 assert.equal(slippyOptions.showSecondaryAttribution, hasVisibleCensusData);

@@ -32,14 +32,12 @@ export function createFallbackTile({
   maximumSourceZoom,
   hasSourceTile,
   getTileBundle,
-  resolveTileSource,
   onLoad = () => {},
   onUnavailable,
 }) {
   const element = document.createElement('div');
   const image = document.createElement('img');
   let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
-  let request = 0;
   element.className = 'slippy-map-tile';
   image.className = 'slippy-map-tile-source';
   image.alt = '';
@@ -78,19 +76,7 @@ export function createFallbackTile({
     image.style.left = `${-bundleX - source.offsetX * TILE_SIZE}px`;
     image.style.top = `${-bundleY - source.offsetY * TILE_SIZE}px`;
     const url = bundle?.url ?? tileUrl(template, source);
-    const currentRequest = ++request;
-    if (!resolveTileSource) {
-      image.src = url;
-      return;
-    }
-    resolveTileSource(url).then(
-      (resolvedUrl) => {
-        if (request === currentRequest) image.src = resolvedUrl;
-      },
-      () => {
-        if (request === currentRequest) useParent();
-      },
-    );
+    image.src = url;
   }
   image.addEventListener('error', useParent);
   image.addEventListener('load', () => {

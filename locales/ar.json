@@ -207,6 +207,10 @@
     "zoomControls": "عناصر تكبير الخريطة",
     "zoomIn": "تكبير",
     "zoomOut": "تصغير",
+    "overviewLayer": "نظرة عامة",
+    "tileLayer": "الطبقة {layer}",
+    "zoomPosition": "التكبير {zoom}",
+    "zoomProgress": "التكبير {zoom}؛ {percent}% من المستوى {lower} إلى {upper}.",
     "attribution": "© مساهمو OpenStreetMap",
     "loadError": "تعذر تهيئة معاينة الخريطة."
   },

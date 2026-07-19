@@ -7,6 +7,7 @@ import {
 } from './projection.js';
 import { createElement } from './slippy-elements.js';
 import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
+import { createZoomChrome } from './interaction/zoom-status.js';
 import {
   syncTileLayerView,
   transitionTileLayer,
@@ -29,7 +30,6 @@ export function createSlippyMap(
     maximumSourceZoom = maximumZoom,
     hasSourceTile,
     getTileBundle,
-    resolveTileSource,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
     secondaryAttribution,
@@ -57,20 +57,8 @@ export function createSlippyMap(
     'aria-hidden': 'true',
   });
   const label = createElement('div', 'slippy-map-label');
-  const controls = createElement('div', 'slippy-map-controls', {
-    'aria-label': lookup('map.zoomControls', 'Map zoom controls'),
-  });
-  const zoomIn = createElement('button', 'slippy-map-control', {
-    type: 'button',
-    'aria-label': lookup('map.zoomIn', 'Zoom in'),
-  });
-  const zoomOut = createElement('button', 'slippy-map-control', {
-    type: 'button',
-    'aria-label': lookup('map.zoomOut', 'Zoom out'),
-  });
-  zoomIn.textContent = '+';
-  zoomOut.textContent = '-';
-  controls.append(zoomIn, zoomOut);
+  const zoomChrome = createZoomChrome();
+  const { controls, status, zoomIn, zoomOut } = zoomChrome;
   const dynamicAttribution = createDynamicAttribution({
     text: attributionText,
     url: attributionUrl,
@@ -78,7 +66,7 @@ export function createSlippyMap(
     showSecondary: showSecondaryAttribution,
   });
   const attribution = dynamicAttribution.element;
-  container.append(tileLayer, marker, label, controls, attribution);
+  container.append(tileLayer, marker, label, controls, status, attribution);
   const scheduleRender = () => {
     if (frameRequest) return;
     frameRequest = requestAnimationFrame(() => {
@@ -88,6 +76,11 @@ export function createSlippyMap(
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
+      zoomChrome.update(
+        currentZoom,
+        tileScale,
+        Math.min(currentZoom, maximumSourceZoom),
+      );
       syncTileLayerView(tileLayer, currentCenter, currentZoom, centerPoint);
       dynamicAttribution.update({
         center: currentCenter,
@@ -112,7 +105,6 @@ export function createSlippyMap(
         maximumSourceZoom,
         hasSourceTile,
         getTileBundle,
-        resolveTileSource,
         origin,
       });
       positionMarker({

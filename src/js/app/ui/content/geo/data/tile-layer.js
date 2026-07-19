@@ -15,7 +15,6 @@ export function renderTileLayer({
   maximumSourceZoom,
   hasSourceTile,
   getTileBundle,
-  resolveTileSource,
   origin,
 }) {
   const range = getVisibleTileRange({
@@ -45,7 +44,6 @@ export function renderTileLayer({
         maximumSourceZoom,
         hasSourceTile,
         getTileBundle,
-        resolveTileSource,
         origin,
       });
     }

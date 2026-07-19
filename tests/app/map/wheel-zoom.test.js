@@ -4,6 +4,78 @@ import {
   createSmoothWheelZoomHandler,
 } from '../../../src/js/app/ui/content/geo/interaction/smooth-wheel-zoom.js';
 import { createWheelZoomHandler } from '../../../src/js/app/ui/content/geo/interaction/wheel-zoom.js';
+import {
+  createZoomChrome,
+  getZoomStatus,
+} from '../../../src/js/app/ui/content/geo/interaction/zoom-status.js';
+
+assert.deepEqual(getZoomStatus(4, 1), {
+  lower: 4,
+  percent: 0,
+  tileLayer: 4,
+  upper: 5,
+  zoom: '4.00',
+});
+assert.deepEqual(getZoomStatus(4, Math.SQRT2), {
+  lower: 4,
+  percent: 50,
+  tileLayer: 4,
+  upper: 5,
+  zoom: '4.50',
+});
+assert.deepEqual(getZoomStatus(4, 1 / Math.SQRT2), {
+  lower: 3,
+  percent: 50,
+  tileLayer: 4,
+  upper: 4,
+  zoom: '3.50',
+});
+assert.deepEqual(getZoomStatus(12, Math.SQRT2, 8), {
+  lower: 12,
+  percent: 50,
+  tileLayer: 8,
+  upper: 13,
+  zoom: '12.50',
+});
+
+const documentDescriptor = Object.getOwnPropertyDescriptor(
+  globalThis,
+  'document',
+);
+globalThis.document = {
+  createElement(tag) {
+    return {
+      attributes: {},
+      children: [],
+      style: {},
+      tag,
+      append(...children) {
+        this.children.push(...children);
+      },
+      setAttribute(name, value) {
+        this.attributes[name] = value;
+      },
+    };
+  },
+};
+const chrome = createZoomChrome();
+chrome.update(4, Math.SQRT2);
+assert.equal(chrome.controls.children.length, 2);
+assert.equal(chrome.status.children[0].children[0].textContent, 'Layer 4');
+assert.equal(chrome.status.children[0].children[1].textContent, 'Zoom 4.50');
+assert.equal(
+  chrome.status.children[1].children[1].children[0].style.width,
+  '50%',
+);
+assert.equal(
+  chrome.status.attributes['aria-label'],
+  'Zoom 4.50; 50% from level 4 to 5.',
+);
+Object.defineProperty(
+  globalThis,
+  'document',
+  documentDescriptor || { configurable: true, value: undefined },
+);
 
 const wheelSteps = [];
 let prevented = 0;

@@ -207,6 +207,10 @@
     "zoomControls": "मानचित्र ज़ूम नियंत्रण",
     "zoomIn": "ज़ूम इन",
     "zoomOut": "ज़ूम आउट",
+    "overviewLayer": "सामान्य दृश्य",
+    "tileLayer": "परत {layer}",
+    "zoomPosition": "ज़ूम {zoom}",
+    "zoomProgress": "ज़ूम {zoom}; स्तर {lower} से {upper} तक {percent}%।",
     "attribution": "© OpenStreetMap योगदानकर्ता",
     "loadError": "मानचित्र पूर्वावलोकन आरंभ नहीं हो सका।"
   },
