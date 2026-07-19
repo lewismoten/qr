@@ -11,6 +11,7 @@ export function renderTile({
   minimumSourceZoom,
   maximumSourceZoom,
   hasSourceTile,
+  getTileBundle,
   resolveTileSource,
   origin,
 }) {
@@ -27,6 +28,7 @@ export function renderTile({
       minimumSourceZoom,
       maximumSourceZoom,
       hasSourceTile,
+      getTileBundle,
       resolveTileSource,
       onLoad: settle,
       onUnavailable: settle,

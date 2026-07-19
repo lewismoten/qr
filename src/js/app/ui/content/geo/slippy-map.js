@@ -28,6 +28,7 @@ export function createSlippyMap(
     minimumSourceZoom = minimumZoom,
     maximumSourceZoom = maximumZoom,
     hasSourceTile,
+    getTileBundle,
     resolveTileSource,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
@@ -110,6 +111,7 @@ export function createSlippyMap(
         minimumSourceZoom,
         maximumSourceZoom,
         hasSourceTile,
+        getTileBundle,
         resolveTileSource,
         origin,
       });

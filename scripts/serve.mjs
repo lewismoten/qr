@@ -2,6 +2,13 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
+import { pipeline } from 'node:stream/promises';
+
+import {
+  createContentEncoder,
+  selectContentEncoding,
+  shouldCompress,
+} from './server/compression.mjs';
 
 const projectRoot = resolve(process.cwd());
 const htmlRoot = resolve(projectRoot, 'src/html');
@@ -91,16 +98,29 @@ const server = createServer(async (request, response) => {
     return;
   }
   const { filePath, fileStat } = match;
-  response.writeHead(200, {
+  const contentType =
+    mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream';
+  const encoding = shouldCompress(contentType, fileStat.size)
+    ? selectContentEncoding(request.headers['accept-encoding'])
+    : null;
+  const headers = {
     'Cache-Control': 'no-cache',
-    'Content-Length': fileStat.size,
-    'Content-Type':
-      mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream',
+    'Content-Type': contentType,
     'Referrer-Policy': 'strict-origin-when-cross-origin',
+    Vary: 'Accept-Encoding',
     'X-Content-Type-Options': 'nosniff',
-  });
+  };
+  if (encoding) headers['Content-Encoding'] = encoding;
+  else headers['Content-Length'] = fileStat.size;
+  response.writeHead(200, headers);
   if (request.method === 'HEAD') response.end();
-  else createReadStream(filePath).pipe(response);
+  else {
+    const encoder = createContentEncoder(encoding);
+    const streams = encoder
+      ? [createReadStream(filePath), encoder, response]
+      : [createReadStream(filePath), response];
+    pipeline(...streams).catch((error) => response.destroy(error));
+  }
 });
 
 server.on('error', (error) => {

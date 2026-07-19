@@ -18,6 +18,7 @@ import {
   addAvailableTile,
   serializeTileAvailability,
 } from './tile-availability.mjs';
+import { writeTileBundles } from './tile-bundles.mjs';
 
 function option(name, fallback) {
   const exact = process.argv.find((value) => value.startsWith(`--${name}=`));
@@ -37,13 +38,14 @@ Options:
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
   --max-tile-kib 24     Simplify tiles larger than this target
+  --bundle-from 6       First zoom stored as 4x4 SVG bundles
+  --bundle-size 4       Width and height of each detailed bundle
   --output path         Tile output directory
   --cache path          Download cache directory
   --plan                Show counts and estimates without downloading
   --force               Replace tiles that already exist`);
   process.exit(0);
 }
-
 const zoom = parseZoomRange(option('zoom', '1-7'));
 const boundsValue = option('bounds', 'world');
 const bounds = parseBounds(boundsValue);
@@ -56,6 +58,8 @@ const jobs = Math.max(
 );
 const maximumTileKiB = Number(option('max-tile-kib', '24'));
 const maximumTileBytes = maximumTileKiB * 1024;
+const bundleFrom = Number(option('bundle-from', '6'));
+const bundleSize = Number(option('bundle-size', '4'));
 const force = has('force');
 const planOnly = has('plan');
 
@@ -63,7 +67,12 @@ if (!Number.isInteger(jobs)) throw new Error('Jobs must be an integer.');
 if (!Number.isFinite(maximumTileKiB) || maximumTileKiB <= 0) {
   throw new Error('Maximum tile size must be a positive number.');
 }
-
+if (!Number.isInteger(bundleFrom) || bundleFrom < 0) {
+  throw new Error('Bundle start zoom must be a non-negative integer.');
+}
+if (!Number.isInteger(bundleSize) || bundleSize < 1) {
+  throw new Error('Bundle size must be a positive integer.');
+}
 if (zoom.maximum >= 8 && boundsValue === 'world') {
   throw new Error(
     'Worldwide builds at zoom 8 or higher require explicit --bounds.',
@@ -74,6 +83,11 @@ for (const layer of layers) {
 }
 
 const plan = createTilePlan({ zoom, bounds });
+const bundleLevels = Object.fromEntries(
+  plan.levels
+    .filter((level) => level.zoom >= bundleFrom && bundleSize > 1)
+    .map((level) => [level.zoom, bundleSize]),
+);
 const estimates = [20 * 1024, 150 * 1024].map(
   (size) => plan.tiles.length * size,
 );
@@ -81,6 +95,10 @@ console.log(`Zoom: ${zoom.minimum}-${zoom.maximum}`);
 console.log(`Bounds: ${boundsValue}`);
 console.log(`Layers: ${layers.join(', ')}`);
 console.log(`Target maximum: ${formatBytes(maximumTileBytes)} per tile`);
+console.log(
+  `Bundles: ${Object.keys(bundleLevels).join(', ') || 'none'} ` +
+    `(${bundleSize}x${bundleSize})`,
+);
 for (const level of plan.levels) {
   console.log(`  z${level.zoom}: ${level.tiles.toLocaleString()} tiles`);
 }
@@ -145,6 +163,7 @@ let simplified = 0;
 let bytesBeforeSimplification = 0;
 const levels = new Map();
 const tileAvailability = new Map();
+const bundledTiles = [];
 
 async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const current = ++completed;
@@ -152,20 +171,23 @@ async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const destination = path.join(directory, `${tile.y}.svg`);
   if (svg) {
     addAvailableTile(tileAvailability, tile);
+    if (bundleLevels[tile.zoom]) bundledTiles.push({ tile, svg });
     let existing = null;
-    try {
-      existing = await stat(destination);
-    } catch {
-      // A missing destination is expected on the first build.
-    }
-    if (force || !existing) {
-      await mkdir(directory, { recursive: true });
-      await writeFile(`${destination}.tmp`, svg);
-      await rename(`${destination}.tmp`, destination);
-      written += 1;
-      bytes += Buffer.byteLength(svg);
-    } else {
-      bytes += existing.size;
+    if (!bundleLevels[tile.zoom]) {
+      try {
+        existing = await stat(destination);
+      } catch {
+        // A missing destination is expected on the first build.
+      }
+      if (force || !existing) {
+        await mkdir(directory, { recursive: true });
+        await writeFile(`${destination}.tmp`, svg);
+        await rename(`${destination}.tmp`, destination);
+        written += 1;
+        bytes += Buffer.byteLength(svg);
+      } else {
+        bytes += existing.size;
+      }
     }
     available += 1;
     bytesBeforeSimplification += originalBytes;
@@ -227,6 +249,19 @@ await mkdir(output, { recursive: true });
 await Promise.all(
   Array.from({ length: Math.min(jobs, plan.tiles.length) }, runWorker),
 );
+const bundleSummary = await writeTileBundles({
+  output,
+  tiles: bundledTiles,
+  levels: bundleLevels,
+});
+bytes += bundleSummary.bytes;
+written += bundleSummary.bundles;
+for (const [levelZoom, bundleLevel] of Object.entries(bundleSummary.levels)) {
+  const level = levels.get(Number(levelZoom));
+  level.sourceBytes = level.bytes;
+  level.bytes = bundleLevel.bytes;
+  level.bundles = bundleLevel.bundles;
+}
 process.stdout.write('\n');
 const manifest = {
   generatedAt: new Date().toISOString(),
@@ -244,6 +279,10 @@ const manifest = {
     [...levels].sort(([left], [right]) => left - right),
   ),
   tileAvailability: serializeTileAvailability(tileAvailability),
+  tileBundles: {
+    template: '/maps/tiles/bundles/{z}/{x}/{y}.svg',
+    levels: bundleLevels,
+  },
   attribution: SOURCE_ATTRIBUTION,
   sources: sources.map(({ name, source }) => ({
     name,

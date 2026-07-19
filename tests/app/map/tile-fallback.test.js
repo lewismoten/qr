@@ -62,6 +62,22 @@ assert.deepEqual(
   })),
   { minimum: 1, maximum: 7 },
 );
+const bundledRange = await loadLocalTileRange(async () => ({
+  ok: true,
+  json: async () => ({
+    zoom: { minimum: 1, maximum: 7 },
+    tileBundles: {
+      template: '/maps/tiles/bundles/{z}/{x}/{y}.svg',
+      levels: { 6: 4, 7: 4 },
+    },
+  }),
+}));
+assert.deepEqual(bundledRange.getTileBundle({ zoom: 6, x: 18, y: 24 }), {
+  url: '/maps/tiles/bundles/6/4/6.svg',
+  size: 4,
+  offsetX: 2,
+  offsetY: 0,
+});
 
 const documentDescriptor = Object.getOwnPropertyDescriptor(
   globalThis,
@@ -139,6 +155,20 @@ const absentElement = createFallbackTile({
 assert.equal(absentElement.children[0].src, undefined);
 assert.equal(absentElement.classList.values.has('is-missing'), true);
 assert.equal(indexedUnavailable, 1);
+
+const bundledElement = createFallbackTile({
+  template: '/maps/tiles/{z}/{x}/{y}.svg',
+  tile: { zoom: 8, x: 73, y: 99 },
+  minimumSourceZoom: 6,
+  maximumSourceZoom: 6,
+  getTileBundle: bundledRange.getTileBundle,
+});
+const bundledImage = bundledElement.children[0];
+assert.equal(bundledImage.src, '/maps/tiles/bundles/6/4/6.svg');
+assert.equal(bundledImage.style.width, '4096px');
+assert.equal(bundledImage.style.height, '4096px');
+assert.equal(bundledImage.style.left, '-2304px');
+assert.equal(bundledImage.style.top, '-768px');
 
 const cachedElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',

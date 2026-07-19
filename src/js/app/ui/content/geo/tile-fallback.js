@@ -1,5 +1,6 @@
 import { TILE_SIZE } from './projection.js';
 import { createTileAvailability } from './data/tile-availability.js';
+import { createTileBundleResolver } from './data/tile-bundles.js';
 
 const DEFAULT_RANGE = { minimum: 1, maximum: 6 };
 
@@ -30,6 +31,7 @@ export function createFallbackTile({
   minimumSourceZoom,
   maximumSourceZoom,
   hasSourceTile,
+  getTileBundle,
   resolveTileSource,
   onLoad = () => {},
   onUnavailable,
@@ -66,12 +68,16 @@ export function createFallbackTile({
       sourceZoom -= 1;
       source = getFallbackTile(tile, sourceZoom);
     }
-    const size = TILE_SIZE * source.scale;
+    const bundle = getTileBundle?.(source);
+    const bundleSize = bundle?.size ?? 1;
+    const size = TILE_SIZE * source.scale * bundleSize;
+    const bundleX = (bundle?.offsetX ?? 0) * TILE_SIZE * source.scale;
+    const bundleY = (bundle?.offsetY ?? 0) * TILE_SIZE * source.scale;
     image.style.width = `${size}px`;
     image.style.height = `${size}px`;
-    image.style.left = `${-source.offsetX * TILE_SIZE}px`;
-    image.style.top = `${-source.offsetY * TILE_SIZE}px`;
-    const url = tileUrl(template, source);
+    image.style.left = `${-bundleX - source.offsetX * TILE_SIZE}px`;
+    image.style.top = `${-bundleY - source.offsetY * TILE_SIZE}px`;
+    const url = bundle?.url ?? tileUrl(template, source);
     const currentRequest = ++request;
     if (!resolveTileSource) {
       image.src = url;
@@ -107,7 +113,13 @@ export async function loadLocalTileRange(fetcher = globalThis.fetch) {
       return DEFAULT_RANGE;
     }
     const hasTile = createTileAvailability(manifest);
-    return hasTile ? { minimum, maximum, hasTile } : { minimum, maximum };
+    const getTileBundle = createTileBundleResolver(manifest);
+    return {
+      minimum,
+      maximum,
+      ...(hasTile ? { hasTile } : {}),
+      ...(getTileBundle ? { getTileBundle } : {}),
+    };
   } catch {
     return DEFAULT_RANGE;
   }

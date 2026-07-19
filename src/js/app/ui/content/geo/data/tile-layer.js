@@ -14,6 +14,7 @@ export function renderTileLayer({
   minimumSourceZoom,
   maximumSourceZoom,
   hasSourceTile,
+  getTileBundle,
   resolveTileSource,
   origin,
 }) {
@@ -43,6 +44,7 @@ export function renderTileLayer({
         minimumSourceZoom,
         maximumSourceZoom,
         hasSourceTile,
+        getTileBundle,
         resolveTileSource,
         origin,
       });

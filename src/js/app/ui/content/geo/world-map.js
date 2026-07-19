@@ -76,6 +76,7 @@ export function createWorldMap(
             minimumSourceZoom: tileRange.minimum,
             maximumSourceZoom: tileRange.maximum,
             hasSourceTile: tileRange.hasTile,
+            getTileBundle: tileRange.getTileBundle,
             resolveTileSource: tileSourceCache.resolve,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
             attributionText: 'Natural Earth',
