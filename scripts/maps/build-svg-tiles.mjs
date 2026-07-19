@@ -28,8 +28,8 @@ if (has('help')) {
   console.log(`Usage: npm run maps:build -- [options]
 
 Options:
-  --zoom 1-6            Generate one zoom or an inclusive range
-  --layers a,b          countries, regions, and/or cities
+  --zoom 1-7            Generate one zoom or an inclusive range
+  --layers a,b          countries, regions, subdivisions, and/or cities
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
   --max-tile-kib 24     Simplify tiles larger than this target
@@ -40,7 +40,7 @@ Options:
   process.exit(0);
 }
 
-const zoom = parseZoomRange(option('zoom', '1-6'));
+const zoom = parseZoomRange(option('zoom', '1-7'));
 const boundsValue = option('bounds', 'world');
 const bounds = parseBounds(boundsValue);
 const layers = option('layers', DEFAULT_LAYERS.join(',')).split(',');
@@ -60,9 +60,9 @@ if (!Number.isFinite(maximumTileKiB) || maximumTileKiB <= 0) {
   throw new Error('Maximum tile size must be a positive number.');
 }
 
-if (zoom.maximum >= 7 && boundsValue === 'world') {
+if (zoom.maximum >= 8 && boundsValue === 'world') {
   throw new Error(
-    'Worldwide builds at zoom 7 or higher require explicit --bounds.',
+    'Worldwide builds at zoom 8 or higher require explicit --bounds.',
   );
 }
 for (const layer of layers) {

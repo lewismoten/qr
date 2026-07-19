@@ -133,6 +133,25 @@ describe('SVG map tile rendering', () => {
         ],
       },
     },
+    subdivisions: {
+      minimumZoom: 7,
+      maximumZoom: 7,
+      collection: {
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-1, -1],
+                [1, 1],
+              ],
+            },
+          },
+        ],
+      },
+    },
   });
 
   test('renders only layers active at the requested zoom', () => {
@@ -146,6 +165,10 @@ describe('SVG map tile rendering', () => {
       renderTile({ zoom: 5, x: 16, y: 16 }, collections).match(/class="city"/g)
         ?.length,
       2,
+    );
+    assert.match(
+      renderTile({ zoom: 7, x: 64, y: 64 }, collections),
+      /class="subdivision"/,
     );
     assert.equal(renderTile({ zoom: 2, x: 0, y: 0 }, collections), '');
   });

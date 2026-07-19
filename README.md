@@ -69,17 +69,20 @@ The dependency-free overview map is available as the reusable public asset
 deeper zoom levels without contacting a tile provider at runtime:
 
 ```sh
-npm run maps:build -- --zoom 1-6 --plan
-npm run maps:build -- --zoom 1-6 --jobs 8
+npm run maps:build -- --zoom 1-7 --plan
+npm run maps:build -- --zoom 1-7 --jobs 8
 ```
 
-Downloads are pinned to Natural Earth 5.1.2 and cached under `.cache/maps`.
-Generated tiles are written to `build/maps/tiles`, skipped when present, and
-copied to `/maps/tiles` during the site build. Add `--force` to replace them.
-Worldwide builds at zoom 7 or higher require explicit geographic bounds:
+Natural Earth 5.1.2 supplies the global layers. The U.S. Census Bureau's 2024
+generalized 20M GeoJSON supplies county and county-equivalent boundaries at
+zoom 7. Downloads are cached under `.cache/maps`. Generated tiles are written
+to `build/maps/tiles`, skipped when present, and copied to `/maps/tiles` during
+the site build. Add `--force` to replace them.
+
+Worldwide builds at zoom 8 or higher require explicit geographic bounds:
 
 ```sh
-npm run maps:build -- --zoom 7 --bounds=-79,38,-77,40 --force
+npm run maps:build -- --zoom 8 --bounds=-79,38,-77,40 --force
 ```
 
 Use `npm run maps:build -- --help` for all options. Natural Earth data is in

@@ -1,8 +1,19 @@
-export const DEFAULT_LAYERS = ['countries', 'regions', 'cities'];
+export const DEFAULT_LAYERS = [
+  'countries',
+  'regions',
+  'subdivisions',
+  'cities',
+];
 
 const NATURAL_EARTH_ROOT =
   'https://raw.githubusercontent.com/nvkelso/' +
   'natural-earth-vector/v5.1.2/geojson/';
+const CENSUS_COUNTY_ROOT =
+  'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
+  'Generalized_ACS2024/State_County/MapServer/13/query?';
+const CENSUS_COUNTY_QUERY =
+  'where=1%3D1&outFields=GEOID%2CNAME&returnGeometry=true&' +
+  'outSR=4326&f=geojson';
 
 export const MAP_SOURCES = {
   countries: {
@@ -20,6 +31,13 @@ export const MAP_SOURCES = {
     maximumZoom: 19,
     kind: 'line',
   },
+  subdivisions: {
+    file: 'census_2024_counties_20m.geojson',
+    url: `${CENSUS_COUNTY_ROOT}${CENSUS_COUNTY_QUERY}`,
+    minimumZoom: 7,
+    maximumZoom: 19,
+    kind: 'area',
+  },
   cities: {
     file: 'ne_50m_populated_places_simple.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_populated_places_simple.geojson`,
@@ -29,9 +47,17 @@ export const MAP_SOURCES = {
   },
 };
 
-export const SOURCE_ATTRIBUTION = {
-  name: 'Natural Earth',
-  license: 'Public domain',
-  website: 'https://www.naturalearthdata.com/',
-  version: '5.1.2',
-};
+export const SOURCE_ATTRIBUTION = [
+  {
+    name: 'Natural Earth',
+    license: 'Public domain',
+    website: 'https://www.naturalearthdata.com/',
+    version: '5.1.2',
+  },
+  {
+    name: 'U.S. Census Bureau',
+    license: 'U.S. government work',
+    website: 'https://www.census.gov/geographies/mapping-files.html',
+    version: '2024 ACS generalized counties 20M',
+  },
+];

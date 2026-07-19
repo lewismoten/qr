@@ -187,18 +187,26 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'region',
     tolerance,
   );
+  const subdivisions = renderPaths(
+    activeFeatures(collections, 'subdivisions', tile.zoom),
+    tile,
+    'subdivision',
+    tolerance,
+  );
   const cities = renderCities(
     activeFeatures(collections, 'cities', tile.zoom),
     tile,
   );
-  if (!countries && !regions && !cities) return '';
+  if (!countries && !regions && !subdivisions && !cities) return '';
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
     '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
     '.region{fill:none;stroke:#8a9d75;stroke-width:.7}' +
+    '.subdivision{fill:none;stroke:#aab59a;stroke-width:.45}' +
     '.city{fill:#e11d48;stroke:#fff;stroke-width:.7}</style>' +
     countries +
     regions +
+    subdivisions +
     cities +
     '</svg>\n'
   );

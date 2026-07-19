@@ -16,7 +16,7 @@ function latitudeTile(latitude, zoom) {
   return clamp(Math.floor(value * count), 0, count - 1);
 }
 
-export function parseZoomRange(value = '1-6') {
+export function parseZoomRange(value = '1-7') {
   const match = /^(\d+)(?:-(\d+))?$/.exec(value);
   if (!match) throw new Error(`Invalid zoom range: ${value}`);
   const minimum = Number(match[1]);

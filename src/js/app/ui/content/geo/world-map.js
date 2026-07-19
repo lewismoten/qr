@@ -67,8 +67,9 @@ export function createWorldMap(
             minimumSourceZoom: tileRange.minimum,
             maximumSourceZoom: tileRange.maximum,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
-            attributionText: 'Natural Earth',
-            attributionUrl: 'https://www.naturalearthdata.com/',
+            attributionText: 'Natural Earth / U.S. Census Bureau',
+            attributionUrl:
+              'https://www.census.gov/geographies/mapping-files.html',
             onMinimumZoomOut: showOverview,
             onSelect,
           });
