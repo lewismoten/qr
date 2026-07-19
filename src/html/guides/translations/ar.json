@@ -218,6 +218,7 @@
   "Technology": "تِقْنيّة",
   "Review standards, browser APIs, and licenses.": "راجع المعايير وواجهات برمجة التطبيقات للمتصفح والتراخيص.",
   "Learn what the generator can create and inspect.": "تعرف على ما يمكن للمولد إنشاؤه وفحصه.",
+  "Browse the source code, setup notes, and protocol documentation.": "تصفّح الشفرة المصدرية وملاحظات الإعداد ووثائق البروتوكول.",
   "Guide index navigation": "التنقل في فهرس الدليل",
   "QR Code Specification Visual Guide": "الدليل المرئي لمواصفات رمز الاستجابة السريعة",
   "A visual guide to QR Code structure: finder and alignment patterns, mode and character-count bits, payload data, error correction, masks, format information, padding and remainder bits.": "دليل مرئي لهيكل رمز الاستجابة السريعة: أنماط الباحث والمحاذاة، وبتات الوضع والأحرف، وبيانات الحمولة، وتصحيح الأخطاء، والأقنعة، ومعلومات التنسيق، والحشو، والبتات المتبقية.",

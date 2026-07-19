@@ -139,4 +139,29 @@ describe('guide index', () => {
     assert.equal(hindiCopyright.attributes.hreflang, 'en');
     assert.match(hindiCopyright.content, /resource-language-indicator/);
   });
+
+  test('repository resources live in guides rather than footers', async () => {
+    const repository = 'https://git.lewismoten.com/lewismoten/qr';
+    const guideIndex = await readFile(generatedPath('index', 'en-US'), 'utf8');
+    const technology = await readFile(
+      generatedPath('technology', 'en-US'),
+      'utf8',
+    );
+
+    assert.match(guideIndex, new RegExp(`href="${repository}"`));
+    assert.match(
+      technology,
+      new RegExp(`${repository}/src/branch/main/README\\.md#`),
+    );
+    assert.doesNotMatch(technology, /href="README\.md#/);
+
+    for (const locale of GUIDE_LOCALES) {
+      for (const route of GUIDE_ROUTES) {
+        const source = await readFile(generatedPath(route, locale), 'utf8');
+        const footer = source.match(/<footer\b[\s\S]*?<\/footer\s*>/i)?.[0];
+        assert.ok(footer, `${locale}/${route}`);
+        assert.doesNotMatch(footer, new RegExp(repository));
+      }
+    }
+  });
 });

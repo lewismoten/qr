@@ -218,6 +218,7 @@
   "Technology": "技术",
   "Review standards, browser APIs, and licenses.": "审查标准、浏览器API和许可证。",
   "Learn what the generator can create and inspect.": "了解生成器可以创建和检查的内容。",
+  "Browse the source code, setup notes, and protocol documentation.": "查看源代码、设置说明和协议文档。",
   "Guide index navigation": "指南索引导航",
   "QR Code Specification Visual Guide": "二维码规格视觉指南",
   "A visual guide to QR Code structure: finder and alignment patterns, mode and character-count bits, payload data, error correction, masks, format information, padding and remainder bits.": "二维码结构的可视指南：查找器和对齐模式、模式和字符计数位、有效载荷数据、错误校正、掩码、格式信息、填充和余数位。",

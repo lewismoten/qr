@@ -451,6 +451,7 @@
   "Gradient angle controls the direction of a linear blend; radial\n              gradients move outward from the center. Avoid combinations where\n              part of the dark fill approaches the light color.": "El ángulo del degradado controla la dirección de la mezcla lineal; los degradados radiales se extienden desde el centro hacia fuera. Evite combinaciones en las que alguna parte del relleno oscuro se aproxime demasiado al color claro.",
   "Technology inventory": "Inventario tecnológico",
   "Project source": "Código fuente del proyecto",
+  "Browse the source code, setup notes, and protocol documentation.": "Consulte el código fuente, las instrucciones de configuración y la documentación del protocolo.",
   "Project source links": "Enlaces al código fuente del proyecto",
   "Raw text, numbers, URLs and data URLs": "Texto sin formato, números, URL y URL de datos",
   "Text and number formats place their resulting characters directly into one or more QR data segments without an additional wrapper. Website codes carry an absolute HTTP or HTTPS URL. Single-file Data mode uses a": "Los formatos de texto y número colocan el contenido directamente en uno o varios segmentos de datos QR, sin una envoltura adicional. Los códigos para sitios web contienen una URL absoluta HTTP o HTTPS. El modo Datos para un solo archivo utiliza una URL",

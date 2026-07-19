@@ -218,6 +218,7 @@
   "Technology": "tecnología",
   "Review standards, browser APIs, and licenses.": "Revisa los estándares, las API del navegador y las licencias.",
   "Learn what the generator can create and inspect.": "Aprenda lo que el generador puede crear e inspeccionar.",
+  "Browse the source code, setup notes, and protocol documentation.": "Consulte el código fuente, las instrucciones de configuración y la documentación del protocolo.",
   "Guide index navigation": "Navegación del índice del guía",
   "QR Code Specification Visual Guide": "Guía visual de especificaciones del código QR",
   "A visual guide to QR Code structure: finder and alignment patterns, mode and character-count bits, payload data, error correction, masks, format information, padding and remainder bits.": "Una guía visual de la estructura del código QR: patrones de búsqueda y alineación, bits de modo y conteo de caracteres, datos de carga útil, corrección de errores, máscaras, información de formato, espaciadores y bits de resto.",
