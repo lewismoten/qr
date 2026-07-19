@@ -207,10 +207,7 @@
     "zoomControls": "Controles de zoom del mapa",
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
-    "overviewLayer": "Vista general",
-    "tileLayer": "Capa {layer}",
-    "zoomPosition": "Zoom {zoom}",
-    "zoomProgress": "Zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
+    "zoomProgress": "Capa {layer}; zoom {zoom}; {percent}% del nivel {lower} al {upper}.",
     "attribution": "© colaboradores de OpenStreetMap",
     "loadError": "No se pudo iniciar la vista previa del mapa."
   },

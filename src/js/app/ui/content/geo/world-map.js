@@ -35,7 +35,6 @@ export function createWorldMap(
   const zoomControls = container.querySelector('#geo-world-zoom-controls');
   const zoomIn = container.querySelector('#geo-world-zoom-in');
   const attribution = container.querySelector('#geo-world-attribution');
-  const zoomStatus = container.querySelector('#geo-world-zoom-status');
   const detail = container.querySelector('#geo-local-map');
   let detailMap = null;
   let detailRequest = null;
@@ -58,7 +57,6 @@ export function createWorldMap(
     overlay.hidden = false;
     zoomControls.hidden = false;
     attribution.hidden = false;
-    if (zoomStatus) zoomStatus.hidden = false;
     detail.hidden = true;
     setOverviewMarker();
   };
@@ -100,7 +98,6 @@ export function createWorldMap(
     overlay.hidden = true;
     zoomControls.hidden = true;
     attribution.hidden = true;
-    if (zoomStatus) zoomStatus.hidden = true;
     label.hidden = true;
     detail.hidden = false;
     return ensureDetailMap()

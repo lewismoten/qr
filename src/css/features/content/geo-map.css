@@ -238,7 +238,7 @@
     sans-serif;
 }
 
-.slippy-map-control + .slippy-map-control {
+.slippy-map-controls > * + * {
   border-top: 1px solid rgba(19, 34, 53, 0.14);
 }
 

@@ -3,7 +3,13 @@ import {
   attachSmoothWheelZoom,
   createSmoothWheelZoomHandler,
 } from '../../../src/js/app/ui/content/geo/interaction/smooth-wheel-zoom.js';
+import {
+  centerZoomAtEvent,
+  centerZoomAtPointer,
+  coordinatesAtPointer,
+} from '../../../src/js/app/ui/content/geo/interaction/pointer-zoom.js';
 import { createWheelZoomHandler } from '../../../src/js/app/ui/content/geo/interaction/wheel-zoom.js';
+import { projectCoordinates } from '../../../src/js/app/ui/content/geo/projection.js';
 import {
   createZoomChrome,
   getZoomStatus,
@@ -60,21 +66,87 @@ globalThis.document = {
 };
 const chrome = createZoomChrome();
 chrome.update(4, Math.SQRT2);
-assert.equal(chrome.controls.children.length, 2);
-assert.equal(chrome.status.children[0].children[0].textContent, 'Layer 4');
-assert.equal(chrome.status.children[0].children[1].textContent, 'Zoom 4.50');
-assert.equal(
-  chrome.status.children[1].children[1].children[0].style.width,
-  '50%',
-);
+assert.equal(chrome.controls.children.length, 3);
+assert.equal(chrome.status.children[1].textContent, 4);
+assert.equal(chrome.status.children[0].children[0].style.height, '50%');
 assert.equal(
   chrome.status.attributes['aria-label'],
-  'Zoom 4.50; 50% from level 4 to 5.',
+  'Layer 4; zoom 4.50; 50% from level 4 to 5.',
 );
 Object.defineProperty(
   globalThis,
   'document',
   documentDescriptor || { configurable: true, value: undefined },
+);
+
+const pointerView = {
+  center: { latitude: 20, longitude: -30 },
+  offset: { x: 90, y: -45 },
+  scale: 1,
+  zoom: 4,
+  nextScale: Math.SQRT2,
+  nextZoom: 5,
+};
+const pointerCenter = centerZoomAtPointer(pointerView);
+const before = projectCoordinates(pointerView.center, pointerView.zoom);
+const beforeAnchor = {
+  x: before.x + pointerView.offset.x / pointerView.scale,
+  y: before.y + pointerView.offset.y / pointerView.scale,
+};
+const after = projectCoordinates(pointerCenter, pointerView.nextZoom);
+const afterAnchor = {
+  x: after.x + pointerView.offset.x / pointerView.nextScale,
+  y: after.y + pointerView.offset.y / pointerView.nextScale,
+};
+const projectedAnchor = projectCoordinates(
+  centerZoomAtPointer({
+    ...pointerView,
+    offset: { x: 0, y: 0 },
+    nextScale: 1,
+    nextZoom: pointerView.zoom,
+  }),
+  pointerView.zoom,
+);
+assert.ok(Math.abs(afterAnchor.x / 2 - beforeAnchor.x) < 1e-9);
+assert.ok(Math.abs(afterAnchor.y / 2 - beforeAnchor.y) < 1e-9);
+assert.deepEqual(projectedAnchor, before);
+assert.equal(centerZoomAtEvent(null, null, pointerView), pointerView.center);
+assert.deepEqual(
+  centerZoomAtEvent(
+    {
+      getBoundingClientRect: () => ({
+        height: 0,
+        left: 0,
+        top: 0,
+        width: 0,
+      }),
+    },
+    { clientX: 90, clientY: -45 },
+    {
+      center: pointerView.center,
+      scale: pointerView.scale,
+      zoom: pointerView.zoom,
+      nextScale: pointerView.nextScale,
+      nextZoom: pointerView.nextZoom,
+    },
+  ),
+  pointerCenter,
+);
+assert.deepEqual(
+  coordinatesAtPointer(
+    {
+      getBoundingClientRect: () => ({
+        height: 200,
+        left: 10,
+        top: 20,
+        width: 400,
+      }),
+    },
+    210,
+    120,
+    { center: pointerView.center, scale: 1, zoom: 4 },
+  ),
+  pointerView.center,
 );
 
 const wheelSteps = [];
@@ -108,10 +180,14 @@ assert.deepEqual(reversedSteps, [1]);
 
 const previews = [];
 const commits = [];
+const commitEvents = [];
 const smoothWheel = createSmoothWheelZoomHandler(
   {
     onPreview: (scale) => previews.push(scale),
-    onCommit: (step, scale) => commits.push({ scale, step }),
+    onCommit: (step, scale, event) => {
+      commits.push({ scale, step });
+      commitEvents.push(event);
+    },
   },
   {
     sensitivity: 320,
@@ -124,15 +200,18 @@ assert.ok(previews[1] > previews[0]);
 assert.deepEqual(commits, []);
 smoothWheel(wheelEvent(0, 20));
 assert.deepEqual(commits, []);
-smoothWheel(wheelEvent(1000, 30));
+const commitEvent = wheelEvent(1000, 30);
+smoothWheel(commitEvent);
 assert.ok(previews.at(-1) > 1);
 assert.equal(commits[0].step, -1);
 assert.ok(commits[0].scale > 1);
+assert.equal(commitEvents[0], commitEvent);
 smoothWheel(wheelEvent(80, 40));
 assert.equal(commits.length, 1);
 
 const properties = new Map();
 const attachedPreviews = [];
+const attachedPreviewEvents = [];
 let attachedHandler;
 const layer = {
   style: {
@@ -151,11 +230,16 @@ attachSmoothWheelZoom(
   },
   () => layer,
   (step) => commits.push(step),
-  (scale) => attachedPreviews.push(scale),
+  (scale, event) => {
+    attachedPreviews.push(scale);
+    attachedPreviewEvents.push(event);
+  },
 );
-attachedHandler(wheelEvent(-320, 30));
+const attachedEvent = wheelEvent(-320, 30);
+attachedHandler(attachedEvent);
 assert.ok(properties.get('--slippy-preview-scale') < 1);
 assert.deepEqual(attachedPreviews, [properties.get('--slippy-preview-scale')]);
+assert.deepEqual(attachedPreviewEvents, [attachedEvent]);
 
 let noPreviewHandler;
 attachSmoothWheelZoom(

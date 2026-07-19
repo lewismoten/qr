@@ -29,39 +29,27 @@ export function createZoomChrome() {
   });
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
-  controls.append(zoomIn, zoomOut);
-
-  const status = createElement('div', 'slippy-map-zoom-status');
-  const summary = createElement('div', 'slippy-map-zoom-summary');
+  const status = createElement('div', 'slippy-map-zoom-status', {
+    role: 'img',
+  });
   const layer = createElement('strong');
-  const zoom = createElement('span');
-  const range = createElement('div', 'slippy-map-zoom-range');
-  const lower = createElement('span');
   const track = createElement('span', 'slippy-map-zoom-track');
   const fill = createElement('span', 'slippy-map-zoom-fill');
-  const upper = createElement('span');
   track.append(fill);
-  summary.append(layer, zoom);
-  range.append(lower, track, upper);
-  status.append(summary, range);
+  status.append(track, layer);
+  controls.append(zoomIn, status, zoomOut);
 
   const update = (viewLayer, scale, tileLayer = viewLayer) => {
     const value = getZoomStatus(viewLayer, scale, tileLayer);
-    layer.textContent = lookup('map.tileLayer', 'Layer {layer}', {
-      layer: value.tileLayer,
-    });
-    zoom.textContent = lookup('map.zoomPosition', 'Zoom {zoom}', {
-      zoom: value.zoom,
-    });
-    lower.textContent = value.lower;
-    upper.textContent = value.upper;
-    fill.style.width = `${value.percent}%`;
+    layer.textContent = value.tileLayer;
+    fill.style.height = `${value.percent}%`;
     status.setAttribute(
       'aria-label',
       lookup(
         'map.zoomProgress',
-        'Zoom {zoom}; {percent}% from level {lower} to {upper}.',
+        'Layer {layer}; zoom {zoom}; {percent}% from level {lower} to {upper}.',
         {
+          layer: value.tileLayer,
           lower: value.lower,
           percent: value.percent,
           upper: value.upper,

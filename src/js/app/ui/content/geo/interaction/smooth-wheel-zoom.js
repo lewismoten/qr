@@ -18,9 +18,9 @@ export function createSmoothWheelZoomHandler(
     if (Math.abs(amount) >= commitThreshold) {
       const step = amount > 0 ? 1 : -1;
       amount -= step;
-      onCommit(step, 2 ** amount);
+      onCommit(step, 2 ** amount, event);
     }
-    onPreview(2 ** amount);
+    onPreview(2 ** amount, event);
   };
 }
 
@@ -31,9 +31,9 @@ export function attachSmoothWheelZoom(
   onPreview,
 ) {
   const handler = createSmoothWheelZoomHandler({
-    onPreview(scale) {
+    onPreview(scale, event) {
       getLayer().style.setProperty('--slippy-preview-scale', scale);
-      onPreview?.(scale);
+      onPreview?.(scale, event);
     },
     onCommit,
   });

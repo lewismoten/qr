@@ -207,10 +207,7 @@
     "zoomControls": "地图缩放控件",
     "zoomIn": "放大",
     "zoomOut": "缩小",
-    "overviewLayer": "概览",
-    "tileLayer": "图层 {layer}",
-    "zoomPosition": "缩放 {zoom}",
-    "zoomProgress": "缩放 {zoom}；从级别 {lower} 到 {upper} 的 {percent}%。",
+    "zoomProgress": "图层 {layer}；缩放 {zoom}；从级别 {lower} 到 {upper} 的 {percent}%。",
     "attribution": "© OpenStreetMap 贡献者",
     "loadError": "无法初始化地图预览。"
   },

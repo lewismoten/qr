@@ -7,6 +7,10 @@ import {
 } from './projection.js';
 import { createElement } from './slippy-elements.js';
 import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
+import {
+  centerZoomAtEvent,
+  coordinatesAtPointer,
+} from './interaction/pointer-zoom.js';
 import { createZoomChrome } from './interaction/zoom-status.js';
 import {
   syncTileLayerView,
@@ -58,7 +62,7 @@ export function createSlippyMap(
   });
   const label = createElement('div', 'slippy-map-label');
   const zoomChrome = createZoomChrome();
-  const { controls, status, zoomIn, zoomOut } = zoomChrome;
+  const { controls, zoomIn, zoomOut } = zoomChrome;
   const dynamicAttribution = createDynamicAttribution({
     text: attributionText,
     url: attributionUrl,
@@ -66,7 +70,7 @@ export function createSlippyMap(
     showSecondary: showSecondaryAttribution,
   });
   const attribution = dynamicAttribution.element;
-  container.append(tileLayer, marker, label, controls, status, attribution);
+  container.append(tileLayer, marker, label, controls, attribution);
   const scheduleRender = () => {
     if (frameRequest) return;
     frameRequest = requestAnimationFrame(() => {
@@ -128,13 +132,23 @@ export function createSlippyMap(
     );
     scheduleRender();
   };
-  const setZoom = (value, nextScale = 1) => {
+  const centerAtPointer = (nextZoom, nextScale, event) => {
+    currentCenter = centerZoomAtEvent(container, event, {
+      center: currentCenter,
+      scale: tileScale,
+      zoom: currentZoom,
+      nextScale,
+      nextZoom,
+    });
+  };
+  const setZoom = (value, nextScale = 1, event) => {
     const next = clamp(value, minimumZoom, maximumZoom);
     if (next === currentZoom) {
       if (value < minimumZoom) onMinimumZoomOut?.();
       return;
     }
     const scale = 2 ** (next - currentZoom);
+    centerAtPointer(next, nextScale, event);
     currentZoom = next;
     tileScale = nextScale;
     tileLayer = transitionTileLayer(
@@ -147,30 +161,22 @@ export function createSlippyMap(
     tiles.clear();
     scheduleRender();
   };
-  const selectAt = (clientX, clientY) => {
-    const bounds = container.getBoundingClientRect();
-    const centerPoint = projectCoordinates(currentCenter, currentZoom);
+  const selectAt = (clientX, clientY) =>
     onSelect?.(
-      unprojectPoint(
-        {
-          x:
-            centerPoint.x +
-            (clientX - bounds.left - bounds.width / 2) / tileScale,
-          y:
-            centerPoint.y +
-            (clientY - bounds.top - bounds.height / 2) / tileScale,
-        },
-        currentZoom,
-      ),
+      coordinatesAtPointer(container, clientX, clientY, {
+        center: currentCenter,
+        scale: tileScale,
+        zoom: currentZoom,
+      }),
     );
-  };
   zoomIn.addEventListener('click', () => setZoom(currentZoom + 1));
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
   attachSmoothWheelZoom(
     container,
     () => tileLayer,
-    (step, nextScale) => setZoom(currentZoom + step, nextScale),
-    (scale) => {
+    (step, nextScale, event) => setZoom(currentZoom + step, nextScale, event),
+    (scale, event) => {
+      centerAtPointer(currentZoom, scale, event);
       tileScale = scale;
       scheduleRender();
     },
