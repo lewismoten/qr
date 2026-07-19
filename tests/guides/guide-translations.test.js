@@ -88,22 +88,24 @@ test('guide translation reports missing prose without changing it', () => {
 
 test('every supported locale translates all long-form guide prose', async () => {
   const files = await listEnglishGuides();
-  const required = new Set();
-  for (const file of files) {
-    if (file.endsWith('/privacy.html')) continue;
-    const source = stripGeneratedMarkup(await readFile(file, 'utf8'));
-    collectGuideText(source).forEach((value) => required.add(value));
-  }
-
   for (const locale of locales) {
-    const translations = await loadGuideTranslationSet(
-      `${sourceRoot}/translations`,
-      locale,
-    );
-    const missing = [...required].filter((value) => {
-      const normalized = value.replace(/\s+/g, ' ').trim();
-      return !translations[value] && !translations[normalized];
-    });
+    const missing = [];
+    for (const file of files) {
+      if (file.endsWith('/privacy.html')) continue;
+      const route = routeFromSource(file);
+      const source = stripGeneratedMarkup(await readFile(file, 'utf8'));
+      const translations = await loadGuideTranslationSet(
+        `${sourceRoot}/translations`,
+        locale,
+        route,
+      );
+      for (const value of collectGuideText(source)) {
+        const normalized = value.replace(/\s+/g, ' ').trim();
+        if (!translations[value] && !translations[normalized]) {
+          missing.push(value);
+        }
+      }
+    }
     assert.deepEqual(missing, [], `${locale} has untranslated guide prose`);
   }
 });

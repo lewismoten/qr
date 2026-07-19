@@ -156,7 +156,8 @@ export async function loadGuideTranslationSet(directory, locale, scope) {
   );
   const scoped = scope
     ? await loadOptionalTranslations(
-        `${directory}/${locale}.${scope.replaceAll('/', '-')}.reviewed.json`,
+        `${directory}/${scope.replaceAll('/', '-')}/` +
+          `${locale}.reviewed.json`,
       )
     : {};
   return includeNormalizedKeys({ ...translations, ...reviewed, ...scoped });

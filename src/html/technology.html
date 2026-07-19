@@ -514,26 +514,26 @@
               </article>
               <article>
                 <div>
-                  <h3>Raster tile map</h3>
-                  <span class="version-badge">First-party + OSM</span>
+                  <h3>Local and detailed maps</h3>
+                  <span class="version-badge">First-party map viewer</span>
                 </div>
                 <p>
                   The Geo preview directly implements Web Mercator projection,
-                  visible-tile selection, longitude wrapping, pointer and
-                  keyboard panning, zoom controls, click-to-coordinate
-                  conversion, and marker/label placement. It requests only
-                  raster tiles intersecting the active viewport and does not
-                  bundle or load a third-party mapping library.
+                  visible-tile selection, fallback scaling, longitude wrapping,
+                  panning, zooming, click-to-coordinate conversion, and marker
+                  placement. It starts with a reusable SVG world overview and
+                  locally generated SVG tiles. OpenStreetMap raster tiles are
+                  requested only after the user selects that view and grants
+                  consent. No third-party mapping library is bundled.
                 </p>
-                <nav aria-label="Raster tile map references">
+                <nav aria-label="Map implementation references">
                   <a
                     href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames"
                     >Slippy map tile coordinates</a
-                  ><a
-                    href="https://operations.osmfoundation.org/policies/tiles/"
-                    >OpenStreetMap tile policy</a
-                  ><a href="https://www.openstreetmap.org/copyright"
-                    >OpenStreetMap attribution</a
+                  ><a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/scripts/maps"
+                    >Local tile builder source</a
+                  ><a href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/assets/maps/world.svg"
+                    >World overview source</a
                   >
                 </nav>
               </article>
@@ -613,19 +613,74 @@
           </section>
 
           <section>
-            <h2>Data and delivery services</h2>
+            <h2>Map data and services</h2>
             <div class="dependency-list">
               <article>
                 <div>
-                  <h3>OpenStreetMap</h3>
-                  <span class="version-badge">Live data</span>
+                  <h3>Natural Earth</h3>
+                  <span class="version-badge">5.1.2 · public domain</span>
                 </div>
                 <p>
-                  Serves standard raster map tiles directly to the first-party
-                  Geo preview. The underlying geographic database is licensed
-                  under ODbL; hosted tiles are governed by the separate tile
-                  usage policy and include the required contributor attribution
-                  in the map.
+                  Supplies the simplified world overview and the global country,
+                  first-level administrative boundary, and populated-place data
+                  used to generate local SVG tiles. Coastlines and borders are
+                  deliberately generalized: these maps provide enough context to
+                  recognize an area while keeping downloads small. They must not
+                  be used for surveying, navigation, or authoritative boundary
+                  decisions.
+                </p>
+                <nav aria-label="Natural Earth links">
+                  <a href="https://www.naturalearthdata.com/">Website</a
+                  ><a href="https://www.naturalearthdata.com/downloads/"
+                    >Data downloads</a
+                  ><a href="https://github.com/nvkelso/natural-earth-vector"
+                    >Data repository</a
+                  ><a href="https://www.naturalearthdata.com/about/terms-of-use/"
+                    >Terms of use</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>U.S. Census Bureau</h3>
+                  <span class="version-badge"
+                    >2024 · U.S. government work</span
+                  >
+                </div>
+                <p>
+                  Supplies generalized 1:20,000,000 county and county-equivalent
+                  boundaries for the United States at zoom 7 through TIGERweb.
+                  These boundaries are also simplified and are included for
+                  geographic awareness rather than legal or high-precision use.
+                  The generated tile manifest records the source, vintage, and
+                  attribution.
+                </p>
+                <nav aria-label="U.S. Census Bureau links">
+                  <a
+                    href="https://tigerweb.geo.census.gov/arcgis/rest/services/Generalized_ACS2024/State_County/MapServer/13"
+                    >TIGERweb county layer</a
+                  ><a
+                    href="https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html"
+                    >Cartographic boundary files</a
+                  ><a href="https://www.census.gov/about/policies/citation.html"
+                    >Citation guidance</a
+                  >
+                </nav>
+              </article>
+              <article>
+                <div>
+                  <h3>OpenStreetMap</h3>
+                  <span class="version-badge">Optional live detail · ODbL</span>
+                </div>
+                <p>
+                  When a user needs more precise visual context, the
+                  OpenStreetMap tab loads standard raster tiles for the visible
+                  area after explicit consent. This view normally shows much
+                  more local detail than the bundled SVG tiles, but it sends the
+                  user's IP address, request headers, referrer, and requested
+                  tile coordinates to OpenStreetMap. Its database is licensed
+                  under ODbL, and hosted tiles follow separate usage
+                  requirements.
                 </p>
                 <nav aria-label="OpenStreetMap links">
                   <a href="https://www.openstreetmap.org/">Website</a

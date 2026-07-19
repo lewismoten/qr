@@ -198,7 +198,7 @@ function languageSwitcher(context) {
 }
 
 async function translate(source, context) {
-  if (['en-US', 'en-GB'].includes(context.locale)) return source;
+  if (context.locale === 'en-US') return source;
   const directory = path.join(context.config.sourceRoot, 'guides/translations');
   const translations = await loadGuideTranslationSet(
     directory,
@@ -207,7 +207,11 @@ async function translate(source, context) {
   );
   const missing = new Set();
   const result = translateGuideHtml(source, translations, missing);
-  if (missing.size && context.route !== 'privacy') {
+  if (
+    missing.size &&
+    context.route !== 'privacy' &&
+    context.locale !== 'en-GB'
+  ) {
     const examples = [...missing].slice(0, 3).join(' | ');
     throw new Error(
       `${context.locale} is missing ${missing.size} translations: ${examples}`,
