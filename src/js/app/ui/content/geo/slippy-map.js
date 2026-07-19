@@ -78,6 +78,7 @@ export function createSlippyMap(
     initialLayer: tileLayer,
     maximumZoom,
     minimumZoom,
+    onChange: () => scheduleRender(),
   });
   container.append(mapPitch.camera, marker, label, controls, attribution);
   const scheduleRender = () => {
@@ -101,6 +102,7 @@ export function createSlippyMap(
         y: centerPoint.y - height / 2,
       };
       const renderingLayer = tileLayer;
+      mapPitch.update(currentZoom, tileScale);
       renderTileLayer({
         tiles,
         layer: tileLayer,
@@ -116,10 +118,10 @@ export function createSlippyMap(
         getTileBundle,
         origin,
         onFallbackChange: scheduleRender,
+        viewportBounds: mapPitch.getViewportBounds(),
       });
       const sourceZoom = renderingLayer.slippySourceZoom;
       zoomChrome.update(currentZoom, tileScale, sourceZoom);
-      mapPitch.update(currentZoom, tileScale);
       positionMarker({
         marker,
         label,

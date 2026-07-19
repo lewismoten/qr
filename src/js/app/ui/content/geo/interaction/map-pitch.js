@@ -1,9 +1,10 @@
 import { lookup } from '../../../../../i18n/index.js';
 import { createElement } from '../slippy-elements.js';
 
-const MAXIMUM_PITCH = 68;
+const MAXIMUM_PITCH = 60;
 const PERSPECTIVE = 720;
 const PITCH_START_ZOOM = 5;
+const MAXIMUM_LOOKBACK_HEIGHTS = 7;
 
 const smoothstep = (value) => value * value * (3 - 2 * value);
 
@@ -51,6 +52,30 @@ export function unprojectPitchedPoint(
   };
 }
 
+export function getPitchedViewportBounds(
+  { height, pitch, width },
+  perspective = PERSPECTIVE,
+) {
+  if (!pitch) return { bottom: height, left: 0, right: width, top: 0 };
+  const radians = (pitch * Math.PI) / 180;
+  const horizon = height - perspective / Math.tan(radians);
+  const screenTop = Math.max(0, horizon + 32);
+  const rawTop = unprojectPitchedPoint(
+    { x: width / 2, y: screenTop },
+    { height, perspective, pitch, width },
+  ).y;
+  const top = Math.max(-height * MAXIMUM_LOOKBACK_HEIGHTS, rawTop);
+  const depth = (top - height) * Math.sin(radians);
+  const factor = perspective / (perspective - depth);
+  const halfPlaneWidth = width / (2 * factor);
+  return {
+    bottom: height,
+    left: width / 2 - halfPlaneWidth,
+    right: width / 2 + halfPlaneWidth,
+    top,
+  };
+}
+
 function setButtonState(button, enabled) {
   const key = enabled ? 'map.pitchDisable' : 'map.pitchEnable';
   const fallback = enabled ? 'Disable perspective' : 'Enable perspective';
@@ -66,6 +91,7 @@ export function createMapPitch({
   initialLayer,
   maximumZoom,
   minimumZoom,
+  onChange = () => {},
 }) {
   const camera = createElement('div', 'slippy-map-camera', {
     'aria-hidden': 'true',
@@ -97,6 +123,7 @@ export function createMapPitch({
     width: container.clientWidth,
   });
   const projectPoint = (point) => projectPitchedPoint(point, getProjection());
+  const getViewportBounds = () => getPitchedViewportBounds(getProjection());
   const toMapClient = (clientX, clientY) => {
     const bounds = container.getBoundingClientRect();
     const point = unprojectPitchedPoint(
@@ -110,19 +137,25 @@ export function createMapPitch({
     const previousPitch = pitch;
     enabled = !enabled;
     camera.classList.add('is-pitch-transitioning');
+    container.classList.add('is-map-pitch-transitioning');
     setButtonState(button, enabled);
     button.classList.toggle('is-active', enabled);
     update(camera.slippyZoom ?? minimumZoom, camera.slippyScale ?? 1);
-    if (pitch === previousPitch)
+    onChange();
+    if (pitch === previousPitch) {
       camera.classList.remove('is-pitch-transitioning');
+      container.classList.remove('is-map-pitch-transitioning');
+    }
   });
   button.classList.add('is-active');
   camera.addEventListener('transitionend', () => {
     camera.classList.remove('is-pitch-transitioning');
+    container.classList.remove('is-map-pitch-transitioning');
   });
 
   return {
     camera,
+    getViewportBounds,
     projectPoint,
     toMapClient,
     update(zoom, scale) {

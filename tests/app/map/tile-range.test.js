@@ -24,6 +24,19 @@ const panned = getVisibleTileRange({
   zoom: 3,
   scale: 0.5,
 });
+const pitched = getVisibleTileRange({
+  center,
+  width: 512,
+  height: 256,
+  zoom: 3,
+  scale: 1,
+  viewportBounds: {
+    bottom: 256,
+    left: -256,
+    right: 768,
+    top: -768,
+  },
+});
 
 assert.ok(fractional.firstX < standard.firstX);
 assert.ok(fractional.lastX > standard.lastX);
@@ -31,5 +44,9 @@ assert.equal(panned.firstX, fractional.firstX + 1);
 assert.equal(panned.lastX, fractional.lastX + 1);
 assert.ok(standard.firstY >= 0);
 assert.ok(standard.lastY <= 7);
+assert.ok(pitched.firstX < standard.firstX);
+assert.ok(pitched.lastX > standard.lastX);
+assert.ok(pitched.firstY < standard.firstY);
+assert.equal(pitched.lastY, standard.lastY);
 
 console.log('Map fractional tile range tests passed.');

@@ -11,6 +11,13 @@
   transition: transform 520ms cubic-bezier(0.2, 0.72, 0.2, 1);
 }
 
+.slippy-map.is-map-pitch-transitioning .slippy-map-marker,
+.slippy-map.is-map-pitch-transitioning .slippy-map-label {
+  transition:
+    left 520ms cubic-bezier(0.2, 0.72, 0.2, 1),
+    top 520ms cubic-bezier(0.2, 0.72, 0.2, 1);
+}
+
 .slippy-map-pitch-control {
   position: relative;
 }
@@ -43,7 +50,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .slippy-map-camera,
-  .slippy-map-pitch-icon {
+  .slippy-map-pitch-icon,
+  .slippy-map.is-map-pitch-transitioning .slippy-map-marker,
+  .slippy-map.is-map-pitch-transitioning .slippy-map-label {
     transition: none;
   }
 }

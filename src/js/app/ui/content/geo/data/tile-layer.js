@@ -1,5 +1,6 @@
 import { setTileLayerCoverage } from '../interaction/tile-transition.js';
 import { getVisibleTileRange } from './tile-range.js';
+import { getTileLod } from './tile-lod.js';
 import { renderTile } from './tile-rendering.js';
 
 export function renderTileLayer({
@@ -17,6 +18,7 @@ export function renderTileLayer({
   getTileBundle,
   origin,
   onFallbackChange,
+  viewportBounds,
 }) {
   const range = getVisibleTileRange({
     center,
@@ -24,6 +26,16 @@ export function renderTileLayer({
     height,
     zoom,
     scale,
+    viewportBounds,
+  });
+  const detailRange = getVisibleTileRange({
+    center,
+    width,
+    height,
+    zoom,
+    scale,
+    padding: 0,
+    viewportBounds,
   });
   const visible = new Set();
   const syncFallback = () => {
@@ -41,21 +53,37 @@ export function renderTileLayer({
   layer.slippySourceChange = syncFallback;
   for (let y = range.firstY; y <= range.lastY; y += 1) {
     for (let x = range.firstX; x <= range.lastX; x += 1) {
-      visible.add(`${zoom}:${x}:${y}`);
+      visible.add(
+        getTileLod({
+          lastY: detailRange.lastY,
+          maximumSourceZoom,
+          minimumSourceZoom,
+          x,
+          y,
+          zoom,
+        }).key,
+      );
     }
   }
   setTileLayerCoverage(layer, visible, tiles);
-  for (let y = range.firstY; y <= range.lastY; y += 1) {
+  for (let y = range.lastY; y >= range.firstY; y -= 1) {
     for (let x = range.firstX; x <= range.lastX; x += 1) {
-      const key = `${zoom}:${x}:${y}`;
+      const lod = getTileLod({
+        lastY: detailRange.lastY,
+        maximumSourceZoom,
+        minimumSourceZoom,
+        x,
+        y,
+        zoom,
+      });
       renderTile({
         tiles,
-        key,
+        key: lod.key,
         layer,
         template,
         tile: { zoom, x, y },
         minimumSourceZoom,
-        maximumSourceZoom,
+        maximumSourceZoom: lod.sourceZoom,
         hasSourceTile,
         getTileBundle,
         origin,
