@@ -22,8 +22,8 @@ test('composes child SVGs into a shared-style supertile', () => {
   const output = renderTileBundle(entries, 4);
   assert.match(output, /viewBox="0 0 1024 1024"/);
   assert.equal(output.match(/<style>/g).length, 1);
-  assert.match(output, /translate\(0 0\).*id="left"/);
-  assert.match(output, /translate\(256 0\).*id="right"/);
+  assert.match(output, /<svg x="0" y="0"[^>]+overflow="hidden">.*id="left"/);
+  assert.match(output, /<svg x="256" y="0"[^>]+overflow="hidden">.*id="right"/);
   assert.deepEqual(getTileBundle({ zoom: 7, x: 5, y: 8 }, 4), {
     zoom: 7,
     x: 1,

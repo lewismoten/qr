@@ -35,7 +35,11 @@ export function renderTileBundle(entries, size) {
       const bundle = getTileBundle(tile, size);
       const x = bundle.offsetX * TILE_SIZE;
       const y = bundle.offsetY * TILE_SIZE;
-      return `<g transform="translate(${x} ${y})">${tileBody(svg)}</g>`;
+      return (
+        `<svg x="${x}" y="${y}" width="${TILE_SIZE}" ` +
+        `height="${TILE_SIZE}" viewBox="0 0 ${TILE_SIZE} ${TILE_SIZE}" ` +
+        `overflow="hidden">${tileBody(svg)}</svg>`
+      );
     })
     .join('');
   const extent = size * TILE_SIZE;
