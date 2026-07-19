@@ -1,3 +1,6 @@
+import { hasVisibleCensusCounties } from './data/attribution.js';
+import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
+
 const WIDTH = 1000;
 const HEIGHT = 500;
 
@@ -71,9 +74,13 @@ export function createWorldMap(
             minimumSourceZoom: tileRange.minimum,
             maximumSourceZoom: tileRange.maximum,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
-            attributionText: 'Natural Earth / U.S. Census Bureau',
-            attributionUrl:
-              'https://www.census.gov/geographies/mapping-files.html',
+            attributionText: 'Natural Earth',
+            attributionUrl: 'https://www.naturalearthdata.com/',
+            secondaryAttribution: {
+              text: 'U.S. Census Bureau',
+              url: 'https://www.census.gov/geographies/mapping-files.html',
+            },
+            showSecondaryAttribution: hasVisibleCensusCounties,
             onMinimumZoomOut: showOverview,
             onSelect,
           });
@@ -118,6 +125,21 @@ export function createWorldMap(
       }),
     );
   });
+  container.addEventListener(
+    'wheel',
+    createWheelZoomHandler(
+      (step) => {
+        if (step > 0 && detail.hidden) {
+          showDetail({
+            center: markerCoordinates || { latitude: 0, longitude: 0 },
+            zoom: 2,
+          });
+        }
+      },
+      { threshold: 40 },
+    ),
+    { passive: false },
+  );
   zoomIn.addEventListener('click', () => showDetail());
 
   return {

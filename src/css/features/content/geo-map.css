@@ -230,14 +230,19 @@
 .slippy-map-attribution {
   position: absolute;
   z-index: 5;
-  right: 0;
+  right: auto;
   bottom: 0;
+  inset-inline-end: 0;
   padding: 0.18rem 0.35rem;
   border-radius: 0.35rem 0 0;
   background: rgba(255, 255, 255, 0.9);
   color: #334155;
   font-size: 0.58rem;
   line-height: 1.2;
+}
+
+[dir='rtl'] .slippy-map-attribution {
+  border-radius: 0 0.35rem 0 0;
 }
 
 .slippy-map-attribution a {

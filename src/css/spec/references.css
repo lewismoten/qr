@@ -183,8 +183,9 @@
   max-height: min(24rem, 70vh);
   padding: 0.4rem;
   position: absolute;
-  right: 0;
+  right: auto;
   bottom: calc(100% + 0.45rem);
+  inset-inline-end: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   overflow-y: auto;
@@ -197,9 +198,4 @@
 .spec-footer .guide-language-switcher a[aria-current='page'] {
   background: rgba(94, 234, 212, 0.18);
   color: #5eead4;
-}
-
-[dir='rtl'] .spec-footer .guide-language-switcher[open] nav {
-  right: auto;
-  left: 0;
 }

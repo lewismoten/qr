@@ -6,9 +6,11 @@ import {
   projectCoordinates,
   unprojectPoint,
 } from './projection.js';
-import { createAttribution, createElement } from './slippy-elements.js';
+import { createElement } from './slippy-elements.js';
 import { createFallbackTile } from './tile-fallback.js';
 import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
+import { createDynamicAttribution } from './data/attribution.js';
+import { positionMarker } from './data/marker-position.js';
 
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -27,6 +29,8 @@ export function createSlippyMap(
     maximumSourceZoom = maximumZoom,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
+    secondaryAttribution,
+    showSecondaryAttribution,
     onMinimumZoomOut,
   },
 ) {
@@ -64,7 +68,13 @@ export function createSlippyMap(
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
   controls.append(zoomIn, zoomOut);
-  const attribution = createAttribution(attributionText, attributionUrl);
+  const dynamicAttribution = createDynamicAttribution({
+    text: attributionText,
+    url: attributionUrl,
+    secondary: secondaryAttribution,
+    showSecondary: showSecondaryAttribution,
+  });
+  const attribution = dynamicAttribution.element;
   container.append(tileLayer, marker, label, controls, attribution);
 
   const scheduleRender = () => {
@@ -76,6 +86,12 @@ export function createSlippyMap(
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
+      dynamicAttribution.update({
+        center: currentCenter,
+        zoom: currentZoom,
+        width,
+        height,
+      });
       const origin = {
         x: centerPoint.x - width / 2,
         y: centerPoint.y - height / 2,
@@ -115,22 +131,16 @@ export function createSlippyMap(
         tiles.delete(key);
       });
 
-      if (!markerCoordinates) {
-        marker.hidden = true;
-        label.hidden = true;
-        return;
-      }
-      const markerPoint = projectCoordinates(markerCoordinates, currentZoom);
-      let deltaX = markerPoint.x - centerPoint.x;
-      if (deltaX > worldSize / 2) deltaX -= worldSize;
-      if (deltaX < -worldSize / 2) deltaX += worldSize;
-      const left = width / 2 + deltaX;
-      const top = height / 2 + markerPoint.y - centerPoint.y;
-      marker.hidden = false;
-      marker.style.left = `${left}px`;
-      marker.style.top = `${top}px`;
-      label.style.left = `${left}px`;
-      label.style.top = `${top}px`;
+      positionMarker({
+        marker,
+        label,
+        coordinates: markerCoordinates,
+        centerPoint,
+        zoom: currentZoom,
+        worldSize,
+        width,
+        height,
+      });
     });
   };
 

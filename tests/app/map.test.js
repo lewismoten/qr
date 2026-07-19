@@ -13,7 +13,7 @@ import {
   createWorldMap,
   worldPointToCoordinates,
 } from '../../src/js/app/ui/content/geo/world-map.js';
-import { createWheelZoomHandler } from '../../src/js/app/ui/content/geo/interaction/wheel-zoom.js';
+import { hasVisibleCensusCounties } from '../../src/js/app/ui/content/geo/data/attribution.js';
 
 assert.deepEqual(projectCoordinates({ latitude: 0, longitude: 0 }, 0), {
   x: 128,
@@ -52,6 +52,7 @@ assert.deepEqual(worldPointToCoordinates({ x: -10, y: 600 }), {
   longitude: -180,
 });
 let clickHandler;
+let worldWheelHandler;
 let zoomHandler;
 let selected;
 const marker = {
@@ -86,9 +87,13 @@ const detailMap = {
   },
 };
 const container = {
-  addEventListener(name, handler) {
-    assert.equal(name, 'click');
-    clickHandler = handler;
+  addEventListener(name, handler, options) {
+    if (name === 'click') clickHandler = handler;
+    else {
+      assert.equal(name, 'wheel');
+      assert.deepEqual(options, { passive: false });
+      worldWheelHandler = handler;
+    }
   },
   getBoundingClientRect: () => ({ left: 10, top: 20, width: 500, height: 250 }),
 };
@@ -130,9 +135,16 @@ clickHandler({
 });
 assert.deepEqual(selected, { latitude: 0, longitude: 0 });
 assert.equal(worldMap.getView(), null);
-zoomHandler();
+worldWheelHandler({
+  deltaMode: 0,
+  deltaY: -100,
+  preventDefault() {},
+  timeStamp: 0,
+});
 await new Promise((resolve) => setTimeout(resolve, 0));
 assert.deepEqual(slippyOptions.center, { latitude: 0, longitude: 0 });
+assert.equal(slippyOptions.zoom, 1);
+assert.equal(detailView.zoom, 2);
 assert.equal(attribution.hidden, true);
 slippyOptions.onMinimumZoomOut();
 assert.equal(attribution.hidden, false);
@@ -152,8 +164,11 @@ assert.equal(slippyOptions.tileUrl, '/maps/tiles/{z}/{x}/{y}.svg');
 assert.equal(slippyOptions.minimumZoom, 1);
 assert.equal(slippyOptions.minimumSourceZoom, 1);
 assert.equal(slippyOptions.maximumSourceZoom, 6);
+assert.equal(slippyOptions.attributionText, 'Natural Earth');
+assert.equal(slippyOptions.secondaryAttribution.text, 'U.S. Census Bureau');
+assert.equal(slippyOptions.showSecondaryAttribution, hasVisibleCensusCounties);
 assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
-assert.deepEqual(worldMap.getView(), { center: frontRoyal, zoom: 1 });
+assert.deepEqual(worldMap.getView(), { center: frontRoyal, zoom: 2 });
 const transferredView = {
   center: { latitude: 40.7128, longitude: -74.006 },
   zoom: 7,
@@ -253,33 +268,5 @@ const unavailableStorage = {
 };
 assert.equal(hasOpenStreetMapConsent(unavailableStorage), false);
 assert.equal(rememberOpenStreetMapConsent(unavailableStorage), false);
-
-const wheelSteps = [];
-let prevented = 0;
-const wheel = createWheelZoomHandler((step) => wheelSteps.push(step));
-const wheelEvent = (deltaY, timeStamp, deltaMode = 0) => ({
-  deltaMode,
-  deltaY,
-  preventDefault: () => (prevented += 1),
-  timeStamp,
-});
-wheel(wheelEvent(20, 0));
-wheel(wheelEvent(20, 10));
-wheel(wheelEvent(20, 20));
-wheel(wheelEvent(20, 30));
-wheel(wheelEvent(100, 40));
-wheel(wheelEvent(-1, 220, 2));
-wheel(wheelEvent(5, 450, 1));
-assert.deepEqual(wheelSteps, [-1, 1, -1]);
-assert.equal(prevented, 7);
-const reversedSteps = [];
-const reversedWheel = createWheelZoomHandler(
-  (step) => reversedSteps.push(step),
-  { threshold: 40, cooldown: 50 },
-);
-reversedWheel(wheelEvent(20, Number.NaN));
-reversedWheel(wheelEvent(-20, 10));
-reversedWheel(wheelEvent(-20, 20));
-assert.deepEqual(reversedSteps, [1]);
 
 console.log('Slippy map projection tests passed.');
