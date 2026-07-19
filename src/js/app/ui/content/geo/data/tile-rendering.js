@@ -14,12 +14,18 @@ export function renderTile({
 }) {
   let element = tiles.get(key);
   if (!element) {
+    const settle = () => {
+      element.slippyLoaded = true;
+      layer.slippyPendingTiles?.delete(key);
+      revealTileLayer(layer);
+    };
     element = createFallbackTile({
       template,
       tile,
       minimumSourceZoom,
       maximumSourceZoom,
-      onLoad: () => revealTileLayer(layer),
+      onLoad: settle,
+      onUnavailable: settle,
     });
     tiles.set(key, element);
     layer.appendChild(element);

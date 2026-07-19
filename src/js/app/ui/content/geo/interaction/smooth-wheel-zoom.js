@@ -24,10 +24,16 @@ export function createSmoothWheelZoomHandler(
   };
 }
 
-export function attachSmoothWheelZoom(container, getLayer, onCommit) {
+export function attachSmoothWheelZoom(
+  container,
+  getLayer,
+  onCommit,
+  onPreview,
+) {
   const handler = createSmoothWheelZoomHandler({
     onPreview(scale) {
       getLayer().style.setProperty('--slippy-preview-scale', scale);
+      onPreview?.(scale);
     },
     onCommit,
   });

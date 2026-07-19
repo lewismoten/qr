@@ -69,12 +69,14 @@ Object.defineProperty(globalThis, 'document', {
   },
 });
 let loaded = 0;
+let unavailable = 0;
 const fallbackElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
   minimumSourceZoom: 5,
   maximumSourceZoom: 6,
   onLoad: () => (loaded += 1),
+  onUnavailable: () => (unavailable += 1),
 });
 const fallbackImage = fallbackElement.children[0];
 assert.equal(fallbackImage.src, '/maps/tiles/6/18/24.svg');
@@ -87,11 +89,13 @@ fallbackImage.dispatch('error');
 assert.equal(fallbackImage.src, '/maps/tiles/5/9/12.svg');
 fallbackImage.dispatch('error');
 assert.equal(fallbackElement.classList.values.has('is-missing'), true);
+assert.equal(unavailable, 1);
 
 const renderedTiles = new Map();
 const renderedChildren = [];
 const renderedLayer = {
   classList: { contains: () => false },
+  slippyPendingTiles: new Set(['6:18:24']),
   appendChild: (element) => renderedChildren.push(element),
 };
 const renderOptions = {
@@ -109,6 +113,7 @@ assert.equal(renderedChildren.length, 1);
 assert.equal(renderedTile.style.left, '108px');
 assert.equal(renderedTile.style.top, '44px');
 renderedTile.children[0].dispatch('load');
+assert.equal(renderedLayer.slippyPendingTiles.size, 0);
 assert.equal(renderTile(renderOptions), renderedTile);
 assert.equal(renderedChildren.length, 1);
 const defaultLoadTile = createFallbackTile({
@@ -118,6 +123,7 @@ const defaultLoadTile = createFallbackTile({
   maximumSourceZoom: 1,
 });
 defaultLoadTile.children[0].dispatch('load');
+defaultLoadTile.children[0].dispatch('error');
 Object.defineProperty(
   globalThis,
   'document',

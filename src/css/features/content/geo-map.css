@@ -161,7 +161,7 @@
 .slippy-map-tiles {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .slippy-map-tile {

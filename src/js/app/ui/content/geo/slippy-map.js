@@ -1,6 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
 import {
-  TILE_SIZE,
   clamp,
   getWorldSize,
   projectCoordinates,
@@ -11,7 +10,7 @@ import { attachSmoothWheelZoom } from './interaction/smooth-wheel-zoom.js';
 import { transitionTileLayer } from './interaction/tile-transition.js';
 import { createDynamicAttribution } from './data/attribution.js';
 import { positionMarker } from './data/marker-position.js';
-import { renderTile } from './data/tile-rendering.js';
+import { renderTileLayer } from './data/tile-layer.js';
 
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 export function createSlippyMap(
@@ -40,6 +39,7 @@ export function createSlippyMap(
   let frameRequest = 0;
   let drag = null;
   let pinchDistance = 0;
+  let tileScale = 1;
   container.replaceChildren();
   container.classList.add('slippy-map');
   container.tabIndex = 0;
@@ -92,36 +92,18 @@ export function createSlippyMap(
         x: centerPoint.x - width / 2,
         y: centerPoint.y - height / 2,
       };
-      const maximumTile = 2 ** currentZoom - 1;
-      const visible = new Set();
-      const firstX = Math.floor(origin.x / TILE_SIZE);
-      const lastX = Math.floor((origin.x + width - 1) / TILE_SIZE);
-      const firstY = Math.max(0, Math.floor(origin.y / TILE_SIZE));
-      const lastY = Math.min(
-        maximumTile,
-        Math.floor((origin.y + height - 1) / TILE_SIZE),
-      );
-
-      for (let tileY = firstY; tileY <= lastY; tileY += 1) {
-        for (let tileX = firstX; tileX <= lastX; tileX += 1) {
-          const key = `${currentZoom}:${tileX}:${tileY}`;
-          visible.add(key);
-          renderTile({
-            tiles,
-            key,
-            layer: tileLayer,
-            template: tileUrl,
-            tile: { zoom: currentZoom, x: tileX, y: tileY },
-            minimumSourceZoom,
-            maximumSourceZoom,
-            origin,
-          });
-        }
-      }
-      tiles.forEach((element, key) => {
-        if (visible.has(key)) return;
-        element.remove();
-        tiles.delete(key);
+      renderTileLayer({
+        tiles,
+        layer: tileLayer,
+        template: tileUrl,
+        zoom: currentZoom,
+        center: centerPoint,
+        width,
+        height,
+        scale: tileScale,
+        minimumSourceZoom,
+        maximumSourceZoom,
+        origin,
       });
 
       positionMarker({
@@ -153,6 +135,7 @@ export function createSlippyMap(
     }
     const scale = 2 ** (next - currentZoom);
     currentZoom = next;
+    tileScale = nextScale;
     tileLayer = transitionTileLayer(
       container,
       tileLayer,
@@ -183,6 +166,10 @@ export function createSlippyMap(
     container,
     () => tileLayer,
     (step, nextScale) => setZoom(currentZoom + step, nextScale),
+    (scale) => {
+      tileScale = scale;
+      scheduleRender();
+    },
   );
   container.addEventListener('keydown', (event) => {
     if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))
@@ -230,8 +217,8 @@ export function createSlippyMap(
       const deltaY = event.clientY - drag.y;
       if (Math.hypot(deltaX, deltaY) > 4) drag.moved = true;
       setCenterFromPoint({
-        x: drag.center.x - deltaX,
-        y: drag.center.y - deltaY,
+        x: drag.center.x - deltaX / tileScale,
+        y: drag.center.y - deltaY / tileScale,
       });
     } else if (pointers.size === 2) {
       const [first, second] = [...pointers.values()];

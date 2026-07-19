@@ -60,6 +60,7 @@ smoothWheel(wheelEvent(80, 40));
 assert.equal(commits.length, 1);
 
 const properties = new Map();
+const attachedPreviews = [];
 let attachedHandler;
 const layer = {
   style: {
@@ -78,8 +79,22 @@ attachSmoothWheelZoom(
   },
   () => layer,
   (step) => commits.push(step),
+  (scale) => attachedPreviews.push(scale),
 );
 attachedHandler(wheelEvent(-320, 30));
 assert.ok(properties.get('--slippy-preview-scale') < 1);
+assert.deepEqual(attachedPreviews, [properties.get('--slippy-preview-scale')]);
+
+let noPreviewHandler;
+attachSmoothWheelZoom(
+  {
+    addEventListener(_name, handler) {
+      noPreviewHandler = handler;
+    },
+  },
+  () => layer,
+  () => {},
+);
+noPreviewHandler(wheelEvent(10, 40));
 
 console.log('Map wheel zoom tests passed.');
