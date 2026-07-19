@@ -175,6 +175,25 @@ describe('SVG map tile rendering', () => {
         ],
       },
     },
+    primaryRoadsOverview: {
+      minimumZoom: 6,
+      maximumZoom: 7,
+      collection: {
+        features: [
+          {
+            type: 'Feature',
+            properties: { MTFCC: 'S1100' },
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-1, 0],
+                [1, 0],
+              ],
+            },
+          },
+        ],
+      },
+    },
     states: {
       minimumZoom: 7,
       maximumZoom: 7,
@@ -231,6 +250,10 @@ describe('SVG map tile rendering', () => {
       renderTile({ zoom: 5, x: 16, y: 16 }, collections).match(/class="city"/g)
         ?.length,
       2,
+    );
+    assert.match(
+      renderTile({ zoom: 6, x: 32, y: 32 }, collections),
+      /class="primary-road"/,
     );
     assert.match(
       renderTile({ zoom: 7, x: 64, y: 64 }, collections),

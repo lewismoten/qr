@@ -13,7 +13,7 @@ import {
   createWorldMap,
   worldPointToCoordinates,
 } from '../../src/js/app/ui/content/geo/world-map.js';
-import { hasVisibleCensusCounties } from '../../src/js/app/ui/content/geo/data/attribution.js';
+import { hasVisibleCensusData } from '../../src/js/app/ui/content/geo/data/attribution.js';
 
 assert.deepEqual(projectCoordinates({ latitude: 0, longitude: 0 }, 0), {
   x: 128,
@@ -171,7 +171,7 @@ assert.equal(slippyOptions.minimumSourceZoom, 1);
 assert.equal(slippyOptions.maximumSourceZoom, 6);
 assert.equal(slippyOptions.attributionText, 'Natural Earth');
 assert.equal(slippyOptions.secondaryAttribution.text, 'U.S. Census Bureau');
-assert.equal(slippyOptions.showSecondaryAttribution, hasVisibleCensusCounties);
+assert.equal(slippyOptions.showSecondaryAttribution, hasVisibleCensusData);
 assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
 assert.deepEqual(worldMap.getView(), { center: frontRoyal, zoom: 2 });
 const nextMarker = { latitude: 39.115, longitude: -77.565 };

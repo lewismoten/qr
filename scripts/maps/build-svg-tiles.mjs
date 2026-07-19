@@ -19,6 +19,7 @@ import {
   serializeTileAvailability,
 } from './tile-availability.mjs';
 import { writeTileBundles } from './tile-bundles.mjs';
+import { obtainMapSource } from './source-loader.mjs';
 
 function option(name, fallback) {
   const exact = process.argv.find((value) => value.startsWith(`--${name}=`));
@@ -33,8 +34,8 @@ if (has('help')) {
   console.log(`Usage: npm run maps:build -- [options]
 
 Options:
-  --zoom 1-7            Generate one zoom or an inclusive range
-  --layers a,b          countries, regions, states, subdivisions, cities
+  --zoom 1-8            Generate one zoom or an inclusive range
+  --layers a,b          Named layers from source-config.mjs
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
   --max-tile-kib 24     Simplify tiles larger than this target
@@ -46,7 +47,7 @@ Options:
   --force               Replace tiles that already exist`);
   process.exit(0);
 }
-const zoom = parseZoomRange(option('zoom', '1-7'));
+const zoom = parseZoomRange(option('zoom', '1-8'));
 const boundsValue = option('bounds', 'world');
 const bounds = parseBounds(boundsValue);
 const layers = option('layers', DEFAULT_LAYERS.join(',')).split(',');
@@ -73,9 +74,9 @@ if (!Number.isInteger(bundleFrom) || bundleFrom < 0) {
 if (!Number.isInteger(bundleSize) || bundleSize < 1) {
   throw new Error('Bundle size must be a positive integer.');
 }
-if (zoom.maximum >= 8 && boundsValue === 'world') {
+if (zoom.maximum >= 9 && boundsValue === 'world') {
   throw new Error(
-    'Worldwide builds at zoom 8 or higher require explicit --bounds.',
+    'Worldwide builds at zoom 9 or higher require explicit --bounds.',
   );
 }
 for (const layer of layers) {
@@ -109,44 +110,16 @@ console.log(
 );
 if (planOnly) process.exit(0);
 
-async function obtainSource(name) {
-  const source = MAP_SOURCES[name];
-  const file = path.join(cache, source.file);
-  try {
-    await stat(file);
-    return { name, path: file, source };
-  } catch {
-    await mkdir(cache, { recursive: true });
-  }
-  console.log(`Downloading ${name}...`);
-  const response = await fetch(source.url);
-  if (!response.ok) {
-    throw new Error(`Unable to download ${source.url}: ${response.status}`);
-  }
-  const total = Number(response.headers.get('content-length')) || 0;
-  const encoded = response.headers.has('content-encoding');
-  const reader = response.body.getReader();
-  const chunks = [];
-  let received = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    const chunk = Buffer.from(value);
-    chunks.push(chunk);
-    received += chunk.byteLength;
-    const progress =
-      total && !encoded
-        ? `${Math.floor((received / total) * 100)}%`
-        : formatBytes(received);
-    process.stdout.write(`\rDownloading ${name}: ${progress}`);
-  }
-  await writeFile(`${file}.tmp`, Buffer.concat(chunks));
-  await rename(`${file}.tmp`, file);
-  process.stdout.write(`\rDownloaded ${name}: ${formatBytes(received)}\n`);
-  return { name, path: file, source };
-}
-
-const sources = await Promise.all(layers.map(obtainSource));
+const sources = await Promise.all(
+  layers.map((name) =>
+    obtainMapSource({
+      name,
+      source: MAP_SOURCES[name],
+      cache,
+      formatBytes,
+    }),
+  ),
+);
 const sourceFiles = sources.map(({ name, path: sourcePath }) => ({
   name,
   path: sourcePath,

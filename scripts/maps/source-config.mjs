@@ -1,6 +1,8 @@
 export const DEFAULT_LAYERS = [
   'countries',
   'regions',
+  'primaryRoadsOverview',
+  'primaryRoads',
   'states',
   'subdivisions',
   'cities',
@@ -18,6 +20,15 @@ const CENSUS_QUERY =
 
 const censusUrl = (layer) =>
   `${CENSUS_SERVICE_ROOT}${layer}/query?${CENSUS_QUERY}`;
+const TRANSPORTATION_ROOT =
+  'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
+  'TIGERweb/Transportation/MapServer/';
+const ROAD_QUERY =
+  'where=1%3D1&outFields=%2A&' +
+  'returnGeometry=true&outSR=4326&geometryPrecision=4&f=geojson';
+const transportationUrl = (layer, offset) =>
+  `${TRANSPORTATION_ROOT}${layer}/query?${ROAD_QUERY}&` +
+  `maxAllowableOffset=${offset}`;
 
 export const MAP_SOURCES = {
   countries: {
@@ -33,6 +44,22 @@ export const MAP_SOURCES = {
       `${NATURAL_EARTH_ROOT}` + 'ne_50m_admin_1_states_provinces_lines.geojson',
     minimumZoom: 4,
     maximumZoom: 19,
+    kind: 'line',
+  },
+  primaryRoadsOverview: {
+    file: 'census_2025_primary_roads_5m.geojson',
+    url: transportationUrl(0, 0.008),
+    pageSize: 1000,
+    minimumZoom: 6,
+    maximumZoom: 7,
+    kind: 'line',
+  },
+  primaryRoads: {
+    file: 'census_2025_primary_roads_2m.geojson',
+    url: transportationUrl(1, 0.002),
+    pageSize: 1000,
+    minimumZoom: 8,
+    maximumZoom: 8,
     kind: 'line',
   },
   states: {
@@ -69,6 +96,6 @@ export const SOURCE_ATTRIBUTION = [
     name: 'U.S. Census Bureau',
     license: 'U.S. government work',
     website: 'https://www.census.gov/geographies/mapping-files.html',
-    version: '2024 ACS generalized states and counties 20M',
+    version: '2024 ACS boundaries and 2025 TIGERweb primary roads',
   },
 ];

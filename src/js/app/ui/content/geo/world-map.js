@@ -1,4 +1,4 @@
-import { hasVisibleCensusCounties } from './data/attribution.js';
+import { hasVisibleCensusData } from './data/attribution.js';
 import { createTileSourceCache } from './data/tile-source-cache.js';
 import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
 
@@ -85,7 +85,7 @@ export function createWorldMap(
               text: 'U.S. Census Bureau',
               url: 'https://www.census.gov/geographies/mapping-files.html',
             },
-            showSecondaryAttribution: hasVisibleCensusCounties,
+            showSecondaryAttribution: hasVisibleCensusData,
             onMinimumZoomOut: showOverview,
             onSelect,
           });

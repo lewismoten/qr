@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   createDynamicAttribution,
-  hasVisibleCensusCounties,
+  hasVisibleCensusData,
 } from '../../../src/js/app/ui/content/geo/data/attribution.js';
 import { createElement } from '../../../src/js/app/ui/content/geo/slippy-elements.js';
 
@@ -12,11 +12,12 @@ const censusView = {
   height: 250,
 };
 
-assert.equal(hasVisibleCensusCounties({ ...censusView, zoom: 6 }), false);
-assert.equal(hasVisibleCensusCounties({ ...censusView, width: 0 }), false);
-assert.equal(hasVisibleCensusCounties(censusView), true);
+assert.equal(hasVisibleCensusData({ ...censusView, zoom: 5 }), false);
+assert.equal(hasVisibleCensusData({ ...censusView, zoom: 6 }), true);
+assert.equal(hasVisibleCensusData({ ...censusView, width: 0 }), false);
+assert.equal(hasVisibleCensusData(censusView), true);
 assert.equal(
-  hasVisibleCensusCounties({
+  hasVisibleCensusData({
     ...censusView,
     center: { latitude: 48.8566, longitude: 2.3522 },
   }),

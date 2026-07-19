@@ -29,8 +29,11 @@ test('Spanish technology copy uses reviewed technical terminology', async () => 
   assert.match(copy, /un estándar del IETF específico/);
   assert.match(copy, /Un manifiesto opcional puede incluir/);
   assert.match(copy, /Datos y servicios cartográficos/);
-  assert.match(copy, /generalizado deliberadamente/);
-  assert.match(copy, /no para usos jurídicos ni de alta precisión/);
+  assert.match(copy, /se han generalizado deliberadamente/);
+  assert.match(
+    copy,
+    /no para la navegación ni para usos jurídicos o de alta precisión/,
+  );
   assert.doesNotMatch(copy, />Código propio</);
 });
 
