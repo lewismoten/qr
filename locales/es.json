@@ -194,6 +194,15 @@
     }
   },
   "map": {
+    "viewTabs": "Fuente del mapa",
+    "world": "Mapa mundial",
+    "worldLabel": "Mapa mundial general. Haga clic para elegir las coordenadas.",
+    "privacyTitle": "¿Cargar OpenStreetMap?",
+    "privacyMessage": "OpenStreetMap recibirá su dirección IP, los encabezados de la solicitud del navegador, la referencia de este sitio y las coordenadas de los mosaicos visibles.",
+    "privacyLink": "Leer la política de privacidad de OpenStreetMap",
+    "neverAsk": "No volver a preguntar en este navegador",
+    "cancel": "Cancelar",
+    "proceed": "Cargar el mapa",
     "zoomControls": "Controles de zoom del mapa",
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",

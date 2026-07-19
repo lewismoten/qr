@@ -3,6 +3,10 @@
   gap: 0.55rem;
 }
 
+.geo-map-tabs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .geo-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -30,6 +34,101 @@
   user-select: none;
 }
 
+.geo-world-map {
+  min-height: 0;
+  aspect-ratio: 2 / 1;
+  background: #bde6ed;
+  cursor: crosshair;
+}
+
+.geo-world-surface,
+.geo-world-overlay {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.geo-local-map {
+  position: absolute;
+  inset: 0;
+  background: #bde6ed;
+}
+
+.geo-world-surface {
+  pointer-events: none;
+  user-select: none;
+}
+
+.geo-world-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.geo-world-marker {
+  fill: rgba(225, 29, 72, 0.24);
+  stroke: #fff;
+  stroke-width: 4;
+  pointer-events: none;
+}
+
+.geo-world-marker-core {
+  fill: #e11d48;
+  stroke: none;
+}
+
+.geo-world-label {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  max-width: calc(100% - 1rem);
+  overflow: hidden;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(19, 34, 53, 0.86);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.geo-map-consent {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  color: #132235;
+  box-shadow: 0 24px 80px rgba(19, 34, 53, 0.32);
+}
+
+.geo-map-consent::backdrop {
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.geo-map-consent form {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.2rem;
+}
+
+.geo-map-consent h2,
+.geo-map-consent p {
+  margin: 0;
+}
+
+.geo-map-consent p {
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.geo-map-consent-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
 .geo-map:focus-visible {
   outline: 3px solid rgba(13, 148, 136, 0.55);
   outline-offset: 2px;
@@ -52,6 +151,10 @@
   max-width: none;
   pointer-events: none;
   -webkit-user-drag: none;
+}
+
+.slippy-map-tile.is-missing {
+  visibility: hidden;
 }
 
 .slippy-map-marker {

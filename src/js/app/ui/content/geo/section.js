@@ -1,7 +1,13 @@
 import { serializeGeo } from '../../../data/content-formats.js';
 import { loadFeatureStylesheet } from '../../../../stylesheets.js';
 import { createLoadingIndicator } from '../../loading-indicator.js';
+import { lookup } from '../../../../i18n/index.js';
 import { parseCoordinate } from './coordinates.js';
+import {
+  hasOpenStreetMapConsent,
+  rememberOpenStreetMapConsent,
+} from './map-consent.js';
+import { createWorldMap } from './world-map.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
 
@@ -13,13 +19,36 @@ export function createGeoSection({
   latitudeInput,
   longitudeInput,
   labelInput,
+  worldElement,
   mapElement,
+  worldTab,
+  osmTab,
+  consentDialog,
+  neverAskInput,
+  cancelButton,
+  proceedButton,
   isActive,
   onChange,
+  storage,
 }) {
   let map = null;
   let mapRequest = null;
-  const loading = createLoadingIndicator({ region: mapElement });
+  let view = 'world';
+  const loading = createLoadingIndicator({ region: worldElement });
+  const selectCoordinates = ({ latitude, longitude }) => {
+    latitudeInput.value = formatCoordinate(latitude);
+    longitudeInput.value = formatCoordinate(longitude);
+    onChange();
+  };
+  const world = createWorldMap(worldElement, {
+    onSelect: selectCoordinates,
+    loadSlippyMap: () => loading.track(import('./slippy-map.js')),
+    onLoadError: (error) => {
+      console.error(error);
+    },
+  });
+
+  loading.track(loadFeatureStylesheet('geo-map')).catch(console.error);
 
   const getCoordinates = () => {
     const latitude = parseCoordinate(latitudeInput.value);
@@ -50,21 +79,12 @@ export function createGeoSection({
     if (map) return Promise.resolve(map);
     if (!mapRequest) {
       mapRequest = loading
-        .track(
-          Promise.all([
-            loadFeatureStylesheet('geo-map'),
-            import('./slippy-map.js'),
-          ]),
-        )
-        .then(([, { createSlippyMap }]) => {
+        .track(import('./slippy-map.js'))
+        .then(({ createSlippyMap }) => {
           map = createSlippyMap(mapElement, {
             center: DEFAULT_CENTER,
             zoom: 13,
-            onSelect({ latitude, longitude }) {
-              latitudeInput.value = formatCoordinate(latitude);
-              longitudeInput.value = formatCoordinate(longitude);
-              onChange();
-            },
+            onSelect: selectCoordinates,
           });
           return map;
         });
@@ -72,21 +92,7 @@ export function createGeoSection({
     return mapRequest;
   };
 
-  const update = () => {
-    if (!isActive()) return;
-    if (!map) {
-      ensureMap()
-        .then(update)
-        .catch((error) => {
-          mapElement.classList.add('has-load-error');
-          mapElement.textContent = lookup(
-            'map.loadError',
-            'Unable to initialize the map preview.',
-          );
-          console.error(error);
-        });
-      return;
-    }
+  const updateMap = () => {
     const coordinates = getCoordinates();
     const label = labelInput.value.trim();
     if (!coordinates) {
@@ -99,16 +105,74 @@ export function createGeoSection({
     map.setView(coordinates, Math.max(15, map.getZoom()));
   };
 
+  const selectView = (nextView) => {
+    view = nextView;
+    const showWorld = view === 'world';
+    worldElement.hidden = !showWorld;
+    mapElement.hidden = showWorld;
+    worldTab.classList.toggle('is-active', showWorld);
+    osmTab.classList.toggle('is-active', !showWorld);
+    worldTab.setAttribute('aria-selected', String(showWorld));
+    osmTab.setAttribute('aria-selected', String(!showWorld));
+  };
+
+  const activateOpenStreetMap = () => {
+    selectView('osm');
+    ensureMap()
+      .then(updateMap)
+      .catch((error) => {
+        mapElement.classList.add('has-load-error');
+        mapElement.textContent = lookup(
+          'map.loadError',
+          'Unable to initialize the map preview.',
+        );
+        console.error(error);
+      });
+  };
+
+  const requestOpenStreetMap = () => {
+    if (map || hasOpenStreetMapConsent(storage)) {
+      activateOpenStreetMap();
+      return;
+    }
+    neverAskInput.checked = false;
+    consentDialog.showModal();
+  };
+
+  worldTab.addEventListener('click', () => selectView('world'));
+  osmTab.addEventListener('click', requestOpenStreetMap);
+  cancelButton.addEventListener('click', () => selectView('world'));
+  proceedButton.addEventListener('click', () => {
+    if (neverAskInput.checked) rememberOpenStreetMapConsent(storage);
+    activateOpenStreetMap();
+  });
+  consentDialog.addEventListener('cancel', () => selectView('world'));
+
+  const update = () => {
+    if (!isActive()) return;
+    const coordinates = getCoordinates();
+    world.setMarker(coordinates, labelInput.value.trim());
+    if (view === 'osm' && map) updateMap();
+  };
+
+  update();
+
   return { buildPayload, buildPreview, getCoordinates, update };
 }
-import { lookup } from '../../../../i18n/index.js';
 
 export function createGeoSectionFromDocument(document, options) {
   return createGeoSection({
     latitudeInput: document.getElementById('geo-latitude'),
     longitudeInput: document.getElementById('geo-longitude'),
     labelInput: document.getElementById('geo-query'),
+    worldElement: document.getElementById('geo-world-map'),
     mapElement: document.getElementById('geo-map'),
+    worldTab: document.getElementById('geo-world-tab'),
+    osmTab: document.getElementById('geo-osm-tab'),
+    consentDialog: document.getElementById('geo-map-consent'),
+    neverAskInput: document.getElementById('geo-map-never-ask'),
+    cancelButton: document.getElementById('geo-map-cancel'),
+    proceedButton: document.getElementById('geo-map-proceed'),
     ...options,
   });
 }

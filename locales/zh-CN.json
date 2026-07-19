@@ -194,6 +194,15 @@
     }
   },
   "map": {
+    "viewTabs": "地图来源",
+    "world": "世界地图",
+    "worldLabel": "世界概览地图。点击以选择坐标。",
+    "privacyTitle": "加载 OpenStreetMap？",
+    "privacyMessage": "OpenStreetMap 将收到您的 IP 地址、浏览器请求标头、本网站的来源信息以及可见地图图块的坐标。",
+    "privacyLink": "阅读 OpenStreetMap 隐私政策",
+    "neverAsk": "不再在此浏览器中询问",
+    "cancel": "取消",
+    "proceed": "加载地图",
     "zoomControls": "地图缩放控件",
     "zoomIn": "放大",
     "zoomOut": "缩小",

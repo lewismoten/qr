@@ -6,27 +6,30 @@ import {
   projectCoordinates,
   unprojectPoint,
 } from './projection.js';
+import { createAttribution, createElement } from './slippy-elements.js';
 
-const MIN_ZOOM = 0;
-const MAX_ZOOM = 19;
-const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 export { projectCoordinates, unprojectPoint } from './projection.js';
 
-function createElement(tag, className, attributes = {}) {
-  const element = document.createElement(tag);
-  element.className = className;
-  Object.entries(attributes).forEach(([name, value]) =>
-    element.setAttribute(name, value),
-  );
-  return element;
-}
-
-export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
+export function createSlippyMap(
+  container,
+  {
+    center,
+    zoom = 13,
+    onSelect,
+    tileUrl = DEFAULT_TILE_URL,
+    minimumZoom = 0,
+    maximumZoom = 19,
+    attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
+    attributionUrl = 'https://www.openstreetmap.org/copyright',
+    onMinimumZoomOut,
+  },
+) {
   const tiles = new Map();
   const pointers = new Map();
   let currentCenter = { ...center };
-  let currentZoom = clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+  let currentZoom = clamp(zoom, minimumZoom, maximumZoom);
   let markerCoordinates = null;
   let frameRequest = 0;
   let drag = null;
@@ -57,14 +60,7 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
   zoomIn.textContent = '+';
   zoomOut.textContent = '-';
   controls.append(zoomIn, zoomOut);
-  const attribution = createElement('div', 'slippy-map-attribution');
-  const attributionLink = document.createElement('a');
-  attributionLink.href = 'https://www.openstreetmap.org/copyright';
-  attributionLink.textContent = lookup(
-    'map.attribution',
-    '© OpenStreetMap contributors',
-  );
-  attribution.appendChild(attributionLink);
+  const attribution = createAttribution(attributionText, attributionUrl);
   container.append(tileLayer, marker, label, controls, attribution);
 
   const scheduleRender = () => {
@@ -105,7 +101,11 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
               referrerpolicy: 'strict-origin-when-cross-origin',
             });
             image.decoding = 'async';
-            image.src = TILE_URL.replace('{z}', currentZoom)
+            image.addEventListener('error', () => {
+              image.classList.add('is-missing');
+            });
+            image.src = tileUrl
+              .replace('{z}', currentZoom)
               .replace('{x}', wrappedX)
               .replace('{y}', tileY);
             tiles.set(key, image);
@@ -149,8 +149,11 @@ export function createSlippyMap(container, { center, zoom = 13, onSelect }) {
     scheduleRender();
   };
   const setZoom = (value) => {
-    const next = clamp(value, MIN_ZOOM, MAX_ZOOM);
-    if (next === currentZoom) return;
+    const next = clamp(value, minimumZoom, maximumZoom);
+    if (next === currentZoom) {
+      if (value < minimumZoom) onMinimumZoomOut?.();
+      return;
+    }
     currentZoom = next;
     tiles.forEach((image) => image.remove());
     tiles.clear();

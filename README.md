@@ -62,6 +62,29 @@ Authored JavaScript is formatted to an 80-column target and limited to 300
 physical lines per module. URLs, regular expressions and indivisible translated
 strings may exceed the column target without weakening the module-size limit.
 
+## Local map assets
+
+The dependency-free overview map is available as the reusable public asset
+`/maps/world.svg`. Natural Earth SVG tiles can be planned or generated for
+deeper zoom levels without contacting a tile provider at runtime:
+
+```sh
+npm run maps:build -- --zoom 1-6 --plan
+npm run maps:build -- --zoom 1-6 --jobs 8
+```
+
+Downloads are pinned to Natural Earth 5.1.2 and cached under `.cache/maps`.
+Generated tiles are written to `build/maps/tiles`, skipped when present, and
+copied to `/maps/tiles` during the site build. Add `--force` to replace them.
+Worldwide builds at zoom 7 or higher require explicit geographic bounds:
+
+```sh
+npm run maps:build -- --zoom 7 --bounds=-79,38,-77,40 --force
+```
+
+Use `npm run maps:build -- --help` for all options. Natural Earth data is in
+the public domain; the generated manifest records source URLs and attribution.
+
 ## Testing
 
 Tests run on Node's built-in test platform. It discovers every

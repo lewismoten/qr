@@ -9,8 +9,15 @@ const generatedRoot = resolve(projectRoot, 'build/site');
 const host = process.env.HOST || '127.0.0.1';
 const port = Number.parseInt(process.env.PORT || '8080', 10);
 const mounts = new Map([
-  ['dist', resolve(projectRoot, 'dist')],
-  ['locales', resolve(projectRoot, 'build/locales')],
+  ['dist', [resolve(projectRoot, 'dist')]],
+  ['locales', [resolve(projectRoot, 'build/locales')]],
+  [
+    'maps',
+    [
+      resolve(projectRoot, 'build/maps'),
+      resolve(projectRoot, 'src/assets/maps'),
+    ],
+  ],
 ]);
 const publicFiles = new Map([
   ['favicon.ico', resolve(projectRoot, 'src/assets/favicon.ico')],
@@ -46,7 +53,10 @@ function candidates(requestUrl) {
   const requested = relative || 'index.html';
   const [prefix, ...rest] = requested.split('/');
   if (mounts.has(prefix)) {
-    return [safePath(mounts.get(prefix), rest.join('/'))].filter(Boolean);
+    return mounts
+      .get(prefix)
+      .map((root) => safePath(root, rest.join('/')))
+      .filter(Boolean);
   }
   if (publicFiles.has(requested)) return [publicFiles.get(requested)];
   return [

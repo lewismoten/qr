@@ -565,6 +565,8 @@
   "format carries a single file or random-order chunks. Its readable header identifies single/chunk mode, manifest presence, a 128-bit random transfer ID encoded as 22 Base64url characters, extension hint, byte offset and total transfer length. An optional typed manifest can include filename, MIME type, modified time, original size, JSON metadata and SHA-256 validation; a flag records optional gzip transfer encoding. This is not an ISO, IETF or established scanner standard, so receiving it requires compatible software.": "يحمل التنسيق ملفا واحدا أو أجزاء عشوائية. يحدد رأسه القابل للقراءة وضع واحد / قطعة، والتواجد الواضح، ومعرف النقل العشوائي 128 بت المشفر ك 22 حرفا Base64url، وتلميح التمديد، وإزاحة البايت، وإجمالي طول النقل. يمكن أن يتضمن البيان المكتوب الاختياري اسم الملف ونوع MIME والوقت المعدل والحجم الأصلي والبيانات الوصفية JSON والتحقق من صحة SHA-256؛ يسجل العلم ترميز نقل gzip الاختياري. هذا ليس معيار ISO أو IETF أو معيار الماسح الضوئي المعمول به، لذلك يتطلب استلامه برنامجا متوافقا.",
   "FILE protocol references": "مراجع بروتوكول الملف",
   "Protocol documentation": "وثائق البروتوكول",
+  "The high-level world map is built into the application and makes no network requests. Click it to replace the coordinates.": "خريطة العالم العامة مضمّنة في التطبيق ولا تُجري أي طلبات شبكة. انقر عليها لاستبدال الإحداثيات.",
+  "OpenStreetMap adds detailed tiles, panning, and zoom controls. It loads only after you choose its tab and confirm the network and privacy notice.": "تضيف OpenStreetMap مربعات خرائط تفصيلية وعناصر للتحريك والتكبير. ولا تُحمّل إلا بعد اختيار علامتها والموافقة على إشعار الشبكة والخصوصية.",
   "RFC 4648 Base64url": "RFC 4648 قاعدة 64url",
   "RFC 8259 JSON": "RFC 8259 JSON",
   "RFC 1952 gzip": "RFC 1952 gzip",

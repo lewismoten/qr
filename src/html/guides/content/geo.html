@@ -100,19 +100,140 @@
             </div>
             <div class="geo-map-card">
               <div
+                class="geo-map-tabs choice-grid choice-grid-compact"
+                role="tablist"
+                aria-label="Map source"
+                data-i18n-aria-label="map.viewTabs"
+              >
+                <button
+                  id="geo-world-tab"
+                  class="choice-button is-active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="geo-world-map"
+                  data-i18n="map.world"
+                >
+                  World
+                </button>
+                <button
+                  id="geo-osm-tab"
+                  class="choice-button"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="geo-map"
+                >
+                  OpenStreetMap
+                </button>
+              </div>
+              <div
+                id="geo-world-map"
+                class="geo-map geo-world-map"
+                role="tabpanel"
+                aria-labelledby="geo-world-tab"
+                aria-label="High-level world map. Click to choose coordinates."
+                data-i18n-aria-label="map.worldLabel"
+              >
+                <img
+                  class="geo-world-surface"
+                  src="/maps/world.svg"
+                  alt=""
+                  draggable="false"
+                  aria-hidden="true"
+                />
+                <svg
+                  class="geo-world-overlay"
+                  viewBox="0 0 1000 500"
+                  aria-hidden="true"
+                >
+                  <g id="geo-world-marker" class="geo-world-marker" hidden>
+                    <circle r="11" />
+                    <circle class="geo-world-marker-core" r="4" />
+                  </g>
+                </svg>
+                <div
+                  id="geo-world-zoom-controls"
+                  class="slippy-map-controls"
+                >
+                  <button
+                    id="geo-world-zoom-in"
+                    class="slippy-map-control"
+                    type="button"
+                    aria-label="Zoom in"
+                    data-i18n-aria-label="map.zoomIn"
+                  >
+                    +
+                  </button>
+                </div>
+                <div id="geo-local-map" class="geo-local-map" hidden></div>
+                <output id="geo-world-label" class="geo-world-label"></output>
+              </div>
+              <div
                 id="geo-map"
                 class="geo-map"
+                role="tabpanel"
+                aria-labelledby="geo-osm-tab"
                 aria-label="Interactive map preview. Drag to pan, use the controls to zoom, or click to choose coordinates."
                 data-i18n-aria-label="form.data.mapLabel"
+                hidden
               ></div>
             </div>
+            <dialog id="geo-map-consent" class="geo-map-consent">
+              <form method="dialog">
+                <h2 data-i18n="map.privacyTitle">Load OpenStreetMap?</h2>
+                <p data-i18n="map.privacyMessage">
+                  OpenStreetMap receives your IP address, browser request
+                  headers, this site's referrer, and the coordinates of visible
+                  map tiles.
+                </p>
+                <p>
+                  <a
+                    href="https://osmfoundation.org/wiki/Privacy_Policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-i18n="map.privacyLink"
+                    >Read the OpenStreetMap privacy policy</a
+                  >
+                </p>
+                <label class="toggle-field">
+                  <input id="geo-map-never-ask" type="checkbox" />
+                  <span data-i18n="map.neverAsk"
+                    >Do not ask again on this browser</span
+                  >
+                </label>
+                <div class="geo-map-consent-actions">
+                  <button
+                    id="geo-map-cancel"
+                    class="secondary-button"
+                    type="submit"
+                    value="cancel"
+                    data-i18n="map.cancel"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    id="geo-map-proceed"
+                    type="submit"
+                    value="proceed"
+                    data-i18n="map.proceed"
+                  >
+                    Load map
+                  </button>
+                </div>
+              </form>
+            </dialog>
           </fieldset>
           <section class="fragment-help-copy" data-fragment-help>
             <h2>Using the map</h2>
             <p>
-              Click the map to replace the coordinates, drag to pan, and use the
-              controls to zoom. OpenStreetMap map tiles load only after the Geo
-              format is selected.
+              The high-level world map is built into the application and makes
+              no network requests. Click it to replace the coordinates.
+            </p>
+            <p>
+              OpenStreetMap adds detailed tiles, panning, and zoom controls. It
+              loads only after you choose its tab and confirm the network and
+              privacy notice.
             </p>
           </section>
         </div>

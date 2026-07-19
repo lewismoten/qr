@@ -12,6 +12,14 @@ deployment:
     from: dist
     include: **/*
     to: dist
+  maps:
+    from: src/assets/maps
+    include: **/*
+    to: maps
+  mapTiles:
+    from: build/maps
+    include: **/*
+    to: maps
   locales:
     from: build/locales
     include: **/*.json

@@ -35,6 +35,10 @@ test('HTML sources and native deployment routes follow site config', async () =>
   assert.equal(config.deployment.html.from, 'src/html');
   assert.equal(config.deployment.assets.from, 'dist');
   assert.equal(config.deployment.locales.from, 'build/locales');
+  assert.equal(config.deployment.maps.from, 'src/assets/maps');
+  assert.equal(config.deployment.maps.to, 'maps');
+  assert.equal(config.deployment.mapTiles.from, 'build/maps');
+  assert.equal(config.deployment.mapTiles.to, 'maps');
   assert.equal(config.deployment.favicon.from, 'src/assets/favicon.ico');
   assert.equal(config.deployment.favicon.to, 'favicon.ico');
   assert.equal(config.deployment.robots.from, 'src/web/robots.txt');

@@ -565,6 +565,8 @@
   "format carries a single file or random-order chunks. Its readable header identifies single/chunk mode, manifest presence, a 128-bit random transfer ID encoded as 22 Base64url characters, extension hint, byte offset and total transfer length. An optional typed manifest can include filename, MIME type, modified time, original size, JSON metadata and SHA-256 validation; a flag records optional gzip transfer encoding. This is not an ISO, IETF or established scanner standard, so receiving it requires compatible software.": "该格式包含一个单个文件或随机顺序块。其可读的头标识单个/块模式、明文存在、以22个Base64url字符编码的128位随机传输ID、扩展提示、字节偏移量和总传输长度。可选的键入明文可以包括文件名、MIME类型、修改时间、原始大小、JSON元数据和SHA-256验证；一个标志记录可选的gzip传输编码。这不是ISO、IETF或已建立的扫描器标准，因此接收它需要兼容的软件。",
   "FILE protocol references": "文件协议引用",
   "Protocol documentation": "协议文档",
+  "The high-level world map is built into the application and makes no network requests. Click it to replace the coordinates.": "世界概览地图内置于应用中，不会发出网络请求。点击地图即可替换坐标。",
+  "OpenStreetMap adds detailed tiles, panning, and zoom controls. It loads only after you choose its tab and confirm the network and privacy notice.": "OpenStreetMap 提供详细图块以及平移和缩放控件。只有在您选择其标签页并确认网络与隐私提示后才会加载。",
   "RFC 4648 Base64url": "RFC 4648 Base64url",
   "RFC 8259 JSON": "RFC 8259 JSON",
   "RFC 1952 gzip": "RFC 1952 gzip",

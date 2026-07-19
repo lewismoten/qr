@@ -74,4 +74,17 @@ describe('standalone guide forms', () => {
     assert.match(controls, /emojiControls\.hidden = mode !== 'emoji'/);
     assert.match(controls, /pixelControls\.hidden = mode !== 'pixel'/);
   });
+
+  test('uses a simplified local world map before network tiles', async () => {
+    const geo = await read('src/html/guides/content/geo.html');
+    const world = await read('src/assets/maps/world.svg');
+
+    assert.match(geo, /src="\/maps\/world\.svg"/);
+    assert.match(world, /class="geo-world-land"/);
+    assert.match(world, /viewBox="0 0 1000 500"/);
+    assert.match(geo, /id="geo-world-map"/);
+    assert.match(geo, /id="geo-map"[\s\S]*?hidden/);
+    assert.match(geo, /id="geo-map-consent"/);
+    assert.match(geo, /id="geo-map-never-ask"/);
+  });
 });

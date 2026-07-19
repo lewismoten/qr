@@ -1,5 +1,5 @@
 import { build, context } from 'esbuild';
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { access, cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
@@ -27,6 +27,15 @@ const shared = {
   legalComments: 'none',
   logLevel: 'info',
 };
+
+async function copyIfPresent(source, destination) {
+  try {
+    await access(source);
+    await cp(source, destination, { recursive: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
 
 const builds = [
   {
@@ -124,4 +133,11 @@ if (watch) {
     ),
     cp('src/web/robots.txt', path.join(htmlConfig.outputRoot, 'robots.txt')),
   ]);
+  await cp('src/assets/maps', path.join(htmlConfig.outputRoot, 'maps'), {
+    recursive: true,
+  });
+  await copyIfPresent(
+    'build/maps/tiles',
+    path.join(htmlConfig.outputRoot, 'maps/tiles'),
+  );
 }

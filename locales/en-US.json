@@ -194,6 +194,15 @@
     }
   },
   "map": {
+    "viewTabs": "Map source",
+    "world": "World",
+    "worldLabel": "High-level world map. Click to choose coordinates.",
+    "privacyTitle": "Load OpenStreetMap?",
+    "privacyMessage": "OpenStreetMap receives your IP address, browser request headers, this site's referrer, and the coordinates of visible map tiles.",
+    "privacyLink": "Read the OpenStreetMap privacy policy",
+    "neverAsk": "Do not ask again on this browser",
+    "cancel": "Cancel",
+    "proceed": "Load map",
     "zoomControls": "Map zoom controls",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
