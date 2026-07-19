@@ -113,8 +113,14 @@ export function createGeoSection({
   const selectView = (nextView) => {
     view = nextView;
     const showWorld = view === 'world';
-    worldElement.hidden = !showWorld;
-    mapElement.hidden = showWorld;
+    worldElement.hidden = false;
+    mapElement.hidden = false;
+    worldElement.classList.toggle('is-map-visible', showWorld);
+    mapElement.classList.toggle('is-map-visible', !showWorld);
+    worldElement.inert = !showWorld;
+    mapElement.inert = showWorld;
+    worldElement.setAttribute('aria-hidden', String(!showWorld));
+    mapElement.setAttribute('aria-hidden', String(showWorld));
     worldTab.classList.toggle('is-active', showWorld);
     osmTab.classList.toggle('is-active', !showWorld);
     worldTab.setAttribute('aria-selected', String(showWorld));
@@ -123,9 +129,11 @@ export function createGeoSection({
 
   const activateOpenStreetMap = () => {
     const worldView = world.getView();
-    selectView('osm');
     ensureMap()
-      .then(() => updateMap(worldView))
+      .then(() => {
+        updateMap(worldView);
+        selectView('osm');
+      })
       .catch((error) => {
         mapElement.classList.add('has-load-error');
         mapElement.textContent = lookup(
@@ -158,6 +166,7 @@ export function createGeoSection({
   });
   consentDialog.addEventListener('cancel', () => selectView('world'));
 
+  selectView('world');
   const update = () => {
     if (!isActive()) return;
     const coordinates = getCoordinates();

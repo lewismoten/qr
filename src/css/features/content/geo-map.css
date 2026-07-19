@@ -35,8 +35,23 @@
 }
 
 .geo-map-card > .geo-map {
+  grid-area: 2 / 1;
   min-height: 0;
   aspect-ratio: 9 / 4;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    visibility 0s linear 260ms;
+}
+
+.geo-map-card > .geo-map.is-map-visible {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
 }
 
 .geo-world-map {
@@ -260,5 +275,11 @@
 
   .geo-label-field {
     grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geo-map-card > .geo-map {
+    transition: none;
   }
 }
