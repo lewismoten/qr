@@ -22,7 +22,7 @@
   "loadError": "No se pudo iniciar la vista previa del mapa.",
   "guideLayers": {
     "title": "Capas del mapa local",
-    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles del 10 al 19 todavía no se generan, por lo que el mapa amplía el mosaico correspondiente del nivel 9.",
+    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles 10 y 11 se generan localmente. En los niveles del 12 al 19, el mapa amplía el mosaico correspondiente del nivel 11.",
     "level": "Capa",
     "contents": "Detalle mostrado",
     "sample": "Ejemplo de Front Royal",
@@ -33,8 +33,8 @@
     "counties": "Estados, condados, carreteras y poblaciones principales.",
     "cities": "Ciudades regionales, carreteras secundarias y ríos más detallados.",
     "towns": "Ciudades pequeñas, localidades, carreteras detalladas y agua.",
-    "localRoutes": "Previsto: más localidades y rutas locales.",
-    "townLabels": "Previsto: nombres de localidades y vías colectoras.",
+    "localRoutes": "Parques, espacios protegidos, más localidades, carreteras y cursos de agua.",
+    "townLabels": "Parques, espacios protegidos, localidades más pequeñas, carreteras y cursos de agua.",
     "localWater": "Previsto: carreteras locales y cursos de agua menores.",
     "neighborhoods": "Previsto: barrios y carreteras secundarias.",
     "streets": "Previsto: calles con nombre y contexto local.",
@@ -43,6 +43,6 @@
     "entrances": "Previsto: accesos, senderos y geometría detallada.",
     "precise": "Previsto: estructuras precisas y detalles peatonales.",
     "maximum": "Previsto: máximo detalle local compatible.",
-    "fallback": "Actualmente muestra el mosaico correspondiente del nivel 9."
+    "fallback": "Actualmente muestra el mosaico correspondiente del nivel 11."
   }
 }

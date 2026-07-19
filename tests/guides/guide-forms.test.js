@@ -90,6 +90,10 @@ describe('standalone guide forms', () => {
     assert.equal(geo.match(/<td>\d{1,2}<\/td>/g)?.length, 19);
     assert.match(geo, /maps\/tiles\/1\/0\/0\.svg/);
     assert.match(geo, /maps\/tiles\/bundles\/9\/36\/48\.svg/);
-    assert.equal(geo.match(/<figcaption>L1\d → L9<\/figcaption>/g)?.length, 10);
+    assert.match(geo, /maps\/tiles\/bundles\/11\/144\/195\.svg/);
+    assert.equal(
+      geo.match(/<figcaption>L1[2-9] → L11<\/figcaption>/g)?.length,
+      8,
+    );
   });
 });

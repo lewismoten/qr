@@ -72,6 +72,7 @@ deeper zoom levels without contacting a tile provider at runtime:
 npm run maps:download
 npm run maps:build -- --zoom 1-9 --plan
 npm run maps:build -- --zoom 1-9 --jobs 8
+npm run maps:generate -- --jobs 8
 ```
 
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
@@ -80,7 +81,14 @@ U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads, while
 Natural Earth supplies global roads and water. `maps:download` retrieves every
 configured raw source without rendering tiles. `maps:build` also downloads any
-missing source automatically.
+missing source automatically. Natural Earth also supplies U.S. National Park
+Service parks and protected lands as area, line, and point features.
+
+`maps:generate` performs the complete reproducible build: it downloads every
+source, rebuilds zooms 1 through 9, then extends indexed parent coverage through
+zooms 10 and 11. It forces a rebuild by default so newly configured layers are
+not omitted from old tiles. Pass `--resume` only when continuing an interrupted
+run and retaining completed output is more important than rebuilding old tiles.
 
 Downloads are cached under `.cache/maps`. Generated tiles are written to
 `build/maps/tiles` and copied to `/maps/tiles` during the site build. By
@@ -94,7 +102,9 @@ An existing worldwide build can be extended from its indexed parent coverage:
 npm run maps:build -- --zoom 9 --extend
 ```
 
-Worldwide builds at zoom 10 or higher require explicit geographic bounds.
+Worldwide direct builds at zoom 10 or higher require explicit geographic
+bounds. `maps:generate` safely reaches those levels by extending only indexed
+parent coverage.
 
 Use `npm run maps:build -- --help` for all options. Natural Earth data is in
 the public domain, GeoNames is CC BY 4.0, and U.S. Census data is a U.S.

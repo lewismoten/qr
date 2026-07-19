@@ -1,5 +1,9 @@
 export const MAP_TILE_STYLE =
   '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
+  '.protected-area{fill:#acd493;stroke:#4f8657;stroke-width:.5}' +
+  '.protected-line{fill:none;stroke:#4f8657;stroke-width:.8;' +
+  'stroke-linecap:round;stroke-linejoin:round}' +
+  '.protected-point{fill:#4f8657;stroke:#f7fff2;stroke-width:.55}' +
   '.lake{fill:#bfe3ed;stroke:#75adbd;stroke-width:.5}' +
   '.river{fill:none;stroke:#75adbd;stroke-width:.45;' +
   'stroke-linecap:round;stroke-linejoin:round}' +

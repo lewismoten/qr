@@ -7,6 +7,9 @@ export const DEFAULT_LAYERS = [
   'riversNorthAmerica',
   'riversEurope',
   'riversAustralia',
+  'protectedAreas',
+  'protectedLines',
+  'protectedPoints',
   'regions',
   'primaryRoadsOverview',
   'primaryRoads',
@@ -60,7 +63,7 @@ export const MAP_SOURCES = {
     file: 'physical/ne_10m_lakes.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_lakes.geojson`,
     minimumZoom: 6,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'area',
   },
   riversOverview: {
@@ -78,29 +81,54 @@ export const MAP_SOURCES = {
       `${NATURAL_EARTH_ROOT}` +
       'ne_10m_rivers_lake_centerlines_scale_rank.geojson',
     minimumZoom: 6,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
   },
   riversNorthAmerica: {
     file: 'physical/ne_10m_rivers_north_america.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_rivers_north_america.geojson`,
     minimumZoom: 8,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
   },
   riversEurope: {
     file: 'physical/ne_10m_rivers_europe.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_rivers_europe.geojson`,
     minimumZoom: 8,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
   },
   riversAustralia: {
     file: 'physical/ne_10m_rivers_australia.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_rivers_australia.geojson`,
     minimumZoom: 8,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
+  },
+  protectedAreas: {
+    file: 'cultural/ne_10m_parks_and_protected_lands_area.geojson',
+    url:
+      `${NATURAL_EARTH_ROOT}` + 'ne_10m_parks_and_protected_lands_area.geojson',
+    minimumZoom: 6,
+    maximumZoom: 11,
+    kind: 'area',
+  },
+  protectedLines: {
+    file: 'cultural/ne_10m_parks_and_protected_lands_line.geojson',
+    url:
+      `${NATURAL_EARTH_ROOT}` + 'ne_10m_parks_and_protected_lands_line.geojson',
+    minimumZoom: 7,
+    maximumZoom: 11,
+    kind: 'line',
+  },
+  protectedPoints: {
+    file: 'cultural/ne_10m_parks_and_protected_lands_point.geojson',
+    url:
+      `${NATURAL_EARTH_ROOT}` +
+      'ne_10m_parks_and_protected_lands_point.geojson',
+    minimumZoom: 8,
+    maximumZoom: 11,
+    kind: 'point',
   },
   regions: {
     file: 'cultural/ne_50m_admin_1_states_provinces_lines.geojson',
@@ -123,7 +151,7 @@ export const MAP_SOURCES = {
     url: transportationUrl(1, 0.002),
     pageSize: 1000,
     minimumZoom: 8,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
   },
   secondaryRoads: {
@@ -131,14 +159,14 @@ export const MAP_SOURCES = {
     url: transportationUrl(3, 0.001),
     pageSize: 1000,
     minimumZoom: 8,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
   },
   naturalEarthRoads: {
     file: 'cultural/ne_10m_roads.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_roads.geojson`,
     minimumZoom: 6,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'line',
     featureFilter: {
       property: 'sov_a3',
@@ -170,7 +198,7 @@ export const MAP_SOURCES = {
     file: 'cultural/ne_10m_populated_places_simple.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_populated_places_simple.geojson`,
     minimumZoom: 7,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'point',
   },
   towns: {
@@ -179,7 +207,7 @@ export const MAP_SOURCES = {
     format: 'geonames',
     cacheVersion: 2,
     minimumZoom: 7,
-    maximumZoom: 9,
+    maximumZoom: 11,
     kind: 'point',
   },
 };

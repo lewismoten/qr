@@ -36,7 +36,7 @@ if (has('help')) {
   console.log(`Usage: npm run maps:build -- [options]
 
 Options:
-  --zoom 1-9            Generate one zoom or an inclusive range
+  --zoom 1-11           Generate one zoom or an inclusive range
   --layers a,b          Named layers from source-config.mjs
   --bounds world        world or west,south,east,north
   --jobs 8              Maximum parallel worker threads
@@ -95,7 +95,7 @@ if (!Number.isInteger(bundleFrom) || bundleFrom < 0) {
 if (!Number.isInteger(bundleSize) || bundleSize < 1) {
   throw new Error('Bundle size must be a positive integer.');
 }
-if (zoom.maximum >= 10 && boundsValue === 'world') {
+if (!extend && zoom.maximum >= 10 && boundsValue === 'world') {
   throw new Error(
     'Worldwide builds at zoom 10 or higher require explicit --bounds.',
   );
