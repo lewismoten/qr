@@ -54,17 +54,23 @@ function sourceClass(name, properties) {
 export function vectorProperties(name, properties = {}) {
   const values = {
     class: sourceClass(name, properties),
-    name: firstValue(properties, ['name', 'NAME', 'ADMIN']),
-    population: firstValue(properties, ['population', 'POP_MAX', 'POP_EST']),
-    rank: firstValue(properties, [
+  };
+  if (sourceLayer(name) === 'place') {
+    values.name = firstValue(properties, ['name', 'NAME', 'ADMIN']);
+    values.population = firstValue(properties, [
+      'population',
+      'POP_MAX',
+      'POP_EST',
+    ]);
+    values.rank = firstValue(properties, [
       'scalerank',
       'SCALERANK',
       'labelrank',
       'LABELRANK',
-    ]),
-  };
-  for (const [language, keys] of Object.entries(LANGUAGE_NAMES)) {
-    values[`name_${language}`] = firstValue(properties, keys);
+    ]);
+    for (const [language, keys] of Object.entries(LANGUAGE_NAMES)) {
+      values[`name_${language}`] = firstValue(properties, keys);
+    }
   }
   return Object.fromEntries(
     Object.entries(values).filter(([, value]) => value != null && value !== ''),

@@ -57,12 +57,21 @@ export function getLabelPlacement(x, y, textWidth, size) {
   return null;
 }
 
-function traceFeature(context, feature, scale) {
+export function getMvtTransform(size, extent, viewport = {}) {
+  const viewportScale = viewport.scale ?? 1;
+  return {
+    scale: (size / extent) * viewportScale,
+    offsetX: (viewport.offsetX ?? 0) * size,
+    offsetY: (viewport.offsetY ?? 0) * size,
+  };
+}
+
+function traceFeature(context, feature, transform) {
   context.beginPath();
   for (const path of feature.geometry) {
     path.points.forEach((point, index) => {
-      const x = point.x * scale;
-      const y = point.y * scale;
+      const x = point.x * transform.scale - transform.offsetX;
+      const y = point.y * transform.scale - transform.offsetY;
       if (index) context.lineTo(x, y);
       else context.moveTo(x, y);
     });
@@ -70,11 +79,15 @@ function traceFeature(context, feature, scale) {
   }
 }
 
-function drawLayer(context, layer) {
+function drawLayer(context, layer, viewport) {
   if (!layer) return;
   const style = STYLES[layer.name];
   if (!style) return;
-  const scale = context.canvas.width / layer.extent;
+  const transform = getMvtTransform(
+    context.canvas.width,
+    layer.extent,
+    viewport,
+  );
   context.lineJoin = 'round';
   context.lineCap = 'round';
   for (const feature of layer.features) {
@@ -87,7 +100,7 @@ function drawLayer(context, layer) {
       featureStyle.stroke = '#aab59a';
       featureStyle.width = 0.45;
     }
-    traceFeature(context, feature, scale);
+    traceFeature(context, feature, transform);
     context.lineWidth = featureStyle.width;
     if (featureStyle.fill && feature.type === 3) {
       context.fillStyle = featureStyle.fill;
@@ -100,9 +113,13 @@ function drawLayer(context, layer) {
   }
 }
 
-function drawPlaces(context, layer, zoom) {
+function drawPlaces(context, layer, zoom, viewport) {
   if (!layer) return;
-  const scale = context.canvas.width / layer.extent;
+  const transform = getMvtTransform(
+    context.canvas.width,
+    layer.extent,
+    viewport,
+  );
   const language = document.documentElement.lang.split('-')[0];
   context.font = '600 9px sans-serif';
   context.textBaseline = 'middle';
@@ -111,8 +128,8 @@ function drawPlaces(context, layer, zoom) {
     if (occupied.length >= getPlaceLimit(zoom)) break;
     const point = feature.geometry[0]?.points[0];
     if (!point) continue;
-    const x = point.x * scale;
-    const y = point.y * scale;
+    const x = point.x * transform.scale - transform.offsetX;
+    const y = point.y * transform.scale - transform.offsetY;
     if (
       x < 0 ||
       x >= context.canvas.width ||
@@ -153,12 +170,12 @@ function drawPlaces(context, layer, zoom) {
   }
 }
 
-export function renderMvt(bytes, canvas, { zoom = 0 } = {}) {
+export function renderMvt(bytes, canvas, { zoom = 0, viewport } = {}) {
   const context = canvas.getContext('2d');
   const layers = decodeMvt(bytes);
   const byName = new Map(layers.map((layer) => [layer.name, layer]));
   context.clearRect(0, 0, canvas.width, canvas.height);
-  for (const name of ORDER) drawLayer(context, byName.get(name));
-  drawPlaces(context, byName.get('place'), zoom);
+  for (const name of ORDER) drawLayer(context, byName.get(name), viewport);
+  drawPlaces(context, byName.get('place'), zoom, viewport);
   return layers;
 }

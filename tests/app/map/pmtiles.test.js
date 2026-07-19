@@ -12,11 +12,16 @@ import {
   parsePmtilesHeader,
 } from '../../../src/js/app/ui/content/geo/pmtiles/header.js';
 import { createPmtilesSource } from '../../../src/js/app/ui/content/geo/pmtiles/source.js';
+import {
+  findPmtilesTile,
+  getPmtilesStatusZoom,
+} from '../../../src/js/app/ui/content/geo/pmtiles/tile.js';
 import { zxyToTileId } from '../../../src/js/app/ui/content/geo/pmtiles/tile-id.js';
 import { decodeMvt } from '../../../src/js/app/ui/content/geo/mvt/decode.js';
 import { decodeGeometry } from '../../../src/js/app/ui/content/geo/mvt/geometry.js';
 import {
   getLabelPlacement,
+  getMvtTransform,
   getPlaceLimit,
   renderMvt,
   sortPlaces,
@@ -138,6 +143,44 @@ test('reads only the PMTiles ranges needed for a tile', async () => {
   assert.deepEqual(requests, ['bytes=0-16383', 'bytes=256-258']);
 });
 
+test('finds the nearest PMTiles parent in a variable-depth pyramid', async () => {
+  const requests = [];
+  const source = {
+    async getTile(zoom, x, y) {
+      requests.push(`${zoom}/${x}/${y}`);
+      return zoom === 10 ? new Uint8Array([10]) : null;
+    },
+  };
+  const result = await findPmtilesTile({
+    source,
+    tile: { zoom: 13, x: 2316, y: 3133 },
+    maximumSourceZoom: 13,
+    minimumSourceZoom: 1,
+  });
+  assert.deepEqual(requests, [
+    '13/2316/3133',
+    '12/1158/1566',
+    '11/579/783',
+    '10/289/391',
+  ]);
+  assert.deepEqual(result.bytes, new Uint8Array([10]));
+  assert.deepEqual(result.sourceTile, {
+    zoom: 10,
+    x: 289,
+    y: 391,
+    scale: 8,
+    offsetX: 4,
+    offsetY: 5,
+  });
+});
+
+test('treats variable-depth parents as covered map levels', () => {
+  const parent = { zoom: 12 };
+  assert.equal(getPmtilesStatusZoom(13, 13, parent), 13);
+  assert.equal(getPmtilesStatusZoom(14, 13, parent), 12);
+  assert.equal(getPmtilesStatusZoom(13, 13, null), -1);
+});
+
 test('rejects servers that ignore PMTiles range requests', async () => {
   const fetcher = async () =>
     new Response(new Uint8Array(20_000), {
@@ -205,6 +248,17 @@ test('keeps map labels inside their owning vector tile', () => {
   });
   assert.equal(getLabelPlacement(-1, 20, 40, 256), null);
   assert.equal(getLabelPlacement(20, 3, 40, 256), null);
+});
+
+test('projects parent vectors directly into an overzoomed child', () => {
+  assert.deepEqual(
+    getMvtTransform(256, 4096, {
+      scale: 8,
+      offsetX: 4,
+      offsetY: 5,
+    }),
+    { scale: 0.5, offsetX: 1024, offsetY: 1280 },
+  );
 });
 
 test('limits dense places by zoom and orders them by population', () => {

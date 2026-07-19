@@ -9,7 +9,7 @@ import {
 
 test('keeps secondary roads through the most detailed local zoom', () => {
   assert.equal(MAP_SOURCES.secondaryRoads.minimumZoom, 8);
-  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 11);
+  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 13);
   assert.match(MAP_SOURCES.secondaryRoads.url, /MapServer\/3\/query/);
 });
 
@@ -91,17 +91,17 @@ test('renders protected lands as areas, lines, and points', () => {
   const parks = prepareCollections({
     protectedAreas: {
       minimumZoom: 6,
-      maximumZoom: 11,
+      maximumZoom: 13,
       collection: { features: [polygon] },
     },
     protectedLines: {
       minimumZoom: 7,
-      maximumZoom: 11,
+      maximumZoom: 13,
       collection: { features: [line] },
     },
     protectedPoints: {
       minimumZoom: 8,
-      maximumZoom: 11,
+      maximumZoom: 13,
       collection: { features: [point] },
     },
   });
@@ -110,6 +110,6 @@ test('renders protected lands as areas, lines, and points', () => {
   assert.match(tile, /class="protected-area"/);
   assert.match(tile, /class="protected-line"/);
   assert.match(tile, /class="protected-point"/);
-  assert.equal(MAP_SOURCES.protectedAreas.maximumZoom, 11);
+  assert.equal(MAP_SOURCES.protectedAreas.maximumZoom, 13);
   assert.match(MAP_SOURCES.protectedPoints.url, /protected_lands_point/);
 });

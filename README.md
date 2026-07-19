@@ -32,10 +32,10 @@ that file rather than embedding the encoder in a hashed application chunk. It
 can also be downloaded or imported independently:
 
 ```js
-import QRCode, { create } from './dist/qr.min.js';
+import QRCode, { create } from "./dist/qr.min.js";
 
-const qr = create('https://qr.lewismoten.com');
-const sameQr = QRCode.create('https://qr.lewismoten.com');
+const qr = create("https://qr.lewismoten.com");
+const sameQr = QRCode.create("https://qr.lewismoten.com");
 ```
 
 During development, rebuild automatically when JavaScript or CSS changes:
@@ -71,8 +71,8 @@ files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 11 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 11 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 13 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 13 --max-tile-kib 16
 ```
 
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
@@ -86,13 +86,20 @@ features.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks
-Tippecanoe to build `build/maps/local.pmtiles`. Tippecanoe is a build-time tool;
-on macOS install it with `brew install tippecanoe`.
+Tippecanoe to build `build/maps/local.pmtiles`. The build uses a variable-depth
+pyramid, so areas stop subdividing when an existing parent tile can be safely
+enlarged. A temporary archive is validated against the default 500 MiB total
+budget before it atomically replaces the working map. Tippecanoe is a
+build-time tool; on macOS install it with `brew install tippecanoe`.
 
 Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
 is cached under `.cache/maps/vector-input`. The default 16 KiB limit applies to
 each compressed MVT tile. Dense tiles are intentionally lossy: Tippecanoe drops
 or simplifies the least-visible detail until the limit is met.
+Use `--max-archive-mib` to change the separate whole-archive budget and
+`--base-zoom` to control when all point features become eligible to appear. A
+separate `--max-working-mib` watchdog (1,000 MiB by default) terminates a build
+whose temporary archive grows unexpectedly while preserving the live archive.
 The default `--detail 11` retains 1/8-pixel coordinate precision at the tile's
 native 256-pixel display size while using less detail at overview levels.
 

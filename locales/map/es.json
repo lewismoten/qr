@@ -22,7 +22,7 @@
   "loadError": "No se pudo iniciar la vista previa del mapa.",
   "guideLayers": {
     "title": "Capas del mapa local",
-    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles 10 y 11 se generan localmente. En los niveles del 12 al 19, el mapa amplía el mosaico correspondiente del nivel 11.",
+    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles del 10 al 13 se generan localmente. En los niveles del 14 al 19, el mapa amplía la tesela correspondiente del nivel 13.",
     "level": "Capa",
     "contents": "Detalle mostrado",
     "sample": "Ejemplo de Front Royal",
@@ -35,14 +35,14 @@
     "towns": "Ciudades pequeñas, localidades, carreteras detalladas y agua.",
     "localRoutes": "Parques, espacios protegidos, más localidades, carreteras y cursos de agua.",
     "townLabels": "Parques, espacios protegidos, localidades más pequeñas, carreteras y cursos de agua.",
-    "localWater": "Previsto: carreteras locales y cursos de agua menores.",
-    "neighborhoods": "Previsto: barrios y carreteras secundarias.",
+    "localWater": "Colocación más precisa de carreteras locales, cursos de agua, parques y lugares clasificados.",
+    "neighborhoods": "Vista generada más detallada de los datos cartográficos locales disponibles.",
     "streets": "Previsto: calles con nombre y contexto local.",
     "blocks": "Previsto: manzanas, senderos y calles detalladas.",
     "buildings": "Previsto: contornos de edificios y vías de servicio.",
     "entrances": "Previsto: accesos, senderos y geometría detallada.",
     "precise": "Previsto: estructuras precisas y detalles peatonales.",
     "maximum": "Previsto: máximo detalle local compatible.",
-    "fallback": "Actualmente muestra el mosaico correspondiente del nivel 11."
+    "fallback": "Actualmente muestra la tesela correspondiente del nivel 13."
   }
 }

@@ -3,19 +3,47 @@ import { setTileDebugCoordinates } from '../data/tile-debug.js';
 import { renderMvt } from '../mvt/render.js';
 import { TILE_SIZE } from '../projection.js';
 
+export async function findPmtilesTile({
+  source,
+  tile,
+  minimumSourceZoom,
+  maximumSourceZoom,
+}) {
+  let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
+  while (sourceZoom >= minimumSourceZoom) {
+    const sourceTile = getFallbackTile(tile, sourceZoom);
+    const bytes = await source.getTile(
+      sourceTile.zoom,
+      sourceTile.x,
+      sourceTile.y,
+    );
+    if (bytes) return { bytes, sourceTile };
+    sourceZoom -= 1;
+  }
+  return null;
+}
+
+export function getPmtilesStatusZoom(
+  requestedZoom,
+  maximumSourceZoom,
+  sourceTile,
+) {
+  if (!sourceTile) return -1;
+  return requestedZoom <= maximumSourceZoom ? requestedZoom : sourceTile.zoom;
+}
+
 export function createPmtilesTile({
   source,
   tile,
+  minimumSourceZoom,
   maximumSourceZoom,
+  coverageMaximumZoom = maximumSourceZoom,
   onLoad = () => {},
   onUnavailable = () => {},
   onSourceChange,
 }) {
   const element = document.createElement('div');
   const canvas = document.createElement('canvas');
-  const sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
-  const sourceTile = getFallbackTile(tile, sourceZoom);
-  const scale = sourceTile.scale;
   element.className = 'slippy-map-tile';
   canvas.className = 'slippy-map-vector-tile';
   canvas.width = TILE_SIZE;
@@ -23,42 +51,49 @@ export function createPmtilesTile({
   element.append(canvas);
   const tone = (((tile.x + tile.y) % 4) + 4) % 4;
   element.classList.add(`tile-tone-${tone}`);
-  element.slippySourceZoom = sourceZoom;
-  const fallback = sourceZoom < tile.zoom;
-  setTileDebugCoordinates(element, {
-    wanted: tile,
-    shown: sourceTile,
-    fallback,
-  });
-  element.classList.toggle('is-fallback', fallback);
-  onSourceChange?.(sourceZoom);
+  element.slippySourceZoom = Math.min(tile.zoom, maximumSourceZoom);
+  element.slippyStatusSourceZoom = Math.min(tile.zoom, coverageMaximumZoom);
 
-  source
-    .getTile(sourceTile.zoom, sourceTile.x, sourceTile.y)
-    .then((bytes) => {
-      if (!bytes) {
-        onUnavailable();
+  const unavailable = () => {
+    element.slippyStatusSourceZoom = -1;
+    onSourceChange?.();
+    onUnavailable();
+  };
+
+  findPmtilesTile({
+    source,
+    tile,
+    maximumSourceZoom,
+    minimumSourceZoom,
+  })
+    .then((result) => {
+      if (!result) {
+        unavailable();
         return;
       }
-      if (scale === 1) renderMvt(bytes, canvas, { zoom: sourceTile.zoom });
-      else {
-        const parent = document.createElement('canvas');
-        parent.width = TILE_SIZE;
-        parent.height = TILE_SIZE;
-        renderMvt(bytes, parent, { zoom: sourceTile.zoom });
-        const context = canvas.getContext('2d');
-        context.imageSmoothingEnabled = true;
-        context.drawImage(
-          parent,
-          -sourceTile.offsetX * TILE_SIZE,
-          -sourceTile.offsetY * TILE_SIZE,
-          TILE_SIZE * scale,
-          TILE_SIZE * scale,
-        );
-      }
+      const { bytes, sourceTile } = result;
+      const scale = sourceTile.scale;
+      const fallback = sourceTile.zoom < tile.zoom;
+      element.slippySourceZoom = sourceTile.zoom;
+      element.slippyStatusSourceZoom = getPmtilesStatusZoom(
+        tile.zoom,
+        coverageMaximumZoom,
+        sourceTile,
+      );
+      setTileDebugCoordinates(element, {
+        wanted: tile,
+        shown: sourceTile,
+        fallback,
+      });
+      element.classList.toggle('is-fallback', fallback);
+      onSourceChange?.(sourceTile.zoom);
+      renderMvt(bytes, canvas, {
+        zoom: tile.zoom,
+        ...(scale === 1 ? {} : { viewport: sourceTile }),
+      });
       element.classList.add('is-loaded');
       onLoad();
     })
-    .catch(() => onUnavailable());
+    .catch(unavailable);
   return element;
 }

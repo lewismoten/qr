@@ -99,6 +99,7 @@ export function createWorldMap(
                 pmtiles.createPmtilesTile({
                   ...options,
                   source: vector.source,
+                  coverageMaximumZoom: vector.header.maximumZoom,
                 })
             : undefined,
           tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',

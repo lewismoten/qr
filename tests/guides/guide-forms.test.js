@@ -91,9 +91,11 @@ describe('standalone guide forms', () => {
     assert.match(geo, /maps\/tiles\/1\/0\/0\.svg/);
     assert.match(geo, /maps\/tiles\/bundles\/9\/36\/48\.svg/);
     assert.match(geo, /maps\/tiles\/bundles\/11\/144\/195\.svg/);
+    assert.match(geo, /<figcaption>L12 · 1158\/1566<\/figcaption>/);
+    assert.match(geo, /<figcaption>L13 · 2316\/3133<\/figcaption>/);
     assert.equal(
-      geo.match(/<figcaption>L1[2-9] → L11<\/figcaption>/g)?.length,
-      8,
+      geo.match(/<figcaption>L1[4-9] → L13<\/figcaption>/g)?.length,
+      6,
     );
   });
 });

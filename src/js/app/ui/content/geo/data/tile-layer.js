@@ -41,7 +41,9 @@ export function renderTileLayer({
   const visible = new Set();
   const syncFallback = () => {
     const sourceZoom = [...visible].reduce((lowest, key) => {
-      const sourceZoom = tiles.get(key)?.slippySourceZoom;
+      const element = tiles.get(key);
+      const sourceZoom =
+        element?.slippyStatusSourceZoom ?? element?.slippySourceZoom;
       return Number.isInteger(sourceZoom)
         ? Math.min(lowest, sourceZoom)
         : lowest;
