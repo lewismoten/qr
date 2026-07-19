@@ -1,5 +1,5 @@
 import { availableParallelism } from 'node:os';
-import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
 
@@ -22,6 +22,13 @@ import {
 import { writeTileBundles } from './tile-bundles.mjs';
 import { createTileManifest } from './tile-manifest.mjs';
 import { obtainMapSource } from './source-loader.mjs';
+import {
+  estimateTileOutput,
+  progressText,
+  readTileManifest,
+  reportBuildSummary,
+  reportTilePlan,
+} from './planning/output-estimate.mjs';
 
 function option(name, fallback) {
   const exact = process.argv.find((value) => value.startsWith(`--${name}=`));
@@ -64,22 +71,18 @@ const maximumTileKiB = Number(option('max-tile-kib', '24'));
 const maximumTileBytes = maximumTileKiB * 1024;
 const bundleFrom = Number(option('bundle-from', '6'));
 const bundleSize = Number(option('bundle-size', '4'));
-const force = has('force');
-const planOnly = has('plan');
-const extend = has('extend');
+const [force, planOnly, extend] = ['force', 'plan', 'extend'].map(has);
 
+const existingManifest = await readTileManifest(output);
 let previousManifest = null;
 if (extend) {
   if (zoom.minimum !== zoom.maximum) {
     throw new Error('An extended build must target exactly one zoom level.');
   }
-  try {
-    previousManifest = JSON.parse(
-      await readFile(path.join(output, 'manifest.json'), 'utf8'),
-    );
-  } catch {
+  if (!existingManifest) {
     throw new Error('An extended build requires an existing tile manifest.');
   }
+  previousManifest = existingManifest;
   if (previousManifest.zoom?.maximum !== zoom.minimum - 1) {
     throw new Error('The existing manifest must end at the parent zoom level.');
   }
@@ -112,25 +115,21 @@ const bundleLevels = Object.fromEntries(
     .filter((level) => level.zoom >= bundleFrom && bundleSize > 1)
     .map((level) => [level.zoom, bundleSize]),
 );
-const estimates = [20 * 1024, 150 * 1024].map(
-  (size) => plan.tiles.length * size,
-);
-console.log(`Zoom: ${zoom.minimum}-${zoom.maximum}`);
-console.log(`Bounds: ${boundsValue}`);
-console.log(`Layers: ${layers.join(', ')}`);
-console.log(`Target maximum: ${formatBytes(maximumTileBytes)} per tile`);
-console.log(
-  `Bundles: ${Object.keys(bundleLevels).join(', ') || 'none'} ` +
-    `(${bundleSize}x${bundleSize})`,
-);
-for (const level of plan.levels) {
-  console.log(`  z${level.zoom}: ${level.tiles.toLocaleString()} tiles`);
-}
-console.log(`Maximum tiles: ${plan.tiles.length.toLocaleString()}`);
-console.log(
-  `Estimated SVG size: ${formatBytes(estimates[0])}–` +
-    formatBytes(estimates[1]),
-);
+const estimate = estimateTileOutput({
+  plan,
+  bundleLevels,
+  manifest: existingManifest,
+});
+reportTilePlan({
+  zoom,
+  bounds: boundsValue,
+  layers,
+  maximumTileBytes,
+  bundleLevels,
+  bundleSize,
+  plan,
+  estimate,
+});
 if (planOnly) process.exit(0);
 
 const sources = await Promise.all(
@@ -153,6 +152,7 @@ const sourceFiles = sources.map(({ name, path: sourcePath }) => ({
 const started = Date.now();
 let completed = 0;
 let written = 0;
+let retained = 0;
 let available = 0;
 let bytes = 0;
 let nextTile = 0;
@@ -183,6 +183,7 @@ async function saveResult({ tile, svg, tolerance, originalBytes }) {
         bytes += Buffer.byteLength(svg);
       } else {
         bytes += existing.size;
+        retained += 1;
       }
     }
     available += 1;
@@ -205,11 +206,7 @@ async function saveResult({ tile, svg, tolerance, originalBytes }) {
   const interval = Math.max(1, Math.floor(plan.tiles.length / 100));
   if (current % interval === 0 || current === plan.tiles.length) {
     const elapsed = (Date.now() - started) / 1000;
-    const remaining = (elapsed / current) * (plan.tiles.length - current);
-    process.stdout.write(
-      `\r${Math.floor((current / plan.tiles.length) * 100)}% ` +
-        `${current}/${plan.tiles.length} | ETA ${remaining.toFixed(0)}s`,
-    );
+    process.stdout.write(progressText(current, plan.tiles.length, elapsed));
   }
 }
 
@@ -261,6 +258,11 @@ process.stdout.write('\n');
 const currentLevels = Object.fromEntries(
   [...levels].sort(([left], [right]) => left - right),
 );
+for (const level of plan.levels) {
+  if (currentLevels[level.zoom]) {
+    currentLevels[level.zoom].candidates = level.tiles;
+  }
+}
 const manifest = createTileManifest({
   previous: previousManifest,
   levels: currentLevels,
@@ -287,7 +289,12 @@ await writeFile(
   path.join(output, 'manifest.json'),
   `${JSON.stringify(manifest, null, 2)}\n`,
 );
-console.log(
-  `${available.toLocaleString()} tiles available; ` +
-    `${written.toLocaleString()} written (${formatBytes(bytes)} total).`,
-);
+const elapsed = (Date.now() - started) / 1000;
+reportBuildSummary({
+  completed,
+  available,
+  written,
+  retained,
+  bytes,
+  elapsed,
+});

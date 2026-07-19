@@ -8,6 +8,11 @@ import {
   parseBounds,
   parseZoomRange,
 } from '../../scripts/maps/tile-plan.mjs';
+import {
+  estimateTileOutput,
+  formatDuration,
+  progressText,
+} from '../../scripts/maps/planning/output-estimate.mjs';
 
 describe('SVG map tile planning', () => {
   test('plans complete world zoom ranges', () => {
@@ -33,6 +38,26 @@ describe('SVG map tile planning', () => {
     assert.deepEqual(plan.tiles[0], { zoom: 9, x: 6, y: 8 });
     assert.deepEqual(plan.tiles.at(-1), { zoom: 9, x: 7, y: 11 });
     assert.deepEqual(createChildTilePlan(null, 8).tiles, []);
+  });
+
+  test('estimates bundled output from prior level measurements', () => {
+    const plan = createChildTilePlan({ 8: { 3: [4, 5] } }, 8);
+    const estimate = estimateTileOutput({
+      plan,
+      bundleLevels: { 9: 2 },
+      manifest: {
+        levels: { 8: { bytes: 4000, bundles: 2, tiles: 2 } },
+      },
+    });
+
+    assert.equal(estimate.files, 2);
+    assert.equal(estimate.minimum, 2200);
+    assert.equal(estimate.maximum, 4600);
+    assert.equal(estimate.basis, 'parent-level output density');
+    assert.equal(formatDuration(0), '<1s');
+    assert.equal(formatDuration(75), '1m 15s');
+    assert.match(progressText(5, 10, 2), /50% 5\/10 \| ETA 2s/);
+    assert.equal(progressText(5, 10, 2).endsWith('\x1b[K'), true);
   });
 
   test('rejects invalid zooms and geographic bounds', () => {
