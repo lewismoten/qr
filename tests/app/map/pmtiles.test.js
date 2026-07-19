@@ -15,6 +15,7 @@ import { createPmtilesSource } from '../../../src/js/app/ui/content/geo/pmtiles/
 import { zxyToTileId } from '../../../src/js/app/ui/content/geo/pmtiles/tile-id.js';
 import { decodeMvt } from '../../../src/js/app/ui/content/geo/mvt/decode.js';
 import { decodeGeometry } from '../../../src/js/app/ui/content/geo/mvt/geometry.js';
+import { renderMvt } from '../../../src/js/app/ui/content/geo/mvt/render.js';
 
 function varint(value) {
   const bytes = [];
@@ -168,4 +169,20 @@ test('decodes MVT layers, properties, and geometry commands', () => {
       closed: true,
     },
   ]);
+});
+
+test('renders sparse MVT tiles without requiring every map layer', () => {
+  let cleared = false;
+  const context = {
+    clearRect() {
+      cleared = true;
+    },
+  };
+  const canvas = {
+    getContext: () => context,
+    height: 256,
+    width: 256,
+  };
+  assert.deepEqual(renderMvt(new Uint8Array(), canvas), []);
+  assert.equal(cleared, true);
 });

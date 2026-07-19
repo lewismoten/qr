@@ -24,6 +24,7 @@ function traceFeature(context, feature, scale) {
 }
 
 function drawLayer(context, layer) {
+  if (!layer) return;
   const style = STYLES[layer.name];
   if (!style) return;
   const scale = context.canvas.width / layer.extent;
