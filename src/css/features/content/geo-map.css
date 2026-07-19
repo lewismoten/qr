@@ -34,9 +34,12 @@
   user-select: none;
 }
 
-.geo-world-map {
+.geo-map-card > .geo-map {
   min-height: 0;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 9 / 4;
+}
+
+.geo-world-map {
   background: #bde6ed;
   cursor: crosshair;
 }
