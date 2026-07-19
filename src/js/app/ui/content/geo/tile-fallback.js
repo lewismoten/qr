@@ -30,12 +30,14 @@ export function createFallbackTile({
   minimumSourceZoom,
   maximumSourceZoom,
   hasSourceTile,
+  resolveTileSource,
   onLoad = () => {},
   onUnavailable,
 }) {
   const element = document.createElement('div');
   const image = document.createElement('img');
   let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
+  let request = 0;
   element.className = 'slippy-map-tile';
   image.className = 'slippy-map-tile-source';
   image.alt = '';
@@ -44,7 +46,16 @@ export function createFallbackTile({
   image.referrerPolicy = 'strict-origin-when-cross-origin';
   element.appendChild(image);
 
-  const load = () => {
+  function useParent() {
+    if (sourceZoom > minimumSourceZoom) {
+      sourceZoom -= 1;
+      load();
+      return;
+    }
+    element.classList.add('is-missing');
+    onUnavailable?.();
+  }
+  function load() {
     let source = getFallbackTile(tile, sourceZoom);
     while (hasSourceTile && !hasSourceTile(source)) {
       if (sourceZoom <= minimumSourceZoom) {
@@ -60,17 +71,22 @@ export function createFallbackTile({
     image.style.height = `${size}px`;
     image.style.left = `${-source.offsetX * TILE_SIZE}px`;
     image.style.top = `${-source.offsetY * TILE_SIZE}px`;
-    image.src = tileUrl(template, source);
-  };
-  image.addEventListener('error', () => {
-    if (sourceZoom > minimumSourceZoom) {
-      sourceZoom -= 1;
-      load();
-    } else {
-      element.classList.add('is-missing');
-      onUnavailable?.();
+    const url = tileUrl(template, source);
+    const currentRequest = ++request;
+    if (!resolveTileSource) {
+      image.src = url;
+      return;
     }
-  });
+    resolveTileSource(url).then(
+      (resolvedUrl) => {
+        if (request === currentRequest) image.src = resolvedUrl;
+      },
+      () => {
+        if (request === currentRequest) useParent();
+      },
+    );
+  }
+  image.addEventListener('error', useParent);
   image.addEventListener('load', () => {
     element.classList.add('is-loaded');
     onLoad();

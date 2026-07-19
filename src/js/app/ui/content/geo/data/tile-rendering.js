@@ -11,6 +11,7 @@ export function renderTile({
   minimumSourceZoom,
   maximumSourceZoom,
   hasSourceTile,
+  resolveTileSource,
   origin,
 }) {
   let element = tiles.get(key);
@@ -26,6 +27,7 @@ export function renderTile({
       minimumSourceZoom,
       maximumSourceZoom,
       hasSourceTile,
+      resolveTileSource,
       onLoad: settle,
       onUnavailable: settle,
     });

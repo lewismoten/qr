@@ -1,4 +1,5 @@
 import { hasVisibleCensusCounties } from './data/attribution.js';
+import { createTileSourceCache } from './data/tile-source-cache.js';
 import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
 
 const WIDTH = 1000;
@@ -40,6 +41,7 @@ export function createWorldMap(
   let detailRequest = null;
   let markerCoordinates = null;
   let markerText = '';
+  const tileSourceCache = createTileSourceCache();
 
   const setOverviewMarker = () => {
     marker.hidden = !markerCoordinates;
@@ -74,6 +76,7 @@ export function createWorldMap(
             minimumSourceZoom: tileRange.minimum,
             maximumSourceZoom: tileRange.maximum,
             hasSourceTile: tileRange.hasTile,
+            resolveTileSource: tileSourceCache.resolve,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
             attributionText: 'Natural Earth',
             attributionUrl: 'https://www.naturalearthdata.com/',

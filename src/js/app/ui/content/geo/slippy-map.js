@@ -28,6 +28,7 @@ export function createSlippyMap(
     minimumSourceZoom = minimumZoom,
     maximumSourceZoom = maximumZoom,
     hasSourceTile,
+    resolveTileSource,
     attributionText = lookup('map.attribution', '© OpenStreetMap contributors'),
     attributionUrl = 'https://www.openstreetmap.org/copyright',
     secondaryAttribution,
@@ -109,6 +110,7 @@ export function createSlippyMap(
         minimumSourceZoom,
         maximumSourceZoom,
         hasSourceTile,
+        resolveTileSource,
         origin,
       });
       positionMarker({
@@ -124,7 +126,6 @@ export function createSlippyMap(
       });
     });
   };
-
   const setCenterFromPoint = (point) => {
     const worldSize = getWorldSize(currentZoom);
     currentCenter = unprojectPoint(
@@ -169,7 +170,6 @@ export function createSlippyMap(
       ),
     );
   };
-
   zoomIn.addEventListener('click', () => setZoom(currentZoom + 1));
   zoomOut.addEventListener('click', () => setZoom(currentZoom - 1));
   attachSmoothWheelZoom(
@@ -270,11 +270,9 @@ export function createSlippyMap(
   container.addEventListener('pointercancel', (event) =>
     finishPointer(event, true),
   );
-
   const resizeObserver = new ResizeObserver(scheduleRender);
   resizeObserver.observe(container);
   scheduleRender();
-
   return {
     getView: () => ({
       center: { ...currentCenter },
