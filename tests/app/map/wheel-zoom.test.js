@@ -16,32 +16,32 @@ import {
 } from '../../../src/js/app/ui/content/geo/interaction/zoom-status.js';
 
 assert.deepEqual(getZoomStatus(4, 1), {
+  emptying: true,
   lower: 4,
   percent: 0,
-  tileLayer: 4,
   upper: 5,
   zoom: '4.00',
 });
 assert.deepEqual(getZoomStatus(4, Math.SQRT2), {
+  emptying: true,
   lower: 4,
   percent: 50,
-  tileLayer: 4,
   upper: 5,
   zoom: '4.50',
 });
 assert.deepEqual(getZoomStatus(4, 1 / Math.SQRT2), {
+  emptying: false,
   lower: 3,
   percent: 50,
-  tileLayer: 4,
   upper: 4,
   zoom: '3.50',
 });
-assert.deepEqual(getZoomStatus(12, Math.SQRT2, 8), {
-  lower: 12,
+assert.deepEqual(getZoomStatus(3, Math.SQRT2), {
+  emptying: false,
+  lower: 3,
   percent: 50,
-  tileLayer: 8,
-  upper: 13,
-  zoom: '12.50',
+  upper: 4,
+  zoom: '3.50',
 });
 
 const documentDescriptor = Object.getOwnPropertyDescriptor(
@@ -53,7 +53,11 @@ globalThis.document = {
     return {
       attributes: {},
       children: [],
-      style: {},
+      style: {
+        setProperty(name, value) {
+          this[name] = value;
+        },
+      },
       tag,
       append(...children) {
         this.children.push(...children);
@@ -67,12 +71,18 @@ globalThis.document = {
 const chrome = createZoomChrome();
 chrome.update(4, Math.SQRT2);
 assert.equal(chrome.controls.children.length, 3);
-assert.equal(chrome.status.children[1].textContent, 4);
-assert.equal(chrome.status.children[0].children[0].style.height, '50%');
+assert.equal(chrome.status.children.length, 1);
+assert.equal(chrome.status.children[0].textContent, 4);
+assert.equal(chrome.status.className, 'slippy-map-zoom-status is-emptying');
+assert.equal(chrome.status.style['--slippy-zoom-progress'], '50%');
 assert.equal(
   chrome.status.attributes['aria-label'],
   'Layer 4; zoom 4.50; 50% from level 4 to 5.',
 );
+chrome.update(3, Math.SQRT2);
+assert.equal(chrome.status.children[0].textContent, 3);
+assert.equal(chrome.status.className, 'slippy-map-zoom-status');
+assert.equal(chrome.status.style['--slippy-zoom-progress'], '50%');
 Object.defineProperty(
   globalThis,
   'document',

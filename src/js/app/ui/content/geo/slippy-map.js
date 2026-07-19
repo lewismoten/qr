@@ -80,11 +80,7 @@ export function createSlippyMap(
       if (!width || !height) return;
       const worldSize = getWorldSize(currentZoom);
       const centerPoint = projectCoordinates(currentCenter, currentZoom);
-      zoomChrome.update(
-        currentZoom,
-        tileScale,
-        Math.min(currentZoom, maximumSourceZoom),
-      );
+      zoomChrome.update(currentZoom, tileScale);
       syncTileLayerView(tileLayer, currentCenter, currentZoom, centerPoint);
       dynamicAttribution.update({
         center: currentCenter,

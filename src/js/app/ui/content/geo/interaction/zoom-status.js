@@ -1,15 +1,15 @@
 import { lookup } from '../../../../../i18n/index.js';
 import { createElement } from '../slippy-elements.js';
 
-export function getZoomStatus(viewLayer, scale, tileLayer = viewLayer) {
+export function getZoomStatus(viewLayer, scale) {
   const zoom = viewLayer + Math.log2(scale);
   const lower = Math.floor(zoom);
   const upper = lower + 1;
   const percent = Math.round((zoom - lower) * 100);
   return {
+    emptying: lower % 2 === 0,
     lower,
     percent,
-    tileLayer,
     upper,
     zoom: zoom.toFixed(2),
   };
@@ -33,23 +33,22 @@ export function createZoomChrome() {
     role: 'img',
   });
   const layer = createElement('strong');
-  const track = createElement('span', 'slippy-map-zoom-track');
-  const fill = createElement('span', 'slippy-map-zoom-fill');
-  track.append(fill);
-  status.append(track, layer);
+  status.append(layer);
   controls.append(zoomIn, status, zoomOut);
 
-  const update = (viewLayer, scale, tileLayer = viewLayer) => {
-    const value = getZoomStatus(viewLayer, scale, tileLayer);
-    layer.textContent = value.tileLayer;
-    fill.style.height = `${value.percent}%`;
+  const update = (viewLayer, scale) => {
+    const value = getZoomStatus(viewLayer, scale);
+    layer.textContent = value.lower;
+    status.className =
+      'slippy-map-zoom-status' + (value.emptying ? ' is-emptying' : '');
+    status.style.setProperty('--slippy-zoom-progress', `${value.percent}%`);
     status.setAttribute(
       'aria-label',
       lookup(
         'map.zoomProgress',
         'Layer {layer}; zoom {zoom}; {percent}% from level {lower} to {upper}.',
         {
-          layer: value.tileLayer,
+          layer: value.lower,
           lower: value.lower,
           percent: value.percent,
           upper: value.upper,
