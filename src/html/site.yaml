@@ -25,8 +25,8 @@ guides:
   spec: spec.html
   technology: technology.html
   content/frame: guides/content/frame.html
-  content/text: guides/content/text.html
-  content/number: guides/content/number.html
+  content/text: guides/content/basic/text.html
+  content/number: guides/content/basic/number.html
   content/wifi: guides/content/wifi.html
   content/email: guides/content/email.html
   content/phone: guides/content/phone.html

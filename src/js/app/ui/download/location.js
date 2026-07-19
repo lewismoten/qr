@@ -1,4 +1,4 @@
-import { base64UrlToBase64 } from '../content/file/protocol.js';
+import { base64UrlToBase64 } from '../content/file/transfer/protocol.js';
 
 export function restoreLocationDownload({ window, document }) {
   const hash = window.location.hash.startsWith('#')

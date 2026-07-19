@@ -8,7 +8,7 @@ import {
   MODE_LABELS,
   QR_ALPHANUMERIC_CHARACTERS,
 } from './configuration.js';
-import { validatePrintableText } from './validation.js';
+import { validatePrintableText } from './data/validation.js';
 import { createFormatVisibility } from './ui/content/format-visibility.js';
 import { createContentEncodingSetup } from './ui/content/encoding-setup.js';
 import { createContentDataSetup } from './ui/content/data-setup.js';

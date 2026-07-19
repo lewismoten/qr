@@ -1,5 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
-import { validatePrintableText } from '../../../validation.js';
+import { validatePrintableText } from '../../../data/validation.js';
 
 const HEX_PATTERN = /^[\dA-Fa-f]+$/;
 const PRINTABLE_ASCII_PATTERN = /^[\x20-\x7e]+$/;

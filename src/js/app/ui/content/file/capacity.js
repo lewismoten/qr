@@ -4,7 +4,7 @@ import {
   buildSingleFileFrameTemplate,
   getFileDataUrlPrefix,
   getFileDownloadUrlPrefix,
-} from './protocol.js';
+} from './transfer/protocol.js';
 
 export function findMaximumEncodableBytes(
   canEncode,

@@ -6,13 +6,13 @@ import {
   getModuleCategory,
   getVersionInfoCoordinates,
   isFunctionModule,
-} from '../../qr-regions.js';
+} from '../../qr/qr-regions.js';
 import {
   buildEncodingUnitGroups,
   buildPostHeaderStreamGroups,
   classifyTraversalBits,
   summarizeCodewordRoles,
-} from '../../qr-stream.js';
+} from '../../qr/qr-stream.js';
 import qrEncoder, { isMaskActive } from '@lewismoten/qr';
 
 export function moduleIsDark(qrDefinition, row, column) {

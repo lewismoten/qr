@@ -1,4 +1,4 @@
-import { getOpaqueArtworkBackground } from '../../../frame-text.js';
+import { getOpaqueArtworkBackground } from '../../../data/frame-text.js';
 import { drawQrModule, fillEyeShape } from '../drawing/shapes.js';
 import { getPixelArtLayout } from './pixel-layout.js';
 

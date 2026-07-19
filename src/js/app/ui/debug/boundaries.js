@@ -1,5 +1,5 @@
 import { getContrastingHex, hexToRgba } from '../../colors.js';
-import { coordKey } from '../../qr-regions.js';
+import { coordKey } from '../../qr/qr-regions.js';
 import { getDebugCategory } from './model.js';
 
 function getOverlayColor(category, colors) {

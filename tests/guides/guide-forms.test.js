@@ -1,0 +1,77 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { describe, test } from 'node:test';
+
+const root = new URL('../../', import.meta.url);
+
+async function read(path) {
+  return readFile(new URL(path, root), 'utf8');
+}
+
+describe('standalone guide forms', () => {
+  test('reveals content formats without changing app visibility', async () => {
+    const css = await read('src/css/app/chrome/info-shell.css');
+    const wifi = await read('src/html/guides/content/wifi.html');
+
+    assert.match(
+      wifi,
+      /data-app-fragment=[^>]+format-fields|format-fields[^>]+data-app-fragment=/s,
+    );
+    assert.match(css, /\.info-page-body \[data-app-fragment\]\.format-fields/);
+    assert.match(css, /\.format-fields \{\s*display: grid;/);
+  });
+
+  test('reveals conditional controls only within guide pages', async () => {
+    const css = await read('src/css/app/chrome/info-shell.css');
+    const paths = [
+      'src/html/guides/content/frame.html',
+      'src/html/guides/content/file.html',
+      'src/html/guides/style/modules.html',
+      'src/html/guides/style/colors.html',
+      'src/html/guides/style/artwork.html',
+      'src/html/guides/download/image.html',
+    ];
+
+    assert.match(css, /\.guide-only \{\s*display: none;/);
+    assert.match(css, /\.info-page-body \[data-guide-reveal\]\[hidden\]/);
+    for (const path of paths) {
+      const page = await read(path);
+      assert.match(page, /data-guide-reveal[^>]*hidden/s, path);
+    }
+  });
+
+  test('documents each artwork mode while app switching stays intact', async () => {
+    const artwork = await read('src/html/guides/style/artwork.html');
+    const controls = await read('src/js/app/ui/style/art/controls.js');
+    const css = await read('src/css/app/chrome/info-shell.css');
+    const featureCss = await read('src/css/features/style/artwork.css');
+
+    for (const name of ['Logo', 'Emoji', 'Pixel art']) {
+      assert.match(artwork, new RegExp(`guide-control-heading[^>]*>${name}<`));
+    }
+    assert.equal(
+      artwork.match(/class="guide-pixel-swatch(?: is-eraser)?"/g)?.length,
+      17,
+    );
+    assert.match(artwork, /class="guide-only guide-pixel-sample"/);
+    assert.equal(artwork.match(/guide-pixel-sample"/g)?.length, 1);
+    assert.doesNotMatch(artwork, /guide-pixel-example/);
+    assert.match(css, /\.info-page-body \[data-app-only\]/);
+    assert.match(css, /\.guide-pixel-swatch\.is-eraser[\s\S]*grid-row: span 2/);
+    assert.match(
+      featureCss,
+      /\.pixel-palette-button\.is-eraser[\s\S]*grid-row: span 2/,
+    );
+    assert.match(
+      artwork,
+      /id="pixel-art-palette"[\s\S]*?data-app-only[\s\S]*?aria-label="EGA paint colors"\s*><\/div>/,
+    );
+    assert.match(
+      artwork,
+      /id="pixel-art-grid"[\s\S]*?data-app-only[\s\S]*?aria-label="16 by 16 pixel art editor"\s*><\/div>/,
+    );
+    assert.match(controls, /logoControls\.hidden = mode !== 'logo'/);
+    assert.match(controls, /emojiControls\.hidden = mode !== 'emoji'/);
+    assert.match(controls, /pixelControls\.hidden = mode !== 'pixel'/);
+  });
+});

@@ -1,4 +1,4 @@
-import { serializeWifi } from '../../../content-formats.js';
+import { serializeWifi } from '../../../data/content-formats.js';
 
 export function createWifiSection({
   ssid,

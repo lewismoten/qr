@@ -3,7 +3,7 @@ import {
   drawCenteredFrameMessage,
   drawFrameMessage,
   fitFrameMessage,
-} from '../../frame-text.js';
+} from '../../data/frame-text.js';
 import {
   createQrImageLayer,
   createQrModuleFill,

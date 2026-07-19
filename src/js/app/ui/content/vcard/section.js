@@ -1,4 +1,4 @@
-import { serializeVCard } from '../../../content-formats.js';
+import { serializeVCard } from '../../../data/content-formats.js';
 import { lookup } from '../../../../i18n/index.js';
 
 export function createVCardSection({

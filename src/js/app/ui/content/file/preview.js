@@ -2,7 +2,7 @@ import {
   encodeStreamPosition,
   getCompactFileExtension,
   getFileManifestFlag,
-} from './protocol.js';
+} from './transfer/protocol.js';
 import { lookup } from '../../../../i18n/index.js';
 
 export function createFilePayloadPreview({

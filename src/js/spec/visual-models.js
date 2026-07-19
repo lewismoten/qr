@@ -2,7 +2,7 @@ import { buildDebugOverlayModel } from '../app/ui/debug/model.js';
 import {
   getAlignmentPatternCenters,
   getDataTraversal,
-} from '../app/qr-regions.js';
+} from '../app/qr/qr-regions.js';
 import qrEncoder from '@lewismoten/qr';
 
 export const COLORS = {

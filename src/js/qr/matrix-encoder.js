@@ -14,7 +14,7 @@ import {
   makeDataCodewords,
   optimizeSegments,
   selectVersionAndSegments,
-} from './segments.js';
+} from './segments/segments.js';
 
 function getAlignmentPositions(version) {
   if (version === 1) return [];

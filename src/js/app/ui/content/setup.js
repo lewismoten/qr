@@ -2,7 +2,7 @@ import { createLazySection } from './lazy-section.js';
 import { createContentPluginRegistry } from './plugin-registry.js';
 import { ensurePanelFragment } from '../fragment-loader.js';
 import { lookup } from '../../../i18n/index.js';
-import { validateUrl } from './url-validation.js';
+import { validateUrl } from './simple/url-validation.js';
 
 export function createContentSections({
   document,
@@ -36,7 +36,7 @@ export function createContentSections({
   });
   const numberLoader = createLazySection({
     region,
-    load: () => import('./number/section.js'),
+    load: () => import('./simple/number/section.js'),
     create: ({ createNumberSectionFromDocument }) => {
       const section = createNumberSectionFromDocument(document, {
         maxFrames: limits.numberFrames,
@@ -121,7 +121,7 @@ export function createContentSections({
   let registry;
   const loaders = {
     text: () =>
-      import('./text/plugin.js').then(({ createTextPlugin }) =>
+      import('./simple/text/plugin.js').then(({ createTextPlugin }) =>
         createTextPlugin(document),
       ),
     number: () =>

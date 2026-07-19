@@ -1,4 +1,4 @@
-import { parseBoolean } from '../../../csv.js';
+import { parseBoolean } from '../../../data/csv.js';
 import {
   getWebsiteValidationState,
   isValidBulkDate,
@@ -9,7 +9,7 @@ import {
   validatePrintableText,
   validateTelephoneValue,
   validateVCardTextValue,
-} from '../../../validation.js';
+} from '../../../data/validation.js';
 import { parseCoordinate } from '../geo/coordinates.js';
 import { validateWifiValues } from '../wifi/validation.js';
 import { normalizeBulkWifiSecurity } from './payload.js';

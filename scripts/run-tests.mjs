@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { stripVTControlCharacters } from 'node:util';
 
-import { generateLocalizedGuides } from './generate-localized-guides.mjs';
+import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
 
 const requested = new Set(process.argv.slice(2));
 const supported = new Set(['--coverage', '--watch']);
@@ -10,11 +10,26 @@ const unknown = [...requested].filter((option) => !supported.has(option));
 const coverageRequested = requested.has('--coverage');
 const minimumFileCoverage = 95;
 const maximumTestFileDurationMs = 1000;
-const qrFiles = new Set(
-  readdirSync(new URL('../src/js/qr/', import.meta.url)).filter((file) =>
-    file.endsWith('.js'),
-  ),
-);
+const qrRoot = new URL('../src/js/qr/', import.meta.url);
+
+function listQrFiles(directory = qrRoot, prefix = '') {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      return listQrFiles(new URL(`${entry.name}/`, directory), relative);
+    }
+    return entry.name.endsWith('.js') ? [relative] : [];
+  });
+}
+
+const qrPaths = listQrFiles();
+const qrFiles = new Set(qrPaths.map((file) => file.split('/').at(-1)));
+
+if (qrFiles.size !== qrPaths.length) {
+  throw new Error(
+    'QR module filenames must remain unique for coverage checks.',
+  );
+}
 
 if (unknown.length) {
   throw new Error(`Unknown test runner option: ${unknown.join(', ')}`);

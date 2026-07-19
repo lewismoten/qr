@@ -1,4 +1,4 @@
-import { serializeEmail } from '../../content-formats.js';
+import { serializeEmail } from '../../data/content-formats.js';
 import { lookup } from '../../../i18n/index.js';
 
 export function createSharedFieldsSection({

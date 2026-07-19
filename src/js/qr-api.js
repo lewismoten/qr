@@ -22,6 +22,9 @@ export {
   getReedSolomonRemainder,
   makeReedSolomonDivisor,
 } from './qr/reed-solomon.js';
-export { optimizeSegments } from './qr/segment-optimizer.js';
-export { makeSegment } from './qr/segment.js';
-export { makeDataCodewords, selectVersionAndSegments } from './qr/segments.js';
+export { optimizeSegments } from './qr/segments/segment-optimizer.js';
+export { makeSegment } from './qr/segments/segment.js';
+export {
+  makeDataCodewords,
+  selectVersionAndSegments,
+} from './qr/segments/segments.js';

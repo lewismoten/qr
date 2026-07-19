@@ -1,5 +1,5 @@
 import { isMaskActive } from '@lewismoten/qr';
-import { isFunctionModule } from '../../qr-regions.js';
+import { isFunctionModule } from '../../qr/qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 
 const MASK_BLUE = '#60a5fa';

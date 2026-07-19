@@ -2,8 +2,8 @@ import { build, context } from 'esbuild';
 import { cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generateLocalizedGuides } from './scripts/generate-localized-guides.mjs';
-import { loadHtmlConfig } from './scripts/html-config.mjs';
+import { generateLocalizedGuides } from './scripts/guides/generate-localized-guides.mjs';
+import { loadHtmlConfig } from './scripts/guides/html-config.mjs';
 
 const watch = process.argv.includes('--watch');
 const htmlConfig = await loadHtmlConfig();

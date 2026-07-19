@@ -1,5 +1,5 @@
 import { getActiveLocale, lookup } from '../../../../i18n/index.js';
-import { parseBoolean } from '../../../csv.js';
+import { parseBoolean } from '../../../data/csv.js';
 
 function shorten(value, maximumLength = 64) {
   const normalized = String(value || '')

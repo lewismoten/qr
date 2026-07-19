@@ -1,9 +1,9 @@
-import { createFileCache } from './cache.js';
+import { createFileCache } from './transfer/cache.js';
 import { createFileCapacityCalculator } from './capacity.js';
-import { createFileManifestController } from './manifest.js';
-import { createFilePayloadBuilder } from './payload.js';
+import { createFileManifestController } from './transfer/manifest.js';
+import { createFilePayloadBuilder } from './transfer/payload.js';
 import { createFileSection } from './section.js';
-import { createFileSettings } from './settings.js';
+import { createFileSettings } from './transfer/settings.js';
 import { createFilePayloadPreview } from './preview.js';
 
 export function createFileSetup({

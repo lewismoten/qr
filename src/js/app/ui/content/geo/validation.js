@@ -1,5 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
-import { validateGeoLabel } from '../../../validation.js';
+import { validateGeoLabel } from '../../../data/validation.js';
 import { parseCoordinate } from './coordinates.js';
 
 const invalid = (error) => ({ error, warning: '' });

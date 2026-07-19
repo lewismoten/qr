@@ -77,7 +77,7 @@ export async function createLazyFileSystem({
 }) {
   const [setupModule, protocolModule, elementsModule] = await Promise.all([
     import('./setup.js'),
-    import('./protocol.js'),
+    import('./transfer/protocol.js'),
     import('./elements.js'),
   ]);
   const fileElements = elementsModule.getFileElements(document, elements);

@@ -1,15 +1,15 @@
-export { canvasToBlob } from '../../canvas-export.js';
+export { canvasToBlob } from '../../export/canvas-export.js';
 export {
   cloneCanvas,
   createAnimatedGifBlob,
   createGifBlob,
-} from '../../gif.js';
-export { createAnimatedMp4Blob } from '../../mp4.js';
+} from '../../export/gif.js';
+export { createAnimatedMp4Blob } from '../../export/mp4.js';
 export {
   capturePdfFrame,
   createPdfBlob,
   createPdfSheetBlob,
   getPdfSheetLayout,
-} from '../../pdf.js';
-export { createSvgBlob } from '../../svg.js';
-export { createZipBlob } from '../../zip.js';
+} from '../../export/pdf.js';
+export { createSvgBlob } from '../../export/svg.js';
+export { createZipBlob } from '../../export/zip.js';

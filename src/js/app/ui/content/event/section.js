@@ -2,7 +2,7 @@ import {
   formatCalendarInputDate,
   formatCalendarInputTime,
   serializeCalendarEvent,
-} from '../../../calendar.js';
+} from '../../../data/calendar.js';
 
 export function createEventSection({
   title,

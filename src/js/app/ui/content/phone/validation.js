@@ -1,5 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
-import { validateTelephoneValue } from '../../../validation.js';
+import { validateTelephoneValue } from '../../../data/validation.js';
 
 const invalid = (error) => ({ error, warning: '' });
 

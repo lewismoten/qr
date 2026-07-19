@@ -241,6 +241,6 @@ export function createQrModuleFill(
 import {
   getFinderPatternPart,
   isFinderPattern,
-} from '../../../qr-finder-regions.js';
+} from '../../../qr/qr-finder-regions.js';
 
 export { getFinderPatternPart, isFinderPattern };

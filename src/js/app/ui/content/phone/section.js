@@ -1,5 +1,5 @@
-import { formatPhoneNumberForDisplay } from '../../../phone.js';
-import { serializePhone, serializeSms } from '../../../content-formats.js';
+import { formatPhoneNumberForDisplay } from '../../../data/phone.js';
+import { serializePhone, serializeSms } from '../../../data/content-formats.js';
 import { lookup } from '../../../../i18n/index.js';
 
 export function createPhoneSection({

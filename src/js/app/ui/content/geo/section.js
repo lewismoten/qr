@@ -1,4 +1,4 @@
-import { serializeGeo } from '../../../content-formats.js';
+import { serializeGeo } from '../../../data/content-formats.js';
 import { loadFeatureStylesheet } from '../../../../stylesheets.js';
 import { createLoadingIndicator } from '../../loading-indicator.js';
 import { parseCoordinate } from './coordinates.js';

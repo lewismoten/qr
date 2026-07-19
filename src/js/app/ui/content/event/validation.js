@@ -4,7 +4,7 @@ import {
   isValidBulkDate,
   isValidBulkTime,
   validateCalendarText,
-} from '../../../validation.js';
+} from '../../../data/validation.js';
 
 const invalid = (error) => ({ error, warning: '' });
 

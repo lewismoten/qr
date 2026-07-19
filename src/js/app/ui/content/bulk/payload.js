@@ -1,7 +1,7 @@
 import {
   createCalendarEventId,
   serializeCalendarEvent,
-} from '../../../calendar.js';
+} from '../../../data/calendar.js';
 import {
   serializeEmail,
   serializeGeo,
@@ -9,8 +9,8 @@ import {
   serializeSms,
   serializeVCard,
   serializeWifi,
-} from '../../../content-formats.js';
-import { parseBoolean } from '../../../csv.js';
+} from '../../../data/content-formats.js';
+import { parseBoolean } from '../../../data/csv.js';
 
 export function normalizeBulkWifiSecurity(value) {
   const normalized = String(value).trim().toLowerCase();

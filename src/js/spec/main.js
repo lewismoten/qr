@@ -4,7 +4,7 @@ import {
   getDebugCategory,
   moduleIsDark,
 } from '../app/ui/debug/model.js';
-import { isFunctionModule } from '../app/qr-regions.js';
+import { isFunctionModule } from '../app/qr/qr-regions.js';
 import { setupExternalLinks } from '../external-links.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
 import { renderEncodingExamples } from './encoding-examples.js';

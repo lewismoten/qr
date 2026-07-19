@@ -2,7 +2,7 @@ import { lookup } from '../../../../i18n/index.js';
 import {
   validateEmailValue,
   validatePrintableText,
-} from '../../../validation.js';
+} from '../../../data/validation.js';
 
 const invalid = (error) => ({ error, warning: '' });
 
