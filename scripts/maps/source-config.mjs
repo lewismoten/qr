@@ -1,5 +1,9 @@
 export const DEFAULT_LAYERS = [
   'countries',
+  'lakesOverview',
+  'lakes',
+  'riversOverview',
+  'rivers',
   'regions',
   'primaryRoadsOverview',
   'primaryRoads',
@@ -33,14 +37,46 @@ const transportationUrl = (layer, offset) =>
 
 export const MAP_SOURCES = {
   countries: {
-    file: 'ne_50m_admin_0_countries.geojson',
+    file: 'cultural/ne_50m_admin_0_countries.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_admin_0_countries.geojson`,
     minimumZoom: 1,
     maximumZoom: 19,
     kind: 'area',
   },
+  lakesOverview: {
+    file: 'physical/ne_50m_lakes.geojson',
+    url: `${NATURAL_EARTH_ROOT}ne_50m_lakes.geojson`,
+    minimumZoom: 1,
+    maximumZoom: 5,
+    kind: 'area',
+  },
+  lakes: {
+    file: 'physical/ne_10m_lakes.geojson',
+    url: `${NATURAL_EARTH_ROOT}ne_10m_lakes.geojson`,
+    minimumZoom: 6,
+    maximumZoom: 8,
+    kind: 'area',
+  },
+  riversOverview: {
+    file: 'physical/ne_50m_rivers_lake_centerlines_scale_rank.geojson',
+    url:
+      `${NATURAL_EARTH_ROOT}` +
+      'ne_50m_rivers_lake_centerlines_scale_rank.geojson',
+    minimumZoom: 1,
+    maximumZoom: 5,
+    kind: 'line',
+  },
+  rivers: {
+    file: 'physical/ne_10m_rivers_lake_centerlines_scale_rank.geojson',
+    url:
+      `${NATURAL_EARTH_ROOT}` +
+      'ne_10m_rivers_lake_centerlines_scale_rank.geojson',
+    minimumZoom: 6,
+    maximumZoom: 8,
+    kind: 'line',
+  },
   regions: {
-    file: 'ne_50m_admin_1_states_provinces_lines.geojson',
+    file: 'cultural/ne_50m_admin_1_states_provinces_lines.geojson',
     url:
       `${NATURAL_EARTH_ROOT}` + 'ne_50m_admin_1_states_provinces_lines.geojson',
     minimumZoom: 4,
@@ -48,7 +84,7 @@ export const MAP_SOURCES = {
     kind: 'line',
   },
   primaryRoadsOverview: {
-    file: 'census_2025_primary_roads_5m.geojson',
+    file: 'census/census_2025_primary_roads_5m.geojson',
     url: transportationUrl(0, 0.008),
     pageSize: 1000,
     minimumZoom: 6,
@@ -56,7 +92,7 @@ export const MAP_SOURCES = {
     kind: 'line',
   },
   primaryRoads: {
-    file: 'census_2025_primary_roads_2m.geojson',
+    file: 'census/census_2025_primary_roads_2m.geojson',
     url: transportationUrl(1, 0.002),
     pageSize: 1000,
     minimumZoom: 8,
@@ -64,7 +100,7 @@ export const MAP_SOURCES = {
     kind: 'line',
   },
   naturalEarthRoads: {
-    file: 'ne_10m_roads.geojson',
+    file: 'cultural/ne_10m_roads.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_roads.geojson`,
     minimumZoom: 6,
     maximumZoom: 8,
@@ -75,21 +111,21 @@ export const MAP_SOURCES = {
     },
   },
   states: {
-    file: 'census_2024_states_20m.geojson',
+    file: 'census/census_2024_states_20m.geojson',
     url: censusUrl(9),
     minimumZoom: 7,
     maximumZoom: 19,
     kind: 'area',
   },
   subdivisions: {
-    file: 'census_2024_counties_20m.geojson',
+    file: 'census/census_2024_counties_20m.geojson',
     url: censusUrl(13),
     minimumZoom: 7,
     maximumZoom: 19,
     kind: 'area',
   },
   cities: {
-    file: 'ne_50m_populated_places_simple.geojson',
+    file: 'cultural/ne_50m_populated_places_simple.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_populated_places_simple.geojson`,
     minimumZoom: 4,
     maximumZoom: 6,

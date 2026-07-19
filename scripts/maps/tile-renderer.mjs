@@ -204,6 +204,24 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'country',
     tolerance,
   );
+  const lakes = renderPaths(
+    [
+      ...rankedFeatures(collections, 'lakesOverview', tile.zoom),
+      ...rankedFeatures(collections, 'lakes', tile.zoom),
+    ],
+    tile,
+    'lake',
+    tolerance,
+  );
+  const rivers = renderPaths(
+    [
+      ...rankedFeatures(collections, 'riversOverview', tile.zoom),
+      ...rankedFeatures(collections, 'rivers', tile.zoom),
+    ],
+    tile,
+    'river',
+    tolerance,
+  );
   const stateFeatures = activeFeatures(collections, 'states', tile.zoom);
   const regionFeatures = activeFeatures(
     collections,
@@ -234,12 +252,15 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     activeFeatures(collections, 'cities', tile.zoom),
     tile,
   );
-  if (!countries && !regions && !roads && !subdivisions && !states && !cities) {
-    return '';
-  }
+  const content = [countries, lakes, rivers, roads];
+  content.push(regions, subdivisions, states, cities);
+  if (!content.some(Boolean)) return '';
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
     '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
+    '.lake{fill:#bfe3ed;stroke:#75adbd;stroke-width:.5}' +
+    '.river{fill:none;stroke:#75adbd;stroke-width:.45;' +
+    'stroke-linecap:round;stroke-linejoin:round}' +
     '.primary-road{fill:none;stroke:#c56f43;stroke-width:.8;' +
     'stroke-linecap:round;stroke-linejoin:round}' +
     '.region{fill:none;stroke:#8a9d75;stroke-width:.7}' +
@@ -247,6 +268,8 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     '.state-boundary{fill:none;stroke:#7d916f;stroke-width:.8}' +
     '.city{fill:#e11d48;stroke:#fff;stroke-width:.7}</style>' +
     countries +
+    lakes +
+    rivers +
     roads +
     regions +
     subdivisions +

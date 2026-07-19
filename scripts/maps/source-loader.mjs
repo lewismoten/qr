@@ -102,7 +102,7 @@ async function validCache(file) {
 export async function obtainMapSource({ name, source, cache, formatBytes }) {
   const file = path.join(cache, source.file);
   if (await validCache(file)) return { name, path: file, source };
-  await mkdir(cache, { recursive: true });
+  await mkdir(path.dirname(file), { recursive: true });
   console.log(`Downloading ${name}...`);
   const { content, collection } = await downloadCollection(
     name,
