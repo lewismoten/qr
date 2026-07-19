@@ -54,9 +54,10 @@ const container = {
     assert.equal(before, marker);
   },
 };
-const result = transitionTileLayer(container, current, marker, 2);
+const result = transitionTileLayer(container, current, marker, 1.5, 0.75);
 assert.equal(result, next);
-assert.equal(current.style.values.get('--slippy-target-scale'), 2);
+assert.equal(current.style.values.get('--slippy-target-scale'), 1.5);
+assert.equal(next.style.values.get('--slippy-preview-scale'), 0.75);
 assert.equal(current.classList.values.has('is-zoom-active'), true);
 assert.equal(next.classList.values.has('is-zoom-ready'), true);
 revealTileLayer(next);

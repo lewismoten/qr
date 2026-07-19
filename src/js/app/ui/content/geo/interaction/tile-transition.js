@@ -15,12 +15,19 @@ export function revealTileLayer(layer) {
   setTimeout(() => current.remove(), TRANSITION_DURATION);
 }
 
-export function transitionTileLayer(container, current, before, scale) {
+export function transitionTileLayer(
+  container,
+  current,
+  before,
+  scale,
+  nextScale = 1,
+) {
   const next = document.createElement('div');
   next.className = 'slippy-map-tiles';
   next.classList.add('is-zoom-entering');
   next.setAttribute('aria-hidden', 'true');
   next.slippyPreviousLayer = current;
+  next.style.setProperty('--slippy-preview-scale', nextScale);
   current.style.setProperty('--slippy-target-scale', scale);
   current.classList.add('is-zoom-leaving');
   container.insertBefore(next, before);

@@ -36,50 +36,35 @@ assert.deepEqual(reversedSteps, [1]);
 
 const previews = [];
 const commits = [];
-let pending;
-let cancelled = 0;
 const smoothWheel = createSmoothWheelZoomHandler(
   {
     onPreview: (scale) => previews.push(scale),
-    onCommit: (step) => commits.push(step),
+    onCommit: (step, scale) => commits.push({ scale, step }),
   },
   {
     sensitivity: 320,
-    settleDelay: 50,
     commitThreshold: 0.75,
-    schedule: (callback) => {
-      pending = callback;
-      return 1;
-    },
-    cancel: () => (cancelled += 1),
   },
 );
 smoothWheel(wheelEvent(-80, 0));
 smoothWheel(wheelEvent(-80, 10));
 assert.ok(previews[1] > previews[0]);
-assert.equal(cancelled, 1);
-pending();
-assert.deepEqual(commits, [1]);
-assert.equal(previews.at(-1), 1);
+assert.deepEqual(commits, []);
 smoothWheel(wheelEvent(0, 20));
-pending();
-assert.deepEqual(commits, [1]);
+assert.deepEqual(commits, []);
 smoothWheel(wheelEvent(1000, 30));
-assert.ok(previews.at(-2) < 1);
-assert.equal(previews.at(-1), 1);
-assert.deepEqual(commits, [1, -1]);
+assert.ok(previews.at(-1) > 1);
+assert.equal(commits[0].step, -1);
+assert.ok(commits[0].scale > 1);
 smoothWheel(wheelEvent(80, 40));
-pending();
-assert.deepEqual(commits, [1, -1, -1]);
+assert.equal(commits.length, 1);
 
 const properties = new Map();
-const propertyValues = [];
 let attachedHandler;
 const layer = {
   style: {
     setProperty(name, value) {
       properties.set(name, value);
-      propertyValues.push(value);
     },
   },
 };
@@ -95,7 +80,6 @@ attachSmoothWheelZoom(
   (step) => commits.push(step),
 );
 attachedHandler(wheelEvent(-320, 30));
-assert.ok(propertyValues.some((value) => value > 1));
-assert.equal(properties.get('--slippy-preview-scale'), 1);
+assert.ok(properties.get('--slippy-preview-scale') < 1);
 
 console.log('Map wheel zoom tests passed.');

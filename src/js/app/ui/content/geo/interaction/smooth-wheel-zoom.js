@@ -5,23 +5,9 @@ const clamp = (value, minimum, maximum) =>
 
 export function createSmoothWheelZoomHandler(
   { onPreview, onCommit },
-  {
-    sensitivity = 240,
-    settleDelay = 90,
-    commitThreshold = 0.5,
-    schedule = setTimeout,
-    cancel = clearTimeout,
-  } = {},
+  { sensitivity = 240, commitThreshold = 0.5 } = {},
 ) {
   let amount = 0;
-  let timer = null;
-  const commit = () => {
-    timer = null;
-    if (!amount) return;
-    onCommit(amount > 0 ? 1 : -1);
-    amount = 0;
-    onPreview(1);
-  };
   return (event) => {
     event.preventDefault();
     amount = clamp(
@@ -29,16 +15,12 @@ export function createSmoothWheelZoomHandler(
       -0.85,
       0.85,
     );
-    onPreview(2 ** amount);
-    if (timer !== null) cancel(timer);
     if (Math.abs(amount) >= commitThreshold) {
-      onCommit(amount > 0 ? 1 : -1);
-      amount = 0;
-      timer = null;
-      onPreview(1);
-      return;
+      const step = amount > 0 ? 1 : -1;
+      amount -= step;
+      onCommit(step, 2 ** amount);
     }
-    timer = schedule(commit, settleDelay);
+    onPreview(2 ** amount);
   };
 }
 
