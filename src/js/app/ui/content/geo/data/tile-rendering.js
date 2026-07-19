@@ -30,7 +30,7 @@ export function renderTile({
     tiles.set(key, element);
     layer.appendChild(element);
   }
-  element.style.left = `${Math.round(tile.x * TILE_SIZE - origin.x)}px`;
-  element.style.top = `${Math.round(tile.y * TILE_SIZE - origin.y)}px`;
+  element.style.left = `${tile.x * TILE_SIZE - origin.x}px`;
+  element.style.top = `${tile.y * TILE_SIZE - origin.y}px`;
   return element;
 }

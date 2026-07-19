@@ -116,6 +116,10 @@ renderedTile.children[0].dispatch('load');
 assert.equal(renderedLayer.slippyPendingTiles.size, 0);
 assert.equal(renderTile(renderOptions), renderedTile);
 assert.equal(renderedChildren.length, 1);
+renderOptions.origin = { x: 4500.25, y: 6100.5 };
+renderTile(renderOptions);
+assert.equal(renderedTile.style.left, '107.75px');
+assert.equal(renderedTile.style.top, '43.5px');
 const defaultLoadTile = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 1, x: 0, y: 0 },
