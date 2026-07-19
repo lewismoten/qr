@@ -1,0 +1,44 @@
+{
+  "loading": "बल्क आयात उपकरण लोड हो रहे हैं।",
+  "warning": "बल्क आयात पंक्ति {rowNumber}: {message}",
+  "requiredValues": "आवश्यक मान: {values}",
+  "status": {
+    "empty": "कोई CSV लोड नहीं है।",
+    "loaded": "{count} पंक्तियाँ लोड हुईं। {count} में से {current} दिखाई जा रही है।"
+  },
+  "progress": {
+    "title": "CSV फ़ाइल संसाधित हो रही है",
+    "reading": "{name} पढ़ी जा रही है...",
+    "readingBytes": "{total} में से {current} पढ़ा जा रहा है...",
+    "parsing": "CSV डेटा पार्स हो रहा है...",
+    "loaded": "{count} पंक्तियाँ लोड हुईं।",
+    "canceled": "CSV संसाधन रद्द किया गया।"
+  },
+  "csv": {
+    "empty": "CSV खाली है।",
+    "duplicateFields": "पहली पंक्ति में दोहराए गए फ़ील्ड नाम हैं।",
+    "missingFields": "पहली पंक्ति में ये फ़ील्ड नहीं हैं: {fields}।",
+    "rowLimit": "बल्क आयात {maxRows} डेटा पंक्तियों तक सीमित है।",
+    "noRows": "CSV में शीर्षक पंक्ति है, लेकिन डेटा पंक्तियाँ नहीं हैं।",
+    "fileSize": "CSV का आकार {size} है; सीमा {maxSize} है।",
+    "readError": "यह CSV पढ़ी नहीं जा सकी।",
+    "unclosedQuote": "CSV में उद्धरण चिह्न वाला एक अधूरा मान है।"
+  },
+  "validation": {
+    "parse": "बल्क आयात अभी मान्य नहीं है: {message}",
+    "fileRequired": "बल्क आयात अभी मान्य नहीं है: CSV फ़ाइल चुनें।",
+    "rowRequired": "बल्क आयात अभी मान्य नहीं है: कम से कम एक डेटा पंक्ति चाहिए।",
+    "row": "बल्क आयात पंक्ति {rowNumber} मान्य नहीं है: {message}",
+    "fieldRequired": "{field} आवश्यक है।",
+    "textRequired": "text आवश्यक है।",
+    "wholeNumber": "number पूर्णांक होना चाहिए।",
+    "security": "security WPA, WEP या open होना चाहिए।",
+    "booleanHidden": "hidden true/false, yes/no या 1/0 होना चाहिए।",
+    "booleanAllDay": "all_day true/false, yes/no या 1/0 होना चाहिए।",
+    "dates": "start_date और end_date YYYY-MM-DD की वास्तविक तिथियाँ होनी चाहिए।",
+    "times": "all_day true न हो तो समय HH:MM प्रारूप में होना चाहिए।",
+    "eventOrder": "कार्यक्रम का अंत आरंभ के बाद होना चाहिए।",
+    "latitude": "latitude -90 से 90 के बीच की संख्या होनी चाहिए।",
+    "longitude": "longitude -180 से 180 के बीच की संख्या होनी चाहिए।"
+  }
+}

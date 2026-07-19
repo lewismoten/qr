@@ -1,0 +1,44 @@
+{
+  "loading": "Cargando las herramientas de importación masiva.",
+  "warning": "Fila {rowNumber} de importación: {message}",
+  "requiredValues": "Valores obligatorios: {values}",
+  "status": {
+    "empty": "No se ha cargado ningún CSV.",
+    "loaded": "{count} filas cargadas. Mostrando {current} de {count}."
+  },
+  "progress": {
+    "title": "Procesando archivo CSV",
+    "reading": "Leyendo {name}...",
+    "readingBytes": "Leyendo {current} de {total}...",
+    "parsing": "Analizando datos CSV...",
+    "loaded": "Se cargaron {count} filas.",
+    "canceled": "Procesamiento CSV cancelado."
+  },
+  "csv": {
+    "empty": "El CSV está vacío.",
+    "duplicateFields": "La primera fila contiene nombres de campo duplicados.",
+    "missingFields": "Faltan campos en la primera fila: {fields}.",
+    "rowLimit": "Las importaciones masivas admiten hasta {maxRows} filas de datos.",
+    "noRows": "El CSV tiene encabezados, pero no filas de datos.",
+    "fileSize": "El CSV ocupa {size}; el límite es {maxSize}.",
+    "readError": "No se pudo leer este CSV.",
+    "unclosedQuote": "El CSV contiene un valor entre comillas sin cerrar."
+  },
+  "validation": {
+    "parse": "La importación masiva aún no es válida: {message}",
+    "fileRequired": "La importación masiva aún no es válida: elige un archivo CSV.",
+    "rowRequired": "La importación masiva aún no es válida: el CSV necesita al menos una fila de datos.",
+    "row": "Fila {rowNumber} no válida: {message}",
+    "fieldRequired": "{field} es obligatorio.",
+    "textRequired": "text es obligatorio.",
+    "wholeNumber": "number debe ser un número entero.",
+    "security": "security debe ser WPA, WEP u open.",
+    "booleanHidden": "hidden debe ser true/false, yes/no o 1/0.",
+    "booleanAllDay": "all_day debe ser true/false, yes/no o 1/0.",
+    "dates": "start_date y end_date deben ser fechas reales con formato AAAA-MM-DD.",
+    "times": "start_time y end_time deben ser horas reales en formato HH:MM, salvo si all_day es true.",
+    "eventOrder": "el final del evento debe ser posterior al inicio.",
+    "latitude": "latitude debe ser un número entre -90 y 90.",
+    "longitude": "longitude debe ser un número entre -180 y 180."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "data": "Datos",
+  "format": "Formato",
+  "frame": "Marco",
+  "tools": "Herramientas de contenido",
+  "preview": {
+    "loading": "[La vista previa se carga al seleccionar este formato]",
+    "url": "[Introduce una URL HTTPS completa]",
+    "text": "[Introduce texto]",
+    "bulkRow": "[Fila de datos importada]",
+    "networkName": "[Nombre de red]",
+    "password": "[Contraseña]",
+    "email": "[Dirección de correo]",
+    "subject": "[Asunto]",
+    "message": "[Mensaje]",
+    "phoneNumber": "[Número de teléfono]",
+    "latitude": "[Latitud]",
+    "longitude": "[Longitud]",
+    "fullName": "[Nombre completo]",
+    "organization": "[Organización]",
+    "title": "[Cargo]",
+    "website": "[Sitio web]",
+    "file": "[Contenido del archivo seleccionado]"
+  }
+}

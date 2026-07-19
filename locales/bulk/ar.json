@@ -1,0 +1,44 @@
+{
+  "loading": "جارٍ تحميل أدوات الاستيراد المجمع.",
+  "warning": "صف الاستيراد {rowNumber}: ‏{message}",
+  "requiredValues": "القيم المطلوبة: {values}",
+  "status": {
+    "empty": "لم يتم تحميل CSV.",
+    "loaded": "تم تحميل {count} صفوف. عرض {current} من {count}."
+  },
+  "progress": {
+    "title": "جارٍ معالجة ملف CSV",
+    "reading": "جارٍ قراءة {name}...",
+    "readingBytes": "جارٍ قراءة {current} من {total}...",
+    "parsing": "جارٍ تحليل بيانات CSV...",
+    "loaded": "تم تحميل {count} صفوف.",
+    "canceled": "تم إلغاء معالجة CSV."
+  },
+  "csv": {
+    "empty": "ملف CSV فارغ.",
+    "duplicateFields": "يحتوي الصف الأول على أسماء حقول مكررة.",
+    "missingFields": "يفتقد الصف الأول الحقول: {fields}.",
+    "rowLimit": "يقتصر الاستيراد المجمع على {maxRows} صفوف بيانات.",
+    "noRows": "يحتوي CSV على صف عناوين دون صفوف بيانات.",
+    "fileSize": "حجم CSV هو {size}؛ الحد الأقصى {maxSize}.",
+    "readError": "تعذرت قراءة ملف CSV هذا.",
+    "unclosedQuote": "يحتوي CSV على قيمة مقتبسة غير مغلقة."
+  },
+  "validation": {
+    "parse": "الاستيراد المجمع غير صالح بعد: {message}",
+    "fileRequired": "الاستيراد المجمع غير صالح بعد: اختر ملف CSV.",
+    "rowRequired": "الاستيراد المجمع غير صالح بعد: يحتاج CSV إلى صف بيانات واحد على الأقل.",
+    "row": "صف الاستيراد {rowNumber} غير صالح: {message}",
+    "fieldRequired": "الحقل {field} مطلوب.",
+    "textRequired": "الحقل text مطلوب.",
+    "wholeNumber": "يجب أن يكون number عددًا صحيحًا.",
+    "security": "يجب أن تكون security ‏WPA أو WEP أو open.",
+    "booleanHidden": "يجب أن تكون hidden ‏true/false أو yes/no أو 1/0.",
+    "booleanAllDay": "يجب أن تكون all_day ‏true/false أو yes/no أو 1/0.",
+    "dates": "يجب أن يكون start_date وend_date تاريخين صالحين بتنسيق YYYY-MM-DD.",
+    "times": "يجب أن تكون الأوقات بتنسيق HH:MM ما لم تكن all_day تساوي true.",
+    "eventOrder": "يجب أن تكون نهاية الحدث بعد بدايته.",
+    "latitude": "يجب أن تكون latitude رقمًا بين -90 و90.",
+    "longitude": "يجب أن تكون longitude رقمًا بين -180 و180."
+  }
+}

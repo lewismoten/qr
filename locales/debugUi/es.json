@@ -1,0 +1,79 @@
+{
+  "tools": "Herramientas de depuración",
+  "tabs": {
+    "encoding": "Codificación",
+    "mask": "Máscara",
+    "payload": "Contenido",
+    "overlay": "Superposición"
+  },
+  "encoding": {
+    "errorCorrection": "Corrección de errores",
+    "aboutErrorCorrection": "Acerca de la corrección de errores",
+    "damageRecovery": "Recuperación de daños",
+    "inputMode": "Modo de entrada",
+    "aboutInputModes": "Acerca de los modos de entrada",
+    "encodingModes": "Modos de codificación",
+    "autoHelp": "La detección automática elige segmentos numéricos, alfanuméricos o de bytes según el coste total en bits. Kanji sigue siendo manual.",
+    "manualHelp": "El modo manual fuerza el modo elegido y marca los caracteres incompatibles.",
+    "autoDetect": "Detección automática (sin Kanji)",
+    "manual": "Manual",
+    "alphanumericShort": "A-Z / 0-9",
+    "mode": "Modo",
+    "version": "Versión",
+    "autoVersion": "Elegir versión QR automáticamente",
+    "versionLabel": "Versión:",
+    "target": "Objetivo"
+  },
+  "mask": {
+    "legend": "Patrón de máscara",
+    "choices": "Opciones de patrón de máscara"
+  },
+  "payload": {
+    "legend": "Contenido codificado",
+    "reveal": "Mostrar contraseñas y secretos en la vista previa"
+  },
+  "overlay": {
+    "legend": "Superposición de depuración",
+    "about": "Acerca de las superposiciones",
+    "controls": "Controles de superposición",
+    "persistHelp": "Persistir mantiene las superposiciones al visitar otras pestañas.",
+    "unmaskHelp": "Sin máscara muestra los módulos de datos antes de aplicar la máscara QR. Solo afecta a la vista de depuración; los patrones funcionales y la información de formato no cambian.",
+    "persistAria": "Mantener superposiciones en otras pestañas",
+    "persist": "Persistir",
+    "unmaskAria": "Mostrar módulos de datos sin máscara",
+    "unmask": "Sin máscara",
+    "segments": "Segmentos",
+    "unused": "Libre",
+    "unusedCapacity": "Capacidad libre",
+    "outlineGrouping": "Agrupación de contornos",
+    "aboutOutline": "Acerca de la agrupación",
+    "groupMarks": "Cómo se marcan los grupos",
+    "dotHelp": "Los puntos sólidos inician grupos; los puntos con anillo inician campos codificados.",
+    "unitsHelp": "Las unidades agrupan 3 dígitos, 2 caracteres alfanuméricos, 1 carácter Kanji o 1 byte codificado.",
+    "codewords": "Palabras",
+    "stream": "Flujo",
+    "units": "Unidades",
+    "encodingUnits": "Unidades de codificación",
+    "metadata": "Metadatos"
+  },
+  "colors": {
+    "data": "Flujo de datos",
+    "mode": "Bits de modo",
+    "characterCount": "Conteo",
+    "ecLevel": "Bits de nivel EC",
+    "mask": "Bits de máscara",
+    "ecWords": "Palabras EC",
+    "ecWordsAria": "Color de palabras de corrección",
+    "remainder": "Resto",
+    "remainderAria": "Color de bits restantes",
+    "padding": "Relleno",
+    "paddingAria": "Color del ajuste a byte y palabras de relleno",
+    "terminator": "Terminador",
+    "finder": "Buscador",
+    "alignment": "Alineación",
+    "timing": "Sincronización",
+    "format": "Formato",
+    "darkModule": "Módulo oscuro",
+    "version": "Versión (v7+)"
+  }
+}

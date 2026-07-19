@@ -1,0 +1,39 @@
+{
+  "tools": "下载类型",
+  "tabs": {
+    "image": "图像",
+    "document": "文档",
+    "animation": "动画"
+  },
+  "image": {
+    "legend": "导出图像",
+    "format": "图像格式",
+    "quality": "JPG 质量",
+    "download": "下载",
+    "current": "下载当前图像",
+    "allZip": "全部下载为 ZIP",
+    "svgHint": "SVG 将整个画布转换为路径，包括边框文字。"
+  },
+  "document": {
+    "legend": "PDF 文档",
+    "autoSize": "根据像素和版本自动调整打印二维码",
+    "printedWidth": "打印宽度",
+    "download": "下载 PDF",
+    "current": "将当前二维码下载为 PDF",
+    "allPdf": "全部下载为 PDF",
+    "hint": "自动打印宽度按每英寸 192 像素计算，并避免高版本二维码模块过小。PDF 页面会按所选物理宽度排列尽可能多的二维码。"
+  },
+  "animation": {
+    "legend": "动画时长",
+    "mode": "动画时长模式",
+    "perImage": "每张图像",
+    "totalDuration": "总时长",
+    "minutes": "分钟",
+    "seconds": "秒",
+    "milliseconds": "毫秒",
+    "initialSummary": "每张图像 1.000 秒，总计 8.000 秒。",
+    "gif": "下载动画 GIF",
+    "mp4": "下载 MP4",
+    "hint": "GIF 会连续循环。MP4 是否可用取决于浏览器内置编码器，并以实时速度录制。"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "contentRequired": "尚无效：内容为必填项。",
+  "email": {
+    "required": "尚不符合{context}格式：{label}为必填项。",
+    "invalid": "尚不符合{context}格式：{label}必须有效。",
+    "length": "尚不符合{context}格式：{label}不得超过 254 个字符。",
+    "subjectLabel": "尚不符合电子邮件格式：主题",
+    "bodyLabel": "尚不符合电子邮件格式：正文",
+    "capacity": "尚不符合电子邮件格式：正文超过当前二维码容量（{current} / {max}）。"
+  },
+  "text": {
+    "length": "{label}不得超过 {maxLength} 个字符。",
+    "printable": "{label}只能使用可打印字符。"
+  },
+  "phone": {
+    "required": "尚不符合{context}格式：{label}为必填项。",
+    "characters": "尚不符合{context}格式：{label}只能使用数字、空格、括号、句点、连字符和可选的开头 +。",
+    "formatLength": "尚不符合{context}格式：{label}不得超过 40 个字符。",
+    "plus": "尚不符合{context}格式：{label}中的 + 只能位于开头。",
+    "length": "尚不符合{context}格式：{label}应包含 10 至 15 位数字。"
+  },
+  "geo": {
+    "labelLength": "尚不符合地理位置格式：标签不得超过 80 个字符。",
+    "labelCharacters": "尚不符合地理位置格式：标签只能使用字母、数字、空格和常用标点。",
+    "latitudeRequired": "尚不符合地理位置格式：纬度为必填项。",
+    "longitudeRequired": "尚不符合地理位置格式：经度为必填项。",
+    "latitudeNumber": "尚不符合地理位置格式：纬度必须是有效数字。",
+    "longitudeNumber": "尚不符合地理位置格式：经度必须是有效数字。",
+    "latitudeRange": "尚不符合地理位置格式：纬度必须介于 -90 和 90 之间。",
+    "longitudeRange": "尚不符合地理位置格式：经度必须介于 -180 和 180 之间。"
+  },
+  "vcard": {
+    "required": "尚不符合 vCard 格式：{label}为必填项。",
+    "length": "尚不符合 vCard 格式：{label}不得超过 {maxLength} 个字符。",
+    "characters": "尚不符合 vCard 格式：{label}只能使用字母、数字、空格和常用标点。"
+  },
+  "website": {
+    "required": "尚不符合{context}格式：网站为必填项。",
+    "length": "尚不符合{context}格式：网站不得超过 2048 个字符。",
+    "protocolRequired": "尚不符合{context}格式：网站必须包含完整协议，例如 https://。",
+    "protocol": "尚不符合{context}格式：网站应以 https:// 或 http:// 开头。",
+    "insecure": "{context}格式警告：网站使用 http://，强烈建议使用 https://。"
+  },
+  "event": {
+    "required": "尚不符合日历事件格式：{label}为必填项。",
+    "length": "尚不符合日历事件格式：{label}不得超过 {maxLength} 个字符。",
+    "characters": "尚不符合日历事件格式：{label}包含不支持的控制字符。",
+    "startDate": "尚不符合日历事件格式：开始日期为必填项。",
+    "endDate": "尚不符合日历事件格式：结束日期为必填项。",
+    "dates": "尚不符合日历事件格式：请输入 YYYY-MM-DD 格式的有效日期。",
+    "dateOrder": "尚不符合日历事件格式：结束日期不能早于开始日期。",
+    "startTime": "尚不符合日历事件格式：开始时间为必填项。",
+    "endTime": "尚不符合日历事件格式：结束时间为必填项。",
+    "times": "尚不符合日历事件格式：请输入 HH:MM 格式的有效 24 小时时间。",
+    "timeOrder": "尚不符合日历事件格式：结束时间必须晚于开始时间。"
+  },
+  "wifi": {
+    "security": "尚不符合 Wi-Fi 格式：请选择 WPA、WEP 或开放网络。",
+    "ssidRequired": "尚不符合 Wi-Fi 格式：网络名称为必填项。",
+    "ssidLabel": "Wi-Fi 网络名称",
+    "ssidBytes": "尚不符合 Wi-Fi 格式：网络名称不得超过 32 个 UTF-8 字节。",
+    "passwordRequired": "尚不符合 Wi-Fi 格式：密码为必填项。",
+    "passwordLabel": "Wi-Fi 密码",
+    "wepPassword": "尚不符合 Wi-Fi 格式：WEP 密钥必须为 5 或 13 个字符，或 10 或 26 个十六进制数字。",
+    "wpaPassword": "尚不符合 Wi-Fi 格式：WPA 密码必须为 8 至 63 个字符，或正好 64 个十六进制数字。"
+  },
+  "sms": {
+    "length": "尚不符合短信格式：为确保广泛兼容，消息不得超过 {maxLength} 个字符。"
+  },
+  "file": {
+    "required": "尚不符合文件格式：请选择要编码的文件。",
+    "embeddedWarning": "文件格式警告：此共享下载网址直接嵌入文件字节，因此较大的文件会很快达到二维码容量。",
+    "chunksWarning": "文件格式警告：此紧凑 FILE 数据流分布在 {totalChunks} 个二维码中。每次扫描都需要相同的文件 ID 和全部分块才能重建文件。"
+  },
+  "number": {
+    "start": "尚不符合数字格式：起始值必须是整数。",
+    "end": "尚不符合数字格式：结束值必须是整数。",
+    "step": "尚不符合数字格式：步长必须是正整数。",
+    "range": "尚不符合数字格式：此范围会创建 {total} 个二维码，请限制为 {maxFrames} 个或更少。",
+    "fieldLabel": "尚不符合数字格式：{label}"
+  }
+}

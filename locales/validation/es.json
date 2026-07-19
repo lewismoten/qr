@@ -1,0 +1,82 @@
+{
+  "contentRequired": "Aún no es válido: el contenido es obligatorio.",
+  "email": {
+    "required": "Aún no es válido para el formato {context}: {label} es obligatorio.",
+    "invalid": "Aún no es válido para el formato {context}: {label} debe ser válido.",
+    "length": "Aún no es válido para el formato {context}: {label} debe tener como máximo 254 caracteres.",
+    "subjectLabel": "Aún no es válido para Correo: asunto",
+    "bodyLabel": "Aún no es válido para Correo: cuerpo",
+    "capacity": "Aún no es válido para Correo: el cuerpo supera la capacidad QR actual ({current} / {max})."
+  },
+  "text": {
+    "length": "{label} debe tener como máximo {maxLength} caracteres.",
+    "printable": "{label} solo puede usar caracteres imprimibles."
+  },
+  "phone": {
+    "required": "Aún no es válido para el formato {context}: {label} es obligatorio.",
+    "characters": "Aún no es válido para {context}: {label} solo admite dígitos, espacios, paréntesis, puntos, guiones y un + inicial opcional.",
+    "formatLength": "Aún no es válido para {context}: {label} debe tener como máximo 40 caracteres.",
+    "plus": "Aún no es válido para {context}: {label} solo puede usar + al principio.",
+    "length": "Aún no es válido para {context}: {label} debe contener entre 10 y 15 dígitos."
+  },
+  "geo": {
+    "labelLength": "Aún no es válido para Geo: la etiqueta debe tener como máximo 80 caracteres.",
+    "labelCharacters": "Aún no es válido para Geo: la etiqueta solo admite letras, números, espacios y puntuación común.",
+    "latitudeRequired": "Aún no es válido para Geo: la latitud es obligatoria.",
+    "longitudeRequired": "Aún no es válido para Geo: la longitud es obligatoria.",
+    "latitudeNumber": "Aún no es válido para Geo: la latitud debe ser un número válido.",
+    "longitudeNumber": "Aún no es válido para Geo: la longitud debe ser un número válido.",
+    "latitudeRange": "Aún no es válido para Geo: la latitud debe estar entre -90 y 90.",
+    "longitudeRange": "Aún no es válido para Geo: la longitud debe estar entre -180 y 180."
+  },
+  "vcard": {
+    "required": "Aún no es válido para vCard: {label} es obligatorio.",
+    "length": "Aún no es válido para vCard: {label} debe tener como máximo {maxLength} caracteres.",
+    "characters": "Aún no es válido para vCard: {label} solo admite letras, números, espacios y puntuación común."
+  },
+  "website": {
+    "required": "Aún no es válido para {context}: el sitio web es obligatorio.",
+    "length": "Aún no es válido para {context}: el sitio web no debe superar 2048 caracteres.",
+    "protocolRequired": "Aún no es válido para {context}: incluye un protocolo completo como https://.",
+    "protocol": "Aún no es válido para {context}: el sitio debe comenzar con https:// o http://.",
+    "insecure": "Advertencia para {context}: el sitio usa http://. Se recomienda encarecidamente https://."
+  },
+  "event": {
+    "required": "Aún no es válido para Evento: {label} es obligatorio.",
+    "length": "Aún no es válido para Evento: {label} debe tener como máximo {maxLength} caracteres.",
+    "characters": "Aún no es válido para Evento: {label} contiene caracteres de control no compatibles.",
+    "startDate": "Aún no es válido para Evento: la fecha inicial es obligatoria.",
+    "endDate": "Aún no es válido para Evento: la fecha final es obligatoria.",
+    "dates": "Aún no es válido para Evento: introduce fechas reales con el formato AAAA-MM-DD.",
+    "dateOrder": "Aún no es válido para Evento: la fecha final no puede ser anterior a la inicial.",
+    "startTime": "Aún no es válido para Evento: la hora inicial es obligatoria.",
+    "endTime": "Aún no es válido para Evento: la hora final es obligatoria.",
+    "times": "Aún no es válido para Evento: introduce horas reales de 24 horas con el formato HH:MM.",
+    "timeOrder": "Aún no es válido para Evento: el final debe ser posterior al inicio."
+  },
+  "wifi": {
+    "security": "Aún no es válido para Wi-Fi: elige WPA, WEP o Abierta.",
+    "ssidRequired": "Aún no es válido para Wi-Fi: el nombre de red es obligatorio.",
+    "ssidLabel": "nombre de red Wi-Fi",
+    "ssidBytes": "Aún no es válido para Wi-Fi: el nombre de red debe caber en 32 bytes UTF-8.",
+    "passwordRequired": "Aún no es válido para Wi-Fi: la contraseña es obligatoria.",
+    "passwordLabel": "contraseña Wi-Fi",
+    "wepPassword": "Aún no es válido para Wi-Fi: las claves WEP deben tener 5 o 13 caracteres, o 10 o 26 dígitos hexadecimales.",
+    "wpaPassword": "Aún no es válido para Wi-Fi: las contraseñas WPA deben tener entre 8 y 63 caracteres, o exactamente 64 dígitos hexadecimales."
+  },
+  "sms": {
+    "length": "Aún no es válido para SMS: el mensaje debe tener {maxLength} caracteres o menos."
+  },
+  "file": {
+    "required": "Aún no es válido para Archivo: elige un archivo para codificar.",
+    "embeddedWarning": "Advertencia para Archivo: esta URL compartible contiene directamente los bytes del archivo, por lo que los archivos grandes agotarán pronto la capacidad QR.",
+    "chunksWarning": "Advertencia para Archivo: este flujo FILE compacto se divide entre {totalChunks} códigos QR. Cada lectura necesita el mismo ID de archivo y todos los fragmentos para reconstruirlo."
+  },
+  "number": {
+    "start": "Aún no es válido para Número: el inicio debe ser un entero.",
+    "end": "Aún no es válido para Número: el final debe ser un entero.",
+    "step": "Aún no es válido para Número: el paso debe ser un entero positivo.",
+    "range": "Aún no es válido para Número: el intervalo crea {total} códigos QR; limítalo a {maxFrames} o menos.",
+    "fieldLabel": "Aún no es válido para Número: {label}"
+  }
+}

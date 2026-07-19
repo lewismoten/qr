@@ -5,6 +5,7 @@ import {
   validatePrintableText,
   validateVCardTextValue,
 } from '../../../src/js/app/data/validation.js';
+import { readLocaleSource } from '../../helpers/locales.js';
 
 const flattenMessages = (value, prefix = '', result = {}) => {
   Object.entries(value).forEach(([name, child]) => {
@@ -96,14 +97,7 @@ const scopedFormKeys = htmlKeys.filter((key) =>
     key,
   ),
 );
-const englishMessages = flattenMessages(
-  JSON.parse(
-    await readFile(
-      new URL('../../../locales/en-US.json', import.meta.url),
-      'utf8',
-    ),
-  ),
-);
+const englishMessages = flattenMessages(await readLocaleSource('en-US'));
 const qrDirectory = new URL('../../../src/js/qr/', import.meta.url);
 const qrFiles = (await readdir(qrDirectory)).filter((name) =>
   name.endsWith('.js'),
@@ -147,14 +141,7 @@ const runtimeErrorKeys = Object.keys(englishMessages).filter(
     ].includes(key),
 );
 for (const locale of ['en-US', 'es', 'zh-CN', 'hi-IN', 'ar']) {
-  const localeMessages = flattenMessages(
-    JSON.parse(
-      await readFile(
-        new URL(`../../../locales/${locale}.json`, import.meta.url),
-        'utf8',
-      ),
-    ),
-  );
+  const localeMessages = flattenMessages(await readLocaleSource(locale));
   const requiredKeys = locale === 'en-US' ? htmlKeys : scopedFormKeys;
   assert.deepEqual(
     requiredKeys.filter((key) => !(key in localeMessages)),

@@ -13,7 +13,7 @@ deployment:
     include: **/*
     to: dist
   locales:
-    from: locales
+    from: build/locales
     include: **/*.json
     to: locales
   favicon:

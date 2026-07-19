@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 import { describe, test } from 'node:test';
 
+import { readLocaleSource } from '../helpers/locales.js';
+
 const read = (path) =>
   readFile(new URL('../../' + path, import.meta.url), 'utf8');
 
@@ -44,11 +46,10 @@ describe('specification guide', () => {
   });
 
   test('localizes dynamically generated encoding examples', async () => {
-    const [source, localeSource] = await Promise.all([
+    const [source, locale] = await Promise.all([
       read('src/js/spec/encoding-examples.js'),
-      read('locales/es.json'),
+      readLocaleSource('es'),
     ]);
-    const locale = JSON.parse(localeSource);
 
     assert.match(source, /lookup\('spec\.mixed\.segment'/);
     assert.match(source, /lookup\(\s*'spec\.units\.numeric'/);

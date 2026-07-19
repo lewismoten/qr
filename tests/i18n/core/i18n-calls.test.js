@@ -3,9 +3,9 @@ import { readdir, readFile } from 'node:fs/promises';
 import { describe, test } from 'node:test';
 
 import { parse } from 'espree';
+import { readLocaleSource } from '../../helpers/locales.js';
 
 const sourceRoot = new URL('../../../src/js/', import.meta.url);
-const englishUrl = new URL('../../../locales/en-US.json', import.meta.url);
 
 async function listJavaScriptFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -116,9 +116,7 @@ function getStaticCalls(program, fileName) {
 
 describe('JavaScript localization calls', () => {
   test('literal lookups match en-US text and interpolation tags', async () => {
-    const english = flattenMessages(
-      JSON.parse(await readFile(englishUrl, 'utf8')),
-    );
+    const english = flattenMessages(await readLocaleSource('en-US'));
     const files = await listJavaScriptFiles(sourceRoot);
     let callCount = 0;
     const issues = [];

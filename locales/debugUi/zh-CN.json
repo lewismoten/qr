@@ -1,0 +1,79 @@
+{
+  "tools": "调试工具",
+  "tabs": {
+    "encoding": "编码",
+    "mask": "掩码",
+    "payload": "载荷",
+    "overlay": "叠加层"
+  },
+  "encoding": {
+    "errorCorrection": "纠错",
+    "aboutErrorCorrection": "关于纠错",
+    "damageRecovery": "损坏恢复",
+    "inputMode": "输入模式",
+    "aboutInputModes": "关于输入模式",
+    "encodingModes": "编码模式",
+    "autoHelp": "自动检测会按总位成本选择数字、字母数字或字节分段。汉字模式仍需手动选择。",
+    "manualHelp": "手动模式强制使用所选模式，并标出不兼容字符。",
+    "autoDetect": "自动检测（不含汉字）",
+    "manual": "手动",
+    "alphanumericShort": "A-Z / 0-9",
+    "mode": "模式",
+    "version": "版本",
+    "autoVersion": "自动选择二维码版本",
+    "versionLabel": "版本：",
+    "target": "目标"
+  },
+  "mask": {
+    "legend": "掩码图案",
+    "choices": "掩码图案选项"
+  },
+  "payload": {
+    "legend": "编码载荷",
+    "reveal": "在预览中显示密码和机密内容"
+  },
+  "overlay": {
+    "legend": "调试叠加层",
+    "about": "关于调试叠加层",
+    "controls": "叠加层控制",
+    "persistHelp": "保留会在访问其他选项卡时继续显示叠加层。",
+    "unmaskHelp": "取消掩码会显示应用所选二维码掩码之前的数据模块。它只影响调试预览；功能图案和格式信息保持不变。",
+    "persistAria": "在其他选项卡中保留叠加层",
+    "persist": "保留",
+    "unmaskAria": "显示未掩码的数据模块",
+    "unmask": "取消掩码",
+    "segments": "分段",
+    "unused": "未使用",
+    "unusedCapacity": "未使用容量",
+    "outlineGrouping": "轮廓分组",
+    "aboutOutline": "关于轮廓分组",
+    "groupMarks": "分组标记方式",
+    "dotHelp": "实心点表示轮廓组的起点；环形点表示编码字段的起点。",
+    "unitsHelp": "一个单位包含 3 个数字、2 个字母数字字符、1 个汉字或 1 个编码字节。",
+    "codewords": "码字",
+    "stream": "数据流",
+    "units": "单位",
+    "encodingUnits": "编码单位",
+    "metadata": "元数据"
+  },
+  "colors": {
+    "data": "数据流",
+    "mode": "模式位",
+    "characterCount": "字符计数",
+    "ecLevel": "纠错级别位",
+    "mask": "掩码位",
+    "ecWords": "纠错码字",
+    "ecWordsAria": "纠错码字颜色",
+    "remainder": "余位",
+    "remainderAria": "余位颜色",
+    "padding": "填充",
+    "paddingAria": "字节边界和填充码字颜色",
+    "terminator": "终止符",
+    "finder": "定位图案",
+    "alignment": "校正图案",
+    "timing": "时序图案",
+    "format": "格式",
+    "darkModule": "固定深色模块",
+    "version": "版本（v7+）"
+  }
+}

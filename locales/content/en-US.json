@@ -1,0 +1,25 @@
+{
+  "data": "Data",
+  "format": "Format",
+  "frame": "Frame",
+  "tools": "Content tools",
+  "preview": {
+    "loading": "[Content preview loads after selecting this format]",
+    "url": "[Enter a complete HTTPS URL]",
+    "text": "[Enter text]",
+    "bulkRow": "[Imported data row]",
+    "networkName": "[Network name]",
+    "password": "[Password]",
+    "email": "[Email address]",
+    "subject": "[Subject]",
+    "message": "[Message]",
+    "phoneNumber": "[Phone number]",
+    "latitude": "[Latitude]",
+    "longitude": "[Longitude]",
+    "fullName": "[Full name]",
+    "organization": "[Organization]",
+    "title": "[Title]",
+    "website": "[Website]",
+    "file": "[Selected file content]"
+  }
+}

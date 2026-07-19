@@ -1,0 +1,39 @@
+{
+  "tools": "Tipo de descarga",
+  "tabs": {
+    "image": "Imagen",
+    "document": "Documento",
+    "animation": "Animación"
+  },
+  "image": {
+    "legend": "Exportar imagen",
+    "format": "Formato de imagen",
+    "quality": "Calidad JPG",
+    "download": "Descargar",
+    "current": "Descargar imagen actual",
+    "allZip": "Descargar todo como ZIP",
+    "svgHint": "SVG convierte todo el lienzo en trazados, incluido el texto del marco."
+  },
+  "document": {
+    "legend": "Documento PDF",
+    "autoSize": "Ajustar el QR impreso según los píxeles y la versión",
+    "printedWidth": "Ancho impreso",
+    "download": "Descargar PDF",
+    "current": "Descargar actual como PDF",
+    "allPdf": "Descargar todo como PDF",
+    "hint": "El ancho automático usa 192 píxeles por pulgada y evita que los módulos de versiones altas sean demasiado pequeños. Las hojas PDF colocan tantos códigos como permite el ancho físico seleccionado."
+  },
+  "animation": {
+    "legend": "Duración de la animación",
+    "mode": "Modo de duración de la animación",
+    "perImage": "Por imagen",
+    "totalDuration": "Duración total",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "milliseconds": "Milisegundos",
+    "initialSummary": "1,000 segundos por imagen; 8,000 segundos en total.",
+    "gif": "Descargar GIF animado",
+    "mp4": "Descargar MP4",
+    "hint": "El GIF se repite continuamente. La disponibilidad de MP4 depende del codificador del navegador y se graba en tiempo real."
+  }
+}

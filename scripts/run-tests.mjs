@@ -3,6 +3,7 @@ import { readdirSync } from 'node:fs';
 import { stripVTControlCharacters } from 'node:util';
 
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
+import { buildLocaleResources } from './locales/resources.mjs';
 
 const requested = new Set(process.argv.slice(2));
 const supported = new Set(['--coverage', '--watch']);
@@ -39,6 +40,7 @@ if (coverageRequested && requested.has('--watch')) {
 }
 
 await generateLocalizedGuides({ clean: true });
+await buildLocaleResources();
 
 const nodeOptions = ['--test', '--test-concurrency=8', '--test-reporter=spec'];
 

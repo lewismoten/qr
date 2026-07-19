@@ -1,0 +1,44 @@
+{
+  "loading": "正在加载批量导入工具。",
+  "warning": "批量导入第 {rowNumber} 行：{message}",
+  "requiredValues": "必填值：{values}",
+  "status": {
+    "empty": "尚未加载 CSV。",
+    "loaded": "已加载 {count} 行，正在显示第 {current} 行，共 {count} 行。"
+  },
+  "progress": {
+    "title": "正在处理 CSV 文件",
+    "reading": "正在读取 {name}...",
+    "readingBytes": "正在读取 {current}/{total}...",
+    "parsing": "正在解析 CSV 数据...",
+    "loaded": "已加载 {count} 行。",
+    "canceled": "CSV 处理已取消。"
+  },
+  "csv": {
+    "empty": "CSV 为空。",
+    "duplicateFields": "第一行包含重复的字段名。",
+    "missingFields": "第一行缺少字段：{fields}。",
+    "rowLimit": "批量导入最多支持 {maxRows} 行数据。",
+    "noRows": "CSV 有标题行，但没有数据行。",
+    "fileSize": "CSV 大小为 {size}；上限为 {maxSize}。",
+    "readError": "无法读取此 CSV。",
+    "unclosedQuote": "CSV 包含未闭合的带引号值。"
+  },
+  "validation": {
+    "parse": "批量导入尚无效：{message}",
+    "fileRequired": "批量导入尚无效：请选择 CSV 文件。",
+    "rowRequired": "批量导入尚无效：CSV 至少需要一行数据。",
+    "row": "批量导入第 {rowNumber} 行无效：{message}",
+    "fieldRequired": "{field}为必填项。",
+    "textRequired": "text 为必填项。",
+    "wholeNumber": "number 必须是整数。",
+    "security": "security 必须是 WPA、WEP 或 open。",
+    "booleanHidden": "hidden 必须是 true/false、yes/no 或 1/0。",
+    "booleanAllDay": "all_day 必须是 true/false、yes/no 或 1/0。",
+    "dates": "start_date 和 end_date 必须是 YYYY-MM-DD 格式的有效日期。",
+    "times": "除非 all_day 为 true，否则时间必须是 HH:MM 格式。",
+    "eventOrder": "事件结束时间必须晚于开始时间。",
+    "latitude": "latitude 必须是 -90 到 90 之间的数字。",
+    "longitude": "longitude 必须是 -180 到 180 之间的数字。"
+  }
+}

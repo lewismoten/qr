@@ -1,0 +1,25 @@
+{
+  "data": "数据",
+  "format": "格式",
+  "frame": "边框",
+  "tools": "内容工具",
+  "preview": {
+    "loading": "[选择此格式后加载内容预览]",
+    "url": "[输入完整的 HTTPS 网址]",
+    "text": "[输入文本]",
+    "bulkRow": "[导入的数据行]",
+    "networkName": "[网络名称]",
+    "password": "[密码]",
+    "email": "[电子邮件地址]",
+    "subject": "[主题]",
+    "message": "[消息]",
+    "phoneNumber": "[电话号码]",
+    "latitude": "[纬度]",
+    "longitude": "[经度]",
+    "fullName": "[姓名]",
+    "organization": "[组织]",
+    "title": "[职位]",
+    "website": "[网站]",
+    "file": "[所选文件内容]"
+  }
+}

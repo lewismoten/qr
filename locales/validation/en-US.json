@@ -1,0 +1,82 @@
+{
+  "contentRequired": "Not valid yet: content is required.",
+  "email": {
+    "required": "Not valid for {context} format yet: {label} is required.",
+    "invalid": "Not valid for {context} format yet: {label} must be valid.",
+    "length": "Not valid for {context} format yet: {label} should stay within 254 characters.",
+    "subjectLabel": "Not valid for Email format yet: subject",
+    "bodyLabel": "Not valid for Email format yet: body",
+    "capacity": "Not valid for Email format yet: body exceeds the current QR capacity ({current} / {max})."
+  },
+  "text": {
+    "length": "{label} should stay within {maxLength} characters.",
+    "printable": "{label} can only use printable characters."
+  },
+  "phone": {
+    "required": "Not valid for {context} format yet: {label} is required.",
+    "characters": "Not valid for {context} format yet: {label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.",
+    "formatLength": "Not valid for {context} format yet: {label} should stay within 40 characters.",
+    "plus": "Not valid for {context} format yet: {label} can only use + at the beginning.",
+    "length": "Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits."
+  },
+  "geo": {
+    "labelLength": "Not valid for Geo format yet: label should stay within 80 characters.",
+    "labelCharacters": "Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.",
+    "latitudeRequired": "Not valid for Geo format yet: latitude is required.",
+    "longitudeRequired": "Not valid for Geo format yet: longitude is required.",
+    "latitudeNumber": "Not valid for Geo format yet: latitude must be a valid number.",
+    "longitudeNumber": "Not valid for Geo format yet: longitude must be a valid number.",
+    "latitudeRange": "Not valid for Geo format yet: latitude must be between -90 and 90.",
+    "longitudeRange": "Not valid for Geo format yet: longitude must be between -180 and 180."
+  },
+  "vcard": {
+    "required": "Not valid for vCard format yet: {label} is required.",
+    "length": "Not valid for vCard format yet: {label} should stay within {maxLength} characters.",
+    "characters": "Not valid for vCard format yet: {label} can only use letters, numbers, spaces, and common punctuation."
+  },
+  "website": {
+    "required": "Not valid for {context} format yet: website is required.",
+    "length": "Not valid for {context} format yet: website should stay within 2048 characters.",
+    "protocolRequired": "Not valid for {context} format yet: website must include a full protocol such as https://.",
+    "protocol": "Not valid for {context} format yet: website should start with https:// or http://.",
+    "insecure": "Warning for {context} format: website uses http://. https:// is strongly recommended."
+  },
+  "event": {
+    "required": "Not valid for Event format yet: {label} is required.",
+    "length": "Not valid for Event format yet: {label} should stay within {maxLength} characters.",
+    "characters": "Not valid for Event format yet: {label} contains unsupported control characters.",
+    "startDate": "Not valid for Event format yet: start date is required.",
+    "endDate": "Not valid for Event format yet: end date is required.",
+    "dates": "Not valid for Event format yet: enter real dates using YYYY-MM-DD.",
+    "dateOrder": "Not valid for Event format yet: end date cannot be before start date.",
+    "startTime": "Not valid for Event format yet: start time is required.",
+    "endTime": "Not valid for Event format yet: end time is required.",
+    "times": "Not valid for Event format yet: enter real 24-hour times using HH:MM.",
+    "timeOrder": "Not valid for Event format yet: end must be after start."
+  },
+  "wifi": {
+    "security": "Not valid for Wi-Fi format yet: choose WPA, WEP, or Open.",
+    "ssidRequired": "Not valid for Wi-Fi format yet: network name is required.",
+    "ssidLabel": "Wi-Fi network name",
+    "ssidBytes": "Not valid for Wi-Fi format yet: network name must fit within 32 UTF-8 bytes.",
+    "passwordRequired": "Not valid for Wi-Fi format yet: a password is required.",
+    "passwordLabel": "Wi-Fi password",
+    "wepPassword": "Not valid for Wi-Fi format yet: WEP keys must be 5 or 13 characters, or 10 or 26 hexadecimal digits.",
+    "wpaPassword": "Not valid for Wi-Fi format yet: WPA passwords must be 8 to 63 characters, or exactly 64 hexadecimal digits."
+  },
+  "sms": {
+    "length": "Not valid for SMS format yet: message should stay at {maxLength} characters or fewer for broad SMS compatibility."
+  },
+  "file": {
+    "required": "Not valid for File format yet: choose a file to encode.",
+    "embeddedWarning": "Warning for File format: this shareable download URL embeds the file bytes directly, so larger files will hit QR capacity quickly.",
+    "chunksWarning": "Warning for File format: this compact FILE stream is split across {totalChunks} QR codes. Each scan needs the same file ID plus every chunk to reconstruct the file."
+  },
+  "number": {
+    "start": "Not valid for Number format yet: start must be a whole number.",
+    "end": "Not valid for Number format yet: end must be a whole number.",
+    "step": "Not valid for Number format yet: step must be a positive whole number.",
+    "range": "Not valid for Number format yet: the range creates {total} QR codes; limit it to {maxFrames} or fewer.",
+    "fieldLabel": "Not valid for Number format yet: {label}"
+  }
+}

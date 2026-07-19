@@ -1,35 +1,12 @@
 {
-  "page": { "title": "免费二维码生成器、设计器和调试器" },
+  "page": {
+    "title": "免费二维码生成器、设计器和调试器"
+  },
   "navigation": {
     "content": "内容",
     "style": "样式",
     "download": "下载",
     "debug": "调试"
-  },
-  "content": {
-    "data": "数据",
-    "format": "格式",
-    "frame": "边框",
-    "tools": "内容工具",
-    "preview": {
-      "loading": "[选择此格式后加载内容预览]",
-      "url": "[输入完整的 HTTPS 网址]",
-      "text": "[输入文本]",
-      "bulkRow": "[导入的数据行]",
-      "networkName": "[网络名称]",
-      "password": "[密码]",
-      "email": "[电子邮件地址]",
-      "subject": "[主题]",
-      "message": "[消息]",
-      "phoneNumber": "[电话号码]",
-      "latitude": "[纬度]",
-      "longitude": "[经度]",
-      "fullName": "[姓名]",
-      "organization": "[组织]",
-      "title": "[职位]",
-      "website": "[网站]",
-      "file": "[所选文件内容]"
-    }
   },
   "formats": {
     "url": "网址",
@@ -45,309 +22,6 @@
     "calendarEvent": "日历事件",
     "geo": "地理位置",
     "file": "文件"
-  },
-  "form": {
-    "format": {
-      "payloadFormat": "内容格式",
-      "qrFormat": "二维码格式",
-      "bulkImport": "批量导入"
-    },
-    "placeholders": {
-      "numberPrefix": "项目-",
-      "numberSuffix": "-甲",
-      "email": "姓名@示例.公司",
-      "phone": "+8613812345678",
-      "eventWebsite": "https://示例.公司/活动",
-      "personName": "示例用户",
-      "organization": "示例公司",
-      "jobTitle": "工程师",
-      "website": "https://示例.公司",
-      "metadata": "{\"collection\":\"寻宝游戏\"}"
-    },
-    "defaults": {
-      "eventTitle": "新活动",
-      "geoLabel": "弗朗特罗亚尔，弗吉尼亚州",
-      "vcardName": "Lewis Moten III",
-      "vcardOrganization": "LewisMoten.com",
-      "vcardTitle": "所有者",
-      "phone": "+15305394775",
-      "vcardEmail": "lewismoten@gmail.com",
-      "vcardWebsite": "https://lewismoten.com"
-    },
-    "data": {
-      "bulkFileUnavailable": "批量导入不支持文件格式。请使用专用文件格式处理二进制数据。",
-      "bulkHeaders": "第一行必须包含以下字段名：",
-      "chooseCsv": "选择 CSV 文件",
-      "clearCsv": "清除 CSV",
-      "urlContent": "网址内容",
-      "textContent": "文本内容",
-      "textPayload": "编码文本",
-      "enterText": "输入任意文本",
-      "numberSeries": "数字序列",
-      "start": "开始",
-      "end": "结束",
-      "step": "步长",
-      "prefixOptional": "前缀（可选）",
-      "suffixOptional": "后缀（可选）",
-      "currentValue": "当前值",
-      "networkName": "网络名称",
-      "networkPlaceholder": "我的 Wi-Fi",
-      "security": "安全性",
-      "wifiSecurity": "Wi-Fi 安全性",
-      "wpa": "WPA/2/3",
-      "wpaLong": "WPA/WPA2/WPA3",
-      "wep": "WEP",
-      "open": "开放",
-      "hiddenNetwork": "隐藏网络",
-      "to": "收件人",
-      "subjectOptional": "主题（可选）",
-      "bodyOptional": "正文（可选）",
-      "phoneFormat": "电话号码格式",
-      "smsPhoneFormat": "短信电话号码格式",
-      "usa": "美国",
-      "international": "国际",
-      "e164": "E.164",
-      "digits": "纯数字",
-      "textMessage": "短信内容",
-      "allDayEvent": "全天事件",
-      "startDate": "开始日期",
-      "startTime": "开始时间",
-      "endDate": "结束日期",
-      "endTime": "结束时间",
-      "locationOptional": "地点（可选）",
-      "descriptionOptional": "说明（可选）",
-      "websiteOptional": "网站（可选）",
-      "eventTimeHint": "定时事件使用扫描设备的本地时区。对于全天事件，所选结束日期是最后包含的一天。",
-      "latitude": "纬度",
-      "longitude": "经度",
-      "label": "标签",
-      "mapLabel": "交互式地图预览。拖动平移，使用控件缩放，或点击选择坐标。",
-      "website": "网站",
-      "transport": "传输方式",
-      "fileTransportMode": "文件传输模式",
-      "blobUrl": "Blob 网址",
-      "chunked": "分块",
-      "dataUrl": "数据网址",
-      "chunkedProtocol": "分块协议",
-      "chooseFile": "选择文件",
-      "autoPickVersion": "自动选择版本",
-      "chunkVersionTarget": "分块目标版本",
-      "includeManifest": "包含清单",
-      "compressTransfer": "压缩传输（gzip）",
-      "customMetadata": "自定义元数据（可选 JSON）",
-      "chunk": "分块",
-      "clearFile": "清除文件",
-      "fileProtocolHint": "FILE:1:S 表示一个完整的单二维码。多二维码传输使用 FILE:1:C 分块，其中包含标识符、字节偏移量和总长度。"
-    }
-  },
-  "downloadUi": {
-    "tools": "下载类型",
-    "tabs": { "image": "图像", "document": "文档", "animation": "动画" },
-    "image": {
-      "legend": "导出图像",
-      "format": "图像格式",
-      "quality": "JPG 质量",
-      "download": "下载",
-      "current": "下载当前图像",
-      "allZip": "全部下载为 ZIP",
-      "svgHint": "SVG 将整个画布转换为路径，包括边框文字。"
-    },
-    "document": {
-      "legend": "PDF 文档",
-      "autoSize": "根据像素和版本自动调整打印二维码",
-      "printedWidth": "打印宽度",
-      "download": "下载 PDF",
-      "current": "将当前二维码下载为 PDF",
-      "allPdf": "全部下载为 PDF",
-      "hint": "自动打印宽度按每英寸 192 像素计算，并避免高版本二维码模块过小。PDF 页面会按所选物理宽度排列尽可能多的二维码。"
-    },
-    "animation": {
-      "legend": "动画时长",
-      "mode": "动画时长模式",
-      "perImage": "每张图像",
-      "totalDuration": "总时长",
-      "minutes": "分钟",
-      "seconds": "秒",
-      "milliseconds": "毫秒",
-      "initialSummary": "每张图像 1.000 秒，总计 8.000 秒。",
-      "gif": "下载动画 GIF",
-      "mp4": "下载 MP4",
-      "hint": "GIF 会连续循环。MP4 是否可用取决于浏览器内置编码器，并以实时速度录制。"
-    }
-  },
-  "debugUi": {
-    "tools": "调试工具",
-    "tabs": {
-      "encoding": "编码",
-      "mask": "掩码",
-      "payload": "载荷",
-      "overlay": "叠加层"
-    },
-    "encoding": {
-      "errorCorrection": "纠错",
-      "aboutErrorCorrection": "关于纠错",
-      "damageRecovery": "损坏恢复",
-      "inputMode": "输入模式",
-      "aboutInputModes": "关于输入模式",
-      "encodingModes": "编码模式",
-      "autoHelp": "自动检测会按总位成本选择数字、字母数字或字节分段。汉字模式仍需手动选择。",
-      "manualHelp": "手动模式强制使用所选模式，并标出不兼容字符。",
-      "autoDetect": "自动检测（不含汉字）",
-      "manual": "手动",
-      "alphanumericShort": "A-Z / 0-9",
-      "mode": "模式",
-      "version": "版本",
-      "autoVersion": "自动选择二维码版本",
-      "versionLabel": "版本：",
-      "target": "目标"
-    },
-    "mask": { "legend": "掩码图案", "choices": "掩码图案选项" },
-    "payload": { "legend": "编码载荷", "reveal": "在预览中显示密码和机密内容" },
-    "overlay": {
-      "legend": "调试叠加层",
-      "about": "关于调试叠加层",
-      "controls": "叠加层控制",
-      "persistHelp": "保留会在访问其他选项卡时继续显示叠加层。",
-      "unmaskHelp": "取消掩码会显示应用所选二维码掩码之前的数据模块。它只影响调试预览；功能图案和格式信息保持不变。",
-      "persistAria": "在其他选项卡中保留叠加层",
-      "persist": "保留",
-      "unmaskAria": "显示未掩码的数据模块",
-      "unmask": "取消掩码",
-      "segments": "分段",
-      "unused": "未使用",
-      "unusedCapacity": "未使用容量",
-      "outlineGrouping": "轮廓分组",
-      "aboutOutline": "关于轮廓分组",
-      "groupMarks": "分组标记方式",
-      "dotHelp": "实心点表示轮廓组的起点；环形点表示编码字段的起点。",
-      "unitsHelp": "一个单位包含 3 个数字、2 个字母数字字符、1 个汉字或 1 个编码字节。",
-      "codewords": "码字",
-      "stream": "数据流",
-      "units": "单位",
-      "encodingUnits": "编码单位",
-      "metadata": "元数据"
-    },
-    "colors": {
-      "data": "数据流",
-      "mode": "模式位",
-      "characterCount": "字符计数",
-      "ecLevel": "纠错级别位",
-      "mask": "掩码位",
-      "ecWords": "纠错码字",
-      "ecWordsAria": "纠错码字颜色",
-      "remainder": "余位",
-      "remainderAria": "余位颜色",
-      "padding": "填充",
-      "paddingAria": "字节边界和填充码字颜色",
-      "terminator": "终止符",
-      "finder": "定位图案",
-      "alignment": "校正图案",
-      "timing": "时序图案",
-      "format": "格式",
-      "darkModule": "固定深色模块",
-      "version": "版本（v7+）"
-    }
-  },
-  "style": {
-    "tools": "样式工具",
-    "tabs": {
-      "size": "尺寸",
-      "modules": "模块",
-      "colors": "颜色",
-      "art": "图案"
-    },
-    "size": {
-      "legend": "尺寸和边距",
-      "targetWidth": "目标宽度",
-      "fromScale": "完全按模块比例确定尺寸",
-      "minimumPixels": "每个模块的最小像素数",
-      "margin": "边距"
-    },
-    "modules": {
-      "legend": "模块和定位眼",
-      "shape": "模块形状",
-      "cornerRounding": "圆角",
-      "spacing": "间距",
-      "rotation": "旋转",
-      "eyes": "定位眼",
-      "outerRounding": "外环圆角",
-      "centerRounding": "中心圆角",
-      "hint": "装饰性模块可能降低扫描可靠性。请按实际使用尺寸测试成品。"
-    },
-    "colors": {
-      "legend": "颜色和填充",
-      "dark": "深色",
-      "light": "浅色",
-      "transparency": "透明度",
-      "customEyes": "使用自定义定位眼颜色",
-      "eyeOuter": "定位眼外环",
-      "eyeCenter": "定位眼中心",
-      "moduleFill": "模块填充",
-      "gradientEnd": "渐变结束色",
-      "direction": "方向",
-      "fillImage": "自定义填充图像",
-      "recommendedContrast": "应用推荐对比度",
-      "clearImage": "清除图像",
-      "imageHint": "推荐：深色模块叠加 25% 黑色，浅色模块叠加 75% 白色。"
-    },
-    "art": {
-      "legend": "中心图案",
-      "useFrameMessage": "将边框文字用作中心图案",
-      "type": "中心图案类型",
-      "logo": "标志",
-      "emoji": "表情符号",
-      "pixelArt": "像素画",
-      "size": "图案尺寸",
-      "logoImage": "标志图像",
-      "clearLogo": "清除标志",
-      "quickPicks": "快速选择",
-      "canvasWidth": "画布宽度",
-      "customColor": "自定义颜色",
-      "clear": "清除",
-      "matchShape": "匹配二维码模块形状",
-      "paintHint": "选择颜色或透明色，然后在画布上点击或拖动。",
-      "icons": {
-        "link": "链接",
-        "phone": "电话",
-        "envelope": "信封",
-        "location": "位置标记",
-        "home": "主页",
-        "cart": "购物车",
-        "gift": "礼物",
-        "star": "星星",
-        "heart": "爱心",
-        "check": "对勾",
-        "rocket": "火箭",
-        "bulb": "灯泡",
-        "globe": "地球",
-        "camera": "相机",
-        "music": "音乐",
-        "coffee": "咖啡",
-        "key": "钥匙",
-        "lock": "锁",
-        "signal": "信号条",
-        "book": "书",
-        "calendar": "日历",
-        "ticket": "票券",
-        "food": "食物",
-        "smile": "笑脸"
-      }
-    },
-    "values": {
-      "square": "方形",
-      "rounded": "圆角",
-      "dots": "圆点",
-      "diamond": "菱形",
-      "custom": "自定义",
-      "default": "默认",
-      "defaultModules": "默认模块",
-      "circle": "圆形",
-      "solid": "纯色",
-      "linear": "线性",
-      "radial": "径向",
-      "image": "图像",
-      "customImage": "自定义图像"
-    }
   },
   "fields": {
     "title": "标题",
@@ -407,88 +81,6 @@
     "current": "当前语言：{language}。选择语言。",
     "loading": "正在加载 {language}..."
   },
-  "validation": {
-    "contentRequired": "尚无效：内容为必填项。",
-    "email": {
-      "required": "尚不符合{context}格式：{label}为必填项。",
-      "invalid": "尚不符合{context}格式：{label}必须有效。",
-      "length": "尚不符合{context}格式：{label}不得超过 254 个字符。",
-      "subjectLabel": "尚不符合电子邮件格式：主题",
-      "bodyLabel": "尚不符合电子邮件格式：正文",
-      "capacity": "尚不符合电子邮件格式：正文超过当前二维码容量（{current} / {max}）。"
-    },
-    "text": {
-      "length": "{label}不得超过 {maxLength} 个字符。",
-      "printable": "{label}只能使用可打印字符。"
-    },
-    "phone": {
-      "required": "尚不符合{context}格式：{label}为必填项。",
-      "characters": "尚不符合{context}格式：{label}只能使用数字、空格、括号、句点、连字符和可选的开头 +。",
-      "formatLength": "尚不符合{context}格式：{label}不得超过 40 个字符。",
-      "plus": "尚不符合{context}格式：{label}中的 + 只能位于开头。",
-      "length": "尚不符合{context}格式：{label}应包含 10 至 15 位数字。"
-    },
-    "geo": {
-      "labelLength": "尚不符合地理位置格式：标签不得超过 80 个字符。",
-      "labelCharacters": "尚不符合地理位置格式：标签只能使用字母、数字、空格和常用标点。",
-      "latitudeRequired": "尚不符合地理位置格式：纬度为必填项。",
-      "longitudeRequired": "尚不符合地理位置格式：经度为必填项。",
-      "latitudeNumber": "尚不符合地理位置格式：纬度必须是有效数字。",
-      "longitudeNumber": "尚不符合地理位置格式：经度必须是有效数字。",
-      "latitudeRange": "尚不符合地理位置格式：纬度必须介于 -90 和 90 之间。",
-      "longitudeRange": "尚不符合地理位置格式：经度必须介于 -180 和 180 之间。"
-    },
-    "vcard": {
-      "required": "尚不符合 vCard 格式：{label}为必填项。",
-      "length": "尚不符合 vCard 格式：{label}不得超过 {maxLength} 个字符。",
-      "characters": "尚不符合 vCard 格式：{label}只能使用字母、数字、空格和常用标点。"
-    },
-    "website": {
-      "required": "尚不符合{context}格式：网站为必填项。",
-      "length": "尚不符合{context}格式：网站不得超过 2048 个字符。",
-      "protocolRequired": "尚不符合{context}格式：网站必须包含完整协议，例如 https://。",
-      "protocol": "尚不符合{context}格式：网站应以 https:// 或 http:// 开头。",
-      "insecure": "{context}格式警告：网站使用 http://，强烈建议使用 https://。"
-    },
-    "event": {
-      "required": "尚不符合日历事件格式：{label}为必填项。",
-      "length": "尚不符合日历事件格式：{label}不得超过 {maxLength} 个字符。",
-      "characters": "尚不符合日历事件格式：{label}包含不支持的控制字符。",
-      "startDate": "尚不符合日历事件格式：开始日期为必填项。",
-      "endDate": "尚不符合日历事件格式：结束日期为必填项。",
-      "dates": "尚不符合日历事件格式：请输入 YYYY-MM-DD 格式的有效日期。",
-      "dateOrder": "尚不符合日历事件格式：结束日期不能早于开始日期。",
-      "startTime": "尚不符合日历事件格式：开始时间为必填项。",
-      "endTime": "尚不符合日历事件格式：结束时间为必填项。",
-      "times": "尚不符合日历事件格式：请输入 HH:MM 格式的有效 24 小时时间。",
-      "timeOrder": "尚不符合日历事件格式：结束时间必须晚于开始时间。"
-    },
-    "wifi": {
-      "security": "尚不符合 Wi-Fi 格式：请选择 WPA、WEP 或开放网络。",
-      "ssidRequired": "尚不符合 Wi-Fi 格式：网络名称为必填项。",
-      "ssidLabel": "Wi-Fi 网络名称",
-      "ssidBytes": "尚不符合 Wi-Fi 格式：网络名称不得超过 32 个 UTF-8 字节。",
-      "passwordRequired": "尚不符合 Wi-Fi 格式：密码为必填项。",
-      "passwordLabel": "Wi-Fi 密码",
-      "wepPassword": "尚不符合 Wi-Fi 格式：WEP 密钥必须为 5 或 13 个字符，或 10 或 26 个十六进制数字。",
-      "wpaPassword": "尚不符合 Wi-Fi 格式：WPA 密码必须为 8 至 63 个字符，或正好 64 个十六进制数字。"
-    },
-    "sms": {
-      "length": "尚不符合短信格式：为确保广泛兼容，消息不得超过 {maxLength} 个字符。"
-    },
-    "file": {
-      "required": "尚不符合文件格式：请选择要编码的文件。",
-      "embeddedWarning": "文件格式警告：此共享下载网址直接嵌入文件字节，因此较大的文件会很快达到二维码容量。",
-      "chunksWarning": "文件格式警告：此紧凑 FILE 数据流分布在 {totalChunks} 个二维码中。每次扫描都需要相同的文件 ID 和全部分块才能重建文件。"
-    },
-    "number": {
-      "start": "尚不符合数字格式：起始值必须是整数。",
-      "end": "尚不符合数字格式：结束值必须是整数。",
-      "step": "尚不符合数字格式：步长必须是正整数。",
-      "range": "尚不符合数字格式：此范围会创建 {total} 个二维码，请限制为 {maxFrames} 个或更少。",
-      "fieldLabel": "尚不符合数字格式：{label}"
-    }
-  },
   "common": {
     "close": "关闭",
     "help": "帮助",
@@ -502,50 +94,6 @@
     "noFileSelected": "未选择文件",
     "sequence": "第 {current} 个，共 {total} 个",
     "count": "{current} / {total}"
-  },
-  "bulk": {
-    "loading": "正在加载批量导入工具。",
-    "warning": "批量导入第 {rowNumber} 行：{message}",
-    "requiredValues": "必填值：{values}",
-    "status": {
-      "empty": "尚未加载 CSV。",
-      "loaded": "已加载 {count} 行，正在显示第 {current} 行，共 {count} 行。"
-    },
-    "progress": {
-      "title": "正在处理 CSV 文件",
-      "reading": "正在读取 {name}...",
-      "readingBytes": "正在读取 {current}/{total}...",
-      "parsing": "正在解析 CSV 数据...",
-      "loaded": "已加载 {count} 行。",
-      "canceled": "CSV 处理已取消。"
-    },
-    "csv": {
-      "empty": "CSV 为空。",
-      "duplicateFields": "第一行包含重复的字段名。",
-      "missingFields": "第一行缺少字段：{fields}。",
-      "rowLimit": "批量导入最多支持 {maxRows} 行数据。",
-      "noRows": "CSV 有标题行，但没有数据行。",
-      "fileSize": "CSV 大小为 {size}；上限为 {maxSize}。",
-      "readError": "无法读取此 CSV。",
-      "unclosedQuote": "CSV 包含未闭合的带引号值。"
-    },
-    "validation": {
-      "parse": "批量导入尚无效：{message}",
-      "fileRequired": "批量导入尚无效：请选择 CSV 文件。",
-      "rowRequired": "批量导入尚无效：CSV 至少需要一行数据。",
-      "row": "批量导入第 {rowNumber} 行无效：{message}",
-      "fieldRequired": "{field}为必填项。",
-      "textRequired": "text 为必填项。",
-      "wholeNumber": "number 必须是整数。",
-      "security": "security 必须是 WPA、WEP 或 open。",
-      "booleanHidden": "hidden 必须是 true/false、yes/no 或 1/0。",
-      "booleanAllDay": "all_day 必须是 true/false、yes/no 或 1/0。",
-      "dates": "start_date 和 end_date 必须是 YYYY-MM-DD 格式的有效日期。",
-      "times": "除非 all_day 为 true，否则时间必须是 HH:MM 格式。",
-      "eventOrder": "事件结束时间必须晚于开始时间。",
-      "latitude": "latitude 必须是 -90 到 90 之间的数字。",
-      "longitude": "longitude 必须是 -180 到 180 之间的数字。"
-    }
   },
   "file": {
     "compressionUnsupported": "此浏览器不支持 gzip 传输压缩，请关闭压缩后继续。",
@@ -609,7 +157,10 @@
       "mixed": "混合"
     }
   },
-  "mask": { "value": "掩码 {value}", "bestFit": "最佳匹配" },
+  "mask": {
+    "value": "掩码 {value}",
+    "bestFit": "最佳匹配"
+  },
   "preview": {
     "generatorTitle": "二维码生成器",
     "sizeControls": "二维码预览尺寸",
@@ -637,7 +188,10 @@
       "label": "较高",
       "detail": "使用更多纠错数据，可从约 25% 的损坏中恢复。"
     },
-    "H": { "label": "高", "detail": "纠错能力最强，通常可承受约 30% 的遮挡。" }
+    "H": {
+      "label": "高",
+      "detail": "纠错能力最强，通常可承受约 30% 的遮挡。"
+    }
   },
   "map": {
     "zoomControls": "地图缩放控件",
@@ -646,7 +200,10 @@
     "attribution": "© OpenStreetMap 贡献者",
     "loadError": "无法初始化地图预览。"
   },
-  "wifi": { "openPassword": "开放网络不使用密码", "password": "密码" },
+  "wifi": {
+    "openPassword": "开放网络不使用密码",
+    "password": "密码"
+  },
   "art": {
     "protectOutline": "使用浅色轮廓保护",
     "protectBackground": "使用浅色背景保护",
@@ -678,63 +235,6 @@
     "degrees": "{value} 度",
     "dimensions": "{width} x {height}",
     "percent": "{value}%"
-  },
-  "download": {
-    "creating": "正在创建 {format}...",
-    "ready": "下载已准备好。",
-    "error": "无法创建下载。",
-    "creatingPdf": "正在创建 PDF...",
-    "pdfReady": "PDF 已准备好。",
-    "pdfError": "无法创建 PDF。",
-    "rendering": "正在渲染第 {frame} 个，共 {total} 个...",
-    "buildingZip": "正在创建 ZIP...",
-    "zipReady": "包含 {total} 个文件的 ZIP 已准备好。",
-    "zipError": "无法创建 ZIP。",
-    "capturingFrame": "正在捕获动画帧 {frame}/{total}...",
-    "animationError": "无法创建 {format} 动画。",
-    "seconds": "{seconds} 秒",
-    "durationSummary": "每张 {perImage} - 总计 {total}。",
-    "mp4Title": "下载 MP4 动画",
-    "mp4Unavailable": "此浏览器无法编码 MP4；仍可使用动画 GIF。",
-    "allZip": "将全部 {count} 个下载为 ZIP",
-    "allPdf": "将全部 {count} 个下载为 PDF",
-    "renderingPdf": "正在渲染 PDF 帧 {frame}/{total}...",
-    "layoutPdf": "正在排版 PDF 页面...",
-    "pdfSheetReadyOne": "PDF 已准备好，{pages} 页包含 {total} 个二维码。",
-    "pdfSheetReadyMany": "PDF 已准备好，{pages} 页包含 {total} 个二维码。",
-    "animationLimit": "为保护浏览器内存，动画最多包含 {max} 张图像。",
-    "durationMinimum": "请选择每张图像至少 10 毫秒的时长。",
-    "gifDurationMaximum": "GIF 每张图像最长支持 10 分 55.35 秒。",
-    "mp4DurationMinimum": "MP4 每张图像至少需要 16 毫秒。",
-    "encodingGif": "正在编码动画 GIF...",
-    "gifReady": "动画 GIF 已准备好，总时长 {duration}。",
-    "recordingMp4": "正在实时录制 MP4，时长 {duration}...",
-    "recordingFrame": "正在录制 MP4 帧 {frame}/{total}...",
-    "mp4Ready": "MP4 已准备好。",
-    "toolsError": "无法加载下载工具。",
-    "mp4EncoderUnavailable": "此浏览器不提供 MP4 编码器，请改用动画 GIF。",
-    "mp4EncodeError": "无法编码 MP4。",
-    "imageError": "无法创建 {type} 图像。",
-    "lzwCodeSize": "GIF 压缩要求代码大小介于 2 到 8 之间。",
-    "lzwPaletteIndex": "GIF 调色板索引必须介于 0 和 {maximum} 之间。",
-    "progress": {
-      "working": "任务进行中",
-      "titleGif": "正在创建动画 GIF",
-      "titleMp4": "正在创建 MP4 动画",
-      "preparing": "正在准备动画...",
-      "encodingFrame": "正在编码 GIF 帧 {frame}/{total}...",
-      "elapsed": "已用时间",
-      "remaining": "预计剩余",
-      "completion": "预计完成时间",
-      "estimating": "正在估算...",
-      "seconds": "{count} 秒",
-      "minutes": "{minutes} 分 {seconds} 秒",
-      "now": "现在",
-      "cancel": "取消",
-      "canceling": "正在取消...",
-      "completed": "已完成",
-      "canceled": "动画导出已取消。"
-    }
   },
   "spec": {
     "units": {

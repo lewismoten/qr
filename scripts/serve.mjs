@@ -10,7 +10,7 @@ const host = process.env.HOST || '127.0.0.1';
 const port = Number.parseInt(process.env.PORT || '8080', 10);
 const mounts = new Map([
   ['dist', resolve(projectRoot, 'dist')],
-  ['locales', resolve(projectRoot, 'locales')],
+  ['locales', resolve(projectRoot, 'build/locales')],
 ]);
 const publicFiles = new Map([
   ['favicon.ico', resolve(projectRoot, 'src/assets/favicon.ico')],

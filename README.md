@@ -140,9 +140,25 @@ hardware and runtime versions; timing and garbage collection vary across systems
 
 ## Locales
 
-Locale files live in `locales` and are listed in `locales/manifest.json`. A locale
-can inherit another locale by adding an `extends` property. Only values that differ
-from the parent need to be stored:
+Locale sources live in `locales` and are listed in `locales/manifest.json`.
+Root locale files hold top-level values. Each subfolder becomes an object key,
+so `locales/content/en-US.json` supplies the value of `content`. Subfolders work
+recursively; `locales/content/email/es.json` supplies `content.email` for
+Spanish. Fragment files contain the value itself, without repeating the folder
+key.
+
+Build complete browser resources or split additional object keys with:
+
+```sh
+npm run locales:build
+npm run locales:split -- content.email
+```
+
+The production build assembles fragments into `build/locales/{locale}.json`
+before deployment. Locale source JSON is limited to 300 lines by the test suite.
+
+A locale can inherit another locale by adding an `extends` property to its root
+file. Only values that differ from the parent need to be stored:
 
 ```json
 {

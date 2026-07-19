@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
 import { loadHtmlConfig } from './guides/html-config.mjs';
+import { buildLocaleResources } from './locales/resources.mjs';
 
 const watch = process.argv.includes('--watch');
 const htmlConfig = await loadHtmlConfig();
@@ -101,18 +102,20 @@ if (!watch) await rm('dist/chunks', { recursive: true, force: true });
 
 if (watch) {
   await generateLocalizedGuides({ clean: true });
+  await buildLocaleResources();
   const contexts = await Promise.all(builds.map((options) => context(options)));
   await Promise.all(contexts.map((buildContext) => buildContext.watch()));
   console.log('Watching JavaScript and CSS sources...');
 } else {
   await Promise.all(builds.map((options) => build(options)));
   await generateLocalizedGuides({ clean: true });
+  await buildLocaleResources();
   await mkdir(htmlConfig.outputRoot, { recursive: true });
   await Promise.all([
     cp('dist', path.join(htmlConfig.outputRoot, 'dist'), {
       recursive: true,
     }),
-    cp('locales', path.join(htmlConfig.outputRoot, 'locales'), {
+    cp('build/locales', path.join(htmlConfig.outputRoot, 'locales'), {
       recursive: true,
     }),
     cp(

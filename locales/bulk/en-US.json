@@ -1,0 +1,44 @@
+{
+  "loading": "Bulk Import tools are loading.",
+  "warning": "Bulk Import row {rowNumber}: {message}",
+  "requiredValues": "Required values: {values}",
+  "status": {
+    "empty": "No CSV loaded.",
+    "loaded": "{count} rows loaded. Showing {current} of {count}."
+  },
+  "progress": {
+    "title": "Processing CSV file",
+    "reading": "Reading {name}...",
+    "readingBytes": "Reading {current} of {total}...",
+    "parsing": "Parsing CSV data...",
+    "loaded": "Loaded {count} rows.",
+    "canceled": "CSV processing canceled."
+  },
+  "csv": {
+    "empty": "The CSV is empty.",
+    "duplicateFields": "The first row contains duplicate field names.",
+    "missingFields": "The first row is missing: {fields}.",
+    "rowLimit": "Bulk imports are limited to {maxRows} data rows.",
+    "noRows": "The CSV has a header row but no data rows.",
+    "fileSize": "The CSV is {size}; Bulk Import CSV files are limited to {maxSize}.",
+    "readError": "Unable to read this CSV.",
+    "unclosedQuote": "The CSV contains an unclosed quoted value."
+  },
+  "validation": {
+    "parse": "Not valid for Bulk Import yet: {message}",
+    "fileRequired": "Not valid for Bulk Import yet: choose a CSV file.",
+    "rowRequired": "Not valid for Bulk Import yet: the CSV needs at least one data row.",
+    "row": "Not valid for Bulk Import row {rowNumber}: {message}",
+    "fieldRequired": "{field} is required.",
+    "textRequired": "text is required.",
+    "wholeNumber": "number must be a whole number.",
+    "security": "security must be WPA, WEP, or open.",
+    "booleanHidden": "hidden must be true/false, yes/no, or 1/0.",
+    "booleanAllDay": "all_day must be true/false, yes/no, or 1/0.",
+    "dates": "start_date and end_date must be real dates using YYYY-MM-DD.",
+    "times": "start_time and end_time must be real 24-hour times using HH:MM unless all_day is true.",
+    "eventOrder": "the event end must be after its start.",
+    "latitude": "latitude must be a number between -90 and 90.",
+    "longitude": "longitude must be a number between -180 and 180."
+  }
+}
