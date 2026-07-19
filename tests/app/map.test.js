@@ -174,6 +174,14 @@ assert.equal(slippyOptions.secondaryAttribution.text, 'U.S. Census Bureau');
 assert.equal(slippyOptions.showSecondaryAttribution, hasVisibleCensusCounties);
 assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
 assert.deepEqual(worldMap.getView(), { center: frontRoyal, zoom: 2 });
+const nextMarker = { latitude: 39.115, longitude: -77.565 };
+worldMap.setMarker(nextMarker, 'Next marker');
+assert.deepEqual(detailCalls.at(-1), ['marker', nextMarker, 'Next marker']);
+assert.equal(marker.hidden, true);
+assert.equal(label.hidden, true);
+worldMap.setMarker(frontRoyal, 'Front Royal, VA');
+assert.deepEqual(detailCalls.at(-1), ['marker', frontRoyal, 'Front Royal, VA']);
+assert.equal(label.hidden, true);
 const transferredView = {
   center: { latitude: 40.7128, longitude: -74.006 },
   zoom: 7,

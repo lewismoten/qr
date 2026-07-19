@@ -150,8 +150,11 @@ export function createWorldMap(
     setMarker(coordinates, text = '') {
       markerCoordinates = coordinates ? { ...coordinates } : null;
       markerText = text;
-      if (!detail.hidden && detailMap) {
-        detailMap.setMarker(markerCoordinates, markerText);
+      if (!detail.hidden) {
+        marker.hidden = true;
+        label.hidden = true;
+        detailMap?.setMarker(markerCoordinates, markerText);
+        return;
       }
       setOverviewMarker();
     },
