@@ -37,6 +37,7 @@ import { validateTippecanoeExecutable } from './runner.mjs';
 import { levelShardLabel } from './shards.mjs';
 import { finalizeArchiveSet } from './lifecycle/archive-set.mjs';
 import { createLevelRunner } from './lifecycle/level-runner.mjs';
+import { initializeArchiveCheckpoint } from './lifecycle/archive-checkpoint.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -62,8 +63,7 @@ if (values.includes('--help')) {
   process.exit(0);
 }
 const log = createBuildLog(options);
-console.log(`Generation log: ${log.file}`);
-validateTippecanoeExecutable(executable);
+const tippecanoeVersion = validateTippecanoeExecutable(executable);
 validateVectorLayers();
 await mkdir(path.dirname(output), { recursive: true });
 const preparationStarted = Date.now();
@@ -75,6 +75,11 @@ log.record('inputs-prepared', {
   durationMs: Date.now() - preparationStarted,
   layers: inputs,
 });
+const checkpoint = await initializeArchiveCheckpoint(
+  inputs,
+  options,
+  tippecanoeVersion,
+);
 const levels = planArchiveLevels({
   minimumZoom,
   maximumZoom,
@@ -82,6 +87,7 @@ const levels = planArchiveLevels({
   output,
   growth: budgetGrowth,
   minimumLevelBytes,
+  inputs,
 });
 const runLevel = createLevelRunner({
   inputs,
@@ -90,8 +96,14 @@ const runLevel = createLevelRunner({
   maximumWorkingBytes,
   log,
   threads: options.tippecanoeThreads,
+  dynamicThreads: options.dynamicTippecanoeThreads,
+  availableThreads: options.availableThreads,
 });
-async function buildLevel(level, allocatedBudgetBytes) {
+async function buildLevel(level, allocatedBudgetBytes, workload) {
+  const restored = await checkpoint.restore(level, allocatedBudgetBytes);
+  if (restored) {
+    return restored;
+  }
   const allocation = { ...level, budgetBytes: allocatedBudgetBytes };
   const smallestFile = smallestArchivePath(level.file);
   await rm(smallestFile, { force: true });
@@ -119,7 +131,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     let result;
     let recovery = false;
     try {
-      result = await runLevel(allocation, settings);
+      result = await runLevel(allocation, settings, workload);
     } catch (error) {
       if (error.noData) {
         await rm(temporaryArchivePath(level.file), { force: true });
@@ -139,7 +151,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
           'building its smallest viable archive.',
       );
       settings = { ...settings, maximumTileBytes: null };
-      result = await runLevel(allocation, settings);
+      result = await runLevel(allocation, settings, workload);
       recovery = true;
     }
     let bytes;
@@ -261,7 +273,8 @@ try {
         temporaryFiles.add(smallestArchivePath(level.file));
       }
     },
-    onComplete(result, durationMs) {
+    async onComplete(result, durationMs) {
+      await checkpoint.complete(result);
       recordCompletedArchive(log, result, durationMs);
     },
   });
@@ -269,7 +282,7 @@ try {
     results,
     output,
     minimumZoom,
-    maximumZoom,
+    maximumZoom: levels.at(-1).maximumZoom,
     maximumArchiveMiB: options.maximumArchiveMiB,
     maximumArchiveBytes,
     log,

@@ -24,13 +24,14 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     option(values, 'shard-variance-percent', '20'),
   );
   const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
-  const defaultThreads = Math.max(1, Math.floor(availableParallelism() / jobs));
+  const availableThreads = availableParallelism();
+  const configuredThreads = option(
+    values,
+    'tippecanoe-threads',
+    process.env.TIPPECANOE_MAX_THREADS || '',
+  );
   const tippecanoeThreads = Number.parseInt(
-    option(
-      values,
-      'tippecanoe-threads',
-      process.env.TIPPECANOE_MAX_THREADS || String(defaultThreads),
-    ),
+    configuredThreads || String(availableThreads),
     10,
   );
   const archiveVariancePercent = Number.parseFloat(
@@ -76,6 +77,8 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     shardVariancePercent,
     jobs,
     tippecanoeThreads,
+    dynamicTippecanoeThreads: !configuredThreads,
+    availableThreads,
     archiveVariancePercent,
     maximumDebtBytes:
       maximumArchiveMiB * 1024 * 1024 * archiveVariancePercent * 0.01,

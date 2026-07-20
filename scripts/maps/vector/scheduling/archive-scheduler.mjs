@@ -21,17 +21,23 @@ function allocateWave(levels, carryBytes, minimumLevelBytes, maximumDebtBytes) {
   });
 }
 
-async function buildWave(levels, allocations, build) {
+async function buildWave(levels, allocations, build, archiveCount) {
   const started = levels.map(() => Date.now());
   const settled = await Promise.allSettled(
-    levels.map((level, index) => build(level, allocations[index])),
+    levels.map((level, index) =>
+      build(level, allocations[index], {
+        archiveCount,
+        concurrentJobs: levels.length,
+      }),
+    ),
   );
   const failure = settled.find((result) => result.status === 'rejected');
-  if (failure) throw failure.reason;
-  return settled.map((result, index) => ({
-    result: result.value,
-    durationMs: Date.now() - started[index],
-  }));
+  const built = settled.flatMap((result, index) => {
+    return result.status === 'fulfilled'
+      ? [{ result: result.value, durationMs: Date.now() - started[index] }]
+      : [];
+  });
+  return { built, failure: failure?.reason };
 }
 
 export async function buildArchiveSchedule({
@@ -63,8 +69,8 @@ export async function buildArchiveSchedule({
         minimumLevelBytes,
         maximumDebtBytes,
       );
-      const built = await buildWave(wave, allocations, build);
-      for (const { result, durationMs } of built) {
+      const outcome = await buildWave(wave, allocations, build, group.length);
+      for (const { result, durationMs } of outcome.built) {
         carryBytes = updateBudgetCarry({
           carryBytes,
           plannedBytes: result.budgetBytes,
@@ -73,8 +79,9 @@ export async function buildArchiveSchedule({
         result.carryBytes = carryBytes;
         levelResults.push(result);
         if (!result.empty) results.push(result);
-        onComplete?.(result, durationMs);
+        await onComplete?.(result, durationMs);
       }
+      if (outcome.failure) throw outcome.failure;
     }
     earlierResults = previousResults;
     previousResults = levelResults;

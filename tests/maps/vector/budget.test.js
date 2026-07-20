@@ -62,6 +62,14 @@ test('allocates a growing budget to every active zoom level', () => {
   }
   assert.match(levels[0].file, /local-z01\.pmtiles$/);
   assert.match(levels[18].file, /local-z19\.pmtiles$/);
+  const capped = planArchiveLevels({
+    minimumZoom: 1,
+    maximumZoom: 19,
+    maximumArchiveBytes: 500 * 1024 * 1024,
+    output: 'build/maps/local.pmtiles',
+    inputs: [{ featuresByZoomRange: { '1-10': 1, '17-17': 1 } }],
+  });
+  assert.equal(capped.at(-1).maximumZoom, 17);
 });
 
 test('reduces only an over-budget zoom level', () => {

@@ -7,8 +7,8 @@ while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 64
+npm run maps:generate -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 64
 ```
 
 To fetch or refresh only the detailed USGS river source before a later build:
@@ -72,9 +72,18 @@ Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between
 parallel waves. Each job runs a separate Tippecanoe process, so choose a value
 that leaves enough CPU, memory, and temporary storage for every active job.
-By default, each process receives an even share of detected CPU concurrency.
-Override that share with `--tippecanoe-threads` or
+By default, each active wave divides detected CPU concurrency evenly. A single
+overview archive can therefore use every available thread, while four active
+shards each receive one quarter. Override this dynamic allocation with
+`--tippecanoe-threads` or
 `TIPPECANOE_MAX_THREADS` when benchmarking job counts.
+
+The vector pipeline ends broad Natural Earth land and lake polygons at zoom
+10. The client overzooms those background layers beneath later roads, rails,
+waterways, parks, places, and boundaries. Administrative polygons become line
+geometry before tiling, avoiding interior tiles that only draw an outline.
+The planner also stops after the highest zoom containing prepared geometry;
+the map can continue to zoom 19 by overzooming the last available detail.
 
 The default allocator gives zooms 1-9, 10-12, and 13-maximum 10%, 9%, and 81%
 of the total. For 500 MiB, those tiers receive 50, 45, and 405 MiB. This keeps
@@ -112,10 +121,10 @@ Every `maps:generate` and `maps:build` run writes a timestamped JSON Lines log
 under `build/maps/logs`. Use `--log-file path` to choose another location. The
 first record contains all normalized parameters. Later records include source
 preparation, stage and archive durations, each pass's file size and budget,
-zoom and quadrant, carry or debt, tile limits, geometry detail, and PMTiles
 addressed-tile, directory-entry, unique-content, and tile-data totals. Fatal
-errors are written before exit. Repetitive Tippecanoe density and oversized
-tile messages are replaced by one summary per pass.
+errors include the last 100 Tippecanoe stderr lines and temporary file size.
+Repetitive Tippecanoe density and oversized tile messages are replaced by one
+summary per pass.
 Feature-count and percentage progress updates are also coalesced in the
 terminal. The newest status appears at most once every 1.5 seconds, while
 warnings, archive transitions, and summaries remain immediate.
@@ -138,6 +147,12 @@ All temporary archives must pass before the manifest atomically publishes the
 new set. Use `--budget-growth` and `--minimum-level-kib` to tune the curve.
 Tippecanoe is a build-time tool; on macOS install it with
 `brew install tippecanoe`.
+
+Each validated shard is atomically promoted and recorded in a fingerprinted
+`local.checkpoints.json` file. The fingerprint covers prepared input hashes,
+encoding settings, sharding settings, and the Tippecanoe version. A restarted
+run validates and reuses matching archives. Successful siblings are saved even
+when another shard in their parallel wave fails.
 
 Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
 is cached under `.cache/maps/vector-input`. The default 64 KiB limit applies to

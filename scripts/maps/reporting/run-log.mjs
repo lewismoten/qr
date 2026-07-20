@@ -9,6 +9,8 @@ function errorDetails(error) {
     exitCode: error?.exitCode,
     noData: error?.noData,
     workingLimitExceeded: error?.workingLimitExceeded,
+    temporaryFileBytes: error?.temporaryFileBytes,
+    stderrTail: error?.stderrTail,
   };
 }
 
@@ -53,16 +55,19 @@ export function createGenerationLog({
 }
 
 export function createBuildLog(options) {
-  return createGenerationLog({
+  const log = createGenerationLog({
     output: options.output,
     logFile: options.logFile,
     parameters: options,
     startEvent: process.env.MAP_LOG_PARENT ? 'build-start' : 'run-start',
   });
+  console.log(`Generation log: ${log.file}`);
+  return log;
 }
 
 export function createTippecanoeOutput(writeLine) {
   let pending = '';
+  const stderrTail = [];
   const summary = {
     fitAttempts: 0,
     minimumKeepPercent: null,
@@ -74,6 +79,8 @@ export function createTippecanoeOutput(writeLine) {
   const consume = (value) => {
     const line = value.trim();
     if (!line) return;
+    stderrTail.push(line);
+    if (stderrTail.length > 100) stderrTail.shift();
     const keep = /keeping the sparsest ([\d.]+)%/.exec(line);
     if (keep) {
       const percent = Number(keep[1]);
@@ -116,6 +123,9 @@ export function createTippecanoeOutput(writeLine) {
       consume(pending);
       pending = '';
       return summary;
+    },
+    tail() {
+      return [...stderrTail];
     },
   };
 }
@@ -169,6 +179,7 @@ export function recordCompletedArchive(log, result, durationMs) {
     archiveStats: result.archiveStats,
     naturalArchiveStats: result.naturalArchiveStats,
     empty: result.empty || undefined,
+    resumed: result.resumed || undefined,
   });
 }
 

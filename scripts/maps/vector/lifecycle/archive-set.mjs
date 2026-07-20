@@ -20,7 +20,11 @@ export async function finalizeArchiveSet({
         `${(overageBytes / 1024 / 1024).toFixed(1)} MiB; publishing them.`,
     );
   }
-  for (const result of results) await rename(result.temporary, result.file);
+  for (const result of results) {
+    if (result.temporary !== result.file) {
+      await rename(result.temporary, result.file);
+    }
+  }
   await writeArchiveManifest({
     manifestFile: archiveManifestPath(output),
     results,

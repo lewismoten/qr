@@ -28,6 +28,7 @@ test('summarizes repetitive Tippecanoe fitting diagnostics', () => {
   assert.equal(summary.largestTile.bytes, 1142);
   assert.equal(summary.largestTile.reportedTippecanoeDetail, 19);
   assert.equal(summary.featureGapLimitReached, true);
+  assert.deepEqual(output.tail().slice(-1), ['A useful diagnostic']);
   assert.match(formatTippecanoeSummary(summary), /2 tile checks/);
 });
 
@@ -72,12 +73,21 @@ test('parses logging and generation command options', () => {
   assert.equal(options.shardVariancePercent, 20);
   assert.equal(options.jobs, 1);
   assert.ok(options.tippecanoeThreads >= 1);
+  assert.equal(options.dynamicTippecanoeThreads, true);
   assert.equal(options.archiveVariancePercent, 1);
   assert.equal(options.maximumDebtBytes, 5 * 1024 * 1024);
   assert.throws(
     () => readVectorBuildOptions(['--jobs', '0']),
     /positive integer/,
   );
+  const fixedThreads = readVectorBuildOptions([
+    '--jobs',
+    '4',
+    '--tippecanoe-threads',
+    '3',
+  ]);
+  assert.equal(fixedThreads.tippecanoeThreads, 3);
+  assert.equal(fixedThreads.dynamicTippecanoeThreads, false);
   assert.throws(
     () => readVectorBuildOptions(['--tippecanoe-threads', '0']),
     /positive integer/,

@@ -4,6 +4,7 @@ import { tippecanoeArguments } from '../command.mjs';
 import { temporaryArchivePath } from '../output.mjs';
 import { runTippecanoe } from '../runner.mjs';
 import { levelShardLabel } from '../shards.mjs';
+import { allocateTippecanoeThreads } from '../scheduling/thread-allocation.mjs';
 
 export function createLevelRunner({
   inputs,
@@ -12,8 +13,10 @@ export function createLevelRunner({
   maximumWorkingBytes,
   log,
   threads,
+  dynamicThreads,
+  availableThreads,
 }) {
-  return async (level, settings) => {
+  return async (level, settings, workload) => {
     const temporary = temporaryArchivePath(level.file);
     await rm(temporary, { force: true });
     const args = tippecanoeArguments({
@@ -24,6 +27,12 @@ export function createLevelRunner({
       baseZoom,
       clipBoundingBox: level.bounds,
       ...settings,
+    });
+    const selectedThreads = allocateTippecanoeThreads({
+      ...workload,
+      configuredThreads: threads,
+      dynamic: dynamicThreads,
+      availableThreads,
     });
     const run = await runTippecanoe({
       executable,
@@ -37,8 +46,9 @@ export function createLevelRunner({
         shard: level.shard,
         maximumTileBytes: settings.maximumTileBytes,
         configuredDetail: settings.detail,
+        tippecanoeThreads: selectedThreads,
       },
-      threads,
+      threads: selectedThreads,
     });
     return { temporary, ...run };
   };

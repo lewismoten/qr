@@ -29,6 +29,23 @@ test('normalizes map properties and feature zoom hints', () => {
   validateVectorLayers();
 });
 
+test('caps vector backgrounds and emits polygon boundaries as lines', () => {
+  const country = prepareVectorFeature('countries', {
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [[[0, 0]]] },
+    properties: {},
+  });
+  const state = prepareVectorFeature('states', {
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [[[0, 0]]] },
+    properties: {},
+  });
+
+  assert.equal(country.tippecanoe.maxzoom, 10);
+  assert.equal(country.geometry.type, 'Polygon');
+  assert.equal(state.geometry.type, 'MultiLineString');
+});
+
 test('applies source filters before writing vector features', () => {
   const excluded = prepareVectorFeature('naturalEarthRoads', {
     type: 'Feature',

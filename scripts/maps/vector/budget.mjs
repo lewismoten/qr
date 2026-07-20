@@ -7,6 +7,15 @@ const TIERS = [
 ];
 const MINIMUM_USEFUL_REDUCTION = 0.05;
 
+function sourceMaximumZoom(inputs, fallback) {
+  const values = inputs.flatMap((input) => {
+    return Object.keys(input.featuresByZoomRange || {}).map((range) => {
+      return Number(range.split('-')[1]);
+    });
+  });
+  return values.length ? Math.max(...values) : fallback;
+}
+
 export function planArchiveLevels({
   minimumZoom,
   maximumZoom,
@@ -14,12 +23,19 @@ export function planArchiveLevels({
   output,
   growth = 1.3,
   minimumLevelBytes = 128 * 1024,
+  inputs = [],
 }) {
-  if (maximumZoom < minimumZoom || growth <= 1) {
+  const plannedMaximumZoom = Math.min(
+    maximumZoom,
+    sourceMaximumZoom(inputs, maximumZoom),
+  );
+  if (plannedMaximumZoom < minimumZoom || growth <= 1) {
     throw new RangeError('Invalid zoom budget.');
   }
   const active = TIERS.filter((tier) => {
-    return tier.maximumZoom >= minimumZoom && tier.minimumZoom <= maximumZoom;
+    return (
+      tier.maximumZoom >= minimumZoom && tier.minimumZoom <= plannedMaximumZoom
+    );
   });
   const tierWeight = active.reduce((sum, tier) => sum + tier.weight, 0);
   const parsed = path.parse(output);
@@ -27,7 +43,7 @@ export function planArchiveLevels({
   let totalAllocated = 0;
   active.forEach((tier, tierIndex) => {
     const first = Math.max(minimumZoom, tier.minimumZoom);
-    const last = Math.min(maximumZoom, tier.maximumZoom);
+    const last = Math.min(plannedMaximumZoom, tier.maximumZoom);
     const count = last - first + 1;
     const weights = Array.from(
       { length: count },

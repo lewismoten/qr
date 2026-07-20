@@ -1,4 +1,5 @@
 import { createReadStream, createWriteStream } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { once } from 'node:events';
 import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -6,6 +7,11 @@ import { createInterface } from 'node:readline';
 
 import { MAP_SOURCES } from '../source-config.mjs';
 import { sourceLayer, vectorProperties, VECTOR_LAYERS } from './layers.mjs';
+
+const VECTOR_MAXIMUM_ZOOMS = new Map([
+  ['countries', 10],
+  ['lakes', 10],
+]);
 
 function matchesFilter(feature, filter) {
   if (!filter) return true;
@@ -21,22 +27,41 @@ function featureZoom(source, properties = {}) {
     ? Math.ceil(Number(suggested))
     : source.minimumZoom;
   const minzoom = Math.max(source.minimumZoom, minimum);
-  if (minzoom > source.maximumZoom) return null;
+  const maxzoom = Math.min(
+    source.maximumZoom,
+    VECTOR_MAXIMUM_ZOOMS.get(source.name) ?? source.maximumZoom,
+  );
+  if (minzoom > maxzoom) return null;
   return {
     minzoom,
-    maxzoom: source.maximumZoom,
+    maxzoom,
   };
 }
 
+function vectorGeometry(name, geometry) {
+  if (sourceLayer(name) !== 'boundary') return geometry;
+  if (geometry.type === 'Polygon') {
+    return { type: 'MultiLineString', coordinates: geometry.coordinates };
+  }
+  if (geometry.type === 'MultiPolygon') {
+    return {
+      type: 'MultiLineString',
+      coordinates: geometry.coordinates.flat(),
+    };
+  }
+  return geometry;
+}
+
 export function prepareVectorFeature(name, feature) {
-  const source = MAP_SOURCES[name];
+  const configured = MAP_SOURCES[name];
+  const source = configured ? { ...configured, name } : null;
   if (!source || !feature?.geometry) return null;
   if (!matchesFilter(feature, source.featureFilter)) return null;
   const tippecanoe = featureZoom(source, feature.properties);
   if (!tippecanoe) return null;
   return {
     type: 'Feature',
-    geometry: feature.geometry,
+    geometry: vectorGeometry(name, feature.geometry),
     properties: vectorProperties(name, feature.properties),
     tippecanoe,
   };
@@ -57,8 +82,10 @@ async function* readFeatures(file, source) {
   }
 }
 
-async function writeFeature(output, feature) {
-  if (!output.write(`${JSON.stringify(feature)}\n`)) {
+async function writeFeature(output, feature, hash) {
+  const line = `${JSON.stringify(feature)}\n`;
+  hash.update(line);
+  if (!output.write(line)) {
     await once(output, 'drain');
   }
 }
@@ -69,6 +96,7 @@ export async function prepareVectorInputs({ cache, output }) {
   for (const [layer, names] of Object.entries(VECTOR_LAYERS)) {
     const file = path.join(output, `${layer}.geojsonseq`);
     const target = createWriteStream(file);
+    const hash = createHash('sha256');
     let features = 0;
     const featuresByMinimumZoom = {};
     const featuresByZoomRange = {};
@@ -78,7 +106,7 @@ export async function prepareVectorInputs({ cache, output }) {
       for await (const feature of readFeatures(sourceFile, source)) {
         const normalized = prepareVectorFeature(name, feature);
         if (!normalized) continue;
-        await writeFeature(target, normalized);
+        await writeFeature(target, normalized, hash);
         features += 1;
         const zoom = normalized.tippecanoe.minzoom;
         featuresByMinimumZoom[zoom] = (featuresByMinimumZoom[zoom] || 0) + 1;
@@ -94,6 +122,7 @@ export async function prepareVectorInputs({ cache, output }) {
       features,
       featuresByMinimumZoom,
       featuresByZoomRange,
+      hash: hash.digest('hex'),
     });
   }
   return prepared;

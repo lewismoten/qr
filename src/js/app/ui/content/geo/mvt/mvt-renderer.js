@@ -205,13 +205,20 @@ function drawPlaces(context, layer, zoom, viewport) {
 export function renderMvt(
   bytes,
   canvas,
-  { zoom = 0, viewport, clear = true } = {},
+  { zoom = 0, viewport, clear = true, includeLayers = null } = {},
 ) {
   const context = canvas.getContext('2d');
   const layers = decodeMvt(bytes);
   const byName = new Map(layers.map((layer) => [layer.name, layer]));
+  const included = includeLayers ? new Set(includeLayers) : null;
   if (clear) context.clearRect(0, 0, canvas.width, canvas.height);
-  for (const name of ORDER) drawLayer(context, byName.get(name), viewport);
-  drawPlaces(context, byName.get('place'), zoom, viewport);
+  for (const name of ORDER) {
+    if (!included || included.has(name)) {
+      drawLayer(context, byName.get(name), viewport);
+    }
+  }
+  if (!included || included.has('place')) {
+    drawPlaces(context, byName.get('place'), zoom, viewport);
+  }
   return layers;
 }

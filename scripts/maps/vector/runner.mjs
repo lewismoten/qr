@@ -25,6 +25,7 @@ export function validateTippecanoeExecutable(executable) {
   if (available.status !== 0) {
     throw new Error(available.stderr || 'Unable to run Tippecanoe.');
   }
+  return `${available.stdout}${available.stderr}`.trim();
 }
 
 export async function runTippecanoe({
@@ -75,6 +76,7 @@ export async function runTippecanoe({
       observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
       standardOutput.finish();
       const summary = output.finish();
+      const stderrTail = output.tail();
       progress.finish();
       fitSummary = summary;
       const message = formatTippecanoeSummary(summary);
@@ -95,6 +97,8 @@ export async function runTippecanoe({
             `exceeding its ${limitMiB} MiB working-size limit.`,
         );
         error.workingLimitExceeded = true;
+        error.temporaryFileBytes = observedBytes;
+        error.stderrTail = stderrTail;
         log?.recordError('tippecanoe-error', error, context);
         reject(error);
       } else if (code === 0) {
@@ -107,6 +111,8 @@ export async function runTippecanoe({
         const error = new Error(reason);
         error.exitCode = code;
         error.noData = noData;
+        error.temporaryFileBytes = observedBytes;
+        error.stderrTail = stderrTail;
         if (noData) {
           log?.record('tippecanoe-no-data', context);
         } else {

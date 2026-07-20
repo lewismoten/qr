@@ -3,6 +3,15 @@ import { setTileDebugCoordinates } from '../data/tile-debug.js';
 import { renderMvt } from '../mvt/mvt-renderer.js';
 import { TILE_SIZE } from '../projection.js';
 
+const BACKGROUND_LAYERS = ['land', 'urban', 'water'];
+const BACKGROUND_MAXIMUM_ZOOM = 10;
+
+function sameTile(left, right) {
+  return (
+    left?.zoom === right?.zoom && left?.x === right?.x && left?.y === right?.y
+  );
+}
+
 export async function findPmtilesTile({
   source,
   tile,
@@ -87,6 +96,15 @@ export function createPmtilesTile({
       });
       element.classList.toggle('is-fallback', fallback);
       onSourceChange?.(sourceTile.zoom);
+      let background = null;
+      if (sourceTile.zoom > BACKGROUND_MAXIMUM_ZOOM) {
+        background = await findPmtilesTile({
+          source,
+          tile,
+          minimumSourceZoom,
+          maximumSourceZoom: BACKGROUND_MAXIMUM_ZOOM,
+        });
+      }
       let parent = null;
       if (sourceTile.zoom >= compositeMinimumZoom) {
         parent = await findPmtilesTile({
@@ -96,16 +114,27 @@ export function createPmtilesTile({
           maximumSourceZoom: sourceTile.zoom - 1,
         });
       }
+      if (background) {
+        renderMvt(background.bytes, canvas, {
+          zoom: tile.zoom,
+          viewport: background.sourceTile,
+          includeLayers: BACKGROUND_LAYERS,
+        });
+      }
+      if (parent && sameTile(parent.sourceTile, background?.sourceTile)) {
+        parent = null;
+      }
       if (parent) {
         renderMvt(parent.bytes, canvas, {
           zoom: tile.zoom,
           viewport: parent.sourceTile,
+          clear: !background,
         });
       }
       renderMvt(bytes, canvas, {
         zoom: tile.zoom,
         viewport: sourceTile,
-        clear: !parent,
+        clear: !parent && !background,
       });
       element.classList.add('is-loaded');
       onLoad();

@@ -61,6 +61,7 @@ test('builds planned shards in bounded parallel waves', async () => {
 
 test('waits for a failed wave and rejects invalid concurrency', async () => {
   let finished = false;
+  const completed = [];
   await assert.rejects(
     () =>
       buildArchiveSchedule({
@@ -74,10 +75,14 @@ test('waits for a failed wave and rejects invalid concurrency', async () => {
           finished = true;
           return { ...level, bytes: 100 };
         },
+        onComplete(result) {
+          completed.push(result.shard);
+        },
       }),
     /failed/,
   );
   assert.equal(finished, true);
+  assert.deepEqual(completed, ['13-1']);
   await assert.rejects(
     () =>
       buildArchiveSchedule({
