@@ -8,6 +8,12 @@ const read = (path) =>
   readFile(new URL('../../' + path, import.meta.url), 'utf8');
 
 describe('specification guide', () => {
+  test('maps the QR package from every localized route', async () => {
+    const html = await read('src/html/spec.html');
+    assert.match(html, /"@lewismoten\/qr"\s*:\s*"\/dist\/qr\.min\.js"/);
+    assert.doesNotMatch(html, /"@lewismoten\/qr"\s*:\s*"dist\//);
+  });
+
   test('keeps the footer visible without covering page content', async () => {
     const [html, base, references] = await Promise.all([
       read('src/html/spec.html'),
