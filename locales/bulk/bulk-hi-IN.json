@@ -38,7 +38,7 @@
     "dates": "start_date और end_date YYYY-MM-DD की वास्तविक तिथियाँ होनी चाहिए।",
     "times": "all_day true न हो तो समय HH:MM प्रारूप में होना चाहिए।",
     "eventOrder": "कार्यक्रम का अंत आरंभ के बाद होना चाहिए।",
-    "latitude": "latitude -90 से 90 के बीच की संख्या होनी चाहिए।",
-    "longitude": "longitude -180 से 180 के बीच की संख्या होनी चाहिए।"
+    "latitude": "latitude {minimum} से {maximum} के बीच की संख्या होनी चाहिए।",
+    "longitude": "longitude {minimum} से {maximum} के बीच की संख्या होनी चाहिए।"
   }
 }

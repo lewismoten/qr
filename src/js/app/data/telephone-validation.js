@@ -34,8 +34,12 @@ export function validateTelephoneValue(
   if (trimmed.length > MAXIMUM_PHONE_FORMAT_LENGTH) {
     return lookup(
       'validation.phone.formatLength',
-      'Not valid for {context} format yet: {label} should stay within 40 characters.',
-      { context: resolvedContext, label: resolvedLabel },
+      'Not valid for {context} format yet: {label} should stay within {maxLength} characters.',
+      {
+        context: resolvedContext,
+        label: resolvedLabel,
+        maxLength: MAXIMUM_PHONE_FORMAT_LENGTH,
+      },
     );
   }
 
@@ -57,8 +61,13 @@ export function validateTelephoneValue(
   ) {
     return lookup(
       'validation.phone.length',
-      'Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits.',
-      { context: resolvedContext, label: resolvedLabel },
+      'Not valid for {context} format yet: {label} should contain a reasonable length of {minimum} to {maximum} digits.',
+      {
+        context: resolvedContext,
+        label: resolvedLabel,
+        minimum: MINIMUM_PHONE_DIGITS,
+        maximum: MAXIMUM_PHONE_DIGITS,
+      },
     );
   }
 

@@ -38,7 +38,7 @@
     "dates": "start_date and end_date must be real dates using YYYY-MM-DD.",
     "times": "start_time and end_time must be real 24-hour times using HH:MM unless all_day is true.",
     "eventOrder": "the event end must be after its start.",
-    "latitude": "latitude must be a number between -90 and 90.",
-    "longitude": "longitude must be a number between -180 and 180."
+    "latitude": "latitude must be a number between {minimum} and {maximum}.",
+    "longitude": "longitude must be a number between {minimum} and {maximum}."
   }
 }

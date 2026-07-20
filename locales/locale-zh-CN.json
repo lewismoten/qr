@@ -98,7 +98,7 @@
   "file": {
     "compressionUnsupported": "此浏览器不支持 gzip 传输压缩，请关闭压缩后继续。",
     "chunkFitError": "当前二维码配置无法容纳分块协议。",
-    "manifestFieldLimit": "清单字段 {type} 超过 65,535 字节限制。",
+    "manifestFieldLimit": "清单字段 {type} 超过 {maxBytes} 字节限制。",
     "metadataJson": "自定义文件元数据必须是有效的 JSON。",
     "capacity": {
       "download": "已加载 {loadedBytes} B（{loadedSize}），最大约 {maxBytes} B（{maxSize}），占 {percent}%。二维码会保存包含文件字节、名称和 MIME 类型的可共享下载网址。",

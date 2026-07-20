@@ -38,7 +38,7 @@
     "dates": "start_date 和 end_date 必须是 YYYY-MM-DD 格式的有效日期。",
     "times": "除非 all_day 为 true，否则时间必须是 HH:MM 格式。",
     "eventOrder": "事件结束时间必须晚于开始时间。",
-    "latitude": "latitude 必须是 -90 到 90 之间的数字。",
-    "longitude": "longitude 必须是 -180 到 180 之间的数字。"
+    "latitude": "latitude 必须是 {minimum} 到 {maximum} 之间的数字。",
+    "longitude": "longitude 必须是 {minimum} 到 {maximum} 之间的数字。"
   }
 }

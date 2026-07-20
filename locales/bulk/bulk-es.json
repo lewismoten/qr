@@ -38,7 +38,7 @@
     "dates": "start_date y end_date deben ser fechas reales con formato AAAA-MM-DD.",
     "times": "start_time y end_time deben ser horas reales en formato HH:MM, salvo si all_day es true.",
     "eventOrder": "el final del evento debe ser posterior al inicio.",
-    "latitude": "latitude debe ser un número entre -90 y 90.",
-    "longitude": "longitude debe ser un número entre -180 y 180."
+    "latitude": "latitude debe ser un número entre {minimum} y {maximum}.",
+    "longitude": "longitude debe ser un número entre {minimum} y {maximum}."
   }
 }

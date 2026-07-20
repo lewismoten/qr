@@ -236,7 +236,8 @@ export function validateBulkImport({
       return fail(
         lookup(
           'bulk.validation.latitude',
-          'latitude must be a number between -90 and 90.',
+          'latitude must be a number between {minimum} and {maximum}.',
+          { minimum: MINIMUM_LATITUDE, maximum: MAXIMUM_LATITUDE },
         ),
       );
     if (
@@ -247,7 +248,8 @@ export function validateBulkImport({
       return fail(
         lookup(
           'bulk.validation.longitude',
-          'longitude must be a number between -180 and 180.',
+          'longitude must be a number between {minimum} and {maximum}.',
+          { minimum: MINIMUM_LONGITUDE, maximum: MAXIMUM_LONGITUDE },
         ),
       );
     const labelError = validateGeoLabel(row.label);

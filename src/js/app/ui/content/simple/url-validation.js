@@ -19,8 +19,8 @@ export function validateUrl(value) {
     return {
       error: lookup(
         'validation.website.length',
-        'Not valid for {context} format yet: website should stay within 2048 characters.',
-        { context },
+        'Not valid for {context} format yet: website should stay within {maxLength} characters.',
+        { context, maxLength: MAXIMUM_URL_CHARACTERS },
       ),
       warning: '',
     };

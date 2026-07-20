@@ -3,7 +3,7 @@
   "email": {
     "required": "Not valid for {context} format yet: {label} is required.",
     "invalid": "Not valid for {context} format yet: {label} must be valid.",
-    "length": "Not valid for {context} format yet: {label} should stay within 254 characters.",
+    "length": "Not valid for {context} format yet: {label} should stay within {maxLength} characters.",
     "subjectLabel": "Not valid for Email format yet: subject",
     "bodyLabel": "Not valid for Email format yet: body",
     "capacity": "Not valid for Email format yet: body exceeds the current QR capacity ({current} / {max})."
@@ -15,19 +15,19 @@
   "phone": {
     "required": "Not valid for {context} format yet: {label} is required.",
     "characters": "Not valid for {context} format yet: {label} can only use digits, spaces, parentheses, periods, hyphens, and an optional leading +.",
-    "formatLength": "Not valid for {context} format yet: {label} should stay within 40 characters.",
+    "formatLength": "Not valid for {context} format yet: {label} should stay within {maxLength} characters.",
     "plus": "Not valid for {context} format yet: {label} can only use + at the beginning.",
-    "length": "Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits."
+    "length": "Not valid for {context} format yet: {label} should contain a reasonable length of {minimum} to {maximum} digits."
   },
   "geo": {
-    "labelLength": "Not valid for Geo format yet: label should stay within 80 characters.",
+    "labelLength": "Not valid for Geo format yet: label should stay within {maxLength} characters.",
     "labelCharacters": "Not valid for Geo format yet: label can only use letters, numbers, spaces, and common punctuation.",
     "latitudeRequired": "Not valid for Geo format yet: latitude is required.",
     "longitudeRequired": "Not valid for Geo format yet: longitude is required.",
     "latitudeNumber": "Not valid for Geo format yet: latitude must be a valid number.",
     "longitudeNumber": "Not valid for Geo format yet: longitude must be a valid number.",
-    "latitudeRange": "Not valid for Geo format yet: latitude must be between -90 and 90.",
-    "longitudeRange": "Not valid for Geo format yet: longitude must be between -180 and 180."
+    "latitudeRange": "Not valid for Geo format yet: latitude must be between {minimum} and {maximum}.",
+    "longitudeRange": "Not valid for Geo format yet: longitude must be between {minimum} and {maximum}."
   },
   "vcard": {
     "required": "Not valid for vCard format yet: {label} is required.",
@@ -36,7 +36,7 @@
   },
   "website": {
     "required": "Not valid for {context} format yet: website is required.",
-    "length": "Not valid for {context} format yet: website should stay within 2048 characters.",
+    "length": "Not valid for {context} format yet: website should stay within {maxLength} characters.",
     "protocolRequired": "Not valid for {context} format yet: website must include a full protocol such as https://.",
     "protocol": "Not valid for {context} format yet: website should start with https:// or http://.",
     "insecure": "Warning for {context} format: website uses http://. https:// is strongly recommended."
@@ -58,11 +58,11 @@
     "security": "Not valid for Wi-Fi format yet: choose WPA, WEP, or Open.",
     "ssidRequired": "Not valid for Wi-Fi format yet: network name is required.",
     "ssidLabel": "Wi-Fi network name",
-    "ssidBytes": "Not valid for Wi-Fi format yet: network name must fit within 32 UTF-8 bytes.",
+    "ssidBytes": "Not valid for Wi-Fi format yet: network name must fit within {maxBytes} UTF-8 bytes.",
     "passwordRequired": "Not valid for Wi-Fi format yet: a password is required.",
     "passwordLabel": "Wi-Fi password",
-    "wepPassword": "Not valid for Wi-Fi format yet: WEP keys must be 5 or 13 characters, or 10 or 26 hexadecimal digits.",
-    "wpaPassword": "Not valid for Wi-Fi format yet: WPA passwords must be 8 to 63 characters, or exactly 64 hexadecimal digits."
+    "wepPassword": "Not valid for Wi-Fi format yet: WEP keys must be {asciiShort} or {asciiLong} characters, or {hexShort} or {hexLong} hexadecimal digits.",
+    "wpaPassword": "Not valid for Wi-Fi format yet: WPA passwords must be {minimum} to {maximum} characters, or exactly {hexLength} hexadecimal digits."
   },
   "sms": {
     "length": "Not valid for SMS format yet: message should stay at {maxLength} characters or fewer for broad SMS compatibility."

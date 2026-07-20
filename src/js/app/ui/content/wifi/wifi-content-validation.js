@@ -18,8 +18,8 @@ const MAXIMUM_PASSWORD_LENGTH = 64;
 const WPA_MINIMUM_PASSWORD_LENGTH = 8;
 const WPA_MAXIMUM_PASSWORD_LENGTH = 63;
 
-function message(key, fallback) {
-  return lookup(`validation.wifi.${key}`, fallback);
+function message(key, fallback, options) {
+  return lookup(`validation.wifi.${key}`, fallback, options);
 }
 
 export function validateWifiValues({ security, ssid, password }) {
@@ -44,7 +44,8 @@ export function validateWifiValues({ security, ssid, password }) {
   if (new TextEncoder().encode(ssid).length > MAXIMUM_SSID_BYTES) {
     return message(
       'ssidBytes',
-      'Not valid for Wi-Fi format yet: network name must fit within 32 UTF-8 bytes.',
+      'Not valid for Wi-Fi format yet: network name must fit within {maxBytes} UTF-8 bytes.',
+      { maxBytes: MAXIMUM_SSID_BYTES },
     );
   }
 
@@ -71,7 +72,13 @@ export function validateWifiValues({ security, ssid, password }) {
       ? ''
       : message(
           'wepPassword',
-          'Not valid for Wi-Fi format yet: WEP keys must be 5 or 13 characters, or 10 or 26 hexadecimal digits.',
+          'Not valid for Wi-Fi format yet: WEP keys must be {asciiShort} or {asciiLong} characters, or {hexShort} or {hexLong} hexadecimal digits.',
+          {
+            asciiShort: WEP_ASCII_SHORT_LENGTH,
+            asciiLong: WEP_ASCII_LONG_LENGTH,
+            hexShort: WEP_HEX_SHORT_LENGTH,
+            hexLong: WEP_HEX_LONG_LENGTH,
+          },
         );
   }
 
@@ -83,7 +90,12 @@ export function validateWifiValues({ security, ssid, password }) {
     ? ''
     : message(
         'wpaPassword',
-        'Not valid for Wi-Fi format yet: WPA passwords must be 8 to 63 characters, or exactly 64 hexadecimal digits.',
+        'Not valid for Wi-Fi format yet: WPA passwords must be {minimum} to {maximum} characters, or exactly {hexLength} hexadecimal digits.',
+        {
+          minimum: WPA_MINIMUM_PASSWORD_LENGTH,
+          maximum: WPA_MAXIMUM_PASSWORD_LENGTH,
+          hexLength: MAXIMUM_PASSWORD_LENGTH,
+        },
       );
 }
 

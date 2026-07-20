@@ -41,7 +41,8 @@ export function validateGeo(document) {
     return invalid(
       lookup(
         'validation.geo.latitudeRange',
-        'Not valid for Geo format yet: latitude must be between -90 and 90.',
+        'Not valid for Geo format yet: latitude must be between {minimum} and {maximum}.',
+        { minimum: MINIMUM_LATITUDE, maximum: MAXIMUM_LATITUDE },
       ),
     );
   }
@@ -49,7 +50,8 @@ export function validateGeo(document) {
     return invalid(
       lookup(
         'validation.geo.longitudeRange',
-        'Not valid for Geo format yet: longitude must be between -180 and 180.',
+        'Not valid for Geo format yet: longitude must be between {minimum} and {maximum}.',
+        { minimum: MINIMUM_LONGITUDE, maximum: MAXIMUM_LONGITUDE },
       ),
     );
   }

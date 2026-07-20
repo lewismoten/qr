@@ -98,7 +98,7 @@
   "file": {
     "compressionUnsupported": "لا يدعم هذا المتصفح ضغط نقل gzip. أوقف الضغط للمتابعة.",
     "chunkFitError": "تعذر احتواء بروتوكول الأجزاء في إعداد QR الحالي.",
-    "manifestFieldLimit": "يتجاوز حقل البيان {type} حد 65,535 بايت.",
+    "manifestFieldLimit": "يتجاوز حقل البيان {type} حد {maxBytes} بايت.",
     "metadataJson": "يجب أن تكون بيانات الملف الوصفية المخصصة JSON صالحًا.",
     "capacity": {
       "download": "تم تحميل {loadedBytes} بايت ({loadedSize}) من حد أقصى يقارب {maxBytes} بايت ({maxSize})، بنسبة {percent}%. يخزن QR رابط تنزيل قابلًا للمشاركة يتضمن بايتات الملف واسمه ونوع MIME.",

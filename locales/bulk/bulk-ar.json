@@ -38,7 +38,7 @@
     "dates": "يجب أن يكون start_date وend_date تاريخين صالحين بتنسيق YYYY-MM-DD.",
     "times": "يجب أن تكون الأوقات بتنسيق HH:MM ما لم تكن all_day تساوي true.",
     "eventOrder": "يجب أن تكون نهاية الحدث بعد بدايته.",
-    "latitude": "يجب أن تكون latitude رقمًا بين -90 و90.",
-    "longitude": "يجب أن تكون longitude رقمًا بين -180 و180."
+    "latitude": "يجب أن تكون latitude رقمًا بين {minimum} و{maximum}.",
+    "longitude": "يجب أن تكون longitude رقمًا بين {minimum} و{maximum}."
   }
 }

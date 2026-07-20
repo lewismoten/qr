@@ -98,7 +98,7 @@
   "file": {
     "compressionUnsupported": "यह ब्राउज़र gzip स्थानांतरण संपीड़न समर्थित नहीं करता। जारी रखने के लिए इसे बंद करें।",
     "chunkFitError": "वर्तमान क्यूआर विन्यास में खंड प्रोटोकॉल नहीं समा सका।",
-    "manifestFieldLimit": "मैनिफ़ेस्ट फ़ील्ड {type} 65,535-बाइट सीमा से बड़ा है।",
+    "manifestFieldLimit": "मैनिफ़ेस्ट फ़ील्ड {type} {maxBytes}-बाइट सीमा से बड़ा है।",
     "metadataJson": "कस्टम फ़ाइल मेटाडेटा मान्य JSON होना चाहिए।",
     "capacity": {
       "download": "लगभग {maxBytes} B ({maxSize}) अधिकतम में से {loadedBytes} B ({loadedSize}) लोड हुआ ({percent}%)। क्यूआर फ़ाइल के बाइट, नाम और MIME प्रकार वाली साझा करने योग्य डाउनलोड यूआरएल रखता है।",

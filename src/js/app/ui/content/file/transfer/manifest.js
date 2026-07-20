@@ -74,8 +74,8 @@ export function serializeManifest({
     if (field.value.length > MAXIMUM_FIELD_LENGTH) {
       throw createLocalizedError(
         'file.manifestFieldLimit',
-        'Manifest field {type} exceeds the 65,535-byte limit.',
-        { type: field.type },
+        'Manifest field {type} exceeds the {maxBytes}-byte limit.',
+        { type: field.type, maxBytes: MAXIMUM_FIELD_LENGTH },
       );
     }
     manifest[offset] = field.type;

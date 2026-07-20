@@ -38,8 +38,12 @@ export function validateEmailValue(
   if (trimmed.length > MAXIMUM_EMAIL_LENGTH) {
     return lookup(
       'validation.email.length',
-      'Not valid for {context} format yet: {label} should stay within 254 characters.',
-      { context: resolvedContext, label: resolvedLabel },
+      'Not valid for {context} format yet: {label} should stay within {maxLength} characters.',
+      {
+        context: resolvedContext,
+        label: resolvedLabel,
+        maxLength: MAXIMUM_EMAIL_LENGTH,
+      },
     );
   }
 
@@ -76,7 +80,8 @@ export function validateGeoLabel(value) {
   if (trimmed.length > MAXIMUM_GEO_LABEL_LENGTH) {
     return lookup(
       'validation.geo.labelLength',
-      'Not valid for Geo format yet: label should stay within 80 characters.',
+      'Not valid for Geo format yet: label should stay within {maxLength} characters.',
+      { maxLength: MAXIMUM_GEO_LABEL_LENGTH },
     );
   }
 
@@ -148,8 +153,8 @@ export function getWebsiteValidationState(
     return {
       error: lookup(
         'validation.website.length',
-        'Not valid for {context} format yet: website should stay within 2048 characters.',
-        { context: resolvedContext },
+        'Not valid for {context} format yet: website should stay within {maxLength} characters.',
+        { context: resolvedContext, maxLength: MAXIMUM_URL_LENGTH },
       ),
       warning: '',
     };

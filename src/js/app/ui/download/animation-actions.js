@@ -52,21 +52,26 @@ export function createAnimationDownloader(deps) {
     if (enteredDurationMs <= 0 || perFrameMs < MINIMUM_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.durationMinimum',
-        'Choose a duration that provides at least 10 milliseconds per image.',
+        'Choose a duration that provides at least {milliseconds} milliseconds per image.',
+        { milliseconds: MINIMUM_FRAME_DURATION_MS },
       );
       return;
     }
     if (format === 'gif' && perFrameMs > MAXIMUM_GIF_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.gifDurationMaximum',
-        'GIF supports at most 10 minutes 55.35 seconds per image.',
+        'GIF supports at most {duration} per image.',
+        {
+          duration: deps.formatAnimationDuration(MAXIMUM_GIF_FRAME_DURATION_MS),
+        },
       );
       return;
     }
     if (format === 'mp4' && perFrameMs < MINIMUM_MP4_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.mp4DurationMinimum',
-        'MP4 needs at least 16 milliseconds per image.',
+        'MP4 needs at least {milliseconds} milliseconds per image.',
+        { milliseconds: MINIMUM_MP4_FRAME_DURATION_MS },
       );
       return;
     }

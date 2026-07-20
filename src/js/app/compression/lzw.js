@@ -22,8 +22,8 @@ export function encodeGifLzw(indexes, minimumCodeSize = DEFAULT_CODE_SIZE) {
   ) {
     throw createLocalizedError(
       'download.lzwCodeSize',
-      'GIF LZW minimum code size must be an integer from 2 through 8.',
-      undefined,
+      'GIF LZW minimum code size must be an integer from {minimum} through {maximum}.',
+      { minimum: MINIMUM_CODE_SIZE, maximum: MAXIMUM_CODE_SIZE },
       RangeError,
     );
   }
@@ -55,8 +55,8 @@ export function encodeGifLzw(indexes, minimumCodeSize = DEFAULT_CODE_SIZE) {
     if (!Number.isInteger(index) || index < 0 || index >= clearCode) {
       throw createLocalizedError(
         'download.lzwPaletteIndex',
-        'GIF palette index must be between 0 and {maximum}.',
-        { maximum: clearCode - 1 },
+        'GIF palette index must be between {minimum} and {maximum}.',
+        { minimum: 0, maximum: clearCode - 1 },
         RangeError,
       );
     }
