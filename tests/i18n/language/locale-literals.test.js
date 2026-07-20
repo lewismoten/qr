@@ -28,6 +28,7 @@ const NUMBER_PATTERN = /\p{Number}/u;
 const DATE_PATTERN = /\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b/u;
 const ASCII_COMMA = ',';
 const ASCII_COLON = ':';
+const ASCII_SEMICOLON = ';';
 const CHINESE_TECHNICAL_COLON_PATTERNS = [
   /https?:\/\//gu,
   /HH:MM/gu,
@@ -126,6 +127,7 @@ test('Chinese prose uses fullwidth punctuation', async () => {
     if (removeChineseTechnicalColons(message).includes(ASCII_COLON)) {
       findings.push('colon');
     }
+    if (message.includes(ASCII_SEMICOLON)) findings.push('semicolon');
     return findings.map(
       (punctuation) =>
         `zh-CN.${key}: ASCII ${punctuation} in "${message}"`,
@@ -135,6 +137,6 @@ test('Chinese prose uses fullwidth punctuation', async () => {
   assert.deepEqual(
     issues,
     [],
-    'Use ， and ： in Chinese prose; retain ASCII only in machine syntax',
+    'Use ，, ：, and ； in Chinese prose; retain ASCII only in machine syntax',
   );
 });

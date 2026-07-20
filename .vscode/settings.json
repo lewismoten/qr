@@ -1,6 +1,7 @@
 {
   "editor.unicodeHighlight.allowedCharacters": {
     "\uFF0C": true,
-    "\uFF1A": true
+    "\uFF1A": true,
+    "\uFF1B": true
   }
 }
