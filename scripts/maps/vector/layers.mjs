@@ -24,6 +24,7 @@ export const VECTOR_LAYERS = {
     'riversNorthAmerica',
     'riversEurope',
     'riversAustralia',
+    'nhdMajorRivers',
   ],
 };
 
@@ -42,6 +43,7 @@ function sourceClass(name, properties) {
   if (name === 'protectedAreas') return 'area';
   if (name === 'protectedLines') return 'line';
   if (name === 'protectedPoints') return 'point';
+  if (name === 'nhdMajorRivers') return 'major';
   return firstValue(properties, [
     'type',
     'TYPE',

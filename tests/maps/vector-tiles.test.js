@@ -55,6 +55,21 @@ test('omits unused labels from non-place vector layers', () => {
   assert.deepEqual(road.properties, { class: 'primary' });
 });
 
+test('classifies ranked USGS flowlines as major waterways', () => {
+  const river = prepareVectorFeature('nhdMajorRivers', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: {
+      gnis_name: 'North Fork Shenandoah River',
+      streamorde: 6,
+      visibilityfilter: 5000000,
+      ftype: 558,
+    },
+  });
+  assert.deepEqual(river.properties, { class: 'major' });
+  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 13 });
+});
+
 test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   const args = tippecanoeArguments({
     inputs: [{ layer: 'land', file: 'land.geojsonseq' }],
@@ -68,11 +83,14 @@ test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   assert.ok(args.includes('--generate-variable-depth-tile-pyramid'));
   assert.ok(args.includes('--drop-densest-as-needed'));
   assert.ok(args.includes('--detect-shared-borders'));
+  assert.ok(
+    args.some((value) => value.includes('U.S. Geological Survey NHDPlus HR')),
+  );
   assert.ok(args.some((value) => value.startsWith('--named-layer=land:')));
   assert.ok(args.some((value) => value.endsWith('local.pmtiles')));
 });
 
-test('preserves PMTiles format through temporary output validation', async () => {
+test('preserves PMTiles through temporary output validation', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-map-output-'));
   const archive = path.join(root, 'local.partial.pmtiles');
   try {

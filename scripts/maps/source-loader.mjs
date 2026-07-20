@@ -19,6 +19,38 @@ function parseCollection(content, url) {
   return collection;
 }
 
+function parseObjectIds(content, url) {
+  let result;
+  try {
+    result = JSON.parse(content);
+  } catch {
+    throw new Error(`Map source did not return valid object IDs: ${url}`);
+  }
+  if (!Array.isArray(result.objectIds)) {
+    throw new Error(`Map source did not return object IDs: ${url}`);
+  }
+  return result.objectIds;
+}
+
+const wait = (milliseconds) =>
+  new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function fetchWithRetry(url, options, attempts = 3) {
+  let response;
+  let failure;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      response = await fetch(url, options);
+      if (response.ok || response.status < 500) return response;
+      failure = new Error(`Map source returned ${response.status}: ${url}`);
+    } catch (error) {
+      failure = error;
+    }
+    if (attempt + 1 < attempts) await wait(500 * 2 ** attempt);
+  }
+  throw failure;
+}
+
 async function readResponse(response, name, formatBytes, showProgress = true) {
   if (!response.ok) {
     throw new Error(`Unable to download ${response.url}: ${response.status}`);
@@ -55,10 +87,59 @@ function pageUrl(source, offset) {
   );
 }
 
+async function downloadObjectIdCollection(name, source, formatBytes) {
+  const idsContent = await readResponse(
+    await fetchWithRetry(source.idsUrl),
+    `${name} index`,
+    formatBytes,
+    false,
+  );
+  const ids = parseObjectIds(idsContent, source.idsUrl);
+  const pages = new Array(Math.ceil(ids.length / source.pageSize));
+  let nextPage = 0;
+  let received = 0;
+  process.stdout.write(`\rDownloading ${name}: 0/${ids.length} features`);
+  const worker = async () => {
+    while (nextPage < pages.length) {
+      const pageIndex = nextPage;
+      nextPage += 1;
+      const start = pageIndex * source.pageSize;
+      const pageIds = ids.slice(start, start + source.pageSize);
+      const request = {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: `objectIds=${pageIds.join(',')}`,
+      };
+      const content = await readResponse(
+        await fetchWithRetry(source.url, request),
+        name,
+        formatBytes,
+        false,
+      );
+      const page = parseCollection(content, source.url);
+      pages[pageIndex] = page.features;
+      received += page.features.length;
+      process.stdout.write(
+        `\rDownloading ${name}: ${received}/${ids.length} features`,
+      );
+    }
+  };
+  const workers = Math.min(source.parallelPages ?? 1, pages.length);
+  await Promise.all(Array.from({ length: workers }, worker));
+  const collection = {
+    type: 'FeatureCollection',
+    features: pages.flat(),
+  };
+  return { collection, content: Buffer.from(JSON.stringify(collection)) };
+}
+
 async function downloadCollection(name, source, formatBytes) {
+  if (source.objectIdPagination) {
+    return downloadObjectIdCollection(name, source, formatBytes);
+  }
   if (!source.pageSize) {
     const content = await readResponse(
-      await fetch(source.url),
+      await fetchWithRetry(source.url),
       name,
       formatBytes,
     );
@@ -77,7 +158,7 @@ async function downloadCollection(name, source, formatBytes) {
   while (true) {
     const url = pageUrl(source, offset);
     const content = await readResponse(
-      await fetch(url),
+      await fetchWithRetry(url),
       name,
       formatBytes,
       false,

@@ -7,6 +7,7 @@ export const DEFAULT_LAYERS = [
   'riversNorthAmerica',
   'riversEurope',
   'riversAustralia',
+  'nhdMajorRivers',
   'protectedAreas',
   'protectedLines',
   'protectedPoints',
@@ -43,6 +44,15 @@ const ROAD_QUERY =
 const transportationUrl = (layer, offset) =>
   `${TRANSPORTATION_ROOT}${layer}/query?${ROAD_QUERY}&` +
   `maxAllowableOffset=${offset}`;
+const NHDPLUS_ROOT =
+  'https://hydro.nationalmap.gov/arcgis/rest/services/' +
+  'NHDPlus_HR/MapServer/3/query?';
+const NHDPLUS_WHERE = 'visibilityfilter%3E%3D5000000';
+const NHDPLUS_QUERY =
+  `where=${NHDPLUS_WHERE}&` +
+  'outFields=OBJECTID%2Cgnis_name%2Cstreamorde%2Cvisibilityfilter%2Cftype&' +
+  'returnGeometry=true&returnZ=false&returnM=false&outSR=4326&' +
+  'geometryPrecision=5&maxAllowableOffset=0.00025&f=geojson';
 const LOCAL_DETAIL_MAXIMUM_ZOOM = 13;
 
 export const MAP_SOURCES = {
@@ -103,6 +113,18 @@ export const MAP_SOURCES = {
     file: 'physical/ne_10m_rivers_australia.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_rivers_australia.geojson`,
     minimumZoom: 8,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
+    kind: 'line',
+  },
+  nhdMajorRivers: {
+    file: 'usgs/nhdplus_hr_major_rivers.geojson',
+    url: `${NHDPLUS_ROOT}${NHDPLUS_QUERY}`,
+    idsUrl:
+      `${NHDPLUS_ROOT}where=${NHDPLUS_WHERE}&` + 'returnIdsOnly=true&f=json',
+    objectIdPagination: true,
+    parallelPages: 4,
+    pageSize: 2000,
+    minimumZoom: 9,
     maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'line',
   },
@@ -225,6 +247,12 @@ export const SOURCE_ATTRIBUTION = [
     license: 'U.S. government work',
     website: 'https://www.census.gov/geographies/mapping-files.html',
     version: '2024 ACS boundaries and 2025 TIGERweb primary roads',
+  },
+  {
+    name: 'U.S. Geological Survey',
+    license: 'Public domain',
+    website: 'https://www.usgs.gov/national-hydrography/',
+    version: 'NHDPlus High Resolution',
   },
   {
     name: 'GeoNames',

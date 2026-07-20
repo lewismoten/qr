@@ -2,6 +2,7 @@ import { getWorldSize, projectCoordinates } from '../projection.js';
 import { createAttribution } from '../slippy-elements.js';
 
 const CENSUS_ZOOM = 6;
+const USGS_ZOOM = 9;
 const CENSUS_REGIONS = [
   [-125, 24, -66, 50],
   [-180, 51, -129, 72],
@@ -42,6 +43,11 @@ function intersectsViewport(bounds, view) {
 
 export function hasVisibleCensusData(view) {
   if (view.zoom < CENSUS_ZOOM || !view.width || !view.height) return false;
+  return CENSUS_REGIONS.some((bounds) => intersectsViewport(bounds, view));
+}
+
+export function hasVisibleUsgsData(view) {
+  if (view.zoom < USGS_ZOOM || !view.width || !view.height) return false;
   return CENSUS_REGIONS.some((bounds) => intersectsViewport(bounds, view));
 }
 

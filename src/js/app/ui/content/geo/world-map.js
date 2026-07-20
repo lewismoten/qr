@@ -1,4 +1,7 @@
-import { hasVisibleCensusData } from './data/attribution.js';
+import {
+  hasVisibleCensusData,
+  hasVisibleUsgsData,
+} from './data/attribution.js';
 import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
 
 const WIDTH = 1000;
@@ -109,6 +112,11 @@ export function createWorldMap(
             {
               text: 'GeoNames',
               url: 'https://www.geonames.org/',
+            },
+            {
+              text: 'U.S. Geological Survey',
+              url: 'https://www.usgs.gov/national-hydrography/',
+              visible: hasVisibleUsgsData,
             },
           ],
           secondaryAttribution: {

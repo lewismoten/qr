@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import {
   createDynamicAttribution,
   hasVisibleCensusData,
+  hasVisibleUsgsData,
 } from '../../../src/js/app/ui/content/geo/data/attribution.js';
-import { createElement } from '../../../src/js/app/ui/content/geo/slippy-elements.js';
+import * as ui from '../../../src/js/app/ui/content/geo/slippy-elements.js';
 
 const censusView = {
   center: { latitude: 38.9182, longitude: -78.1944 },
@@ -16,6 +17,8 @@ assert.equal(hasVisibleCensusData({ ...censusView, zoom: 5 }), false);
 assert.equal(hasVisibleCensusData({ ...censusView, zoom: 6 }), true);
 assert.equal(hasVisibleCensusData({ ...censusView, width: 0 }), false);
 assert.equal(hasVisibleCensusData(censusView), true);
+assert.equal(hasVisibleUsgsData({ ...censusView, zoom: 8 }), false);
+assert.equal(hasVisibleUsgsData({ ...censusView, zoom: 9 }), true);
 assert.equal(
   hasVisibleCensusData({
     ...censusView,
@@ -47,7 +50,7 @@ Object.defineProperty(globalThis, 'document', {
   value: { createElement: createNode },
 });
 
-const attributedElement = createElement('div', 'sample', { role: 'note' });
+const attributedElement = ui.createElement('div', 'sample', { role: 'note' });
 assert.equal(attributedElement.className, 'sample');
 assert.equal(attributedElement.role, 'note');
 

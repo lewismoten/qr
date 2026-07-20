@@ -15,6 +15,19 @@ test('keeps regional river supplements through zoom level thirteen', () => {
   }
 });
 
+test('adds ranked public-domain USGS rivers at detailed zooms', () => {
+  const source = MAP_SOURCES.nhdMajorRivers;
+  assert.equal(source.minimumZoom, 9);
+  assert.equal(source.maximumZoom, 13);
+  assert.equal(source.pageSize, 2000);
+  assert.equal(source.objectIdPagination, true);
+  assert.equal(source.parallelPages, 4);
+  assert.match(source.idsUrl, /returnIdsOnly=true/);
+  assert.match(source.url, /NHDPlus_HR\/MapServer\/3\/query/);
+  assert.match(source.url, /visibilityfilter%3E%3D5000000/);
+  assert.match(source.url, /maxAllowableOffset=0\.00025/);
+});
+
 const line = (minimumZoom) => ({
   properties: { min_zoom: minimumZoom },
   geometry: {

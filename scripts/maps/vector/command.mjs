@@ -1,6 +1,8 @@
 import path from 'node:path';
 
-const ATTRIBUTION = 'Natural Earth; GeoNames CC BY 4.0; U.S. Census Bureau';
+const ATTRIBUTION =
+  'Natural Earth; GeoNames CC BY 4.0; U.S. Census Bureau; ' +
+  'U.S. Geological Survey NHDPlus HR';
 
 export function tippecanoeArguments({
   inputs,

@@ -75,14 +75,24 @@ npm run maps:build -- --maximum-zoom 13 --max-tile-kib 16
 npm run maps:generate -- --maximum-zoom 13 --max-tile-kib 16
 ```
 
+To fetch or refresh only the detailed USGS river source before a later build:
+
+```sh
+npm run maps:download -- --layers nhdMajorRivers
+```
+
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
 ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads, while
-Natural Earth supplies global roads and water. `maps:download` retrieves every
-configured raw source without rendering tiles. Natural Earth also supplies
-U.S. National Park Service parks and protected lands as area, line, and point
-features.
+Natural Earth supplies global roads and water. At zoom 9 and deeper, the
+public-domain USGS NHDPlus High Resolution network supplements U.S. rivers
+ranked for display at approximately 1:5,000,000 and larger scales. The source
+query is simplified during download to preserve recognizable major waterways,
+including both Shenandoah forks, without importing the complete 27-million
+feature network. `maps:download` retrieves every configured raw source without
+rendering tiles. Natural Earth also supplies U.S. National Park Service parks
+and protected lands as area, line, and point features.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks
@@ -110,9 +120,10 @@ npm run maps:build:svg -- --zoom 1-9 --jobs 8
 npm run maps:generate:svg -- --jobs 8
 ```
 
-Use `npm run maps:build -- --help` for all PMTiles options. Natural Earth data
-is in the public domain, GeoNames is CC BY 4.0, and U.S. Census data is a U.S.
-government work. PMTiles v3 and MVT 2.1 are open specifications.
+Use `npm run maps:build -- --help` for all PMTiles options. Natural Earth and
+USGS NHDPlus HR data are in the public domain, GeoNames is CC BY 4.0, and U.S.
+Census data is a U.S. government work. PMTiles v3 and MVT 2.1 are open
+specifications.
 
 ## Testing
 
