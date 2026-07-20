@@ -40,8 +40,18 @@ function shardBounds(column, row, grid) {
   ];
 }
 
-function regionLevel(level, grid, column, row, weight) {
-  if (grid === 1) return { ...level, weight };
+function regionLevel(
+  level,
+  grid,
+  column,
+  row,
+  weight,
+  forecastBytes,
+  forecastMultiplier,
+) {
+  if (grid === 1) {
+    return { ...level, weight, forecastBytes, forecastMultiplier };
+  }
   const shard = shardName(column, row, grid);
   return {
     ...level,
@@ -52,6 +62,8 @@ function regionLevel(level, grid, column, row, weight) {
     bounds: shardBounds(column, row, grid),
     file: shardFile(level.file, shard),
     weight,
+    forecastBytes,
+    forecastMultiplier,
   };
 }
 
@@ -64,15 +76,21 @@ export function adaptiveSplitFactor(bytes, targetBytes) {
   return 2 ** Math.max(1, depth);
 }
 
-function expandRegion(level, parent, targetBytes) {
+function expandRegion(level, parent, targetBytes, forecastMultiplier) {
   const parentGrid = parent.shardGrid ?? 1;
   const parentColumn = parent.shardColumn ?? 0;
   const parentRow = parent.shardRow ?? 0;
-  const requested = adaptiveSplitFactor(parent.bytes, targetBytes);
+  const multiplier =
+    typeof forecastMultiplier === 'function'
+      ? forecastMultiplier(parent)
+      : forecastMultiplier;
+  const projectedBytes = parent.bytes * multiplier;
+  const requested = adaptiveSplitFactor(projectedBytes, targetBytes);
   const maximumFactor = Math.max(1, 2 ** level.minimumZoom / parentGrid);
   const factor = Math.min(requested, maximumFactor);
   const childGrid = parentGrid * factor;
   const childWeight = parent.bytes / factor ** 2;
+  const forecastBytes = projectedBytes / factor ** 2;
   const children = [];
   for (let row = factor - 1; row >= 0; row -= 1) {
     for (let column = 0; column < factor; column += 1) {
@@ -83,6 +101,8 @@ function expandRegion(level, parent, targetBytes) {
           parentColumn * factor + column,
           parentRow * factor + row,
           childWeight,
+          forecastBytes,
+          multiplier,
         ),
       );
     }
@@ -107,14 +127,18 @@ function allocateBudgets(levels, totalBytes) {
 export function planAdaptiveShardLevel(
   level,
   previousResults,
-  { minimumZoom = 9, targetBytes = 10 * 1024 * 1024 } = {},
+  {
+    minimumZoom = 9,
+    targetBytes = 10 * 1024 * 1024,
+    forecastMultiplier = 1,
+  } = {},
 ) {
   if (level.minimumZoom < minimumZoom) return [level];
   const parents = previousResults.length
     ? previousResults
     : [{ bytes: targetBytes + 1 }];
   const regions = parents.flatMap((parent) => {
-    return expandRegion(level, parent, targetBytes);
+    return expandRegion(level, parent, targetBytes, forecastMultiplier);
   });
   return allocateBudgets(regions, level.budgetBytes);
 }

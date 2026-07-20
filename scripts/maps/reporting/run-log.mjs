@@ -172,12 +172,18 @@ export function recordZoomPlan(log, levels, shardTargetBytes) {
     zoom: levels[0]?.minimumZoom,
     archives: levels.length,
     shardTargetBytes,
+    forecastMultiplier: levels[0]?.multiplier,
+    observedGrowth: levels[0]?.observedGrowth,
+    visibleFeatures: levels[0]?.visibleFeatures,
+    revealedFeatures: levels[0]?.revealedFeatures,
     regions: levels.map((level) => ({
       shard: level.shard,
       grid: level.shardGrid,
       column: level.shardColumn,
       row: level.shardRow,
       budgetBytes: level.budgetBytes,
+      forecastBytes: level.forecastBytes,
+      forecastMultiplier: level.forecastMultiplier,
     })),
   });
 }

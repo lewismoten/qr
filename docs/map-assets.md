@@ -60,6 +60,11 @@ children would still average more than the target, it divides directly into
 bounds while dense areas subdivide independently along exact Web Mercator tile
 boundaries.
 
+Before each zoom is built, the planner forecasts 2x to 3x growth from the two
+previous zooms and features that first become visible at the new zoom. A
+region is subdivided in advance when its forecast exceeds the shard target,
+including multiple quadtree depths when one four-way split is insufficient.
+
 Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between
 parallel waves. Each job runs a separate Tippecanoe process, so choose a value
@@ -100,6 +105,9 @@ zoom and quadrant, carry or debt, tile limits, geometry detail, and PMTiles
 addressed-tile, directory-entry, unique-content, and tile-data totals. Fatal
 errors are written before exit. Repetitive Tippecanoe density and oversized
 tile messages are replaced by one summary per pass.
+Feature-count and percentage progress updates are also coalesced in the
+terminal. The newest status appears at most once every 1.5 seconds, while
+warnings, archive transitions, and summaries remain immediate.
 
 Each level is validated independently. An over-budget level is rebuilt with a
 tile-byte ceiling derived from its measured archive-to-budget ratio. Geometry

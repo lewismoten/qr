@@ -19,6 +19,7 @@ import {
   planArchiveLevels,
 } from './budget.mjs';
 import { buildArchiveSchedule } from './scheduling/archive-scheduler.mjs';
+import { createLevelPlanner } from './scheduling/level-planner.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import {
   readPmtilesArchiveStats as readArchiveStats,
@@ -28,7 +29,7 @@ import {
   writeArchiveManifest,
 } from './output.mjs';
 import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
-import { levelShardLabel, planAdaptiveShardLevel } from './shards.mjs';
+import { levelShardLabel } from './shards.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -236,6 +237,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
   throw new Error(`Unable to build ${levelShardLabel(level)}.`);
 }
 const temporaryFiles = new Set();
+const planLevel = createLevelPlanner({ inputs, shardZoom, shardTargetBytes });
 try {
   const results = await buildArchiveSchedule({
     levels,
@@ -243,12 +245,7 @@ try {
     maximumDebtBytes: options.maximumDebtBytes,
     minimumLevelBytes,
     build: buildLevel,
-    planLevel(level, previousResults) {
-      return planAdaptiveShardLevel(level, previousResults, {
-        minimumZoom: shardZoom,
-        targetBytes: shardTargetBytes,
-      });
-    },
+    planLevel,
     onPlan(plannedLevels) {
       recordZoomPlan(log, plannedLevels, shardTargetBytes);
       for (const level of plannedLevels) {

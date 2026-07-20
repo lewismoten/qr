@@ -48,10 +48,11 @@ export async function buildArchiveSchedule({
     throw new RangeError('Map build jobs must be a positive integer.');
   }
   const results = [];
+  let earlierResults = [];
   let previousResults = [];
   let carryBytes = 0;
   for (const level of levels) {
-    const group = planLevel(level, previousResults);
+    const group = planLevel(level, previousResults, earlierResults);
     onPlan?.(group);
     const levelResults = [];
     for (let offset = 0; offset < group.length; offset += jobs) {
@@ -75,6 +76,7 @@ export async function buildArchiveSchedule({
         onComplete?.(result, durationMs);
       }
     }
+    earlierResults = previousResults;
     previousResults = levelResults;
   }
   return results;

@@ -5,6 +5,10 @@ import {
   createTippecanoeOutput,
   formatTippecanoeSummary,
 } from '../reporting/run-log.mjs';
+import {
+  createLineOutput,
+  createProgressOutput,
+} from '../reporting/progress-output.mjs';
 
 export function validateTippecanoeExecutable(executable) {
   const available = spawnSync(executable, ['--version'], {
@@ -35,12 +39,15 @@ export async function runTippecanoe({
   let workingLimitExceeded = false;
   let fitSummary;
   await new Promise((resolve, reject) => {
-    const output = createTippecanoeOutput((line) => {
+    const progress = createProgressOutput((line) => {
       process.stderr.write(`${line}\n`);
     });
+    const output = createTippecanoeOutput(progress.writeLine);
+    const standardOutput = createLineOutput(progress.writeLine);
     const child = spawn(executable, args, {
-      stdio: ['ignore', 'inherit', 'pipe'],
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
+    child.stdout.on('data', (chunk) => standardOutput.write(chunk));
     child.stderr.on('data', (chunk) => output.write(chunk));
     const monitor = setInterval(() => {
       stat(temporary)
@@ -62,7 +69,9 @@ export async function runTippecanoe({
     child.on('exit', async (code, signal) => {
       clearInterval(monitor);
       observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
+      standardOutput.finish();
       const summary = output.finish();
+      progress.finish();
       fitSummary = summary;
       const message = formatTippecanoeSummary(summary);
       if (message) console.warn(message);

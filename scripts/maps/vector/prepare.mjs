@@ -67,6 +67,7 @@ export async function prepareVectorInputs({ cache, output }) {
     const file = path.join(output, `${layer}.geojsonseq`);
     const target = createWriteStream(file);
     let features = 0;
+    const featuresByMinimumZoom = {};
     for (const name of names) {
       const source = MAP_SOURCES[name];
       const sourceFile = path.join(cache, source.file);
@@ -75,11 +76,13 @@ export async function prepareVectorInputs({ cache, output }) {
         if (!normalized) continue;
         await writeFeature(target, normalized);
         features += 1;
+        const zoom = normalized.tippecanoe.minzoom;
+        featuresByMinimumZoom[zoom] = (featuresByMinimumZoom[zoom] || 0) + 1;
       }
     }
     target.end();
     await once(target, 'finish');
-    prepared.push({ layer, file, features });
+    prepared.push({ layer, file, features, featuresByMinimumZoom });
   }
   return prepared;
 }
