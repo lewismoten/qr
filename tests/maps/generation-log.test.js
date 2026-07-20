@@ -68,6 +68,7 @@ test('parses logging and generation command options', () => {
   assert.equal(options.shardZoom, 9);
   assert.equal(options.shardTargetMiB, 10);
   assert.equal(options.shardTargetBytes, 10 * 1024 * 1024);
+  assert.equal(options.shardVariancePercent, 20);
   assert.equal(options.jobs, 1);
   assert.equal(options.archiveVariancePercent, 1);
   assert.equal(options.maximumDebtBytes, 5 * 1024 * 1024);
@@ -81,6 +82,10 @@ test('parses logging and generation command options', () => {
   );
   assert.throws(
     () => readVectorBuildOptions(['--archive-variance-percent', '-1']),
+    /cannot be negative/,
+  );
+  assert.throws(
+    () => readVectorBuildOptions(['--shard-variance-percent', '-1']),
     /cannot be negative/,
   );
 });

@@ -7,22 +7,28 @@ function clampGrowth(value) {
 }
 
 function totalBytes(results) {
-  return results.reduce((sum, result) => sum + result.bytes, 0);
+  return results.reduce((sum, result) => {
+    return sum + (result.naturalBytes ?? result.bytes);
+  }, 0);
 }
 
 function featureCounts(inputs, zoom) {
   let visible = 0;
   let revealed = 0;
+  const revealedByLayer = {};
   for (const input of inputs) {
     for (const [minimumZoom, count] of Object.entries(
       input.featuresByMinimumZoom || {},
     )) {
       const level = Number(minimumZoom);
       if (level <= zoom) visible += count;
-      if (level === zoom) revealed += count;
+      if (level === zoom) {
+        revealed += count;
+        revealedByLayer[input.layer] = count;
+      }
     }
   }
-  return { visible, revealed };
+  return { visible, revealed, revealedByLayer };
 }
 
 export function forecastLevelGrowth({
@@ -34,7 +40,7 @@ export function forecastLevelGrowth({
   const previousBytes = totalBytes(previousResults);
   const earlierBytes = totalBytes(earlierResults);
   const observed = earlierBytes ? previousBytes / earlierBytes : DEFAULT_GROWTH;
-  const { visible, revealed } = featureCounts(inputs, zoom);
+  const { visible, revealed, revealedByLayer } = featureCounts(inputs, zoom);
   const existing = Math.max(1, visible - revealed);
   const geometryIncrease = Math.min(1, revealed / existing);
   const multiplier = clampGrowth(observed + geometryIncrease);
@@ -44,6 +50,7 @@ export function forecastLevelGrowth({
     observedGrowth: earlierBytes ? observed : null,
     visibleFeatures: visible,
     revealedFeatures: revealed,
+    revealedFeaturesByLayer: revealedByLayer,
   };
 }
 
@@ -68,8 +75,10 @@ export function forecastRegionGrowth(
   const ancestor = ancestors.sort((left, right) => {
     return (right.shardGrid ?? 1) - (left.shardGrid ?? 1);
   })[0];
-  if (!ancestor?.bytes) return fallbackGrowth;
+  const ancestorBytes = ancestor?.naturalBytes ?? ancestor?.bytes;
+  if (!ancestorBytes) return fallbackGrowth;
   const scale = parentGrid / (ancestor.shardGrid ?? 1);
-  const expectedBytes = ancestor.bytes / scale ** 2;
-  return clampGrowth(parent.bytes / expectedBytes + geometryIncrease);
+  const expectedBytes = ancestorBytes / scale ** 2;
+  const parentBytes = parent.naturalBytes ?? parent.bytes;
+  return clampGrowth(parentBytes / expectedBytes + geometryIncrease);
 }

@@ -10,7 +10,12 @@ function size(value) {
   return `${(value / MEBIBYTE).toFixed(1)} MiB`;
 }
 
-export function createLevelPlanner({ inputs, shardZoom, shardTargetBytes }) {
+export function createLevelPlanner({
+  inputs,
+  shardZoom,
+  shardTargetBytes,
+  shardVariancePercent,
+}) {
   return (level, previousResults, earlierResults) => {
     const forecast = forecastLevelGrowth({
       previousResults,
@@ -24,6 +29,7 @@ export function createLevelPlanner({ inputs, shardZoom, shardTargetBytes }) {
       {
         minimumZoom: shardZoom,
         targetBytes: shardTargetBytes,
+        targetVariance: shardVariancePercent / 100,
         forecastMultiplier(parent) {
           return forecastRegionGrowth(
             parent,

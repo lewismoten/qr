@@ -84,12 +84,13 @@ function expandRegion(level, parent, targetBytes, forecastMultiplier) {
     typeof forecastMultiplier === 'function'
       ? forecastMultiplier(parent)
       : forecastMultiplier;
-  const projectedBytes = parent.bytes * multiplier;
+  const naturalBytes = parent.naturalBytes ?? parent.bytes;
+  const projectedBytes = naturalBytes * multiplier;
   const requested = adaptiveSplitFactor(projectedBytes, targetBytes);
   const maximumFactor = Math.max(1, 2 ** level.minimumZoom / parentGrid);
   const factor = Math.min(requested, maximumFactor);
   const childGrid = parentGrid * factor;
-  const childWeight = parent.bytes / factor ** 2;
+  const childWeight = naturalBytes / factor ** 2;
   const forecastBytes = projectedBytes / factor ** 2;
   const children = [];
   for (let row = factor - 1; row >= 0; row -= 1) {
@@ -130,6 +131,7 @@ export function planAdaptiveShardLevel(
   {
     minimumZoom = 9,
     targetBytes = 10 * 1024 * 1024,
+    targetVariance = 0,
     forecastMultiplier = 1,
   } = {},
 ) {
@@ -137,8 +139,9 @@ export function planAdaptiveShardLevel(
   const parents = previousResults.length
     ? previousResults
     : [{ bytes: targetBytes + 1 }];
+  const softTargetBytes = targetBytes * (1 + targetVariance);
   const regions = parents.flatMap((parent) => {
-    return expandRegion(level, parent, targetBytes, forecastMultiplier);
+    return expandRegion(level, parent, softTargetBytes, forecastMultiplier);
   });
   return allocateBudgets(regions, level.budgetBytes);
 }

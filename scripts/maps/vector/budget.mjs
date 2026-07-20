@@ -1,9 +1,9 @@
 import path from 'node:path';
 
 const TIERS = [
-  { minimumZoom: 1, maximumZoom: 8, weight: 1 },
-  { minimumZoom: 9, maximumZoom: 12, weight: 9 },
-  { minimumZoom: 13, maximumZoom: Infinity, weight: 90 },
+  { minimumZoom: 1, maximumZoom: 9, weight: 10 },
+  { minimumZoom: 10, maximumZoom: 12, weight: 9 },
+  { minimumZoom: 13, maximumZoom: Infinity, weight: 81 },
 ];
 const MINIMUM_USEFUL_REDUCTION = 0.05;
 
@@ -69,7 +69,7 @@ export function compactBuildSettings({
   detail,
   attempt = 1,
 }) {
-  const minimumTileBytes = 1024;
+  const minimumTileBytes = 4 * 1024;
   if (maximumTileBytes <= minimumTileBytes) {
     return {
       maximumTileBytes: minimumTileBytes,

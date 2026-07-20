@@ -13,6 +13,7 @@ test('forecasts archive growth from history and newly revealed geometry', () => 
     earlierResults: [{ bytes: 10 }],
     inputs: [
       {
+        layer: 'waterway',
         featuresByMinimumZoom: { 8: 100, 9: 50 },
       },
     ],
@@ -23,11 +24,13 @@ test('forecasts archive growth from history and newly revealed geometry', () => 
   assert.equal(forecast.observedGrowth, 2.4);
   assert.equal(forecast.visibleFeatures, 150);
   assert.equal(forecast.revealedFeatures, 50);
+  assert.deepEqual(forecast.revealedFeaturesByLayer, { waterway: 50 });
 });
 
 test('forecasts growth independently for a divided region', () => {
   const parent = {
-    bytes: 6,
+    bytes: 2,
+    naturalBytes: 6,
     shardGrid: 2,
     shardColumn: 1,
     shardRow: 0,

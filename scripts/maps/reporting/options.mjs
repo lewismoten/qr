@@ -19,12 +19,18 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
   const shardTargetMiB = Number.parseFloat(
     option(values, 'shard-target-mib', '10'),
   );
+  const shardVariancePercent = Number.parseFloat(
+    option(values, 'shard-variance-percent', '20'),
+  );
   const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
   const archiveVariancePercent = Number.parseFloat(
     option(values, 'archive-variance-percent', '1'),
   );
   if (!Number.isFinite(shardTargetMiB) || shardTargetMiB <= 0) {
     throw new RangeError('Shard target must be greater than zero.');
+  }
+  if (!Number.isFinite(shardVariancePercent) || shardVariancePercent < 0) {
+    throw new RangeError('Shard variance cannot be negative.');
   }
   if (!Number.isInteger(jobs) || jobs < 1) {
     throw new RangeError('Map build jobs must be a positive integer.');
@@ -54,6 +60,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     shardZoom: Number.parseInt(option(values, 'shard-zoom', '9'), 10),
     shardTargetMiB,
     shardTargetBytes: shardTargetMiB * 1024 * 1024,
+    shardVariancePercent,
     jobs,
     archiveVariancePercent,
     maximumDebtBytes:
@@ -82,5 +89,6 @@ Options:
   --minimum-level-kib 128 Minimum budget reserved for every archive
   --shard-zoom 9        First zoom eligible for adaptive subdivision
   --shard-target-mib 10 Target maximum before a region subdivides
+  --shard-variance-percent 20 Soft variance before subdivision
   --archive-variance-percent 1 Allowed cumulative budget variance
   --jobs 1              Parallel archives built within each zoom`;

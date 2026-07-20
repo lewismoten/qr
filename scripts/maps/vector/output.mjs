@@ -109,12 +109,15 @@ export async function writeArchiveManifest({
       bounds: result.bounds,
       file: path.basename(result.file),
       bytes: result.bytes,
+      naturalBytes: result.naturalBytes,
+      retainedRatio: result.retainedRatio,
       plannedBudgetBytes: result.budgetBytes,
       allocatedBudgetBytes: result.allocatedBudgetBytes,
       carryBytes: result.carryBytes,
       maximumTileBytes: result.maximumTileBytes,
       detail: result.detail,
       archiveStats: result.archiveStats,
+      naturalArchiveStats: result.naturalArchiveStats,
     })),
   };
   await removeStaleArchives(

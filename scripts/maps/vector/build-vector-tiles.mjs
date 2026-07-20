@@ -12,8 +12,11 @@ import {
 } from '../reporting/run-log.mjs';
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
+  archiveCandidate,
+  finalizeArchiveQuality,
+} from './lifecycle/archive-quality.mjs';
+import {
   archiveReductionWarning,
-  archiveManifestPath,
   compactBuildSettings,
   formatTileLimit,
   planArchiveLevels,
@@ -26,10 +29,10 @@ import {
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
-  writeArchiveManifest,
 } from './output.mjs';
 import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
 import { levelShardLabel } from './shards.mjs';
+import { finalizeArchiveSet } from './lifecycle/archive-set.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -40,7 +43,6 @@ const {
   maximumZoom,
   baseZoom,
   maximumTileBytes,
-  maximumArchiveMiB,
   maximumWorkingBytes,
   maximumArchiveBytes,
   detail,
@@ -110,6 +112,8 @@ async function buildLevel(level, allocatedBudgetBytes) {
   const smallestFile = smallestArchivePath(level.file);
   await rm(smallestFile, { force: true });
   let best = null;
+  let naturalBytes = null;
+  let naturalArchiveStats = null;
   let settings = { maximumTileBytes, detail };
   const acceptSmallest = () => {
     const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
@@ -117,7 +121,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       `${levelShardLabel(level)} reached its compaction limit; ` +
         `carrying ${debt.toFixed(1)} MiB debt.`,
     );
-    return best;
+    return finalizeArchiveQuality(level, best);
   };
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const attemptStarted = Date.now();
@@ -170,6 +174,8 @@ async function buildLevel(level, allocatedBudgetBytes) {
       );
       return acceptSmallest();
     }
+    naturalBytes ??= bytes;
+    naturalArchiveStats ??= archiveStats;
     recordArchiveAttempt(log, 'archive-attempt-complete', {
       level,
       attempt,
@@ -178,43 +184,53 @@ async function buildLevel(level, allocatedBudgetBytes) {
       durationMs: Date.now() - attemptStarted,
       bytes,
       archiveStats,
+      naturalBytes,
+      retainedRatio: bytes / naturalBytes,
       recovery,
       fitSummary: result.fitSummary,
     });
     if (bytes <= allocatedBudgetBytes) {
       await rm(smallestFile, { force: true });
-      return {
-        ...level,
-        ...settings,
-        allocatedBudgetBytes,
-        bytes,
-        archiveStats,
-        temporary: result.temporary,
-      };
+      return finalizeArchiveQuality(
+        level,
+        archiveCandidate({
+          level,
+          settings,
+          allocatedBudgetBytes,
+          bytes,
+          archiveStats,
+          naturalBytes,
+          naturalArchiveStats,
+          temporary: result.temporary,
+        }),
+      );
     }
     const previousBytes = best?.bytes;
-    if (!best || bytes < best.bytes) {
-      await rm(smallestFile, { force: true });
-      await rename(result.temporary, smallestFile);
-      best = {
-        ...level,
-        ...settings,
-        allocatedBudgetBytes,
-        bytes,
-        archiveStats,
-        temporary: smallestFile,
-      };
-    } else {
-      await rm(result.temporary, { force: true });
-    }
     const warning = archiveReductionWarning(
       levelShardLabel(level),
       previousBytes,
       bytes,
     );
     if (warning) {
+      await rm(result.temporary, { force: true });
       console.warn(warning);
       return acceptSmallest();
+    }
+    if (!best || bytes < best.bytes) {
+      await rm(smallestFile, { force: true });
+      await rename(result.temporary, smallestFile);
+      best = archiveCandidate({
+        level,
+        settings,
+        allocatedBudgetBytes,
+        bytes,
+        archiveStats,
+        naturalBytes,
+        naturalArchiveStats,
+        temporary: smallestFile,
+      });
+    } else {
+      await rm(result.temporary, { force: true });
     }
     if (recovery || result.fitSummary?.featureGapLimitReached) {
       return acceptSmallest();
@@ -237,7 +253,12 @@ async function buildLevel(level, allocatedBudgetBytes) {
   throw new Error(`Unable to build ${levelShardLabel(level)}.`);
 }
 const temporaryFiles = new Set();
-const planLevel = createLevelPlanner({ inputs, shardZoom, shardTargetBytes });
+const planLevel = createLevelPlanner({
+  inputs,
+  shardZoom,
+  shardTargetBytes,
+  shardVariancePercent: options.shardVariancePercent,
+});
 try {
   const results = await buildArchiveSchedule({
     levels,
@@ -257,32 +278,14 @@ try {
       recordCompletedArchive(log, result, durationMs);
     },
   });
-  const total = results.reduce((sum, result) => sum + result.bytes, 0);
-  const overageBytes = Math.max(0, total - maximumArchiveBytes);
-  if (overageBytes) {
-    console.warn(
-      `Map archives exceed the target by ` +
-        `${(overageBytes / 1024 / 1024).toFixed(1)} MiB; publishing them.`,
-    );
-  }
-  for (const result of results) await rename(result.temporary, result.file);
-  await writeArchiveManifest({
-    manifestFile: archiveManifestPath(output),
+  await finalizeArchiveSet({
     results,
+    output,
     minimumZoom,
     maximumZoom,
-    maximumArchiveMiB,
-    totalBytes: total,
-    overageBytes,
-  });
-  console.log(`Map archives written: ${(total / 1024 / 1024).toFixed(1)} MiB.`);
-  log.record('run-complete', {
-    durationMs: Date.now() - log.startedAt,
-    archiveCount: results.length,
-    totalBytes: total,
-    targetBytes: maximumArchiveBytes,
-    overageBytes,
-    overBudget: overageBytes > 0,
+    maximumArchiveMiB: options.maximumArchiveMiB,
+    maximumArchiveBytes,
+    log,
   });
   log.close();
 } catch (error) {

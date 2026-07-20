@@ -64,18 +64,21 @@ Before each zoom is built, the planner forecasts 2x to 3x growth from the two
 previous zooms and features that first become visible at the new zoom. A
 region is subdivided in advance when its forecast exceeds the shard target,
 including multiple quadtree depths when one four-way split is insufficient.
+The default 20% soft variance permits a forecast up to 12 MiB before splitting
+a nominal 10 MiB region, avoiding unnecessary archives near the boundary.
 
 Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between
 parallel waves. Each job runs a separate Tippecanoe process, so choose a value
 that leaves enough CPU, memory, and temporary storage for every active job.
 
-The default allocator gives zooms 1-8, 9-12, and 13-maximum 1%, 9%, and 90% of
-the total. For 500 MiB, those tiers receive 5, 45, and 450 MiB. Within each tier,
-individual level allowances grow by a relative weight of 1.3 and retain a 128
-KiB minimum. Every archive budget adds up to exactly the configured maximum.
-Lower maximum zooms redistribute the total among only the active tiers. Sparse
-shard archives pass unused space to later shards and levels.
+The default allocator gives zooms 1-9, 10-12, and 13-maximum 10%, 9%, and 81%
+of the total. For 500 MiB, those tiers receive 50, 45, and 405 MiB. This keeps
+the overview through zoom 9 at normal tile quality while reserving 450 MiB for
+zooms 10-19. Within each tier, individual allowances grow by a relative weight
+of 1.3 and retain a 128 KiB minimum. Every archive budget adds up to the
+configured maximum. Lower maximum zooms redistribute the total among only the
+active tiers. Sparse archives pass unused space to later shards and levels.
 
 Level budgets are guidance rather than strict content ceilings. The builder
 allows cumulative variance of `--archive-variance-percent 1`, equal to 5 MiB
@@ -83,6 +86,10 @@ for a 500 MiB collection, before trying to compact an archive. This headroom is
 shared across each parallel wave and reduced by existing budget debt. If a
 compaction retry saves less than 5%, the builder accepts the smallest result
 and carries its overage instead of repeatedly lowering the per-tile limit.
+Tile ceilings do not fall below 4 KiB. The first normal-limit result is stored
+as `naturalBytes`; this value drives later density forecasts and subdivision,
+while accepted bytes alone count against the final package budget. A retained
+ratio below 50% emits a quality warning.
 
 The final archive target and temporary workspace limit are independent.
 Tippecanoe may need substantially more temporary space than the compressed

@@ -33,23 +33,29 @@ test('allocates a growing budget to every active zoom level', () => {
     500 * mib,
   );
   assert.equal(
-    levels.slice(0, 8).reduce((sum, level) => sum + level.budgetBytes, 0),
-    5 * mib,
+    levels.slice(0, 9).reduce((sum, level) => sum + level.budgetBytes, 0),
+    50 * mib,
   );
   assert.equal(
-    levels.slice(8, 12).reduce((sum, level) => sum + level.budgetBytes, 0),
+    levels.slice(9, 12).reduce((sum, level) => sum + level.budgetBytes, 0),
     45 * mib,
   );
   assert.equal(
     levels.slice(12).reduce((sum, level) => sum + level.budgetBytes, 0),
-    450 * mib,
+    405 * mib,
   );
   assert.ok(levels.every((level) => level.minimumZoom === level.maximumZoom));
-  assert.ok(
-    levels.slice(1).every((level, index) => {
-      return level.budgetBytes > levels[index].budgetBytes;
-    }),
-  );
+  for (const [start, end] of [
+    [0, 9],
+    [9, 12],
+    [12, 19],
+  ]) {
+    assert.ok(
+      levels.slice(start + 1, end).every((level, index) => {
+        return level.budgetBytes > levels[start + index].budgetBytes;
+      }),
+    );
+  }
   assert.match(levels[0].file, /local-z01\.pmtiles$/);
   assert.match(levels[18].file, /local-z19\.pmtiles$/);
 });
@@ -84,10 +90,10 @@ test('reduces detail only after reaching the minimum tile ceiling', () => {
     compactBuildSettings({
       budgetBytes: 50,
       observedBytes: 200,
-      maximumTileBytes: 1024,
+      maximumTileBytes: 4096,
       detail: 11,
     }),
-    { maximumTileBytes: 1024, detail: 10 },
+    { maximumTileBytes: 4096, detail: 10 },
   );
 });
 
@@ -148,6 +154,24 @@ test('chooses enough quadtree depth to approach the shard target', () => {
   assert.equal(adaptiveSplitFactor(40 * mib, 10 * mib), 2);
   assert.equal(adaptiveSplitFactor(40 * mib + 1, 10 * mib), 4);
   assert.throws(() => adaptiveSplitFactor(1, 0), /greater than zero/);
+});
+
+test('uses natural density and permits soft shard target variance', () => {
+  const mib = 1024 * 1024;
+  const level = {
+    minimumZoom: 10,
+    budgetBytes: 10 * mib,
+    file: 'build/maps/local-z10.pmtiles',
+  };
+  const planned = planAdaptiveShardLevel(
+    level,
+    [{ bytes: 4 * mib, naturalBytes: 13 * mib }],
+    {
+      targetBytes: 10 * mib,
+      targetVariance: 0.2,
+    },
+  );
+  assert.equal(planned.length, 4);
 });
 
 test('passes surplus without shrinking initial budgets for debt', () => {

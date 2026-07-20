@@ -158,12 +158,15 @@ export function recordCompletedArchive(log, result, durationMs) {
     file: path.basename(result.file),
     durationMs,
     bytes: result.bytes,
+    naturalBytes: result.naturalBytes,
+    retainedRatio: result.retainedRatio,
     plannedBudgetBytes: result.budgetBytes,
     allocatedBudgetBytes: result.allocatedBudgetBytes,
     carryBytes: result.carryBytes,
     maximumTileBytes: result.maximumTileBytes,
     configuredDetail: result.detail,
     archiveStats: result.archiveStats,
+    naturalArchiveStats: result.naturalArchiveStats,
   });
 }
 
@@ -176,6 +179,7 @@ export function recordZoomPlan(log, levels, shardTargetBytes) {
     observedGrowth: levels[0]?.observedGrowth,
     visibleFeatures: levels[0]?.visibleFeatures,
     revealedFeatures: levels[0]?.revealedFeatures,
+    revealedFeaturesByLayer: levels[0]?.revealedFeaturesByLayer,
     regions: levels.map((level) => ({
       shard: level.shard,
       grid: level.shardGrid,
