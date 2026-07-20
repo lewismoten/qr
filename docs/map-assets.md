@@ -52,11 +52,13 @@ as area, line, and point features through zoom 16.
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks
 Tippecanoe to build PMTiles archives plus `build/maps/local.json`. Zooms 1-8 use
-one world archive each. Beginning at `--shard-zoom 9`, every zoom is split into
-north-west, north-east, south-west, and south-east archives along exact Web
-Mercator tile boundaries. Beginning at `--deep-shard-zoom 13`, each level uses
-a 4x4 grid of 16 smaller archives. This keeps detailed builds and HTTP range
-indexes manageable without changing the combined budget for that zoom.
+one world archive each. Beginning at `--shard-zoom 9`, the builder inspects the
+actual size of every region from the preceding zoom. A region larger than
+`--shard-target-mib 10` divides into four children for the next zoom. If four
+children would still average more than the target, it divides directly into
+16, 64, or another power-of-four count. Sparse regions retain their existing
+bounds while dense areas subdivide independently along exact Web Mercator tile
+boundaries.
 
 Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between
@@ -72,8 +74,9 @@ shard archives pass unused space to later shards and levels.
 
 The final archive target and temporary workspace limit are independent.
 Tippecanoe may need substantially more temporary space than the compressed
-archive it ultimately emits, so `--max-working-mib` is enforced per active zoom
-without reducing it to that zoom's final archive allowance.
+archive it ultimately emits, so `--max-working-mib` is enforced per active
+archive without reducing it to that archive's final allowance. Parallel builds
+can therefore consume up to this limit for each active job.
 
 ## Reports and compaction
 

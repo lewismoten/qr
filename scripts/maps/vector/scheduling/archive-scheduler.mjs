@@ -1,18 +1,5 @@
 import { availableLevelBudget, updateBudgetCarry } from '../budget.mjs';
 
-function groupByZoom(levels) {
-  const groups = [];
-  for (const level of levels) {
-    const group = groups.at(-1);
-    if (!group || group[0].minimumZoom !== level.minimumZoom) {
-      groups.push([level]);
-    } else {
-      group.push(level);
-    }
-  }
-  return groups;
-}
-
 function allocateWave(levels, carryBytes, minimumLevelBytes) {
   const surplus = Math.max(0, carryBytes);
   const planned = levels.reduce((sum, level) => sum + level.budgetBytes, 0);
@@ -50,13 +37,19 @@ export async function buildArchiveSchedule({
   minimumLevelBytes,
   build,
   onComplete,
+  onPlan,
+  planLevel = (level) => [level],
 }) {
   if (!Number.isInteger(jobs) || jobs < 1) {
     throw new RangeError('Map build jobs must be a positive integer.');
   }
   const results = [];
+  let previousResults = [];
   let carryBytes = 0;
-  for (const group of groupByZoom(levels)) {
+  for (const level of levels) {
+    const group = planLevel(level, previousResults);
+    onPlan?.(group);
+    const levelResults = [];
     for (let offset = 0; offset < group.length; offset += jobs) {
       const wave = group.slice(offset, offset + jobs);
       const allocations = allocateWave(wave, carryBytes, minimumLevelBytes);
@@ -69,9 +62,11 @@ export async function buildArchiveSchedule({
         });
         result.carryBytes = carryBytes;
         results.push(result);
+        levelResults.push(result);
         onComplete?.(result, durationMs);
       }
     }
+    previousResults = levelResults;
   }
   return results;
 }

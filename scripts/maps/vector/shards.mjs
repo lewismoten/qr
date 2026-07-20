@@ -40,44 +40,81 @@ function shardBounds(column, row, grid) {
   ];
 }
 
-function splitLevel(level, grid) {
-  const count = grid ** 2;
-  let allocated = 0;
-  const shards = [];
-  for (let row = grid - 1; row >= 0; row -= 1) {
-    for (let column = 0; column < grid; column += 1) {
-      const final = shards.length === count - 1;
-      const budgetBytes = final
-        ? level.budgetBytes - allocated
-        : Math.floor(level.budgetBytes / count);
-      const shard = shardName(column, row, grid);
-      allocated += budgetBytes;
-      shards.push({
-        ...level,
-        shard,
-        shardGrid: grid,
-        shardColumn: column,
-        shardRow: row,
-        bounds: shardBounds(column, row, grid),
-        budgetBytes,
-        file: shardFile(level.file, shard),
-      });
-    }
-  }
-  return shards;
+function regionLevel(level, grid, column, row, weight) {
+  if (grid === 1) return { ...level, weight };
+  const shard = shardName(column, row, grid);
+  return {
+    ...level,
+    shard,
+    shardGrid: grid,
+    shardColumn: column,
+    shardRow: row,
+    bounds: shardBounds(column, row, grid),
+    file: shardFile(level.file, shard),
+    weight,
+  };
 }
 
-export function shardArchiveLevels(
-  levels,
-  minimumZoom = 9,
-  deepMinimumZoom = 13,
-) {
-  if (deepMinimumZoom < minimumZoom) {
-    throw new RangeError('Deep shard zoom cannot precede shard zoom.');
+export function adaptiveSplitFactor(bytes, targetBytes) {
+  if (!Number.isFinite(targetBytes) || targetBytes <= 0) {
+    throw new RangeError('Shard target must be greater than zero.');
   }
-  return levels.flatMap((level) => {
-    if (level.minimumZoom < minimumZoom) return level;
-    const grid = level.minimumZoom < deepMinimumZoom ? 2 : 4;
-    return splitLevel(level, grid);
+  if (bytes <= targetBytes) return 1;
+  const depth = Math.ceil(Math.log(bytes / targetBytes) / Math.log(4));
+  return 2 ** Math.max(1, depth);
+}
+
+function expandRegion(level, parent, targetBytes) {
+  const parentGrid = parent.shardGrid ?? 1;
+  const parentColumn = parent.shardColumn ?? 0;
+  const parentRow = parent.shardRow ?? 0;
+  const requested = adaptiveSplitFactor(parent.bytes, targetBytes);
+  const maximumFactor = Math.max(1, 2 ** level.minimumZoom / parentGrid);
+  const factor = Math.min(requested, maximumFactor);
+  const childGrid = parentGrid * factor;
+  const childWeight = parent.bytes / factor ** 2;
+  const children = [];
+  for (let row = factor - 1; row >= 0; row -= 1) {
+    for (let column = 0; column < factor; column += 1) {
+      children.push(
+        regionLevel(
+          level,
+          childGrid,
+          parentColumn * factor + column,
+          parentRow * factor + row,
+          childWeight,
+        ),
+      );
+    }
+  }
+  return children;
+}
+
+function allocateBudgets(levels, totalBytes) {
+  const weight = levels.reduce((sum, level) => sum + level.weight, 0);
+  let allocated = 0;
+  return levels.map((level, index) => {
+    const final = index === levels.length - 1;
+    const budgetBytes = final
+      ? totalBytes - allocated
+      : Math.floor((totalBytes * level.weight) / weight);
+    allocated += budgetBytes;
+    const { weight: _weight, ...result } = level;
+    return { ...result, budgetBytes };
   });
+}
+
+export function planAdaptiveShardLevel(
+  level,
+  previousResults,
+  { minimumZoom = 9, targetBytes = 10 * 1024 * 1024 } = {},
+) {
+  if (level.minimumZoom < minimumZoom) return [level];
+  const parents = previousResults.length
+    ? previousResults
+    : [{ bytes: targetBytes + 1 }];
+  const regions = parents.flatMap((parent) => {
+    return expandRegion(level, parent, targetBytes);
+  });
+  return allocateBudgets(regions, level.budgetBytes);
 }

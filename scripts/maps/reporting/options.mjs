@@ -16,6 +16,16 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     option(values, 'max-working-mib', String(maximumArchiveMiB * 2)),
     10,
   );
+  const shardTargetMiB = Number.parseFloat(
+    option(values, 'shard-target-mib', '10'),
+  );
+  const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
+  if (!Number.isFinite(shardTargetMiB) || shardTargetMiB <= 0) {
+    throw new RangeError('Shard target must be greater than zero.');
+  }
+  if (!Number.isInteger(jobs) || jobs < 1) {
+    throw new RangeError('Map build jobs must be a positive integer.');
+  }
   return {
     values,
     cache: path.resolve(option(values, 'cache', '.cache/maps/natural-earth')),
@@ -36,8 +46,9 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     minimumLevelBytes:
       Number.parseInt(option(values, 'minimum-level-kib', '128'), 10) * 1024,
     shardZoom: Number.parseInt(option(values, 'shard-zoom', '9'), 10),
-    deepShardZoom: Number.parseInt(option(values, 'deep-shard-zoom', '13'), 10),
-    jobs: Number.parseInt(option(values, 'jobs', '1'), 10),
+    shardTargetMiB,
+    shardTargetBytes: shardTargetMiB * 1024 * 1024,
+    jobs,
     executable: process.env.TIPPECANOE || 'tippecanoe',
   };
 }
@@ -60,6 +71,6 @@ Options:
   --detail 11           Maximum geometry precision (2^detail extent)
   --budget-growth 1.3   Relative budget growth within each zoom tier
   --minimum-level-kib 128 Minimum budget reserved for every archive
-  --shard-zoom 9        First zoom split into a 2x2 archive grid
-  --deep-shard-zoom 13  First zoom split into a 4x4 archive grid
+  --shard-zoom 9        First zoom eligible for adaptive subdivision
+  --shard-target-mib 10 Target maximum before a region subdivides
   --jobs 1              Parallel archives built within each zoom`;

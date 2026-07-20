@@ -164,3 +164,18 @@ export function recordCompletedArchive(log, result, durationMs) {
     archiveStats: result.archiveStats,
   });
 }
+
+export function recordZoomPlan(log, levels, shardTargetBytes) {
+  log.record('zoom-plan', {
+    zoom: levels[0]?.minimumZoom,
+    archives: levels.length,
+    shardTargetBytes,
+    regions: levels.map((level) => ({
+      shard: level.shard,
+      grid: level.shardGrid,
+      column: level.shardColumn,
+      row: level.shardRow,
+      budgetBytes: level.budgetBytes,
+    })),
+  });
+}

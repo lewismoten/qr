@@ -11,7 +11,10 @@ import {
   updateBudgetCarry,
 } from '../../../scripts/maps/vector/budget.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
-import { shardArchiveLevels } from '../../../scripts/maps/vector/shards.mjs';
+import {
+  adaptiveSplitFactor,
+  planAdaptiveShardLevel,
+} from '../../../scripts/maps/vector/shards.mjs';
 
 test('allocates a growing budget to every active zoom level', () => {
   const mib = 1024 * 1024;
@@ -85,49 +88,50 @@ test('reduces detail only after reaching the minimum tile ceiling', () => {
   );
 });
 
-test('progressively shards detailed zooms while preserving budgets', () => {
+test('subdivides only dense regions to target archive sizes', () => {
   const mib = 1024 * 1024;
-  const planned = planArchiveLevels({
-    minimumZoom: 1,
-    maximumZoom: 19,
-    maximumArchiveBytes: 500 * mib,
-    output: 'build/maps/local.pmtiles',
+  const level = {
+    minimumZoom: 14,
+    maximumZoom: 14,
+    budgetBytes: 220 * mib,
+    file: 'build/maps/local-z14.pmtiles',
+  };
+  const parents = [5, 25, 45, 10].map((size, index) => ({
+    bytes: size * mib,
+    shardGrid: 2,
+    shardColumn: index % 2,
+    shardRow: Math.floor(index / 2),
+  }));
+  const shards = planAdaptiveShardLevel(level, parents, {
+    minimumZoom: 9,
+    targetBytes: 10 * mib,
   });
-  const levels = shardArchiveLevels(planned, 9);
-  assert.equal(levels.length, 136);
+
+  assert.equal(shards.length, 22);
   assert.equal(
-    levels.reduce((sum, level) => sum + level.budgetBytes, 0),
-    500 * mib,
+    shards.reduce((sum, shard) => sum + shard.budgetBytes, 0),
+    level.budgetBytes,
   );
-  assert.equal(levels.filter((level) => level.minimumZoom === 8).length, 1);
-  const zoomNine = levels.filter((level) => level.minimumZoom === 9);
-  assert.equal(zoomNine.length, 4);
-  assert.deepEqual(
-    zoomNine.map((level) => level.shard),
-    ['south-west', 'south-east', 'north-west', 'north-east'],
+  assert.equal(shards.filter((shard) => shard.shardGrid === 2).length, 2);
+  assert.equal(shards.filter((shard) => shard.shardGrid === 4).length, 4);
+  assert.equal(shards.filter((shard) => shard.shardGrid === 8).length, 16);
+  assert.match(
+    shards.find((shard) => shard.shard === 'g4-x3-y0').file,
+    /local-z14-g4-x3-y0\.pmtiles$/,
   );
-  assert.deepEqual(zoomNine[0].bounds, [-180, -85.05112878, 0, 0]);
-  assert.match(zoomNine[3].file, /local-z09-north-east\.pmtiles$/);
-  assert.equal(
-    zoomNine.reduce((sum, level) => sum + level.budgetBytes, 0),
-    planned[8].budgetBytes,
-  );
-  const zoomThirteen = levels.filter((level) => level.minimumZoom === 13);
-  assert.equal(zoomThirteen.length, 16);
-  assert.ok(zoomThirteen.every((level) => level.shardGrid === 4));
-  assert.deepEqual(
-    zoomThirteen.find((level) => level.shard === 'g4-x0-y0').bounds,
-    [-180, 66.51326044311186, -90, 85.05112878],
-  );
-  assert.match(zoomThirteen.at(-1).file, /local-z13-g4-x3-y0\.pmtiles$/);
-  assert.equal(
-    zoomThirteen.reduce((sum, level) => sum + level.budgetBytes, 0),
-    planned[12].budgetBytes,
-  );
+  const dense = shards.find((shard) => shard.shard === 'g8-x0-y4');
+  assert.equal(dense.bounds[0], -180);
+  assert.equal(dense.bounds[2], -135);
+  assert.equal(dense.bounds[3], 0);
 });
 
-test('rejects a deep shard threshold before the initial threshold', () => {
-  assert.throws(() => shardArchiveLevels([], 9, 8), /cannot precede/);
+test('chooses enough quadtree depth to approach the shard target', () => {
+  const mib = 1024 * 1024;
+  assert.equal(adaptiveSplitFactor(10 * mib, 10 * mib), 1);
+  assert.equal(adaptiveSplitFactor(10 * mib + 1, 10 * mib), 2);
+  assert.equal(adaptiveSplitFactor(40 * mib, 10 * mib), 2);
+  assert.equal(adaptiveSplitFactor(40 * mib + 1, 10 * mib), 4);
+  assert.throws(() => adaptiveSplitFactor(1, 0), /greater than zero/);
 });
 
 test('passes surplus without shrinking initial budgets for debt', () => {

@@ -65,6 +65,15 @@ test('parses logging and generation command options', () => {
   assert.equal(options.logFile, 'build/custom.jsonl');
   assert.equal(options.maximumArchiveMiB, 500);
   assert.equal(options.shardZoom, 9);
-  assert.equal(options.deepShardZoom, 13);
+  assert.equal(options.shardTargetMiB, 10);
+  assert.equal(options.shardTargetBytes, 10 * 1024 * 1024);
   assert.equal(options.jobs, 1);
+  assert.throws(
+    () => readVectorBuildOptions(['--jobs', '0']),
+    /positive integer/,
+  );
+  assert.throws(
+    () => readVectorBuildOptions(['--shard-target-mib', '0']),
+    /greater than zero/,
+  );
 });

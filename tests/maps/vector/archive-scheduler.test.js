@@ -3,34 +3,45 @@ import test from 'node:test';
 
 import { buildArchiveSchedule } from '../../../scripts/maps/vector/scheduling/archive-scheduler.mjs';
 
-function levels(count = 4) {
+function baseLevels(count = 2) {
   return Array.from({ length: count }, (_, index) => ({
-    minimumZoom: 13,
-    budgetBytes: 100,
-    shard: `shard-${index}`,
+    minimumZoom: 13 + index,
+    budgetBytes: 200,
   }));
 }
 
-test('builds same-zoom archives in bounded parallel waves', async () => {
+function planLevel(level) {
+  return [0, 1].map((index) => ({
+    ...level,
+    budgetBytes: 100,
+    shard: `${level.minimumZoom}-${index}`,
+  }));
+}
+
+test('builds planned shards in bounded parallel waves', async () => {
   let active = 0;
   let peak = 0;
   const allocations = [];
   const completed = [];
+  const priorCounts = [];
   const results = await buildArchiveSchedule({
-    levels: levels(),
+    levels: baseLevels(),
     jobs: 2,
     minimumLevelBytes: 10,
+    planLevel(level, previousResults) {
+      priorCounts.push(previousResults.length);
+      return planLevel(level);
+    },
     async build(level, allocatedBudgetBytes) {
       active += 1;
       peak = Math.max(peak, active);
       allocations.push(allocatedBudgetBytes);
       await new Promise((resolve) => setTimeout(resolve, 5));
       active -= 1;
-      const early = level.shard.endsWith('0') || level.shard.endsWith('1');
       return {
         ...level,
         allocatedBudgetBytes,
-        bytes: early ? 50 : 120,
+        bytes: level.minimumZoom === 13 ? 50 : 120,
       };
     },
     onComplete(result) {
@@ -39,15 +50,13 @@ test('builds same-zoom archives in bounded parallel waves', async () => {
   });
 
   assert.equal(peak, 2);
+  assert.deepEqual(priorCounts, [0, 2]);
   assert.deepEqual(allocations, [100, 100, 150, 150]);
   assert.deepEqual(
     results.map((result) => result.carryBytes),
     [50, 100, 80, 60],
   );
-  assert.deepEqual(
-    completed,
-    levels().map((level) => level.shard),
-  );
+  assert.deepEqual(completed, ['13-0', '13-1', '14-0', '14-1']);
 });
 
 test('waits for a failed wave and rejects invalid concurrency', async () => {
@@ -55,9 +64,10 @@ test('waits for a failed wave and rejects invalid concurrency', async () => {
   await assert.rejects(
     () =>
       buildArchiveSchedule({
-        levels: levels(2),
+        levels: baseLevels(1),
         jobs: 2,
         minimumLevelBytes: 10,
+        planLevel,
         async build(level) {
           if (level.shard.endsWith('0')) throw new Error('failed');
           await new Promise((resolve) => setTimeout(resolve, 5));

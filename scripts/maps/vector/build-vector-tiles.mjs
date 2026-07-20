@@ -8,6 +8,7 @@ import {
   createBuildLog,
   recordArchiveAttempt,
   recordCompletedArchive,
+  recordZoomPlan,
 } from '../reporting/run-log.mjs';
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
@@ -25,7 +26,7 @@ import {
   writeArchiveManifest,
 } from './output.mjs';
 import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
-import { levelShardLabel, shardArchiveLevels } from './shards.mjs';
+import { levelShardLabel, planAdaptiveShardLevel } from './shards.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -43,7 +44,7 @@ const {
   budgetGrowth,
   minimumLevelBytes,
   shardZoom,
-  deepShardZoom,
+  shardTargetBytes,
   jobs,
   executable,
 } = options;
@@ -67,18 +68,14 @@ log.record('inputs-prepared', {
   durationMs: Date.now() - preparationStarted,
   layers: inputs,
 });
-const levels = shardArchiveLevels(
-  planArchiveLevels({
-    minimumZoom,
-    maximumZoom,
-    maximumArchiveBytes,
-    output,
-    growth: budgetGrowth,
-    minimumLevelBytes,
-  }),
-  shardZoom,
-  deepShardZoom,
-);
+const levels = planArchiveLevels({
+  minimumZoom,
+  maximumZoom,
+  maximumArchiveBytes,
+  output,
+  growth: budgetGrowth,
+  minimumLevelBytes,
+});
 async function runLevel(level, settings) {
   const temporary = temporaryArchivePath(level.file);
   await rm(temporary, { force: true });
@@ -237,16 +234,26 @@ async function buildLevel(level, allocatedBudgetBytes) {
   }
   throw new Error(`Unable to build ${levelShardLabel(level)}.`);
 }
-const temporaryFiles = levels.flatMap((level) => [
-  temporaryArchivePath(level.file),
-  smallestArchivePath(level.file),
-]);
+const temporaryFiles = new Set();
 try {
   const results = await buildArchiveSchedule({
     levels,
     jobs,
     minimumLevelBytes,
     build: buildLevel,
+    planLevel(level, previousResults) {
+      return planAdaptiveShardLevel(level, previousResults, {
+        minimumZoom: shardZoom,
+        targetBytes: shardTargetBytes,
+      });
+    },
+    onPlan(plannedLevels) {
+      recordZoomPlan(log, plannedLevels, shardTargetBytes);
+      for (const level of plannedLevels) {
+        temporaryFiles.add(temporaryArchivePath(level.file));
+        temporaryFiles.add(smallestArchivePath(level.file));
+      }
+    },
     onComplete(result, durationMs) {
       recordCompletedArchive(log, result, durationMs);
     },
@@ -280,7 +287,9 @@ try {
   });
   log.close();
 } catch (error) {
-  await Promise.all(temporaryFiles.map((file) => rm(file, { force: true })));
+  await Promise.all(
+    [...temporaryFiles].map((file) => rm(file, { force: true })),
+  );
   log.recordError('run-error', error, {
     durationMs: Date.now() - runStarted,
   });
