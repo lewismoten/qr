@@ -4,6 +4,7 @@ import {
   FRONT_ROYAL,
   getCenteredTileLayout,
 } from '../../../../src/js/info/geo-layer-layout.js';
+import { revealFallbackSamples } from '../../../../src/js/info/geo-layer-samples.js';
 
 const level = getCenteredTileLayout(13);
 assert.deepEqual(level.centerTile, {
@@ -34,3 +35,16 @@ assert.deepEqual(FRONT_ROYAL, {
   latitude: 38.9182,
   longitude: -78.1944,
 });
+
+const removed = [];
+const image = {
+  dataset: { fallbackSrc: '/maps/tiles/1/0/0.svg' },
+  removeAttribute(name) {
+    removed.push(name);
+  },
+};
+revealFallbackSamples({
+  querySelectorAll: () => [image],
+});
+assert.equal(image.src, '/maps/tiles/1/0/0.svg');
+assert.deepEqual(removed, ['data-fallback-src']);

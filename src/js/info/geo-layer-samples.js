@@ -61,6 +61,13 @@ function loadArchive() {
   return archiveRequest;
 }
 
+export function revealFallbackSamples(root = document) {
+  root.querySelectorAll?.('img[data-fallback-src]').forEach((image) => {
+    image.src = image.dataset.fallbackSrc;
+    image.removeAttribute('data-fallback-src');
+  });
+}
+
 export async function initializeGeoLayerSamples(root = document) {
   const tables = [
     ...(root.querySelectorAll?.('[data-centered-map-samples]') ?? []),
@@ -76,6 +83,7 @@ export async function initializeGeoLayerSamples(root = document) {
     archive = await loadArchive();
   } catch (error) {
     samples.forEach((sample) => initializedSamples.delete(sample));
+    revealFallbackSamples(root);
     throw error;
   }
   const { header, source } = archive;
@@ -104,6 +112,6 @@ export async function initializeGeoLayerSamples(root = document) {
 
 if (typeof document !== 'undefined') {
   initializeGeoLayerSamples().catch(() => {
-    // Existing guide images remain visible without the PMTiles archive.
+    // Deferred SVG samples remain available without the PMTiles archive.
   });
 }

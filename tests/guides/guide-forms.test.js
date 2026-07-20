@@ -94,6 +94,8 @@ describe('standalone guide forms', () => {
     assert.match(geo, /maps\/tiles\/1\/0\/0\.svg/);
     assert.match(geo, /maps\/tiles\/bundles\/9\/36\/48\.svg/);
     assert.match(geo, /maps\/tiles\/bundles\/11\/144\/195\.svg/);
+    assert.equal(geo.match(/data-fallback-src=/g)?.length, 19);
+    assert.doesNotMatch(geo, /<img src="\/maps\/tiles\//);
     assert.match(geo, /<figcaption>L12 · 1158\/1566<\/figcaption>/);
     assert.match(geo, /<figcaption>L13 · 2316\/3133<\/figcaption>/);
     assert.equal(
