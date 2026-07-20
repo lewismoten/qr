@@ -11,6 +11,17 @@ import {
 } from './style-drawing.js';
 import { drawQrMatrix } from './module-rendering.js';
 
+const DEFAULT_MARGIN_MODULES = 4;
+const DEFAULT_MODULE_SCALE = 4;
+const MAXIMUM_CORNER_RADIUS_PX = 16;
+const CORNER_RADIUS_START_PIXELS = 128;
+const CORNER_RADIUS_GROWTH_PIXELS = 192;
+const MINIMUM_CAPTION_PADDING_PX = 7;
+const MAXIMUM_CAPTION_PADDING_PX = 14;
+const CAPTION_PADDING_RATIO = 0.035;
+const MINIMUM_FRAME_MESSAGE_WIDTH_PX = 20;
+const CENTERED_FRAME_WIDTH_RATIO = 0.56;
+
 export function createQrRenderer(deps) {
   const {
     canvas,
@@ -41,10 +52,13 @@ export function createQrRenderer(deps) {
   } = deps;
 
   return function drawQr(qrDefinition, options) {
-    const marginModules = options.margin ?? 4;
+    const marginModules = options.margin ?? DEFAULT_MARGIN_MODULES;
     const moduleCount = qrDefinition.modules.size;
     const totalModules = moduleCount + marginModules * 2;
-    const minimumModuleScale = Math.max(1, options.scale ?? 4);
+    const minimumModuleScale = Math.max(
+      1,
+      options.scale ?? DEFAULT_MODULE_SCALE,
+    );
     const minimumCanvasSize = totalModules * minimumModuleScale;
     const maximumModuleScale = Math.max(
       minimumModuleScale,
@@ -70,7 +84,12 @@ export function createQrRenderer(deps) {
     formatWidthLabel();
     const cornerRadius = Math.max(
       0,
-      Math.min(16, ((canvasSize - 128) / 192) * 16),
+      Math.min(
+        MAXIMUM_CORNER_RADIUS_PX,
+        ((canvasSize - CORNER_RADIUS_START_PIXELS) /
+          CORNER_RADIUS_GROWTH_PIXELS) *
+          MAXIMUM_CORNER_RADIUS_PX,
+      ),
     );
     canvas.style.setProperty(
       '--qr-corner-radius',
@@ -82,11 +101,20 @@ export function createQrRenderer(deps) {
     const frameOptions = getCurrentFrameOptions();
     const frameMessageIsCentered = frameOptions.centered;
     const captionLineHeight = frameOptions.lineHeight;
-    const captionPadding = Math.max(7, Math.min(14, canvasSize * 0.035));
+    const captionPadding = Math.max(
+      MINIMUM_CAPTION_PADDING_PX,
+      Math.min(MAXIMUM_CAPTION_PADDING_PX, canvasSize * CAPTION_PADDING_RATIO),
+    );
     const qrDrawSize = moduleCount * cellSize;
     const frameMessageMaximumWidth = frameMessageIsCentered
-      ? Math.max(20, qrDrawSize * 0.56)
-      : Math.max(20, canvasSize - captionPadding * 2);
+      ? Math.max(
+          MINIMUM_FRAME_MESSAGE_WIDTH_PX,
+          qrDrawSize * CENTERED_FRAME_WIDTH_RATIO,
+        )
+      : Math.max(
+          MINIMUM_FRAME_MESSAGE_WIDTH_PX,
+          canvasSize - captionPadding * 2,
+        );
     canvas.width = canvasSize;
     canvas.height = canvasSize;
     const frameMessageLayout = frameMessageText

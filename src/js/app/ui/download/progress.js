@@ -4,6 +4,11 @@ import { loadFeatureStylesheet } from '../../../stylesheets.js';
 const clamp = (value) => Math.min(1, Math.max(0, value));
 const SHOW_DELAY_MS = 400;
 const COMPLETION_HOLD_MS = 2000;
+const MILLISECONDS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MINIMUM_ESTIMATE_FRACTION = 0.01;
+const CLOCK_REFRESH_MS = 500;
+const PERCENT_SCALE = 100;
 
 export function createTaskProgressFromDocument(document) {
   return createTaskProgress(() => {
@@ -23,13 +28,16 @@ export function createTaskProgressFromDocument(document) {
 }
 
 function formatDuration(milliseconds) {
-  const seconds = Math.max(0, Math.round(milliseconds / 1000));
-  if (seconds < 60)
+  const seconds = Math.max(
+    0,
+    Math.round(milliseconds / MILLISECONDS_PER_SECOND),
+  );
+  if (seconds < SECONDS_PER_MINUTE)
     return lookup('download.progress.seconds', '{count} seconds', {
       count: seconds,
     });
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
+  const minutes = Math.floor(seconds / SECONDS_PER_MINUTE);
+  const remainder = seconds % SECONDS_PER_MINUTE;
   return lookup('download.progress.minutes', '{minutes} min {seconds} sec', {
     minutes,
     seconds: remainder,
@@ -66,7 +74,7 @@ export function createTaskProgress(
     if (!active) return;
     const elapsed = now() - active.startedAt;
     elements.elapsed.textContent = formatDuration(elapsed);
-    if (active.fraction > 0.01 && active.fraction < 1) {
+    if (active.fraction > MINIMUM_ESTIMATE_FRACTION && active.fraction < 1) {
       const remaining = (elapsed * (1 - active.fraction)) / active.fraction;
       elements.remaining.textContent = formatDuration(remaining);
       elements.completion.textContent = new Date(
@@ -132,7 +140,10 @@ export function createTaskProgress(
         task.visible = true;
         if (!elements.dialog.open) elements.dialog.showModal();
         renderTime();
-        task.clockTimer = windowObject.setInterval(renderTime, 500);
+        task.clockTimer = windowObject.setInterval(
+          renderTime,
+          CLOCK_REFRESH_MS,
+        );
       });
     }, showDelay);
 
@@ -143,7 +154,7 @@ export function createTaskProgress(
         if (controller.signal.aborted || active?.controller !== controller)
           return;
         active.fraction = clamp(fraction);
-        const percent = Math.round(active.fraction * 100);
+        const percent = Math.round(active.fraction * PERCENT_SCALE);
         elements.meter.value = percent;
         elements.percent.textContent = lookup('units.percent', '{value}%', {
           value: percent,
@@ -163,9 +174,9 @@ export function createTaskProgress(
         }
 
         task.fraction = 1;
-        elements.meter.value = 100;
+        elements.meter.value = PERCENT_SCALE;
         elements.percent.textContent = lookup('units.percent', '{value}%', {
-          value: 100,
+          value: PERCENT_SCALE,
         });
         elements.phase.textContent = lookup(
           'download.progress.completed',

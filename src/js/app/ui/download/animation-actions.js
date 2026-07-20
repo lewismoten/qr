@@ -2,6 +2,11 @@ import { getErrorText, lookup } from '../../../i18n/index.js';
 import { isAbortError, throwIfAborted } from '../../abort.js';
 
 const MAX_ANIMATION_FRAMES = 200;
+const MINIMUM_FRAME_DURATION_MS = 10;
+const MAXIMUM_GIF_FRAME_DURATION_MS = 655_350;
+const MINIMUM_MP4_FRAME_DURATION_MS = 16;
+const GIF_CAPTURE_PROGRESS_WEIGHT = 0.45;
+const MP4_CAPTURE_PROGRESS_WEIGHT = 0.25;
 
 export function createAnimationDownloader(deps) {
   const captureFrames = async (total, task, captureWeight) => {
@@ -44,21 +49,21 @@ export function createAnimationDownloader(deps) {
     }
     const { enteredDurationMs, perFrameMs, totalDurationMs } =
       deps.getAnimationTiming(total);
-    if (enteredDurationMs <= 0 || perFrameMs < 10) {
+    if (enteredDurationMs <= 0 || perFrameMs < MINIMUM_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.durationMinimum',
         'Choose a duration that provides at least 10 milliseconds per image.',
       );
       return;
     }
-    if (format === 'gif' && perFrameMs > 655350) {
+    if (format === 'gif' && perFrameMs > MAXIMUM_GIF_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.gifDurationMaximum',
         'GIF supports at most 10 minutes 55.35 seconds per image.',
       );
       return;
     }
-    if (format === 'mp4' && perFrameMs < 16) {
+    if (format === 'mp4' && perFrameMs < MINIMUM_MP4_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.mp4DurationMinimum',
         'MP4 needs at least 16 milliseconds per image.',
@@ -67,7 +72,10 @@ export function createAnimationDownloader(deps) {
     }
 
     deps.setDisabled(true);
-    const captureWeight = format === 'gif' ? 0.45 : 0.25;
+    const captureWeight =
+      format === 'gif'
+        ? GIF_CAPTURE_PROGRESS_WEIGHT
+        : MP4_CAPTURE_PROGRESS_WEIGHT;
     const title = lookup(
       format === 'gif'
         ? 'download.progress.titleGif'

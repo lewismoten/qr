@@ -55,6 +55,13 @@ export default [
       'src/js/app/ui/content/geo/pmtiles/**/*.js',
       'src/js/app/ui/content/simple/url-validation.js',
       'src/js/app/ui/content/wifi/wifi-content-validation.js',
+      'src/js/app/ui/download/animation/animation-download-section.js',
+      'src/js/app/ui/download/animation-actions.js',
+      'src/js/app/ui/download/progress.js',
+      'src/js/app/ui/preview/controls-setup.js',
+      'src/js/app/ui/preview/invalid.js',
+      'src/js/app/ui/preview/qr-renderer.js',
+      'src/js/app/ui/preview/size.js',
       'src/js/qr/**/*.js',
     ],
     rules: {

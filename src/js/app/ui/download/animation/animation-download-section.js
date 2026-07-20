@@ -1,5 +1,15 @@
 import { lookup } from '../../../../i18n/index.js';
 
+const DECIMAL_RADIX = 10;
+const MAXIMUM_MINUTES = 60;
+const MAXIMUM_SECONDS = 59;
+const MAXIMUM_MILLISECONDS = 999;
+const MILLISECONDS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MILLISECONDS_PER_MINUTE = SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+const DURATION_DECIMAL_PLACES = 3;
+const CLOCK_SECONDS_WIDTH = 6;
+
 export function createAnimationSection({
   timingMode,
   minutesInput,
@@ -12,18 +22,21 @@ export function createAnimationSection({
 }) {
   const getTiming = (frameCount = getFrameCount()) => {
     const minutes = Math.min(
-      60,
-      Math.max(0, Number.parseInt(minutesInput.value, 10) || 0),
+      MAXIMUM_MINUTES,
+      Math.max(0, Number.parseInt(minutesInput.value, DECIMAL_RADIX) || 0),
     );
     const seconds = Math.min(
-      59,
-      Math.max(0, Number.parseInt(secondsInput.value, 10) || 0),
+      MAXIMUM_SECONDS,
+      Math.max(0, Number.parseInt(secondsInput.value, DECIMAL_RADIX) || 0),
     );
     const milliseconds = Math.min(
-      999,
-      Math.max(0, Number.parseInt(millisecondsInput.value, 10) || 0),
+      MAXIMUM_MILLISECONDS,
+      Math.max(0, Number.parseInt(millisecondsInput.value, DECIMAL_RADIX) || 0),
     );
-    const enteredDurationMs = minutes * 60000 + seconds * 1000 + milliseconds;
+    const enteredDurationMs =
+      minutes * MILLISECONDS_PER_MINUTE +
+      seconds * MILLISECONDS_PER_SECOND +
+      milliseconds;
     const perFrameMs =
       timingMode.value === 'total'
         ? enteredDurationMs / Math.max(1, frameCount)
@@ -36,15 +49,20 @@ export function createAnimationSection({
   };
 
   const formatDuration = (milliseconds) => {
-    if (milliseconds >= 60000) {
-      const minutes = Math.floor(milliseconds / 60000);
-      const seconds = ((milliseconds % 60000) / 1000)
-        .toFixed(3)
-        .padStart(6, '0');
+    if (milliseconds >= MILLISECONDS_PER_MINUTE) {
+      const minutes = Math.floor(milliseconds / MILLISECONDS_PER_MINUTE);
+      const seconds = (
+        (milliseconds % MILLISECONDS_PER_MINUTE) /
+        MILLISECONDS_PER_SECOND
+      )
+        .toFixed(DURATION_DECIMAL_PLACES)
+        .padStart(CLOCK_SECONDS_WIDTH, '0');
       return `${minutes}:${seconds}`;
     }
     return lookup('download.seconds', '{seconds} seconds', {
-      seconds: (milliseconds / 1000).toFixed(3),
+      seconds: (milliseconds / MILLISECONDS_PER_SECOND).toFixed(
+        DURATION_DECIMAL_PLACES,
+      ),
     });
   };
 

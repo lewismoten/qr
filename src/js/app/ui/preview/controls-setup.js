@@ -1,6 +1,14 @@
 import { createPreviewViewport } from './viewport.js';
 import { lookup } from '../../../i18n/index.js';
 
+const DECIMAL_RADIX = 10;
+const DEFAULT_PREVIEW_PIXELS = 320;
+const DEFAULT_MODULE_SCALE = 4;
+const MINIMUM_PRINT_WIDTH_INCHES = 0.5;
+const MAXIMUM_PRINT_WIDTH_INCHES = 7;
+const DEFAULT_PRINT_WIDTH_INCHES = 1.65;
+const MILLIMETERS_PER_INCH = 25.4;
+
 export function createPreviewControlsSetup({
   document,
   elements: e,
@@ -65,14 +73,17 @@ export function createPreviewControlsSetup({
     const pixelWidth =
       source.width ||
       renderedWidth ||
-      Number.parseInt(e.qrWidth.value, 10) ||
-      320;
-    const scale = moduleScale || Number.parseInt(e.qrScale.value, 10) || 4;
+      Number.parseInt(e.qrWidth.value, DECIMAL_RADIX) ||
+      DEFAULT_PREVIEW_PIXELS;
+    const scale =
+      moduleScale ||
+      Number.parseInt(e.qrScale.value, DECIMAL_RADIX) ||
+      DEFAULT_MODULE_SCALE;
     const totalModules = Math.max(1, Math.round(pixelWidth / scale));
     return Math.min(
-      7,
+      MAXIMUM_PRINT_WIDTH_INCHES,
       Math.max(
-        0.5,
+        MINIMUM_PRINT_WIDTH_INCHES,
         pixelWidth / pixelsPerInch,
         totalModules * minPrintModuleInches,
       ),
@@ -84,10 +95,11 @@ export function createPreviewControlsSetup({
     return printElements.printWidthAuto.checked
       ? getAutomaticPrintWidth(source)
       : Math.min(
-          7,
+          MAXIMUM_PRINT_WIDTH_INCHES,
           Math.max(
-            0.5,
-            Number.parseFloat(printElements.printWidth.value) || 1.65,
+            MINIMUM_PRINT_WIDTH_INCHES,
+            Number.parseFloat(printElements.printWidth.value) ||
+              DEFAULT_PRINT_WIDTH_INCHES,
           ),
         );
   };
@@ -105,7 +117,10 @@ export function createPreviewControlsSetup({
     const selected = getPrintWidth();
     const totalModules = Math.max(
       1,
-      Math.round((renderedWidth || e.canvas.width || 320) / (moduleScale || 4)),
+      Math.round(
+        (renderedWidth || e.canvas.width || DEFAULT_PREVIEW_PIXELS) /
+          (moduleScale || DEFAULT_MODULE_SCALE),
+      ),
     );
     printElements.printWidthValue.textContent = lookup(
       'preview.printSize',
@@ -115,7 +130,9 @@ export function createPreviewControlsSetup({
         automatic: printElements.printWidthAuto.checked
           ? ` ${lookup('common.autoLower', 'auto')}`
           : '',
-        millimeters: ((selected / totalModules) * 25.4).toFixed(2),
+        millimeters: ((selected / totalModules) * MILLIMETERS_PER_INCH).toFixed(
+          2,
+        ),
       },
     );
   };
