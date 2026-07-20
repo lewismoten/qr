@@ -82,7 +82,9 @@ npm run maps:download -- --layers nhdMajorRivers,nhdLocalRivers
 ```
 
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
-ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
+ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract.
+Natural Earth's public-domain 1:50m urban polygons add generalized dense
+settlement context from zoom 5 through the complete zoom 16 base. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads and
 railroads, while Natural Earth supplies global roads and water. Generalized

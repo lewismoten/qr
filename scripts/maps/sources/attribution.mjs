@@ -3,7 +3,7 @@ export const SOURCE_ATTRIBUTION = [
     name: 'Natural Earth',
     license: 'Public domain',
     website: 'https://www.naturalearthdata.com/',
-    version: '5.1.2',
+    version: '5.1.2; urban areas 4.0.0',
   },
   {
     name: 'U.S. Census Bureau',

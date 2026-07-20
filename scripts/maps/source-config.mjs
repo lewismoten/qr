@@ -3,6 +3,7 @@ import { createDetailSources } from './sources/detail.mjs';
 
 export const DEFAULT_LAYERS = [
   'countries',
+  'urbanAreas',
   'lakesOverview',
   'lakes',
   'riversOverview',
@@ -54,6 +55,13 @@ export const MAP_SOURCES = {
     file: 'cultural/ne_50m_admin_0_countries.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_admin_0_countries.geojson`,
     minimumZoom: 1,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
+    kind: 'area',
+  },
+  urbanAreas: {
+    file: 'cultural/ne_50m_urban_areas.geojson',
+    url: `${NATURAL_EARTH_ROOT}ne_50m_urban_areas.geojson`,
+    minimumZoom: 5,
     maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'area',
   },

@@ -55,6 +55,16 @@ test('omits unused labels from non-place vector layers', () => {
   assert.deepEqual(road.properties, { class: 'primary' });
 });
 
+test('classifies generalized urban polygons below map details', () => {
+  const urban = prepareVectorFeature('urbanAreas', {
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [] },
+    properties: { featurecla: 'Urban area', min_zoom: 7.2 },
+  });
+  assert.deepEqual(urban.properties, { class: 'urban' });
+  assert.deepEqual(urban.tippecanoe, { minzoom: 8, maxzoom: 16 });
+});
+
 test('classifies ranked USGS flowlines as major waterways', () => {
   const river = prepareVectorFeature('nhdMajorRivers', {
     type: 'Feature',

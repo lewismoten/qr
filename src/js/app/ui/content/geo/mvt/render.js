@@ -9,9 +9,11 @@ const STYLES = {
   road: { stroke: '#c56f43', width: 0.75 },
   water: { fill: '#bfe3ed', stroke: '#75adbd', width: 0.45 },
   waterway: { stroke: '#75adbd', width: 0.45 },
+  urban: { fill: 'rgba(216,210,189,.55)' },
 };
 const ORDER = [
   'land',
+  'urban',
   'park',
   'water',
   'waterway',

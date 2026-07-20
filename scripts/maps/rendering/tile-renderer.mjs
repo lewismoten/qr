@@ -81,6 +81,12 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'protected-area',
     tolerance,
   );
+  const urbanAreas = renderPaths(
+    rankedTileFeatures(collections, 'urbanAreas', tile),
+    tile,
+    'urban-area',
+    tolerance,
+  );
   const protectedLines = renderPaths(
     featuresInTile(collections, 'protectedLines', tile),
     tile,
@@ -188,7 +194,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     project,
     TILE_SIZE,
   );
-  const content = [countries, protectedAreas, protectedLines];
+  const content = [countries, urbanAreas, protectedAreas, protectedLines];
   content.push(protectedPoints, lakes, rivers, riverDetails, roads);
   content.push(secondaryRoads);
   content.push(railways);
@@ -198,6 +204,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">' +
     MAP_TILE_STYLE +
     countries +
+    urbanAreas +
     protectedAreas +
     protectedLines +
     protectedPoints +

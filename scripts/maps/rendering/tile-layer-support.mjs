@@ -1,5 +1,6 @@
 export const MAP_TILE_STYLE =
   '<style>.country{fill:#d9e9c3;stroke:#5d8069;stroke-width:1}' +
+  '.urban-area{fill:#d8d2bd;stroke:none;opacity:.55}' +
   '.protected-area{fill:#acd493;stroke:#4f8657;stroke-width:.5}' +
   '.protected-line{fill:none;stroke:#4f8657;stroke-width:.8;' +
   'stroke-linecap:round;stroke-linejoin:round}' +

@@ -23,6 +23,7 @@ export const VECTOR_LAYERS = {
     'naturalEarthRoads',
   ],
   railway: ['railroadsOverview', 'railroadsDetailed', 'railroadsLocal'],
+  urban: ['urbanAreas'],
   water: ['lakesOverview', 'lakes'],
   waterway: [
     'riversOverview',
@@ -45,6 +46,7 @@ function sourceClass(name, properties) {
   if (name === 'subdivisions') return 'county';
   if (name === 'states') return 'state';
   if (name === 'regions') return 'region';
+  if (name === 'urbanAreas') return 'urban';
   if (name.includes('secondary')) return 'secondary';
   if (
     name === 'mainRoads' ||
