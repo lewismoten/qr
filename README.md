@@ -138,7 +138,9 @@ tile messages are replaced on the console and in the log by one summary per
 pass.
 
 Each level is validated independently. An over-budget level is rebuilt with a
-lower tile-byte ceiling and geometry detail without degrading completed zooms.
+tile-byte ceiling derived from its measured archive-to-budget ratio. Geometry
+detail remains stable until the tile ceiling reaches its minimum, reducing the
+number of passes and avoiding unnecessary quality loss in completed zooms.
 Unused bytes roll into the next level. If a level cannot shrink enough at the
 minimum settings, its smallest valid archive is retained and its overage is
 recorded as debt. That debt does not reduce another archive's initial planned
@@ -148,6 +150,9 @@ Tippecanoe exit status 100 during a stricter retry therefore restores the last
 valid candidate instead of aborting the entire map build. If no constrained
 attempt can produce a candidate, one recovery attempt omits the tile ceiling
 and carries the resulting archive's overage into the following levels.
+When Tippecanoe reports that its feature-gap compaction limit has been reached,
+the builder immediately accepts the smallest valid candidate instead of
+running additional attempts that cannot improve it.
 All temporary archives must pass before the manifest atomically publishes the
 new set. Use `--budget-growth` and `--minimum-level-kib` to tune the curve.
 Tippecanoe is a build-time tool; on macOS install it with

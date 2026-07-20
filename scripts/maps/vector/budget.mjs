@@ -66,11 +66,26 @@ export function compactBuildSettings({
   observedBytes,
   maximumTileBytes,
   detail,
+  attempt = 1,
 }) {
-  const ratio = Math.min(0.8, (budgetBytes / observedBytes) * 0.9);
+  const minimumTileBytes = 1024;
+  if (maximumTileBytes <= minimumTileBytes) {
+    return {
+      maximumTileBytes: minimumTileBytes,
+      detail: Math.max(8, detail - 1),
+    };
+  }
+  const safety = attempt === 1 ? 0.92 : 0.97;
+  const measuredRatio = (budgetBytes / observedBytes) * safety;
+  const ratio = Math.max(0.2, Math.min(0.95, measuredRatio));
+  const proportionalTarget = Math.floor(maximumTileBytes * ratio);
+  const minimumReduction = maximumTileBytes - 256;
   return {
-    maximumTileBytes: Math.max(1024, Math.floor(maximumTileBytes * ratio)),
-    detail: Math.max(8, detail - 1),
+    maximumTileBytes: Math.max(
+      minimumTileBytes,
+      Math.min(proportionalTarget, minimumReduction),
+    ),
+    detail,
   };
 }
 

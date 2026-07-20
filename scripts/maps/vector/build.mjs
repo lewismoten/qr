@@ -1,6 +1,5 @@
 import { mkdir, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
-
 import {
   readVectorBuildOptions,
   VECTOR_BUILD_HELP,
@@ -28,7 +27,6 @@ import {
 } from './output.mjs';
 import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
 import { shardArchiveLevels } from './shards.mjs';
-
 const options = readVectorBuildOptions();
 const {
   values,
@@ -102,7 +100,7 @@ async function runLevel(level, settings) {
     clipBoundingBox: level.bounds,
     ...settings,
   });
-  const observedBytes = await runTippecanoe({
+  const run = await runTippecanoe({
     executable,
     args,
     temporary,
@@ -116,7 +114,7 @@ async function runLevel(level, settings) {
       detail: settings.detail,
     },
   });
-  return { temporary, observedBytes };
+  return { temporary, ...run };
 }
 
 async function buildLevel(level, allocatedBudgetBytes) {
@@ -199,6 +197,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       bytes,
       archiveStats,
       recovery,
+      fitSummary: result.fitSummary,
     });
     if (bytes <= allocatedBudgetBytes) {
       await rm(smallestFile, { force: true });
@@ -225,11 +224,14 @@ async function buildLevel(level, allocatedBudgetBytes) {
     } else {
       await rm(result.temporary, { force: true });
     }
-    if (recovery) return acceptSmallest();
+    if (recovery || result.fitSummary?.featureGapLimitReached) {
+      return acceptSmallest();
+    }
     const next = compactBuildSettings({
       ...settings,
       budgetBytes: allocatedBudgetBytes,
       observedBytes: bytes,
+      attempt,
     });
     const smallest =
       attempt === 5 ||
@@ -242,7 +244,6 @@ async function buildLevel(level, allocatedBudgetBytes) {
   }
   throw new Error(`Unable to build ${levelLabel(level)}.`);
 }
-
 const temporaryFiles = levels.flatMap((level) => [
   temporaryArchivePath(level.file),
   smallestArchivePath(level.file),

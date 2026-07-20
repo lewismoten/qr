@@ -56,7 +56,32 @@ test('reduces only an over-budget zoom level', () => {
       maximumTileBytes: 16_384,
       detail: 11,
     }),
-    { maximumTileBytes: 7372, detail: 10 },
+    { maximumTileBytes: 7536, detail: 11 },
+  );
+});
+
+test('targets near-budget archives without a fixed twenty-percent cut', () => {
+  assert.deepEqual(
+    compactBuildSettings({
+      budgetBytes: 95,
+      observedBytes: 100,
+      maximumTileBytes: 16_384,
+      detail: 11,
+      attempt: 2,
+    }),
+    { maximumTileBytes: 15_097, detail: 11 },
+  );
+});
+
+test('reduces detail only after reaching the minimum tile ceiling', () => {
+  assert.deepEqual(
+    compactBuildSettings({
+      budgetBytes: 50,
+      observedBytes: 200,
+      maximumTileBytes: 1024,
+      detail: 11,
+    }),
+    { maximumTileBytes: 1024, detail: 10 },
   );
 });
 

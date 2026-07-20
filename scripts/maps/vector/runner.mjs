@@ -33,6 +33,7 @@ export async function runTippecanoe({
   const started = Date.now();
   let observedBytes = 0;
   let workingLimitExceeded = false;
+  let fitSummary;
   await new Promise((resolve, reject) => {
     const output = createTippecanoeOutput((line) => {
       process.stderr.write(`${line}\n`);
@@ -62,6 +63,7 @@ export async function runTippecanoe({
       clearInterval(monitor);
       observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
       const summary = output.finish();
+      fitSummary = summary;
       const message = formatTippecanoeSummary(summary);
       if (message) console.warn(message);
       log?.record('tippecanoe-complete', {
@@ -92,5 +94,5 @@ export async function runTippecanoe({
       }
     });
   });
-  return observedBytes;
+  return { observedBytes, fitSummary };
 }
