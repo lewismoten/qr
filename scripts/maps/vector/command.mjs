@@ -20,7 +20,6 @@ export function tippecanoeArguments({
     `--minimum-zoom=${minimumZoom}`,
     `--maximum-zoom=${maximumZoom}`,
     `--base-zoom=${Math.min(baseZoom, maximumZoom)}`,
-    `--maximum-tile-bytes=${maximumTileBytes}`,
     `--full-detail=${detail}`,
     `--low-detail=${Math.max(8, detail - 2)}`,
     '--generate-variable-depth-tile-pyramid',
@@ -32,6 +31,9 @@ export function tippecanoeArguments({
     `--attribution=${ATTRIBUTION}`,
     `--output=${path.resolve(output)}`,
   ];
+  if (maximumTileBytes != null) {
+    args.splice(6, 0, `--maximum-tile-bytes=${maximumTileBytes}`);
+  }
   for (const { layer, file } of inputs) {
     args.push(`--named-layer=${layer}:${path.resolve(file)}`);
   }

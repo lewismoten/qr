@@ -199,6 +199,18 @@ test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   assert.ok(args.some((value) => value.endsWith('local.pmtiles')));
 });
 
+test('can omit the tile ceiling for an irreducible recovery build', () => {
+  const args = tippecanoeArguments({
+    inputs: [],
+    output: 'local.pmtiles',
+    maximumTileBytes: null,
+  });
+  assert.equal(
+    args.some((value) => value.startsWith('--maximum-tile-bytes=')),
+    false,
+  );
+});
+
 test('preserves PMTiles through temporary output validation', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-map-output-'));
   const archive = path.join(root, 'local.partial.pmtiles');

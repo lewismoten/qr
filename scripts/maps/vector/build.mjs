@@ -162,12 +162,17 @@ async function buildLevel(level, allocatedBudgetBytes) {
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const zoom = `z${level.minimumZoom}`;
+    const tileLimit =
+      settings.maximumTileBytes == null
+        ? 'recovery tile limit'
+        : `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
     console.log(
       `Building ${zoom}, attempt ${attempt}, ` +
         `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
-        `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles...`,
+        `${tileLimit}...`,
     );
     let result;
+    let recovery = false;
     try {
       result = await runLevel(allocation, settings);
     } catch (error) {
@@ -175,7 +180,14 @@ async function buildLevel(level, allocatedBudgetBytes) {
         await rm(temporaryArchivePath(level.file), { force: true });
         return acceptSmallest();
       }
-      throw error;
+      if (error.exitCode !== 100) throw error;
+      console.warn(
+        `Zoom ${level.minimumZoom} cannot satisfy the tile ceiling; ` +
+          'building its smallest viable archive.',
+      );
+      settings = { ...settings, maximumTileBytes: null };
+      result = await runLevel(allocation, settings);
+      recovery = true;
     }
     const bytes = await validatePmtilesArchive(
       result.temporary,
@@ -204,6 +216,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     } else {
       await rm(result.temporary, { force: true });
     }
+    if (recovery) return acceptSmallest();
     const next = compactBuildSettings({
       ...settings,
       budgetBytes: allocatedBudgetBytes,

@@ -127,7 +127,9 @@ deducted from following levels. A level whose allowance becomes negative uses
 the configured minimum while passing the remaining debt forward. Unresolved
 debt at the final level prevents publication, preserving the total hard cap.
 Tippecanoe exit status 100 during a stricter retry therefore restores the last
-valid candidate instead of aborting the entire map build.
+valid candidate instead of aborting the entire map build. If no constrained
+attempt can produce a candidate, one recovery attempt omits the tile ceiling
+and carries the resulting archive's overage into the following levels.
 All temporary archives must pass before the manifest atomically publishes the
 new set. Use `--budget-growth` and `--minimum-level-kib` to tune the curve.
 Tippecanoe is a build-time tool; on macOS install it with
