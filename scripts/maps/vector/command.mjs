@@ -10,7 +10,7 @@ export function tippecanoeArguments({
   minimumZoom = 1,
   maximumZoom = 19,
   baseZoom = 16,
-  maximumTileBytes = 16 * 1024,
+  maximumTileBytes = 64 * 1024,
   detail = 11,
   clipBoundingBox,
 }) {

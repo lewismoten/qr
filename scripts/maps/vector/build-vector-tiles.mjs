@@ -13,7 +13,10 @@ import {
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
   archiveCandidate,
+  archiveFitsSoftTarget,
+  acceptCompactedArchive,
   finalizeArchiveQuality,
+  warnForNonBindingTileLimit,
 } from './lifecycle/archive-quality.mjs';
 import {
   archiveReductionWarning,
@@ -104,6 +107,7 @@ async function runLevel(level, settings) {
       maximumTileBytes: settings.maximumTileBytes,
       configuredDetail: settings.detail,
     },
+    threads: options.tippecanoeThreads,
   });
   return { temporary, ...run };
 }
@@ -115,14 +119,8 @@ async function buildLevel(level, allocatedBudgetBytes) {
   let naturalBytes = null;
   let naturalArchiveStats = null;
   let settings = { maximumTileBytes, detail };
-  const acceptSmallest = () => {
-    const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
-    console.warn(
-      `${levelShardLabel(level)} reached its compaction limit; ` +
-        `carrying ${debt.toFixed(1)} MiB debt.`,
-    );
-    return finalizeArchiveQuality(level, best);
-  };
+  const acceptSmallest = () =>
+    acceptCompactedArchive(level, best, allocatedBudgetBytes);
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const attemptStarted = Date.now();
     const tileLimit = formatTileLimit(settings.maximumTileBytes);
@@ -176,6 +174,17 @@ async function buildLevel(level, allocatedBudgetBytes) {
     }
     naturalBytes ??= bytes;
     naturalArchiveStats ??= archiveStats;
+    const candidate = (temporary) =>
+      archiveCandidate({
+        level,
+        settings,
+        allocatedBudgetBytes,
+        bytes,
+        archiveStats,
+        naturalBytes,
+        naturalArchiveStats,
+        temporary,
+      });
     recordArchiveAttempt(log, 'archive-attempt-complete', {
       level,
       attempt,
@@ -189,21 +198,16 @@ async function buildLevel(level, allocatedBudgetBytes) {
       recovery,
       fitSummary: result.fitSummary,
     });
-    if (bytes <= allocatedBudgetBytes) {
+    if (
+      archiveFitsSoftTarget(
+        bytes,
+        allocatedBudgetBytes,
+        shardTargetBytes,
+        options.shardVariancePercent,
+      )
+    ) {
       await rm(smallestFile, { force: true });
-      return finalizeArchiveQuality(
-        level,
-        archiveCandidate({
-          level,
-          settings,
-          allocatedBudgetBytes,
-          bytes,
-          archiveStats,
-          naturalBytes,
-          naturalArchiveStats,
-          temporary: result.temporary,
-        }),
-      );
+      return finalizeArchiveQuality(level, candidate(result.temporary));
     }
     const previousBytes = best?.bytes;
     const warning = archiveReductionWarning(
@@ -219,16 +223,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     if (!best || bytes < best.bytes) {
       await rm(smallestFile, { force: true });
       await rename(result.temporary, smallestFile);
-      best = archiveCandidate({
-        level,
-        settings,
-        allocatedBudgetBytes,
-        bytes,
-        archiveStats,
-        naturalBytes,
-        naturalArchiveStats,
-        temporary: smallestFile,
-      });
+      best = candidate(smallestFile);
     } else {
       await rm(result.temporary, { force: true });
     }
@@ -241,6 +236,11 @@ async function buildLevel(level, allocatedBudgetBytes) {
       observedBytes: bytes,
       attempt,
     });
+    if (
+      warnForNonBindingTileLimit(level, next.maximumTileBytes, archiveStats)
+    ) {
+      return acceptSmallest();
+    }
     const smallest =
       attempt === 5 ||
       (next.maximumTileBytes === settings.maximumTileBytes &&

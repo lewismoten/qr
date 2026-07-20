@@ -45,14 +45,23 @@ test('converts GeoNames rows and ranks places by map zoom', () => {
         code: 'PPL',
         population: '15000',
       }),
+      row({
+        id: '3',
+        name: 'Village',
+        latitude: '39',
+        longitude: '-78',
+        code: 'PPL',
+        population: '1500',
+      }),
     ].join('\n'),
     2,
   );
 
-  assert.equal(collection.features.length, 2);
+  assert.equal(collection.features.length, 3);
   assert.deepEqual(collection.features[0].geometry.coordinates, [-77, 38.9]);
   assert.equal(collection.features[0].properties.min_zoom, 7);
   assert.equal(collection.features[1].properties.min_zoom, 9);
   assert.equal(collection.features[1].properties.name, 'Town');
   assert.equal(collection.features[1].properties.source_version, 2);
+  assert.equal(collection.features[2].properties.min_zoom, 12);
 });

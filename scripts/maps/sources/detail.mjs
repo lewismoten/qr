@@ -37,7 +37,7 @@ const NHD_LOCAL_WHERE =
   'visibilityfilter%3C5000000%20AND%20streamorde%3E%3D6';
 const nhdUrl = (where, offset) =>
   `${NHDPLUS_ROOT}where=${where}&` +
-  'outFields=OBJECTID%2Cvisibilityfilter%2Cftype&' +
+  'outFields=OBJECTID%2Cvisibilityfilter%2Cftype%2Cstreamorde%2Cgnis_name&' +
   'returnGeometry=true&returnZ=false&returnM=false&outSR=4326&' +
   `geometryPrecision=5&maxAllowableOffset=${offset}&f=geojson`;
 const nhdIdsUrl = (where) =>
@@ -50,6 +50,14 @@ const pagedNhdSource = (where, offset, maximumFeatures) => ({
   pageSize: 2000,
   maximumFeatures,
   kind: 'line',
+  featureMinimumZoom(properties) {
+    const order = Number(properties.streamorde);
+    if (order >= 7) return 9;
+    if (order >= 6) return 10;
+    if (order >= 5) return 11;
+    if (order >= 4) return 12;
+    return 13;
+  },
 });
 
 export function createDetailSources(maximumZoom) {

@@ -33,6 +33,7 @@ export async function runTippecanoe({
   zoom,
   log,
   context,
+  threads,
 }) {
   const started = Date.now();
   let observedBytes = 0;
@@ -46,6 +47,7 @@ export async function runTippecanoe({
     const standardOutput = createLineOutput(progress.writeLine);
     const child = spawn(executable, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, TIPPECANOE_MAX_THREADS: String(threads) },
     });
     child.stdout.on('data', (chunk) => standardOutput.write(chunk));
     child.stderr.on('data', (chunk) => output.write(chunk));

@@ -15,6 +15,10 @@ import {
 } from '../../../scripts/maps/vector/budget.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
 import {
+  archiveFitsSoftTarget,
+  tileLimitCannotBind,
+} from '../../../scripts/maps/vector/lifecycle/archive-quality.mjs';
+import {
   adaptiveSplitFactor,
   planAdaptiveShardLevel,
 } from '../../../scripts/maps/vector/shards.mjs';
@@ -108,6 +112,20 @@ test('stops archive fitting when a retry saves less than five percent', () => {
   assert.equal(archiveReductionWarning('z6', 100, 90), null);
   assert.equal(formatTileLimit(null), 'no tile ceiling (recovery)');
   assert.equal(formatTileLimit(16_384), '16.0 KiB tiles');
+});
+
+test('accepts soft shard sizes and skips non-binding tile retries', () => {
+  const mib = 1024 * 1024;
+  assert.equal(archiveFitsSoftTarget(11.9 * mib, 2 * mib, 10 * mib, 20), true);
+  assert.equal(archiveFitsSoftTarget(12.1 * mib, 2 * mib, 10 * mib, 20), false);
+  assert.equal(
+    tileLimitCannotBind(13_133, { actualLargestTileBytes: 10_245 }),
+    true,
+  );
+  assert.equal(
+    tileLimitCannotBind(8_000, { actualLargestTileBytes: 10_245 }),
+    false,
+  );
 });
 
 test('subdivides only dense regions to target archive sizes', () => {

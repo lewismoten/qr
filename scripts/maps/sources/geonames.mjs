@@ -25,7 +25,10 @@ function firstZipEntry(buffer) {
 function placeZoom(population, featureCode) {
   if (featureCode.startsWith('PPLC') || population >= 500000) return 7;
   if (featureCode === 'PPLA' || population >= 50000) return 8;
-  return 9;
+  if (population >= 10000) return 9;
+  if (population >= 5000) return 10;
+  if (population >= 2000) return 11;
+  return 12;
 }
 
 export function parseGeoNamesText(text, sourceVersion = 1) {

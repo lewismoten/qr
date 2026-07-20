@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { availableParallelism } from 'node:os';
 
 function option(values, name, fallback) {
   const exact = values.find((value) => value.startsWith(`--${name}=`));
@@ -23,6 +24,15 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     option(values, 'shard-variance-percent', '20'),
   );
   const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
+  const defaultThreads = Math.max(1, Math.floor(availableParallelism() / jobs));
+  const tippecanoeThreads = Number.parseInt(
+    option(
+      values,
+      'tippecanoe-threads',
+      process.env.TIPPECANOE_MAX_THREADS || String(defaultThreads),
+    ),
+    10,
+  );
   const archiveVariancePercent = Number.parseFloat(
     option(values, 'archive-variance-percent', '1'),
   );
@@ -34,6 +44,9 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
   }
   if (!Number.isInteger(jobs) || jobs < 1) {
     throw new RangeError('Map build jobs must be a positive integer.');
+  }
+  if (!Number.isInteger(tippecanoeThreads) || tippecanoeThreads < 1) {
+    throw new RangeError('Tippecanoe threads must be a positive integer.');
   }
   if (!Number.isFinite(archiveVariancePercent) || archiveVariancePercent < 0) {
     throw new RangeError('Archive variance cannot be negative.');
@@ -48,7 +61,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     maximumZoom: Number.parseInt(option(values, 'maximum-zoom', '19'), 10),
     baseZoom: Number.parseInt(option(values, 'base-zoom', '16'), 10),
     maximumTileBytes:
-      Number.parseInt(option(values, 'max-tile-kib', '16'), 10) * 1024,
+      Number.parseInt(option(values, 'max-tile-kib', '64'), 10) * 1024,
     maximumArchiveMiB,
     maximumWorkingMiB,
     maximumArchiveBytes: maximumArchiveMiB * 1024 * 1024,
@@ -62,6 +75,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     shardTargetBytes: shardTargetMiB * 1024 * 1024,
     shardVariancePercent,
     jobs,
+    tippecanoeThreads,
     archiveVariancePercent,
     maximumDebtBytes:
       maximumArchiveMiB * 1024 * 1024 * archiveVariancePercent * 0.01,
@@ -81,7 +95,7 @@ Options:
   --minimum-zoom 1      First generated zoom level
   --maximum-zoom 19     Last generated zoom level
   --base-zoom 16        Zoom where all point features may appear
-  --max-tile-kib 16     Maximum compressed MVT tile size
+  --max-tile-kib 64     Maximum compressed MVT tile size
   --max-archive-mib 500 Reject archives larger than this total
   --max-working-mib 1000 Maximum temporary size for any one level
   --detail 11           Maximum geometry precision (2^detail extent)
@@ -91,4 +105,5 @@ Options:
   --shard-target-mib 10 Target maximum before a region subdivides
   --shard-variance-percent 20 Soft variance before subdivision
   --archive-variance-percent 1 Allowed cumulative budget variance
-  --jobs 1              Parallel archives built within each zoom`;
+  --jobs 1              Parallel archives built within each zoom
+  --tippecanoe-threads N Threads used by each Tippecanoe process`;

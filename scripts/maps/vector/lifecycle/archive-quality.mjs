@@ -32,3 +32,35 @@ export function finalizeArchiveQuality(level, result) {
   }
   return { ...result, retainedRatio };
 }
+
+export function archiveFitsSoftTarget(
+  bytes,
+  budgetBytes,
+  shardTargetBytes,
+  variancePercent,
+) {
+  const softTargetBytes = shardTargetBytes * (1 + variancePercent / 100);
+  return bytes <= budgetBytes || bytes <= softTargetBytes;
+}
+
+export function tileLimitCannotBind(maximumBytes, archiveStats) {
+  return maximumBytes >= archiveStats.actualLargestTileBytes;
+}
+
+export function warnForNonBindingTileLimit(level, maximumBytes, archiveStats) {
+  if (!tileLimitCannotBind(maximumBytes, archiveStats)) return false;
+  console.warn(
+    `${levelShardLabel(level)} retry ceiling cannot affect its ` +
+      'largest stored tile; accepting the current archive.',
+  );
+  return true;
+}
+
+export function acceptCompactedArchive(level, result, budgetBytes) {
+  const debt = (result.bytes - budgetBytes) / 1024 / 1024;
+  console.warn(
+    `${levelShardLabel(level)} reached its compaction limit; ` +
+      `carrying ${debt.toFixed(1)} MiB debt.`,
+  );
+  return finalizeArchiveQuality(level, result);
+}

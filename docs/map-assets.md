@@ -36,12 +36,13 @@ these children over complete level 16 parents so unchanged layers are not
 duplicated.
 
 At zooms 9-16, the public-domain USGS NHDPlus High Resolution network adds U.S.
-rivers ranked for display at approximately 1:5,000,000 and larger scales. Zooms
-14-16 supplement it with non-overlapping 1:1,000,000-1:5,000,000 flowlines at
-stream order 6 or higher and finer geometry. Explicit feature-count limits stop
-the download if an upstream query grows beyond its expected size. These filters
-preserve recognizable waterways, including both Shenandoah forks, without
-importing the complete 27-million-feature network.
+rivers ranked by stream order. The highest orders begin at zoom 9, with smaller
+orders entering progressively through zoom 13. Zooms 14-16 supplement them with
+non-overlapping 1:1,000,000-1:5,000,000 flowlines at stream order 6 or higher
+and finer geometry. Explicit feature-count limits stop the download if an
+upstream query grows beyond its expected size. These filters preserve
+recognizable waterways, including both Shenandoah forks, without importing the
+complete 27-million-feature network.
 
 `maps:download` retrieves every configured raw source without rendering tiles.
 Natural Earth also supplies U.S. National Park Service parks and protected lands
@@ -71,6 +72,9 @@ Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between
 parallel waves. Each job runs a separate Tippecanoe process, so choose a value
 that leaves enough CPU, memory, and temporary storage for every active job.
+By default, each process receives an even share of detected CPU concurrency.
+Override that share with `--tippecanoe-threads` or
+`TIPPECANOE_MAX_THREADS` when benchmarking job counts.
 
 The default allocator gives zooms 1-9, 10-12, and 13-maximum 10%, 9%, and 81%
 of the total. For 500 MiB, those tiers receive 50, 45, and 405 MiB. This keeps
@@ -136,7 +140,7 @@ Tippecanoe is a build-time tool; on macOS install it with
 `brew install tippecanoe`.
 
 Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
-is cached under `.cache/maps/vector-input`. The default 16 KiB limit applies to
+is cached under `.cache/maps/vector-input`. The default 64 KiB limit applies to
 each compressed MVT tile. Dense tiles are intentionally lossy: Tippecanoe drops
 or simplifies the least-visible detail until the limit is met. Use
 `--max-archive-mib` to change the whole-archive target and `--base-zoom` to

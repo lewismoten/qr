@@ -196,7 +196,7 @@ export const MAP_SOURCES = {
     file: 'cultural/geonames_cities1000.geojson',
     url: 'https://download.geonames.org/export/dump/cities1000.zip',
     format: 'geonames',
-    cacheVersion: 2,
+    cacheVersion: 3,
     minimumZoom: 7,
     maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'point',

@@ -13,7 +13,10 @@ function matchesFilter(feature, filter) {
 }
 
 function featureZoom(source, properties = {}) {
-  const suggested = properties.min_zoom ?? properties.MIN_ZOOM;
+  const suggested =
+    properties.min_zoom ??
+    properties.MIN_ZOOM ??
+    source.featureMinimumZoom?.(properties);
   const minimum = Number.isFinite(Number(suggested))
     ? Math.ceil(Number(suggested))
     : source.minimumZoom;
@@ -68,6 +71,7 @@ export async function prepareVectorInputs({ cache, output }) {
     const target = createWriteStream(file);
     let features = 0;
     const featuresByMinimumZoom = {};
+    const featuresByZoomRange = {};
     for (const name of names) {
       const source = MAP_SOURCES[name];
       const sourceFile = path.join(cache, source.file);
@@ -78,11 +82,19 @@ export async function prepareVectorInputs({ cache, output }) {
         features += 1;
         const zoom = normalized.tippecanoe.minzoom;
         featuresByMinimumZoom[zoom] = (featuresByMinimumZoom[zoom] || 0) + 1;
+        const range = `${zoom}-${normalized.tippecanoe.maxzoom}`;
+        featuresByZoomRange[range] = (featuresByZoomRange[range] || 0) + 1;
       }
     }
     target.end();
     await once(target, 'finish');
-    prepared.push({ layer, file, features, featuresByMinimumZoom });
+    prepared.push({
+      layer,
+      file,
+      features,
+      featuresByMinimumZoom,
+      featuresByZoomRange,
+    });
   }
   return prepared;
 }

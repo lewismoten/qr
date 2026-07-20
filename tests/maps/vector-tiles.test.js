@@ -78,7 +78,7 @@ test('classifies ranked USGS flowlines as major waterways', () => {
     },
   });
   assert.deepEqual(river.properties, { class: 'major' });
-  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 16 });
+  assert.deepEqual(river.tippecanoe, { minzoom: 10, maxzoom: 16 });
 });
 
 test('classifies Natural Earth rivers as reference waterways', () => {
@@ -170,12 +170,12 @@ test('limits finer railroad geometry to zooms fourteen and fifteen', () => {
   assert.deepEqual(railroad.tippecanoe, { minzoom: 14, maxzoom: 16 });
 });
 
-test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
+test('builds a PMTiles Tippecanoe command with a 64 KiB limit', () => {
   const args = tippecanoeArguments({
     inputs: [{ layer: 'land', file: 'land.geojsonseq' }],
     output: 'local.pmtiles',
   });
-  assert.ok(args.includes('--maximum-tile-bytes=16384'));
+  assert.ok(args.includes('--maximum-tile-bytes=65536'));
   assert.ok(args.includes('--maximum-zoom=19'));
   assert.ok(args.includes('--base-zoom=16'));
   assert.ok(args.includes('--full-detail=11'));
