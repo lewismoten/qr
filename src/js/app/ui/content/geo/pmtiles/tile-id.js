@@ -1,3 +1,7 @@
+const MAXIMUM_HILBERT_ZOOM = 26;
+const HILBERT_ROTATION_FACTOR = 3;
+const HILBERT_SERIES_DIVISOR = 3;
+
 function rotate(size, point, rx, ry) {
   if (ry) return point;
   const next = { ...point };
@@ -14,7 +18,7 @@ export function zxyToTileId(zoom, x, y) {
   if (
     !Number.isInteger(zoom) ||
     zoom < 0 ||
-    zoom > 26 ||
+    zoom > MAXIMUM_HILBERT_ZOOM ||
     !Number.isInteger(x) ||
     !Number.isInteger(y) ||
     x < 0 ||
@@ -29,8 +33,8 @@ export function zxyToTileId(zoom, x, y) {
   for (let scale = size / 2; scale >= 1; scale /= 2) {
     const rx = (point.x & scale) > 0 ? 1 : 0;
     const ry = (point.y & scale) > 0 ? 1 : 0;
-    position += scale * scale * ((3 * rx) ^ ry);
+    position += scale * scale * ((HILBERT_ROTATION_FACTOR * rx) ^ ry);
     point = rotate(scale, point, rx, ry);
   }
-  return (size * size - 1) / 3 + position;
+  return (size * size - 1) / HILBERT_SERIES_DIVISOR + position;
 }

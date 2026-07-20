@@ -5,6 +5,7 @@ import { TILE_SIZE } from '../projection.js';
 
 const BACKGROUND_LAYERS = ['land', 'urban', 'water'];
 const BACKGROUND_MAXIMUM_ZOOM = 10;
+const TILE_TONE_COUNT = 4;
 
 function sameTile(left, right) {
   return (
@@ -59,7 +60,8 @@ export function createPmtilesTile({
   canvas.width = TILE_SIZE;
   canvas.height = TILE_SIZE;
   element.append(canvas);
-  const tone = (((tile.x + tile.y) % 4) + 4) % 4;
+  const tone =
+    (((tile.x + tile.y) % TILE_TONE_COUNT) + TILE_TONE_COUNT) % TILE_TONE_COUNT;
   element.classList.add(`tile-tone-${tone}`);
   element.slippySourceZoom = Math.min(tile.zoom, maximumSourceZoom);
   element.slippyStatusSourceZoom = Math.min(tile.zoom, coverageMaximumZoom);

@@ -1,20 +1,49 @@
 import { decodeGeometry } from './geometry.js';
 import { packedVarints, ProtobufReader } from './protobuf.js';
 
+const VALUE_FIELDS = {
+  string: 1,
+  float: 2,
+  double: 3,
+  signedInteger: 4,
+  unsignedInteger: 5,
+  zigzagInteger: 6,
+  boolean: 7,
+};
+const FEATURE_FIELDS = { id: 1, tags: 2, type: 3, geometry: 4 };
+const LAYER_FIELDS = {
+  name: 1,
+  feature: 2,
+  key: 3,
+  value: 4,
+  extent: 5,
+  version: 15,
+};
+const TILE_LAYER_FIELD = 3;
+const ZIGZAG_SIGN_BIT = 1;
+const ZIGZAG_DIVISOR = 2;
+
 function decodeValue(bytes) {
   const reader = new ProtobufReader(bytes);
   let value = null;
   while (!reader.done) {
     const { field, wire } = reader.tag();
-    if (field === 1) value = reader.string();
-    else if (field === 2) value = reader.fixed32();
-    else if (field === 3) value = reader.fixed64();
-    else if ([4, 5].includes(field)) value = reader.varint();
-    else if (field === 6) {
+    if (field === VALUE_FIELDS.string) value = reader.string();
+    else if (field === VALUE_FIELDS.float) value = reader.fixed32();
+    else if (field === VALUE_FIELDS.double) value = reader.fixed64();
+    else if (
+      [VALUE_FIELDS.signedInteger, VALUE_FIELDS.unsignedInteger].includes(field)
+    ) {
+      value = reader.varint();
+    } else if (field === VALUE_FIELDS.zigzagInteger) {
       const encoded = reader.varint();
-      value = encoded & 1 ? -(encoded + 1) / 2 : encoded / 2;
-    } else if (field === 7) value = Boolean(reader.varint());
-    else reader.skip(wire);
+      value =
+        encoded & ZIGZAG_SIGN_BIT
+          ? -(encoded + ZIGZAG_SIGN_BIT) / ZIGZAG_DIVISOR
+          : encoded / ZIGZAG_DIVISOR;
+    } else if (field === VALUE_FIELDS.boolean) {
+      value = Boolean(reader.varint());
+    } else reader.skip(wire);
   }
   return value;
 }
@@ -24,10 +53,11 @@ function decodeFeature(bytes) {
   const feature = { id: null, tags: [], type: 0, geometry: [] };
   while (!reader.done) {
     const { field, wire } = reader.tag();
-    if (field === 1) feature.id = reader.varint();
-    else if (field === 2) feature.tags = packedVarints(reader.bytesValue());
-    else if (field === 3) feature.type = reader.varint();
-    else if (field === 4) {
+    if (field === FEATURE_FIELDS.id) feature.id = reader.varint();
+    else if (field === FEATURE_FIELDS.tags) {
+      feature.tags = packedVarints(reader.bytesValue());
+    } else if (field === FEATURE_FIELDS.type) feature.type = reader.varint();
+    else if (field === FEATURE_FIELDS.geometry) {
       feature.geometry = packedVarints(reader.bytesValue());
     } else reader.skip(wire);
   }
@@ -55,13 +85,14 @@ function decodeLayer(bytes) {
   };
   while (!reader.done) {
     const { field, wire } = reader.tag();
-    if (field === 1) layer.name = reader.string();
-    else if (field === 2)
+    if (field === LAYER_FIELDS.name) layer.name = reader.string();
+    else if (field === LAYER_FIELDS.feature)
       layer.rawFeatures.push(decodeFeature(reader.bytesValue()));
-    else if (field === 3) layer.keys.push(reader.string());
-    else if (field === 4) layer.values.push(decodeValue(reader.bytesValue()));
-    else if (field === 5) layer.extent = reader.varint();
-    else if (field === 15) layer.version = reader.varint();
+    else if (field === LAYER_FIELDS.key) layer.keys.push(reader.string());
+    else if (field === LAYER_FIELDS.value) {
+      layer.values.push(decodeValue(reader.bytesValue()));
+    } else if (field === LAYER_FIELDS.extent) layer.extent = reader.varint();
+    else if (field === LAYER_FIELDS.version) layer.version = reader.varint();
     else reader.skip(wire);
   }
   return {
@@ -82,8 +113,9 @@ export function decodeMvt(bytes) {
   const layers = [];
   while (!reader.done) {
     const { field, wire } = reader.tag();
-    if (field === 3) layers.push(decodeLayer(reader.bytesValue()));
-    else reader.skip(wire);
+    if (field === TILE_LAYER_FIELD) {
+      layers.push(decodeLayer(reader.bytesValue()));
+    } else reader.skip(wire);
   }
   return layers;
 }

@@ -3,6 +3,9 @@ import { decodeDirectory, findDirectoryEntry } from './directory.js';
 import { INITIAL_RANGE_BYTES, parsePmtilesHeader } from './header.js';
 import { zxyToTileId } from './tile-id.js';
 
+const HTTP_OK = 200;
+const HTTP_PARTIAL_CONTENT = 206;
+
 function createRangeReader(url, fetcher) {
   let etag = null;
   return async (offset, length) => {
@@ -12,16 +15,16 @@ function createRangeReader(url, fetcher) {
     };
     if (etag) headers['If-Match'] = etag;
     const response = await fetcher(url, { headers });
-    if (![200, 206].includes(response.status)) {
+    if (![HTTP_OK, HTTP_PARTIAL_CONTENT].includes(response.status)) {
       throw new Error(`Unable to read PMTiles range: ${response.status}.`);
     }
     const responseLength = Number(response.headers.get('content-length'));
-    if (response.status === 200 && responseLength > length) {
+    if (response.status === HTTP_OK && responseLength > length) {
       throw new Error('The PMTiles server does not support byte ranges.');
     }
     etag ||= response.headers.get('etag');
     const bytes = new Uint8Array(await response.arrayBuffer());
-    return response.status === 200
+    return response.status === HTTP_OK
       ? bytes.subarray(offset, offset + length)
       : bytes;
   };

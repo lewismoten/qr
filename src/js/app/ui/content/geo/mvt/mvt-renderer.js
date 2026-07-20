@@ -22,14 +22,22 @@ const ORDER = [
   'boundary',
 ];
 const PLACE_LIMITS = [
-  [8, 6],
-  [9, 8],
-  [10, 14],
-  [11, 24],
+  { maximumZoom: 8, limit: 6 },
+  { maximumZoom: 9, limit: 8 },
+  { maximumZoom: 10, limit: 14 },
+  { maximumZoom: 11, limit: 24 },
 ];
+const DEFAULT_PLACE_LIMIT = 32;
+const LABEL_PADDING = 6;
+const LABEL_POINT_GAP = 2;
+const LABEL_TEXT_GAP = 4;
+const POLYGON_GEOMETRY_TYPE = 3;
 
 export function getPlaceLimit(zoom) {
-  return PLACE_LIMITS.find(([maximum]) => zoom <= maximum)?.[1] ?? 32;
+  return (
+    PLACE_LIMITS.find(({ maximumZoom }) => zoom <= maximumZoom)?.limit ??
+    DEFAULT_PLACE_LIMIT
+  );
 }
 
 export function sortPlaces(features) {
@@ -50,20 +58,32 @@ export function sortPlaces(features) {
 }
 
 export function getLabelPlacement(x, y, textWidth, size) {
-  const width = textWidth + 6;
-  if (x < 0 || x >= size || y < 6 || y > size - 6) return null;
+  const width = textWidth + LABEL_PADDING;
+  if (x < 0 || x >= size || y < LABEL_PADDING || y > size - LABEL_PADDING) {
+    return null;
+  }
   if (x + width <= size) {
     return {
-      box: { left: x + 2, right: x + width, top: y - 6, bottom: y + 6 },
+      box: {
+        left: x + LABEL_POINT_GAP,
+        right: x + width,
+        top: y - LABEL_PADDING,
+        bottom: y + LABEL_PADDING,
+      },
       textAlign: 'left',
-      textX: x + 4,
+      textX: x + LABEL_TEXT_GAP,
     };
   }
   if (x - width >= 0) {
     return {
-      box: { left: x - width, right: x - 2, top: y - 6, bottom: y + 6 },
+      box: {
+        left: x - width,
+        right: x - LABEL_POINT_GAP,
+        top: y - LABEL_PADDING,
+        bottom: y + LABEL_PADDING,
+      },
       textAlign: 'right',
-      textX: x - 4,
+      textX: x - LABEL_TEXT_GAP,
     };
   }
   return null;
@@ -134,7 +154,7 @@ function drawLayer(context, layer, viewport) {
     }
     traceFeature(context, feature, transform);
     context.lineWidth = featureStyle.width;
-    if (featureStyle.fill && feature.type === 3) {
+    if (featureStyle.fill && feature.type === POLYGON_GEOMETRY_TYPE) {
       context.fillStyle = featureStyle.fill;
       context.fill('evenodd');
     }

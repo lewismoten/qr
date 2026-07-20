@@ -1,8 +1,18 @@
+const BASE64_CHUNK_BYTES = 0x8000;
+const BASE64_GROUP_BYTES = 3;
+const BASE64_GROUP_CHARACTERS = 4;
+const BASE64_ALIGNMENT = 4;
+const FILE_ID_BYTES = 16;
+const MAXIMUM_EXTENSION_CHARACTERS = 8;
+const DECIMAL_RADIX = 10;
+
 export function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+  for (let index = 0; index < bytes.length; index += BASE64_CHUNK_BYTES) {
+    binary += String.fromCharCode(
+      ...bytes.subarray(index, index + BASE64_CHUNK_BYTES),
+    );
   }
   return btoa(binary);
 }
@@ -13,12 +23,14 @@ export function base64ToBase64Url(base64) {
 
 export function base64UrlToBase64(base64Url) {
   const normalized = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const paddingLength = (4 - (normalized.length % 4 || 4)) % 4;
+  const remainder = normalized.length % BASE64_ALIGNMENT;
+  const paddingLength =
+    (BASE64_ALIGNMENT - (remainder || BASE64_ALIGNMENT)) % BASE64_ALIGNMENT;
   return `${normalized}${'='.repeat(paddingLength)}`;
 }
 
 export function createCompactFileId() {
-  const bytes = new Uint8Array(16);
+  const bytes = new Uint8Array(FILE_ID_BYTES);
   crypto.getRandomValues(bytes);
   return base64ToBase64Url(arrayBufferToBase64(bytes.buffer));
 }
@@ -33,16 +45,21 @@ export function getCompactFileExtension(value) {
     .replace(/[^A-Z0-9.]/g, '');
   const segments = sanitized.split('.');
   const extension = segments.length > 1 ? segments.pop() : '';
-  return (extension || 'BIN').slice(0, 8);
+  return (extension || 'BIN').slice(0, MAXIMUM_EXTENSION_CHARACTERS);
 }
 
 export function getBase64UrlLength(byteCount) {
-  return Math.ceil((Math.max(0, byteCount) * 4) / 3);
+  return Math.ceil(
+    (Math.max(0, byteCount) * BASE64_GROUP_CHARACTERS) / BASE64_GROUP_BYTES,
+  );
 }
 
 export function encodeStreamPosition(value, streamLength) {
-  const width = Math.max(1, Math.max(0, streamLength).toString(10).length);
-  return Math.max(0, value).toString(10).padStart(width, '0');
+  const width = Math.max(
+    1,
+    Math.max(0, streamLength).toString(DECIMAL_RADIX).length,
+  );
+  return Math.max(0, value).toString(DECIMAL_RADIX).padStart(width, '0');
 }
 
 export function getFileManifestFlag(includeManifest) {
@@ -86,7 +103,7 @@ export function buildChunkFileFrame({
     id,
     getCompactFileExtension(file?.name),
     encodeStreamPosition(offset, streamLength),
-    Math.max(0, streamLength).toString(10),
+    Math.max(0, streamLength).toString(DECIMAL_RADIX),
     data,
   ].join(':');
 }

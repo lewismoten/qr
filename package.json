@@ -39,7 +39,7 @@
     "test:watch": "node scripts/run-tests.mjs --watch",
     "test:coverage": "node scripts/run-tests.mjs --coverage",
     "audit:dependencies": "npm audit --audit-level=moderate",
-    "audit:magic-numbers": "eslint \"src/js/**/*.js\"",
+    "audit:magic-numbers": "eslint \"src/js/**/*.js\" \"scripts/**/*.mjs\"",
     "verify": "npm run lint && npm run test:coverage && npm run build"
   },
   "devDependencies": {

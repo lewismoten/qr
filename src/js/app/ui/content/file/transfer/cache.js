@@ -1,6 +1,8 @@
 import { createLocalizedError } from '../../../../../localized-error.js';
 import { refreshFilePicker } from '../../../file-picker.js';
 
+const HEX_RADIX = 16;
+
 export function createFileCache({
   input,
   createId,
@@ -105,7 +107,7 @@ export function createFileCache({
     canonicalBytes.set(fileBytes, manifestBytes.length);
     const digest = await crypto.subtle.digest('SHA-256', canonicalBytes);
     const computed = [...new Uint8Array(digest)]
-      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .map((byte) => byte.toString(HEX_RADIX).padStart(2, '0'))
       .join('');
     if (requestRevision === revision) hash = computed;
     return computed;

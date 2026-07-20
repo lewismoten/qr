@@ -45,6 +45,9 @@ export default [
       'src/js/app/qr/encoding-units.js',
       'src/js/app/qr/qr-regions.js',
       'src/js/app/qr/qr-stream.js',
+      'src/js/app/ui/content/file/transfer/**/*.js',
+      'src/js/app/ui/content/geo/mvt/**/*.js',
+      'src/js/app/ui/content/geo/pmtiles/**/*.js',
       'src/js/qr/**/*.js',
     ],
     rules: {
@@ -86,6 +89,9 @@ export default [
         ...globals.node,
         ...globals.browser,
       },
+    },
+    rules: {
+      'no-magic-numbers': ['warn', magicNumberOptions],
     },
   },
   {

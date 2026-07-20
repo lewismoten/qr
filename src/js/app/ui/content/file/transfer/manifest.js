@@ -1,6 +1,14 @@
 import { hexToBytes, uint64Bytes } from '../../../../bytes.js';
 import { createLocalizedError } from '../../../../../localized-error.js';
 
+const VERSION_OFFSET = 4;
+const FLAGS_OFFSET = 5;
+const LENGTH_OFFSET = 6;
+const FIELD_LENGTH_OFFSET = 1;
+const MAXIMUM_FIELD_LENGTH = 0xffff;
+const SHA256_BYTES = 32;
+const DECIMAL_RADIX = 10;
+
 export function buildManifestFields({
   file,
   customMetadata,
@@ -58,12 +66,12 @@ export function serializeManifest({
   const manifest = new Uint8Array(length);
   const view = new DataView(manifest.buffer);
   manifest.set(new TextEncoder().encode(magic), 0);
-  manifest[4] = Number.parseInt(version, 10);
-  manifest[5] = flags;
-  view.setUint32(6, length, false);
+  manifest[VERSION_OFFSET] = Number.parseInt(version, DECIMAL_RADIX);
+  manifest[FLAGS_OFFSET] = flags;
+  view.setUint32(LENGTH_OFFSET, length, false);
   let offset = headerBytes;
   fields.forEach((field) => {
-    if (field.value.length > 0xffff) {
+    if (field.value.length > MAXIMUM_FIELD_LENGTH) {
       throw createLocalizedError(
         'file.manifestFieldLimit',
         'Manifest field {type} exceeds the 65,535-byte limit.',
@@ -71,7 +79,7 @@ export function serializeManifest({
       );
     }
     manifest[offset] = field.type;
-    view.setUint16(offset + 1, field.value.length, false);
+    view.setUint16(offset + FIELD_LENGTH_OFFSET, field.value.length, false);
     manifest.set(field.value, offset + fieldHeaderBytes);
     offset += fieldHeaderBytes + field.value.length;
   });
@@ -104,7 +112,10 @@ export function createFileManifestController({
     }
   };
 
-  const getFields = (file, { validationValue = new Uint8Array(32) } = {}) =>
+  const getFields = (
+    file,
+    { validationValue = new Uint8Array(SHA256_BYTES) } = {},
+  ) =>
     buildManifestFields({
       file,
       customMetadata: normalizeCustomMetadata(),

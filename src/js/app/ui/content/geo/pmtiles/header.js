@@ -1,6 +1,31 @@
 const MAGIC = 'PMTiles';
+const MAGIC_BYTES = 7;
+const VERSION_OFFSET = 7;
+const SUPPORTED_VERSION = 3;
+const MVT_TILE_TYPE = 1;
+const KIBIBYTE = 1024;
+const INITIAL_RANGE_KIB = 16;
+const HEADER_OFFSETS = {
+  root: 8,
+  rootLength: 16,
+  metadata: 24,
+  metadataLength: 32,
+  leaf: 40,
+  leafLength: 48,
+  tile: 56,
+  tileLength: 64,
+  addressedTiles: 72,
+  tileEntries: 80,
+  tileContents: 88,
+  clustered: 96,
+  internalCompression: 97,
+  tileCompression: 98,
+  tileType: 99,
+  minimumZoom: 100,
+  maximumZoom: 101,
+};
 export const HEADER_BYTES = 127;
-export const INITIAL_RANGE_BYTES = 16 * 1024;
+export const INITIAL_RANGE_BYTES = INITIAL_RANGE_KIB * KIBIBYTE;
 
 function uint64(view, offset) {
   const value = view.getBigUint64(offset, true);
@@ -14,32 +39,32 @@ export function parsePmtilesHeader(bytes) {
   if (bytes.byteLength < HEADER_BYTES) {
     throw new Error('The PMTiles header is incomplete.');
   }
-  const magic = new TextDecoder().decode(bytes.subarray(0, 7));
+  const magic = new TextDecoder().decode(bytes.subarray(0, MAGIC_BYTES));
   if (magic !== MAGIC) throw new Error('The map is not a PMTiles archive.');
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  if (view.getUint8(7) !== 3) {
+  if (view.getUint8(VERSION_OFFSET) !== SUPPORTED_VERSION) {
     throw new Error('Only PMTiles version 3 is supported.');
   }
   const header = {
-    rootOffset: uint64(view, 8),
-    rootLength: uint64(view, 16),
-    metadataOffset: uint64(view, 24),
-    metadataLength: uint64(view, 32),
-    leafOffset: uint64(view, 40),
-    leafLength: uint64(view, 48),
-    tileOffset: uint64(view, 56),
-    tileLength: uint64(view, 64),
-    addressedTiles: uint64(view, 72),
-    tileEntries: uint64(view, 80),
-    tileContents: uint64(view, 88),
-    clustered: view.getUint8(96) === 1,
-    internalCompression: view.getUint8(97),
-    tileCompression: view.getUint8(98),
-    tileType: view.getUint8(99),
-    minimumZoom: view.getUint8(100),
-    maximumZoom: view.getUint8(101),
+    rootOffset: uint64(view, HEADER_OFFSETS.root),
+    rootLength: uint64(view, HEADER_OFFSETS.rootLength),
+    metadataOffset: uint64(view, HEADER_OFFSETS.metadata),
+    metadataLength: uint64(view, HEADER_OFFSETS.metadataLength),
+    leafOffset: uint64(view, HEADER_OFFSETS.leaf),
+    leafLength: uint64(view, HEADER_OFFSETS.leafLength),
+    tileOffset: uint64(view, HEADER_OFFSETS.tile),
+    tileLength: uint64(view, HEADER_OFFSETS.tileLength),
+    addressedTiles: uint64(view, HEADER_OFFSETS.addressedTiles),
+    tileEntries: uint64(view, HEADER_OFFSETS.tileEntries),
+    tileContents: uint64(view, HEADER_OFFSETS.tileContents),
+    clustered: view.getUint8(HEADER_OFFSETS.clustered) === 1,
+    internalCompression: view.getUint8(HEADER_OFFSETS.internalCompression),
+    tileCompression: view.getUint8(HEADER_OFFSETS.tileCompression),
+    tileType: view.getUint8(HEADER_OFFSETS.tileType),
+    minimumZoom: view.getUint8(HEADER_OFFSETS.minimumZoom),
+    maximumZoom: view.getUint8(HEADER_OFFSETS.maximumZoom),
   };
-  if (header.tileType !== 1) {
+  if (header.tileType !== MVT_TILE_TYPE) {
     throw new Error('The PMTiles archive does not contain MVT vector tiles.');
   }
   if (header.rootOffset + header.rootLength > INITIAL_RANGE_BYTES) {

@@ -1,11 +1,17 @@
+const VARINT_VALUE_MASK = 0x7f;
+const VARINT_CONTINUATION_BIT = 0x80;
+const VARINT_RADIX = 128;
+const MAXIMUM_DIRECTORY_ENTRIES = 1_000_000;
+const DIRECTORY_ARRAY_COUNT = 4;
+
 function readVarint(bytes, state) {
   let value = 0;
   let multiplier = 1;
   while (state.offset < bytes.length) {
     const byte = bytes[state.offset++];
-    value += (byte & 0x7f) * multiplier;
-    if (!(byte & 0x80)) return value;
-    multiplier *= 128;
+    value += (byte & VARINT_VALUE_MASK) * multiplier;
+    if (!(byte & VARINT_CONTINUATION_BIT)) return value;
+    multiplier *= VARINT_RADIX;
     if (multiplier > Number.MAX_SAFE_INTEGER) break;
   }
   throw new Error('Invalid PMTiles directory varint.');
@@ -15,7 +21,10 @@ export function decodeDirectory(bytes) {
   const state = { offset: 0 };
   const count = readVarint(bytes, state);
   if (!count) throw new Error('A PMTiles directory cannot be empty.');
-  if (count > 1_000_000 || count * 4 > bytes.length) {
+  if (
+    count > MAXIMUM_DIRECTORY_ENTRIES ||
+    count * DIRECTORY_ARRAY_COUNT > bytes.length
+  ) {
     throw new Error('The PMTiles directory entry count is invalid.');
   }
   const entries = Array.from({ length: count }, () => ({}));
