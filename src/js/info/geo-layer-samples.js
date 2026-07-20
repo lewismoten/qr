@@ -1,4 +1,5 @@
 import { getFallbackTile } from '../app/ui/content/geo/tile-fallback.js';
+import { createPmtilesArchiveSet } from '../app/ui/content/geo/pmtiles/archive-set.js';
 import { createPmtilesSource } from '../app/ui/content/geo/pmtiles/source.js';
 import { createPmtilesTile } from '../app/ui/content/geo/pmtiles/tile.js';
 import { getCenteredTileLayout } from './geo-layer-layout.js';
@@ -55,8 +56,9 @@ function renderSample(sample, zoom, source, header) {
 
 function loadArchive() {
   if (!archiveRequest) {
-    const source = createPmtilesSource('/maps/local.pmtiles');
-    archiveRequest = source.getHeader().then((header) => ({ header, source }));
+    archiveRequest = createPmtilesArchiveSet('/maps/local.json')
+      .catch(() => createPmtilesSource('/maps/local.pmtiles'))
+      .then(async (source) => ({ header: await source.getHeader(), source }));
   }
   return archiveRequest;
 }

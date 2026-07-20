@@ -81,7 +81,13 @@ export function createWorldMap(
         let vector = null;
         if (pmtiles) {
           try {
-            const source = pmtiles.createPmtilesSource('/maps/local.pmtiles');
+            let source;
+            try {
+              source =
+                await pmtiles.createPmtilesArchiveSet('/maps/local.json');
+            } catch {
+              source = pmtiles.createPmtilesSource('/maps/local.pmtiles');
+            }
             const header = await source.getHeader();
             vector = { source, header };
           } catch {

@@ -1,4 +1,4 @@
-import { access, cp, mkdir, rm } from 'node:fs/promises';
+import { access, cp, mkdir, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 async function exists(file) {
@@ -14,10 +14,21 @@ async function exists(file) {
 export async function publishDetailedMap({
   outputRoot,
   archive = 'build/maps/local.pmtiles',
+  manifest = 'build/maps/local.json',
   legacyTiles = 'build/maps/tiles',
 }) {
   const maps = path.join(outputRoot, 'maps');
   await mkdir(maps, { recursive: true });
+  if (await exists(manifest)) {
+    const parsed = JSON.parse(await readFile(manifest, 'utf8'));
+    await rm(path.join(maps, 'tiles'), { recursive: true, force: true });
+    for (const item of parsed.archives) {
+      const source = path.join(path.dirname(manifest), item.file);
+      await cp(source, path.join(maps, item.file));
+    }
+    await cp(manifest, path.join(maps, 'local.json'));
+    return 'pmtiles-set';
+  }
   if (await exists(archive)) {
     await rm(path.join(maps, 'tiles'), { recursive: true, force: true });
     await cp(archive, path.join(maps, 'local.pmtiles'));

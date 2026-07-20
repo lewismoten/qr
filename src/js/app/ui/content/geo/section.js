@@ -48,9 +48,14 @@ export function createGeoSection({
     loadPmtiles: () =>
       loading.track(
         Promise.all([
+          import('./pmtiles/archive-set.js'),
           import('./pmtiles/source.js'),
           import('./pmtiles/tile.js'),
-        ]).then(([source, tile]) => ({ ...source, ...tile })),
+        ]).then(([archiveSet, source, tile]) => ({
+          ...archiveSet,
+          ...source,
+          ...tile,
+        })),
       ),
     onLoadError: (error) => {
       console.error(error);

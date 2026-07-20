@@ -86,8 +86,8 @@ ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract.
 Natural Earth's public-domain 1:50m urban polygons add generalized dense
 settlement context from zooms 5 through 10. They stop before local detail to
 avoid repeating broad, historical settlement polygons across millions of
-high-zoom tiles. The
-U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
+high-zoom tiles. The U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies
+matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads and
 railroads, while Natural Earth supplies global roads and water. Generalized
 railroads appear at zooms 10–11, finer geometry appears at zooms 12–13, and a
@@ -111,11 +111,17 @@ lands as area, line, and point features through zoom 16.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks
-Tippecanoe to build `build/maps/local.pmtiles`. The build uses a variable-depth
-pyramid, so areas stop subdividing when an existing parent tile can be safely
-enlarged. A temporary archive is validated against the default 500 MiB total
-budget before it atomically replaces the working map. Tippecanoe is a
-build-time tool; on macOS install it with `brew install tippecanoe`.
+Tippecanoe to build three PMTiles archives plus `build/maps/local.json`. Zooms
+1–8 receive 1% of the total archive budget, zooms 9–12 receive 9%, and zooms
+13 through the requested maximum receive the remaining 90%. With the default
+500 MiB maximum, those allowances are 5, 45, and 450 MiB. Only active bands
+share the budget when a lower maximum zoom is requested.
+
+Each band uses a variable-depth pyramid and is validated independently. An
+over-budget band is rebuilt with a lower tile-byte ceiling and geometry detail,
+without degrading completed lower zooms. All temporary archives must pass
+before the manifest atomically publishes the new set. Tippecanoe is a build-time
+tool; on macOS install it with `brew install tippecanoe`.
 
 Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
 is cached under `.cache/maps/vector-input`. The default 16 KiB limit applies to
