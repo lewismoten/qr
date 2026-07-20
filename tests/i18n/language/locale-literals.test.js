@@ -26,6 +26,7 @@ const ALLOWED_NUMERIC_KEYS = new Set([
 const PLACEHOLDER_PATTERN = /\{[A-Za-z][\w.-]*\}/gu;
 const NUMBER_PATTERN = /\p{Number}/u;
 const DATE_PATTERN = /\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b/u;
+const ASCII_COMMA = ',';
 const ASCII_COLON = ':';
 const CHINESE_TECHNICAL_COLON_PATTERNS = [
   /https?:\/\//gu,
@@ -117,17 +118,23 @@ test('locale prose receives numbers and calendar values as tags', async () => {
   );
 });
 
-test('Chinese prose uses fullwidth colons', async () => {
+test('Chinese prose uses fullwidth punctuation', async () => {
   const messages = flattenMessages(await readLocaleSource('zh-CN'));
-  const issues = Object.entries(messages)
-    .filter(([, message]) =>
-      removeChineseTechnicalColons(message).includes(ASCII_COLON),
-    )
-    .map(([key, message]) => `zh-CN.${key}: ASCII colon in "${message}"`);
+  const issues = Object.entries(messages).flatMap(([key, message]) => {
+    const findings = [];
+    if (message.includes(ASCII_COMMA)) findings.push('comma');
+    if (removeChineseTechnicalColons(message).includes(ASCII_COLON)) {
+      findings.push('colon');
+    }
+    return findings.map(
+      (punctuation) =>
+        `zh-CN.${key}: ASCII ${punctuation} in "${message}"`,
+    );
+  });
 
   assert.deepEqual(
     issues,
     [],
-    'Use ： in Chinese prose; retain : only in machine-readable syntax',
+    'Use ， and ： in Chinese prose; retain ASCII only in machine syntax',
   );
 });
