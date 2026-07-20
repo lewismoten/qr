@@ -12,6 +12,7 @@ export function tippecanoeArguments({
   baseZoom = 16,
   maximumTileBytes = 16 * 1024,
   detail = 11,
+  clipBoundingBox,
 }) {
   const args = [
     '--force',
@@ -33,6 +34,9 @@ export function tippecanoeArguments({
   ];
   if (maximumTileBytes != null) {
     args.splice(6, 0, `--maximum-tile-bytes=${maximumTileBytes}`);
+  }
+  if (clipBoundingBox) {
+    args.push(`--clip-bounding-box=${clipBoundingBox.join(',')}`);
   }
   for (const { layer, file } of inputs) {
     args.push(`--named-layer=${layer}:${path.resolve(file)}`);

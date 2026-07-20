@@ -10,6 +10,19 @@ function validateManifest(manifest) {
   return manifest;
 }
 
+export function findArchiveForTile(archives, zoom, x, y) {
+  const candidates = archives.filter((item) => {
+    return zoom >= item.minimumZoom && zoom <= item.maximumZoom;
+  });
+  const wholeWorld = candidates.find((item) => !item.shard);
+  if (wholeWorld) return wholeWorld;
+  const middle = 2 ** (zoom - 1);
+  const vertical = y < middle ? 'north' : 'south';
+  const horizontal = x < middle ? 'west' : 'east';
+  const shard = `${vertical}-${horizontal}`;
+  return candidates.find((item) => item.shard === shard);
+}
+
 export async function createPmtilesArchiveSet(
   manifestUrl,
   {
@@ -38,9 +51,7 @@ export async function createPmtilesArchiveSet(
       };
     },
     async getTile(zoom, x, y) {
-      const archive = archives.find(
-        (item) => zoom >= item.minimumZoom && zoom <= item.maximumZoom,
-      );
+      const archive = findArchiveForTile(archives, zoom, x, y);
       return archive ? archive.source.getTile(zoom, x, y) : null;
     },
   };

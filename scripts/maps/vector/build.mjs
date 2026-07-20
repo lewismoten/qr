@@ -13,11 +13,13 @@ import {
 } from './budget.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import {
+  removeStaleArchives,
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
 } from './output.mjs';
 import { runTippecanoe } from './runner.mjs';
+import { shardArchiveLevels } from './shards.mjs';
 
 const values = process.argv.slice(2);
 
@@ -47,6 +49,7 @@ const detail = Number.parseInt(option('detail', '11'), 10);
 const budgetGrowth = Number.parseFloat(option('budget-growth', '1.3'));
 const minimumLevelBytes =
   Number.parseInt(option('minimum-level-kib', '128'), 10) * 1024;
+const shardZoom = Number.parseInt(option('shard-zoom', '9'), 10);
 const executable = process.env.TIPPECANOE || 'tippecanoe';
 
 if (values.includes('--help')) {
@@ -66,7 +69,8 @@ Options:
   --max-working-mib 1000 Maximum temporary size for any one level
   --detail 11           Maximum geometry precision (2^detail extent)
   --budget-growth 1.3   Relative budget growth within each zoom tier
-  --minimum-level-kib 128 Minimum budget reserved for every level`);
+  --minimum-level-kib 128 Minimum budget reserved for every archive
+  --shard-zoom 9       First zoom split into four quadrant archives`);
   process.exit(0);
 }
 
@@ -91,14 +95,22 @@ for (const item of inputs) {
   console.log(`  ${item.layer}: ${item.features.toLocaleString()} features`);
 }
 
-const levels = planArchiveLevels({
-  minimumZoom,
-  maximumZoom,
-  maximumArchiveBytes,
-  output,
-  growth: budgetGrowth,
-  minimumLevelBytes,
-});
+const levels = shardArchiveLevels(
+  planArchiveLevels({
+    minimumZoom,
+    maximumZoom,
+    maximumArchiveBytes,
+    output,
+    growth: budgetGrowth,
+    minimumLevelBytes,
+  }),
+  shardZoom,
+);
+
+function levelLabel(level) {
+  const zoom = `z${level.minimumZoom}`;
+  return level.shard ? `${zoom} ${level.shard}` : zoom;
+}
 
 async function runLevel(level, settings) {
   const temporary = temporaryArchivePath(level.file);
@@ -109,6 +121,7 @@ async function runLevel(level, settings) {
     minimumZoom: level.minimumZoom,
     maximumZoom: level.maximumZoom,
     baseZoom,
+    clipBoundingBox: level.bounds,
     ...settings,
   });
   const observedBytes = await runTippecanoe({
@@ -116,7 +129,7 @@ async function runLevel(level, settings) {
     args,
     temporary,
     workingLimit: maximumWorkingBytes,
-    zoom: level.minimumZoom,
+    zoom: levelLabel(level),
   });
   return { temporary, observedBytes };
 }
@@ -131,14 +144,14 @@ async function buildLevel(level, allocatedBudgetBytes) {
   const acceptSmallest = () => {
     const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
     console.warn(
-      `Zoom ${level.minimumZoom} reached its compaction limit; ` +
+      `${levelLabel(level)} reached its compaction limit; ` +
         `carrying ${debt.toFixed(1)} MiB debt.`,
     );
     return best;
   };
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
-    const zoom = `z${level.minimumZoom}`;
+    const zoom = levelLabel(level);
     const tileLimit =
       settings.maximumTileBytes == null
         ? 'no tile ceiling (recovery)'
@@ -160,7 +173,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       }
       if (error.exitCode !== 100) throw error;
       console.warn(
-        `Zoom ${level.minimumZoom} cannot satisfy the tile ceiling; ` +
+        `${levelLabel(level)} cannot satisfy the tile ceiling; ` +
           'building its smallest viable archive.',
       );
       settings = { ...settings, maximumTileBytes: null };
@@ -177,7 +190,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       await rm(result.temporary, { force: true });
       if (!best) throw error;
       console.warn(
-        `Zoom ${level.minimumZoom} produced an incomplete retry; ` +
+        `${levelLabel(level)} produced an incomplete retry; ` +
           'restoring its last valid archive.',
       );
       return acceptSmallest();
@@ -220,7 +233,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     }
     settings = next;
   }
-  throw new Error(`Unable to build zoom ${level.minimumZoom}.`);
+  throw new Error(`Unable to build ${levelLabel(level)}.`);
 }
 
 const temporaryFiles = levels.flatMap((level) => [
@@ -260,6 +273,8 @@ try {
     archives: results.map((result) => ({
       minimumZoom: result.minimumZoom,
       maximumZoom: result.maximumZoom,
+      shard: result.shard,
+      bounds: result.bounds,
       file: path.basename(result.file),
       bytes: result.bytes,
       plannedBudgetBytes: result.budgetBytes,
@@ -270,6 +285,10 @@ try {
     })),
   };
   const manifestFile = archiveManifestPath(output);
+  await removeStaleArchives(
+    manifestFile,
+    results.map((result) => result.file),
+  );
   const temporaryManifest = `${manifestFile}.partial`;
   await writeFile(temporaryManifest, `${JSON.stringify(manifest, null, 2)}\n`);
   await rename(temporaryManifest, manifestFile);

@@ -1,4 +1,4 @@
-import { open, stat } from 'node:fs/promises';
+import { open, readFile, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 const PMTILES_MAGIC = 'PMTiles';
@@ -32,4 +32,21 @@ export async function validatePmtilesArchive(file, maximumBytes) {
     );
   }
   return size;
+}
+
+export async function removeStaleArchives(manifestFile, currentFiles) {
+  let manifest;
+  try {
+    manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+  } catch {
+    return;
+  }
+  const directory = path.dirname(manifestFile);
+  const keep = new Set(currentFiles.map((file) => path.basename(file)));
+  const stale = manifest.archives
+    .map((archive) => path.basename(archive.file))
+    .filter((file) => !keep.has(file));
+  await Promise.all(
+    stale.map((file) => rm(path.join(directory, file), { force: true })),
+  );
 }

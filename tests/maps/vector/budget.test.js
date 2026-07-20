@@ -11,6 +11,7 @@ import {
   updateBudgetCarry,
 } from '../../../scripts/maps/vector/budget.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
+import { shardArchiveLevels } from '../../../scripts/maps/vector/shards.mjs';
 
 test('allocates a growing budget to every active zoom level', () => {
   const mib = 1024 * 1024;
@@ -59,6 +60,35 @@ test('reduces only an over-budget zoom level', () => {
   );
 });
 
+test('splits detailed zooms into four budget-preserving quadrants', () => {
+  const mib = 1024 * 1024;
+  const planned = planArchiveLevels({
+    minimumZoom: 1,
+    maximumZoom: 19,
+    maximumArchiveBytes: 500 * mib,
+    output: 'build/maps/local.pmtiles',
+  });
+  const levels = shardArchiveLevels(planned, 9);
+  assert.equal(levels.length, 52);
+  assert.equal(
+    levels.reduce((sum, level) => sum + level.budgetBytes, 0),
+    500 * mib,
+  );
+  assert.equal(levels.filter((level) => level.minimumZoom === 8).length, 1);
+  const zoomNine = levels.filter((level) => level.minimumZoom === 9);
+  assert.equal(zoomNine.length, 4);
+  assert.deepEqual(
+    zoomNine.map((level) => level.shard),
+    ['south-west', 'south-east', 'north-west', 'north-east'],
+  );
+  assert.deepEqual(zoomNine[0].bounds, [-180, -85.05112878, 0, 0]);
+  assert.match(zoomNine[3].file, /local-z09-north-east\.pmtiles$/);
+  assert.equal(
+    zoomNine.reduce((sum, level) => sum + level.budgetBytes, 0),
+    planned[8].budgetBytes,
+  );
+});
+
 test('passes unused space and unavoidable debt between levels', () => {
   let carryBytes = updateBudgetCarry({
     carryBytes: 0,
@@ -98,6 +128,8 @@ test('publishes every budgeted PMTiles archive and its manifest', async () => {
   const manifest = path.join(source, 'local.json');
   try {
     await mkdir(source, { recursive: true });
+    await mkdir(path.join(outputRoot, 'maps'), { recursive: true });
+    await writeFile(path.join(outputRoot, 'maps/local.pmtiles'), 'stale');
     await writeFile(path.join(source, 'local-z01.pmtiles'), 'low');
     await writeFile(path.join(source, 'local-z09.pmtiles'), 'mid');
     await writeFile(
@@ -112,6 +144,10 @@ test('publishes every budgeted PMTiles archive and its manifest', async () => {
     assert.equal(
       await publishDetailedMap({ outputRoot, manifest, legacyTiles: '' }),
       'pmtiles-set',
+    );
+    await assert.rejects(
+      () => readFile(path.join(outputRoot, 'maps/local.pmtiles')),
+      /ENOENT/,
     );
     assert.equal(
       await readFile(path.join(outputRoot, 'maps/local-z09.pmtiles'), 'utf8'),

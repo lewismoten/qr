@@ -6,6 +6,7 @@ import { test } from 'node:test';
 
 import { tippecanoeArguments } from '../../scripts/maps/vector/command.mjs';
 import {
+  removeStaleArchives,
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
@@ -211,6 +212,16 @@ test('can omit the tile ceiling for an irreducible recovery build', () => {
   );
 });
 
+test('clips a quadrant archive at its geographic bounds', () => {
+  const bounds = [-180, 0, 0, 85.05112878];
+  const args = tippecanoeArguments({
+    inputs: [],
+    output: 'north-west.pmtiles',
+    clipBoundingBox: bounds,
+  });
+  assert.ok(args.includes(`--clip-bounding-box=${bounds.join(',')}`));
+});
+
 test('preserves PMTiles through temporary output validation', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-map-output-'));
   const archive = path.join(root, 'local.partial.pmtiles');
@@ -232,6 +243,26 @@ test('preserves PMTiles through temporary output validation', async () => {
       () => validatePmtilesArchive(archive, 1024),
       /PMTiles v3/,
     );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('removes archives excluded from a replacement manifest', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-stale-'));
+  const manifest = path.join(root, 'local.json');
+  const oldArchive = path.join(root, 'local-z09.pmtiles');
+  const currentArchive = path.join(root, 'local-z09-north-west.pmtiles');
+  try {
+    await writeFile(oldArchive, 'old');
+    await writeFile(currentArchive, 'current');
+    await writeFile(
+      manifest,
+      JSON.stringify({ archives: [{ file: path.basename(oldArchive) }] }),
+    );
+    await removeStaleArchives(manifest, [currentArchive]);
+    await assert.rejects(() => readFile(oldArchive), /ENOENT/);
+    assert.equal(await readFile(currentArchive, 'utf8'), 'current');
   } finally {
     await rm(root, { recursive: true, force: true });
   }

@@ -1,4 +1,4 @@
-import { access, cp, mkdir, readFile, rm } from 'node:fs/promises';
+import { access, cp, mkdir, readFile, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 async function exists(file) {
@@ -22,6 +22,12 @@ export async function publishDetailedMap({
   if (await exists(manifest)) {
     const parsed = JSON.parse(await readFile(manifest, 'utf8'));
     await rm(path.join(maps, 'tiles'), { recursive: true, force: true });
+    const oldArchives = (await readdir(maps)).filter((file) => {
+      return /^local(?:-|\.pmtiles$)/.test(file) && file.endsWith('.pmtiles');
+    });
+    await Promise.all(
+      oldArchives.map((file) => rm(path.join(maps, file), { force: true })),
+    );
     for (const item of parsed.archives) {
       const source = path.join(path.dirname(manifest), item.file);
       await cp(source, path.join(maps, item.file));
