@@ -1,5 +1,6 @@
 {
   "editor.unicodeHighlight.allowedCharacters": {
+    "\u00D7": true,
     "\uFF08": true,
     "\uFF09": true,
     "\uFF0C": true,
