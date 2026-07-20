@@ -1,42 +1,64 @@
 import path from 'node:path';
 
-const DEFINITIONS = [
+const TIERS = [
   { minimumZoom: 1, maximumZoom: 8, weight: 1 },
   { minimumZoom: 9, maximumZoom: 12, weight: 9 },
   { minimumZoom: 13, maximumZoom: Infinity, weight: 90 },
 ];
 
-export function planArchiveBands({
+export function planArchiveLevels({
   minimumZoom,
   maximumZoom,
   maximumArchiveBytes,
   output,
+  growth = 1.3,
+  minimumLevelBytes = 128 * 1024,
 }) {
-  const active = DEFINITIONS.filter(
-    (band) =>
-      band.maximumZoom >= minimumZoom && band.minimumZoom <= maximumZoom,
-  );
-  const totalWeight = active.reduce((sum, band) => sum + band.weight, 0);
-  const parsed = path.parse(output);
-  let allocated = 0;
-  return active.map((band, index) => {
-    const first = Math.max(minimumZoom, band.minimumZoom);
-    const last = Math.min(maximumZoom, band.maximumZoom);
-    const final = index === active.length - 1;
-    const budgetBytes = final
-      ? maximumArchiveBytes - allocated
-      : Math.floor((maximumArchiveBytes * band.weight) / totalWeight);
-    allocated += budgetBytes;
-    const firstText = String(first).padStart(2, '0');
-    const lastText = String(last).padStart(2, '0');
-    const suffix = `z${firstText}-${lastText}`;
-    return {
-      minimumZoom: first,
-      maximumZoom: last,
-      budgetBytes,
-      file: path.join(parsed.dir, `${parsed.name}-${suffix}${parsed.ext}`),
-    };
+  if (maximumZoom < minimumZoom || growth <= 1) {
+    throw new RangeError('Invalid zoom budget.');
+  }
+  const active = TIERS.filter((tier) => {
+    return tier.maximumZoom >= minimumZoom && tier.minimumZoom <= maximumZoom;
   });
+  const tierWeight = active.reduce((sum, tier) => sum + tier.weight, 0);
+  const parsed = path.parse(output);
+  const levels = [];
+  let totalAllocated = 0;
+  active.forEach((tier, tierIndex) => {
+    const first = Math.max(minimumZoom, tier.minimumZoom);
+    const last = Math.min(maximumZoom, tier.maximumZoom);
+    const count = last - first + 1;
+    const weights = Array.from(
+      { length: count },
+      (_, index) => growth ** index,
+    );
+    const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+    const finalTier = tierIndex === active.length - 1;
+    const tierBytes = finalTier
+      ? maximumArchiveBytes - totalAllocated
+      : Math.floor((maximumArchiveBytes * tier.weight) / tierWeight);
+    let tierAllocated = 0;
+    weights.forEach((weight, index) => {
+      const zoom = first + index;
+      const finalLevel = index === weights.length - 1;
+      const budgetBytes = finalLevel
+        ? tierBytes - tierAllocated
+        : Math.floor((tierBytes * weight) / weightTotal);
+      if (budgetBytes < minimumLevelBytes) {
+        throw new RangeError('The archive budget is too small for every zoom.');
+      }
+      tierAllocated += budgetBytes;
+      const suffix = `z${String(zoom).padStart(2, '0')}`;
+      levels.push({
+        minimumZoom: zoom,
+        maximumZoom: zoom,
+        budgetBytes,
+        file: path.join(parsed.dir, `${parsed.name}-${suffix}${parsed.ext}`),
+      });
+    });
+    totalAllocated += tierBytes;
+  });
+  return levels;
 }
 
 export function compactBuildSettings({

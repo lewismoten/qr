@@ -10,8 +10,8 @@ test('routes zooms across a budgeted PMTiles archive set', async () => {
     minimumZoom: 1,
     maximumZoom: 17,
     archives: [
-      { minimumZoom: 1, maximumZoom: 8, file: 'low.pmtiles' },
-      { minimumZoom: 9, maximumZoom: 17, file: 'high.pmtiles' },
+      { minimumZoom: 7, maximumZoom: 7, file: 'z07.pmtiles' },
+      { minimumZoom: 13, maximumZoom: 13, file: 'z13.pmtiles' },
     ],
   };
   const source = await createPmtilesArchiveSet('/maps/local.json', {
@@ -30,7 +30,7 @@ test('routes zooms across a budgeted PMTiles archive set', async () => {
   assert.deepEqual(await source.getTile(7, 0, 0), new Uint8Array([7]));
   assert.deepEqual(await source.getTile(13, 0, 0), new Uint8Array([13]));
   assert.deepEqual(requests, [
-    'http://localhost/maps/low.pmtiles:7',
-    'http://localhost/maps/high.pmtiles:13',
+    'http://localhost/maps/z07.pmtiles:7',
+    'http://localhost/maps/z13.pmtiles:13',
   ]);
 });

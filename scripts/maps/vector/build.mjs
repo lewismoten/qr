@@ -7,7 +7,7 @@ import { prepareVectorInputs } from './prepare.mjs';
 import {
   archiveManifestPath,
   compactBuildSettings,
-  planArchiveBands,
+  planArchiveLevels,
 } from './budget.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import { temporaryArchivePath, validatePmtilesArchive } from './output.mjs';
@@ -25,7 +25,7 @@ const cache = path.resolve(option('cache', '.cache/maps/natural-earth'));
 const input = path.resolve(option('input', '.cache/maps/vector-input'));
 const output = path.resolve(option('output', 'build/maps/local.pmtiles'));
 const minimumZoom = Number.parseInt(option('minimum-zoom', '1'), 10);
-const maximumZoom = Number.parseInt(option('maximum-zoom', '17'), 10);
+const maximumZoom = Number.parseInt(option('maximum-zoom', '19'), 10);
 const baseZoom = Number.parseInt(option('base-zoom', '16'), 10);
 const maximumTileBytes =
   Number.parseInt(option('max-tile-kib', '16'), 10) * 1024;
@@ -37,24 +37,29 @@ const maximumWorkingMiB = Number.parseInt(
 const maximumArchiveBytes = maximumArchiveMiB * 1024 * 1024;
 const maximumWorkingBytes = maximumWorkingMiB * 1024 * 1024;
 const detail = Number.parseInt(option('detail', '11'), 10);
+const budgetGrowth = Number.parseFloat(option('budget-growth', '1.3'));
+const minimumLevelBytes =
+  Number.parseInt(option('minimum-level-kib', '128'), 10) * 1024;
 const executable = process.env.TIPPECANOE || 'tippecanoe';
 
 if (values.includes('--help')) {
   console.log(`Usage: npm run maps:build -- [options]
 
-Builds budgeted MVT-in-PMTiles zoom-band archives with Tippecanoe.
+Builds one budgeted MVT-in-PMTiles archive per zoom with Tippecanoe.
 
 Options:
   --cache path          Downloaded GeoJSON source directory
   --input path          Temporary normalized GeoJSON sequence directory
   --output file         Filename stem for the PMTiles archive set
   --minimum-zoom 1      First generated zoom level
-  --maximum-zoom 17     Last generated zoom level
+  --maximum-zoom 19     Last generated zoom level
   --base-zoom 16        Zoom where all point features may appear
   --max-tile-kib 16     Maximum compressed MVT tile size
   --max-archive-mib 500 Reject archives larger than this total
-  --max-working-mib 1000 Maximum temporary size for any one band
-  --detail 11           Maximum geometry precision (2^detail extent)`);
+  --max-working-mib 1000 Maximum temporary size for any one level
+  --detail 11           Maximum geometry precision (2^detail extent)
+  --budget-growth 1.3   Relative budget growth within each zoom tier
+  --minimum-level-kib 128 Minimum budget reserved for every level`);
   process.exit(0);
 }
 
@@ -79,27 +84,29 @@ for (const item of inputs) {
   console.log(`  ${item.layer}: ${item.features.toLocaleString()} features`);
 }
 
-const bands = planArchiveBands({
+const levels = planArchiveLevels({
   minimumZoom,
   maximumZoom,
   maximumArchiveBytes,
   output,
+  growth: budgetGrowth,
+  minimumLevelBytes,
 });
 
-async function runBand(band, settings) {
-  const temporary = temporaryArchivePath(band.file);
+async function runLevel(level, settings) {
+  const temporary = temporaryArchivePath(level.file);
   await rm(temporary, { force: true });
   const args = tippecanoeArguments({
     inputs,
     output: temporary,
-    minimumZoom: band.minimumZoom,
-    maximumZoom: band.maximumZoom,
+    minimumZoom: level.minimumZoom,
+    maximumZoom: level.maximumZoom,
     baseZoom,
     ...settings,
   });
   const workingLimit = Math.min(
     maximumWorkingBytes,
-    Math.max(band.budgetBytes * 1.5, band.budgetBytes + 32 * 1024 * 1024),
+    Math.max(level.budgetBytes * 1.5, level.budgetBytes + 32 * 1024 * 1024),
   );
   let observedBytes = 0;
   await new Promise((resolve, reject) => {
@@ -127,26 +134,26 @@ async function runBand(band, settings) {
   return { temporary, observedBytes };
 }
 
-async function buildBand(band) {
+async function buildLevel(level) {
   let settings = { maximumTileBytes, detail };
   for (let attempt = 1; attempt <= 5; attempt += 1) {
-    const zooms = `z${band.minimumZoom}-${band.maximumZoom}`;
+    const zoom = `z${level.minimumZoom}`;
     console.log(
-      `Building ${zooms}, attempt ${attempt}, ` +
-        `${(band.budgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
+      `Building ${zoom}, attempt ${attempt}, ` +
+        `${(level.budgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
         `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles...`,
     );
-    const result = await runBand(band, settings);
-    if (result.observedBytes <= band.budgetBytes) {
+    const result = await runLevel(level, settings);
+    if (result.observedBytes <= level.budgetBytes) {
       const bytes = await validatePmtilesArchive(
         result.temporary,
-        band.budgetBytes,
+        level.budgetBytes,
       );
-      return { ...band, ...settings, bytes, temporary: result.temporary };
+      return { ...level, ...settings, bytes, temporary: result.temporary };
     }
     const next = compactBuildSettings({
       ...settings,
-      budgetBytes: band.budgetBytes,
+      budgetBytes: level.budgetBytes,
       observedBytes: result.observedBytes,
     });
     await rm(result.temporary, { force: true });
@@ -159,15 +166,15 @@ async function buildBand(band) {
     settings = next;
   }
   throw new Error(
-    `Unable to compact zooms ${band.minimumZoom}-${band.maximumZoom} ` +
-      `within ${(band.budgetBytes / 1024 / 1024).toFixed(1)} MiB.`,
+    `Unable to compact zoom ${level.minimumZoom} within ` +
+      `${(level.budgetBytes / 1024 / 1024).toFixed(1)} MiB.`,
   );
 }
 
-const temporaryFiles = bands.map((band) => temporaryArchivePath(band.file));
+const temporaryFiles = levels.map((level) => temporaryArchivePath(level.file));
 try {
   const results = [];
-  for (const band of bands) results.push(await buildBand(band));
+  for (const level of levels) results.push(await buildLevel(level));
   for (const result of results) await rename(result.temporary, result.file);
   const manifest = {
     version: 1,

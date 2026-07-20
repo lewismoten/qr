@@ -71,8 +71,8 @@ files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 17 --base-zoom 16 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 17 --base-zoom 16 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 19 --base-zoom 16 --max-tile-kib 16
 ```
 
 To fetch or refresh only the detailed USGS river source before a later build:
@@ -111,17 +111,20 @@ lands as area, line, and point features through zoom 16.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks
-Tippecanoe to build three PMTiles archives plus `build/maps/local.json`. Zooms
-1–8 receive 1% of the total archive budget, zooms 9–12 receive 9%, and zooms
-13 through the requested maximum receive the remaining 90%. With the default
-500 MiB maximum, those allowances are 5, 45, and 450 MiB. Only active bands
-share the budget when a lower maximum zoom is requested.
+Tippecanoe to build one PMTiles archive per active zoom plus
+`build/maps/local.json`. The default allocator gives zooms 1–8, 9–12, and
+13–maximum 1%, 9%, and 90% of the total. For 500 MiB, those tiers receive 5,
+45, and 450 MiB. Within each tier, individual level allowances grow by a
+relative weight of 1.3 and retain a 128 KiB minimum. Every archive budget adds
+up to exactly the configured maximum. Lower maximum zooms redistribute the
+total among only the active tiers.
 
-Each band uses a variable-depth pyramid and is validated independently. An
-over-budget band is rebuilt with a lower tile-byte ceiling and geometry detail,
-without degrading completed lower zooms. All temporary archives must pass
-before the manifest atomically publishes the new set. Tippecanoe is a build-time
-tool; on macOS install it with `brew install tippecanoe`.
+Each level is validated independently. An over-budget level is rebuilt with a
+lower tile-byte ceiling and geometry detail without degrading completed zooms.
+All temporary archives must pass before the manifest atomically publishes the
+new set. Use `--budget-growth` and `--minimum-level-kib` to tune the curve.
+Tippecanoe is a build-time tool; on macOS install it with
+`brew install tippecanoe`.
 
 Downloads are cached under `.cache/maps`. Normalized newline-delimited GeoJSON
 is cached under `.cache/maps/vector-input`. The default 16 KiB limit applies to

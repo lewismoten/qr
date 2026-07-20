@@ -184,7 +184,7 @@ test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
     output: 'local.pmtiles',
   });
   assert.ok(args.includes('--maximum-tile-bytes=16384'));
-  assert.ok(args.includes('--maximum-zoom=17'));
+  assert.ok(args.includes('--maximum-zoom=19'));
   assert.ok(args.includes('--base-zoom=16'));
   assert.ok(args.includes('--full-detail=11'));
   assert.ok(args.includes('--low-detail=9'));

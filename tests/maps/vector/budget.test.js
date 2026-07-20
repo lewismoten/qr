@@ -6,33 +6,46 @@ import test from 'node:test';
 
 import {
   compactBuildSettings,
-  planArchiveBands,
+  planArchiveLevels,
 } from '../../../scripts/maps/vector/budget.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
 
-test('allocates archive budgets by active zoom band', () => {
+test('allocates a growing budget to every active zoom level', () => {
   const mib = 1024 * 1024;
-  const bands = planArchiveBands({
+  const levels = planArchiveLevels({
     minimumZoom: 1,
-    maximumZoom: 17,
+    maximumZoom: 19,
     maximumArchiveBytes: 500 * mib,
     output: 'build/maps/local.pmtiles',
   });
-  assert.deepEqual(
-    bands.map((band) => [
-      band.minimumZoom,
-      band.maximumZoom,
-      band.budgetBytes / mib,
-    ]),
-    [
-      [1, 8, 5],
-      [9, 12, 45],
-      [13, 17, 450],
-    ],
+  assert.equal(levels.length, 19);
+  assert.equal(
+    levels.reduce((sum, level) => sum + level.budgetBytes, 0),
+    500 * mib,
   );
+  assert.equal(
+    levels.slice(0, 8).reduce((sum, level) => sum + level.budgetBytes, 0),
+    5 * mib,
+  );
+  assert.equal(
+    levels.slice(8, 12).reduce((sum, level) => sum + level.budgetBytes, 0),
+    45 * mib,
+  );
+  assert.equal(
+    levels.slice(12).reduce((sum, level) => sum + level.budgetBytes, 0),
+    450 * mib,
+  );
+  assert.ok(levels.every((level) => level.minimumZoom === level.maximumZoom));
+  assert.ok(
+    levels.slice(1).every((level, index) => {
+      return level.budgetBytes > levels[index].budgetBytes;
+    }),
+  );
+  assert.match(levels[0].file, /local-z01\.pmtiles$/);
+  assert.match(levels[18].file, /local-z19\.pmtiles$/);
 });
 
-test('reduces only an over-budget zoom band', () => {
+test('reduces only an over-budget zoom level', () => {
   assert.deepEqual(
     compactBuildSettings({
       budgetBytes: 100,
@@ -51,14 +64,14 @@ test('publishes every budgeted PMTiles archive and its manifest', async () => {
   const manifest = path.join(source, 'local.json');
   try {
     await mkdir(source, { recursive: true });
-    await writeFile(path.join(source, 'local-z01-08.pmtiles'), 'low');
-    await writeFile(path.join(source, 'local-z09-12.pmtiles'), 'mid');
+    await writeFile(path.join(source, 'local-z01.pmtiles'), 'low');
+    await writeFile(path.join(source, 'local-z09.pmtiles'), 'mid');
     await writeFile(
       manifest,
       JSON.stringify({
         archives: [
-          { file: 'local-z01-08.pmtiles' },
-          { file: 'local-z09-12.pmtiles' },
+          { file: 'local-z01.pmtiles' },
+          { file: 'local-z09.pmtiles' },
         ],
       }),
     );
@@ -67,10 +80,7 @@ test('publishes every budgeted PMTiles archive and its manifest', async () => {
       'pmtiles-set',
     );
     assert.equal(
-      await readFile(
-        path.join(outputRoot, 'maps/local-z09-12.pmtiles'),
-        'utf8',
-      ),
+      await readFile(path.join(outputRoot, 'maps/local-z09.pmtiles'), 'utf8'),
       'mid',
     );
   } finally {
