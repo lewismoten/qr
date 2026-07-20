@@ -32,8 +32,11 @@ export async function runTippecanoe({
       clearInterval(monitor);
       observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
       if (workingLimitExceeded || observedBytes > workingLimit) {
+        const observedMiB = (observedBytes / 1024 / 1024).toFixed(1);
+        const limitMiB = (workingLimit / 1024 / 1024).toFixed(1);
         const error = new Error(
-          `Zoom ${zoom} exceeded its working-size limit.`,
+          `Zoom ${zoom} temporary output reached ${observedMiB} MiB, ` +
+            `exceeding its ${limitMiB} MiB working-size limit.`,
         );
         error.workingLimitExceeded = true;
         reject(error);

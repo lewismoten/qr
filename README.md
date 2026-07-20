@@ -119,6 +119,11 @@ relative weight of 1.3 and retain a 128 KiB minimum. Every archive budget adds
 up to exactly the configured maximum. Lower maximum zooms redistribute the
 total among only the active tiers.
 
+The final archive budget and temporary workspace limit are independent.
+Tippecanoe may need substantially more temporary space than the compressed
+archive it ultimately emits, so `--max-working-mib` is enforced per active
+zoom without reducing it to that zoom's final archive allowance.
+
 Each level is validated independently. An over-budget level is rebuilt with a
 lower tile-byte ceiling and geometry detail without degrading completed zooms.
 Unused bytes roll into the next level. If a level cannot shrink enough at the

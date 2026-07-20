@@ -111,15 +111,11 @@ async function runLevel(level, settings) {
     baseZoom,
     ...settings,
   });
-  const workingLimit = Math.min(
-    maximumWorkingBytes,
-    Math.max(level.budgetBytes * 1.5, level.budgetBytes + 32 * 1024 * 1024),
-  );
   const observedBytes = await runTippecanoe({
     executable,
     args,
     temporary,
-    workingLimit,
+    workingLimit: maximumWorkingBytes,
     zoom: level.minimumZoom,
   });
   return { temporary, observedBytes };
