@@ -70,6 +70,7 @@ function createEnvironment() {
 describe('fragment help', () => {
   test('preserves the href and opens imported help in a dialog', async () => {
     const { document, link, panel } = createEnvironment();
+    let initializedContent = null;
     const source = createElement('section');
     source.children.push(createElement('h2'));
     const parsed = {
@@ -80,6 +81,9 @@ describe('fragment help', () => {
       document,
       fetcher: async () => ({ ok: true, text: async () => '' }),
       parse: () => parsed,
+      initializeHelp: (content) => {
+        initializedContent = content;
+      },
     });
     const dialog = panel.children.at(-1);
     assert.equal(panel.children.at(-2), link);
@@ -94,6 +98,7 @@ describe('fragment help', () => {
     });
     assert.equal(prevented, true);
     assert.equal(dialog.open, true);
+    assert.equal(initializedContent, dialog.children[0]);
     dialog.children[1].listeners.get('click')();
     assert.equal(dialog.open, false);
   });

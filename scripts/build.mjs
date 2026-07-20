@@ -94,6 +94,13 @@ const builds = [
   },
   {
     ...shared,
+    entryPoints: ['src/js/info/geo-layer-samples.js'],
+    outfile: 'dist/geo-samples.min.js',
+    format: 'esm',
+    platform: 'browser',
+  },
+  {
+    ...shared,
     entryPoints: ['src/css/spec.css'],
     outfile: 'dist/spec.min.css',
   },

@@ -77,9 +77,56 @@
   left: calc(var(--sample-x, 0) * -100%);
 }
 
-.geo-layer-sample figcaption {
+.geo-layer-sample-mosaic {
   position: absolute;
   z-index: 1;
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  inset: 0;
+}
+
+.geo-layer-sample.has-centered-map > img {
+  visibility: hidden;
+}
+
+.geo-layer-sample.has-centered-map .geo-layer-sample-mosaic {
+  opacity: 1;
+}
+
+.geo-layer-sample-mosaic .slippy-map-tile {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.geo-layer-sample-mosaic .slippy-map-vector-tile {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.geo-layer-sample-marker {
+  position: absolute;
+  z-index: 2;
+  width: 0.48rem;
+  height: 0.48rem;
+  border: 0.1rem solid white;
+  border-radius: 50%;
+  background: #e11d48;
+  box-shadow: 0 1px 3px rgba(19, 34, 53, 0.55);
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+}
+
+.geo-layer-sample figcaption {
+  position: absolute;
+  z-index: 3;
   inset: auto 0 0;
   padding: 0.2rem;
   background: rgba(19, 34, 53, 0.82);

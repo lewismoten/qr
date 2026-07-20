@@ -14,7 +14,20 @@ function getParser(document) {
   return new Parser();
 }
 
-function installFragmentHelp({ document, panel, parsed, link }) {
+function initializeHelpFeatures(content) {
+  if (!content.querySelector?.('[data-centered-map-samples]')) return;
+  import('../../info/geo-layer-samples.js')
+    .then(({ initializeGeoLayerSamples }) => initializeGeoLayerSamples(content))
+    .catch(console.error);
+}
+
+function installFragmentHelp({
+  document,
+  panel,
+  parsed,
+  link,
+  initializeFeatures,
+}) {
   const sources = [
     ...(parsed.querySelectorAll?.('[data-fragment-help]') ?? []),
   ];
@@ -41,6 +54,7 @@ function installFragmentHelp({ document, panel, parsed, link }) {
   link.addEventListener('click', (event) => {
     event.preventDefault();
     dialog.showModal();
+    initializeFeatures(content);
   });
   dialog.append(content, close);
   panel.append(dialog);
@@ -53,6 +67,7 @@ export function ensurePanelFragment(
     fetcher = document?.defaultView?.fetch?.bind(document.defaultView),
     parse = (source) =>
       getParser(document).parseFromString(source, 'text/html'),
+    initializeHelp = initializeHelpFeatures,
   } = {},
 ) {
   const url = panel?.dataset.fragmentUrl;
@@ -93,6 +108,7 @@ export function ensurePanelFragment(
         panel,
         parsed,
         link: helpLink,
+        initializeFeatures: initializeHelp,
       });
       panel.dispatchEvent(new Event('fragmentload'));
       return panel;
