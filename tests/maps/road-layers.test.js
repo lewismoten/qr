@@ -20,6 +20,53 @@ test('increases secondary-road detail at zoom level twelve', () => {
   );
 });
 
+test('uses progressively detailed Census railroads at zoom ten', () => {
+  const overview = MAP_SOURCES.railroadsOverview;
+  const detailed = MAP_SOURCES.railroadsDetailed;
+  assert.deepEqual([overview.minimumZoom, overview.maximumZoom], [10, 11]);
+  assert.deepEqual([detailed.minimumZoom, detailed.maximumZoom], [12, 13]);
+  assert.match(overview.url, /Transportation_LargeScale\/MapServer\/3/);
+  assert.match(overview.url, /outFields=OBJECTID%2CMTFCC/);
+  assert.match(overview.url, /maxAllowableOffset=0\.002/);
+  assert.match(detailed.url, /maxAllowableOffset=0\.0005/);
+});
+
+test('renders railroads only within their configured zoom ranges', () => {
+  const line = {
+    properties: {},
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        [-1, 0],
+        [1, 0],
+      ],
+    },
+  };
+  const railroads = prepareCollections({
+    railroadsOverview: {
+      minimumZoom: 10,
+      maximumZoom: 11,
+      collection: { features: [line] },
+    },
+    railroadsDetailed: {
+      minimumZoom: 12,
+      maximumZoom: 13,
+      collection: { features: [line] },
+    },
+  });
+
+  assert.equal(renderTile({ zoom: 9, x: 256, y: 256 }, railroads), '');
+  assert.match(
+    renderTile({ zoom: 10, x: 512, y: 512 }, railroads),
+    /class="railway"/,
+  );
+  assert.match(
+    renderTile({ zoom: 12, x: 2048, y: 2048 }, railroads),
+    /class="railway"/,
+  );
+  assert.equal(renderTile({ zoom: 14, x: 8192, y: 8192 }, railroads), '');
+});
+
 test('excludes configured countries and honors road zoom rankings', () => {
   const road = (country, minimumZoom, type = 'Major Highway') => ({
     properties: { sov_a3: country, min_zoom: minimumZoom, type },

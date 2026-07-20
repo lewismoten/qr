@@ -5,11 +5,20 @@ const STYLES = {
   boundary: { stroke: '#7d916f', width: 0.75 },
   land: { fill: '#d9e9c3', stroke: '#5d8069', width: 0.5 },
   park: { fill: '#acd493', stroke: '#4f8657', width: 0.55 },
+  railway: { stroke: '#59636f', width: 0.55 },
   road: { stroke: '#c56f43', width: 0.75 },
   water: { fill: '#bfe3ed', stroke: '#75adbd', width: 0.45 },
   waterway: { stroke: '#75adbd', width: 0.45 },
 };
-const ORDER = ['land', 'park', 'water', 'waterway', 'road', 'boundary'];
+const ORDER = [
+  'land',
+  'park',
+  'water',
+  'waterway',
+  'road',
+  'railway',
+  'boundary',
+];
 const PLACE_LIMITS = [
   [8, 6],
   [9, 8],

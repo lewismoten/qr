@@ -13,6 +13,8 @@ export const MAP_TILE_STYLE =
   'stroke-linecap:round;stroke-linejoin:round}' +
   '.secondary-road{fill:none;stroke:#d39772;stroke-width:.42;' +
   'stroke-linecap:round;stroke-linejoin:round}' +
+  '.railway{fill:none;stroke:#59636f;stroke-width:.55;' +
+  'stroke-linecap:round;stroke-linejoin:round}' +
   '.region{fill:none;stroke:#8a9d75;stroke-width:.7}' +
   '.subdivision{fill:none;stroke:#aab59a;stroke-width:.45}' +
   '.state-boundary{fill:none;stroke:#7d916f;stroke-width:.8}' +

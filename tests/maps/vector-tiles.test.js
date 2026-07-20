@@ -89,6 +89,16 @@ test('classifies detailed Census roads as secondary roads', () => {
   assert.deepEqual(road.tippecanoe, { minzoom: 12, maxzoom: 13 });
 });
 
+test('classifies Census railroad geometry in its own vector layer', () => {
+  const railroad = prepareVectorFeature('railroadsDetailed', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { NAME: 'Example Railway', MTFCC: 'R1011' },
+  });
+  assert.deepEqual(railroad.properties, { class: 'rail' });
+  assert.deepEqual(railroad.tippecanoe, { minzoom: 12, maxzoom: 13 });
+});
+
 test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   const args = tippecanoeArguments({
     inputs: [{ layer: 'land', file: 'land.geojsonseq' }],

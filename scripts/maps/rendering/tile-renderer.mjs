@@ -154,6 +154,15 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     'secondary-road',
     tolerance,
   );
+  const railways = renderPaths(
+    [
+      ...featuresInTile(collections, 'railroadsOverview', tile),
+      ...featuresInTile(collections, 'railroadsDetailed', tile),
+    ],
+    tile,
+    'railway',
+    tolerance,
+  );
   const subdivisions = renderPaths(
     featuresInTile(collections, 'subdivisions', tile),
     tile,
@@ -174,6 +183,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
   const content = [countries, protectedAreas, protectedLines];
   content.push(protectedPoints, lakes, rivers, riverDetails, roads);
   content.push(secondaryRoads);
+  content.push(railways);
   content.push(regions, subdivisions, states, cities);
   if (!content.some(Boolean)) return '';
   return (
@@ -188,6 +198,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     riverDetails +
     roads +
     secondaryRoads +
+    railways +
     regions +
     subdivisions +
     states +

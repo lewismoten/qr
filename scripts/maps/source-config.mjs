@@ -16,6 +16,8 @@ export const DEFAULT_LAYERS = [
   'primaryRoads',
   'secondaryRoads',
   'secondaryRoadsDetailed',
+  'railroadsOverview',
+  'railroadsDetailed',
   'naturalEarthRoads',
   'states',
   'subdivisions',
@@ -45,6 +47,12 @@ const ROAD_QUERY =
 const transportationUrl = (layer, offset) =>
   `${TRANSPORTATION_ROOT}${layer}/query?${ROAD_QUERY}&` +
   `maxAllowableOffset=${offset}`;
+const RAILROAD_ROOT =
+  'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
+  'TIGERweb/Transportation_LargeScale/MapServer/3/query?';
+const RAILROAD_QUERY = ROAD_QUERY.replace('%2A', 'OBJECTID%2CMTFCC');
+const railroadUrl = (offset) =>
+  `${RAILROAD_ROOT}${RAILROAD_QUERY}&maxAllowableOffset=${offset}`;
 const NHDPLUS_ROOT =
   'https://hydro.nationalmap.gov/arcgis/rest/services/' +
   'NHDPlus_HR/MapServer/3/query?';
@@ -194,6 +202,22 @@ export const MAP_SOURCES = {
     maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'line',
   },
+  railroadsOverview: {
+    file: 'census/census_2025_railroads_2m.geojson',
+    url: railroadUrl(0.002),
+    pageSize: 1000,
+    minimumZoom: 10,
+    maximumZoom: 11,
+    kind: 'line',
+  },
+  railroadsDetailed: {
+    file: 'census/census_2025_railroads_500k.geojson',
+    url: railroadUrl(0.0005),
+    pageSize: 1000,
+    minimumZoom: 12,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
+    kind: 'line',
+  },
   naturalEarthRoads: {
     file: 'cultural/ne_10m_roads.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_roads.geojson`,
@@ -255,7 +279,7 @@ export const SOURCE_ATTRIBUTION = [
     name: 'U.S. Census Bureau',
     license: 'U.S. government work',
     website: 'https://www.census.gov/geographies/mapping-files.html',
-    version: '2024 ACS boundaries and 2025 TIGERweb primary roads',
+    version: '2024 ACS boundaries and 2025 TIGERweb transport',
   },
   {
     name: 'U.S. Geological Survey',
