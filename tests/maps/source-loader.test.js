@@ -59,3 +59,39 @@ test('downloads ArcGIS object ID pages without deep offsets', async () => {
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test('rejects oversized ArcGIS sources before downloading pages', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-source-'));
+  const originalFetch = globalThis.fetch;
+  let pageRequests = 0;
+  globalThis.fetch = async (url) => {
+    if (url.endsWith('/ids')) {
+      return response({ objectIds: [10, 20, 30] });
+    }
+    pageRequests += 1;
+    return response({ type: 'FeatureCollection', features: [] });
+  };
+  try {
+    await assert.rejects(
+      obtainMapSource({
+        name: 'sample',
+        source: {
+          file: 'sample.geojson',
+          url: 'https://example.test/query?f=geojson',
+          idsUrl: 'https://example.test/ids',
+          objectIdPagination: true,
+          parallelPages: 2,
+          pageSize: 2,
+          maximumFeatures: 2,
+        },
+        cache: root,
+        formatBytes: (bytes) => `${bytes} B`,
+      }),
+      /returned 3 features; the configured limit is 2/,
+    );
+    assert.equal(pageRequests, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    await rm(root, { recursive: true, force: true });
+  }
+});

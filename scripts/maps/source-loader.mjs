@@ -95,6 +95,12 @@ async function downloadObjectIdCollection(name, source, formatBytes) {
     false,
   );
   const ids = parseObjectIds(idsContent, source.idsUrl);
+  if (source.maximumFeatures && ids.length > source.maximumFeatures) {
+    throw new Error(
+      `${name} returned ${ids.length.toLocaleString()} features; ` +
+        `the configured limit is ${source.maximumFeatures.toLocaleString()}.`,
+    );
+  }
   const pages = new Array(Math.ceil(ids.length / source.pageSize));
   let nextPage = 0;
   let received = 0;

@@ -67,7 +67,7 @@ test('classifies ranked USGS flowlines as major waterways', () => {
     },
   });
   assert.deepEqual(river.properties, { class: 'major' });
-  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 13 });
+  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 15 });
 });
 
 test('classifies Natural Earth rivers as reference waterways', () => {

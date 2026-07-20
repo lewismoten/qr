@@ -21,20 +21,24 @@ const railroadUrl = (offset, precision = 4) =>
 const NHDPLUS_ROOT =
   'https://hydro.nationalmap.gov/arcgis/rest/services/' +
   'NHDPlus_HR/MapServer/3/query?';
-const nhdWhere = (visibility) => `visibilityfilter%3E%3D${visibility}`;
-const nhdUrl = (visibility, offset) =>
-  `${NHDPLUS_ROOT}where=${nhdWhere(visibility)}&` +
+const NHD_MAJOR_WHERE = 'visibilityfilter%3E%3D5000000';
+const NHD_LOCAL_WHERE =
+  'visibilityfilter%3E%3D1000000%20AND%20' +
+  'visibilityfilter%3C5000000%20AND%20streamorde%3E%3D6';
+const nhdUrl = (where, offset) =>
+  `${NHDPLUS_ROOT}where=${where}&` +
   'outFields=OBJECTID%2Cvisibilityfilter%2Cftype&' +
   'returnGeometry=true&returnZ=false&returnM=false&outSR=4326&' +
   `geometryPrecision=5&maxAllowableOffset=${offset}&f=geojson`;
-const nhdIdsUrl = (visibility) =>
-  `${NHDPLUS_ROOT}where=${nhdWhere(visibility)}&` + 'returnIdsOnly=true&f=json';
-const pagedNhdSource = (visibility, offset) => ({
-  url: nhdUrl(visibility, offset),
-  idsUrl: nhdIdsUrl(visibility),
+const nhdIdsUrl = (where) =>
+  `${NHDPLUS_ROOT}where=${where}&returnIdsOnly=true&f=json`;
+const pagedNhdSource = (where, offset, maximumFeatures) => ({
+  url: nhdUrl(where, offset),
+  idsUrl: nhdIdsUrl(where),
   objectIdPagination: true,
   parallelPages: 4,
   pageSize: 2000,
+  maximumFeatures,
   kind: 'line',
 });
 
@@ -42,13 +46,13 @@ export function createDetailSources(maximumZoom) {
   return {
     nhdMajorRivers: {
       file: 'usgs/nhdplus_hr_major_rivers.geojson',
-      ...pagedNhdSource(5000000, 0.00025),
+      ...pagedNhdSource(NHD_MAJOR_WHERE, 0.00025, 2000000),
       minimumZoom: 9,
-      maximumZoom: 13,
+      maximumZoom,
     },
     nhdLocalRivers: {
       file: 'usgs/nhdplus_hr_local_rivers.geojson',
-      ...pagedNhdSource(1000000, 0.0001),
+      ...pagedNhdSource(NHD_LOCAL_WHERE, 0.0001, 100000),
       minimumZoom: 14,
       maximumZoom,
     },

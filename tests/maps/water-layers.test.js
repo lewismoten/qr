@@ -18,7 +18,8 @@ test('keeps regional river supplements through zoom level fifteen', () => {
 test('adds ranked public-domain USGS rivers at detailed zooms', () => {
   const source = MAP_SOURCES.nhdMajorRivers;
   assert.equal(source.minimumZoom, 9);
-  assert.equal(source.maximumZoom, 13);
+  assert.equal(source.maximumZoom, 15);
+  assert.equal(source.maximumFeatures, 2000000);
   assert.equal(source.pageSize, 2000);
   assert.equal(source.objectIdPagination, true);
   assert.equal(source.parallelPages, 4);
@@ -32,8 +33,10 @@ test('uses a finer ranked USGS river tier at zoom fourteen', () => {
   const source = MAP_SOURCES.nhdLocalRivers;
   assert.equal(source.minimumZoom, 14);
   assert.equal(source.maximumZoom, 15);
+  assert.equal(source.maximumFeatures, 100000);
   assert.equal(source.objectIdPagination, true);
-  assert.match(source.url, /visibilityfilter%3E%3D1000000/);
+  assert.match(source.url, /visibilityfilter%3C5000000/);
+  assert.match(source.url, /streamorde%3E%3D6/);
   assert.match(source.url, /maxAllowableOffset=0\.0001/);
 });
 
