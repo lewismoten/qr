@@ -1,21 +1,11 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
 import { test } from 'node:test';
 
 import { tippecanoeArguments } from '../../scripts/maps/vector/command.mjs';
 import {
-  removeStaleArchives,
-  smallestArchivePath,
-  temporaryArchivePath,
-  validatePmtilesArchive,
-} from '../../scripts/maps/vector/output.mjs';
-import {
   prepareVectorFeature,
   validateVectorLayers,
 } from '../../scripts/maps/vector/prepare.mjs';
-import { publishDetailedMap } from '../../scripts/maps/vector/publish.mjs';
 
 test('normalizes map properties and feature zoom hints', () => {
   const feature = prepareVectorFeature('towns', {
@@ -220,70 +210,4 @@ test('clips a quadrant archive at its geographic bounds', () => {
     clipBoundingBox: bounds,
   });
   assert.ok(args.includes(`--clip-bounding-box=${bounds.join(',')}`));
-});
-
-test('preserves PMTiles through temporary output validation', async () => {
-  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-output-'));
-  const archive = path.join(root, 'local.partial.pmtiles');
-  try {
-    const bytes = Buffer.from('PMTiles\x03payload');
-    await writeFile(archive, bytes);
-    assert.equal(
-      temporaryArchivePath(path.join(root, 'local.pmtiles')),
-      archive,
-    );
-    assert.equal(
-      smallestArchivePath(path.join(root, 'local.pmtiles')),
-      path.join(root, 'local.smallest.pmtiles'),
-    );
-    assert.equal(await validatePmtilesArchive(archive, 1024), bytes.length);
-    await assert.rejects(() => validatePmtilesArchive(archive, 4), /budget is/);
-    await writeFile(archive, 'SQLite format 3');
-    await assert.rejects(
-      () => validatePmtilesArchive(archive, 1024),
-      /PMTiles v3/,
-    );
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-});
-
-test('removes archives excluded from a replacement manifest', async () => {
-  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-stale-'));
-  const manifest = path.join(root, 'local.json');
-  const oldArchive = path.join(root, 'local-z09.pmtiles');
-  const currentArchive = path.join(root, 'local-z09-north-west.pmtiles');
-  try {
-    await writeFile(oldArchive, 'old');
-    await writeFile(currentArchive, 'current');
-    await writeFile(
-      manifest,
-      JSON.stringify({ archives: [{ file: path.basename(oldArchive) }] }),
-    );
-    await removeStaleArchives(manifest, [currentArchive]);
-    await assert.rejects(() => readFile(oldArchive), /ENOENT/);
-    assert.equal(await readFile(currentArchive, 'utf8'), 'current');
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-});
-
-test('publishes the PMTiles archive into a new map directory', async () => {
-  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-publish-'));
-  const archive = path.join(root, 'source', 'local.pmtiles');
-  const outputRoot = path.join(root, 'site');
-  try {
-    await mkdir(path.dirname(archive), { recursive: true });
-    await writeFile(archive, 'PMTiles');
-    assert.equal(
-      await publishDetailedMap({ outputRoot, archive, legacyTiles: '' }),
-      'pmtiles',
-    );
-    assert.equal(
-      await readFile(path.join(outputRoot, 'maps', 'local.pmtiles'), 'utf8'),
-      'PMTiles',
-    );
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
 });

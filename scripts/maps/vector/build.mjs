@@ -1,7 +1,15 @@
-import { spawnSync } from 'node:child_process';
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
 
+import {
+  readVectorBuildOptions,
+  VECTOR_BUILD_HELP,
+} from '../reporting/options.mjs';
+import {
+  createBuildLog,
+  recordArchiveAttempt,
+  recordCompletedArchive,
+} from '../reporting/run-log.mjs';
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
   availableLevelBudget,
@@ -12,87 +20,58 @@ import {
 } from './budget.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import {
-  removeStaleArchives,
+  readPmtilesArchiveStats,
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
+  writeArchiveManifest,
 } from './output.mjs';
-import { runTippecanoe } from './runner.mjs';
+import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
 import { shardArchiveLevels } from './shards.mjs';
 
-const values = process.argv.slice(2);
-
-function option(name, fallback) {
-  const exact = values.find((value) => value.startsWith(`--${name}=`));
-  if (exact) return exact.slice(name.length + 3);
-  const index = values.indexOf(`--${name}`);
-  return index >= 0 ? values[index + 1] : fallback;
-}
-
-const cache = path.resolve(option('cache', '.cache/maps/natural-earth'));
-const input = path.resolve(option('input', '.cache/maps/vector-input'));
-const output = path.resolve(option('output', 'build/maps/local.pmtiles'));
-const minimumZoom = Number.parseInt(option('minimum-zoom', '1'), 10);
-const maximumZoom = Number.parseInt(option('maximum-zoom', '19'), 10);
-const baseZoom = Number.parseInt(option('base-zoom', '16'), 10);
-const maximumTileBytes =
-  Number.parseInt(option('max-tile-kib', '16'), 10) * 1024;
-const maximumArchiveMiB = Number.parseInt(option('max-archive-mib', '500'), 10);
-const maximumWorkingMiB = Number.parseInt(
-  option('max-working-mib', String(maximumArchiveMiB * 2)),
-  10,
-);
-const maximumArchiveBytes = maximumArchiveMiB * 1024 * 1024;
-const maximumWorkingBytes = maximumWorkingMiB * 1024 * 1024;
-const detail = Number.parseInt(option('detail', '11'), 10);
-const budgetGrowth = Number.parseFloat(option('budget-growth', '1.3'));
-const minimumLevelBytes =
-  Number.parseInt(option('minimum-level-kib', '128'), 10) * 1024;
-const shardZoom = Number.parseInt(option('shard-zoom', '9'), 10);
-const executable = process.env.TIPPECANOE || 'tippecanoe';
+const options = readVectorBuildOptions();
+const {
+  values,
+  cache,
+  input,
+  output,
+  minimumZoom,
+  maximumZoom,
+  baseZoom,
+  maximumTileBytes,
+  maximumArchiveMiB,
+  maximumWorkingBytes,
+  maximumArchiveBytes,
+  detail,
+  budgetGrowth,
+  minimumLevelBytes,
+  shardZoom,
+  executable,
+} = options;
 
 if (values.includes('--help')) {
-  console.log(`Usage: npm run maps:build -- [options]
-
-Builds one budgeted MVT-in-PMTiles archive per zoom with Tippecanoe.
-
-Options:
-  --cache path          Downloaded GeoJSON source directory
-  --input path          Temporary normalized GeoJSON sequence directory
-  --output file         Filename stem for the PMTiles archive set
-  --minimum-zoom 1      First generated zoom level
-  --maximum-zoom 19     Last generated zoom level
-  --base-zoom 16        Zoom where all point features may appear
-  --max-tile-kib 16     Maximum compressed MVT tile size
-  --max-archive-mib 500 Reject archives larger than this total
-  --max-working-mib 1000 Maximum temporary size for any one level
-  --detail 11           Maximum geometry precision (2^detail extent)
-  --budget-growth 1.3   Relative budget growth within each zoom tier
-  --minimum-level-kib 128 Minimum budget reserved for every archive
-  --shard-zoom 9       First zoom split into four quadrant archives`);
+  console.log(VECTOR_BUILD_HELP);
   process.exit(0);
 }
 
-const available = spawnSync(executable, ['--version'], {
-  encoding: 'utf8',
-});
-if (available.error?.code === 'ENOENT') {
-  throw new Error(
-    'Tippecanoe is required to build PMTiles. On macOS, run ' +
-      '`brew install tippecanoe`, then retry.',
-  );
-}
-if (available.status !== 0) {
-  throw new Error(available.stderr || 'Unable to run Tippecanoe.');
-}
+const log = createBuildLog(options);
+const runStarted = Date.now();
+console.log(`Generation log: ${log.file}`);
+
+validateTippecanoeExecutable(executable);
 
 validateVectorLayers();
 await mkdir(path.dirname(output), { recursive: true });
 console.log('Preparing compact vector layers...');
+const preparationStarted = Date.now();
 const inputs = await prepareVectorInputs({ cache, output: input });
 for (const item of inputs) {
   console.log(`  ${item.layer}: ${item.features.toLocaleString()} features`);
 }
+log.record('inputs-prepared', {
+  durationMs: Date.now() - preparationStarted,
+  layers: inputs,
+});
 
 const levels = shardArchiveLevels(
   planArchiveLevels({
@@ -129,6 +108,13 @@ async function runLevel(level, settings) {
     temporary,
     workingLimit: maximumWorkingBytes,
     zoom: levelLabel(level),
+    log,
+    context: {
+      zoom: level.minimumZoom,
+      shard: level.shard,
+      maximumTileBytes: settings.maximumTileBytes,
+      detail: settings.detail,
+    },
   });
   return { temporary, observedBytes };
 }
@@ -150,6 +136,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
   };
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const attemptStarted = Date.now();
     const scope = level.shard ? 'quadrant' : 'zoom';
     const tileLimit =
       settings.maximumTileBytes == null
@@ -161,6 +148,12 @@ async function buildLevel(level, allocatedBudgetBytes) {
         `${scope} budget, ` +
         `${tileLimit}...`,
     );
+    recordArchiveAttempt(log, 'archive-attempt-start', {
+      level,
+      attempt,
+      allocatedBudgetBytes,
+      settings,
+    });
     let result;
     let recovery = false;
     try {
@@ -181,11 +174,13 @@ async function buildLevel(level, allocatedBudgetBytes) {
       recovery = true;
     }
     let bytes;
+    let archiveStats;
     try {
       bytes = await validatePmtilesArchive(
         result.temporary,
         Number.MAX_SAFE_INTEGER,
       );
+      archiveStats = await readPmtilesArchiveStats(result.temporary);
     } catch (error) {
       await rm(result.temporary, { force: true });
       if (!best) throw error;
@@ -195,6 +190,16 @@ async function buildLevel(level, allocatedBudgetBytes) {
       );
       return acceptSmallest();
     }
+    recordArchiveAttempt(log, 'archive-attempt-complete', {
+      level,
+      attempt,
+      allocatedBudgetBytes,
+      settings,
+      durationMs: Date.now() - attemptStarted,
+      bytes,
+      archiveStats,
+      recovery,
+    });
     if (bytes <= allocatedBudgetBytes) {
       await rm(smallestFile, { force: true });
       return {
@@ -202,6 +207,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
         ...settings,
         allocatedBudgetBytes,
         bytes,
+        archiveStats,
         temporary: result.temporary,
       };
     }
@@ -213,6 +219,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
         ...settings,
         allocatedBudgetBytes,
         bytes,
+        archiveStats,
         temporary: smallestFile,
       };
     } else {
@@ -244,6 +251,7 @@ try {
   const results = [];
   let carryBytes = 0;
   for (const level of levels) {
+    const levelStarted = Date.now();
     const allocatedBudgetBytes = availableLevelBudget({
       plannedBytes: level.budgetBytes,
       carryBytes,
@@ -257,6 +265,7 @@ try {
     });
     result.carryBytes = carryBytes;
     results.push(result);
+    recordCompletedArchive(log, result, Date.now() - levelStarted);
   }
   if (carryBytes < 0) {
     throw new Error(
@@ -265,36 +274,26 @@ try {
     );
   }
   for (const result of results) await rename(result.temporary, result.file);
-  const manifest = {
-    version: 1,
+  await writeArchiveManifest({
+    manifestFile: archiveManifestPath(output),
+    results,
     minimumZoom,
     maximumZoom,
     maximumArchiveMiB,
-    archives: results.map((result) => ({
-      minimumZoom: result.minimumZoom,
-      maximumZoom: result.maximumZoom,
-      shard: result.shard,
-      bounds: result.bounds,
-      file: path.basename(result.file),
-      bytes: result.bytes,
-      plannedBudgetBytes: result.budgetBytes,
-      allocatedBudgetBytes: result.allocatedBudgetBytes,
-      carryBytes: result.carryBytes,
-      maximumTileBytes: result.maximumTileBytes,
-      detail: result.detail,
-    })),
-  };
-  const manifestFile = archiveManifestPath(output);
-  await removeStaleArchives(
-    manifestFile,
-    results.map((result) => result.file),
-  );
-  const temporaryManifest = `${manifestFile}.partial`;
-  await writeFile(temporaryManifest, `${JSON.stringify(manifest, null, 2)}\n`);
-  await rename(temporaryManifest, manifestFile);
+  });
   const total = results.reduce((sum, result) => sum + result.bytes, 0);
   console.log(`Map archives written: ${(total / 1024 / 1024).toFixed(1)} MiB.`);
+  log.record('run-complete', {
+    durationMs: Date.now() - runStarted,
+    archiveCount: results.length,
+    totalBytes: total,
+  });
+  log.close();
 } catch (error) {
   await Promise.all(temporaryFiles.map((file) => rm(file, { force: true })));
+  log.recordError('run-error', error, {
+    durationMs: Date.now() - runStarted,
+  });
+  log.close();
   throw error;
 }

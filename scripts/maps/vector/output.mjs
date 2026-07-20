@@ -1,7 +1,8 @@
-import { open, readFile, rm, stat } from 'node:fs/promises';
+import { open, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const PMTILES_MAGIC = 'PMTiles';
+const PMTILES_STATS_BYTES = 96;
 
 export function temporaryArchivePath(output) {
   const parsed = path.parse(output);
@@ -34,6 +35,26 @@ export async function validatePmtilesArchive(file, maximumBytes) {
   return size;
 }
 
+export async function readPmtilesArchiveStats(file) {
+  const handle = await open(file, 'r');
+  try {
+    const bytes = Buffer.alloc(PMTILES_STATS_BYTES);
+    const { bytesRead } = await handle.read(bytes, 0, bytes.length, 0);
+    if (bytesRead < bytes.length) {
+      throw new Error('PMTiles header is incomplete.');
+    }
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    return {
+      tileDataBytes: Number(view.getBigUint64(64, true)),
+      addressedTiles: Number(view.getBigUint64(72, true)),
+      tileEntries: Number(view.getBigUint64(80, true)),
+      tileContents: Number(view.getBigUint64(88, true)),
+    };
+  } finally {
+    await handle.close();
+  }
+}
+
 export async function removeStaleArchives(manifestFile, currentFiles) {
   let manifest;
   try {
@@ -49,4 +70,40 @@ export async function removeStaleArchives(manifestFile, currentFiles) {
   await Promise.all(
     stale.map((file) => rm(path.join(directory, file), { force: true })),
   );
+}
+
+export async function writeArchiveManifest({
+  manifestFile,
+  results,
+  minimumZoom,
+  maximumZoom,
+  maximumArchiveMiB,
+}) {
+  const manifest = {
+    version: 1,
+    minimumZoom,
+    maximumZoom,
+    maximumArchiveMiB,
+    archives: results.map((result) => ({
+      minimumZoom: result.minimumZoom,
+      maximumZoom: result.maximumZoom,
+      shard: result.shard,
+      bounds: result.bounds,
+      file: path.basename(result.file),
+      bytes: result.bytes,
+      plannedBudgetBytes: result.budgetBytes,
+      allocatedBudgetBytes: result.allocatedBudgetBytes,
+      carryBytes: result.carryBytes,
+      maximumTileBytes: result.maximumTileBytes,
+      detail: result.detail,
+      archiveStats: result.archiveStats,
+    })),
+  };
+  await removeStaleArchives(
+    manifestFile,
+    results.map((result) => result.file),
+  );
+  const temporary = `${manifestFile}.partial`;
+  await writeFile(temporary, `${JSON.stringify(manifest, null, 2)}\n`);
+  await rename(temporary, manifestFile);
 }

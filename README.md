@@ -127,6 +127,16 @@ Tippecanoe may need substantially more temporary space than the compressed
 archive it ultimately emits, so `--max-working-mib` is enforced per active
 zoom without reducing it to that zoom's final archive allowance.
 
+Every `maps:generate` and `maps:build` run writes a timestamped JSON Lines log
+under `build/maps/logs`. Use `--log-file path` to choose another location. The
+first record contains all normalized parameters. Later records include source
+preparation, stage and archive durations, each pass's file size and budget,
+zoom and quadrant, carry or debt, tile limits, geometry detail, and PMTiles
+addressed-tile, directory-entry, unique-content, and tile-data totals. Fatal
+errors are written before exit. Repetitive Tippecanoe density and oversized
+tile messages are replaced on the console and in the log by one summary per
+pass.
+
 Each level is validated independently. An over-budget level is rebuilt with a
 lower tile-byte ceiling and geometry detail without degrading completed zooms.
 Unused bytes roll into the next level. If a level cannot shrink enough at the
