@@ -1,3 +1,4 @@
+import { COLOR_ACCENT, COLOR_BLACK, COLOR_WHITE } from '../../../colors.js';
 import { lookup } from '../../../../i18n/index.js';
 
 export function createColorSection({
@@ -52,15 +53,15 @@ export function createColorSection({
     type: gradientType.value,
     angle: Number.parseInt(gradientAngle.value, 10) || 0,
     endColor: colorWithTransparency(
-      gradientEndColor.value.trim() || '#0f766e',
+      gradientEndColor.value.trim() || COLOR_ACCENT,
       gradientEndTransparency,
     ),
   });
 
   const applyRecommendedImageContrast = () => {
-    darkColor.value = '#000000';
+    darkColor.value = COLOR_BLACK;
     darkTransparency.value = '75';
-    lightColor.value = '#ffffff';
+    lightColor.value = COLOR_WHITE;
     lightTransparency.value = '25';
     formatTransparency();
   };

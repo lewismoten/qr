@@ -38,6 +38,7 @@ export default [
     files: [
       'src/js/app/checksum/crc32.js',
       'src/js/app/export/gif.js',
+      'src/js/app/export/mp4.js',
       'src/js/app/export/pdf.js',
       'src/js/app/export/zip.js',
     ],

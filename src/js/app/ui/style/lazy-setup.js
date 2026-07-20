@@ -57,21 +57,21 @@ export function createLazyStyleSetup(options) {
         controller?.colors.getGradientOptions() ?? {
           type: 'solid',
           angle: 0,
-          endColor: '#0f766e',
+          endColor: COLOR_ACCENT,
         },
       getQrColors: () => ({
         dark: featureElements?.colorDark
           ? options.colorWithTransparency(
-              featureElements.colorDark.value.trim() || '#111827',
+              featureElements.colorDark.value.trim() || COLOR_DARK,
               featureElements.colorDarkTransparency,
             )
-          : '#111827ff',
+          : COLOR_DARK_OPAQUE,
         light: featureElements?.colorLight
           ? options.colorWithTransparency(
-              featureElements.colorLight.value.trim() || '#ffffff',
+              featureElements.colorLight.value.trim() || COLOR_WHITE,
               featureElements.colorLightTransparency,
             )
-          : '#ffffffff',
+          : COLOR_WHITE_OPAQUE,
       }),
     },
     artwork: {
@@ -109,8 +109,15 @@ export function createLazyStyleSetup(options) {
     centerLogo: { getImage: () => controller?.centerLogo.getImage() ?? null },
     getEyeColors: () => ({
       enabled: featureElements?.eyeCustomColorsEnabled?.checked ?? false,
-      outer: featureElements?.eyeOuterColor?.value ?? '#0f766e',
-      center: featureElements?.eyeCenterColor?.value ?? '#111827',
+      outer: featureElements?.eyeOuterColor?.value ?? COLOR_ACCENT,
+      center: featureElements?.eyeCenterColor?.value ?? COLOR_DARK,
     }),
   };
 }
+import {
+  COLOR_ACCENT,
+  COLOR_DARK,
+  COLOR_DARK_OPAQUE,
+  COLOR_WHITE,
+  COLOR_WHITE_OPAQUE,
+} from '../../colors.js';

@@ -215,5 +215,8 @@ export function drawCenteredFrameMessage(
 }
 
 export function getOpaqueArtworkBackground(lightColor) {
-  return /^#[0-9a-f]{6}/i.test(lightColor) ? lightColor.slice(0, 7) : '#ffffff';
+  return /^#[0-9a-f]{6}/i.test(lightColor)
+    ? lightColor.slice(0, 7)
+    : COLOR_WHITE;
 }
+import { COLOR_WHITE } from '../colors.js';

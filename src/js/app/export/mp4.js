@@ -3,6 +3,12 @@ import { getSupportedMp4MimeType } from '../media-support.js';
 import { createLocalizedError } from '../../localized-error.js';
 import { throwIfAborted, waitFor } from '../abort.js';
 
+const MAXIMUM_FRAME_RATE = 60;
+const MINIMUM_FRAME_RATE = 1;
+const MILLISECONDS_PER_SECOND = 1000;
+const MINIMUM_FRAME_DURATION_MS = 16;
+const RECORDER_CHUNK_INTERVAL_MS = 1000;
+
 export async function createAnimatedMp4Blob(
   frames,
   frameDurationMs,
@@ -19,8 +25,14 @@ export async function createAnimatedMp4Blob(
   const stage = createAnimationStage(frames);
   drawAnimationStageFrame(stage, frames[0], true);
   const frameRate = Math.min(
-    60,
-    Math.max(1, Math.ceil(1000 / Math.max(16, frameDurationMs))),
+    MAXIMUM_FRAME_RATE,
+    Math.max(
+      MINIMUM_FRAME_RATE,
+      Math.ceil(
+        MILLISECONDS_PER_SECOND /
+          Math.max(MINIMUM_FRAME_DURATION_MS, frameDurationMs),
+      ),
+    ),
   );
   const stream = stage.captureStream(frameRate);
   let recorder;
@@ -50,7 +62,7 @@ export async function createAnimatedMp4Blob(
       );
     });
 
-    recorder.start(1000);
+    recorder.start(RECORDER_CHUNK_INTERVAL_MS);
     for (let index = 0; index < frames.length; index += 1) {
       throwIfAborted(signal);
       drawAnimationStageFrame(stage, frames[index], true);

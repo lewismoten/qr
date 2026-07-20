@@ -1,7 +1,8 @@
+import { COLOR_BLACK, COLOR_WHITE } from '../../../colors.js';
 import { lookup } from '../../../../i18n/index.js';
 
 const PALETTE = [
-  ['black', 'Black', '#000000'],
+  ['black', 'Black', COLOR_BLACK],
   ['blue', 'Blue', '#0000aa'],
   ['green', 'Green', '#00aa00'],
   ['cyan', 'Cyan', '#00aaaa'],
@@ -16,7 +17,7 @@ const PALETTE = [
   ['brightRed', 'Bright red', '#ff5555'],
   ['brightMagenta', 'Bright magenta', '#ff55ff'],
   ['yellow', 'Yellow', '#ffff55'],
-  ['white', 'White', '#ffffff'],
+  ['white', 'White', COLOR_WHITE],
 ];
 
 export function createPixelArtEditor({
@@ -30,7 +31,7 @@ export function createPixelArtEditor({
 }) {
   let size = 16;
   let pixels = Array(size * size).fill(null);
-  let activeColor = '#000000';
+  let activeColor = COLOR_BLACK;
   let paintValue = null;
   let painting = false;
   let renderFrame = 0;

@@ -1,4 +1,5 @@
 import { createLocalizedError } from '../../localized-error.js';
+import { COLOR_WHITE } from '../colors.js';
 
 export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
   return new Promise((resolve, reject) => {
@@ -8,7 +9,7 @@ export function canvasToBlob(sourceCanvas, type, quality, flatten = false) {
       exportCanvas.width = sourceCanvas.width;
       exportCanvas.height = sourceCanvas.height;
       const context = exportCanvas.getContext('2d');
-      context.fillStyle = '#ffffff';
+      context.fillStyle = COLOR_WHITE;
       context.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
       context.drawImage(sourceCanvas, 0, 0);
     }

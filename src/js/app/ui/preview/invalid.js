@@ -1,3 +1,4 @@
+import { COLOR_DARK, COLOR_WHITE } from '../../colors.js';
 import { lookup } from '../../../i18n/index.js';
 
 export function createInvalidPreviewRenderer({
@@ -14,7 +15,7 @@ export function createInvalidPreviewRenderer({
     context.fillRect(0, 0, width, height);
     context.fillStyle = 'rgba(153, 27, 27, 0.92)';
     context.fillRect(0, (height - bannerHeight) / 2, width, bannerHeight);
-    context.fillStyle = '#ffffff';
+    context.fillStyle = COLOR_WHITE;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.font = `800 ${Math.max(18, width * 0.07)}px "Avenir Next", "Segoe UI", sans-serif`;
@@ -36,7 +37,7 @@ export function createInvalidPreviewRenderer({
           errorCorrectionLevel: 'M',
           margin: 1,
           scale: 4,
-          color: { dark: '#111827', light: '#ffffff' },
+          color: { dark: COLOR_DARK, light: COLOR_WHITE },
         };
     delete previewOptions.version;
     try {

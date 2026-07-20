@@ -1,3 +1,4 @@
+import { COLOR_DARK } from '../../colors.js';
 import { createContentPayload } from './payload.js';
 
 export function createContentPipeline({
@@ -67,7 +68,7 @@ export function createContentPipeline({
       frameController?.getRenderOptions() ?? {
         centered: false,
         lineHeight: 18,
-        color: '#111827',
+        color: COLOR_DARK,
       },
     sync: () => frameController?.sync(),
     load: () => ensureFrame(),

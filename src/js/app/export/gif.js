@@ -1,6 +1,7 @@
 import { pushUint16LE, textBytes } from '../bytes.js';
 import { encodeGifLzw } from '../compression/lzw.js';
 import { throwIfAborted, waitFor } from '../abort.js';
+import { COLOR_WHITE } from '../colors.js';
 
 const RGB_CHANNEL_COUNT = 3;
 const RGBA_CHANNEL_COUNT = 4;
@@ -142,7 +143,7 @@ export function drawAnimationStageFrame(
 ) {
   context.clearRect(0, 0, stage.width, stage.height);
   if (flatten) {
-    context.fillStyle = '#ffffff';
+    context.fillStyle = COLOR_WHITE;
     context.fillRect(0, 0, stage.width, stage.height);
   }
   context.drawImage(

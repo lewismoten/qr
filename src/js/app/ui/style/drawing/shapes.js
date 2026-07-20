@@ -146,7 +146,7 @@ export function drawFinderEyes(
       y + cellSize,
       cellSize * 5,
       geometry.outerRounding,
-      '#000000',
+      COLOR_BLACK,
     );
     context.restore();
     if (!transparentLight) {
@@ -244,3 +244,4 @@ import {
 } from '../../../qr/qr-finder-regions.js';
 
 export { getFinderPatternPart, isFinderPattern };
+import { COLOR_BLACK } from '../../../colors.js';

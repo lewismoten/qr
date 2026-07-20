@@ -2,6 +2,7 @@ import {
   installArtworkDrawing,
   installShapeDrawing,
 } from '../preview/style-drawing.js';
+import { COLOR_ACCENT } from '../../colors.js';
 import { loadFeatureStylesheet } from '../../../stylesheets.js';
 
 const readInteger = (input, fallback) => {
@@ -247,10 +248,10 @@ export function createStyleSetup({
         angle: readInteger(e.gradientAngle, 0),
         endColor: e.colorGradientEnd
           ? colorWithTransparency(
-              e.colorGradientEnd.value.trim() || '#0f766e',
+              e.colorGradientEnd.value.trim() || COLOR_ACCENT,
               e.colorGradientEndTransparency,
             )
-          : '#0f766e',
+          : COLOR_ACCENT,
       },
   };
   const artwork = {

@@ -1,4 +1,5 @@
 import { isMaskActive } from '@lewismoten/qr';
+import { COLOR_DARK, COLOR_WHITE } from '../../colors.js';
 import { isFunctionModule } from '../../qr/qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 
@@ -19,9 +20,9 @@ function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
   const offsetX = Math.floor((targetCanvas.width - drawSize) / 2);
   const offsetY = Math.floor((targetCanvas.height - drawSize) / 2);
   context.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-  context.fillStyle = options.color?.light || '#ffffff';
+  context.fillStyle = options.color?.light || COLOR_WHITE;
   context.fillRect(offsetX, offsetY, drawSize, drawSize);
-  context.fillStyle = options.color?.dark || '#111827';
+  context.fillStyle = options.color?.dark || COLOR_DARK;
   for (let row = 0; row < qrDefinition.modules.size; row += 1) {
     for (let column = 0; column < qrDefinition.modules.size; column += 1) {
       if (

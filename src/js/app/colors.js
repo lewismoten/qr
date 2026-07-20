@@ -1,5 +1,12 @@
+export const COLOR_BLACK = '#000000';
+export const COLOR_WHITE = '#ffffff';
+export const COLOR_DARK = '#111827';
+export const COLOR_ACCENT = '#0f766e';
+export const COLOR_DARK_OPAQUE = '#111827ff';
+export const COLOR_WHITE_OPAQUE = '#ffffffff';
+
 export function colorWithTransparency(color, transparencyInput) {
-  const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : '#000000';
+  const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : COLOR_BLACK;
   const transparency = Math.min(
     100,
     Math.max(0, Number.parseInt(transparencyInput.value, 10) || 0),
@@ -40,5 +47,5 @@ export function hexToRgb(hex) {
 export function getContrastingHex(hex) {
   const { red, green, blue } = hexToRgb(hex);
   const luminance = (red * 299 + green * 587 + blue * 114) / 1000;
-  return luminance > 140 ? '#111827' : '#ffffff';
+  return luminance > 140 ? COLOR_DARK : COLOR_WHITE;
 }

@@ -70,11 +70,11 @@ export function createDebugFacade(options) {
       getCodewordStyle: (...args) =>
         controller?.styles.getCodewordStyle(...args) ?? {
           color: '#0ea5e9',
-          strokeColor: '#ffffff',
+          strokeColor: COLOR_WHITE,
           opacity: 0.7,
         },
       getModuleContrastColor: (...args) =>
-        controller?.styles.getModuleContrastColor(...args) ?? '#ffffff',
+        controller?.styles.getModuleContrastColor(...args) ?? COLOR_WHITE,
     },
     masks: {
       ensure: (...args) => controller?.masks.ensure(...args),
@@ -98,3 +98,4 @@ export function createDebugFacade(options) {
     },
   };
 }
+import { COLOR_WHITE } from '../../colors.js';

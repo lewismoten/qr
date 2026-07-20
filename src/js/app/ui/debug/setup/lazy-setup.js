@@ -1,3 +1,4 @@
+import { COLOR_WHITE } from '../../../colors.js';
 import { loadFeatureStylesheet } from '../../../../stylesheets.js';
 
 function moduleIsDark(qrDefinition, row, column) {
@@ -85,11 +86,11 @@ export function createLazyDebugSetup(options) {
       getCodewordStyle: (...args) =>
         overlay?.styles.getCodewordStyle(...args) ?? {
           color: '#0ea5e9',
-          strokeColor: '#ffffff',
+          strokeColor: COLOR_WHITE,
           opacity: 0.7,
         },
       getModuleContrastColor: (...args) =>
-        overlay?.styles.getModuleContrastColor(...args) ?? '#ffffff',
+        overlay?.styles.getModuleContrastColor(...args) ?? COLOR_WHITE,
     },
     masks: {
       ensure: (...args) => isActive('mask') && masks?.ensure(...args),
