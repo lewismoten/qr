@@ -16,6 +16,14 @@ export function findArchiveForTile(archives, zoom, x, y) {
   });
   const wholeWorld = candidates.find((item) => !item.shard);
   if (wholeWorld) return wholeWorld;
+  const side = 2 ** zoom;
+  const gridArchive = candidates.find((item) => {
+    if (!Number.isInteger(item.shardGrid)) return false;
+    const column = Math.floor((x * item.shardGrid) / side);
+    const row = Math.floor((y * item.shardGrid) / side);
+    return column === item.shardColumn && row === item.shardRow;
+  });
+  if (gridArchive) return gridArchive;
   const middle = 2 ** (zoom - 1);
   const vertical = y < middle ? 'north' : 'south';
   const horizontal = x < middle ? 'west' : 'east';

@@ -54,14 +54,16 @@ source, removes unused source attributes, assigns feature zoom ranges, and asks
 Tippecanoe to build PMTiles archives plus `build/maps/local.json`. Zooms 1-8 use
 one world archive each. Beginning at `--shard-zoom 9`, every zoom is split into
 north-west, north-east, south-west, and south-east archives along exact Web
-Mercator tile boundaries.
+Mercator tile boundaries. Beginning at `--deep-shard-zoom 13`, each level uses
+a 4x4 grid of 16 smaller archives. This keeps detailed builds and HTTP range
+indexes manageable without changing the combined budget for that zoom.
 
 The default allocator gives zooms 1-8, 9-12, and 13-maximum 1%, 9%, and 90% of
 the total. For 500 MiB, those tiers receive 5, 45, and 450 MiB. Within each tier,
 individual level allowances grow by a relative weight of 1.3 and retain a 128
 KiB minimum. Every archive budget adds up to exactly the configured maximum.
 Lower maximum zooms redistribute the total among only the active tiers. Sparse
-quadrant archives pass unused space to later quadrants and levels.
+shard archives pass unused space to later shards and levels.
 
 The final archive target and temporary workspace limit are independent.
 Tippecanoe may need substantially more temporary space than the compressed

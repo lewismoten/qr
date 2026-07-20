@@ -64,4 +64,6 @@ test('parses logging and generation command options', () => {
   assert.equal(options.maximumZoom, 12);
   assert.equal(options.logFile, 'build/custom.jsonl');
   assert.equal(options.maximumArchiveMiB, 500);
+  assert.equal(options.shardZoom, 9);
+  assert.equal(options.deepShardZoom, 13);
 });

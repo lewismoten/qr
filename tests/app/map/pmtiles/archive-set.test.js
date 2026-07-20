@@ -21,6 +21,21 @@ test('selects a tile-aligned geographic quadrant', () => {
   assert.equal(findArchiveForTile(archives, 8, 10, 10), undefined);
 });
 
+test('selects a tile from a deeper four-by-four archive grid', () => {
+  const archives = Array.from({ length: 16 }, (_, index) => ({
+    shard: `grid-${index}`,
+    shardGrid: 4,
+    shardColumn: index % 4,
+    shardRow: Math.floor(index / 4),
+    minimumZoom: 13,
+    maximumZoom: 13,
+  }));
+
+  assert.equal(findArchiveForTile(archives, 13, 0, 0).shard, 'grid-0');
+  assert.equal(findArchiveForTile(archives, 13, 4096, 6144).shard, 'grid-14');
+  assert.equal(findArchiveForTile(archives, 13, 8191, 8191).shard, 'grid-15');
+});
+
 test('routes zooms across a budgeted PMTiles archive set', async () => {
   const requests = [];
   const manifest = {

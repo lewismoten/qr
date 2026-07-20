@@ -85,7 +85,7 @@ test('reduces detail only after reaching the minimum tile ceiling', () => {
   );
 });
 
-test('splits detailed zooms into four budget-preserving quadrants', () => {
+test('progressively shards detailed zooms while preserving budgets', () => {
   const mib = 1024 * 1024;
   const planned = planArchiveLevels({
     minimumZoom: 1,
@@ -94,7 +94,7 @@ test('splits detailed zooms into four budget-preserving quadrants', () => {
     output: 'build/maps/local.pmtiles',
   });
   const levels = shardArchiveLevels(planned, 9);
-  assert.equal(levels.length, 52);
+  assert.equal(levels.length, 136);
   assert.equal(
     levels.reduce((sum, level) => sum + level.budgetBytes, 0),
     500 * mib,
@@ -112,6 +112,22 @@ test('splits detailed zooms into four budget-preserving quadrants', () => {
     zoomNine.reduce((sum, level) => sum + level.budgetBytes, 0),
     planned[8].budgetBytes,
   );
+  const zoomThirteen = levels.filter((level) => level.minimumZoom === 13);
+  assert.equal(zoomThirteen.length, 16);
+  assert.ok(zoomThirteen.every((level) => level.shardGrid === 4));
+  assert.deepEqual(
+    zoomThirteen.find((level) => level.shard === 'g4-x0-y0').bounds,
+    [-180, 66.51326044311186, -90, 85.05112878],
+  );
+  assert.match(zoomThirteen.at(-1).file, /local-z13-g4-x3-y0\.pmtiles$/);
+  assert.equal(
+    zoomThirteen.reduce((sum, level) => sum + level.budgetBytes, 0),
+    planned[12].budgetBytes,
+  );
+});
+
+test('rejects a deep shard threshold before the initial threshold', () => {
+  assert.throws(() => shardArchiveLevels([], 9, 8), /cannot precede/);
 });
 
 test('passes surplus without shrinking initial budgets for debt', () => {

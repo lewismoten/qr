@@ -36,6 +36,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     minimumLevelBytes:
       Number.parseInt(option(values, 'minimum-level-kib', '128'), 10) * 1024,
     shardZoom: Number.parseInt(option(values, 'shard-zoom', '9'), 10),
+    deepShardZoom: Number.parseInt(option(values, 'deep-shard-zoom', '13'), 10),
     executable: process.env.TIPPECANOE || 'tippecanoe',
   };
 }
@@ -58,4 +59,5 @@ Options:
   --detail 11           Maximum geometry precision (2^detail extent)
   --budget-growth 1.3   Relative budget growth within each zoom tier
   --minimum-level-kib 128 Minimum budget reserved for every archive
-  --shard-zoom 9        First zoom split into four quadrant archives`;
+  --shard-zoom 9        First zoom split into a 2x2 archive grid
+  --deep-shard-zoom 13  First zoom split into a 4x4 archive grid`;

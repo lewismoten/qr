@@ -26,7 +26,7 @@ import {
   writeArchiveManifest,
 } from './output.mjs';
 import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
-import { shardArchiveLevels } from './shards.mjs';
+import { levelShardLabel, shardArchiveLevels } from './shards.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -44,6 +44,7 @@ const {
   budgetGrowth,
   minimumLevelBytes,
   shardZoom,
+  deepShardZoom,
   executable,
 } = options;
 if (values.includes('--help')) {
@@ -76,12 +77,8 @@ const levels = shardArchiveLevels(
     minimumLevelBytes,
   }),
   shardZoom,
+  deepShardZoom,
 );
-function levelLabel(level) {
-  const zoom = `z${level.minimumZoom}`;
-  return level.shard ? `${zoom} ${level.shard}` : zoom;
-}
-
 async function runLevel(level, settings) {
   const temporary = temporaryArchivePath(level.file);
   await rm(temporary, { force: true });
@@ -99,7 +96,7 @@ async function runLevel(level, settings) {
     args,
     temporary,
     workingLimit: maximumWorkingBytes,
-    zoom: levelLabel(level),
+    zoom: levelShardLabel(level),
     log,
     context: {
       zoom: level.minimumZoom,
@@ -121,7 +118,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
   const acceptSmallest = () => {
     const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
     console.warn(
-      `${levelLabel(level)} reached its compaction limit; ` +
+      `${levelShardLabel(level)} reached its compaction limit; ` +
         `carrying ${debt.toFixed(1)} MiB debt.`,
     );
     return best;
@@ -129,13 +126,15 @@ async function buildLevel(level, allocatedBudgetBytes) {
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const attemptStarted = Date.now();
-    const scope = level.shard ? 'quadrant' : 'zoom';
+    const scope = level.shard
+      ? `${level.shardGrid}x${level.shardGrid} shard`
+      : 'zoom';
     const tileLimit =
       settings.maximumTileBytes == null
         ? 'no tile ceiling (recovery)'
         : `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
     console.log(
-      `Building ${levelLabel(level)}, attempt ${attempt}, ` +
+      `Building ${levelShardLabel(level)}, attempt ${attempt}, ` +
         `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB ` +
         `${scope} budget, ` +
         `${tileLimit}...`,
@@ -158,7 +157,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       }
       if (error.exitCode !== 100) throw error;
       console.warn(
-        `${levelLabel(level)} cannot satisfy the tile ceiling; ` +
+        `${levelShardLabel(level)} cannot satisfy the tile ceiling; ` +
           'building its smallest viable archive.',
       );
       settings = { ...settings, maximumTileBytes: null };
@@ -177,7 +176,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
       await rm(result.temporary, { force: true });
       if (!best) throw error;
       console.warn(
-        `${levelLabel(level)} produced an incomplete retry; ` +
+        `${levelShardLabel(level)} produced an incomplete retry; ` +
           'restoring its last valid archive.',
       );
       return acceptSmallest();
@@ -236,7 +235,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     }
     settings = next;
   }
-  throw new Error(`Unable to build ${levelLabel(level)}.`);
+  throw new Error(`Unable to build ${levelShardLabel(level)}.`);
 }
 const temporaryFiles = levels.flatMap((level) => [
   temporaryArchivePath(level.file),
