@@ -1,5 +1,5 @@
-import { spawn, spawnSync } from 'node:child_process';
-import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { validateVectorLayers } from './prepare.mjs';
@@ -17,6 +17,7 @@ import {
   temporaryArchivePath,
   validatePmtilesArchive,
 } from './output.mjs';
+import { runTippecanoe } from './runner.mjs';
 
 const values = process.argv.slice(2);
 
@@ -114,32 +115,12 @@ async function runLevel(level, settings) {
     maximumWorkingBytes,
     Math.max(level.budgetBytes * 1.5, level.budgetBytes + 32 * 1024 * 1024),
   );
-  let observedBytes = 0;
-  await new Promise((resolve, reject) => {
-    const child = spawn(executable, args, { stdio: 'inherit' });
-    const monitor = setInterval(() => {
-      stat(temporary)
-        .then(({ size }) => {
-          observedBytes = size;
-          if (size > workingLimit && child.exitCode === null) {
-            child.kill('SIGTERM');
-          }
-        })
-        .catch(() => {});
-    }, 1000);
-    monitor.unref();
-    child.on('error', reject);
-    child.on('exit', async (code, signal) => {
-      clearInterval(monitor);
-      observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
-      if (observedBytes > workingLimit) resolve();
-      else if (code === 0) resolve();
-      else {
-        const error = new Error(`Tippecanoe stopped by ${signal || code}.`);
-        error.exitCode = code;
-        reject(error);
-      }
-    });
+  const observedBytes = await runTippecanoe({
+    executable,
+    args,
+    temporary,
+    workingLimit,
+    zoom: level.minimumZoom,
   });
   return { temporary, observedBytes };
 }
@@ -164,7 +145,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
     const zoom = `z${level.minimumZoom}`;
     const tileLimit =
       settings.maximumTileBytes == null
-        ? 'recovery tile limit'
+        ? 'no tile ceiling (recovery)'
         : `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
     console.log(
       `Building ${zoom}, attempt ${attempt}, ` +
@@ -176,7 +157,8 @@ async function buildLevel(level, allocatedBudgetBytes) {
     try {
       result = await runLevel(allocation, settings);
     } catch (error) {
-      if (error.exitCode === 100 && best) {
+      const recoverable = error.exitCode === 100 || error.workingLimitExceeded;
+      if (recoverable && best) {
         await rm(temporaryArchivePath(level.file), { force: true });
         return acceptSmallest();
       }
@@ -189,10 +171,21 @@ async function buildLevel(level, allocatedBudgetBytes) {
       result = await runLevel(allocation, settings);
       recovery = true;
     }
-    const bytes = await validatePmtilesArchive(
-      result.temporary,
-      Number.MAX_SAFE_INTEGER,
-    );
+    let bytes;
+    try {
+      bytes = await validatePmtilesArchive(
+        result.temporary,
+        Number.MAX_SAFE_INTEGER,
+      );
+    } catch (error) {
+      await rm(result.temporary, { force: true });
+      if (!best) throw error;
+      console.warn(
+        `Zoom ${level.minimumZoom} produced an incomplete retry; ` +
+          'restoring its last valid archive.',
+      );
+      return acceptSmallest();
+    }
     if (bytes <= allocatedBudgetBytes) {
       await rm(smallestFile, { force: true });
       return {
