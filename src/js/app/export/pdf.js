@@ -1,6 +1,15 @@
 import { concatBytes, textBytes } from '../bytes.js';
 import { canvasToBlob } from './canvas-export.js';
 
+const PDF_POINTS_PER_INCH = 72;
+const PDF_DECIMAL_PLACES = 3;
+const PDF_XREF_OFFSET_WIDTH = 10;
+const LETTER_WIDTH_POINTS = 612;
+const LETTER_HEIGHT_POINTS = 792;
+const SHEET_MARGIN_POINTS = 36;
+const SHEET_GAP_POINTS = 10;
+const DEFAULT_PRINT_WIDTH_INCHES = 1.65;
+
 export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const jpegBlob = await canvasToBlob(
     sourceCanvas,
@@ -11,14 +20,14 @@ export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const jpeg = new Uint8Array(await jpegBlob.arrayBuffer());
   const pixelWidth = sourceCanvas.width;
   const pixelHeight = sourceCanvas.height;
-  const width = printWidthInches * 72;
+  const width = printWidthInches * PDF_POINTS_PER_INCH;
   const height = width * (pixelHeight / pixelWidth);
-  const content = `q\n${width.toFixed(3)} 0 0 ${height.toFixed(3)} 0 0 cm\n/Im0 Do\nQ\n`;
+  const content = `q\n${width.toFixed(PDF_DECIMAL_PLACES)} 0 0 ${height.toFixed(PDF_DECIMAL_PLACES)} 0 0 cm\n/Im0 Do\nQ\n`;
   const objects = [
     textBytes('<< /Type /Catalog /Pages 2 0 R >>'),
     textBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
     textBytes(
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(3)} ${height.toFixed(3)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`,
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(PDF_DECIMAL_PLACES)} ${height.toFixed(PDF_DECIMAL_PLACES)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`,
     ),
     concatBytes([
       textBytes(
@@ -51,7 +60,7 @@ function createPdfDocumentBlob(objects) {
   const xrefOffset = length;
   let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   offsets.slice(1).forEach((offset) => {
-    xref += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    xref += `${String(offset).padStart(PDF_XREF_OFFSET_WIDTH, '0')} 00000 n \n`;
   });
   xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
   parts.push(textBytes(xref));
@@ -74,15 +83,22 @@ export async function capturePdfFrame(sourceCanvas, quality, printWidthInches) {
 }
 
 export function getPdfSheetLayout(frames) {
-  const pageWidth = 612;
-  const pageHeight = 792;
-  const margin = 36;
-  const gap = 10;
+  const pageWidth = LETTER_WIDTH_POINTS;
+  const pageHeight = LETTER_HEIGHT_POINTS;
+  const margin = SHEET_MARGIN_POINTS;
+  const gap = SHEET_GAP_POINTS;
   const printableWidth = pageWidth - margin * 2;
   const printableHeight = pageHeight - margin * 2;
   const printWidth = Math.min(
     printableWidth,
-    Math.max(...frames.map((frame) => (frame.printWidthInches || 1.65) * 72)),
+    Math.max(
+      ...frames.map((frame) => {
+        return (
+          (frame.printWidthInches || DEFAULT_PRINT_WIDTH_INCHES) *
+          PDF_POINTS_PER_INCH
+        );
+      }),
+    ),
   );
   const maximumAspectRatio = Math.max(
     ...frames.map((frame) => frame.height / frame.width),
@@ -165,7 +181,7 @@ export function createPdfSheetBlob(frames) {
       const imageName = `Im${index + 1}`;
       resources.push(`/${imageName} ${imageReferences[index]} 0 R`);
       commands.push(
-        `q\n${drawWidth.toFixed(3)} 0 0 ${drawHeight.toFixed(3)} ${x.toFixed(3)} ${y.toFixed(3)} cm\n/${imageName} Do\nQ\n`,
+        `q\n${drawWidth.toFixed(PDF_DECIMAL_PLACES)} 0 0 ${drawHeight.toFixed(PDF_DECIMAL_PLACES)} ${x.toFixed(PDF_DECIMAL_PLACES)} ${y.toFixed(PDF_DECIMAL_PLACES)} cm\n/${imageName} Do\nQ\n`,
       );
       setObject(
         imageReferences[index],

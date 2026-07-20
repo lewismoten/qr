@@ -2,55 +2,106 @@ import { pushUint16LE, textBytes } from '../bytes.js';
 import { encodeGifLzw } from '../compression/lzw.js';
 import { throwIfAborted, waitFor } from '../abort.js';
 
-export function createGifBlob(sourceCanvas) {
-  const context = sourceCanvas.getContext('2d');
-  const pixels = context.getImageData(
-    0,
-    0,
-    sourceCanvas.width,
-    sourceCanvas.height,
-  ).data;
-  const indexes = new Uint8Array(sourceCanvas.width * sourceCanvas.height);
-  const levels = [0, 51, 102, 153, 204, 255];
-  const palette = new Uint8Array(256 * 3);
-  for (let r = 0; r < 6; r += 1) {
-    for (let g = 0; g < 6; g += 1) {
-      for (let b = 0; b < 6; b += 1) {
-        const index = 1 + r * 36 + g * 6 + b;
-        palette[index * 3] = levels[r];
-        palette[index * 3 + 1] = levels[g];
-        palette[index * 3 + 2] = levels[b];
+const RGB_CHANNEL_COUNT = 3;
+const RGBA_CHANNEL_COUNT = 4;
+const ALPHA_CHANNEL_INDEX = 3;
+const COLOR_LEVEL_COUNT = 6;
+const COLOR_LEVEL_STEP = 51;
+const COLOR_LEVELS = Array.from(
+  { length: COLOR_LEVEL_COUNT },
+  (_, level) => level * COLOR_LEVEL_STEP,
+);
+const COLOR_TABLE_SIZE = 256;
+const FIRST_OPAQUE_COLOR = 1;
+const RED_COLOR_STRIDE = COLOR_LEVEL_COUNT ** 2;
+const ALPHA_OPAQUE_THRESHOLD = 128;
+const GIF_PACKED_COLOR_TABLE = 0xf7;
+const GIF_EXTENSION = 0x21;
+const GIF_GRAPHICS_CONTROL = 0xf9;
+const GIF_APPLICATION_EXTENSION = 0xff;
+const GIF_IMAGE_DESCRIPTOR = 0x2c;
+const GIF_TRAILER = 0x3b;
+const GIF_GRAPHICS_BLOCK_SIZE = 4;
+const GIF_APPLICATION_BLOCK_SIZE = 0x0b;
+const GIF_LOOP_BLOCK_SIZE = 3;
+const GIF_LZW_MINIMUM_CODE_SIZE = 8;
+const GIF_DATA_BLOCK_LIMIT = 255;
+const GIF_DELAY_LIMIT = 65535;
+const MILLISECONDS_PER_GIF_DELAY = 10;
+const ANIMATED_GRAPHICS_FLAGS = 9;
+const CENTER_DIVISOR = 2;
+
+function getGifPaletteAndIndexes(stage, context) {
+  const palette = new Uint8Array(COLOR_TABLE_SIZE * RGB_CHANNEL_COUNT);
+  for (let red = 0; red < COLOR_LEVEL_COUNT; red += 1) {
+    for (let green = 0; green < COLOR_LEVEL_COUNT; green += 1) {
+      for (let blue = 0; blue < COLOR_LEVEL_COUNT; blue += 1) {
+        const index =
+          FIRST_OPAQUE_COLOR +
+          red * RED_COLOR_STRIDE +
+          green * COLOR_LEVEL_COUNT +
+          blue;
+        palette[index * RGB_CHANNEL_COUNT] = COLOR_LEVELS[red];
+        palette[index * RGB_CHANNEL_COUNT + 1] = COLOR_LEVELS[green];
+        palette[index * RGB_CHANNEL_COUNT + 2] = COLOR_LEVELS[blue];
       }
     }
   }
+
+  const pixels = context.getImageData(0, 0, stage.width, stage.height).data;
+  const indexes = new Uint8Array(stage.width * stage.height);
   for (let index = 0; index < indexes.length; index += 1) {
-    const pixel = index * 4;
-    if (pixels[pixel + 3] < 128) {
+    const pixel = index * RGBA_CHANNEL_COUNT;
+    if (pixels[pixel + ALPHA_CHANNEL_INDEX] < ALPHA_OPAQUE_THRESHOLD) {
       indexes[index] = 0;
       continue;
     }
-    const r = Math.round(pixels[pixel] / 51);
-    const g = Math.round(pixels[pixel + 1] / 51);
-    const b = Math.round(pixels[pixel + 2] / 51);
-    indexes[index] = 1 + r * 36 + g * 6 + b;
+    const red = Math.round(pixels[pixel] / COLOR_LEVEL_STEP);
+    const green = Math.round(pixels[pixel + 1] / COLOR_LEVEL_STEP);
+    const blue = Math.round(pixels[pixel + 2] / COLOR_LEVEL_STEP);
+    indexes[index] =
+      FIRST_OPAQUE_COLOR +
+      red * RED_COLOR_STRIDE +
+      green * COLOR_LEVEL_COUNT +
+      blue;
   }
+  return { palette, indexes };
+}
+
+export function createGifBlob(sourceCanvas) {
+  const context = sourceCanvas.getContext('2d');
+  const { palette, indexes } = getGifPaletteAndIndexes(sourceCanvas, context);
 
   const packed = encodeGifLzw(indexes);
 
   const bytes = [...textBytes('GIF89a')];
   pushUint16LE(bytes, sourceCanvas.width);
   pushUint16LE(bytes, sourceCanvas.height);
-  bytes.push(0xf7, 0, 0, ...palette, 0x21, 0xf9, 4, 1, 0, 0, 0, 0, 0x2c);
+  bytes.push(
+    GIF_PACKED_COLOR_TABLE,
+    0,
+    0,
+    ...palette,
+    GIF_EXTENSION,
+    GIF_GRAPHICS_CONTROL,
+    GIF_GRAPHICS_BLOCK_SIZE,
+    1,
+    0,
+    0,
+    0,
+    0,
+    GIF_IMAGE_DESCRIPTOR,
+  );
   pushUint16LE(bytes, 0);
   pushUint16LE(bytes, 0);
   pushUint16LE(bytes, sourceCanvas.width);
   pushUint16LE(bytes, sourceCanvas.height);
-  bytes.push(0, 8);
-  for (let offset = 0; offset < packed.length; offset += 255) {
-    const block = packed.slice(offset, offset + 255);
+  bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);
+  for (let offset = 0; offset < packed.length; offset += GIF_DATA_BLOCK_LIMIT) {
+    const block = packed.slice(offset, offset + GIF_DATA_BLOCK_LIMIT);
     bytes.push(block.length, ...block);
   }
-  bytes.push(0, 0x3b);
+  bytes.push(0, GIF_TRAILER);
   return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
 }
 
@@ -82,39 +133,9 @@ export function drawAnimationStageFrame(
   }
   context.drawImage(
     frame,
-    (stage.width - frame.width) / 2,
-    (stage.height - frame.height) / 2,
+    (stage.width - frame.width) / CENTER_DIVISOR,
+    (stage.height - frame.height) / CENTER_DIVISOR,
   );
-}
-
-function getGifPaletteAndIndexes(stage, context) {
-  const levels = [0, 51, 102, 153, 204, 255];
-  const palette = new Uint8Array(256 * 3);
-  for (let red = 0; red < 6; red += 1) {
-    for (let green = 0; green < 6; green += 1) {
-      for (let blue = 0; blue < 6; blue += 1) {
-        const index = 1 + red * 36 + green * 6 + blue;
-        palette[index * 3] = levels[red];
-        palette[index * 3 + 1] = levels[green];
-        palette[index * 3 + 2] = levels[blue];
-      }
-    }
-  }
-
-  const pixels = context.getImageData(0, 0, stage.width, stage.height).data;
-  const indexes = new Uint8Array(stage.width * stage.height);
-  for (let index = 0; index < indexes.length; index += 1) {
-    const pixel = index * 4;
-    if (pixels[pixel + 3] < 128) {
-      indexes[index] = 0;
-      continue;
-    }
-    const red = Math.round(pixels[pixel] / 51);
-    const green = Math.round(pixels[pixel + 1] / 51);
-    const blue = Math.round(pixels[pixel + 2] / 51);
-    indexes[index] = 1 + red * 36 + green * 6 + blue;
-  }
-  return { palette, indexes };
 }
 
 export async function createAnimatedGifBlob(
@@ -127,20 +148,26 @@ export async function createAnimatedGifBlob(
   const context = stage.getContext('2d', { willReadFrequently: true });
   drawAnimationStageFrame(stage, frames[0], false, context);
   const { palette } = getGifPaletteAndIndexes(stage, context);
-  const delay = Math.max(1, Math.min(65535, Math.round(frameDurationMs / 10)));
+  const delay = Math.max(
+    1,
+    Math.min(
+      GIF_DELAY_LIMIT,
+      Math.round(frameDurationMs / MILLISECONDS_PER_GIF_DELAY),
+    ),
+  );
   const bytes = [...textBytes('GIF89a')];
   pushUint16LE(bytes, stage.width);
   pushUint16LE(bytes, stage.height);
   bytes.push(
-    0xf7,
+    GIF_PACKED_COLOR_TABLE,
     0,
     0,
     ...palette,
-    0x21,
-    0xff,
-    0x0b,
+    GIF_EXTENSION,
+    GIF_APPLICATION_EXTENSION,
+    GIF_APPLICATION_BLOCK_SIZE,
     ...textBytes('NETSCAPE2.0'),
-    3,
+    GIF_LOOP_BLOCK_SIZE,
     1,
     0,
     0,
@@ -153,22 +180,31 @@ export async function createAnimatedGifBlob(
     drawAnimationStageFrame(stage, frame, false, context);
     const { indexes } = getGifPaletteAndIndexes(stage, context);
     const packed = encodeGifLzw(indexes);
-    bytes.push(0x21, 0xf9, 4, 9);
+    bytes.push(
+      GIF_EXTENSION,
+      GIF_GRAPHICS_CONTROL,
+      GIF_GRAPHICS_BLOCK_SIZE,
+      ANIMATED_GRAPHICS_FLAGS,
+    );
     pushUint16LE(bytes, delay);
-    bytes.push(0, 0, 0x2c);
+    bytes.push(0, 0, GIF_IMAGE_DESCRIPTOR);
     pushUint16LE(bytes, 0);
     pushUint16LE(bytes, 0);
     pushUint16LE(bytes, stage.width);
     pushUint16LE(bytes, stage.height);
-    bytes.push(0, 8);
-    for (let offset = 0; offset < packed.length; offset += 255) {
-      const block = packed.slice(offset, offset + 255);
+    bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);
+    for (
+      let offset = 0;
+      offset < packed.length;
+      offset += GIF_DATA_BLOCK_LIMIT
+    ) {
+      const block = packed.slice(offset, offset + GIF_DATA_BLOCK_LIMIT);
       bytes.push(block.length, ...block);
     }
     bytes.push(0);
     onProgress?.(frameIndex + 1, frames.length);
     await waitFor(0, signal);
   }
-  bytes.push(0x3b);
+  bytes.push(GIF_TRAILER);
   return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
 }

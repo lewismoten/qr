@@ -6,6 +6,12 @@ import {
 } from '../bytes.js';
 import { getCrc32 } from '../checksum/crc32.js';
 
+const ZIP_LOCAL_HEADER_SIGNATURE = 0x04034b50;
+const ZIP_CENTRAL_HEADER_SIGNATURE = 0x02014b50;
+const ZIP_END_SIGNATURE = 0x06054b50;
+const ZIP_VERSION = 20;
+const ZIP_UTF8_FLAG = 0x0800;
+
 export async function createZipBlob(files) {
   const localParts = [];
   const centralParts = [];
@@ -15,9 +21,9 @@ export async function createZipBlob(files) {
     const data = new Uint8Array(await file.blob.arrayBuffer());
     const crc = getCrc32(data);
     const local = [];
-    pushUint32LE(local, 0x04034b50);
-    pushUint16LE(local, 20);
-    pushUint16LE(local, 0x0800);
+    pushUint32LE(local, ZIP_LOCAL_HEADER_SIGNATURE);
+    pushUint16LE(local, ZIP_VERSION);
+    pushUint16LE(local, ZIP_UTF8_FLAG);
     pushUint16LE(local, 0);
     pushUint16LE(local, 0);
     pushUint16LE(local, 0);
@@ -30,10 +36,10 @@ export async function createZipBlob(files) {
     localParts.push(localPart);
 
     const central = [];
-    pushUint32LE(central, 0x02014b50);
-    pushUint16LE(central, 20);
-    pushUint16LE(central, 20);
-    pushUint16LE(central, 0x0800);
+    pushUint32LE(central, ZIP_CENTRAL_HEADER_SIGNATURE);
+    pushUint16LE(central, ZIP_VERSION);
+    pushUint16LE(central, ZIP_VERSION);
+    pushUint16LE(central, ZIP_UTF8_FLAG);
     pushUint16LE(central, 0);
     pushUint16LE(central, 0);
     pushUint16LE(central, 0);
@@ -52,7 +58,7 @@ export async function createZipBlob(files) {
   }
   const centralDirectory = concatBytes(centralParts);
   const end = [];
-  pushUint32LE(end, 0x06054b50);
+  pushUint32LE(end, ZIP_END_SIGNATURE);
   pushUint16LE(end, 0);
   pushUint16LE(end, 0);
   pushUint16LE(end, files.length);
