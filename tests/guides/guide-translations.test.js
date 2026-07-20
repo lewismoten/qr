@@ -11,6 +11,7 @@ import {
   getGuideOutputPath,
   getGuideRouteFromPath,
 } from '../../src/js/i18n/guide-routes.js';
+import { readHtmlWithIncludes } from '../../scripts/html/includes.mjs';
 
 const locales = ['ar', 'es', 'hi-IN', 'zh-CN'];
 const localizedName = /\.(?:ar|es|hi-IN|zh-CN)\.html$/;
@@ -93,7 +94,7 @@ test('every supported locale translates all long-form guide prose', async () => 
     for (const file of files) {
       if (file.endsWith('/privacy.html')) continue;
       const route = routeFromSource(file);
-      const source = stripGeneratedMarkup(await readFile(file, 'utf8'));
+      const source = stripGeneratedMarkup(await readHtmlWithIncludes(file));
       const translations = await loadGuideTranslationSet(
         `${sourceRoot}/translations`,
         locale,

@@ -1,6 +1,7 @@
 import { setupExternalLinks } from '../external-links.js';
 import { localizeDates } from '../i18n/date.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
+import { setupHandbookExports } from './handbook/setup.js';
 
 function syncLanguageSwitcher(locale) {
   document.querySelectorAll('.guide-language-switcher').forEach((switcher) => {
@@ -49,3 +50,6 @@ if (isEmbedded && window.parent !== window) {
 }
 
 setupExternalLinks();
+if (!new URLSearchParams(location.search).has('handbook-source')) {
+  setupHandbookExports(guideLocale || 'en-US');
+}

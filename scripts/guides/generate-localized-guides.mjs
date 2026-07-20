@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
@@ -21,6 +21,7 @@ import {
 import { writeGuideSitemap } from './guide-sitemap.mjs';
 import { updatePrivacyRevision } from './privacy-revision.mjs';
 import { annotateExternalResourceLanguages } from './links/resource-language.mjs';
+import { readHtmlWithIncludes } from '../html/includes.mjs';
 
 const SITE_URL = 'https://qr.lewismoten.com/';
 const GENERATED_LOCALES = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
@@ -243,7 +244,7 @@ async function copyPages(config) {
       const input = path.join(config.sourceRoot, source);
       const destination = path.join(config.outputRoot, output);
       await mkdir(path.dirname(destination), { recursive: true });
-      await writeFile(destination, await readFile(input, 'utf8'));
+      await writeFile(destination, await readHtmlWithIncludes(input));
     }),
   );
 }
@@ -260,7 +261,7 @@ export async function generateLocalizedGuides(options = {}) {
     await Promise.all(
       routeNames.map(async (route) => [
         route,
-        await readFile(configuredGuideSource(config, route), 'utf8'),
+        await readHtmlWithIncludes(configuredGuideSource(config, route)),
       ]),
     ),
   );

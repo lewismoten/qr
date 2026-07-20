@@ -73,8 +73,8 @@ function candidates(requestUrl) {
   }
   if (publicFiles.has(requested)) return [publicFiles.get(requested)];
   return [
-    safePath(htmlRoot, requested),
     safePath(generatedRoot, requested),
+    safePath(htmlRoot, requested),
   ].filter(Boolean);
 }
 

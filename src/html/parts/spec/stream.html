@@ -1,0 +1,241 @@
+      <section id="stream" class="guide-section stream-section">
+        <div class="section-intro">
+          <p class="section-number">03 / Encoded stream</p>
+          <h2>Headers and payload are bit fields, not always bytes</h2>
+          <p>
+            Automatic segmentation can switch modes when the reduced payload
+            size is worth another mode and count header. Every segment starts
+            with its own mode and character-count fields.
+          </p>
+        </div>
+
+        <div
+          class="bitstream"
+          role="img"
+          aria-label="Ordered QR data stream with one or more repeated segments followed by terminator, padding, error correction and remainder bits"
+        >
+          <div class="segment-cycle">
+            <header>
+              <strong>Segment 1…N</strong
+              ><span>Repeat once for every optimized segment</span>
+            </header>
+            <div class="segment-fields">
+              <div class="bit-field mode">
+                <strong>Mode</strong><span>4 bits</span>
+              </div>
+              <div class="bit-field count">
+                <strong>Character count</strong><span>width varies</span>
+              </div>
+              <div class="bit-field data">
+                <strong>Payload</strong><span>mode encoded</span>
+              </div>
+            </div>
+          </div>
+          <div class="post-segment-fields">
+            <div class="bit-field terminator">
+              <strong>Terminator</strong><span>up to 4 bits</span>
+            </div>
+            <div class="bit-field padding">
+              <strong>Byte boundary</strong><span>0–7 bits</span>
+            </div>
+            <div class="bit-field padding">
+              <strong>Pad words</strong><span>EC / 11</span>
+            </div>
+            <div class="bit-field ec">
+              <strong>EC words</strong><span>interleaved</span>
+            </div>
+            <div class="bit-field remainder">
+              <strong>Remainder</strong><span>0, 3, 4, or 7 bits</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-grid stream-grid">
+          <article class="visual-card">
+            <div class="visual-heading multi-dot">
+              <span class="color-dot mode"></span
+              ><span class="color-dot count"></span>
+              <h3>Mode and character count</h3>
+            </div>
+            <canvas
+              data-qr-visual="header"
+              role="img"
+              aria-label="Close-up of green mode bits followed by orange character-count bits and blue payload modules"
+            ></canvas>
+            <p>
+              The 4-bit mode indicator selects Numeric, Alphanumeric, Byte or
+              Kanji. Count-field width depends on both mode and version range;
+              Byte mode counts encoded bytes.
+            </p>
+          </article>
+          <article class="visual-card payload-units-card">
+            <div class="visual-heading">
+              <span class="color-dot data"></span>
+              <h3>Payload units</h3>
+            </div>
+            <p>
+              Each example below is a complete Version 1 segment header and
+              payload. The count field changes width by mode; Byte counts
+              encoded bytes rather than visible characters.
+            </p>
+            <div class="unit-example-grid">
+              <article
+                class="unit-example"
+                data-unit-mode="numeric"
+                data-unit-value="123"
+              >
+                <header>
+                  <strong>Numeric</strong><code>123</code><span>3 digits</span>
+                </header>
+                <div class="unit-stream" aria-label="Numeric segment bits">
+                  <span class="mode"
+                    ><small>Mode</small><code data-mode-bits>0001</code></span
+                  >
+                  <span class="count"
+                    ><small>Count</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>Payload</small><code data-payload-bits></code
+                  ></span>
+                </div>
+                <p data-unit-detail></p>
+              </article>
+              <article
+                class="unit-example"
+                data-unit-mode="alphanumeric"
+                data-unit-value="AB"
+              >
+                <header>
+                  <strong>Alphanumeric</strong><code>AB</code
+                  ><span>2 characters</span>
+                </header>
+                <div class="unit-stream" aria-label="Alphanumeric segment bits">
+                  <span class="mode"
+                    ><small>Mode</small><code data-mode-bits>0010</code></span
+                  >
+                  <span class="count"
+                    ><small>Count</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>Payload</small><code data-payload-bits></code
+                  ></span>
+                </div>
+                <p data-unit-detail></p>
+              </article>
+              <article
+                class="unit-example"
+                data-unit-mode="byte"
+                data-unit-value="é"
+              >
+                <header>
+                  <strong>Byte</strong><code>é</code><span>2 UTF-8 bytes</span>
+                </header>
+                <div class="unit-stream" aria-label="Byte segment bits">
+                  <span class="mode"
+                    ><small>Mode</small><code data-mode-bits>0100</code></span
+                  >
+                  <span class="count"
+                    ><small>Count</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>Payload</small><code data-payload-bits></code
+                  ></span>
+                </div>
+                <p data-unit-detail></p>
+              </article>
+              <article
+                class="unit-example"
+                data-unit-mode="kanji"
+                data-unit-value="漢"
+              >
+                <header>
+                  <strong>Kanji</strong><code>漢</code><span>1 character</span>
+                </header>
+                <div class="unit-stream" aria-label="Kanji segment bits">
+                  <span class="mode"
+                    ><small>Mode</small><code data-mode-bits>1000</code></span
+                  >
+                  <span class="count"
+                    ><small>Count</small><code data-count-bits></code
+                  ></span>
+                  <span class="data"
+                    ><small>Payload</small><code data-payload-bits></code
+                  ></span>
+                </div>
+                <p data-unit-detail></p>
+              </article>
+            </div>
+
+            <div class="mixed-example">
+              <header>
+                <div>
+                  <span class="example-kicker">Automatic mixed mode</span
+                  ><strong><code>1234567890HELLO-world</code></strong>
+                </div>
+                <span id="mixed-mode-savings"></span>
+              </header>
+              <div class="mixed-example-layout">
+                <figure class="mixed-qr-figure">
+                  <canvas
+                    class="mixed-qr-visual"
+                    data-qr-visual="mixed"
+                    role="img"
+                    aria-label="Version 1 QR Code for the mixed-mode example with debug overlays and the stream path"
+                  ></canvas>
+                  <figcaption>
+                    Repeated green Mode and orange Count fields mark each
+                    segment before its blue payload.
+                  </figcaption>
+                </figure>
+                <div
+                  id="mixed-mode-stream"
+                  class="mixed-mode-stream"
+                  aria-label="Automatically optimized mixed-mode segment stream"
+                ></div>
+              </div>
+              <p>
+                Each colored block is a separate segment with another 4-bit mode
+                indicator and count field. The optimizer keeps a switch only
+                when its smaller payload offsets that header cost. Automatic
+                detection does not select Kanji; Kanji must be requested
+                explicitly.
+              </p>
+            </div>
+          </article>
+          <article class="visual-card">
+            <div class="visual-heading multi-dot">
+              <span class="color-dot terminator"></span
+              ><span class="color-dot padding"></span>
+              <h3>Terminator and padding</h3>
+            </div>
+            <canvas
+              data-qr-visual="padding"
+              role="img"
+              aria-label="Close-up of lime terminator bits and gray byte-boundary and pad modules"
+            ></canvas>
+            <p>
+              After the last segment, up to four zero terminator bits are added.
+              More zero bits reach a byte boundary; alternating
+              <code>0xEC</code> and <code>0x11</code> pad codewords fill the
+              data capacity.
+            </p>
+          </article>
+          <article class="visual-card">
+            <div class="visual-heading">
+              <span class="color-dot remainder"></span>
+              <h3>Remainder bits</h3>
+            </div>
+            <canvas
+              data-qr-visual="remainder"
+              role="img"
+              aria-label="Close-up of teal remainder modules after the final codeword"
+            ></canvas>
+            <p>
+              Some versions leave 3, 4 or 7 traversable modules after all
+              complete codewords. These zero remainder bits complete the matrix
+              geometry; they are not data or error correction.
+            </p>
+          </article>
+        </div>
+      </section>
+

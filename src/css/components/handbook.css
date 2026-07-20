@@ -1,0 +1,36 @@
+.handbook-actions {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.handbook-action {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: #fffaf0;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.handbook-action:hover,
+.handbook-action:focus-visible {
+  background: rgba(94, 234, 212, 0.12);
+}
+
+.handbook-action:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+@media (max-width: 42rem) {
+  .handbook-actions {
+    order: 2;
+    width: 100%;
+    overflow-x: auto;
+  }
+}

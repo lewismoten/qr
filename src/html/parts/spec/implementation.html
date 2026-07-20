@@ -1,0 +1,137 @@
+      <section id="implementation" class="guide-section implementation-section">
+        <div class="section-intro">
+          <p class="section-number">06 / Implementation boundaries</p>
+          <h2>Use the guide to learn; use the source to reproduce</h2>
+          <p>
+            This visual guide explains the structure and read order, but it does
+            not reproduce every normative table, polynomial, coordinate,
+            bit-width rule or edge case needed to build a conforming encoder.
+            The links below show where this generator implements those details.
+            They are readable implementation references, not replacements for
+            ISO/IEC 18004.
+          </p>
+        </div>
+
+        <div class="reference-links implementation-links">
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/constants.js"
+            ><strong>Modes, count widths and block tables</strong
+            ><span
+              ><code>constants.js</code> defines mode indicators, the
+              alphanumeric alphabet, character-count widths, EC-level format
+              values, EC codewords per block and block counts for versions
+              1–40.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments/segment.js"
+            ><strong>Encoding units</strong
+            ><span
+              ><code>segment.js</code> validates and converts Numeric,
+              Alphanumeric, UTF-8 Byte and Shift JIS Kanji units into payload
+              bits.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments/segment-optimizer.js"
+            ><strong>Mixed-mode optimization</strong
+            ><span
+              ><code>segment-optimizer.js</code> finds a low-cost sequence of
+              Numeric, Alphanumeric and Byte segments, including each repeated
+              mode and count header.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/segments/segments.js"
+            ><strong>Version and data codewords</strong
+            ><span
+              ><code>segments.js</code> selects a fitting version and writes
+              segment headers, payload, terminator, byte alignment and
+              alternating pad words.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/capacity.js"
+            ><strong>Capacity and remainder geometry</strong
+            ><span
+              ><code>capacity.js</code> calculates raw data modules,
+              character-count widths and usable data codewords from version,
+              recovery level and block structure.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/reed-solomon.js"
+            ><strong>Reed-Solomon and interleaving</strong
+            ><span
+              ><code>reed-solomon.js</code> contains GF(256) multiplication,
+              generator-divisor construction, remainder generation, short/long
+              block division and data/EC interleaving.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/matrix-encoder.js"
+            ><strong>Matrix, metadata and placement</strong
+            ><span
+              ><code>matrix-encoder.js</code> places functional patterns, writes
+              BCH-protected metadata, traverses codeword bits and produces each
+              mask candidate.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/mask.js"
+            ><strong>Eight mask formulas</strong
+            ><span
+              ><code>mask.js</code> gives the exact row/column predicate used by
+              every mask candidate.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/penalty.js"
+            ><strong>Mask penalty scoring</strong
+            ><span
+              ><code>penalty.js</code> scores runs, blocks, finder-like
+              sequences and dark/light imbalance to select the automatic
+              mask.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/src/js/qr/kanji.js"
+            ><strong>Shift JIS Kanji conversion</strong
+            ><span
+              ><code>kanji.js</code> builds the browser-supported Shift JIS map,
+              validates the two QR Kanji ranges and transforms characters into
+              13-bit values.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/qr/qr.test.js"
+            ><strong>Structural and capacity tests</strong
+            ><span
+              ><code>tests/qr/qr.test.js</code> exercises versions, modes,
+              capacities, masks, codewords and expected matrices.</span
+            ></a
+          >
+          <a
+            href="https://git.lewismoten.com/lewismoten/qr/src/branch/main/tests/helpers/qr-parity.js"
+            ><strong>Reference parity harness</strong
+            ><span
+              ><code>tests/helpers/qr-parity.js</code> compares each split
+              parity range against an optional node-qrcode reference
+              bundle.</span
+            ></a
+          >
+        </div>
+
+        <div class="implementation-warning">
+          <strong>Not implemented by this encoder</strong>
+          <p>
+            The current source targets standard Model 2 QR Codes in Numeric,
+            Alphanumeric, Byte and manually selected Kanji modes. It is not an
+            implementation reference for ECI segments, Structured Append,
+            FNC1/GS1, Hanzi mode, Micro QR, Rectangular Micro QR, Model 1
+            symbols or QR decoding. Consult the applicable normative
+            specification before claiming compatibility beyond the tested scope.
+          </p>
+        </div>
+      </section>
+

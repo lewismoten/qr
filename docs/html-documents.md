@@ -10,9 +10,20 @@ older files predate this rule. Their current lengths are frozen in
 `scripts/lint/lint-html-limits.mjs`: they may shrink, but they cannot grow.
 Removing those temporary baselines is the remaining migration work.
 
-## Recommended composition model
+## Composition model
 
-Long-form pages such as the QR specification should use:
+Long-form pages use recursive comments such as:
+
+```html
+<!-- include file="parts/spec/anatomy.html" -->
+```
+
+The include path is relative to the containing file and cannot escape
+`src/html`. Circular includes fail the build. Includes are resolved before
+localization, allowing every locale to reuse the same document structure.
+
+The QR specification is the first migrated long-form page. The remaining
+legacy baselines should move to the same model:
 
 1. A page shell containing metadata, navigation, and footer markup.
 2. An ordered manifest listing section source files.
@@ -35,18 +46,19 @@ sections as tabs or a table of contents, but it should use links and disclosure
 controls rather than deleting inactive content. Print CSS can then reveal every
 section, remove sticky controls, and preserve headings and page-break rules.
 
-The specification stylesheet already provides a paper-friendly print mode.
-Browser **Print** or **Save as PDF** therefore produces the complete document,
-not only the section currently visible on screen.
+The specification stylesheet provides a paper-friendly print mode. Every guide
+footer also offers a client-side handbook action. It gathers About, Technology,
+all guides, the specification, and Privacy in the active language, creates a
+table of contents, and opens one continuous document for **Print** or
+**Save as PDF**.
 
-PDF and ePub downloads should eventually be generated from the same ordered
-section manifest:
+The ePub action packages the same ordered handbook with the application's
+first-party ZIP writer:
 
-- PDF can be produced from the composed print document in a headless browser.
-- ePub can wrap the sections as XHTML spine items with a generated navigation
-  document, metadata file, stylesheet, and images.
-- A combined handbook can append About, Technology, Privacy, and all guides to
-  that same manifest.
+- PDF is produced from the composed print document by the browser.
+- ePub wraps sections as XHTML spine items with navigation, metadata, styles,
+  and captured local images.
+- The combined handbook includes About, Technology, Privacy, and every guide.
 - Every locale should generate a separate book so language metadata, direction,
   links, and translated prose remain correct.
 

@@ -10,7 +10,6 @@ export const LEGACY_HTML_LIMITS = new Map([
   ['src/html/guides/style/colors.html', 402],
   ['src/html/guides/style/modules.html', 400],
   ['src/html/index.html', 1886],
-  ['src/html/spec.html', 887],
   ['src/html/technology.html', 821],
 ]);
 

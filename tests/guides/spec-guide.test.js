@@ -3,9 +3,12 @@ import { access, readFile } from 'node:fs/promises';
 import { describe, test } from 'node:test';
 
 import { readLocaleSource } from '../helpers/locales.js';
+import { readHtmlWithIncludes } from '../../scripts/html/includes.mjs';
 
-const read = (path) =>
-  readFile(new URL('../../' + path, import.meta.url), 'utf8');
+const read = (file) => {
+  if (file.endsWith('.html')) return readHtmlWithIncludes(file);
+  return readFile(new URL('../../' + file, import.meta.url), 'utf8');
+};
 
 describe('specification guide', () => {
   test('maps the QR package from every localized route', async () => {
