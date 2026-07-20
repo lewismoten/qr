@@ -1,4 +1,17 @@
 const workspaces = new Map();
+const MINIMUM_PENALIZED_RUN = 5;
+const RUN_BASELINE = 2;
+const FINDER_PATTERN_WINDOW_BITS = 11;
+const FINDER_PATTERN_WINDOW_MASK = 0x7ff;
+const FINDER_PATTERN_FORWARD = 0x05d;
+const FINDER_PATTERN_REVERSE = 0x5d0;
+const FINDER_PATTERN_END = FINDER_PATTERN_WINDOW_BITS - 1;
+const FINDER_PATTERN_PENALTY = 40;
+const BLOCK_PENALTY = 3;
+const PERCENTAGE_SCALE = 100;
+const IDEAL_DARK_PERCENTAGE = 50;
+const DARK_PERCENTAGE_STEP = 5;
+const DARK_PERCENTAGE_PENALTY = 10;
 
 function getWorkspace(size) {
   if (!workspaces.has(size)) {
@@ -31,12 +44,19 @@ export function getPenalty(modules) {
       if (column > 0) {
         if (dark === currentRow[column - 1]) rowRun += 1;
         else {
-          if (rowRun >= 5) result += rowRun - 2;
+          if (rowRun >= MINIMUM_PENALIZED_RUN) {
+            result += rowRun - RUN_BASELINE;
+          }
           rowRun = 1;
         }
-        rowPattern = ((rowPattern << 1) | dark) & 0x7ff;
-        if (column >= 10 && (rowPattern === 0x05d || rowPattern === 0x5d0))
-          result += 40;
+        rowPattern = ((rowPattern << 1) | dark) & FINDER_PATTERN_WINDOW_MASK;
+        if (
+          column >= FINDER_PATTERN_END &&
+          (rowPattern === FINDER_PATTERN_FORWARD ||
+            rowPattern === FINDER_PATTERN_REVERSE)
+        ) {
+          result += FINDER_PATTERN_PENALTY;
+        }
       }
 
       if (row === 0) {
@@ -45,12 +65,21 @@ export function getPenalty(modules) {
       } else {
         if (dark === previousRow[column]) columnRuns[column] += 1;
         else {
-          if (columnRuns[column] >= 5) result += columnRuns[column] - 2;
+          if (columnRuns[column] >= MINIMUM_PENALIZED_RUN) {
+            result += columnRuns[column] - RUN_BASELINE;
+          }
           columnRuns[column] = 1;
         }
-        const pattern = ((columnPatterns[column] << 1) | dark) & 0x7ff;
+        const pattern =
+          ((columnPatterns[column] << 1) | dark) & FINDER_PATTERN_WINDOW_MASK;
         columnPatterns[column] = pattern;
-        if (row >= 10 && (pattern === 0x05d || pattern === 0x5d0)) result += 40;
+        if (
+          row >= FINDER_PATTERN_END &&
+          (pattern === FINDER_PATTERN_FORWARD ||
+            pattern === FINDER_PATTERN_REVERSE)
+        ) {
+          result += FINDER_PATTERN_PENALTY;
+        }
 
         if (
           column > 0 &&
@@ -58,16 +87,21 @@ export function getPenalty(modules) {
           dark === previousRow[column] &&
           dark === previousRow[column - 1]
         )
-          result += 3;
+          result += BLOCK_PENALTY;
       }
     }
-    if (rowRun >= 5) result += rowRun - 2;
+    if (rowRun >= MINIMUM_PENALIZED_RUN) result += rowRun - RUN_BASELINE;
   }
 
   for (let column = 0; column < size; column += 1) {
-    if (columnRuns[column] >= 5) result += columnRuns[column] - 2;
+    if (columnRuns[column] >= MINIMUM_PENALIZED_RUN) {
+      result += columnRuns[column] - RUN_BASELINE;
+    }
   }
-  const darkPercentage = (darkCount * 100) / (size * size);
-  result += Math.floor(Math.abs(darkPercentage - 50) / 5) * 10;
+  const darkPercentage = (darkCount * PERCENTAGE_SCALE) / (size * size);
+  result +=
+    Math.floor(
+      Math.abs(darkPercentage - IDEAL_DARK_PERCENTAGE) / DARK_PERCENTAGE_STEP,
+    ) * DARK_PERCENTAGE_PENALTY;
   return result;
 }

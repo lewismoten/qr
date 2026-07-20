@@ -1,3 +1,10 @@
+import { COLOR_WHITE } from '../colors.js';
+
+const MAXIMUM_FONT_HEIGHT_MULTIPLIER = 2.5;
+const MINIMUM_FRAME_FONT_SIZE = 4;
+const CENTER_OUTLINE_CELL_RATIO = 0.8;
+const HEX_COLOR_LENGTH = 7;
+
 export function fitCanvasText(context, text, maximumWidth) {
   let low = 0;
   let high = text.length + 1;
@@ -114,7 +121,9 @@ export function fitFrameMessage(
   maximumLineHeight,
   getFont,
 ) {
-  const maximumFontSize = Math.ceil(maximumLineHeight * 2.5);
+  const maximumFontSize = Math.ceil(
+    maximumLineHeight * MAXIMUM_FONT_HEIGHT_MULTIPLIER,
+  );
   const trySize = (fontSize) => {
     const font = getFont(fontSize);
     context.font = font;
@@ -135,7 +144,7 @@ export function fitFrameMessage(
     }
     return null;
   };
-  let low = 4;
+  let low = MINIMUM_FRAME_FONT_SIZE;
   let high = maximumFontSize;
   let fitted = null;
   while (low <= high) {
@@ -150,7 +159,7 @@ export function fitFrameMessage(
   }
   if (fitted) return fitted;
 
-  const font = getFont(4);
+  const font = getFont(MINIMUM_FRAME_FONT_SIZE);
   context.font = font;
   return { font, lines: wrapFrameMessage(context, message, maximumWidth) };
 }
@@ -199,7 +208,7 @@ export function drawCenteredFrameMessage(
   context.save();
   context.font = font;
   context.strokeStyle = getOpaqueArtworkBackground(lightColor);
-  context.lineWidth = Math.max(2, cellSize * 0.8);
+  context.lineWidth = Math.max(2, cellSize * CENTER_OUTLINE_CELL_RATIO);
   context.lineJoin = 'round';
   context.miterLimit = 2;
   context.fillStyle = textColor;
@@ -216,7 +225,6 @@ export function drawCenteredFrameMessage(
 
 export function getOpaqueArtworkBackground(lightColor) {
   return /^#[0-9a-f]{6}/i.test(lightColor)
-    ? lightColor.slice(0, 7)
+    ? lightColor.slice(0, HEX_COLOR_LENGTH)
     : COLOR_WHITE;
 }
-import { COLOR_WHITE } from '../colors.js';

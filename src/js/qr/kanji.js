@@ -2,6 +2,22 @@ import { createQrError } from './error.js';
 
 let shiftJisMap;
 
+const FIRST_LEAD_RANGE_START = 0x81;
+const FIRST_LEAD_RANGE_END = 0x9f;
+const SECOND_LEAD_RANGE_START = 0xe0;
+const SECOND_LEAD_RANGE_END = 0xeb;
+const TRAIL_RANGE_START = 0x40;
+const TRAIL_RANGE_END = 0xfc;
+const INVALID_TRAIL_BYTE = 0x7f;
+const BITS_PER_BYTE = 8;
+const FIRST_QR_RANGE_START = 0x8140;
+const FIRST_QR_RANGE_END = 0x9ffc;
+const SECOND_QR_RANGE_START = 0xe040;
+const SECOND_QR_RANGE_END = 0xebbf;
+const SECOND_QR_RANGE_OFFSET = 0xc140;
+const QR_KANJI_ROW_WIDTH = 0xc0;
+const BYTE_MASK = 0xff;
+
 function getShiftJisMap() {
   if (shiftJisMap) return shiftJisMap;
   let decoder;
@@ -16,13 +32,17 @@ function getShiftJisMap() {
 
   shiftJisMap = new Map();
   const leadRanges = [
-    [0x81, 0x9f],
-    [0xe0, 0xeb],
+    [FIRST_LEAD_RANGE_START, FIRST_LEAD_RANGE_END],
+    [SECOND_LEAD_RANGE_START, SECOND_LEAD_RANGE_END],
   ];
   leadRanges.forEach(([firstLead, lastLead]) => {
     for (let lead = firstLead; lead <= lastLead; lead += 1) {
-      for (let trail = 0x40; trail <= 0xfc; trail += 1) {
-        if (trail === 0x7f) continue;
+      for (
+        let trail = TRAIL_RANGE_START;
+        trail <= TRAIL_RANGE_END;
+        trail += 1
+      ) {
+        if (trail === INVALID_TRAIL_BYTE) continue;
         try {
           const character = decoder.decode(Uint8Array.of(lead, trail));
           if (
@@ -30,7 +50,7 @@ function getShiftJisMap() {
             character !== '\ufffd' &&
             !shiftJisMap.has(character)
           ) {
-            shiftJisMap.set(character, (lead << 8) | trail);
+            shiftJisMap.set(character, (lead << BITS_PER_BYTE) | trail);
           }
         } catch {
           // Unassigned Shift JIS byte pairs are not QR Kanji characters.
@@ -49,9 +69,15 @@ export function getQrKanjiValue(character) {
   const shiftJis = toShiftJis(character);
   if (!Number.isInteger(shiftJis)) return null;
   let adjusted;
-  if (shiftJis >= 0x8140 && shiftJis <= 0x9ffc) adjusted = shiftJis - 0x8140;
-  else if (shiftJis >= 0xe040 && shiftJis <= 0xebbf)
-    adjusted = shiftJis - 0xc140;
-  else return null;
-  return (adjusted >>> 8) * 0xc0 + (adjusted & 0xff);
+  if (shiftJis >= FIRST_QR_RANGE_START && shiftJis <= FIRST_QR_RANGE_END) {
+    adjusted = shiftJis - FIRST_QR_RANGE_START;
+  } else if (
+    shiftJis >= SECOND_QR_RANGE_START &&
+    shiftJis <= SECOND_QR_RANGE_END
+  ) {
+    adjusted = shiftJis - SECOND_QR_RANGE_OFFSET;
+  } else return null;
+  return (
+    (adjusted >>> BITS_PER_BYTE) * QR_KANJI_ROW_WIDTH + (adjusted & BYTE_MASK)
+  );
 }

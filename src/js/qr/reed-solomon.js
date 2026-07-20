@@ -6,18 +6,31 @@ import { getRawDataModules } from './capacity.js';
 
 const divisorCache = new Map();
 const divisorLogarithmCache = new WeakMap();
-const fieldExponents = new Uint8Array(512);
-const fieldLogarithms = new Uint8Array(256);
+const FIELD_ORDER = 256;
+const FIELD_NONZERO_VALUE_COUNT = FIELD_ORDER - 1;
+const EXPONENT_TABLE_LENGTH = FIELD_ORDER * 2;
+const FIELD_HIGH_BIT = 0x100;
+const FIELD_PRIMITIVE_POLYNOMIAL = 0x11d;
+const BITS_PER_CODEWORD = 8;
+const FIELD_GENERATOR = 2;
+const fieldExponents = new Uint8Array(EXPONENT_TABLE_LENGTH);
+const fieldLogarithms = new Uint8Array(FIELD_ORDER);
 
 let fieldValue = 1;
-for (let exponent = 0; exponent < 255; exponent += 1) {
+for (let exponent = 0; exponent < FIELD_NONZERO_VALUE_COUNT; exponent += 1) {
   fieldExponents[exponent] = fieldValue;
   fieldLogarithms[fieldValue] = exponent;
   fieldValue <<= 1;
-  if (fieldValue & 0x100) fieldValue ^= 0x11d;
+  if (fieldValue & FIELD_HIGH_BIT) fieldValue ^= FIELD_PRIMITIVE_POLYNOMIAL;
 }
-for (let exponent = 255; exponent < fieldExponents.length; exponent += 1)
-  fieldExponents[exponent] = fieldExponents[exponent - 255];
+for (
+  let exponent = FIELD_NONZERO_VALUE_COUNT;
+  exponent < fieldExponents.length;
+  exponent += 1
+) {
+  fieldExponents[exponent] =
+    fieldExponents[exponent - FIELD_NONZERO_VALUE_COUNT];
+}
 
 function multiply(x, y) {
   if (x === 0 || y === 0) return 0;
@@ -36,7 +49,7 @@ export function makeReedSolomonDivisor(degree) {
       if (coefficient + 1 < degree)
         result[coefficient] ^= result[coefficient + 1];
     }
-    root = multiply(root, 2);
+    root = multiply(root, FIELD_GENERATOR);
   }
   const divisor = Object.freeze(result);
   divisorCache.set(degree, divisor);
@@ -72,7 +85,9 @@ export function getReedSolomonRemainder(data, divisor) {
 export function addErrorCorrection(data, version, errorLevel) {
   const blockCount = NUM_ERROR_CORRECTION_BLOCKS[errorLevel][version];
   const eccLength = ECC_CODEWORDS_PER_BLOCK[errorLevel][version];
-  const rawCodewords = Math.floor(getRawDataModules(version) / 8);
+  const rawCodewords = Math.floor(
+    getRawDataModules(version) / BITS_PER_CODEWORD,
+  );
   const shortBlockCount = blockCount - (rawCodewords % blockCount);
   const shortBlockLength = Math.floor(rawCodewords / blockCount);
   const shortDataLength = shortBlockLength - eccLength;

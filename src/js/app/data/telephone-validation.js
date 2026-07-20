@@ -1,5 +1,9 @@
 import { lookup } from '../../i18n/index.js';
 
+const MAXIMUM_PHONE_FORMAT_LENGTH = 40;
+const MINIMUM_PHONE_DIGITS = 10;
+const MAXIMUM_PHONE_DIGITS = 15;
+
 export function validateTelephoneValue(
   value,
   { required = true, label, contextLabel } = {},
@@ -27,7 +31,7 @@ export function validateTelephoneValue(
     );
   }
 
-  if (trimmed.length > 40) {
+  if (trimmed.length > MAXIMUM_PHONE_FORMAT_LENGTH) {
     return lookup(
       'validation.phone.formatLength',
       'Not valid for {context} format yet: {label} should stay within 40 characters.',
@@ -47,7 +51,10 @@ export function validateTelephoneValue(
   }
 
   const digits = trimmed.replace(/\D/g, '');
-  if (digits.length < 10 || digits.length > 15) {
+  if (
+    digits.length < MINIMUM_PHONE_DIGITS ||
+    digits.length > MAXIMUM_PHONE_DIGITS
+  ) {
     return lookup(
       'validation.phone.length',
       'Not valid for {context} format yet: {label} should contain a reasonable length of 10 to 15 digits.',

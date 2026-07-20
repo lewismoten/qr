@@ -4,6 +4,11 @@ export { validateTelephoneValue } from './telephone-validation.js';
 const VCARD_TEXT_PATTERN = /^[\p{L}\p{M}\p{N}\p{P}\p{S}\p{Zs}]*$/u;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PRINTABLE_TEXT_PATTERN = /^[^\p{Cc}\p{Cs}]*$/u;
+const MAXIMUM_EMAIL_LENGTH = 254;
+const MAXIMUM_GEO_LABEL_LENGTH = 80;
+const MAXIMUM_URL_LENGTH = 2048;
+const MAXIMUM_HOUR = 23;
+const MAXIMUM_MINUTE = 59;
 
 export function validateEmailValue(
   value,
@@ -30,7 +35,7 @@ export function validateEmailValue(
     );
   }
 
-  if (trimmed.length > 254) {
+  if (trimmed.length > MAXIMUM_EMAIL_LENGTH) {
     return lookup(
       'validation.email.length',
       'Not valid for {context} format yet: {label} should stay within 254 characters.',
@@ -68,7 +73,7 @@ export function validateGeoLabel(value) {
     return '';
   }
 
-  if (trimmed.length > 80) {
+  if (trimmed.length > MAXIMUM_GEO_LABEL_LENGTH) {
     return lookup(
       'validation.geo.labelLength',
       'Not valid for Geo format yet: label should stay within 80 characters.',
@@ -139,7 +144,7 @@ export function getWebsiteValidationState(
     };
   }
 
-  if (trimmed.length > 2048) {
+  if (trimmed.length > MAXIMUM_URL_LENGTH) {
     return {
       error: lookup(
         'validation.website.length',
@@ -244,5 +249,7 @@ export function isValidBulkTime(value) {
     return false;
   }
   const [hour, minute] = value.split(':').map(Number);
-  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
+  return (
+    hour >= 0 && hour <= MAXIMUM_HOUR && minute >= 0 && minute <= MAXIMUM_MINUTE
+  );
 }

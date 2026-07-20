@@ -39,14 +39,13 @@ export default [
       'src/js/app/checksum/crc32.js',
       'src/js/app/bytes.js',
       'src/js/app/compression/lzw.js',
-      'src/js/app/export/gif.js',
-      'src/js/app/export/mp4.js',
-      'src/js/app/export/pdf.js',
-      'src/js/app/export/zip.js',
+      'src/js/app/data/**/*.js',
+      'src/js/app/export/**/*.js',
       'src/js/app/qr/qr-finder-regions.js',
       'src/js/app/qr/encoding-units.js',
       'src/js/app/qr/qr-regions.js',
       'src/js/app/qr/qr-stream.js',
+      'src/js/qr/**/*.js',
     ],
     rules: {
       'no-magic-numbers': ['error', magicNumberOptions],
@@ -64,6 +63,13 @@ export default [
             'Pass named constants to byte-array push calls so fields are clear.',
         },
       ],
+    },
+  },
+  {
+    files: ['src/js/qr/constants.js'],
+    rules: {
+      // These arrays are named ISO/IEC 18004 lookup tables, not algorithms.
+      'no-magic-numbers': 'off',
     },
   },
   {

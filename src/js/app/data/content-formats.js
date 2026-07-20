@@ -1,5 +1,8 @@
 import { normalizePhoneNumber } from './phone.js';
 
+const WIFI_HIDDEN_FIELD = 'H:true';
+const VCARD_END = 'END:VCARD';
+
 export function escapeWifiValue(value) {
   return String(value).replace(/([\\;,:"])/g, '\\$1');
 }
@@ -15,7 +18,7 @@ export function serializeWifi({
     `S:${escapeWifiValue(String(ssid).trim())}`,
   ];
   if (security !== 'nopass') segments.push(`P:${escapeWifiValue(password)}`);
-  if (hidden) segments.push('H:true');
+  if (hidden) segments.push(WIFI_HIDDEN_FIELD);
   return `WIFI:${segments.join(';')};;`;
 }
 
@@ -63,6 +66,6 @@ export function serializeVCard({
   optionalFields.forEach(([key, value]) => {
     if (String(value).trim()) lines.push(`${key}:${String(value).trim()}`);
   });
-  lines.push('END:VCARD');
+  lines.push(VCARD_END);
   return lines.join('\n');
 }

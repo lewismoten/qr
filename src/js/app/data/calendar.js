@@ -1,7 +1,11 @@
+const RANDOM_ID_RADIX = 36;
+const EVENT_END = 'END:VEVENT';
+const CALENDAR_END = 'END:VCALENDAR';
+
 const eventUid = `${
   typeof globalThis.crypto?.randomUUID === 'function'
     ? globalThis.crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    : `${Date.now()}-${Math.random().toString(RANDOM_ID_RADIX).slice(2)}`
 }@qr.lewismoten.com`;
 const eventTimestamp = new Date();
 
@@ -72,6 +76,6 @@ export function serializeCalendarEvent(values, uid = eventUid) {
   if (values.description.trim())
     lines.push(`DESCRIPTION:${escapeText(values.description.trim())}`);
   if (values.url.trim()) lines.push(`URL:${values.url.trim()}`);
-  lines.push('END:VEVENT', 'END:VCALENDAR');
+  lines.push(EVENT_END, CALENDAR_END);
   return lines.join('\r\n');
 }

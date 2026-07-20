@@ -1,3 +1,13 @@
+const RGBA_CHANNEL_COUNT = 4;
+const GREEN_CHANNEL_OFFSET = 1;
+const BLUE_CHANNEL_OFFSET = 2;
+const ALPHA_CHANNEL_OFFSET = 3;
+const OPAQUE_CHANNEL_VALUE = 255;
+const HEX_RADIX = 16;
+const HEX_CHANNEL_WIDTH = 2;
+const OPACITY_DECIMAL_PLACES = 4;
+const SVG_END = '</svg>';
+
 export async function createSvgBlob(sourceCanvas) {
   const context = sourceCanvas.getContext('2d');
   const pixels = context.getImageData(
@@ -20,11 +30,11 @@ export async function createSvgBlob(sourceCanvas) {
     const nextRuns = new Map();
     let x = 0;
     while (x < sourceCanvas.width) {
-      const offset = (y * sourceCanvas.width + x) * 4;
+      const offset = (y * sourceCanvas.width + x) * RGBA_CHANNEL_COUNT;
       const red = pixels[offset];
-      const green = pixels[offset + 1];
-      const blue = pixels[offset + 2];
-      const alpha = pixels[offset + 3];
+      const green = pixels[offset + GREEN_CHANNEL_OFFSET];
+      const blue = pixels[offset + BLUE_CHANNEL_OFFSET];
+      const alpha = pixels[offset + ALPHA_CHANNEL_OFFSET];
       if (alpha === 0) {
         x += 1;
         continue;
@@ -32,12 +42,12 @@ export async function createSvgBlob(sourceCanvas) {
 
       let end = x + 1;
       while (end < sourceCanvas.width) {
-        const nextOffset = (y * sourceCanvas.width + end) * 4;
+        const nextOffset = (y * sourceCanvas.width + end) * RGBA_CHANNEL_COUNT;
         if (
           pixels[nextOffset] !== red ||
-          pixels[nextOffset + 1] !== green ||
-          pixels[nextOffset + 2] !== blue ||
-          pixels[nextOffset + 3] !== alpha
+          pixels[nextOffset + GREEN_CHANNEL_OFFSET] !== green ||
+          pixels[nextOffset + BLUE_CHANNEL_OFFSET] !== blue ||
+          pixels[nextOffset + ALPHA_CHANNEL_OFFSET] !== alpha
         ) {
           break;
         }
@@ -66,11 +76,19 @@ export async function createSvgBlob(sourceCanvas) {
   ];
   pathsByColor.forEach((paths, color) => {
     const [red, green, blue, alpha] = color.split(',').map(Number);
-    const hex = `#${[red, green, blue].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+    const hex = `#${[red, green, blue]
+      .map((channel) =>
+        channel.toString(HEX_RADIX).padStart(HEX_CHANNEL_WIDTH, '0'),
+      )
+      .join('')}`;
     const opacity =
-      alpha < 255 ? ` fill-opacity="${(alpha / 255).toFixed(4)}"` : '';
+      alpha < OPAQUE_CHANNEL_VALUE
+        ? ` fill-opacity="${(alpha / OPAQUE_CHANNEL_VALUE).toFixed(
+            OPACITY_DECIMAL_PLACES,
+          )}"`
+        : '';
     parts.push(`<path fill="${hex}"${opacity} d="${paths.join('')}"/>`);
   });
-  parts.push('</svg>');
+  parts.push(SVG_END);
   return new Blob(parts, { type: 'image/svg+xml' });
 }

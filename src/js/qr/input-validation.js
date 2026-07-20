@@ -2,7 +2,14 @@ import { getDataCodewords } from './capacity.js';
 import { createQrError } from './error.js';
 
 const MAX_CONTENT_CHARACTERS = 7089;
-const MAX_SEGMENTS = Math.floor((getDataCodewords(40, 'L') * 8) / 12);
+const MAXIMUM_VERSION = 40;
+const BITS_PER_CODEWORD = 8;
+const MINIMUM_SEGMENT_OVERHEAD_BITS = 12;
+const MINIMUM_VERSION = 1;
+const MAX_SEGMENTS = Math.floor(
+  (getDataCodewords(MAXIMUM_VERSION, 'L') * BITS_PER_CODEWORD) /
+    MINIMUM_SEGMENT_OVERHEAD_BITS,
+);
 
 export function assertContentLength(length) {
   if (length > MAX_CONTENT_CHARACTERS)
@@ -23,7 +30,11 @@ export function assertSegmentCount(count) {
 }
 
 export function assertVersion(version) {
-  if (!Number.isInteger(version) || version < 1 || version > 40)
+  if (
+    !Number.isInteger(version) ||
+    version < MINIMUM_VERSION ||
+    version > MAXIMUM_VERSION
+  )
     throw createQrError(
       'versionRange',
       'QR version must be an integer from 1 through 40.',

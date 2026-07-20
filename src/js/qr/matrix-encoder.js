@@ -9,6 +9,12 @@ import {
 } from './reed-solomon.js';
 import { toShiftJis } from './kanji.js';
 import { getMaskMap } from './mask.js';
+import {
+  drawAlignment,
+  drawFinder,
+  getAlignmentPositions,
+} from './matrix/patterns.js';
+import * as M from './matrix/specification.js';
 import { getPenalty } from './penalty.js';
 import {
   makeDataCodewords,
@@ -16,24 +22,12 @@ import {
   selectVersionAndSegments,
 } from './segments/segments.js';
 
-function getAlignmentPositions(version) {
-  if (version === 1) return [];
-  const size = version * 4 + 17;
-  const count = Math.floor(version / 7) + 2;
-  const step =
-    version === 32 ? 26 : Math.ceil((size - 13) / (count * 2 - 2)) * 2;
-  const result = [6];
-  for (let position = size - 7; result.length < count; position -= step)
-    result.splice(1, 0, position);
-  return result;
-}
-
 class MatrixBuilder {
   constructor(version, errorLevel, codewords) {
     assertVersion(version);
     this.version = version;
     this.errorLevel = errorLevel;
-    this.size = version * 4 + 17;
+    this.size = version * M.modulesPerVersion + M.versionOneSize;
     this.modules = Array.from(
       { length: this.size },
       () => new Uint8Array(this.size),
@@ -63,12 +57,12 @@ class MatrixBuilder {
 
   drawFunctionPatterns() {
     for (let index = 0; index < this.size; index += 1) {
-      this.setFunction(6, index, index % 2 === 0);
-      this.setFunction(index, 6, index % 2 === 0);
+      this.setFunction(M.timingAxis, index, index % 2 === 0);
+      this.setFunction(index, M.timingAxis, index % 2 === 0);
     }
-    this.drawFinder(3, 3);
-    this.drawFinder(3, this.size - 4);
-    this.drawFinder(this.size - 4, 3);
+    drawFinder(this, M.finderCenterOffset, M.finderCenterOffset);
+    drawFinder(this, M.finderCenterOffset, this.size - M.finderFarEdgeOffset);
+    drawFinder(this, this.size - M.finderFarEdgeOffset, M.finderCenterOffset);
 
     const positions = getAlignmentPositions(this.version);
     positions.forEach((row, rowIndex) =>
@@ -78,70 +72,71 @@ class MatrixBuilder {
           (rowIndex === 0 && columnIndex === 0) ||
           (rowIndex === 0 && columnIndex === last) ||
           (rowIndex === last && columnIndex === 0);
-        if (!overlapsFinder) this.drawAlignment(row, column);
+        if (!overlapsFinder) drawAlignment(this, row, column);
       }),
     );
     this.drawFormatBits(0);
     this.drawVersionBits();
   }
 
-  drawFinder(centerRow, centerColumn) {
-    for (let rowOffset = -4; rowOffset <= 4; rowOffset += 1) {
-      for (let columnOffset = -4; columnOffset <= 4; columnOffset += 1) {
-        const row = centerRow + rowOffset;
-        const column = centerColumn + columnOffset;
-        if (row < 0 || row >= this.size || column < 0 || column >= this.size)
-          continue;
-        const distance = Math.max(Math.abs(rowOffset), Math.abs(columnOffset));
-        this.setFunction(row, column, distance !== 2 && distance !== 4);
-      }
-    }
-  }
-
-  drawAlignment(centerRow, centerColumn) {
-    for (let rowOffset = -2; rowOffset <= 2; rowOffset += 1) {
-      for (let columnOffset = -2; columnOffset <= 2; columnOffset += 1) {
-        this.setFunction(
-          centerRow + rowOffset,
-          centerColumn + columnOffset,
-          Math.max(Math.abs(rowOffset), Math.abs(columnOffset)) !== 1,
-        );
-      }
-    }
-  }
-
   drawFormatBits(mask) {
-    const data = (FORMAT_ECL_BITS[this.errorLevel] << 3) | mask;
+    const data =
+      (FORMAT_ECL_BITS[this.errorLevel] << M.formatErrorLevelShift) | mask;
     let remainder = data;
-    for (let index = 0; index < 10; index += 1)
-      remainder = (remainder << 1) ^ ((remainder >>> 9) * 0x537);
-    const bits = ((data << 10) | remainder) ^ 0x5412;
+    for (let index = 0; index < M.formatGeneratorDegree; index += 1) {
+      remainder =
+        (remainder << 1) ^
+        ((remainder >>> M.formatRemainderHighBit) * M.formatGenerator);
+    }
+    const bits = ((data << M.formatDataShift) | remainder) ^ M.formatMask;
     const bit = (index) => ((bits >>> index) & 1) !== 0;
 
-    for (let index = 0; index <= 5; index += 1)
-      this.setFunction(index, 8, bit(index));
-    this.setFunction(7, 8, bit(6));
-    this.setFunction(8, 8, bit(7));
-    this.setFunction(8, 7, bit(8));
-    for (let index = 9; index < 15; index += 1)
-      this.setFunction(8, 14 - index, bit(index));
-    for (let index = 0; index < 8; index += 1)
-      this.setFunction(8, this.size - 1 - index, bit(index));
-    for (let index = 8; index < 15; index += 1)
-      this.setFunction(this.size - 15 + index, 8, bit(index));
-    this.setFunction(this.size - 8, 8, true);
+    for (let index = 0; index <= M.formatFirstSequenceEnd; index += 1) {
+      this.setFunction(index, M.formatAxis, bit(index));
+    }
+    this.setFunction(M.maximumMaskPattern, M.formatAxis, bit(M.timingAxis));
+    this.setFunction(M.formatAxis, M.formatAxis, bit(M.maximumMaskPattern));
+    this.setFunction(M.formatAxis, M.maximumMaskPattern, bit(M.formatAxis));
+    for (
+      let index = M.formatSecondSequenceStart;
+      index < M.formatSequenceBits;
+      index += 1
+    ) {
+      this.setFunction(
+        M.formatAxis,
+        M.formatSequenceBits - 1 - index,
+        bit(index),
+      );
+    }
+    for (let index = 0; index < M.formatAxis; index += 1) {
+      this.setFunction(M.formatAxis, this.size - 1 - index, bit(index));
+    }
+    for (let index = M.formatAxis; index < M.formatSequenceBits; index += 1) {
+      this.setFunction(
+        this.size - M.formatSequenceBits + index,
+        M.formatAxis,
+        bit(index),
+      );
+    }
+    this.setFunction(this.size - M.formatAxis, M.formatAxis, true);
   }
 
   drawVersionBits() {
-    if (this.version < 7) return;
+    if (this.version < M.versionInformationStart) return;
     let remainder = this.version;
-    for (let index = 0; index < 12; index += 1)
-      remainder = (remainder << 1) ^ ((remainder >>> 11) * 0x1f25);
-    const bits = (this.version << 12) | remainder;
-    for (let index = 0; index < 18; index += 1) {
+    for (let index = 0; index < M.versionGeneratorDegree; index += 1) {
+      remainder =
+        (remainder << 1) ^
+        ((remainder >>> M.versionInformationEdgeOffset) * M.versionGenerator);
+    }
+    const bits = (this.version << M.versionDataShift) | remainder;
+    for (let index = 0; index < M.versionInformationBits; index += 1) {
       const dark = ((bits >>> index) & 1) !== 0;
-      const low = Math.floor(index / 3);
-      const high = this.size - 11 + (index % 3);
+      const low = Math.floor(index / M.versionInformationColumns);
+      const high =
+        this.size -
+        M.versionInformationEdgeOffset +
+        (index % M.versionInformationColumns);
       this.setFunction(low, high, dark);
       this.setFunction(high, low, dark);
     }
@@ -149,25 +144,27 @@ class MatrixBuilder {
 
   drawCodewords(codewords) {
     let bitIndex = 0;
-    for (let right = this.size - 1; right >= 1; right -= 2) {
-      if (right === 6) right = 5;
+    for (let right = this.size - 1; right >= 1; right -= M.dataColumnStep) {
+      if (right === M.timingAxis) right = M.timingDataColumn;
       for (let vertical = 0; vertical < this.size; vertical += 1) {
         const upward = ((right + 1) & 2) === 0;
         const row = upward ? this.size - 1 - vertical : vertical;
-        for (let pair = 0; pair < 2; pair += 1) {
+        for (let pair = 0; pair < M.dataColumnStep; pair += 1) {
           const column = right - pair;
           if (
             this.functionModules[row][column] ||
-            bitIndex >= codewords.length * 8
+            bitIndex >= codewords.length * M.bitsPerCodeword
           )
             continue;
           this.modules[row][column] =
-            (codewords[bitIndex >>> 3] >>> (7 - (bitIndex & 7))) & 1;
+            (codewords[bitIndex >>> M.codewordIndexShift] >>>
+              (M.maximumMaskPattern - (bitIndex & M.maximumMaskPattern))) &
+            1;
           bitIndex += 1;
         }
       }
     }
-    if (bitIndex !== codewords.length * 8)
+    if (bitIndex !== codewords.length * M.bitsPerCodeword)
       throw createQrError(
         'matrixBits',
         'The QR matrix could not place every encoded bit.',
@@ -214,7 +211,7 @@ class MatrixBuilder {
     if (mask === undefined) {
       this.prepareMaskableColumns();
       let minimumPenalty = Infinity;
-      for (let candidate = 0; candidate < 8; candidate += 1) {
+      for (let candidate = 0; candidate < M.maskPatternCount; candidate += 1) {
         this.transitionMask(appliedMask, candidate);
         appliedMask = candidate;
         this.drawFormatBits(candidate);
@@ -225,7 +222,7 @@ class MatrixBuilder {
         }
       }
     }
-    if (!Number.isInteger(mask) || mask < 0 || mask > 7)
+    if (!Number.isInteger(mask) || mask < 0 || mask > M.maximumMaskPattern)
       throw createQrError(
         'maskPattern',
         'Mask pattern must be an integer from 0 through 7.',

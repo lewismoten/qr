@@ -4,6 +4,14 @@ import { createQrError } from '../error.js';
 import { getQrKanjiValue } from '../kanji.js';
 
 const textEncoder = new TextEncoder();
+const NUMERIC_GROUP_SIZE = 3;
+const NUMERIC_RADIX = 10;
+const NUMERIC_GROUP_BASE_BITS = 1;
+const ALPHANUMERIC_RADIX = 45;
+const ALPHANUMERIC_PAIR_BITS = 11;
+const ALPHANUMERIC_SINGLE_BITS = 6;
+const BITS_PER_BYTE = 8;
+const KANJI_VALUE_BITS = 13;
 
 function detectMode(text) {
   if (/^[0-9]+$/.test(text)) return 'numeric';
@@ -52,29 +60,37 @@ export function makeSegment(data, requestedMode) {
   let count;
   if (mode === 'numeric') {
     count = text.length;
-    for (let index = 0; index < text.length; index += 3) {
-      const part = text.slice(index, index + 3);
-      payload.append(Number.parseInt(part, 10), part.length * 3 + 1);
+    for (let index = 0; index < text.length; index += NUMERIC_GROUP_SIZE) {
+      const part = text.slice(index, index + NUMERIC_GROUP_SIZE);
+      payload.append(
+        Number.parseInt(part, NUMERIC_RADIX),
+        part.length * NUMERIC_GROUP_SIZE + NUMERIC_GROUP_BASE_BITS,
+      );
     }
   } else if (mode === 'alphanumeric') {
     count = text.length;
     for (let index = 0; index + 1 < text.length; index += 2) {
       payload.append(
-        ALPHANUMERIC.indexOf(text[index]) * 45 +
+        ALPHANUMERIC.indexOf(text[index]) * ALPHANUMERIC_RADIX +
           ALPHANUMERIC.indexOf(text[index + 1]),
-        11,
+        ALPHANUMERIC_PAIR_BITS,
       );
     }
-    if (text.length % 2) payload.append(ALPHANUMERIC.indexOf(text.at(-1)), 6);
+    if (text.length % 2) {
+      payload.append(
+        ALPHANUMERIC.indexOf(text.at(-1)),
+        ALPHANUMERIC_SINGLE_BITS,
+      );
+    }
   } else if (mode === 'byte') {
     const bytes = textEncoder.encode(text);
     count = bytes.length;
-    bytes.forEach((byte) => payload.append(byte, 8));
+    bytes.forEach((byte) => payload.append(byte, BITS_PER_BYTE));
   } else {
     const characters = [...text];
     count = characters.length;
     characters.forEach((character) =>
-      payload.append(getQrKanjiValue(character), 13),
+      payload.append(getQrKanjiValue(character), KANJI_VALUE_BITS),
     );
   }
 
