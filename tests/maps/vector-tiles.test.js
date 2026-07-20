@@ -79,6 +79,16 @@ test('classifies Natural Earth rivers as reference waterways', () => {
   assert.deepEqual(river.properties, { class: 'reference' });
 });
 
+test('classifies detailed Census roads as secondary roads', () => {
+  const road = prepareVectorFeature('secondaryRoadsDetailed', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { RTTYP: 'S' },
+  });
+  assert.deepEqual(road.properties, { class: 'secondary' });
+  assert.deepEqual(road.tippecanoe, { minzoom: 12, maxzoom: 13 });
+});
+
 test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   const args = tippecanoeArguments({
     inputs: [{ layer: 'land', file: 'land.geojsonseq' }],

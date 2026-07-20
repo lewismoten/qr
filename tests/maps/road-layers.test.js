@@ -7,10 +7,17 @@ import {
   renderTile,
 } from '../../scripts/maps/rendering/tile-renderer.mjs';
 
-test('keeps secondary roads through the most detailed local zoom', () => {
+test('increases secondary-road detail at zoom level twelve', () => {
   assert.equal(MAP_SOURCES.secondaryRoads.minimumZoom, 8);
-  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 13);
+  assert.equal(MAP_SOURCES.secondaryRoads.maximumZoom, 11);
   assert.match(MAP_SOURCES.secondaryRoads.url, /MapServer\/3\/query/);
+  assert.equal(MAP_SOURCES.secondaryRoadsDetailed.minimumZoom, 12);
+  assert.equal(MAP_SOURCES.secondaryRoadsDetailed.maximumZoom, 13);
+  assert.match(MAP_SOURCES.secondaryRoadsDetailed.url, /MapServer\/5\/query/);
+  assert.match(
+    MAP_SOURCES.secondaryRoadsDetailed.url,
+    /maxAllowableOffset=0\.0005/,
+  );
 });
 
 test('excludes configured countries and honors road zoom rankings', () => {

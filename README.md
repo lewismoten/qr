@@ -85,7 +85,9 @@ Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
 ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads, while
-Natural Earth supplies global roads and water. At zoom 9 and deeper, the
+Natural Earth supplies global roads and water. TIGERweb's 289k–144k secondary
+road layer adds moderate detail beginning at zoom 12; dense local streets are
+reserved for later zoom levels. At zoom 9 and deeper, the
 public-domain USGS NHDPlus High Resolution network supplements U.S. rivers
 ranked for display at approximately 1:5,000,000 and larger scales. The source
 query is simplified during download to preserve recognizable major waterways,

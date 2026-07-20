@@ -15,6 +15,7 @@ export const VECTOR_LAYERS = {
     'primaryRoadsOverview',
     'primaryRoads',
     'secondaryRoads',
+    'secondaryRoadsDetailed',
     'naturalEarthRoads',
   ],
   water: ['lakesOverview', 'lakes'],
