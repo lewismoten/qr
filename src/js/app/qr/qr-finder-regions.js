@@ -6,35 +6,41 @@ export function isInSquare(row, column, top, left, size) {
 
 export function isFinderPattern(size, row, column) {
   return (
-    isInSquare(row, column, 0, 0, 7) ||
-    isInSquare(row, column, 0, size - 7, 7) ||
-    isInSquare(row, column, size - 7, 0, 7)
+    isInSquare(row, column, 0, 0, FINDER_PATTERN_SIZE) ||
+    isInSquare(
+      row,
+      column,
+      0,
+      size - FINDER_PATTERN_SIZE,
+      FINDER_PATTERN_SIZE,
+    ) ||
+    isInSquare(row, column, size - FINDER_PATTERN_SIZE, 0, FINDER_PATTERN_SIZE)
   );
 }
 
 export function getFinderPatternPart(size, row, column) {
   const origins = [
     [0, 0],
-    [0, size - 7],
-    [size - 7, 0],
+    [0, size - FINDER_PATTERN_SIZE],
+    [size - FINDER_PATTERN_SIZE, 0],
   ];
   for (const [top, left] of origins) {
-    if (!isInSquare(row, column, top, left, 7)) continue;
+    if (!isInSquare(row, column, top, left, FINDER_PATTERN_SIZE)) continue;
     const localRow = row - top;
     const localColumn = column - left;
     if (
-      localRow >= 2 &&
-      localRow <= 4 &&
-      localColumn >= 2 &&
-      localColumn <= 4
+      localRow >= FINDER_CENTER_START &&
+      localRow <= FINDER_CENTER_END &&
+      localColumn >= FINDER_CENTER_START &&
+      localColumn <= FINDER_CENTER_END
     ) {
       return 'center';
     }
     if (
       localRow === 0 ||
-      localRow === 6 ||
+      localRow === FINDER_OUTER_END ||
       localColumn === 0 ||
-      localColumn === 6
+      localColumn === FINDER_OUTER_END
     ) {
       return 'outer';
     }
@@ -42,3 +48,7 @@ export function getFinderPatternPart(size, row, column) {
   }
   return null;
 }
+const FINDER_PATTERN_SIZE = 7;
+const FINDER_CENTER_START = 2;
+const FINDER_CENTER_END = 4;
+const FINDER_OUTER_END = FINDER_PATTERN_SIZE - 1;

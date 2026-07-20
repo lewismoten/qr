@@ -1,3 +1,27 @@
+import { isInSquare } from './qr-finder-regions.js';
+
+const MODULES_PER_VERSION = 4;
+const BASE_MATRIX_SIZE = 17;
+const ALIGNMENT_VERSION_INTERVAL = 7;
+const ALIGNMENT_BASE_COUNT = 2;
+const ALIGNMENT_SPECIAL_SIZE = 145;
+const ALIGNMENT_SPECIAL_STEP = 26;
+const ALIGNMENT_FIRST_CENTER = 6;
+const ALIGNMENT_EDGE_INSET = 7;
+const ALIGNMENT_STEP_INSET = 13;
+const ALIGNMENT_RADIUS = 2;
+const FINDER_REGION_SIZE = 8;
+const TIMING_LINE = 6;
+const FORMAT_LINE = 8;
+const FUNCTION_END_INSET = 9;
+const VERSION_MINIMUM = 7;
+const VERSION_AREA_SIZE = 6;
+const VERSION_START_INSET = 11;
+const VERSION_END_INSET = 9;
+const DATA_COLUMN_PAIR_SIZE = 2;
+const EC_LEVEL_BIT_COUNT = 2;
+const MASK_PATTERN_BIT_COUNT = 3;
+
 export function coordKey(row, column) {
   return `${row},${column}`;
 }
@@ -7,12 +31,23 @@ export function getAlignmentPatternCenters(version) {
     return [];
   }
 
-  const size = version * 4 + 17;
-  const count = Math.floor(version / 7) + 2;
-  const step = size === 145 ? 26 : Math.ceil((size - 13) / (count * 2 - 2)) * 2;
-  const centers = [6];
+  const size = version * MODULES_PER_VERSION + BASE_MATRIX_SIZE;
+  const count =
+    Math.floor(version / ALIGNMENT_VERSION_INTERVAL) + ALIGNMENT_BASE_COUNT;
+  const step =
+    size === ALIGNMENT_SPECIAL_SIZE
+      ? ALIGNMENT_SPECIAL_STEP
+      : Math.ceil(
+          (size - ALIGNMENT_STEP_INSET) /
+            (count * ALIGNMENT_BASE_COUNT - ALIGNMENT_BASE_COUNT),
+        ) * ALIGNMENT_BASE_COUNT;
+  const centers = [ALIGNMENT_FIRST_CENTER];
 
-  for (let pos = size - 7; centers.length < count; pos -= step) {
+  for (
+    let pos = size - ALIGNMENT_EDGE_INSET;
+    centers.length < count;
+    pos -= step
+  ) {
     centers.splice(1, 0, pos);
   }
 
@@ -21,87 +56,81 @@ export function getAlignmentPatternCenters(version) {
 
 export function isFinderRegion(size, row, column) {
   return (
-    isInSquare(row, column, 0, 0, 8) ||
-    isInSquare(row, column, 0, size - 8, 8) ||
-    isInSquare(row, column, size - 8, 0, 8)
+    isInSquare(row, column, 0, 0, FINDER_REGION_SIZE) ||
+    isInSquare(row, column, 0, size - FINDER_REGION_SIZE, FINDER_REGION_SIZE) ||
+    isInSquare(row, column, size - FINDER_REGION_SIZE, 0, FINDER_REGION_SIZE)
   );
 }
 
 export function isTimingRegion(size, row, column) {
-  if (row === 6 && column >= 8 && column <= size - 9) {
+  if (
+    row === TIMING_LINE &&
+    column >= FORMAT_LINE &&
+    column <= size - FUNCTION_END_INSET
+  ) {
     return true;
   }
-  if (column === 6 && row >= 8 && row <= size - 9) {
+  if (
+    column === TIMING_LINE &&
+    row >= FORMAT_LINE &&
+    row <= size - FUNCTION_END_INSET
+  ) {
     return true;
   }
   return false;
 }
 
 export function isFormatRegion(size, row, column) {
-  const topLeftRow = row === 8 && column <= 8 && column !== 6;
-  const topLeftColumn = column === 8 && row <= 8 && row !== 6;
-  const topRight = row === 8 && column >= size - 8;
-  const bottomLeft = column === 8 && row >= size - 7;
+  const topLeftRow =
+    row === FORMAT_LINE && column <= FORMAT_LINE && column !== TIMING_LINE;
+  const topLeftColumn =
+    column === FORMAT_LINE && row <= FORMAT_LINE && row !== TIMING_LINE;
+  const topRight = row === FORMAT_LINE && column >= size - FINDER_REGION_SIZE;
+  const bottomLeft =
+    column === FORMAT_LINE && row >= size - ALIGNMENT_EDGE_INSET;
   return (
     topLeftRow ||
     topLeftColumn ||
     topRight ||
     bottomLeft ||
-    (row === size - 8 && column === 8)
+    (row === size - FINDER_REGION_SIZE && column === FORMAT_LINE)
   );
 }
 
 export function isVersionRegion(size, version, row, column) {
-  if (version < 7) {
+  if (version < VERSION_MINIMUM) {
     return false;
   }
   return (
-    (row < 6 && column >= size - 11 && column <= size - 9) ||
-    (column < 6 && row >= size - 11 && row <= size - 9)
+    (row < VERSION_AREA_SIZE &&
+      column >= size - VERSION_START_INSET &&
+      column <= size - VERSION_END_INSET) ||
+    (column < VERSION_AREA_SIZE &&
+      row >= size - VERSION_START_INSET &&
+      row <= size - VERSION_END_INSET)
   );
 }
 
 export function isDarkModuleRegion(size, row, column) {
-  return row === size - 8 && column === 8;
+  return row === size - FINDER_REGION_SIZE && column === FORMAT_LINE;
 }
 
 export function getFormatInfoCoordinates(size) {
-  return {
-    primary: [
-      [8, 0],
-      [8, 1],
-      [8, 2],
-      [8, 3],
-      [8, 4],
-      [8, 5],
-      [8, 7],
-      [8, 8],
-      [7, 8],
-      [5, 8],
-      [4, 8],
-      [3, 8],
-      [2, 8],
-      [1, 8],
-      [0, 8],
-    ],
-    secondary: [
-      [size - 1, 8],
-      [size - 2, 8],
-      [size - 3, 8],
-      [size - 4, 8],
-      [size - 5, 8],
-      [size - 6, 8],
-      [size - 7, 8],
-      [8, size - 8],
-      [8, size - 7],
-      [8, size - 6],
-      [8, size - 5],
-      [8, size - 4],
-      [8, size - 3],
-      [8, size - 2],
-      [8, size - 1],
-    ],
-  };
+  const primary = [];
+  const secondary = [];
+  for (let column = 0; column <= FORMAT_LINE; column += 1) {
+    if (column !== TIMING_LINE) primary.push([FORMAT_LINE, column]);
+  }
+  for (let row = FORMAT_LINE - 1; row >= 0; row -= 1) {
+    if (row !== TIMING_LINE) primary.push([row, FORMAT_LINE]);
+  }
+  for (let offset = 1; offset <= ALIGNMENT_EDGE_INSET; offset += 1) {
+    secondary.push([size - offset, FORMAT_LINE]);
+  }
+  for (let offset = FINDER_REGION_SIZE; offset >= 1; offset -= 1) {
+    secondary.push([FORMAT_LINE, size - offset]);
+  }
+  return { primary, secondary };
 }
 
 export function isFunctionModule(qrDefinition, row, column) {
@@ -123,15 +152,15 @@ export function getDataTraversal(qrDefinition) {
   const traversal = [];
   let upward = true;
 
-  for (let column = size - 1; column > 0; column -= 2) {
-    if (column === 6) {
+  for (let column = size - 1; column > 0; column -= DATA_COLUMN_PAIR_SIZE) {
+    if (column === TIMING_LINE) {
       column -= 1;
     }
 
     for (let offset = 0; offset < size; offset += 1) {
       const row = upward ? size - 1 - offset : offset;
 
-      for (let pair = 0; pair < 2; pair += 1) {
+      for (let pair = 0; pair < DATA_COLUMN_PAIR_SIZE; pair += 1) {
         const currentColumn = column - pair;
         if (isFunctionModule(qrDefinition, row, currentColumn)) {
           continue;
@@ -154,10 +183,10 @@ export function getFormatBitGroups(size) {
 
   [primary, secondary].forEach((coords) => {
     coords
-      .slice(0, 2)
+      .slice(0, EC_LEVEL_BIT_COUNT)
       .forEach(([row, column]) => ecLevelBits.add(coordKey(row, column)));
     coords
-      .slice(2, 5)
+      .slice(EC_LEVEL_BIT_COUNT, EC_LEVEL_BIT_COUNT + MASK_PATTERN_BIT_COUNT)
       .forEach(([row, column]) => maskBits.add(coordKey(row, column)));
   });
 
@@ -168,14 +197,22 @@ export function getVersionInfoCoordinates(size) {
   const primary = [];
   const secondary = [];
 
-  for (let row = 0; row < 6; row += 1) {
-    for (let column = size - 11; column <= size - 9; column += 1) {
+  for (let row = 0; row < VERSION_AREA_SIZE; row += 1) {
+    for (
+      let column = size - VERSION_START_INSET;
+      column <= size - VERSION_END_INSET;
+      column += 1
+    ) {
       primary.push([row, column]);
     }
   }
 
-  for (let column = 0; column < 6; column += 1) {
-    for (let row = size - 11; row <= size - 9; row += 1) {
+  for (let column = 0; column < VERSION_AREA_SIZE; column += 1) {
+    for (
+      let row = size - VERSION_START_INSET;
+      row <= size - VERSION_END_INSET;
+      row += 1
+    ) {
       secondary.push([row, column]);
     }
   }
@@ -188,17 +225,20 @@ export function isAlignmentRegion(version, size, row, column) {
   for (const centerRow of centers) {
     for (const centerColumn of centers) {
       const overlapsFinder =
-        (centerRow === 6 && centerColumn === 6) ||
-        (centerRow === 6 && centerColumn === size - 7) ||
-        (centerRow === size - 7 && centerColumn === 6);
+        (centerRow === ALIGNMENT_FIRST_CENTER &&
+          centerColumn === ALIGNMENT_FIRST_CENTER) ||
+        (centerRow === ALIGNMENT_FIRST_CENTER &&
+          centerColumn === size - ALIGNMENT_EDGE_INSET) ||
+        (centerRow === size - ALIGNMENT_EDGE_INSET &&
+          centerColumn === ALIGNMENT_FIRST_CENTER);
 
       if (overlapsFinder) {
         continue;
       }
 
       if (
-        Math.abs(row - centerRow) <= 2 &&
-        Math.abs(column - centerColumn) <= 2
+        Math.abs(row - centerRow) <= ALIGNMENT_RADIUS &&
+        Math.abs(column - centerColumn) <= ALIGNMENT_RADIUS
       ) {
         return true;
       }
@@ -231,8 +271,6 @@ export function getModuleCategory(qrDefinition, row, column) {
   }
   return 'data';
 }
-import { isInSquare } from './qr-finder-regions.js';
-
 export {
   getFinderPatternPart,
   isFinderPattern,

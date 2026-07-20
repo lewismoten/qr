@@ -37,10 +37,16 @@ export default [
   {
     files: [
       'src/js/app/checksum/crc32.js',
+      'src/js/app/bytes.js',
+      'src/js/app/compression/lzw.js',
       'src/js/app/export/gif.js',
       'src/js/app/export/mp4.js',
       'src/js/app/export/pdf.js',
       'src/js/app/export/zip.js',
+      'src/js/app/qr/qr-finder-regions.js',
+      'src/js/app/qr/encoding-units.js',
+      'src/js/app/qr/qr-regions.js',
+      'src/js/app/qr/qr-stream.js',
     ],
     rules: {
       'no-magic-numbers': ['error', magicNumberOptions],

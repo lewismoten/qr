@@ -1,16 +1,24 @@
 import { createLocalizedError } from '../../localized-error.js';
 
+const MINIMUM_CODE_SIZE = 2;
+const MAXIMUM_CODE_SIZE = 8;
+const DEFAULT_CODE_SIZE = 8;
+const BITS_PER_BYTE = 8;
+const BYTE_MASK = 0xff;
+const LITERAL_LIMIT = 200;
+const RESERVED_CODE_COUNT = 2;
+
 /**
  * Packs palette indexes as a GIF-compatible LZW stream.
  *
  * This literal-oriented encoder clears the dictionary before code widths grow.
  * It favors a small, predictable implementation over maximum compression.
  */
-export function encodeGifLzw(indexes, minimumCodeSize = 8) {
+export function encodeGifLzw(indexes, minimumCodeSize = DEFAULT_CODE_SIZE) {
   if (
     !Number.isInteger(minimumCodeSize) ||
-    minimumCodeSize < 2 ||
-    minimumCodeSize > 8
+    minimumCodeSize < MINIMUM_CODE_SIZE ||
+    minimumCodeSize > MAXIMUM_CODE_SIZE
   ) {
     throw createLocalizedError(
       'download.lzwCodeSize',
@@ -23,7 +31,10 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
   const clearCode = 1 << minimumCodeSize;
   const endCode = clearCode + 1;
   const codeSize = minimumCodeSize + 1;
-  const maximumLiteralsBeforeClear = Math.min(200, clearCode - 2);
+  const maximumLiteralsBeforeClear = Math.min(
+    LITERAL_LIMIT,
+    clearCode - RESERVED_CODE_COUNT,
+  );
   const packed = [];
   let accumulator = 0;
   let bitCount = 0;
@@ -32,10 +43,10 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
   const writeCode = (code) => {
     accumulator |= code << bitCount;
     bitCount += codeSize;
-    while (bitCount >= 8) {
-      packed.push(accumulator & 255);
-      accumulator >>>= 8;
-      bitCount -= 8;
+    while (bitCount >= BITS_PER_BYTE) {
+      packed.push(accumulator & BYTE_MASK);
+      accumulator >>>= BITS_PER_BYTE;
+      bitCount -= BITS_PER_BYTE;
     }
   };
 
@@ -58,6 +69,6 @@ export function encodeGifLzw(indexes, minimumCodeSize = 8) {
   });
   writeCode(endCode);
 
-  if (bitCount) packed.push(accumulator & 255);
+  if (bitCount) packed.push(accumulator & BYTE_MASK);
   return new Uint8Array(packed);
 }
