@@ -3,9 +3,20 @@ import { validatePrintableText } from '../../../data/validation.js';
 
 const HEX_PATTERN = /^[\dA-Fa-f]+$/;
 const PRINTABLE_ASCII_PATTERN = /^[\x20-\x7e]+$/;
-const WEP_ASCII_LENGTHS = new Set([5, 13]);
-const WEP_HEX_LENGTHS = new Set([10, 26]);
+const WEP_ASCII_SHORT_LENGTH = 5;
+const WEP_ASCII_LONG_LENGTH = 13;
+const WEP_HEX_SHORT_LENGTH = 10;
+const WEP_HEX_LONG_LENGTH = 26;
+const WEP_ASCII_LENGTHS = new Set([
+  WEP_ASCII_SHORT_LENGTH,
+  WEP_ASCII_LONG_LENGTH,
+]);
+const WEP_HEX_LENGTHS = new Set([WEP_HEX_SHORT_LENGTH, WEP_HEX_LONG_LENGTH]);
 const SECURITY_TYPES = new Set(['WPA', 'WEP', 'nopass']);
+const MAXIMUM_SSID_BYTES = 32;
+const MAXIMUM_PASSWORD_LENGTH = 64;
+const WPA_MINIMUM_PASSWORD_LENGTH = 8;
+const WPA_MAXIMUM_PASSWORD_LENGTH = 63;
 
 function message(key, fallback) {
   return lookup(`validation.wifi.${key}`, fallback);
@@ -27,10 +38,10 @@ export function validateWifiValues({ security, ssid, password }) {
   }
   const ssidError = validatePrintableText(ssid, {
     label: message('ssidLabel', 'Wi-Fi network name'),
-    maxLength: 32,
+    maxLength: MAXIMUM_SSID_BYTES,
   });
   if (ssidError) return ssidError;
-  if (new TextEncoder().encode(ssid).length > 32) {
+  if (new TextEncoder().encode(ssid).length > MAXIMUM_SSID_BYTES) {
     return message(
       'ssidBytes',
       'Not valid for Wi-Fi format yet: network name must fit within 32 UTF-8 bytes.',
@@ -46,7 +57,7 @@ export function validateWifiValues({ security, ssid, password }) {
   }
   const passwordError = validatePrintableText(password, {
     label: message('passwordLabel', 'Wi-Fi password'),
-    maxLength: 64,
+    maxLength: MAXIMUM_PASSWORD_LENGTH,
   });
   if (passwordError) return passwordError;
 
@@ -64,8 +75,11 @@ export function validateWifiValues({ security, ssid, password }) {
         );
   }
 
-  const validHexKey = password.length === 64 && HEX_PATTERN.test(password);
-  return validHexKey || (password.length >= 8 && password.length <= 63)
+  const validHexKey =
+    password.length === MAXIMUM_PASSWORD_LENGTH && HEX_PATTERN.test(password);
+  return validHexKey ||
+    (password.length >= WPA_MINIMUM_PASSWORD_LENGTH &&
+      password.length <= WPA_MAXIMUM_PASSWORD_LENGTH)
     ? ''
     : message(
         'wpaPassword',

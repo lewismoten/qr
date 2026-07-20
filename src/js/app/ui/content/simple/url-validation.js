@@ -1,5 +1,7 @@
 import { lookup } from '../../../../i18n/index.js';
 
+const MAXIMUM_URL_CHARACTERS = 2048;
+
 export function validateUrl(value) {
   const context = lookup('formats.url', 'URL');
   const trimmed = value.trim();
@@ -13,7 +15,7 @@ export function validateUrl(value) {
       warning: '',
     };
   }
-  if (trimmed.length > 2048) {
+  if (trimmed.length > MAXIMUM_URL_CHARACTERS) {
     return {
       error: lookup(
         'validation.website.length',

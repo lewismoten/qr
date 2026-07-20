@@ -1,6 +1,12 @@
 import { lookup } from '../../../../i18n/index.js';
 import { validateGeoLabel } from '../../../data/validation.js';
-import { parseCoordinate } from './coordinates.js';
+import {
+  MAXIMUM_LATITUDE,
+  MAXIMUM_LONGITUDE,
+  MINIMUM_LATITUDE,
+  MINIMUM_LONGITUDE,
+  parseCoordinate,
+} from './coordinates.js';
 
 const invalid = (error) => ({ error, warning: '' });
 
@@ -31,7 +37,7 @@ export function validateGeo(document) {
       ),
     );
   }
-  if (latitude < -90 || latitude > 90) {
+  if (latitude < MINIMUM_LATITUDE || latitude > MAXIMUM_LATITUDE) {
     return invalid(
       lookup(
         'validation.geo.latitudeRange',
@@ -39,7 +45,7 @@ export function validateGeo(document) {
       ),
     );
   }
-  if (longitude < -180 || longitude > 180) {
+  if (longitude < MINIMUM_LONGITUDE || longitude > MAXIMUM_LONGITUDE) {
     return invalid(
       lookup(
         'validation.geo.longitudeRange',

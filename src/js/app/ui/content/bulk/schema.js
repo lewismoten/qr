@@ -1,5 +1,9 @@
+const KIBIBYTE = 1024;
+const MEBIBYTE = KIBIBYTE * KIBIBYTE;
+const MAXIMUM_BULK_FILE_MIB = 5;
+
 export const MAX_BULK_ROWS = 10000;
-export const MAX_BULK_FILE_BYTES = 5 * 1024 * 1024;
+export const MAX_BULK_FILE_BYTES = MAXIMUM_BULK_FILE_MIB * MEBIBYTE;
 
 export const BULK_FORMAT_SCHEMAS = {
   url: { fields: ['url'], required: ['url'] },

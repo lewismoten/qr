@@ -1,34 +1,64 @@
 import { inflateRawSync } from 'node:zlib';
 
+const ZIP_END_RECORD_BYTES = 22;
+const ZIP_END_SIGNATURE = 0x06054b50;
+const ZIP_CENTRAL_SIGNATURE = 0x02014b50;
+const ZIP_METHOD_STORED = 0;
+const ZIP_METHOD_DEFLATE = 8;
+const ZIP_OFFSETS = {
+  directory: 16,
+  method: 10,
+  compressedSize: 20,
+  localHeader: 42,
+  nameLength: 26,
+  extraLength: 28,
+  localData: 30,
+};
+const CAPITAL_POPULATION = 500_000;
+const ADMINISTRATIVE_POPULATION = 50_000;
+const LARGE_TOWN_POPULATION = 10_000;
+const TOWN_POPULATION = 5_000;
+const SMALL_TOWN_POPULATION = 2_000;
+const CAPITAL_ZOOM = 7;
+const ADMINISTRATIVE_ZOOM = 8;
+const LARGE_TOWN_ZOOM = 9;
+const TOWN_ZOOM = 10;
+const SMALL_TOWN_ZOOM = 11;
+const VILLAGE_ZOOM = 12;
+
 function firstZipEntry(buffer) {
-  let end = buffer.length - 22;
-  while (end >= 0 && buffer.readUInt32LE(end) !== 0x06054b50) end -= 1;
+  let end = buffer.length - ZIP_END_RECORD_BYTES;
+  while (end >= 0 && buffer.readUInt32LE(end) !== ZIP_END_SIGNATURE) end -= 1;
   if (end < 0) {
     throw new Error('GeoNames source is not a ZIP archive.');
   }
-  const directory = buffer.readUInt32LE(end + 16);
-  if (buffer.readUInt32LE(directory) !== 0x02014b50) {
+  const directory = buffer.readUInt32LE(end + ZIP_OFFSETS.directory);
+  if (buffer.readUInt32LE(directory) !== ZIP_CENTRAL_SIGNATURE) {
     throw new Error('GeoNames ZIP central directory is invalid.');
   }
-  const method = buffer.readUInt16LE(directory + 10);
-  const size = buffer.readUInt32LE(directory + 20);
-  const local = buffer.readUInt32LE(directory + 42);
-  const nameLength = buffer.readUInt16LE(local + 26);
-  const extraLength = buffer.readUInt16LE(local + 28);
-  const start = local + 30 + nameLength + extraLength;
+  const method = buffer.readUInt16LE(directory + ZIP_OFFSETS.method);
+  const size = buffer.readUInt32LE(directory + ZIP_OFFSETS.compressedSize);
+  const local = buffer.readUInt32LE(directory + ZIP_OFFSETS.localHeader);
+  const nameLength = buffer.readUInt16LE(local + ZIP_OFFSETS.nameLength);
+  const extraLength = buffer.readUInt16LE(local + ZIP_OFFSETS.extraLength);
+  const start = local + ZIP_OFFSETS.localData + nameLength + extraLength;
   const compressed = buffer.subarray(start, start + size);
-  if (method === 0) return compressed;
-  if (method === 8) return inflateRawSync(compressed);
+  if (method === ZIP_METHOD_STORED) return compressed;
+  if (method === ZIP_METHOD_DEFLATE) return inflateRawSync(compressed);
   throw new Error(`Unsupported GeoNames ZIP compression method: ${method}`);
 }
 
 function placeZoom(population, featureCode) {
-  if (featureCode.startsWith('PPLC') || population >= 500000) return 7;
-  if (featureCode === 'PPLA' || population >= 50000) return 8;
-  if (population >= 10000) return 9;
-  if (population >= 5000) return 10;
-  if (population >= 2000) return 11;
-  return 12;
+  if (featureCode.startsWith('PPLC') || population >= CAPITAL_POPULATION) {
+    return CAPITAL_ZOOM;
+  }
+  if (featureCode === 'PPLA' || population >= ADMINISTRATIVE_POPULATION) {
+    return ADMINISTRATIVE_ZOOM;
+  }
+  if (population >= LARGE_TOWN_POPULATION) return LARGE_TOWN_ZOOM;
+  if (population >= TOWN_POPULATION) return TOWN_ZOOM;
+  if (population >= SMALL_TOWN_POPULATION) return SMALL_TOWN_ZOOM;
+  return VILLAGE_ZOOM;
 }
 
 export function parseGeoNamesText(text, sourceVersion = 1) {

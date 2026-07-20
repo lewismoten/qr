@@ -1,6 +1,15 @@
 import { gunzipSync } from 'node:zlib';
 
 const HEADER_BYTES = 127;
+const VARINT_VALUE_MASK = 0x7f;
+const VARINT_CONTINUATION_BIT = 0x80;
+const VARINT_RADIX = 128;
+const HEADER_OFFSETS = {
+  root: 8,
+  rootLength: 16,
+  leaf: 40,
+  compression: 97,
+};
 
 function uint64(view, offset) {
   return Number(view.getBigUint64(offset, true));
@@ -11,9 +20,9 @@ function readVarint(bytes, state) {
   let multiplier = 1;
   while (state.offset < bytes.length) {
     const byte = bytes[state.offset++];
-    value += (byte & 0x7f) * multiplier;
-    if (!(byte & 0x80)) return value;
-    multiplier *= 128;
+    value += (byte & VARINT_VALUE_MASK) * multiplier;
+    if (!(byte & VARINT_CONTINUATION_BIT)) return value;
+    multiplier *= VARINT_RADIX;
   }
   throw new Error('Invalid PMTiles directory varint.');
 }
@@ -72,10 +81,10 @@ export async function scanArchiveTileStatistics(
     header.byteOffset,
     header.byteLength,
   );
-  const rootOffset = uint64(view, 8);
-  const rootLength = uint64(view, 16);
-  const leafOffset = uint64(view, 40);
-  const compression = view.getUint8(97);
+  const rootOffset = uint64(view, HEADER_OFFSETS.root);
+  const rootLength = uint64(view, HEADER_OFFSETS.rootLength);
+  const leafOffset = uint64(view, HEADER_OFFSETS.leaf);
+  const compression = view.getUint8(HEADER_OFFSETS.compression);
   const root = decodeDirectory(
     decompress(await readRange(handle, rootOffset, rootLength), compression),
   );

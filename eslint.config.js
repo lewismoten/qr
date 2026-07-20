@@ -46,9 +46,15 @@ export default [
       'src/js/app/qr/qr-regions.js',
       'src/js/app/qr/qr-stream.js',
       'src/js/app/ui/content/email/email-capacity.js',
+      'src/js/app/ui/content/bulk/bulk-content-validation.js',
+      'src/js/app/ui/content/bulk/schema.js',
       'src/js/app/ui/content/file/transfer/**/*.js',
+      'src/js/app/ui/content/geo/coordinates.js',
+      'src/js/app/ui/content/geo/geo-content-validation.js',
       'src/js/app/ui/content/geo/mvt/**/*.js',
       'src/js/app/ui/content/geo/pmtiles/**/*.js',
+      'src/js/app/ui/content/simple/url-validation.js',
+      'src/js/app/ui/content/wifi/wifi-content-validation.js',
       'src/js/qr/**/*.js',
     ],
     rules: {
@@ -99,8 +105,11 @@ export default [
     files: [
       'scripts/maps/planning/output-estimate.mjs',
       'scripts/maps/reporting/options.mjs',
+      'scripts/maps/sources/geonames.mjs',
       'scripts/maps/vector/budget.mjs',
       'scripts/maps/vector/output.mjs',
+      'scripts/maps/vector/pmtiles/archive-statistics.mjs',
+      'scripts/maps/vector/shards.mjs',
     ],
     rules: {
       'no-magic-numbers': ['error', magicNumberOptions],

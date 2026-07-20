@@ -10,13 +10,20 @@ import {
   validateTelephoneValue,
   validateVCardTextValue,
 } from '../../../data/validation.js';
-import { parseCoordinate } from '../geo/coordinates.js';
+import {
+  MAXIMUM_LATITUDE,
+  MAXIMUM_LONGITUDE,
+  MINIMUM_LATITUDE,
+  MINIMUM_LONGITUDE,
+  parseCoordinate,
+} from '../geo/coordinates.js';
 import { validateWifiValues } from '../wifi/wifi-content-validation.js';
 import { normalizeBulkWifiSecurity } from './bulk-payload.js';
 import { lookup } from '../../../../i18n/index.js';
 
 const detail = (message) =>
   message.includes(': ') ? message.slice(message.indexOf(': ') + 2) : message;
+const NUMBER_AFFIX_MAXIMUM_LENGTH = 32;
 
 export function validateBulkImport({
   parseError,
@@ -97,7 +104,7 @@ export function validateBulkImport({
     for (const field of ['prefix', 'suffix']) {
       const error = validatePrintableText(row[field], {
         label: lookup(`fields.${field}`, field),
-        maxLength: 32,
+        maxLength: NUMBER_AFFIX_MAXIMUM_LENGTH,
       });
       if (error) return fail(error);
     }
@@ -221,14 +228,22 @@ export function validateBulkImport({
   if (format === 'geo') {
     const latitude = parseCoordinate(row.latitude);
     const longitude = parseCoordinate(row.longitude);
-    if (latitude === null || latitude < -90 || latitude > 90)
+    if (
+      latitude === null ||
+      latitude < MINIMUM_LATITUDE ||
+      latitude > MAXIMUM_LATITUDE
+    )
       return fail(
         lookup(
           'bulk.validation.latitude',
           'latitude must be a number between -90 and 90.',
         ),
       );
-    if (longitude === null || longitude < -180 || longitude > 180)
+    if (
+      longitude === null ||
+      longitude < MINIMUM_LONGITUDE ||
+      longitude > MAXIMUM_LONGITUDE
+    )
       return fail(
         lookup(
           'bulk.validation.longitude',
