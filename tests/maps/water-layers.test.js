@@ -7,11 +7,11 @@ import {
   renderTile,
 } from '../../scripts/maps/rendering/tile-renderer.mjs';
 
-test('keeps regional river supplements through zoom level thirteen', () => {
+test('keeps regional river supplements through zoom level fifteen', () => {
   const names = ['riversNorthAmerica', 'riversEurope', 'riversAustralia'];
   for (const name of names) {
     assert.equal(MAP_SOURCES[name].minimumZoom, 8);
-    assert.equal(MAP_SOURCES[name].maximumZoom, 13);
+    assert.equal(MAP_SOURCES[name].maximumZoom, 15);
   }
 });
 
@@ -26,6 +26,15 @@ test('adds ranked public-domain USGS rivers at detailed zooms', () => {
   assert.match(source.url, /NHDPlus_HR\/MapServer\/3\/query/);
   assert.match(source.url, /visibilityfilter%3E%3D5000000/);
   assert.match(source.url, /maxAllowableOffset=0\.00025/);
+});
+
+test('uses a finer ranked USGS river tier at zoom fourteen', () => {
+  const source = MAP_SOURCES.nhdLocalRivers;
+  assert.equal(source.minimumZoom, 14);
+  assert.equal(source.maximumZoom, 15);
+  assert.equal(source.objectIdPagination, true);
+  assert.match(source.url, /visibilityfilter%3E%3D1000000/);
+  assert.match(source.url, /maxAllowableOffset=0\.0001/);
 });
 
 const line = (minimumZoom) => ({

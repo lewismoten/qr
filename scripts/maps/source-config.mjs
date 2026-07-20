@@ -1,3 +1,6 @@
+import { SOURCE_ATTRIBUTION } from './sources/attribution.mjs';
+import { createDetailSources } from './sources/detail.mjs';
+
 export const DEFAULT_LAYERS = [
   'countries',
   'lakesOverview',
@@ -8,6 +11,7 @@ export const DEFAULT_LAYERS = [
   'riversEurope',
   'riversAustralia',
   'nhdMajorRivers',
+  'nhdLocalRivers',
   'protectedAreas',
   'protectedLines',
   'protectedPoints',
@@ -16,8 +20,10 @@ export const DEFAULT_LAYERS = [
   'primaryRoads',
   'secondaryRoads',
   'secondaryRoadsDetailed',
+  'secondaryRoadsLocal',
   'railroadsOverview',
   'railroadsDetailed',
+  'railroadsLocal',
   'naturalEarthRoads',
   'states',
   'subdivisions',
@@ -38,31 +44,7 @@ const CENSUS_QUERY =
 
 const censusUrl = (layer) =>
   `${CENSUS_SERVICE_ROOT}${layer}/query?${CENSUS_QUERY}`;
-const TRANSPORTATION_ROOT =
-  'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
-  'TIGERweb/Transportation/MapServer/';
-const ROAD_QUERY =
-  'where=1%3D1&outFields=%2A&' +
-  'returnGeometry=true&outSR=4326&geometryPrecision=4&f=geojson';
-const transportationUrl = (layer, offset) =>
-  `${TRANSPORTATION_ROOT}${layer}/query?${ROAD_QUERY}&` +
-  `maxAllowableOffset=${offset}`;
-const RAILROAD_ROOT =
-  'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
-  'TIGERweb/Transportation_LargeScale/MapServer/3/query?';
-const RAILROAD_QUERY = ROAD_QUERY.replace('%2A', 'OBJECTID%2CMTFCC');
-const railroadUrl = (offset) =>
-  `${RAILROAD_ROOT}${RAILROAD_QUERY}&maxAllowableOffset=${offset}`;
-const NHDPLUS_ROOT =
-  'https://hydro.nationalmap.gov/arcgis/rest/services/' +
-  'NHDPlus_HR/MapServer/3/query?';
-const NHDPLUS_WHERE = 'visibilityfilter%3E%3D5000000';
-const NHDPLUS_QUERY =
-  `where=${NHDPLUS_WHERE}&` +
-  'outFields=OBJECTID%2Cgnis_name%2Cstreamorde%2Cvisibilityfilter%2Cftype&' +
-  'returnGeometry=true&returnZ=false&returnM=false&outSR=4326&' +
-  'geometryPrecision=5&maxAllowableOffset=0.00025&f=geojson';
-const LOCAL_DETAIL_MAXIMUM_ZOOM = 13;
+const LOCAL_DETAIL_MAXIMUM_ZOOM = 15;
 
 export const MAP_SOURCES = {
   countries: {
@@ -125,18 +107,6 @@ export const MAP_SOURCES = {
     maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'line',
   },
-  nhdMajorRivers: {
-    file: 'usgs/nhdplus_hr_major_rivers.geojson',
-    url: `${NHDPLUS_ROOT}${NHDPLUS_QUERY}`,
-    idsUrl:
-      `${NHDPLUS_ROOT}where=${NHDPLUS_WHERE}&` + 'returnIdsOnly=true&f=json',
-    objectIdPagination: true,
-    parallelPages: 4,
-    pageSize: 2000,
-    minimumZoom: 9,
-    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
-    kind: 'line',
-  },
   protectedAreas: {
     file: 'cultural/ne_10m_parks_and_protected_lands_area.geojson',
     url:
@@ -170,54 +140,7 @@ export const MAP_SOURCES = {
     maximumZoom: 19,
     kind: 'line',
   },
-  primaryRoadsOverview: {
-    file: 'census/census_2025_primary_roads_5m.geojson',
-    url: transportationUrl(0, 0.008),
-    pageSize: 1000,
-    minimumZoom: 6,
-    maximumZoom: 7,
-    kind: 'line',
-  },
-  primaryRoads: {
-    file: 'census/census_2025_primary_roads_2m.geojson',
-    url: transportationUrl(1, 0.002),
-    pageSize: 1000,
-    minimumZoom: 8,
-    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
-    kind: 'line',
-  },
-  secondaryRoads: {
-    file: 'census/census_2025_secondary_roads_2m.geojson',
-    url: transportationUrl(3, 0.001),
-    pageSize: 1000,
-    minimumZoom: 8,
-    maximumZoom: 11,
-    kind: 'line',
-  },
-  secondaryRoadsDetailed: {
-    file: 'census/census_2025_secondary_roads_144k.geojson',
-    url: transportationUrl(5, 0.0005),
-    pageSize: 1000,
-    minimumZoom: 12,
-    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
-    kind: 'line',
-  },
-  railroadsOverview: {
-    file: 'census/census_2025_railroads_2m.geojson',
-    url: railroadUrl(0.002),
-    pageSize: 1000,
-    minimumZoom: 10,
-    maximumZoom: 11,
-    kind: 'line',
-  },
-  railroadsDetailed: {
-    file: 'census/census_2025_railroads_500k.geojson',
-    url: railroadUrl(0.0005),
-    pageSize: 1000,
-    minimumZoom: 12,
-    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
-    kind: 'line',
-  },
+  ...createDetailSources(LOCAL_DETAIL_MAXIMUM_ZOOM),
   naturalEarthRoads: {
     file: 'cultural/ne_10m_roads.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_10m_roads.geojson`,
@@ -268,29 +191,4 @@ export const MAP_SOURCES = {
   },
 };
 
-export const SOURCE_ATTRIBUTION = [
-  {
-    name: 'Natural Earth',
-    license: 'Public domain',
-    website: 'https://www.naturalearthdata.com/',
-    version: '5.1.2',
-  },
-  {
-    name: 'U.S. Census Bureau',
-    license: 'U.S. government work',
-    website: 'https://www.census.gov/geographies/mapping-files.html',
-    version: '2024 ACS boundaries and 2025 TIGERweb transport',
-  },
-  {
-    name: 'U.S. Geological Survey',
-    license: 'Public domain',
-    website: 'https://www.usgs.gov/national-hydrography/',
-    version: 'NHDPlus High Resolution',
-  },
-  {
-    name: 'GeoNames',
-    license: 'Creative Commons Attribution 4.0',
-    website: 'https://www.geonames.org/',
-    version: 'cities1000 gazetteer extract',
-  },
-];
+export { SOURCE_ATTRIBUTION };

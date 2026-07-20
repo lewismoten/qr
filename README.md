@@ -71,14 +71,14 @@ files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 13 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 13 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 15 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 15 --max-tile-kib 16
 ```
 
 To fetch or refresh only the detailed USGS river source before a later build:
 
 ```sh
-npm run maps:download -- --layers nhdMajorRivers
+npm run maps:download -- --layers nhdMajorRivers,nhdLocalRivers
 ```
 
 Natural Earth 5.1.2 supplies the global layers. GeoNames supplies progressively
@@ -86,16 +86,18 @@ ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads and
 railroads, while Natural Earth supplies global roads and water. Generalized
-railroads appear at zooms 10–11, with finer geometry at zooms 12–13. Dense
-local streets, rail yards, and spurs are reserved for later zoom levels. At
-zoom 9 and deeper, the
-public-domain USGS NHDPlus High Resolution network supplements U.S. rivers
-ranked for display at approximately 1:5,000,000 and larger scales. The source
-query is simplified during download to preserve recognizable major waterways,
-including both Shenandoah forks, without importing the complete 27-million
-feature network. `maps:download` retrieves every configured raw source without
-rendering tiles. Natural Earth also supplies U.S. National Park Service parks
-and protected lands as area, line, and point features.
+railroads, while Natural Earth supplies global roads and water. Generalized
+railroads appear at zooms 10–11, finer geometry appears at zooms 12–13, and a
+more precise query is used at zooms 14–15. Secondary roads follow comparable
+detail tiers, but the much denser Census local-road layers remain excluded.
+At zooms 9–13, the public-domain USGS NHDPlus High Resolution network adds
+U.S. rivers ranked for display at approximately 1:5,000,000 and larger scales.
+Zooms 14–15 use the stricter 1:1,000,000 visibility tier with finer geometry.
+These queries preserve recognizable waterways, including both Shenandoah
+forks, without importing the complete 27-million-feature network.
+`maps:download` retrieves every configured raw source without rendering tiles.
+Natural Earth also supplies U.S. National Park Service parks and protected
+lands as area, line, and point features through zoom 15.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks

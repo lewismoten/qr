@@ -123,6 +123,9 @@ function drawLayer(context, layer, viewport) {
     if (layer.name === 'waterway' && feature.properties.class === 'major') {
       featureStyle.width = 0.65;
     }
+    if (layer.name === 'waterway' && feature.properties.class === 'local') {
+      featureStyle.width = 0.35;
+    }
     traceFeature(context, feature, transform);
     context.lineWidth = featureStyle.width;
     if (featureStyle.fill && feature.type === 3) {

@@ -55,8 +55,8 @@ test('creates a standalone manifest and configures ranked settlements', () => {
   assert.equal(manifest.tiles, 2);
   assert.match(MAP_SOURCES.settlements.file, /10m_populated_places/);
   assert.equal(MAP_SOURCES.settlements.minimumZoom, 7);
-  assert.equal(MAP_SOURCES.settlements.maximumZoom, 13);
+  assert.equal(MAP_SOURCES.settlements.maximumZoom, 15);
   assert.match(MAP_SOURCES.towns.url, /geonames.*cities1000\.zip/i);
   assert.equal(MAP_SOURCES.towns.minimumZoom, 7);
-  assert.equal(MAP_SOURCES.towns.maximumZoom, 13);
+  assert.equal(MAP_SOURCES.towns.maximumZoom, 15);
 });

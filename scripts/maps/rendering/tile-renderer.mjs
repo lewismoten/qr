@@ -116,6 +116,8 @@ export function renderTile(tile, collections, tolerance = 0.45) {
       ...rankedTileFeatures(collections, 'riversNorthAmerica', tile),
       ...rankedTileFeatures(collections, 'riversEurope', tile),
       ...rankedTileFeatures(collections, 'riversAustralia', tile),
+      ...rankedTileFeatures(collections, 'nhdMajorRivers', tile),
+      ...rankedTileFeatures(collections, 'nhdLocalRivers', tile),
     ],
     tile,
     'river-detail',
@@ -146,6 +148,8 @@ export function renderTile(tile, collections, tolerance = 0.45) {
   const secondaryRoads = renderPaths(
     [
       ...featuresInTile(collections, 'secondaryRoads', tile),
+      ...featuresInTile(collections, 'secondaryRoadsDetailed', tile),
+      ...featuresInTile(collections, 'secondaryRoadsLocal', tile),
       ...naturalEarthRoads.filter((feature) =>
         isNaturalEarthMinorRoad(feature, tile.zoom),
       ),
@@ -158,6 +162,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
     [
       ...featuresInTile(collections, 'railroadsOverview', tile),
       ...featuresInTile(collections, 'railroadsDetailed', tile),
+      ...featuresInTile(collections, 'railroadsLocal', tile),
     ],
     tile,
     'railway',

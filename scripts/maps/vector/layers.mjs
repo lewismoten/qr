@@ -16,9 +16,10 @@ export const VECTOR_LAYERS = {
     'primaryRoads',
     'secondaryRoads',
     'secondaryRoadsDetailed',
+    'secondaryRoadsLocal',
     'naturalEarthRoads',
   ],
-  railway: ['railroadsOverview', 'railroadsDetailed'],
+  railway: ['railroadsOverview', 'railroadsDetailed', 'railroadsLocal'],
   water: ['lakesOverview', 'lakes'],
   waterway: [
     'riversOverview',
@@ -27,6 +28,7 @@ export const VECTOR_LAYERS = {
     'riversEurope',
     'riversAustralia',
     'nhdMajorRivers',
+    'nhdLocalRivers',
   ],
 };
 
@@ -47,6 +49,7 @@ function sourceClass(name, properties) {
   if (name === 'protectedLines') return 'line';
   if (name === 'protectedPoints') return 'point';
   if (name === 'nhdMajorRivers') return 'major';
+  if (name === 'nhdLocalRivers') return 'local';
   if (name.startsWith('rivers')) return 'reference';
   return firstValue(properties, [
     'type',
