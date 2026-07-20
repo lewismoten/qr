@@ -8,8 +8,8 @@ export function tippecanoeArguments({
   inputs,
   output,
   minimumZoom = 1,
-  maximumZoom = 15,
-  baseZoom = 14,
+  maximumZoom = 16,
+  baseZoom = 15,
   maximumTileBytes = 16 * 1024,
   detail = 11,
 }) {

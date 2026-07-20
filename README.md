@@ -71,8 +71,8 @@ files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 15 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 15 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 16 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 16 --max-tile-kib 16
 ```
 
 To fetch or refresh only the detailed USGS river source before a later build:
@@ -89,17 +89,18 @@ railroads, while Natural Earth supplies global roads and water. Generalized
 railroads, while Natural Earth supplies global roads and water. Generalized
 railroads appear at zooms 10–11, finer geometry appears at zooms 12–13, and a
 more precise query is used at zooms 14–15. Secondary roads follow comparable
-detail tiers, but the much denser Census local-road layers remain excluded.
-At zooms 9–15, the public-domain USGS NHDPlus High Resolution network adds
+detail tiers. Zoom 16 adds a bounded subset of county, other-numbered, and long
+named roads while excluding millions of shorter local streets. At zooms 9–16,
+the public-domain USGS NHDPlus High Resolution network adds
 U.S. rivers ranked for display at approximately 1:5,000,000 and larger scales.
-Zooms 14–15 supplement it with non-overlapping 1:1,000,000–1:5,000,000
+Zooms 14–16 supplement it with non-overlapping 1:1,000,000–1:5,000,000
 flowlines at stream order 6 or higher and finer geometry. Explicit feature-count
 limits stop the download if an upstream query grows beyond its expected size.
 These filters preserve recognizable waterways, including both Shenandoah forks,
 without importing the complete 27-million-feature network.
 `maps:download` retrieves every configured raw source without rendering tiles.
 Natural Earth also supplies U.S. National Park Service parks and protected
-lands as area, line, and point features through zoom 15.
+lands as area, line, and point features through zoom 16.
 
 `maps:generate` performs the complete reproducible build. It downloads every
 source, removes unused source attributes, assigns feature zoom ranges, and asks

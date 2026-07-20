@@ -20,8 +20,8 @@ const cache = path.resolve(option('cache', '.cache/maps/natural-earth'));
 const input = path.resolve(option('input', '.cache/maps/vector-input'));
 const output = path.resolve(option('output', 'build/maps/local.pmtiles'));
 const minimumZoom = Number.parseInt(option('minimum-zoom', '1'), 10);
-const maximumZoom = Number.parseInt(option('maximum-zoom', '15'), 10);
-const baseZoom = Number.parseInt(option('base-zoom', '14'), 10);
+const maximumZoom = Number.parseInt(option('maximum-zoom', '16'), 10);
+const baseZoom = Number.parseInt(option('base-zoom', '15'), 10);
 const maximumTileBytes =
   Number.parseInt(option('max-tile-kib', '16'), 10) * 1024;
 const maximumArchiveMiB = Number.parseInt(option('max-archive-mib', '500'), 10);
@@ -45,8 +45,8 @@ Options:
   --input path          Temporary normalized GeoJSON sequence directory
   --output file         PMTiles destination
   --minimum-zoom 1      First generated zoom level
-  --maximum-zoom 15     Last generated zoom level
-  --base-zoom 14        Zoom where all point features may appear
+  --maximum-zoom 16     Last generated zoom level
+  --base-zoom 15        Zoom where all point features may appear
   --max-tile-kib 16     Maximum compressed MVT tile size
   --max-archive-mib 500 Reject archives larger than this total
   --max-working-mib 1000 Stop if the temporary archive exceeds this

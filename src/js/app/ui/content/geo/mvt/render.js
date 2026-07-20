@@ -116,6 +116,10 @@ function drawLayer(context, layer, viewport) {
       featureStyle.stroke = '#d39772';
       featureStyle.width = 0.45;
     }
+    if (layer.name === 'road' && feature.properties.class === 'local') {
+      featureStyle.stroke = '#dcb69c';
+      featureStyle.width = 0.3;
+    }
     if (layer.name === 'boundary' && feature.properties.class === 'county') {
       featureStyle.stroke = '#aab59a';
       featureStyle.width = 0.45;

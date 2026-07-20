@@ -95,3 +95,48 @@ test('rejects oversized ArcGIS sources before downloading pages', async () => {
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test('streams large ArcGIS sources as GeoJSON sequences', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-source-'));
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (url.endsWith('/ids')) return response({ objectIds: [10, 20, 30] });
+    const ids = new URLSearchParams(options.body).get('objectIds').split(',');
+    return response({
+      type: 'FeatureCollection',
+      features: ids.map((id) => ({
+        type: 'Feature',
+        id: Number(id),
+        properties: {},
+        geometry: { type: 'Point', coordinates: [0, 0] },
+      })),
+    });
+  };
+  try {
+    const source = {
+      file: 'sample.geojsonseq',
+      url: 'https://example.test/query?f=geojson',
+      idsUrl: 'https://example.test/ids',
+      objectIdPagination: true,
+      cacheFormat: 'geojsonseq',
+      parallelPages: 2,
+      pageSize: 2,
+      maximumFeatures: 3,
+    };
+    await obtainMapSource({
+      name: 'sample',
+      source,
+      cache: root,
+      formatBytes: (bytes) => `${bytes} B`,
+    });
+    const content = await readFile(path.join(root, source.file), 'utf8');
+    const features = content.trim().split('\n').map(JSON.parse);
+    assert.deepEqual(
+      features.map(({ id }) => id).sort((left, right) => left - right),
+      [10, 20, 30],
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+    await rm(root, { recursive: true, force: true });
+  }
+});

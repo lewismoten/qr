@@ -1,5 +1,8 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { once } from 'node:events';
+import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createInterface } from 'node:readline';
 
 import { MAP_SOURCES } from '../source-config.mjs';
 import { sourceLayer, vectorProperties, VECTOR_LAYERS } from './layers.mjs';
@@ -32,23 +35,47 @@ export function prepareVectorFeature(name, feature) {
   };
 }
 
+async function* readFeatures(file, source) {
+  if (source.cacheFormat !== 'geojsonseq') {
+    const collection = JSON.parse(await readFile(file, 'utf8'));
+    yield* collection.features;
+    return;
+  }
+  const lines = createInterface({
+    input: createReadStream(file),
+    crlfDelay: Infinity,
+  });
+  for await (const line of lines) {
+    if (line) yield JSON.parse(line);
+  }
+}
+
+async function writeFeature(output, feature) {
+  if (!output.write(`${JSON.stringify(feature)}\n`)) {
+    await once(output, 'drain');
+  }
+}
+
 export async function prepareVectorInputs({ cache, output }) {
   await mkdir(output, { recursive: true });
   const prepared = [];
   for (const [layer, names] of Object.entries(VECTOR_LAYERS)) {
-    const lines = [];
+    const file = path.join(output, `${layer}.geojsonseq`);
+    const target = createWriteStream(file);
+    let features = 0;
     for (const name of names) {
       const source = MAP_SOURCES[name];
-      const file = path.join(cache, source.file);
-      const collection = JSON.parse(await readFile(file, 'utf8'));
-      for (const feature of collection.features) {
+      const sourceFile = path.join(cache, source.file);
+      for await (const feature of readFeatures(sourceFile, source)) {
         const normalized = prepareVectorFeature(name, feature);
-        if (normalized) lines.push(JSON.stringify(normalized));
+        if (!normalized) continue;
+        await writeFeature(target, normalized);
+        features += 1;
       }
     }
-    const file = path.join(output, `${layer}.geojsonseq`);
-    await writeFile(file, `${lines.join('\n')}\n`);
-    prepared.push({ layer, file, features: lines.length });
+    target.end();
+    await once(target, 'finish');
+    prepared.push({ layer, file, features });
   }
   return prepared;
 }

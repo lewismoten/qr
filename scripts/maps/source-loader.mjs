@@ -1,4 +1,12 @@
-import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
+import {
+  mkdir,
+  open,
+  readFile,
+  rename,
+  rm,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 import path from 'node:path';
 
 import { parseGeoNames } from './sources/geonames.mjs';
@@ -88,6 +96,39 @@ function pageUrl(source, offset) {
 }
 
 async function downloadObjectIdCollection(name, source, formatBytes) {
+  const ids = await downloadObjectIds(name, source, formatBytes);
+  const pages = new Array(Math.ceil(ids.length / source.pageSize));
+  let nextPage = 0;
+  let received = 0;
+  process.stdout.write(`\rDownloading ${name}: 0/${ids.length} features`);
+  const worker = async () => {
+    while (nextPage < pages.length) {
+      const pageIndex = nextPage;
+      nextPage += 1;
+      const features = await downloadObjectIdPage(
+        name,
+        source,
+        formatBytes,
+        ids.slice(
+          pageIndex * source.pageSize,
+          (pageIndex + 1) * source.pageSize,
+        ),
+      );
+      pages[pageIndex] = features;
+      received += features.length;
+      showFeatureProgress(name, received, ids.length);
+    }
+  };
+  const workers = Math.min(source.parallelPages ?? 1, pages.length);
+  await Promise.all(Array.from({ length: workers }, worker));
+  const collection = {
+    type: 'FeatureCollection',
+    features: pages.flat(),
+  };
+  return { collection, content: Buffer.from(JSON.stringify(collection)) };
+}
+
+async function downloadObjectIds(name, source, formatBytes) {
   const idsContent = await readResponse(
     await fetchWithRetry(source.idsUrl),
     `${name} index`,
@@ -101,42 +142,66 @@ async function downloadObjectIdCollection(name, source, formatBytes) {
         `the configured limit is ${source.maximumFeatures.toLocaleString()}.`,
     );
   }
-  const pages = new Array(Math.ceil(ids.length / source.pageSize));
-  let nextPage = 0;
+  return ids;
+}
+
+async function downloadObjectIdPage(name, source, formatBytes, ids) {
+  const request = {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: `objectIds=${ids.join(',')}`,
+  };
+  const content = await readResponse(
+    await fetchWithRetry(source.url, request),
+    name,
+    formatBytes,
+    false,
+  );
+  return parseCollection(content, source.url).features;
+}
+
+function showFeatureProgress(name, received, total) {
+  process.stdout.write(`\rDownloading ${name}: ${received}/${total} features`);
+}
+
+async function downloadObjectIdSequence(name, source, file, formatBytes) {
+  const ids = await downloadObjectIds(name, source, formatBytes);
+  const temporary = `${file}.tmp`;
+  const output = await open(temporary, 'w');
   let received = 0;
-  process.stdout.write(`\rDownloading ${name}: 0/${ids.length} features`);
-  const worker = async () => {
-    while (nextPage < pages.length) {
-      const pageIndex = nextPage;
-      nextPage += 1;
-      const start = pageIndex * source.pageSize;
-      const pageIds = ids.slice(start, start + source.pageSize);
-      const request = {
-        method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        body: `objectIds=${pageIds.join(',')}`,
-      };
-      const content = await readResponse(
-        await fetchWithRetry(source.url, request),
-        name,
-        formatBytes,
-        false,
-      );
-      const page = parseCollection(content, source.url);
-      pages[pageIndex] = page.features;
-      received += page.features.length;
-      process.stdout.write(
-        `\rDownloading ${name}: ${received}/${ids.length} features`,
-      );
+  showFeatureProgress(name, received, ids.length);
+  try {
+    const batchSize = source.pageSize * (source.parallelPages ?? 1);
+    for (let offset = 0; offset < ids.length; offset += batchSize) {
+      const batch = ids.slice(offset, offset + batchSize);
+      const pages = [];
+      for (let index = 0; index < batch.length; index += source.pageSize) {
+        pages.push(
+          downloadObjectIdPage(
+            name,
+            source,
+            formatBytes,
+            batch.slice(index, index + source.pageSize),
+          ),
+        );
+      }
+      for (const features of await Promise.all(pages)) {
+        await output.write(`${features.map(JSON.stringify).join('\n')}\n`);
+        received += features.length;
+        showFeatureProgress(name, received, ids.length);
+      }
     }
-  };
-  const workers = Math.min(source.parallelPages ?? 1, pages.length);
-  await Promise.all(Array.from({ length: workers }, worker));
-  const collection = {
-    type: 'FeatureCollection',
-    features: pages.flat(),
-  };
-  return { collection, content: Buffer.from(JSON.stringify(collection)) };
+    await output.close();
+    await rename(temporary, file);
+    const { size } = await stat(file);
+    process.stdout.write(
+      `\rDownloaded ${name}: ${formatBytes(size)} (${received} features)\n`,
+    );
+  } catch (error) {
+    await output.close().catch(() => {});
+    await rm(temporary, { force: true });
+    throw error;
+  }
 }
 
 async function downloadCollection(name, source, formatBytes) {
@@ -187,7 +252,8 @@ async function downloadCollection(name, source, formatBytes) {
 
 async function validCache(file, source) {
   try {
-    await stat(file);
+    const details = await stat(file);
+    if (source.cacheFormat === 'geojsonseq') return details.size > 0;
     const collection = parseCollection(await readFile(file), file);
     return (
       !source.cacheVersion ||
@@ -203,6 +269,10 @@ export async function obtainMapSource({ name, source, cache, formatBytes }) {
   if (await validCache(file, source)) return { name, path: file, source };
   await mkdir(path.dirname(file), { recursive: true });
   console.log(`Downloading ${name}...`);
+  if (source.cacheFormat === 'geojsonseq') {
+    await downloadObjectIdSequence(name, source, file, formatBytes);
+    return { name, path: file, source };
+  }
   const { content, collection } = await downloadCollection(
     name,
     source,

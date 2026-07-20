@@ -150,6 +150,7 @@ export function renderTile(tile, collections, tolerance = 0.45) {
       ...featuresInTile(collections, 'secondaryRoads', tile),
       ...featuresInTile(collections, 'secondaryRoadsDetailed', tile),
       ...featuresInTile(collections, 'secondaryRoadsLocal', tile),
+      ...featuresInTile(collections, 'localRoads', tile),
       ...naturalEarthRoads.filter((feature) =>
         isNaturalEarthMinorRoad(feature, tile.zoom),
       ),

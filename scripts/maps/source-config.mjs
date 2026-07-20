@@ -21,6 +21,7 @@ export const DEFAULT_LAYERS = [
   'secondaryRoads',
   'secondaryRoadsDetailed',
   'secondaryRoadsLocal',
+  'localRoads',
   'railroadsOverview',
   'railroadsDetailed',
   'railroadsLocal',
@@ -44,7 +45,7 @@ const CENSUS_QUERY =
 
 const censusUrl = (layer) =>
   `${CENSUS_SERVICE_ROOT}${layer}/query?${CENSUS_QUERY}`;
-const LOCAL_DETAIL_MAXIMUM_ZOOM = 15;
+const LOCAL_DETAIL_MAXIMUM_ZOOM = 16;
 
 export const MAP_SOURCES = {
   countries: {

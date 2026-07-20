@@ -31,7 +31,7 @@ test('normalizes map properties and feature zoom hints', () => {
     name: 'Example',
     population: 1200,
   });
-  assert.deepEqual(feature.tippecanoe, { minzoom: 9, maxzoom: 15 });
+  assert.deepEqual(feature.tippecanoe, { minzoom: 9, maxzoom: 16 });
   assert.equal(feature.properties.ignored, undefined);
   assert.equal(prepareVectorFeature('missing', feature), null);
   validateVectorLayers();
@@ -67,7 +67,7 @@ test('classifies ranked USGS flowlines as major waterways', () => {
     },
   });
   assert.deepEqual(river.properties, { class: 'major' });
-  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 15 });
+  assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 16 });
 });
 
 test('classifies Natural Earth rivers as reference waterways', () => {
@@ -86,7 +86,7 @@ test('classifies finer USGS flowlines as local waterways', () => {
     properties: { visibilityfilter: 1000000, ftype: 558 },
   });
   assert.deepEqual(river.properties, { class: 'local' });
-  assert.deepEqual(river.tippecanoe, { minzoom: 14, maxzoom: 15 });
+  assert.deepEqual(river.tippecanoe, { minzoom: 14, maxzoom: 16 });
 });
 
 test('classifies detailed Census roads as secondary roads', () => {
@@ -106,7 +106,17 @@ test('limits finer Census roads to the last generated levels', () => {
     properties: { RTTYP: 'S' },
   });
   assert.deepEqual(road.properties, { class: 'secondary' });
-  assert.deepEqual(road.tippecanoe, { minzoom: 14, maxzoom: 15 });
+  assert.deepEqual(road.tippecanoe, { minzoom: 14, maxzoom: 16 });
+});
+
+test('classifies the bounded level-sixteen road subset as local', () => {
+  const road = prepareVectorFeature('localRoads', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { RTTYP: 'C', MTFCC: 'S1400' },
+  });
+  assert.deepEqual(road.properties, { class: 'local' });
+  assert.deepEqual(road.tippecanoe, { minzoom: 16, maxzoom: 16 });
 });
 
 test('classifies Census railroad geometry in its own vector layer', () => {
@@ -126,7 +136,7 @@ test('limits finer railroad geometry to zooms fourteen and fifteen', () => {
     properties: { MTFCC: 'R1011' },
   });
   assert.deepEqual(railroad.properties, { class: 'rail' });
-  assert.deepEqual(railroad.tippecanoe, { minzoom: 14, maxzoom: 15 });
+  assert.deepEqual(railroad.tippecanoe, { minzoom: 14, maxzoom: 16 });
 });
 
 test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
@@ -135,8 +145,8 @@ test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
     output: 'local.pmtiles',
   });
   assert.ok(args.includes('--maximum-tile-bytes=16384'));
-  assert.ok(args.includes('--maximum-zoom=15'));
-  assert.ok(args.includes('--base-zoom=14'));
+  assert.ok(args.includes('--maximum-zoom=16'));
+  assert.ok(args.includes('--base-zoom=15'));
   assert.ok(args.includes('--full-detail=11'));
   assert.ok(args.includes('--low-detail=9'));
   assert.ok(args.includes('--generate-variable-depth-tile-pyramid'));

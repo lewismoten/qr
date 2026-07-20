@@ -19,13 +19,19 @@ test('increases secondary-road detail at zoom levels twelve and fourteen', () =>
     /maxAllowableOffset=0\.0005/,
   );
   assert.equal(MAP_SOURCES.secondaryRoadsLocal.minimumZoom, 14);
-  assert.equal(MAP_SOURCES.secondaryRoadsLocal.maximumZoom, 15);
+  assert.equal(MAP_SOURCES.secondaryRoadsLocal.maximumZoom, 16);
   assert.match(MAP_SOURCES.secondaryRoadsLocal.url, /MapServer\/6\/query/);
   assert.match(
     MAP_SOURCES.secondaryRoadsLocal.url,
     /maxAllowableOffset=0\.00015/,
   );
   assert.match(MAP_SOURCES.secondaryRoadsLocal.url, /geometryPrecision=5/);
+  assert.equal(MAP_SOURCES.localRoads.minimumZoom, 16);
+  assert.equal(MAP_SOURCES.localRoads.maximumZoom, 16);
+  assert.equal(MAP_SOURCES.localRoads.maximumFeatures, 600000);
+  assert.match(MAP_SOURCES.localRoads.url, /MapServer\/7\/query/);
+  assert.match(MAP_SOURCES.localRoads.url, /STGEOMETRY_Length%3E%3D10000/);
+  assert.match(MAP_SOURCES.localRoads.idsUrl, /returnIdsOnly=true/);
 });
 
 test('uses progressively detailed Census railroads at zoom ten', () => {
@@ -34,7 +40,7 @@ test('uses progressively detailed Census railroads at zoom ten', () => {
   const local = MAP_SOURCES.railroadsLocal;
   assert.deepEqual([overview.minimumZoom, overview.maximumZoom], [10, 11]);
   assert.deepEqual([detailed.minimumZoom, detailed.maximumZoom], [12, 13]);
-  assert.deepEqual([local.minimumZoom, local.maximumZoom], [14, 15]);
+  assert.deepEqual([local.minimumZoom, local.maximumZoom], [14, 16]);
   assert.match(overview.url, /Transportation_LargeScale\/MapServer\/3/);
   assert.match(overview.url, /outFields=OBJECTID%2CMTFCC/);
   assert.match(overview.url, /maxAllowableOffset=0\.002/);
@@ -67,7 +73,7 @@ test('renders railroads only within their configured zoom ranges', () => {
     },
     railroadsLocal: {
       minimumZoom: 14,
-      maximumZoom: 15,
+      maximumZoom: 16,
       collection: { features: [line] },
     },
   });
@@ -85,7 +91,11 @@ test('renders railroads only within their configured zoom ranges', () => {
     renderTile({ zoom: 14, x: 8192, y: 8192 }, railroads),
     /class="railway"/,
   );
-  assert.equal(renderTile({ zoom: 16, x: 32768, y: 32768 }, railroads), '');
+  assert.match(
+    renderTile({ zoom: 16, x: 32768, y: 32768 }, railroads),
+    /class="railway"/,
+  );
+  assert.equal(renderTile({ zoom: 17, x: 65536, y: 65536 }, railroads), '');
 });
 
 test('excludes configured countries and honors road zoom rankings', () => {
@@ -185,6 +195,6 @@ test('renders protected lands as areas, lines, and points', () => {
   assert.match(tile, /class="protected-area"/);
   assert.match(tile, /class="protected-line"/);
   assert.match(tile, /class="protected-point"/);
-  assert.equal(MAP_SOURCES.protectedAreas.maximumZoom, 15);
+  assert.equal(MAP_SOURCES.protectedAreas.maximumZoom, 16);
   assert.match(MAP_SOURCES.protectedPoints.url, /protected_lands_point/);
 });

@@ -17,6 +17,7 @@ export const VECTOR_LAYERS = {
     'secondaryRoads',
     'secondaryRoadsDetailed',
     'secondaryRoadsLocal',
+    'localRoads',
     'naturalEarthRoads',
   ],
   railway: ['railroadsOverview', 'railroadsDetailed', 'railroadsLocal'],
@@ -43,6 +44,7 @@ function sourceClass(name, properties) {
   if (name === 'states') return 'state';
   if (name === 'regions') return 'region';
   if (name.includes('secondary')) return 'secondary';
+  if (name === 'localRoads') return 'local';
   if (name.startsWith('primary')) return 'primary';
   if (name.startsWith('railroads')) return 'rail';
   if (name === 'protectedAreas') return 'area';

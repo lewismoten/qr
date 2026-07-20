@@ -1,12 +1,18 @@
 const TRANSPORTATION_ROOT =
   'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
   'TIGERweb/Transportation/MapServer/';
-const roadQuery = (precision) =>
-  'where=1%3D1&outFields=OBJECTID%2CRTTYP%2CMTFCC&' +
+const roadQuery = (precision, where = '1%3D1') =>
+  `where=${where}&outFields=OBJECTID%2CRTTYP%2CMTFCC&` +
   `returnGeometry=true&outSR=4326&geometryPrecision=${precision}&f=geojson`;
-const transportationUrl = (layer, offset, precision = 4) =>
-  `${TRANSPORTATION_ROOT}${layer}/query?${roadQuery(precision)}&` +
+const transportationUrl = (layer, offset, precision = 4, where) =>
+  `${TRANSPORTATION_ROOT}${layer}/query?${roadQuery(precision, where)}&` +
   `maxAllowableOffset=${offset}`;
+const transportationIdsUrl = (layer, where) =>
+  `${TRANSPORTATION_ROOT}${layer}/query?where=${where}&` +
+  'returnIdsOnly=true&f=json';
+const LOCAL_ROAD_WHERE =
+  'RTTYP%3D%27C%27%20OR%20RTTYP%3D%27O%27%20OR%20' +
+  '%28RTTYP%3D%27M%27%20AND%20STGEOMETRY_Length%3E%3D10000%29';
 
 const RAILROAD_ROOT =
   'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
@@ -93,6 +99,19 @@ export function createDetailSources(maximumZoom) {
       url: transportationUrl(6, 0.00015, 5),
       pageSize: 1000,
       minimumZoom: 14,
+      maximumZoom,
+      kind: 'line',
+    },
+    localRoads: {
+      file: 'census/census_2025_ranked_local_roads_42k.geojsonseq',
+      url: transportationUrl(7, 0.00005, 5, LOCAL_ROAD_WHERE),
+      idsUrl: transportationIdsUrl(7, LOCAL_ROAD_WHERE),
+      objectIdPagination: true,
+      cacheFormat: 'geojsonseq',
+      parallelPages: 4,
+      pageSize: 2000,
+      maximumFeatures: 600000,
+      minimumZoom: 16,
       maximumZoom,
       kind: 'line',
     },
