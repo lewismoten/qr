@@ -26,6 +26,14 @@ const ALLOWED_NUMERIC_KEYS = new Set([
 const PLACEHOLDER_PATTERN = /\{[A-Za-z][\w.-]*\}/gu;
 const NUMBER_PATTERN = /\p{Number}/u;
 const DATE_PATTERN = /\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b/u;
+const ASCII_COLON = ':';
+const CHINESE_TECHNICAL_COLON_PATTERNS = [
+  /https?:\/\//gu,
+  /HH:MM/gu,
+  /FILE:1:[CS]/gu,
+  /"[^"]+":/gu,
+  /1:1/gu,
+];
 
 function flattenMessages(value, prefix = '', output = {}) {
   for (const [key, child] of Object.entries(value)) {
@@ -71,6 +79,13 @@ function removeTechnicalIdentifiers(message) {
   return message.replaceAll('MP4', '').replaceAll('UTF-8', '');
 }
 
+function removeChineseTechnicalColons(message) {
+  return CHINESE_TECHNICAL_COLON_PATTERNS.reduce(
+    (text, pattern) => text.replaceAll(pattern, ''),
+    message,
+  );
+}
+
 test('locale prose receives numbers and calendar values as tags', async () => {
   const manifest = await readSourceLocaleManifest();
   const issues = [];
@@ -99,5 +114,20 @@ test('locale prose receives numbers and calendar values as tags', async () => {
     issues,
     [],
     'Pass numeric and calendar-dependent values as interpolation tags',
+  );
+});
+
+test('Chinese prose uses fullwidth colons', async () => {
+  const messages = flattenMessages(await readLocaleSource('zh-CN'));
+  const issues = Object.entries(messages)
+    .filter(([, message]) =>
+      removeChineseTechnicalColons(message).includes(ASCII_COLON),
+    )
+    .map(([key, message]) => `zh-CN.${key}: ASCII colon in "${message}"`);
+
+  assert.deepEqual(
+    issues,
+    [],
+    'Use ： in Chinese prose; retain : only in machine-readable syntax',
   );
 });
