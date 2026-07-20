@@ -1,4 +1,9 @@
-import { getWorldSize, projectCoordinates } from '../projection.js';
+import {
+  getWorldSize,
+  projectCoordinates,
+  TILE_SIZE,
+  unprojectPoint,
+} from '../projection.js';
 import { createAttribution } from '../slippy-elements.js';
 
 const CENSUS_ZOOM = 6;
@@ -49,6 +54,23 @@ export function hasVisibleCensusData(view) {
 export function hasVisibleUsgsData(view) {
   if (view.zoom < USGS_ZOOM || !view.width || !view.height) return false;
   return CENSUS_REGIONS.some((bounds) => intersectsViewport(bounds, view));
+}
+
+export function hasUsgsTile({ zoom, x, y } = {}) {
+  if (zoom < USGS_ZOOM || !Number.isFinite(x) || !Number.isFinite(y)) {
+    return false;
+  }
+  const center = unprojectPoint(
+    { x: (x + 0.5) * TILE_SIZE, y: (y + 0.5) * TILE_SIZE },
+    zoom,
+  );
+  return CENSUS_REGIONS.some(
+    ([west, south, east, north]) =>
+      center.longitude >= west &&
+      center.longitude <= east &&
+      center.latitude >= south &&
+      center.latitude <= north,
+  );
 }
 
 export function createDynamicAttribution({

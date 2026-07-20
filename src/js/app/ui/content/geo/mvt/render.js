@@ -1,4 +1,5 @@
 import { decodeMvt } from './decode.js';
+import { hasUsgsTile } from '../data/attribution.js';
 
 const STYLES = {
   boundary: { stroke: '#7d916f', width: 0.75 },
@@ -79,6 +80,14 @@ function traceFeature(context, feature, transform) {
   }
 }
 
+export function isMvtFeatureVisible(layer, properties, viewport) {
+  return !(
+    layer === 'waterway' &&
+    properties.class === 'reference' &&
+    hasUsgsTile(viewport)
+  );
+}
+
 function drawLayer(context, layer, viewport) {
   if (!layer) return;
   const style = STYLES[layer.name];
@@ -91,6 +100,8 @@ function drawLayer(context, layer, viewport) {
   context.lineJoin = 'round';
   context.lineCap = 'round';
   for (const feature of layer.features) {
+    if (!isMvtFeatureVisible(layer.name, feature.properties, viewport))
+      continue;
     const featureStyle = { ...style };
     if (layer.name === 'road' && feature.properties.class === 'secondary') {
       featureStyle.stroke = '#d39772';

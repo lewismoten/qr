@@ -70,6 +70,15 @@ test('classifies ranked USGS flowlines as major waterways', () => {
   assert.deepEqual(river.tippecanoe, { minzoom: 9, maxzoom: 13 });
 });
 
+test('classifies Natural Earth rivers as reference waterways', () => {
+  const river = prepareVectorFeature('riversNorthAmerica', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { name: 'South Fork Shenandoah River' },
+  });
+  assert.deepEqual(river.properties, { class: 'reference' });
+});
+
 test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
   const args = tippecanoeArguments({
     inputs: [{ layer: 'land', file: 'land.geojsonseq' }],

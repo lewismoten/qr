@@ -3,7 +3,9 @@ import {
   createDynamicAttribution,
   hasVisibleCensusData,
   hasVisibleUsgsData,
+  hasUsgsTile,
 } from '../../../src/js/app/ui/content/geo/data/attribution.js';
+import { isMvtFeatureVisible } from '../../../src/js/app/ui/content/geo/mvt/render.js';
 import * as ui from '../../../src/js/app/ui/content/geo/slippy-elements.js';
 
 const censusView = {
@@ -19,6 +21,34 @@ assert.equal(hasVisibleCensusData({ ...censusView, width: 0 }), false);
 assert.equal(hasVisibleCensusData(censusView), true);
 assert.equal(hasVisibleUsgsData({ ...censusView, zoom: 8 }), false);
 assert.equal(hasVisibleUsgsData({ ...censusView, zoom: 9 }), true);
+assert.equal(hasUsgsTile({ zoom: 12, x: 1158, y: 1566 }), true);
+assert.equal(hasUsgsTile({ zoom: 8, x: 72, y: 97 }), false);
+assert.equal(hasUsgsTile({ zoom: 12, x: 2074, y: 1408 }), false);
+
+const frontRoyalTile = { zoom: 12, x: 1158, y: 1566 };
+assert.equal(
+  isMvtFeatureVisible('waterway', { class: 'reference' }, frontRoyalTile),
+  false,
+);
+assert.equal(
+  isMvtFeatureVisible('waterway', { class: 'major' }, frontRoyalTile),
+  true,
+);
+assert.equal(
+  isMvtFeatureVisible(
+    'waterway',
+    { class: 'reference' },
+    {
+      ...frontRoyalTile,
+      zoom: 8,
+    },
+  ),
+  true,
+);
+assert.equal(
+  isMvtFeatureVisible('road', { class: 'reference' }, frontRoyalTile),
+  true,
+);
 assert.equal(
   hasVisibleCensusData({
     ...censusView,

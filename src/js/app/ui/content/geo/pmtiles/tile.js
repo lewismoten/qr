@@ -72,7 +72,6 @@ export function createPmtilesTile({
         return;
       }
       const { bytes, sourceTile } = result;
-      const scale = sourceTile.scale;
       const fallback = sourceTile.zoom < tile.zoom;
       element.slippySourceZoom = sourceTile.zoom;
       element.slippyStatusSourceZoom = getPmtilesStatusZoom(
@@ -87,10 +86,7 @@ export function createPmtilesTile({
       });
       element.classList.toggle('is-fallback', fallback);
       onSourceChange?.(sourceTile.zoom);
-      renderMvt(bytes, canvas, {
-        zoom: tile.zoom,
-        ...(scale === 1 ? {} : { viewport: sourceTile }),
-      });
+      renderMvt(bytes, canvas, { zoom: tile.zoom, viewport: sourceTile });
       element.classList.add('is-loaded');
       onLoad();
     })

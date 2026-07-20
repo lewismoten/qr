@@ -44,6 +44,7 @@ function sourceClass(name, properties) {
   if (name === 'protectedLines') return 'line';
   if (name === 'protectedPoints') return 'point';
   if (name === 'nhdMajorRivers') return 'major';
+  if (name.startsWith('rivers')) return 'reference';
   return firstValue(properties, [
     'type',
     'TYPE',
