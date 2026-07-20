@@ -21,7 +21,7 @@
     "download": "Descargar PDF",
     "current": "Descargar actual como PDF",
     "allPdf": "Descargar todo como PDF",
-    "hint": "El ancho automático usa 192 píxeles por pulgada y evita que los módulos de versiones altas sean demasiado pequeños. Las hojas PDF colocan tantos códigos como permite el ancho físico seleccionado."
+    "hint": "El ancho automático calcula el tamaño físico a partir de los píxeles y evita que los módulos de versiones altas sean demasiado pequeños. Las hojas PDF colocan tantos códigos como permite el ancho seleccionado."
   },
   "animation": {
     "legend": "Duración de la animación",
@@ -31,7 +31,7 @@
     "minutes": "Minutos",
     "seconds": "Segundos",
     "milliseconds": "Milisegundos",
-    "initialSummary": "1,000 segundos por imagen; 8,000 segundos en total.",
+    "initialSummary": "Elija una duración por imagen o para toda la animación.",
     "gif": "Descargar GIF animado",
     "mp4": "Descargar MP4",
     "hint": "El GIF se repite continuamente. La disponibilidad de MP4 depende del codificador del navegador y se graba en tiempo real."

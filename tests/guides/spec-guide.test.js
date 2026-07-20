@@ -70,10 +70,10 @@ describe('specification guide', () => {
     );
     assert.equal(
       locale.spec.units.kanji,
-      'El valor {value} de Shift JIS se transforma en un valor Kanji de 13 bits ' +
-        'para el código QR.',
+      'El valor {value} de Shift JIS se transforma en un valor Kanji de ' +
+        '{bits} bits para el código QR.',
     );
-    assert.match(locale.spec.units.byte, /los datos ocupan 16 bits/);
+    assert.match(locale.spec.units.byte, /los datos ocupan \{bits\} bits/);
     assert.match(locale.spec.mixed.savings, /si se utiliza únicamente/);
   });
 });

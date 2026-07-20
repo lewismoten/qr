@@ -222,11 +222,18 @@ class MatrixBuilder {
         }
       }
     }
-    if (!Number.isInteger(mask) || mask < 0 || mask > M.maximumMaskPattern)
+    if (
+      !Number.isInteger(mask) ||
+      mask < M.minimumMaskPattern ||
+      mask > M.maximumMaskPattern
+    )
       throw createQrError(
         'maskPattern',
-        'Mask pattern must be an integer from 0 through 7.',
-        undefined,
+        'Mask pattern must be an integer from {minimum} through {maximum}.',
+        {
+          minimum: M.minimumMaskPattern,
+          maximum: M.maximumMaskPattern,
+        },
         RangeError,
       );
     this.transitionMask(appliedMask, mask);

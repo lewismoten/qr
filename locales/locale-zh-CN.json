@@ -178,19 +178,19 @@
   "errorCorrection": {
     "L": {
       "label": "低",
-      "detail": "冗余最少，可从约 7% 的损坏或遮挡中恢复。"
+      "detail": "冗余最少，可从约 {recovery}% 的损坏或遮挡中恢复。"
     },
     "M": {
       "label": "中",
-      "detail": "平衡容量与韧性，可从约 15% 的损坏中恢复。"
+      "detail": "平衡容量与韧性，可从约 {recovery}% 的损坏中恢复。"
     },
     "Q": {
       "label": "较高",
-      "detail": "使用更多纠错数据，可从约 25% 的损坏中恢复。"
+      "detail": "使用更多纠错数据，可从约 {recovery}% 的损坏中恢复。"
     },
     "H": {
       "label": "高",
-      "detail": "纠错能力最强，通常可承受约 30% 的遮挡。"
+      "detail": "纠错能力最强，通常可承受约 {recovery}% 的遮挡。"
     }
   },
   "wifi": {
@@ -232,9 +232,9 @@
   "spec": {
     "units": {
       "numeric": "{value} 存储为一个 {bits} 位二进制数。",
-      "alphanumeric": "A × 45 + B = 461，并存储为 {bits} 位。",
-      "byte": "可见字符的 UTF-8 编码为 C3 A9，因此计数为 2，数据占 16 位。",
-      "kanji": "Shift JIS 值 {value} 转换为一个 13 位的 QR 汉字值。"
+      "alphanumeric": "{first} × {radix} + {second} = {result}，并存储为 {bits} 位。",
+      "byte": "可见字符的 UTF-8 编码为 {encoding}，因此计数为 {count}，数据占 {bits} 位。",
+      "kanji": "Shift JIS 值 {value} 转换为一个 {bits} 位的 QR 汉字值。"
     },
     "modes": {
       "numeric": "数字",
@@ -251,18 +251,18 @@
   "qr": {
     "errors": {
       "modeUnsupported": "尚不支持此原生二维码模式：{mode}。",
-      "numericCharacters": "数字模式只接受 0-9。",
+      "numericCharacters": "数字模式只接受 {minimum} 到 {maximum}。",
       "alphanumericCharacters": "字母数字模式包含不支持的字符。",
       "kanjiCharacters": "汉字模式包含二维码 Shift JIS 范围之外的字符。",
       "kanjiUnsupported": "原生汉字模式需要浏览器支持 Shift JIS 解码。",
-      "versionRange": "二维码版本必须是 1 到 40 之间的整数。",
+      "versionRange": "二维码版本必须是 {minimum} 到 {maximum} 之间的整数。",
       "minimumVersion": "所选二维码版本无法容纳这些数据，最低需要版本 {version}。",
-      "tooLarge": "内容过大，无法放入版本 40 的二维码。",
+      "tooLarge": "内容过大，无法放入版本 {maximum} 的二维码。",
       "contentTooLong": "内容超过二维码输入上限 {maximum} 个字符。",
       "tooManySegments": "分段列表超过二维码安全输入上限 {maximum}。",
       "bitLength": "值无法放入请求的二维码位长度。",
       "matrixBits": "二维码矩阵无法放置所有编码位。",
-      "maskPattern": "掩码图案必须是 0 到 7 之间的整数。",
+      "maskPattern": "掩码图案必须是 {minimum} 到 {maximum} 之间的整数。",
       "errorCorrectionLevel": "未知的二维码纠错级别：{level}。"
     }
   }

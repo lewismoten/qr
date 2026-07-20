@@ -60,8 +60,8 @@ function chooseVersion(segments, errorLevel, requestedVersion) {
     ) {
       throw createQrError(
         'versionRange',
-        'QR version must be an integer from 1 through 40.',
-        undefined,
+        'QR version must be an integer from {minimum} through {maximum}.',
+        { minimum: MINIMUM_VERSION, maximum: MAXIMUM_VERSION },
         RangeError,
       );
     }
@@ -85,7 +85,8 @@ function chooseVersion(segments, errorLevel, requestedVersion) {
   }
   throw createQrError(
     'tooLarge',
-    'The content is too large for a version 40 QR Code.',
+    'The content is too large for a version {maximum} QR Code.',
+    { maximum: MAXIMUM_VERSION },
   );
 }
 
@@ -131,8 +132,8 @@ export function selectVersionAndSegments(
     ) {
       throw createQrError(
         'versionRange',
-        'QR version must be an integer from 1 through 40.',
-        undefined,
+        'QR version must be an integer from {minimum} through {maximum}.',
+        { minimum: MINIMUM_VERSION, maximum: MAXIMUM_VERSION },
         RangeError,
       );
     }
@@ -159,7 +160,8 @@ export function selectVersionAndSegments(
   }
   throw createQrError(
     'tooLarge',
-    'The content is too large for a version 40 QR Code.',
+    'The content is too large for a version {maximum} QR Code.',
+    { maximum: MAXIMUM_VERSION },
   );
 }
 

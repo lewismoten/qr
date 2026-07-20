@@ -178,19 +178,19 @@
   "errorCorrection": {
     "L": {
       "label": "Low",
-      "detail": "Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered."
+      "detail": "Uses the least redundancy and can still scan if about {recovery}% of the symbol area is damaged or covered."
     },
     "M": {
       "label": "Medium",
-      "detail": "Balances capacity and resilience, with recovery for about 15% of damaged or covered area."
+      "detail": "Balances capacity and resilience, with recovery for about {recovery}% of damaged or covered area."
     },
     "Q": {
       "label": "Quartile",
-      "detail": "Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion."
+      "detail": "Spends more of the code on correction data, allowing recovery from about {recovery}% damage or occlusion."
     },
     "H": {
       "label": "High",
-      "detail": "Uses the most correction data, so the code can often survive about 30% of its area being obscured."
+      "detail": "Uses the most correction data, so the code can often survive about {recovery}% of its area being obscured."
     }
   },
   "wifi": {
@@ -232,9 +232,9 @@
   "spec": {
     "units": {
       "numeric": "{value} is stored as one {bits}-bit binary number.",
-      "alphanumeric": "A × 45 + B = 461, stored in {bits} bits.",
-      "byte": "The visible character is UTF-8 C3 A9, so the count is 2 and the payload is 16 bits.",
-      "kanji": "Shift JIS {value} is transformed into one 13-bit QR Kanji value."
+      "alphanumeric": "{first} × {radix} + {second} = {result}, stored in {bits} bits.",
+      "byte": "The visible character is UTF-8 {encoding}, so the count is {count} and the payload is {bits} bits.",
+      "kanji": "Shift JIS {value} is transformed into one {bits}-bit QR Kanji value."
     },
     "modes": {
       "numeric": "Numeric",
@@ -251,18 +251,18 @@
   "qr": {
     "errors": {
       "modeUnsupported": "Native QR mode is not supported yet: {mode}.",
-      "numericCharacters": "Numeric mode only accepts digits 0-9.",
+      "numericCharacters": "Numeric mode only accepts digits {minimum}-{maximum}.",
       "alphanumericCharacters": "Alphanumeric mode contains unsupported characters.",
       "kanjiCharacters": "Kanji mode contains characters outside the QR Shift JIS ranges.",
       "kanjiUnsupported": "Native Kanji mode requires browser Shift JIS decoding support.",
-      "versionRange": "QR version must be an integer from 1 through 40.",
+      "versionRange": "QR version must be an integer from {minimum} through {maximum}.",
       "minimumVersion": "The chosen QR Code version cannot contain this amount of data. Minimum version required is: {version}.",
-      "tooLarge": "The content is too large for a version 40 QR Code.",
+      "tooLarge": "The content is too large for a version {maximum} QR Code.",
       "contentTooLong": "Content exceeds the QR input limit of {maximum} characters.",
       "tooManySegments": "The segment list exceeds the safe QR input limit of {maximum}.",
       "bitLength": "A value does not fit in the requested QR bit length.",
       "matrixBits": "The QR matrix could not place every encoded bit.",
-      "maskPattern": "Mask pattern must be an integer from 0 through 7.",
+      "maskPattern": "Mask pattern must be an integer from {minimum} through {maximum}.",
       "errorCorrectionLevel": "Unknown QR error correction level: {level}."
     }
   }

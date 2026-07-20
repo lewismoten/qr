@@ -30,6 +30,7 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel }) {
     e.errorCorrectionHelp.textContent = lookup(
       `errorCorrection.${selected.value}.detail`,
       selected.detail,
+      { recovery: selected.recovery },
     );
   }
 

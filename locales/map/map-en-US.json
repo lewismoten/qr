@@ -22,7 +22,7 @@
   "loadError": "Unable to initialize the map preview.",
   "guideLayers": {
     "title": "Local map layers",
-    "intro": "These Front Royal samples show the detail currently generated at each local layer and the intended direction for deeper layers. Levels 10 through 17 are generated locally. At levels 18 and 19, the map enlarges the matching level 17 tile.",
+    "intro": "These Front Royal samples show the detail currently generated at each local layer and the intended direction for deeper layers. Unavailable views enlarge the nearest generated tile.",
     "level": "Layer",
     "contents": "Displayed detail",
     "sample": "Front Royal sample",
@@ -40,13 +40,13 @@
     "fineRoutes": "Finer secondary roads, ranked waterways, rail lines, and protected lands.",
     "finestRoutes": "Finest generated roads, including Main Streets, plus waterways, rail lines, parks, and ranked places.",
     "rankedRoads": "Ranked county, numbered, and long named roads supplement the existing map detail.",
-    "detailedRoads": "A sparse overlay adds another tier of long municipal roads over level 16.",
+    "detailedRoads": "A sparse overlay adds another tier of long municipal roads.",
     "streets": "Planned: named streets and local context.",
     "blocks": "Planned: blocks, paths, and detailed streets.",
     "buildings": "Planned: building footprints and service roads.",
     "entrances": "Planned: entrances, paths, and fine geometry.",
     "precise": "Planned: precise structures and pedestrian detail.",
     "maximum": "Planned: maximum supported local detail.",
-    "fallback": "Currently displays the matching layer 17 tile."
+    "fallback": "Currently displays the nearest generated tile."
   }
 }

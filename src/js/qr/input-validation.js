@@ -37,8 +37,8 @@ export function assertVersion(version) {
   )
     throw createQrError(
       'versionRange',
-      'QR version must be an integer from 1 through 40.',
-      undefined,
+      'QR version must be an integer from {minimum} through {maximum}.',
+      { minimum: MINIMUM_VERSION, maximum: MAXIMUM_VERSION },
       RangeError,
     );
 }

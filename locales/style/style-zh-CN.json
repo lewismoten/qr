@@ -38,7 +38,7 @@
     "fillImage": "自定义填充图像",
     "recommendedContrast": "应用推荐对比度",
     "clearImage": "清除图像",
-    "imageHint": "推荐：深色模块叠加 25% 黑色，浅色模块叠加 75% 白色。"
+    "imageHint": "推荐：用黑色适度加深深色模块，并用白色明显提亮浅色模块。"
   },
   "art": {
     "legend": "中心图案",

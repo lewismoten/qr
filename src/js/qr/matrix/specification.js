@@ -25,6 +25,7 @@ export const formatRemainderHighBit = 9;
 export const formatSecondSequenceStart = 9;
 export const formatSequenceBits = 15;
 export const maskPatternCount = 8;
+export const minimumMaskPattern = 0;
 export const maximumMaskPattern = 7;
 export const modulesPerVersion = 4;
 export const timingAxis = 6;

@@ -38,7 +38,7 @@
     "fillImage": "Imagen de relleno personalizada",
     "recommendedContrast": "Aplicar contraste recomendado",
     "clearImage": "Borrar imagen",
-    "imageHint": "Recomendado: negro sobre módulos oscuros al 25% y blanco sobre módulos claros al 75%."
+    "imageHint": "Recomendado: oscurezca parcialmente los módulos oscuros con negro y aclare bastante los módulos claros con blanco."
   },
   "art": {
     "legend": "Arte central",

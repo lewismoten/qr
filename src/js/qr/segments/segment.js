@@ -12,6 +12,8 @@ const ALPHANUMERIC_PAIR_BITS = 11;
 const ALPHANUMERIC_SINGLE_BITS = 6;
 const BITS_PER_BYTE = 8;
 const KANJI_VALUE_BITS = 13;
+const MINIMUM_NUMERIC_DIGIT = 0;
+const MAXIMUM_NUMERIC_DIGIT = 9;
 
 function detectMode(text) {
   if (/^[0-9]+$/.test(text)) return 'numeric';
@@ -34,7 +36,11 @@ export function makeSegment(data, requestedMode) {
   if (mode === 'numeric' && !/^[0-9]*$/.test(text)) {
     throw createQrError(
       'numericCharacters',
-      'Numeric mode only accepts digits 0-9.',
+      'Numeric mode only accepts digits {minimum}-{maximum}.',
+      {
+        minimum: MINIMUM_NUMERIC_DIGIT,
+        maximum: MAXIMUM_NUMERIC_DIGIT,
+      },
     );
   }
   if (

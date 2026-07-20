@@ -3,26 +3,30 @@ export const ERROR_LEVELS = [
   {
     value: 'L',
     label: 'Low',
+    recovery: 7,
     detail:
-      'Uses the least redundancy and can still scan if about 7% of the symbol area is damaged or covered.',
+      'Uses the least redundancy and can still scan if about {recovery}% of the symbol area is damaged or covered.',
   },
   {
     value: 'M',
     label: 'Medium',
+    recovery: 15,
     detail:
-      'Balances capacity and resilience, with recovery for about 15% of damaged or covered area.',
+      'Balances capacity and resilience, with recovery for about {recovery}% of damaged or covered area.',
   },
   {
     value: 'Q',
     label: 'Quartile',
+    recovery: 25,
     detail:
-      'Spends more of the code on correction data, allowing recovery from about 25% damage or occlusion.',
+      'Spends more of the code on correction data, allowing recovery from about {recovery}% damage or occlusion.',
   },
   {
     value: 'H',
     label: 'High',
+    recovery: 30,
     detail:
-      'Uses the most correction data, so the code can often survive about 30% of its area being obscured.',
+      'Uses the most correction data, so the code can often survive about {recovery}% of its area being obscured.',
   },
 ];
 export const MODE_LABELS = {

@@ -29,13 +29,26 @@ function describeUnit(mode, value, segment) {
   if (mode === 'alphanumeric')
     return lookup(
       'spec.units.alphanumeric',
-      'A × 45 + B = 461, stored in {bits} bits.',
-      { bits: segment.bits.length },
+      '{first} × {radix} + {second} = {result}, stored in {bits} bits.',
+      {
+        first: 10,
+        radix: 45,
+        second: 11,
+        result: 461,
+        bits: segment.bits.length,
+      },
     );
   if (mode === 'byte')
     return lookup(
       'spec.units.byte',
-      'The visible character is UTF-8 C3 A9, so the count is 2 and the payload is 16 bits.',
+      'The visible character is UTF-8 {encoding}, so the count is {count} and the payload is {bits} bits.',
+      {
+        encoding: [...new TextEncoder().encode(value)]
+          .map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
+          .join(' '),
+        count: segment.characterCount,
+        bits: segment.bits.length,
+      },
     );
   const shiftJis = qrEncoder
     .toSJIS(value)
@@ -44,8 +57,8 @@ function describeUnit(mode, value, segment) {
     .padStart(4, '0');
   return lookup(
     'spec.units.kanji',
-    'Shift JIS {value} is transformed into one 13-bit QR Kanji value.',
-    { value: shiftJis },
+    'Shift JIS {value} is transformed into one {bits}-bit QR Kanji value.',
+    { value: shiftJis, bits: segment.bits.length },
   );
 }
 

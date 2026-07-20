@@ -178,19 +178,19 @@
   "errorCorrection": {
     "L": {
       "label": "Baja",
-      "detail": "Usa la menor redundancia y tolera aproximadamente un 7% de daño o cobertura."
+      "detail": "Usa la menor redundancia y tolera aproximadamente un {recovery}% de daño o cobertura."
     },
     "M": {
       "label": "Media",
-      "detail": "Equilibra capacidad y resistencia, con recuperación de aproximadamente un 15%."
+      "detail": "Equilibra capacidad y resistencia, con recuperación de aproximadamente un {recovery}%."
     },
     "Q": {
       "label": "Cuartil",
-      "detail": "Dedica más datos a corrección y permite recuperar aproximadamente un 25%."
+      "detail": "Dedica más datos a corrección y permite recuperar aproximadamente un {recovery}%."
     },
     "H": {
       "label": "Alta",
-      "detail": "Usa la máxima corrección y puede tolerar cerca de un 30% de obstrucción."
+      "detail": "Usa la máxima corrección y puede tolerar cerca de un {recovery}% de obstrucción."
     }
   },
   "wifi": {
@@ -232,9 +232,9 @@
   "spec": {
     "units": {
       "numeric": "{value} se almacena como un único número binario de {bits} bits.",
-      "alphanumeric": "A × 45 + B = 461, que se almacena en {bits} bits.",
-      "byte": "El carácter visible se codifica en UTF-8 como C3 A9, por lo que el recuento es 2 y los datos ocupan 16 bits.",
-      "kanji": "El valor {value} de Shift JIS se transforma en un valor Kanji de 13 bits para el código QR."
+      "alphanumeric": "{first} × {radix} + {second} = {result}, que se almacena en {bits} bits.",
+      "byte": "El carácter visible se codifica en UTF-8 como {encoding}, por lo que el recuento es {count} y los datos ocupan {bits} bits.",
+      "kanji": "El valor {value} de Shift JIS se transforma en un valor Kanji de {bits} bits para el código QR."
     },
     "modes": {
       "numeric": "Numérico",
@@ -251,18 +251,18 @@
   "qr": {
     "errors": {
       "modeUnsupported": "El modo QR nativo aún no es compatible: {mode}.",
-      "numericCharacters": "El modo numérico solo acepta dígitos 0-9.",
+      "numericCharacters": "El modo numérico solo acepta dígitos del {minimum} al {maximum}.",
       "alphanumericCharacters": "El modo alfanumérico contiene caracteres no compatibles.",
       "kanjiCharacters": "El modo Kanji contiene caracteres fuera de los rangos Shift JIS de QR.",
       "kanjiUnsupported": "El modo Kanji nativo requiere compatibilidad del navegador con Shift JIS.",
-      "versionRange": "La versión QR debe ser un entero del 1 al 40.",
+      "versionRange": "La versión QR debe ser un entero del {minimum} al {maximum}.",
       "minimumVersion": "La versión QR elegida no admite estos datos. La versión mínima necesaria es {version}.",
-      "tooLarge": "El contenido es demasiado grande para un código QR versión 40.",
+      "tooLarge": "El contenido es demasiado grande para un código QR versión {maximum}.",
       "contentTooLong": "El contenido supera el límite de entrada QR de {maximum} caracteres.",
       "tooManySegments": "La lista de segmentos supera el límite seguro de entrada QR de {maximum}.",
       "bitLength": "Un valor no cabe en la longitud de bits QR solicitada.",
       "matrixBits": "La matriz QR no pudo colocar todos los bits codificados.",
-      "maskPattern": "El patrón de máscara debe ser un entero del 0 al 7.",
+      "maskPattern": "El patrón de máscara debe ser un entero del {minimum} al {maximum}.",
       "errorCorrectionLevel": "Nivel de corrección de errores QR desconocido: {level}."
     }
   }

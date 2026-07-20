@@ -38,7 +38,7 @@
     "fillImage": "Custom fill image",
     "recommendedContrast": "Apply recommended contrast",
     "clearImage": "Clear image",
-    "imageHint": "Recommended: black over dark modules at 25% opacity and white over light modules at 75% opacity."
+    "imageHint": "Recommended: partially darken dark modules with black and strongly lighten light modules with white."
   },
   "art": {
     "legend": "Center artwork",

@@ -21,7 +21,7 @@
     "download": "Download PDF",
     "current": "Download current as PDF",
     "allPdf": "Download all as PDF",
-    "hint": "Auto print width uses 192 pixels per inch and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected physical width allows."
+    "hint": "Auto print width derives physical size from pixels and protects higher-version QR modules from becoming too small. PDF sheets fit as many codes as the selected width allows."
   },
   "animation": {
     "legend": "Animation timing",
@@ -31,7 +31,7 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "milliseconds": "Milliseconds",
-    "initialSummary": "1.000 seconds per image - 8.000 seconds total.",
+    "initialSummary": "Choose a duration per image or for the complete animation.",
     "gif": "Download animated GIF",
     "mp4": "Download MP4",
     "hint": "GIF loops continuously. MP4 availability depends on the browser's built-in encoder and records in real time."
