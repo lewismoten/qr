@@ -89,3 +89,21 @@ test('waits for a failed wave and rejects invalid concurrency', async () => {
     /positive integer/,
   );
 });
+
+test('shares a cumulative variance allowance across a wave', async () => {
+  const allocations = [];
+  const results = await buildArchiveSchedule({
+    levels: baseLevels(1),
+    jobs: 2,
+    maximumDebtBytes: 40,
+    minimumLevelBytes: 10,
+    planLevel,
+    async build(level, allocatedBudgetBytes) {
+      allocations.push(allocatedBudgetBytes);
+      return { ...level, bytes: 110 };
+    },
+  });
+
+  assert.deepEqual(allocations, [120, 120]);
+  assert.equal(results.at(-1).carryBytes, -20);
+});

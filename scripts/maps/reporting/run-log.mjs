@@ -17,6 +17,7 @@ export function createGenerationLog({
   parameters,
   startEvent = 'run-start',
 }) {
+  const startedAt = Date.now();
   const stamp = new Date().toISOString().replaceAll(':', '-');
   const file = path.resolve(
     logFile ||
@@ -39,6 +40,7 @@ export function createGenerationLog({
   process.once('uncaughtExceptionMonitor', onFatal);
   return {
     file,
+    startedAt,
     record,
     recordError(event, error, details = {}) {
       record(event, { ...details, error: errorDetails(error) });
@@ -87,7 +89,7 @@ export function createTippecanoeOutput(writeLine) {
       const report = {
         tile: tile[1],
         bytes: Number(tile[2]),
-        detail: Number(tile[3]),
+        reportedTippecanoeDetail: Number(tile[3]),
         limitBytes: Number(tile[4]),
       };
       summary.oversizedTileReports += 1;
@@ -144,7 +146,7 @@ export function recordArchiveAttempt(
     attempt,
     allocatedBudgetBytes,
     maximumTileBytes: settings.maximumTileBytes,
-    detail: settings.detail,
+    configuredDetail: settings.detail,
     ...details,
   });
 }
@@ -160,7 +162,7 @@ export function recordCompletedArchive(log, result, durationMs) {
     allocatedBudgetBytes: result.allocatedBudgetBytes,
     carryBytes: result.carryBytes,
     maximumTileBytes: result.maximumTileBytes,
-    detail: result.detail,
+    configuredDetail: result.detail,
     archiveStats: result.archiveStats,
   });
 }

@@ -44,21 +44,62 @@ test('reads tile counts and content bytes from a PMTiles header', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-map-stats-'));
   const archive = path.join(root, 'local.pmtiles');
   try {
-    const bytes = Buffer.alloc(96);
+    const rootDirectory = Buffer.from([1, 0, 1, 200, 1, 1]);
+    const bytes = Buffer.alloc(127 + rootDirectory.length);
     bytes.write('PMTiles');
     bytes[7] = 3;
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    view.setBigUint64(8, 127n, true);
+    view.setBigUint64(16, BigInt(rootDirectory.length), true);
     view.setBigUint64(64, 1234n, true);
     view.setBigUint64(72, 80n, true);
     view.setBigUint64(80, 70n, true);
     view.setBigUint64(88, 60n, true);
+    view.setUint8(97, 1);
+    rootDirectory.copy(bytes, 127);
     await writeFile(archive, bytes);
-    assert.deepEqual(await readPmtilesArchiveStats(archive), {
+    assert.deepEqual(await readPmtilesArchiveStats(archive, 100), {
       tileDataBytes: 1234,
       addressedTiles: 80,
       tileEntries: 70,
       tileContents: 60,
+      averageStoredTileBytes: 21,
+      actualLargestTileBytes: 200,
+      actualTileContentsOverLimit: 1,
     });
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('scans final tile sizes stored in PMTiles leaf directories', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-leaf-stats-'));
+  const archive = path.join(root, 'local.pmtiles');
+  try {
+    const rootDirectory = Buffer.from([1, 0, 0, 6, 1]);
+    const leafDirectory = Buffer.from([1, 0, 1, 172, 2, 1]);
+    const bytes = Buffer.alloc(
+      127 + rootDirectory.length + leafDirectory.length,
+    );
+    bytes.write('PMTiles');
+    bytes[7] = 3;
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    view.setBigUint64(8, 127n, true);
+    view.setBigUint64(16, BigInt(rootDirectory.length), true);
+    view.setBigUint64(40, BigInt(127 + rootDirectory.length), true);
+    view.setBigUint64(48, BigInt(leafDirectory.length), true);
+    view.setBigUint64(64, 300n, true);
+    view.setBigUint64(72, 1n, true);
+    view.setBigUint64(80, 1n, true);
+    view.setBigUint64(88, 1n, true);
+    view.setUint8(97, 1);
+    rootDirectory.copy(bytes, 127);
+    leafDirectory.copy(bytes, 127 + rootDirectory.length);
+    await writeFile(archive, bytes);
+
+    const statistics = await readPmtilesArchiveStats(archive, 200);
+    assert.equal(statistics.actualLargestTileBytes, 300);
+    assert.equal(statistics.actualTileContentsOverLimit, 1);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

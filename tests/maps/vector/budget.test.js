@@ -5,8 +5,11 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
+  archiveReductionWarning,
   availableLevelBudget,
   compactBuildSettings,
+  formatTileLimit,
+  isUsefulArchiveReduction,
   planArchiveLevels,
   updateBudgetCarry,
 } from '../../../scripts/maps/vector/budget.mjs';
@@ -86,6 +89,19 @@ test('reduces detail only after reaching the minimum tile ceiling', () => {
     }),
     { maximumTileBytes: 1024, detail: 10 },
   );
+});
+
+test('stops archive fitting when a retry saves less than five percent', () => {
+  assert.equal(isUsefulArchiveReduction(2_607_094, 2_565_165), false);
+  assert.equal(isUsefulArchiveReduction(2_607_094, 2_400_000), true);
+  assert.equal(isUsefulArchiveReduction(0, 0), true);
+  assert.match(
+    archiveReductionWarning('z6', 2_607_094, 2_565_165),
+    /improved only 1\.6%/,
+  );
+  assert.equal(archiveReductionWarning('z6', 100, 90), null);
+  assert.equal(formatTileLimit(null), 'no tile ceiling (recovery)');
+  assert.equal(formatTileLimit(16_384), '16.0 KiB tiles');
 });
 
 test('subdivides only dense regions to target archive sizes', () => {

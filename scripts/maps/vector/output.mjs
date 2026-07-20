@@ -1,6 +1,8 @@
 import { open, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { scanArchiveTileStatistics } from './pmtiles/archive-statistics.mjs';
+
 const PMTILES_MAGIC = 'PMTiles';
 const PMTILES_STATS_BYTES = 96;
 
@@ -35,7 +37,7 @@ export async function validatePmtilesArchive(file, maximumBytes) {
   return size;
 }
 
-export async function readPmtilesArchiveStats(file) {
+export async function readPmtilesArchiveStats(file, maximumTileBytes) {
   const handle = await open(file, 'r');
   try {
     const bytes = Buffer.alloc(PMTILES_STATS_BYTES);
@@ -44,11 +46,19 @@ export async function readPmtilesArchiveStats(file) {
       throw new Error('PMTiles header is incomplete.');
     }
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const tileDataBytes = Number(view.getBigUint64(64, true));
+    const addressedTiles = Number(view.getBigUint64(72, true));
+    const tileEntries = Number(view.getBigUint64(80, true));
+    const tileContents = Number(view.getBigUint64(88, true));
     return {
-      tileDataBytes: Number(view.getBigUint64(64, true)),
-      addressedTiles: Number(view.getBigUint64(72, true)),
-      tileEntries: Number(view.getBigUint64(80, true)),
-      tileContents: Number(view.getBigUint64(88, true)),
+      tileDataBytes,
+      addressedTiles,
+      tileEntries,
+      tileContents,
+      averageStoredTileBytes: tileContents
+        ? Math.round(tileDataBytes / tileContents)
+        : 0,
+      ...(await scanArchiveTileStatistics(handle, maximumTileBytes)),
     };
   } finally {
     await handle.close();

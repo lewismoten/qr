@@ -72,11 +72,23 @@ KiB minimum. Every archive budget adds up to exactly the configured maximum.
 Lower maximum zooms redistribute the total among only the active tiers. Sparse
 shard archives pass unused space to later shards and levels.
 
+Level budgets are guidance rather than strict content ceilings. The builder
+allows cumulative variance of `--archive-variance-percent 1`, equal to 5 MiB
+for a 500 MiB collection, before trying to compact an archive. This headroom is
+shared across each parallel wave and reduced by existing budget debt. If a
+compaction retry saves less than 5%, the builder accepts the smallest result
+and carries its overage instead of repeatedly lowering the per-tile limit.
+
 The final archive target and temporary workspace limit are independent.
 Tippecanoe may need substantially more temporary space than the compressed
 archive it ultimately emits, so `--max-working-mib` is enforced per active
 archive without reducing it to that archive's final allowance. Parallel builds
 can therefore consume up to this limit for each active job.
+
+Completed archives record average stored tile bytes, the largest tile payload
+found in the final PMTiles directories, and the count of stored tile payloads
+over the configured tile limit. Tippecanoe's diagnostic detail is logged as
+`reportedTippecanoeDetail`; build configuration uses `configuredDetail`.
 
 ## Reports and compaction
 

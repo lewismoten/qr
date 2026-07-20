@@ -26,6 +26,7 @@ test('summarizes repetitive Tippecanoe fitting diagnostics', () => {
   assert.equal(summary.minimumKeepPercent, 75.64);
   assert.equal(summary.oversizedTileReports, 2);
   assert.equal(summary.largestTile.bytes, 1142);
+  assert.equal(summary.largestTile.reportedTippecanoeDetail, 19);
   assert.equal(summary.featureGapLimitReached, true);
   assert.match(formatTippecanoeSummary(summary), /2 tile checks/);
 });
@@ -68,6 +69,8 @@ test('parses logging and generation command options', () => {
   assert.equal(options.shardTargetMiB, 10);
   assert.equal(options.shardTargetBytes, 10 * 1024 * 1024);
   assert.equal(options.jobs, 1);
+  assert.equal(options.archiveVariancePercent, 1);
+  assert.equal(options.maximumDebtBytes, 5 * 1024 * 1024);
   assert.throws(
     () => readVectorBuildOptions(['--jobs', '0']),
     /positive integer/,
@@ -75,5 +78,9 @@ test('parses logging and generation command options', () => {
   assert.throws(
     () => readVectorBuildOptions(['--shard-target-mib', '0']),
     /greater than zero/,
+  );
+  assert.throws(
+    () => readVectorBuildOptions(['--archive-variance-percent', '-1']),
+    /cannot be negative/,
   );
 });

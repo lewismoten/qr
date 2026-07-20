@@ -5,6 +5,7 @@ const TIERS = [
   { minimumZoom: 9, maximumZoom: 12, weight: 9 },
   { minimumZoom: 13, maximumZoom: Infinity, weight: 90 },
 ];
+const MINIMUM_USEFUL_REDUCTION = 0.05;
 
 export function planArchiveLevels({
   minimumZoom,
@@ -87,6 +88,32 @@ export function compactBuildSettings({
     ),
     detail,
   };
+}
+
+export function isUsefulArchiveReduction(
+  previousBytes,
+  currentBytes,
+  minimumReduction = MINIMUM_USEFUL_REDUCTION,
+) {
+  if (!Number.isFinite(previousBytes) || previousBytes <= 0) return true;
+  return (previousBytes - currentBytes) / previousBytes >= minimumReduction;
+}
+
+export function archiveReductionWarning(label, previousBytes, currentBytes) {
+  if (!previousBytes || isUsefulArchiveReduction(previousBytes, currentBytes)) {
+    return null;
+  }
+  const reduction = ((previousBytes - currentBytes) / previousBytes) * 100;
+  return (
+    `${label} compaction improved only ${reduction.toFixed(1)}%; ` +
+    'accepting its smallest archive.'
+  );
+}
+
+export function formatTileLimit(maximumTileBytes) {
+  return maximumTileBytes == null
+    ? 'no tile ceiling (recovery)'
+    : `${(maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
 }
 
 export function availableLevelBudget({

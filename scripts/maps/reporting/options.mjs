@@ -20,11 +20,17 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     option(values, 'shard-target-mib', '10'),
   );
   const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
+  const archiveVariancePercent = Number.parseFloat(
+    option(values, 'archive-variance-percent', '1'),
+  );
   if (!Number.isFinite(shardTargetMiB) || shardTargetMiB <= 0) {
     throw new RangeError('Shard target must be greater than zero.');
   }
   if (!Number.isInteger(jobs) || jobs < 1) {
     throw new RangeError('Map build jobs must be a positive integer.');
+  }
+  if (!Number.isFinite(archiveVariancePercent) || archiveVariancePercent < 0) {
+    throw new RangeError('Archive variance cannot be negative.');
   }
   return {
     values,
@@ -49,6 +55,9 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     shardTargetMiB,
     shardTargetBytes: shardTargetMiB * 1024 * 1024,
     jobs,
+    archiveVariancePercent,
+    maximumDebtBytes:
+      maximumArchiveMiB * 1024 * 1024 * archiveVariancePercent * 0.01,
     executable: process.env.TIPPECANOE || 'tippecanoe',
   };
 }
@@ -73,4 +82,5 @@ Options:
   --minimum-level-kib 128 Minimum budget reserved for every archive
   --shard-zoom 9        First zoom eligible for adaptive subdivision
   --shard-target-mib 10 Target maximum before a region subdivides
+  --archive-variance-percent 1 Allowed cumulative budget variance
   --jobs 1              Parallel archives built within each zoom`;

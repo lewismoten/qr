@@ -12,14 +12,16 @@ import {
 } from '../reporting/run-log.mjs';
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
+  archiveReductionWarning,
   archiveManifestPath,
   compactBuildSettings,
+  formatTileLimit,
   planArchiveLevels,
 } from './budget.mjs';
 import { buildArchiveSchedule } from './scheduling/archive-scheduler.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import {
-  readPmtilesArchiveStats,
+  readPmtilesArchiveStats as readArchiveStats,
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
@@ -53,12 +55,10 @@ if (values.includes('--help')) {
   process.exit(0);
 }
 const log = createBuildLog(options);
-const runStarted = Date.now();
 console.log(`Generation log: ${log.file}`);
 validateTippecanoeExecutable(executable);
 validateVectorLayers();
 await mkdir(path.dirname(output), { recursive: true });
-console.log('Preparing compact vector layers...');
 const preparationStarted = Date.now();
 const inputs = await prepareVectorInputs({ cache, output: input });
 for (const item of inputs) {
@@ -99,19 +99,17 @@ async function runLevel(level, settings) {
       zoom: level.minimumZoom,
       shard: level.shard,
       maximumTileBytes: settings.maximumTileBytes,
-      detail: settings.detail,
+      configuredDetail: settings.detail,
     },
   });
   return { temporary, ...run };
 }
-
 async function buildLevel(level, allocatedBudgetBytes) {
   const allocation = { ...level, budgetBytes: allocatedBudgetBytes };
   const smallestFile = smallestArchivePath(level.file);
   await rm(smallestFile, { force: true });
   let best = null;
   let settings = { maximumTileBytes, detail };
-
   const acceptSmallest = () => {
     const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
     console.warn(
@@ -120,20 +118,13 @@ async function buildLevel(level, allocatedBudgetBytes) {
     );
     return best;
   };
-
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const attemptStarted = Date.now();
-    const scope = level.shard
-      ? `${level.shardGrid}x${level.shardGrid} shard`
-      : 'zoom';
-    const tileLimit =
-      settings.maximumTileBytes == null
-        ? 'no tile ceiling (recovery)'
-        : `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
+    const tileLimit = formatTileLimit(settings.maximumTileBytes);
     console.log(
       `Building ${levelShardLabel(level)}, attempt ${attempt}, ` +
         `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB ` +
-        `${scope} budget, ` +
+        'budget, ' +
         `${tileLimit}...`,
     );
     recordArchiveAttempt(log, 'archive-attempt-start', {
@@ -168,7 +159,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
         result.temporary,
         Number.MAX_SAFE_INTEGER,
       );
-      archiveStats = await readPmtilesArchiveStats(result.temporary);
+      archiveStats = await readArchiveStats(result.temporary, maximumTileBytes);
     } catch (error) {
       await rm(result.temporary, { force: true });
       if (!best) throw error;
@@ -200,6 +191,7 @@ async function buildLevel(level, allocatedBudgetBytes) {
         temporary: result.temporary,
       };
     }
+    const previousBytes = best?.bytes;
     if (!best || bytes < best.bytes) {
       await rm(smallestFile, { force: true });
       await rename(result.temporary, smallestFile);
@@ -213,6 +205,15 @@ async function buildLevel(level, allocatedBudgetBytes) {
       };
     } else {
       await rm(result.temporary, { force: true });
+    }
+    const warning = archiveReductionWarning(
+      levelShardLabel(level),
+      previousBytes,
+      bytes,
+    );
+    if (warning) {
+      console.warn(warning);
+      return acceptSmallest();
     }
     if (recovery || result.fitSummary?.featureGapLimitReached) {
       return acceptSmallest();
@@ -239,6 +240,7 @@ try {
   const results = await buildArchiveSchedule({
     levels,
     jobs,
+    maximumDebtBytes: options.maximumDebtBytes,
     minimumLevelBytes,
     build: buildLevel,
     planLevel(level, previousResults) {
@@ -278,7 +280,7 @@ try {
   });
   console.log(`Map archives written: ${(total / 1024 / 1024).toFixed(1)} MiB.`);
   log.record('run-complete', {
-    durationMs: Date.now() - runStarted,
+    durationMs: Date.now() - log.startedAt,
     archiveCount: results.length,
     totalBytes: total,
     targetBytes: maximumArchiveBytes,
@@ -291,7 +293,7 @@ try {
     [...temporaryFiles].map((file) => rm(file, { force: true })),
   );
   log.recordError('run-error', error, {
-    durationMs: Date.now() - runStarted,
+    durationMs: Date.now() - log.startedAt,
   });
   log.close();
   throw error;

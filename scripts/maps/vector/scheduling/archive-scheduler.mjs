@@ -1,14 +1,17 @@
 import { availableLevelBudget, updateBudgetCarry } from '../budget.mjs';
 
-function allocateWave(levels, carryBytes, minimumLevelBytes) {
+function allocateWave(levels, carryBytes, minimumLevelBytes, maximumDebtBytes) {
   const surplus = Math.max(0, carryBytes);
+  const debt = Math.max(0, -carryBytes);
+  const variance = Math.max(0, maximumDebtBytes - debt);
+  const headroom = surplus + variance;
   const planned = levels.reduce((sum, level) => sum + level.budgetBytes, 0);
   let distributed = 0;
   return levels.map((level, index) => {
     const final = index === levels.length - 1;
     const bonus = final
-      ? surplus - distributed
-      : Math.floor((surplus * level.budgetBytes) / planned);
+      ? headroom - distributed
+      : Math.floor((headroom * level.budgetBytes) / planned);
     distributed += bonus;
     return availableLevelBudget({
       plannedBytes: level.budgetBytes + bonus,
@@ -34,6 +37,7 @@ async function buildWave(levels, allocations, build) {
 export async function buildArchiveSchedule({
   levels,
   jobs = 1,
+  maximumDebtBytes = 0,
   minimumLevelBytes,
   build,
   onComplete,
@@ -52,7 +56,12 @@ export async function buildArchiveSchedule({
     const levelResults = [];
     for (let offset = 0; offset < group.length; offset += jobs) {
       const wave = group.slice(offset, offset + jobs);
-      const allocations = allocateWave(wave, carryBytes, minimumLevelBytes);
+      const allocations = allocateWave(
+        wave,
+        carryBytes,
+        minimumLevelBytes,
+        maximumDebtBytes,
+      );
       const built = await buildWave(wave, allocations, build);
       for (const { result, durationMs } of built) {
         carryBytes = updateBudgetCarry({
