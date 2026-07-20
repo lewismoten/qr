@@ -90,6 +90,10 @@ console.log(
     `${maximumTileBytes / 1024} KiB tiles and a ` +
     `${maximumArchiveMiB} MiB archive budget...`,
 );
+console.log(
+  'Tippecanoe may report oversized intermediate tiles while it reduces ' +
+    'geometry detail to meet the configured tile limit.',
+);
 
 try {
   await new Promise((resolve, reject) => {

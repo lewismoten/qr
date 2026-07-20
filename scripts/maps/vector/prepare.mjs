@@ -17,8 +17,10 @@ function featureZoom(source, properties = {}) {
   const minimum = Number.isFinite(Number(suggested))
     ? Math.ceil(Number(suggested))
     : source.minimumZoom;
+  const minzoom = Math.max(source.minimumZoom, minimum);
+  if (minzoom > source.maximumZoom) return null;
   return {
-    minzoom: Math.max(source.minimumZoom, minimum),
+    minzoom,
     maxzoom: source.maximumZoom,
   };
 }
@@ -27,11 +29,13 @@ export function prepareVectorFeature(name, feature) {
   const source = MAP_SOURCES[name];
   if (!source || !feature?.geometry) return null;
   if (!matchesFilter(feature, source.featureFilter)) return null;
+  const tippecanoe = featureZoom(source, feature.properties);
+  if (!tippecanoe) return null;
   return {
     type: 'Feature',
     geometry: feature.geometry,
     properties: vectorProperties(name, feature.properties),
-    tippecanoe: featureZoom(source, feature.properties),
+    tippecanoe,
   };
 }
 

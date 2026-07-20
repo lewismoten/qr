@@ -61,7 +61,7 @@ test('creates a standalone manifest and configures ranked settlements', () => {
   assert.equal(MAP_SOURCES.towns.maximumZoom, 16);
   assert.equal(MAP_SOURCES.countries.maximumZoom, 16);
   assert.equal(MAP_SOURCES.urbanAreas.minimumZoom, 5);
-  assert.equal(MAP_SOURCES.urbanAreas.maximumZoom, 16);
+  assert.equal(MAP_SOURCES.urbanAreas.maximumZoom, 10);
   assert.match(MAP_SOURCES.urbanAreas.url, /ne_50m_urban_areas\.geojson/);
   assert.equal(MAP_SOURCES.regions.maximumZoom, 16);
   assert.equal(MAP_SOURCES.states.maximumZoom, 16);

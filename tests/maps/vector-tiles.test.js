@@ -62,7 +62,16 @@ test('classifies generalized urban polygons below map details', () => {
     properties: { featurecla: 'Urban area', min_zoom: 7.2 },
   });
   assert.deepEqual(urban.properties, { class: 'urban' });
-  assert.deepEqual(urban.tippecanoe, { minzoom: 8, maxzoom: 16 });
+  assert.deepEqual(urban.tippecanoe, { minzoom: 8, maxzoom: 10 });
+});
+
+test('omits urban polygons ranked beyond the overview zoom cap', () => {
+  const urban = prepareVectorFeature('urbanAreas', {
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [] },
+    properties: { min_zoom: 10.2 },
+  });
+  assert.equal(urban, null);
 });
 
 test('classifies ranked USGS flowlines as major waterways', () => {

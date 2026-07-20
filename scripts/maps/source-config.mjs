@@ -49,6 +49,7 @@ const CENSUS_QUERY =
 const censusUrl = (layer) =>
   `${CENSUS_SERVICE_ROOT}${layer}/query?${CENSUS_QUERY}`;
 const LOCAL_DETAIL_MAXIMUM_ZOOM = 16;
+const URBAN_AREA_MAXIMUM_ZOOM = 10;
 
 export const MAP_SOURCES = {
   countries: {
@@ -62,7 +63,7 @@ export const MAP_SOURCES = {
     file: 'cultural/ne_50m_urban_areas.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_urban_areas.geojson`,
     minimumZoom: 5,
-    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
+    maximumZoom: URBAN_AREA_MAXIMUM_ZOOM,
     kind: 'area',
   },
   lakesOverview: {
