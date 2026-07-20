@@ -1,59 +1,69 @@
-      <section class="guide-section reading-section">
-        <div class="section-intro">
-          <p class="section-number">05 / Decoder order</p>
-          <h2>What a scanner conceptually does</h2>
-        </div>
-        <ol class="process-list">
-          <li>
-            <span>1</span>
-            <div>
-              <strong>Locate and sample</strong>
-              <p>
-                Use finder, separator, timing and alignment patterns to estimate
-                the module grid.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span>2</span>
-            <div>
-              <strong>Read metadata</strong>
-              <p>
-                Decode format information, select the EC level and mask, and
-                read version information when present.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span>3</span>
-            <div>
-              <strong>Unmask and traverse</strong>
-              <p>
-                Reverse the selected mask on non-functional modules and collect
-                codeword bits along the two-column zigzag path.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span>4</span>
-            <div>
-              <strong>Deinterleave and correct</strong>
-              <p>
-                Reconstruct Reed-Solomon blocks, detect errors and recover
-                codewords where redundancy permits.
-              </p>
-            </div>
-          </li>
-          <li>
-            <span>5</span>
-            <div>
-              <strong>Parse segments</strong>
-              <p>
-                Read each mode and count header, then decode its payload units
-                until the terminator or data capacity is reached.
-              </p>
-            </div>
-          </li>
-        </ol>
-      </section>
-
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR reading reliability | QR specification</title>
+    <link rel="stylesheet" href="../../dist/spec.min.css" />
+  </head>
+  <body class="spec-body">
+    <section class="guide-section reading-section">
+      <div class="section-intro">
+        <p class="section-number">05 / Decoder order</p>
+        <h2>What a scanner conceptually does</h2>
+      </div>
+      <ol class="process-list">
+        <li>
+          <span>1</span>
+          <div>
+            <strong>Locate and sample</strong>
+            <p>
+              Use finder, separator, timing and alignment patterns to estimate
+              the module grid.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <strong>Read metadata</strong>
+            <p>
+              Decode format information, select the EC level and mask, and read
+              version information when present.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <strong>Unmask and traverse</strong>
+            <p>
+              Reverse the selected mask on non-functional modules and collect
+              codeword bits along the two-column zigzag path.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>4</span>
+          <div>
+            <strong>Deinterleave and correct</strong>
+            <p>
+              Reconstruct Reed-Solomon blocks, detect errors and recover
+              codewords where redundancy permits.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span>5</span>
+          <div>
+            <strong>Parse segments</strong>
+            <p>
+              Read each mode and count header, then decode its payload units
+              until the terminator or data capacity is reached.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </body>
+</html>

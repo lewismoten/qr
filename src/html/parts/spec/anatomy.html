@@ -1,77 +1,85 @@
-      <section id="anatomy" class="guide-section">
-        <div class="section-intro">
-          <p class="section-number">01 / Anatomy</p>
-          <h2>Landmarks tell a scanner where the grid is</h2>
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR anatomy | QR specification</title>
+    <link rel="stylesheet" href="../../dist/spec.min.css" />
+  </head>
+  <body class="spec-body">
+    <section id="anatomy" class="guide-section">
+      <div class="section-intro">
+        <p class="section-number">01 / Anatomy</p>
+        <h2>Landmarks tell a scanner where the grid is</h2>
+        <p>
+          Functional patterns are reserved before the encoded stream is placed.
+          They are not payload bytes, and the data traversal steps around them.
+        </p>
+      </div>
+
+      <div class="visual-grid">
+        <article class="visual-card">
+          <div class="visual-heading">
+            <span class="color-dot finder"></span>
+            <h3>Finder patterns</h3>
+          </div>
+          <canvas
+            data-qr-visual="finder"
+            role="img"
+            aria-label="Close-up of a red finder pattern and separator"
+          ></canvas>
           <p>
-            Functional patterns are reserved before the encoded stream is
-            placed. They are not payload bytes, and the data traversal steps
-            around them.
+            Three 7-by-7 targets identify the symbol and its rotation. A
+            one-module light separator isolates each target from nearby modules.
           </p>
-        </div>
-
-        <div class="visual-grid">
-          <article class="visual-card">
-            <div class="visual-heading">
-              <span class="color-dot finder"></span>
-              <h3>Finder patterns</h3>
-            </div>
-            <canvas
-              data-qr-visual="finder"
-              role="img"
-              aria-label="Close-up of a red finder pattern and separator"
-            ></canvas>
-            <p>
-              Three 7-by-7 targets identify the symbol and its rotation. A
-              one-module light separator isolates each target from nearby
-              modules.
-            </p>
-          </article>
-          <article class="visual-card">
-            <div class="visual-heading">
-              <span class="color-dot alignment"></span>
-              <h3>Alignment patterns</h3>
-            </div>
-            <canvas
-              data-qr-visual="alignment"
-              role="img"
-              aria-label="Close-up of a yellow alignment pattern"
-            ></canvas>
-            <p>
-              Version 2 and higher add smaller 5-by-5 targets. Their number
-              grows with the version so a reader can correct perspective and
-              surface distortion.
-            </p>
-          </article>
-          <article class="visual-card">
-            <div class="visual-heading">
-              <span class="color-dot timing"></span>
-              <h3>Timing tracks</h3>
-            </div>
-            <canvas
-              data-qr-visual="timing"
-              role="img"
-              aria-label="Close-up of cyan horizontal and vertical timing patterns"
-            ></canvas>
-            <p>
-              Alternating dark and light modules on row 6 and column 6 establish
-              the module rhythm and connect the finder regions.
-            </p>
-          </article>
-          <article class="visual-card">
-            <div class="visual-heading">
-              <span class="color-dot dark-module"></span>
-              <h3>Dark module</h3>
-            </div>
-            <canvas
-              data-qr-visual="dark-module"
-              role="img"
-              aria-label="Close-up of the fixed dark module colored deep violet"
-            ></canvas>
-            <p>
-              One fixed dark module sits at row <code>4V + 9</code>, column 8.
-              It is always on and is separate from the nearby format copy.
-            </p>
-          </article>
-        </div>
-      </section>
-
+        </article>
+        <article class="visual-card">
+          <div class="visual-heading">
+            <span class="color-dot alignment"></span>
+            <h3>Alignment patterns</h3>
+          </div>
+          <canvas
+            data-qr-visual="alignment"
+            role="img"
+            aria-label="Close-up of a yellow alignment pattern"
+          ></canvas>
+          <p>
+            Version 2 and higher add smaller 5-by-5 targets. Their number grows
+            with the version so a reader can correct perspective and surface
+            distortion.
+          </p>
+        </article>
+        <article class="visual-card">
+          <div class="visual-heading">
+            <span class="color-dot timing"></span>
+            <h3>Timing tracks</h3>
+          </div>
+          <canvas
+            data-qr-visual="timing"
+            role="img"
+            aria-label="Close-up of cyan horizontal and vertical timing patterns"
+          ></canvas>
+          <p>
+            Alternating dark and light modules on row 6 and column 6 establish
+            the module rhythm and connect the finder regions.
+          </p>
+        </article>
+        <article class="visual-card">
+          <div class="visual-heading">
+            <span class="color-dot dark-module"></span>
+            <h3>Dark module</h3>
+          </div>
+          <canvas
+            data-qr-visual="dark-module"
+            role="img"
+            aria-label="Close-up of the fixed dark module colored deep violet"
+          ></canvas>
+          <p>
+            One fixed dark module sits at row <code>4V + 9</code>, column 8. It
+            is always on and is separate from the nearby format copy.
+          </p>
+        </article>
+      </div>
+    </section>
+  </body>
+</html>

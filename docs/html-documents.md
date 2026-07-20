@@ -22,6 +22,11 @@ The include path is relative to the containing file and cannot escape
 `src/html`. Circular includes fail the build. Includes are resolved before
 localization, allowing every locale to reuse the same document structure.
 
+Included files remain complete standalone HTML documents with their own
+doctype, head, title, stylesheet links, and body. Composition inserts only the
+contents of the included `<body>`; its document wrapper and metadata are not
+copied into the parent page. An included file without a body fails the build.
+
 The QR specification is the first migrated long-form page. The remaining
 legacy baselines should move to the same model:
 

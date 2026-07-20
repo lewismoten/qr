@@ -1,49 +1,59 @@
-      <section class="guide-section metadata-section">
-        <div class="section-intro">
-          <p class="section-number">02 / Metadata</p>
-          <h2>The decoder receives instructions before content</h2>
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR metadata | QR specification</title>
+    <link rel="stylesheet" href="../../dist/spec.min.css" />
+  </head>
+  <body class="spec-body">
+    <section class="guide-section metadata-section">
+      <div class="section-intro">
+        <p class="section-number">02 / Metadata</p>
+        <h2>The decoder receives instructions before content</h2>
+        <p>
+          Format and version information are encoded with BCH error protection.
+          Format information is written twice so damage near one finder does not
+          remove the decoder instructions.
+        </p>
+      </div>
+      <div class="visual-grid metadata-grid">
+        <article class="visual-card wide-card">
+          <div class="visual-heading multi-dot">
+            <span class="color-dot ec-level"></span
+            ><span class="color-dot mask"></span
+            ><span class="color-dot format"></span>
+            <h3>EC level, mask and format protection</h3>
+          </div>
+          <canvas
+            data-qr-visual="format"
+            role="img"
+            aria-label="Top-left metadata close-up showing pink error correction level bits, blue mask bits and purple protected format bits"
+          ></canvas>
           <p>
-            Format and version information are encoded with BCH error
-            protection. Format information is written twice so damage near one
-            finder does not remove the decoder instructions.
+            The 15-bit format value contains 2 error-correction-level bits and 3
+            mask-pattern bits. Ten BCH protection bits are appended, then the
+            result is XOR-masked with a fixed pattern. The same value appears in
+            two locations.
           </p>
-        </div>
-        <div class="visual-grid metadata-grid">
-          <article class="visual-card wide-card">
-            <div class="visual-heading multi-dot">
-              <span class="color-dot ec-level"></span
-              ><span class="color-dot mask"></span
-              ><span class="color-dot format"></span>
-              <h3>EC level, mask and format protection</h3>
-            </div>
-            <canvas
-              data-qr-visual="format"
-              role="img"
-              aria-label="Top-left metadata close-up showing pink error correction level bits, blue mask bits and purple protected format bits"
-            ></canvas>
-            <p>
-              The 15-bit format value contains 2 error-correction-level bits and
-              3 mask-pattern bits. Ten BCH protection bits are appended, then
-              the result is XOR-masked with a fixed pattern. The same value
-              appears in two locations.
-            </p>
-          </article>
-          <article class="visual-card">
-            <div class="visual-heading">
-              <span class="color-dot version"></span>
-              <h3>Version information</h3>
-            </div>
-            <canvas
-              data-qr-visual="version"
-              role="img"
-              aria-label="Close-up of green Version 7 information beside a finder pattern"
-            ></canvas>
-            <p>
-              Versions 7 through 40 store an 18-bit protected version value in
-              two 3-by-6 areas. Smaller versions communicate their size directly
-              through matrix dimensions.
-            </p>
-          </article>
-        </div>
-      </section>
-
+        </article>
+        <article class="visual-card">
+          <div class="visual-heading">
+            <span class="color-dot version"></span>
+            <h3>Version information</h3>
+          </div>
+          <canvas
+            data-qr-visual="version"
+            role="img"
+            aria-label="Close-up of green Version 7 information beside a finder pattern"
+          ></canvas>
+          <p>
+            Versions 7 through 40 store an 18-bit protected version value in two
+            3-by-6 areas. Smaller versions communicate their size directly
+            through matrix dimensions.
+          </p>
+        </article>
+      </div>
+    </section>
+  </body>
+</html>

@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const INCLUDE_PATTERN = /<!--\s*include\s+file=(['"])(.+?)\1\s*-->/;
+const BODY_PATTERN = /<body(?:\s[^>]*)?>([\s\S]*?)<\/body\s*>/i;
 
 function assertInsideRoot(file, root) {
   const relative = path.relative(root, file);
@@ -12,7 +13,7 @@ function assertInsideRoot(file, root) {
 
 export async function readHtmlWithIncludes(
   file,
-  { root = 'src/html', stack = [] } = {},
+  { root = 'src/html', stack = [], bodyOnly = false } = {},
 ) {
   const sourceRoot = path.resolve(root);
   const current = path.resolve(file);
@@ -32,6 +33,7 @@ export async function readHtmlWithIncludes(
     const content = await readHtmlWithIncludes(included, {
       root: sourceRoot,
       stack: ancestry,
+      bodyOnly: true,
     });
     source =
       source.slice(0, match.index) +
@@ -39,5 +41,8 @@ export async function readHtmlWithIncludes(
       source.slice(match.index + match[0].length);
     match = INCLUDE_PATTERN.exec(source);
   }
-  return source;
+  if (!bodyOnly) return source;
+  const body = BODY_PATTERN.exec(source);
+  if (!body) throw new Error(`Included HTML has no body: ${current}`);
+  return body[1];
 }
