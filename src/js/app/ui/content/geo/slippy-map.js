@@ -199,6 +199,10 @@ export function createSlippyMap(
       tileScale = scale;
       scheduleRender();
     },
+    {
+      canZoom: (step) =>
+        step > 0 ? currentZoom < maximumZoom : currentZoom > minimumZoom,
+    },
   );
   container.addEventListener('keydown', (event) => {
     if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))

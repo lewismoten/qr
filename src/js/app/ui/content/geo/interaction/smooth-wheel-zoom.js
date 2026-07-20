@@ -4,7 +4,7 @@ const clamp = (value, minimum, maximum) =>
   Math.min(maximum, Math.max(minimum, value));
 
 export function createSmoothWheelZoomHandler(
-  { onPreview, onCommit },
+  { onPreview, onCommit, canZoom = () => true },
   { sensitivity = 120, commitThreshold = 1 } = {},
 ) {
   let amount = 0;
@@ -15,6 +15,9 @@ export function createSmoothWheelZoomHandler(
       -1,
       1,
     );
+    if ((amount > 0 && !canZoom(1)) || (amount < 0 && !canZoom(-1))) {
+      amount = 0;
+    }
     if (Math.abs(amount) >= commitThreshold) {
       const step = amount > 0 ? 1 : -1;
       amount -= step;
@@ -29,6 +32,7 @@ export function attachSmoothWheelZoom(
   getLayer,
   onCommit,
   onPreview,
+  options = {},
 ) {
   const handler = createSmoothWheelZoomHandler({
     onPreview(scale, event) {
@@ -36,6 +40,7 @@ export function attachSmoothWheelZoom(
       onPreview?.(scale, event);
     },
     onCommit,
+    canZoom: options.canZoom,
   });
   container.addEventListener('wheel', handler, { passive: false });
 }
