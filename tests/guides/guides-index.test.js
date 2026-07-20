@@ -151,7 +151,11 @@ describe('guide index', () => {
     assert.match(guideIndex, new RegExp(`href="${repository}"`));
     assert.match(
       technology,
-      new RegExp(`${repository}/src/branch/main/README\\.md#`),
+      new RegExp(`${repository}/src/branch/main/docs/file-transport\\.md`),
+    );
+    assert.match(
+      technology,
+      new RegExp(`${repository}/src/branch/main/README`),
     );
     assert.doesNotMatch(technology, /href="README\.md#/);
 

@@ -31,7 +31,7 @@
     "lint:css": "stylelint --config config/stylelint.json \"src/css/**/*.css\" && node scripts/lint/lint-css-limits.mjs",
     "lint:html": "htmlhint --config config/htmlhint.json \"src/html/**/*.html\"",
     "lint:json": "node scripts/lint/lint-json.mjs",
-    "lint:markdown": "markdownlint-cli2 --config config/markdownlint.jsonc \"README.md\"",
+    "lint:markdown": "node scripts/lint/lint-markdown.mjs && markdownlint-cli2 --config config/markdownlint.jsonc \"README.md\" \"docs/**/*.md\"",
     "lint:web-metadata": "node scripts/lint/lint-web-metadata.mjs",
     "format:js": "prettier --config config/prettier.json --ignore-path config/prettier.ignore --write \"src/js/**/*.js\" \"scripts/**/*.mjs\" \"benchmarks/**/*.mjs\" \"tests/**/*.js\" \"eslint.config.js\"",
     "test": "node scripts/run-tests.mjs",
