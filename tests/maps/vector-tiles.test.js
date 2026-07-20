@@ -109,6 +109,16 @@ test('limits finer Census roads to the last generated levels', () => {
   assert.deepEqual(road.tippecanoe, { minzoom: 14, maxzoom: 16 });
 });
 
+test('shows Main Street geometry starting at level fifteen', () => {
+  const road = prepareVectorFeature('mainRoads', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { BASENAME: 'Main', RTTYP: 'M', MTFCC: 'S1400' },
+  });
+  assert.deepEqual(road.properties, { class: 'local' });
+  assert.deepEqual(road.tippecanoe, { minzoom: 15, maxzoom: 16 });
+});
+
 test('classifies the bounded level-sixteen road subset as local', () => {
   const road = prepareVectorFeature('localRoads', {
     type: 'Feature',

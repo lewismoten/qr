@@ -21,6 +21,7 @@ export const DEFAULT_LAYERS = [
   'secondaryRoads',
   'secondaryRoadsDetailed',
   'secondaryRoadsLocal',
+  'mainRoads',
   'localRoads',
   'railroadsOverview',
   'railroadsDetailed',

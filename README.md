@@ -86,11 +86,11 @@ ranked cities and towns from its CC BY 4.0 `cities1000` gazetteer extract. The
 U.S. Census Bureau's 2024 generalized 20M GeoJSON supplies matching state,
 county, and county-equivalent boundaries. TIGERweb supplies U.S. roads and
 railroads, while Natural Earth supplies global roads and water. Generalized
-railroads, while Natural Earth supplies global roads and water. Generalized
 railroads appear at zooms 10–11, finer geometry appears at zooms 12–13, and a
-more precise query is used at zooms 14–15. Secondary roads follow comparable
-detail tiers. Zoom 16 adds a bounded subset of county, other-numbered, and long
-named roads while excluding millions of shorter local streets. At zooms 9–16,
+more precise query is used at zooms 14–16. Secondary roads follow comparable
+detail tiers. Zooms 15–16 add Main Street segments. Zoom 16 also adds a bounded
+subset of county, other-numbered, and long named roads while excluding millions
+of shorter local streets. At zooms 9–16,
 the public-domain USGS NHDPlus High Resolution network adds
 U.S. rivers ranked for display at approximately 1:5,000,000 and larger scales.
 Zooms 14–16 supplement it with non-overlapping 1:1,000,000–1:5,000,000

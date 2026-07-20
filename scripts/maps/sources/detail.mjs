@@ -13,6 +13,7 @@ const transportationIdsUrl = (layer, where) =>
 const LOCAL_ROAD_WHERE =
   'RTTYP%3D%27C%27%20OR%20RTTYP%3D%27O%27%20OR%20' +
   '%28RTTYP%3D%27M%27%20AND%20STGEOMETRY_Length%3E%3D10000%29';
+const MAIN_ROAD_WHERE = 'BASENAME%3D%27Main%27';
 
 const RAILROAD_ROOT =
   'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
@@ -99,6 +100,19 @@ export function createDetailSources(maximumZoom) {
       url: transportationUrl(6, 0.00015, 5),
       pageSize: 1000,
       minimumZoom: 14,
+      maximumZoom,
+      kind: 'line',
+    },
+    mainRoads: {
+      file: 'census/census_2025_main_roads_42k.geojsonseq',
+      url: transportationUrl(7, 0.00005, 5, MAIN_ROAD_WHERE),
+      idsUrl: transportationIdsUrl(7, MAIN_ROAD_WHERE),
+      objectIdPagination: true,
+      cacheFormat: 'geojsonseq',
+      parallelPages: 4,
+      pageSize: 2000,
+      maximumFeatures: 30000,
+      minimumZoom: 15,
       maximumZoom,
       kind: 'line',
     },

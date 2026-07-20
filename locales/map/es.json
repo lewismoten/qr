@@ -38,7 +38,7 @@
     "localWater": "Colocación más precisa de carreteras locales, ferrocarriles, cursos de agua, parques y lugares clasificados.",
     "neighborhoods": "Vista generada más detallada de carreteras, ferrocarriles, agua, parques y lugares locales.",
     "fineRoutes": "Carreteras secundarias más detalladas, cursos de agua clasificados, líneas ferroviarias y espacios protegidos.",
-    "finestRoutes": "Vista generada más detallada de carreteras, cursos de agua, líneas ferroviarias, parques y lugares clasificados.",
+    "finestRoutes": "Vista generada más detallada de carreteras, incluidas las calles principales llamadas Main Street, además de cursos de agua, líneas ferroviarias, parques y lugares clasificados.",
     "rankedRoads": "Las rutas de condado, otras rutas numeradas y las carreteras largas con nombre complementan el detalle existente del mapa.",
     "streets": "Previsto: calles con nombre y contexto local.",
     "blocks": "Previsto: manzanas, senderos y calles detalladas.",

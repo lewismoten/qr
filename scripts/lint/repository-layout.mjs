@@ -4,6 +4,7 @@ import path from 'node:path';
 export const MAX_DIRECTORY_ENTRIES = 10;
 
 const IGNORED_DIRECTORIES = new Set([
+  '.cache',
   '.git',
   'benchmark-results',
   'build',

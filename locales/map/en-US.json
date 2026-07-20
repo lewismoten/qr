@@ -38,7 +38,7 @@
     "localWater": "Finer placement of local roads, railways, waterways, parks, and ranked places.",
     "neighborhoods": "Finest generated view of roads, railways, water, parks, and local places.",
     "fineRoutes": "Finer secondary roads, ranked waterways, rail lines, and protected lands.",
-    "finestRoutes": "Finest generated roads, waterways, rail lines, parks, and ranked places.",
+    "finestRoutes": "Finest generated roads, including Main Streets, plus waterways, rail lines, parks, and ranked places.",
     "rankedRoads": "Ranked county, numbered, and long named roads supplement the existing map detail.",
     "streets": "Planned: named streets and local context.",
     "blocks": "Planned: blocks, paths, and detailed streets.",

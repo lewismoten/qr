@@ -26,6 +26,11 @@ test('increases secondary-road detail at zoom levels twelve and fourteen', () =>
     /maxAllowableOffset=0\.00015/,
   );
   assert.match(MAP_SOURCES.secondaryRoadsLocal.url, /geometryPrecision=5/);
+  assert.equal(MAP_SOURCES.mainRoads.minimumZoom, 15);
+  assert.equal(MAP_SOURCES.mainRoads.maximumZoom, 16);
+  assert.equal(MAP_SOURCES.mainRoads.maximumFeatures, 30000);
+  assert.match(MAP_SOURCES.mainRoads.url, /BASENAME%3D%27Main%27/);
+  assert.match(MAP_SOURCES.mainRoads.idsUrl, /returnIdsOnly=true/);
   assert.equal(MAP_SOURCES.localRoads.minimumZoom, 16);
   assert.equal(MAP_SOURCES.localRoads.maximumZoom, 16);
   assert.equal(MAP_SOURCES.localRoads.maximumFeatures, 600000);
