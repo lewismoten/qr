@@ -58,6 +58,11 @@ Mercator tile boundaries. Beginning at `--deep-shard-zoom 13`, each level uses
 a 4x4 grid of 16 smaller archives. This keeps detailed builds and HTTP range
 indexes manageable without changing the combined budget for that zoom.
 
+Use `--jobs 4` to build up to four shards from the same zoom concurrently.
+Zoom levels remain ordered, and archive surplus or debt is reconciled between
+parallel waves. Each job runs a separate Tippecanoe process, so choose a value
+that leaves enough CPU, memory, and temporary storage for every active job.
+
 The default allocator gives zooms 1-8, 9-12, and 13-maximum 1%, 9%, and 90% of
 the total. For 500 MiB, those tiers receive 5, 45, and 450 MiB. Within each tier,
 individual level allowances grow by a relative weight of 1.3 and retain a 128

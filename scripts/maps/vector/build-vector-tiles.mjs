@@ -11,12 +11,11 @@ import {
 } from '../reporting/run-log.mjs';
 import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
-  availableLevelBudget,
   archiveManifestPath,
   compactBuildSettings,
   planArchiveLevels,
-  updateBudgetCarry,
 } from './budget.mjs';
+import { buildArchiveSchedule } from './scheduling/archive-scheduler.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import {
   readPmtilesArchiveStats,
@@ -45,6 +44,7 @@ const {
   minimumLevelBytes,
   shardZoom,
   deepShardZoom,
+  jobs,
   executable,
 } = options;
 if (values.includes('--help')) {
@@ -242,25 +242,15 @@ const temporaryFiles = levels.flatMap((level) => [
   smallestArchivePath(level.file),
 ]);
 try {
-  const results = [];
-  let carryBytes = 0;
-  for (const level of levels) {
-    const levelStarted = Date.now();
-    const allocatedBudgetBytes = availableLevelBudget({
-      plannedBytes: level.budgetBytes,
-      carryBytes,
-      minimumLevelBytes,
-    });
-    const result = await buildLevel(level, allocatedBudgetBytes);
-    carryBytes = updateBudgetCarry({
-      carryBytes,
-      plannedBytes: level.budgetBytes,
-      actualBytes: result.bytes,
-    });
-    result.carryBytes = carryBytes;
-    results.push(result);
-    recordCompletedArchive(log, result, Date.now() - levelStarted);
-  }
+  const results = await buildArchiveSchedule({
+    levels,
+    jobs,
+    minimumLevelBytes,
+    build: buildLevel,
+    onComplete(result, durationMs) {
+      recordCompletedArchive(log, result, durationMs);
+    },
+  });
   const total = results.reduce((sum, result) => sum + result.bytes, 0);
   const overageBytes = Math.max(0, total - maximumArchiveBytes);
   if (overageBytes) {

@@ -66,4 +66,5 @@ test('parses logging and generation command options', () => {
   assert.equal(options.maximumArchiveMiB, 500);
   assert.equal(options.shardZoom, 9);
   assert.equal(options.deepShardZoom, 13);
+  assert.equal(options.jobs, 1);
 });
