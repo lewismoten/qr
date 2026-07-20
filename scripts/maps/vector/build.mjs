@@ -46,18 +46,14 @@ const {
   shardZoom,
   executable,
 } = options;
-
 if (values.includes('--help')) {
   console.log(VECTOR_BUILD_HELP);
   process.exit(0);
 }
-
 const log = createBuildLog(options);
 const runStarted = Date.now();
 console.log(`Generation log: ${log.file}`);
-
 validateTippecanoeExecutable(executable);
-
 validateVectorLayers();
 await mkdir(path.dirname(output), { recursive: true });
 console.log('Preparing compact vector layers...');
@@ -70,7 +66,6 @@ log.record('inputs-prepared', {
   durationMs: Date.now() - preparationStarted,
   layers: inputs,
 });
-
 const levels = shardArchiveLevels(
   planArchiveLevels({
     minimumZoom,
@@ -82,7 +77,6 @@ const levels = shardArchiveLevels(
   }),
   shardZoom,
 );
-
 function levelLabel(level) {
   const zoom = `z${level.minimumZoom}`;
   return level.shard ? `${zoom} ${level.shard}` : zoom;
@@ -268,10 +262,12 @@ try {
     results.push(result);
     recordCompletedArchive(log, result, Date.now() - levelStarted);
   }
-  if (carryBytes < 0) {
-    throw new Error(
-      `Minimum map archives exceed the total budget by ` +
-        `${(-carryBytes / 1024 / 1024).toFixed(1)} MiB.`,
+  const total = results.reduce((sum, result) => sum + result.bytes, 0);
+  const overageBytes = Math.max(0, total - maximumArchiveBytes);
+  if (overageBytes) {
+    console.warn(
+      `Map archives exceed the target by ` +
+        `${(overageBytes / 1024 / 1024).toFixed(1)} MiB; publishing them.`,
     );
   }
   for (const result of results) await rename(result.temporary, result.file);
@@ -281,13 +277,17 @@ try {
     minimumZoom,
     maximumZoom,
     maximumArchiveMiB,
+    totalBytes: total,
+    overageBytes,
   });
-  const total = results.reduce((sum, result) => sum + result.bytes, 0);
   console.log(`Map archives written: ${(total / 1024 / 1024).toFixed(1)} MiB.`);
   log.record('run-complete', {
     durationMs: Date.now() - runStarted,
     archiveCount: results.length,
     totalBytes: total,
+    targetBytes: maximumArchiveBytes,
+    overageBytes,
+    overBudget: overageBytes > 0,
   });
   log.close();
 } catch (error) {

@@ -10,6 +10,7 @@ import {
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
+  writeArchiveManifest,
 } from '../../../scripts/maps/vector/output.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
 
@@ -78,6 +79,28 @@ test('removes archives excluded from a replacement manifest', async () => {
     await removeStaleArchives(manifest, [currentArchive]);
     await assert.rejects(() => readFile(oldArchive), /ENOENT/);
     assert.equal(await readFile(currentArchive, 'utf8'), 'current');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('records a successful archive-set budget overage', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'qr-map-manifest-'));
+  const manifestFile = path.join(root, 'local.json');
+  try {
+    await writeArchiveManifest({
+      manifestFile,
+      results: [],
+      minimumZoom: 1,
+      maximumZoom: 19,
+      maximumArchiveMiB: 500,
+      totalBytes: 510 * 1024 * 1024,
+      overageBytes: 10 * 1024 * 1024,
+    });
+    const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+    assert.equal(manifest.overBudget, true);
+    assert.equal(manifest.overageBytes, 10 * 1024 * 1024);
+    assert.equal(manifest.totalBytes, 510 * 1024 * 1024);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

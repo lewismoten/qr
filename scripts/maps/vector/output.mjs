@@ -78,12 +78,17 @@ export async function writeArchiveManifest({
   minimumZoom,
   maximumZoom,
   maximumArchiveMiB,
+  totalBytes,
+  overageBytes,
 }) {
   const manifest = {
     version: 1,
     minimumZoom,
     maximumZoom,
     maximumArchiveMiB,
+    totalBytes,
+    overageBytes,
+    overBudget: overageBytes > 0,
     archives: results.map((result) => ({
       minimumZoom: result.minimumZoom,
       maximumZoom: result.maximumZoom,

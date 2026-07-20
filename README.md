@@ -144,8 +144,9 @@ number of passes and avoiding unnecessary quality loss in completed zooms.
 Unused bytes roll into the next level. If a level cannot shrink enough at the
 minimum settings, its smallest valid archive is retained and its overage is
 recorded as debt. That debt does not reduce another archive's initial planned
-budget; later unused space offsets it naturally. Unresolved debt at the final
-level prevents publication, preserving the total hard cap.
+budget; later unused space offsets it naturally. If irreducible archives still
+exceed the final target, the build reports and records the exact overage but
+publishes the completed archive set rather than discarding the work.
 Tippecanoe exit status 100 during a stricter retry therefore restores the last
 valid candidate instead of aborting the entire map build. If no constrained
 attempt can produce a candidate, one recovery attempt omits the tile ceiling
