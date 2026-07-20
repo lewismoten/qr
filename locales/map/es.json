@@ -22,7 +22,7 @@
   "loadError": "No se pudo iniciar la vista previa del mapa.",
   "guideLayers": {
     "title": "Capas del mapa local",
-    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles del 10 al 16 se generan localmente. En los niveles del 17 al 19, el mapa amplía la tesela correspondiente del nivel 16.",
+    "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Los niveles del 10 al 17 se generan localmente. En los niveles 18 y 19, el mapa amplía la tesela correspondiente del nivel 17.",
     "level": "Capa",
     "contents": "Detalle mostrado",
     "sample": "Ejemplo de Front Royal",
@@ -40,12 +40,13 @@
     "fineRoutes": "Carreteras secundarias más detalladas, cursos de agua clasificados, líneas ferroviarias y espacios protegidos.",
     "finestRoutes": "Vista generada más detallada de carreteras, incluidas las calles principales llamadas Main Street, además de cursos de agua, líneas ferroviarias, parques y lugares clasificados.",
     "rankedRoads": "Las rutas de condado, otras rutas numeradas y las carreteras largas con nombre complementan el detalle existente del mapa.",
+    "detailedRoads": "Una superposición dispersa añade otro nivel de carreteras municipales largas sobre el nivel 16.",
     "streets": "Previsto: calles con nombre y contexto local.",
     "blocks": "Previsto: manzanas, senderos y calles detalladas.",
     "buildings": "Previsto: contornos de edificios y vías de servicio.",
     "entrances": "Previsto: accesos, senderos y geometría detallada.",
     "precise": "Previsto: estructuras precisas y detalles peatonales.",
     "maximum": "Previsto: máximo detalle local compatible.",
-    "fallback": "Actualmente muestra la tesela correspondiente del nivel 16."
+    "fallback": "Actualmente muestra la tesela correspondiente del nivel 17."
   }
 }

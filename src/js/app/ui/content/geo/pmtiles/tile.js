@@ -38,6 +38,7 @@ export function createPmtilesTile({
   minimumSourceZoom,
   maximumSourceZoom,
   coverageMaximumZoom = maximumSourceZoom,
+  compositeMinimumZoom = 17,
   onLoad = () => {},
   onUnavailable = () => {},
   onSourceChange,
@@ -66,7 +67,7 @@ export function createPmtilesTile({
     maximumSourceZoom,
     minimumSourceZoom,
   })
-    .then((result) => {
+    .then(async (result) => {
       if (!result) {
         unavailable();
         return;
@@ -86,7 +87,26 @@ export function createPmtilesTile({
       });
       element.classList.toggle('is-fallback', fallback);
       onSourceChange?.(sourceTile.zoom);
-      renderMvt(bytes, canvas, { zoom: tile.zoom, viewport: sourceTile });
+      let parent = null;
+      if (sourceTile.zoom >= compositeMinimumZoom) {
+        parent = await findPmtilesTile({
+          source,
+          tile,
+          minimumSourceZoom,
+          maximumSourceZoom: sourceTile.zoom - 1,
+        });
+      }
+      if (parent) {
+        renderMvt(parent.bytes, canvas, {
+          zoom: tile.zoom,
+          viewport: parent.sourceTile,
+        });
+      }
+      renderMvt(bytes, canvas, {
+        zoom: tile.zoom,
+        viewport: sourceTile,
+        clear: !parent,
+      });
       element.classList.add('is-loaded');
       onLoad();
     })

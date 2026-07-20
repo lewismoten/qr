@@ -101,9 +101,10 @@ describe('standalone guide forms', () => {
     assert.match(geo, /<figcaption>L14 · 4633\/6266<\/figcaption>/);
     assert.match(geo, /<figcaption>L15 · 9266\/12532<\/figcaption>/);
     assert.match(geo, /<figcaption>L16 · 18533\/25065<\/figcaption>/);
+    assert.match(geo, /<figcaption>L17 · 37066\/50131<\/figcaption>/);
     assert.equal(
-      geo.match(/<figcaption>L1[7-9] → L16<\/figcaption>/g)?.length,
-      3,
+      geo.match(/<figcaption>L1[8-9] → L17<\/figcaption>/g)?.length,
+      2,
     );
   });
 });

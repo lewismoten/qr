@@ -23,6 +23,7 @@ export const DEFAULT_LAYERS = [
   'secondaryRoadsLocal',
   'mainRoads',
   'localRoads',
+  'detailedLocalRoads',
   'railroadsOverview',
   'railroadsDetailed',
   'railroadsLocal',
@@ -53,7 +54,7 @@ export const MAP_SOURCES = {
     file: 'cultural/ne_50m_admin_0_countries.geojson',
     url: `${NATURAL_EARTH_ROOT}ne_50m_admin_0_countries.geojson`,
     minimumZoom: 1,
-    maximumZoom: 19,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'area',
   },
   lakesOverview: {
@@ -139,7 +140,7 @@ export const MAP_SOURCES = {
     url:
       `${NATURAL_EARTH_ROOT}` + 'ne_50m_admin_1_states_provinces_lines.geojson',
     minimumZoom: 4,
-    maximumZoom: 19,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'line',
   },
   ...createDetailSources(LOCAL_DETAIL_MAXIMUM_ZOOM),
@@ -158,14 +159,14 @@ export const MAP_SOURCES = {
     file: 'census/census_2024_states_20m.geojson',
     url: censusUrl(9),
     minimumZoom: 7,
-    maximumZoom: 19,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'area',
   },
   subdivisions: {
     file: 'census/census_2024_counties_20m.geojson',
     url: censusUrl(13),
     minimumZoom: 7,
-    maximumZoom: 19,
+    maximumZoom: LOCAL_DETAIL_MAXIMUM_ZOOM,
     kind: 'area',
   },
   cities: {

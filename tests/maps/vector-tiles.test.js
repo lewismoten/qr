@@ -119,6 +119,16 @@ test('shows Main Street geometry starting at level fifteen', () => {
   assert.deepEqual(road.tippecanoe, { minzoom: 15, maxzoom: 16 });
 });
 
+test('adds a sparse municipal-road overlay at level seventeen', () => {
+  const road = prepareVectorFeature('detailedLocalRoads', {
+    type: 'Feature',
+    geometry: { type: 'LineString', coordinates: [] },
+    properties: { RTTYP: 'M', MTFCC: 'S1400' },
+  });
+  assert.deepEqual(road.properties, { class: 'local' });
+  assert.deepEqual(road.tippecanoe, { minzoom: 17, maxzoom: 17 });
+});
+
 test('classifies the bounded level-sixteen road subset as local', () => {
   const road = prepareVectorFeature('localRoads', {
     type: 'Feature',
@@ -155,8 +165,8 @@ test('builds a PMTiles Tippecanoe command with a 16 KiB limit', () => {
     output: 'local.pmtiles',
   });
   assert.ok(args.includes('--maximum-tile-bytes=16384'));
-  assert.ok(args.includes('--maximum-zoom=16'));
-  assert.ok(args.includes('--base-zoom=15'));
+  assert.ok(args.includes('--maximum-zoom=17'));
+  assert.ok(args.includes('--base-zoom=16'));
   assert.ok(args.includes('--full-detail=11'));
   assert.ok(args.includes('--low-detail=9'));
   assert.ok(args.includes('--generate-variable-depth-tile-pyramid'));

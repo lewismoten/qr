@@ -37,6 +37,14 @@ test('increases secondary-road detail at zoom levels twelve and fourteen', () =>
   assert.match(MAP_SOURCES.localRoads.url, /MapServer\/7\/query/);
   assert.match(MAP_SOURCES.localRoads.url, /STGEOMETRY_Length%3E%3D10000/);
   assert.match(MAP_SOURCES.localRoads.idsUrl, /returnIdsOnly=true/);
+  assert.equal(MAP_SOURCES.detailedLocalRoads.minimumZoom, 17);
+  assert.equal(MAP_SOURCES.detailedLocalRoads.maximumZoom, 17);
+  assert.equal(MAP_SOURCES.detailedLocalRoads.maximumFeatures, 36000);
+  assert.match(
+    MAP_SOURCES.detailedLocalRoads.url,
+    /STGEOMETRY_Length%3E%3D8500/,
+  );
+  assert.match(MAP_SOURCES.detailedLocalRoads.url, /STGEOMETRY_Length%3C10000/);
 });
 
 test('uses progressively detailed Census railroads at zoom ten', () => {

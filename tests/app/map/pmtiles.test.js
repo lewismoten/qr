@@ -233,6 +233,9 @@ test('renders sparse MVT tiles without requiring every map layer', () => {
   };
   assert.deepEqual(renderMvt(new Uint8Array(), canvas), []);
   assert.equal(cleared, true);
+  cleared = false;
+  assert.deepEqual(renderMvt(new Uint8Array(), canvas, { clear: false }), []);
+  assert.equal(cleared, false);
 });
 
 test('keeps map labels inside their owning vector tile', () => {

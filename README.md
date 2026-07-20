@@ -71,8 +71,8 @@ files while keeping map requests local:
 
 ```sh
 npm run maps:download
-npm run maps:build -- --maximum-zoom 16 --max-tile-kib 16
-npm run maps:generate -- --maximum-zoom 16 --max-tile-kib 16
+npm run maps:build -- --maximum-zoom 17 --base-zoom 16 --max-tile-kib 16
+npm run maps:generate -- --maximum-zoom 17 --base-zoom 16 --max-tile-kib 16
 ```
 
 To fetch or refresh only the detailed USGS river source before a later build:
@@ -90,7 +90,10 @@ railroads appear at zooms 10–11, finer geometry appears at zooms 12–13, and 
 more precise query is used at zooms 14–16. Secondary roads follow comparable
 detail tiers. Zooms 15–16 add Main Street segments. Zoom 16 also adds a bounded
 subset of county, other-numbered, and long named roads while excluding millions
-of shorter local streets. At zooms 9–16,
+of shorter local streets. Zoom 17 adds a sparse 34,238-feature tier of municipal
+roads between the existing length thresholds. The browser composites these
+children over complete level 16 parents so unchanged layers are not duplicated.
+At zooms 9–16,
 the public-domain USGS NHDPlus High Resolution network adds
 U.S. rivers ranked for display at approximately 1:5,000,000 and larger scales.
 Zooms 14–16 supplement it with non-overlapping 1:1,000,000–1:5,000,000

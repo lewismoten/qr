@@ -14,6 +14,9 @@ const LOCAL_ROAD_WHERE =
   'RTTYP%3D%27C%27%20OR%20RTTYP%3D%27O%27%20OR%20' +
   '%28RTTYP%3D%27M%27%20AND%20STGEOMETRY_Length%3E%3D10000%29';
 const MAIN_ROAD_WHERE = 'BASENAME%3D%27Main%27';
+const DETAIL_ROAD_WHERE =
+  'RTTYP%3D%27M%27%20AND%20STGEOMETRY_Length%3E%3D8500%20AND%20' +
+  'STGEOMETRY_Length%3C10000';
 
 const RAILROAD_ROOT =
   'https://tigerweb.geo.census.gov/arcgis/rest/services/' +
@@ -127,6 +130,19 @@ export function createDetailSources(maximumZoom) {
       maximumFeatures: 600000,
       minimumZoom: 16,
       maximumZoom,
+      kind: 'line',
+    },
+    detailedLocalRoads: {
+      file: 'census/census_2025_detailed_local_roads_42k.geojsonseq',
+      url: transportationUrl(7, 0.000025, 5, DETAIL_ROAD_WHERE),
+      idsUrl: transportationIdsUrl(7, DETAIL_ROAD_WHERE),
+      objectIdPagination: true,
+      cacheFormat: 'geojsonseq',
+      parallelPages: 4,
+      pageSize: 2000,
+      maximumFeatures: 36000,
+      minimumZoom: 17,
+      maximumZoom: 17,
       kind: 'line',
     },
     railroadsOverview: {
