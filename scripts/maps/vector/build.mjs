@@ -2,8 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { validateVectorLayers } from './prepare.mjs';
-import { prepareVectorInputs } from './prepare.mjs';
+import { prepareVectorInputs, validateVectorLayers } from './prepare.mjs';
 import {
   availableLevelBudget,
   archiveManifestPath,
@@ -151,14 +150,15 @@ async function buildLevel(level, allocatedBudgetBytes) {
   };
 
   for (let attempt = 1; attempt <= 5; attempt += 1) {
-    const zoom = levelLabel(level);
+    const scope = level.shard ? 'quadrant' : 'zoom';
     const tileLimit =
       settings.maximumTileBytes == null
         ? 'no tile ceiling (recovery)'
         : `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
     console.log(
-      `Building ${zoom}, attempt ${attempt}, ` +
-        `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
+      `Building ${levelLabel(level)}, attempt ${attempt}, ` +
+        `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB ` +
+        `${scope} budget, ` +
         `${tileLimit}...`,
     );
     let result;

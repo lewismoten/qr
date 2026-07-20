@@ -89,7 +89,7 @@ test('splits detailed zooms into four budget-preserving quadrants', () => {
   );
 });
 
-test('passes unused space and unavoidable debt between levels', () => {
+test('passes surplus without shrinking initial budgets for debt', () => {
   let carryBytes = updateBudgetCarry({
     carryBytes: 0,
     plannedBytes: 100,
@@ -117,7 +117,7 @@ test('passes unused space and unavoidable debt between levels', () => {
       carryBytes,
       minimumLevelBytes: 8,
     }),
-    8,
+    10,
   );
 });
 

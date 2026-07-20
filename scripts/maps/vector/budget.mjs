@@ -79,7 +79,8 @@ export function availableLevelBudget({
   carryBytes,
   minimumLevelBytes,
 }) {
-  return Math.max(minimumLevelBytes, plannedBytes + carryBytes);
+  const availableSurplus = Math.max(0, carryBytes);
+  return Math.max(minimumLevelBytes, plannedBytes + availableSurplus);
 }
 
 export function updateBudgetCarry({ carryBytes, plannedBytes, actualBytes }) {
