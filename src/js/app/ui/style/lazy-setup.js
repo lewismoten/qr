@@ -6,7 +6,10 @@ export function createLazyStyleSetup(options) {
   const ensure = () => {
     if (controller) return Promise.resolve(controller);
     if (!request) {
-      request = Promise.all([import('./setup.js'), import('./elements.js')])
+      request = Promise.all([
+        import('./style-setup.js'),
+        import('./style-elements.js'),
+      ])
         .then(([{ createStyleSetup }, { getStyleElements }]) => {
           getElements = getStyleElements;
           featureElements = getStyleElements(options.document);

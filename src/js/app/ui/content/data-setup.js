@@ -35,7 +35,7 @@ export function createContentDataSetup(options) {
     if (file) return Promise.resolve(file);
     if (!fileRequest) {
       fileRequest = loading
-        .track(import('./file/lazy-setup.js'))
+        .track(import('./file/file-lazy-setup.js'))
         .then(({ createLazyFileSystem }) => createLazyFileSystem(options))
         .then((system) => {
           file = system;
@@ -54,7 +54,7 @@ export function createContentDataSetup(options) {
       bulkRequest = loading
         .track(
           ensurePanelFragment(document.getElementById('bulk-fields')).then(
-            () => import('./bulk/lazy-setup.js'),
+            () => import('./bulk/bulk-lazy-setup.js'),
           ),
         )
         .then(({ createLazyBulkSystem }) =>

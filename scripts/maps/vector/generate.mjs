@@ -51,7 +51,7 @@ try {
   stageStarted = Date.now();
   console.log('Stage 2/2: building the MVT PMTiles archive');
   log.record('stage-start', { stage: 'build' });
-  await run(path.join(directory, 'build.mjs'), buildArgs, {
+  await run(path.join(directory, 'build-vector-tiles.mjs'), buildArgs, {
     ...process.env,
     MAP_LOG_PARENT: '1',
   });

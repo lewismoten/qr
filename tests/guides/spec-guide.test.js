@@ -20,7 +20,7 @@ describe('specification guide', () => {
   test('keeps the footer visible without covering page content', async () => {
     const [html, base, references] = await Promise.all([
       read('src/html/spec.html'),
-      read('src/css/spec/base.css'),
+      read('src/css/spec/spec-base.css'),
       read('src/css/spec/references.css'),
     ]);
     assert.match(html, /<footer class="spec-footer">/);
@@ -33,7 +33,7 @@ describe('specification guide', () => {
   test('shares the mask-preview blue throughout its visuals', async () => {
     const sources = await Promise.all([
       read('src/html/spec.html'),
-      read('src/css/spec/base.css'),
+      read('src/css/spec/spec-base.css'),
       read('src/js/spec/visual-models.js'),
       read('src/js/app/ui/debug/mask-selector.js'),
     ]);

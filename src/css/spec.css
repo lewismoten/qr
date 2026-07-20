@@ -1,4 +1,4 @@
-@import './spec/base.css';
+@import './spec/spec-base.css';
 @import './components/resource-language.css';
 @import './spec/shell.css';
 @import './spec/visuals.css';
@@ -8,4 +8,4 @@
 @import './spec/references.css';
 @import './spec/responsive.css';
 @import './spec/print.css';
-@import './spec/handbook.css';
+@import './spec/spec-handbook.css';

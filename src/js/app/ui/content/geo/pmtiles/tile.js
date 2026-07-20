@@ -1,6 +1,6 @@
 import { getFallbackTile } from '../tile-fallback.js';
 import { setTileDebugCoordinates } from '../data/tile-debug.js';
-import { renderMvt } from '../mvt/render.js';
+import { renderMvt } from '../mvt/mvt-renderer.js';
 import { TILE_SIZE } from '../projection.js';
 
 export async function findPmtilesTile({

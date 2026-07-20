@@ -68,7 +68,7 @@ export async function startApplication({
     window.location.hash.includes('download=1') &&
     window.location.hash.includes('data=')
   ) {
-    import('../download/location.js')
+    import('../download/download-location.js')
       .then(({ restoreLocationDownload }) =>
         restoreLocationDownload({ window, document }),
       )

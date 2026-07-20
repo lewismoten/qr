@@ -1,5 +1,5 @@
 import { createBulkImportSection } from './section.js';
-import { getBulkElements } from './elements.js';
+import { getBulkElements } from './bulk-elements.js';
 import { setupFilePicker } from '../../file-picker.js';
 
 export function createLazyBulkSystem({

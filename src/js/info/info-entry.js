@@ -1,7 +1,7 @@
 import { setupExternalLinks } from '../external-links.js';
 import { localizeDates } from '../i18n/date.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
-import { setupHandbookExports } from './handbook/setup.js';
+import { setupHandbookExports } from './handbook/handbook-setup.js';
 
 function syncLanguageSwitcher(locale) {
   document.querySelectorAll('.guide-language-switcher').forEach((switcher) => {

@@ -79,7 +79,7 @@ const builds = [
   },
   {
     ...shared,
-    entryPoints: ['src/js/spec/main.js'],
+    entryPoints: ['src/js/spec/spec-entry.js'],
     outfile: 'dist/spec.min.js',
     format: 'esm',
     platform: 'browser',
@@ -87,7 +87,7 @@ const builds = [
   },
   {
     ...shared,
-    entryPoints: ['src/js/info/main.js'],
+    entryPoints: ['src/js/info/info-entry.js'],
     outfile: 'dist/info.min.js',
     format: 'esm',
     platform: 'browser',

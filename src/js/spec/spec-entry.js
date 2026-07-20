@@ -7,7 +7,7 @@ import {
 import { isFunctionModule } from '../app/qr/qr-regions.js';
 import { setupExternalLinks } from '../external-links.js';
 import { initializeLanguage, translateDocument } from '../i18n/index.js';
-import { setupHandbookExports } from '../info/handbook/setup.js';
+import { setupHandbookExports } from '../info/handbook/handbook-setup.js';
 import { renderEncodingExamples } from './encoding-examples.js';
 import { COLORS, getVisuals } from './visual-models.js';
 

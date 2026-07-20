@@ -5,7 +5,7 @@ import { getErrorText, lookup } from '../../../../i18n/index.js';
 import { createLocalizedError } from '../../../../localized-error.js';
 import { refreshFilePicker } from '../../file-picker.js';
 import { isAbortError, readCsvText, throwIfAborted } from './csv-reader.js';
-import { serializeBulkRow } from './payload.js';
+import { serializeBulkRow } from './bulk-payload.js';
 import {
   BULK_FORMAT_SCHEMAS,
   MAX_BULK_FILE_BYTES,

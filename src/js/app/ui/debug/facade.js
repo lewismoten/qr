@@ -16,9 +16,9 @@ export function createDebugFacade(options) {
     if (controller) return Promise.resolve(controller);
     if (!request) {
       request = Promise.all([
-        import('./setup/lazy-setup.js'),
+        import('./setup/debug-lazy-setup.js'),
         import('../help-popovers.js'),
-        import('./elements.js'),
+        import('./debug-elements.js'),
       ])
         .then(
           ([

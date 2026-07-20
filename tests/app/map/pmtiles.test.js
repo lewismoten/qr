@@ -25,7 +25,7 @@ import {
   getPlaceLimit,
   renderMvt,
   sortPlaces,
-} from '../../../src/js/app/ui/content/geo/mvt/render.js';
+} from '../../../src/js/app/ui/content/geo/mvt/mvt-renderer.js';
 
 function varint(value) {
   const bytes = [];

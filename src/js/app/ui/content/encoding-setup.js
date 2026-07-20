@@ -1,5 +1,5 @@
 import { createContentPipeline } from './pipeline.js';
-import { createQrConfiguration } from '../encoding/configuration.js';
+import { createQrConfiguration } from '../encoding/encoding-configuration.js';
 
 export function createContentEncodingSetup({
   document,

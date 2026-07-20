@@ -43,8 +43,8 @@ export function createLazyDownloadSetup({
     if (!request) {
       request = Promise.all([
         loadFeatureStylesheet('download'),
-        import('../download/application-setup.js'),
-        import('../download/elements.js'),
+        import('../download/download-application.js'),
+        import('../download/download-elements.js'),
       ])
         .then(
           ([, { createApplicationDownloadSetup }, { getDownloadElements }]) => {

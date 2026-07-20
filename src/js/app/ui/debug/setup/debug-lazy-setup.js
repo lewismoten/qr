@@ -36,7 +36,7 @@ export function createLazyDebugSetup(options) {
     loadOnce('encoding', () =>
       Promise.all([
         loadFeatureStylesheet('debug-encoding'),
-        import('./encoding-setup.js'),
+        import('./debug-encoding-setup.js'),
       ]).then(([, { createDebugEncodingSetup }]) => {
         diagnostics = createDebugEncodingSetup(options);
         return diagnostics;

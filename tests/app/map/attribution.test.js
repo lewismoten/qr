@@ -5,7 +5,7 @@ import {
   hasVisibleUsgsData,
   hasUsgsTile,
 } from '../../../src/js/app/ui/content/geo/data/attribution.js';
-import { isMvtFeatureVisible } from '../../../src/js/app/ui/content/geo/mvt/render.js';
+import { isMvtFeatureVisible } from '../../../src/js/app/ui/content/geo/mvt/mvt-renderer.js';
 import * as ui from '../../../src/js/app/ui/content/geo/slippy-elements.js';
 
 const censusView = {

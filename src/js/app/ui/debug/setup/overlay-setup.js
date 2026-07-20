@@ -3,7 +3,7 @@ import {
   drawCodewordOutlines,
   drawHighlightedBoundaries,
 } from '../boundaries.js';
-import { getDebugColorElements } from '../colors.js';
+import { getDebugColorElements } from '../debug-colors.js';
 import {
   buildDebugOverlayModel,
   getDebugCategory,

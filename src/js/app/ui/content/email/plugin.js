@@ -1,4 +1,4 @@
-import { createEmailCapacityFromDocument } from './capacity.js';
+import { createEmailCapacityFromDocument } from './email-capacity.js';
 import { validateEmail } from './validation.js';
 
 export function createEmailPlugin({

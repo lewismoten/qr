@@ -19,7 +19,7 @@
     "locales:build": "node scripts/locales/build.mjs",
     "locales:split": "node scripts/locales/split.mjs",
     "maps:download": "node scripts/maps/sources/download.mjs",
-    "maps:build": "node scripts/maps/vector/build.mjs",
+    "maps:build": "node scripts/maps/vector/build-vector-tiles.mjs",
     "maps:build:svg": "node scripts/maps/build-svg-tiles.mjs",
     "maps:generate": "node scripts/maps/vector/generate.mjs",
     "maps:generate:svg": "node scripts/maps/generate/all.mjs",

@@ -1,4 +1,4 @@
-import { createNavigation } from './setup.js';
+import { createNavigation } from './navigation-setup.js';
 
 export function createApplicationNavigation({
   document,

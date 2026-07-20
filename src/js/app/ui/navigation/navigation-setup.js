@@ -72,7 +72,7 @@ export function createNavigation({
   const ensureStyleSubtabs = () =>
     ensureSubtabs(
       'style',
-      () => import('../style/subtabs.js'),
+      () => import('../style/style-subtabs.js'),
       (module, elements) =>
         module.createStyleSubtabs({
           ...elements,
