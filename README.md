@@ -151,10 +151,11 @@ across systems.
 
 Locale sources live in `locales` and are listed in `locales/manifest.json`.
 Root locale files hold top-level values. Each subfolder becomes an object key,
-so `locales/content/en-US.json` supplies the value of `content`. Subfolders work
-recursively; `locales/content/email/es.json` supplies `content.email` for
-Spanish. Fragment files contain the value itself, without repeating the folder
-key.
+so `locales/content/content-en-US.json` supplies the value of `content`.
+Subfolders work recursively; `locales/content/email/content-email-es.json`
+supplies `content.email` for Spanish. The namespace in each filename keeps it
+unique across the repository. Fragment files contain the value itself, without
+repeating the folder key.
 
 Build complete browser resources or split additional object keys with:
 

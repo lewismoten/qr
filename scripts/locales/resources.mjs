@@ -1,6 +1,8 @@
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { localeSourcePath } from './locale-source-name.mjs';
+
 function isObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -14,27 +16,27 @@ async function readJson(file, optional = false) {
   }
 }
 
-async function assembleDirectory(directory, locale) {
-  const source = await readJson(path.join(directory, `${locale}.json`), true);
+async function assembleDirectory(directory, locale, sourceRoot) {
+  const sourceFile = localeSourcePath(directory, locale, sourceRoot);
+  const source = await readJson(sourceFile, true);
   const entries = await readdir(directory, { withFileTypes: true });
   const folders = entries
     .filter((entry) => entry.isDirectory())
     .sort((left, right) => left.name.localeCompare(right.name));
   const result = source === undefined ? {} : source;
   if (!isObject(result) && folders.length) {
-    throw new Error(`${directory}/${locale}.json must contain an object.`);
+    throw new Error(`${sourceFile} must contain an object.`);
   }
   let found = source !== undefined;
   for (const folder of folders) {
     const child = await assembleDirectory(
       path.join(directory, folder.name),
       locale,
+      sourceRoot,
     );
     if (child === undefined) continue;
     if (Object.hasOwn(result, folder.name)) {
-      throw new Error(
-        `${directory}/${locale}.json duplicates folder key ${folder.name}.`,
-      );
+      throw new Error(`${sourceFile} duplicates folder key ${folder.name}.`);
     }
     result[folder.name] = child;
     found = true;
@@ -47,7 +49,7 @@ export async function readLocaleManifest(sourceRoot = 'locales') {
 }
 
 export async function assembleLocaleResource(locale, sourceRoot = 'locales') {
-  const resource = await assembleDirectory(sourceRoot, locale);
+  const resource = await assembleDirectory(sourceRoot, locale, sourceRoot);
   if (!isObject(resource)) {
     throw new Error(`No locale source found for ${locale}.`);
   }

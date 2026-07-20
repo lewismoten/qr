@@ -3,6 +3,7 @@ import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 
 import { assembleLocaleResource, readLocaleManifest } from './resources.mjs';
+import { localeSourcePath } from './locale-source-name.mjs';
 
 const DEFAULT_KEYS = [
   'bulk',
@@ -42,8 +43,13 @@ async function splitLocale(locale, sourceRoot, keyPaths) {
     const key = parts.at(-1);
     const parent = parts.slice(0, -1);
     const parentDirectory = path.join(sourceRoot, ...parent);
-    const parentFile = path.join(parentDirectory, `${locale}.json`);
-    const destination = path.join(sourceRoot, ...parts, `${locale}.json`);
+    const destinationDirectory = path.join(sourceRoot, ...parts);
+    const parentFile = localeSourcePath(parentDirectory, locale, sourceRoot);
+    const destination = localeSourcePath(
+      destinationDirectory,
+      locale,
+      sourceRoot,
+    );
     const source = await readObject(parentFile);
     if (!Object.hasOwn(source, key)) continue;
     const value = getValue(before, parts);

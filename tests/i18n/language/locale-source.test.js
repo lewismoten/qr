@@ -9,6 +9,10 @@ import {
   buildLocaleResources,
   readLocaleManifest,
 } from '../../../scripts/locales/resources.mjs';
+import {
+  localeFromSourceFilename,
+  localeSourcePath,
+} from '../../../scripts/locales/locale-source-name.mjs';
 
 const sourceRoot = 'locales';
 const maximumLines = 300;
@@ -30,9 +34,7 @@ async function findJson(directory) {
 
 test('locale source JSON stays split into manageable files', async () => {
   const manifest = await readLocaleManifest(sourceRoot);
-  const localeNames = new Set(
-    manifest.locales.map((entry) => `${entry.code || entry}.json`),
-  );
+  const locales = manifest.locales.map((entry) => entry.code || entry);
   for (const file of await findJson(sourceRoot)) {
     const source = await readFile(file, 'utf8');
     const lines = source
@@ -41,7 +43,7 @@ test('locale source JSON stays split into manageable files', async () => {
     assert.ok(lines <= maximumLines, `${file} exceeds ${maximumLines} lines`);
     if (path.basename(file) !== 'manifest.json') {
       assert.ok(
-        localeNames.has(path.basename(file)),
+        localeFromSourceFilename(path.basename(file), locales),
         `${file} is not a locale`,
       );
     }
@@ -50,18 +52,18 @@ test('locale source JSON stays split into manageable files', async () => {
 
 test('locale folders recursively become assembled object keys', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-locales-'));
-  await writeFile(path.join(root, 'en-US.json'), '{"root":"value"}');
+  await writeFile(localeSourcePath(root, 'en-US', root), '{"root":"value"}');
   await writeFile(
     path.join(root, 'manifest.json'),
     '{"locales":[{"code":"en-US"}]}',
   );
   await mkdir(path.join(root, 'content', 'email'), { recursive: true });
   await writeFile(
-    path.join(root, 'content', 'en-US.json'),
+    localeSourcePath(path.join(root, 'content'), 'en-US', root),
     '{"title":"Content"}',
   );
   await writeFile(
-    path.join(root, 'content', 'email', 'en-US.json'),
+    localeSourcePath(path.join(root, 'content', 'email'), 'en-US', root),
     '{"subject":"Subject"}',
   );
 

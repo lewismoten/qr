@@ -147,17 +147,26 @@ async function loadOptionalTranslations(file) {
   }
 }
 
+function guideTranslationFile(directory, locale, reviewed = false) {
+  const suffix = reviewed ? '-reviewed' : '';
+  return `${directory}/guides-${locale}${suffix}.json`;
+}
+
+function scopedTranslationFile(directory, locale, scope) {
+  const namespace = scope.replaceAll('/', '-');
+  return `${directory}/${namespace}/` + `${namespace}-${locale}-reviewed.json`;
+}
+
 export async function loadGuideTranslationSet(directory, locale, scope) {
   const translations = await loadGuideTranslations(
-    `${directory}/${locale}.json`,
+    guideTranslationFile(directory, locale),
   );
   const reviewed = await loadOptionalTranslations(
-    `${directory}/${locale}.reviewed.json`,
+    guideTranslationFile(directory, locale, true),
   );
   const scoped = scope
     ? await loadOptionalTranslations(
-        `${directory}/${scope.replaceAll('/', '-')}/` +
-          `${locale}.reviewed.json`,
+        scopedTranslationFile(directory, locale, scope),
       )
     : {};
   return includeNormalizedKeys({ ...translations, ...reviewed, ...scoped });

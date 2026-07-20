@@ -16,7 +16,7 @@
     "benchmark:quick": "node --expose-gc scripts/run-benchmarks.mjs --quick",
     "favicon": "node scripts/generate-favicon.mjs",
     "guides:localize": "node scripts/guides/generate-localized-guides.mjs",
-    "locales:build": "node scripts/locales/build.mjs",
+    "locales:build": "node scripts/locales/build-locales.mjs",
     "locales:split": "node scripts/locales/split.mjs",
     "maps:download": "node scripts/maps/sources/download.mjs",
     "maps:build": "node scripts/maps/vector/build-vector-tiles.mjs",

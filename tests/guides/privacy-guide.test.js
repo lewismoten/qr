@@ -21,10 +21,13 @@ function stripLanguageSwitcher(source) {
 
 test('reviewed translations include only known or privacy prose', async () => {
   const machine = JSON.parse(
-    await readFile(`${sourceRoot}/translations/es.json`, 'utf8'),
+    await readFile(`${sourceRoot}/translations/guides-es.json`, 'utf8'),
   );
   const reviewed = JSON.parse(
-    await readFile(`${sourceRoot}/translations/es.reviewed.json`, 'utf8'),
+    await readFile(
+      `${sourceRoot}/translations/guides-es-reviewed.json`,
+      'utf8',
+    ),
   );
   const translations = await loadGuideTranslationSet(
     `${sourceRoot}/translations`,

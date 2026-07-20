@@ -9,9 +9,7 @@ const ignoredDirectories = new Set([
   '.git',
   'build',
   'dist',
-  'locales',
   'node_modules',
-  'translations',
 ]);
 
 async function collectFiles(directory, files = []) {
