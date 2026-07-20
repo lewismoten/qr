@@ -109,12 +109,17 @@
   width: min(38rem, calc(100vw - 2rem));
   max-height: min(42rem, calc(100dvh - 2rem));
   padding: 0;
-  overflow: auto;
+  overflow: hidden;
   border: 1px solid rgba(19, 34, 53, 0.18);
   border-radius: 1.1rem;
   color: var(--ink);
   background: var(--paper);
   box-shadow: 0 1.5rem 4rem rgba(7, 24, 39, 0.32);
+}
+
+.fragment-help-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .fragment-help-dialog::backdrop {
@@ -124,8 +129,11 @@
 
 .fragment-help-dialog-content {
   display: grid;
+  min-height: 0;
+  overflow-y: auto;
   gap: 1rem;
-  padding: 1.25rem 1.25rem 0.5rem;
+  padding: 1.25rem;
+  overscroll-behavior: contain;
 }
 
 .fragment-help-dialog-content section {
@@ -133,16 +141,30 @@
   gap: 0.55rem;
 }
 
+.fragment-help-header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(19, 34, 53, 0.12);
+  background: var(--paper);
+}
+
+.fragment-help-header h2,
 .fragment-help-dialog-content h2,
 .fragment-help-dialog-content p {
   margin: 0;
 }
 
-.fragment-help-close {
+.fragment-help-footer {
   position: sticky;
+  z-index: 10;
   bottom: 0;
-  float: right;
-  margin: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid rgba(19, 34, 53, 0.12);
+  background: var(--paper);
 }
 
 @keyframes module-loading-spin {

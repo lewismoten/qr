@@ -89,6 +89,9 @@ describe('fragment help', () => {
     assert.equal(panel.children.at(-2), link);
     assert.equal(dialog.tagName, 'dialog');
     assert.match(dialog.attributes.get('aria-labelledby'), /^fragment-help-/);
+    assert.equal(dialog.children[0].tagName, 'header');
+    assert.equal(dialog.children[1].tagName, 'div');
+    assert.equal(dialog.children[2].tagName, 'footer');
 
     let prevented = false;
     link.listeners.get('click')({
@@ -98,8 +101,8 @@ describe('fragment help', () => {
     });
     assert.equal(prevented, true);
     assert.equal(dialog.open, true);
-    assert.equal(initializedContent, dialog.children[0]);
-    dialog.children[1].listeners.get('click')();
+    assert.equal(initializedContent, dialog.children[1]);
+    dialog.children[2].children[0].listeners.get('click')();
     assert.equal(dialog.open, false);
   });
 

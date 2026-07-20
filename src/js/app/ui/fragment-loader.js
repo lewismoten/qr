@@ -34,10 +34,14 @@ function installFragmentHelp({
   if (!link || sources.length === 0) return;
 
   const dialog = document.createElement('dialog');
+  const header = document.createElement('header');
   const content = document.createElement('div');
+  const footer = document.createElement('footer');
   const close = document.createElement('button');
   dialog.className = 'fragment-help-dialog';
+  header.className = 'fragment-help-header';
   content.className = 'fragment-help-dialog-content';
+  footer.className = 'fragment-help-footer';
   close.className = 'secondary-button fragment-help-close';
   close.type = 'button';
   close.textContent = lookup('common.close', 'Close');
@@ -49,6 +53,8 @@ function installFragmentHelp({
   const heading = content.querySelector('h2');
   helpDialogId += 1;
   heading.id = 'fragment-help-title-' + helpDialogId;
+  header.append(heading);
+  footer.append(close);
   dialog.setAttribute('aria-labelledby', heading.id);
   close.addEventListener('click', () => dialog.close());
   link.addEventListener('click', (event) => {
@@ -56,7 +62,7 @@ function installFragmentHelp({
     dialog.showModal();
     initializeFeatures(content);
   });
-  dialog.append(content, close);
+  dialog.append(header, content, footer);
   panel.append(dialog);
 }
 
