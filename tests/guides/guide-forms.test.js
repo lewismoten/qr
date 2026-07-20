@@ -82,7 +82,10 @@ describe('standalone guide forms', () => {
     assert.match(geo, /src="\/maps\/world\.svg"/);
     assert.match(world, /class="geo-world-land"/);
     assert.match(world, /viewBox="0 0 1000 500"/);
-    assert.match(geo, /id="geo-world-map"/);
+    assert.match(
+      geo,
+      /id="geo-world-map"[\s\S]*?class="[^"]*is-map-visible[^"]*"/,
+    );
     assert.match(geo, /id="geo-map"[\s\S]*?hidden/);
     assert.match(geo, /id="geo-map-consent"/);
     assert.match(geo, /id="geo-map-never-ask"/);
