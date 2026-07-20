@@ -21,6 +21,7 @@ test('throttles repetitive map progress while preserving other messages', () => 
   time = 100;
   output.writeLine('Read 2.4 million features');
   output.writeLine('43.9% 5/8/12');
+  output.writeLine('Reordering geometry: 98%');
   output.writeLine('A useful warning');
 
   assert.deepEqual(lines, ['Read 1.2 million features', 'A useful warning']);
@@ -29,7 +30,7 @@ test('throttles repetitive map progress while preserving other messages', () => 
   assert.deepEqual(lines, [
     'Read 1.2 million features',
     'A useful warning',
-    '43.9% 5/8/12',
+    'Reordering geometry: 98%',
   ]);
   output.finish();
 });

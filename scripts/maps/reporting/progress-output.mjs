@@ -3,6 +3,7 @@ const DEFAULT_INTERVAL_MS = 1500;
 function isProgressLine(line) {
   return (
     /^Read [\d.]+(?: thousand| million)? features/i.test(line) ||
+    /^Reordering geometry:\s*\d+(?:\.\d+)?%/i.test(line) ||
     /^\s*\d+(?:\.\d+)?%\s+\d+\/\d+\/\d+/.test(line)
   );
 }
