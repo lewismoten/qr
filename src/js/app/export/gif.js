@@ -30,6 +30,8 @@ const GIF_DELAY_LIMIT = 65535;
 const MILLISECONDS_PER_GIF_DELAY = 10;
 const ANIMATED_GRAPHICS_FLAGS = 9;
 const CENTER_DIVISOR = 2;
+const GIF_IMAGE_LEFT = 0;
+const GIF_IMAGE_TOP = 0;
 
 function getGifPaletteAndIndexes(stage, context) {
   const palette = new Uint8Array(COLOR_TABLE_SIZE * RGB_CHANNEL_COUNT);
@@ -92,8 +94,8 @@ export function createGifBlob(sourceCanvas) {
     0,
     GIF_IMAGE_DESCRIPTOR,
   );
-  pushUint16LE(bytes, 0);
-  pushUint16LE(bytes, 0);
+  pushUint16LE(bytes, GIF_IMAGE_LEFT);
+  pushUint16LE(bytes, GIF_IMAGE_TOP);
   pushUint16LE(bytes, sourceCanvas.width);
   pushUint16LE(bytes, sourceCanvas.height);
   bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);
@@ -188,8 +190,8 @@ export async function createAnimatedGifBlob(
     );
     pushUint16LE(bytes, delay);
     bytes.push(0, 0, GIF_IMAGE_DESCRIPTOR);
-    pushUint16LE(bytes, 0);
-    pushUint16LE(bytes, 0);
+    pushUint16LE(bytes, GIF_IMAGE_LEFT);
+    pushUint16LE(bytes, GIF_IMAGE_TOP);
     pushUint16LE(bytes, stage.width);
     pushUint16LE(bytes, stage.height);
     bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);

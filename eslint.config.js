@@ -23,6 +23,15 @@ export default [
     },
     rules: {
       'no-magic-numbers': ['warn', magicNumberOptions],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'CallExpression[callee.name=/^pushUint(?:16|32)LE$/] > Literal',
+          message:
+            'Pass a named constant to integer writers so the field is clear.',
+        },
+      ],
     },
   },
   {
