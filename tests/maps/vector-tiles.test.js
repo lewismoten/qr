@@ -6,6 +6,7 @@ import { test } from 'node:test';
 
 import { tippecanoeArguments } from '../../scripts/maps/vector/command.mjs';
 import {
+  smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
 } from '../../scripts/maps/vector/output.mjs';
@@ -207,6 +208,10 @@ test('preserves PMTiles through temporary output validation', async () => {
     assert.equal(
       temporaryArchivePath(path.join(root, 'local.pmtiles')),
       archive,
+    );
+    assert.equal(
+      smallestArchivePath(path.join(root, 'local.pmtiles')),
+      path.join(root, 'local.smallest.pmtiles'),
     );
     assert.equal(await validatePmtilesArchive(archive, 1024), bytes.length);
     await assert.rejects(() => validatePmtilesArchive(archive, 4), /budget is/);

@@ -8,6 +8,11 @@ export function temporaryArchivePath(output) {
   return path.join(parsed.dir, `${parsed.name}.partial${parsed.ext}`);
 }
 
+export function smallestArchivePath(output) {
+  const parsed = path.parse(output);
+  return path.join(parsed.dir, `${parsed.name}.smallest${parsed.ext}`);
+}
+
 export async function validatePmtilesArchive(file, maximumBytes) {
   const handle = await open(file, 'r');
   try {

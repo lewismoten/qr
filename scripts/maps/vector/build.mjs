@@ -12,7 +12,11 @@ import {
   updateBudgetCarry,
 } from './budget.mjs';
 import { tippecanoeArguments } from './command.mjs';
-import { temporaryArchivePath, validatePmtilesArchive } from './output.mjs';
+import {
+  smallestArchivePath,
+  temporaryArchivePath,
+  validatePmtilesArchive,
+} from './output.mjs';
 
 const values = process.argv.slice(2);
 
@@ -130,7 +134,11 @@ async function runLevel(level, settings) {
       observedBytes = (await stat(temporary).catch(() => ({ size: 0 }))).size;
       if (observedBytes > workingLimit) resolve();
       else if (code === 0) resolve();
-      else reject(new Error(`Tippecanoe stopped by ${signal || code}.`));
+      else {
+        const error = new Error(`Tippecanoe stopped by ${signal || code}.`);
+        error.exitCode = code;
+        reject(error);
+      }
     });
   });
   return { temporary, observedBytes };
@@ -138,7 +146,20 @@ async function runLevel(level, settings) {
 
 async function buildLevel(level, allocatedBudgetBytes) {
   const allocation = { ...level, budgetBytes: allocatedBudgetBytes };
+  const smallestFile = smallestArchivePath(level.file);
+  await rm(smallestFile, { force: true });
+  let best = null;
   let settings = { maximumTileBytes, detail };
+
+  const acceptSmallest = () => {
+    const debt = (best.bytes - allocatedBudgetBytes) / 1024 / 1024;
+    console.warn(
+      `Zoom ${level.minimumZoom} reached its compaction limit; ` +
+        `carrying ${debt.toFixed(1)} MiB debt.`,
+    );
+    return best;
+  };
+
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const zoom = `z${level.minimumZoom}`;
     console.log(
@@ -146,12 +167,22 @@ async function buildLevel(level, allocatedBudgetBytes) {
         `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
         `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles...`,
     );
-    const result = await runLevel(allocation, settings);
-    if (result.observedBytes <= allocatedBudgetBytes) {
-      const bytes = await validatePmtilesArchive(
-        result.temporary,
-        allocatedBudgetBytes,
-      );
+    let result;
+    try {
+      result = await runLevel(allocation, settings);
+    } catch (error) {
+      if (error.exitCode === 100 && best) {
+        await rm(temporaryArchivePath(level.file), { force: true });
+        return acceptSmallest();
+      }
+      throw error;
+    }
+    const bytes = await validatePmtilesArchive(
+      result.temporary,
+      Number.MAX_SAFE_INTEGER,
+    );
+    if (bytes <= allocatedBudgetBytes) {
+      await rm(smallestFile, { force: true });
       return {
         ...level,
         ...settings,
@@ -160,41 +191,40 @@ async function buildLevel(level, allocatedBudgetBytes) {
         temporary: result.temporary,
       };
     }
+    if (!best || bytes < best.bytes) {
+      await rm(smallestFile, { force: true });
+      await rename(result.temporary, smallestFile);
+      best = {
+        ...level,
+        ...settings,
+        allocatedBudgetBytes,
+        bytes,
+        temporary: smallestFile,
+      };
+    } else {
+      await rm(result.temporary, { force: true });
+    }
     const next = compactBuildSettings({
       ...settings,
       budgetBytes: allocatedBudgetBytes,
-      observedBytes: result.observedBytes,
+      observedBytes: bytes,
     });
     const smallest =
       attempt === 5 ||
       (next.maximumTileBytes === settings.maximumTileBytes &&
         next.detail === settings.detail);
     if (smallest) {
-      const bytes = await validatePmtilesArchive(
-        result.temporary,
-        Number.MAX_SAFE_INTEGER,
-      );
-      console.warn(
-        `Zoom ${level.minimumZoom} cannot reach its allocation; ` +
-          `carrying ${((bytes - allocatedBudgetBytes) / 1024 / 1024).toFixed(
-            1,
-          )} MiB debt.`,
-      );
-      return {
-        ...level,
-        ...settings,
-        allocatedBudgetBytes,
-        bytes,
-        temporary: result.temporary,
-      };
+      return acceptSmallest();
     }
-    await rm(result.temporary, { force: true });
     settings = next;
   }
   throw new Error(`Unable to build zoom ${level.minimumZoom}.`);
 }
 
-const temporaryFiles = levels.map((level) => temporaryArchivePath(level.file));
+const temporaryFiles = levels.flatMap((level) => [
+  temporaryArchivePath(level.file),
+  smallestArchivePath(level.file),
+]);
 try {
   const results = [];
   let carryBytes = 0;
