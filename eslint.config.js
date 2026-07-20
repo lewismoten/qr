@@ -43,6 +43,20 @@ export default [
     ],
     rules: {
       'no-magic-numbers': ['error', magicNumberOptions],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'CallExpression[callee.name=/^pushUint(?:16|32)LE$/] > Literal',
+          message:
+            'Pass a named constant to integer writers so the field is clear.',
+        },
+        {
+          selector: "CallExpression[callee.property.name='push'] > Literal",
+          message:
+            'Pass named constants to byte-array push calls so fields are clear.',
+        },
+      ],
     },
   },
   {

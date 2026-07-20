@@ -32,6 +32,17 @@ const ANIMATED_GRAPHICS_FLAGS = 9;
 const CENTER_DIVISOR = 2;
 const GIF_IMAGE_LEFT = 0;
 const GIF_IMAGE_TOP = 0;
+const GIF_BACKGROUND_COLOR_INDEX = 0;
+const GIF_PIXEL_ASPECT_RATIO = 0;
+const GIF_SINGLE_GRAPHICS_FLAGS = 1;
+const GIF_NO_DELAY = 0;
+const GIF_TRANSPARENT_COLOR_INDEX = 0;
+const GIF_BLOCK_TERMINATOR = 0;
+const GIF_IMAGE_FLAGS = 0;
+const GIF_LOOP_SUBBLOCK_ID = 1;
+const GIF_LOOP_FOREVER = 0;
+const GIF_MINIMUM_DELAY = 1;
+const YIELD_DELAY_MS = 0;
 
 function getGifPaletteAndIndexes(stage, context) {
   const palette = new Uint8Array(COLOR_TABLE_SIZE * RGB_CHANNEL_COUNT);
@@ -81,29 +92,30 @@ export function createGifBlob(sourceCanvas) {
   pushUint16LE(bytes, sourceCanvas.height);
   bytes.push(
     GIF_PACKED_COLOR_TABLE,
-    0,
-    0,
+    GIF_BACKGROUND_COLOR_INDEX,
+    GIF_PIXEL_ASPECT_RATIO,
     ...palette,
     GIF_EXTENSION,
     GIF_GRAPHICS_CONTROL,
     GIF_GRAPHICS_BLOCK_SIZE,
-    1,
-    0,
-    0,
-    0,
-    0,
+    GIF_SINGLE_GRAPHICS_FLAGS,
+  );
+  pushUint16LE(bytes, GIF_NO_DELAY);
+  bytes.push(
+    GIF_TRANSPARENT_COLOR_INDEX,
+    GIF_BLOCK_TERMINATOR,
     GIF_IMAGE_DESCRIPTOR,
   );
   pushUint16LE(bytes, GIF_IMAGE_LEFT);
   pushUint16LE(bytes, GIF_IMAGE_TOP);
   pushUint16LE(bytes, sourceCanvas.width);
   pushUint16LE(bytes, sourceCanvas.height);
-  bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);
+  bytes.push(GIF_IMAGE_FLAGS, GIF_LZW_MINIMUM_CODE_SIZE);
   for (let offset = 0; offset < packed.length; offset += GIF_DATA_BLOCK_LIMIT) {
     const block = packed.slice(offset, offset + GIF_DATA_BLOCK_LIMIT);
     bytes.push(block.length, ...block);
   }
-  bytes.push(0, GIF_TRAILER);
+  bytes.push(GIF_BLOCK_TERMINATOR, GIF_TRAILER);
   return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
 }
 
@@ -151,7 +163,7 @@ export async function createAnimatedGifBlob(
   drawAnimationStageFrame(stage, frames[0], false, context);
   const { palette } = getGifPaletteAndIndexes(stage, context);
   const delay = Math.max(
-    1,
+    GIF_MINIMUM_DELAY,
     Math.min(
       GIF_DELAY_LIMIT,
       Math.round(frameDurationMs / MILLISECONDS_PER_GIF_DELAY),
@@ -162,19 +174,18 @@ export async function createAnimatedGifBlob(
   pushUint16LE(bytes, stage.height);
   bytes.push(
     GIF_PACKED_COLOR_TABLE,
-    0,
-    0,
+    GIF_BACKGROUND_COLOR_INDEX,
+    GIF_PIXEL_ASPECT_RATIO,
     ...palette,
     GIF_EXTENSION,
     GIF_APPLICATION_EXTENSION,
     GIF_APPLICATION_BLOCK_SIZE,
     ...textBytes('NETSCAPE2.0'),
     GIF_LOOP_BLOCK_SIZE,
-    1,
-    0,
-    0,
-    0,
+    GIF_LOOP_SUBBLOCK_ID,
   );
+  pushUint16LE(bytes, GIF_LOOP_FOREVER);
+  bytes.push(GIF_BLOCK_TERMINATOR);
 
   for (let frameIndex = 0; frameIndex < frames.length; frameIndex += 1) {
     throwIfAborted(signal);
@@ -189,12 +200,16 @@ export async function createAnimatedGifBlob(
       ANIMATED_GRAPHICS_FLAGS,
     );
     pushUint16LE(bytes, delay);
-    bytes.push(0, 0, GIF_IMAGE_DESCRIPTOR);
+    bytes.push(
+      GIF_TRANSPARENT_COLOR_INDEX,
+      GIF_BLOCK_TERMINATOR,
+      GIF_IMAGE_DESCRIPTOR,
+    );
     pushUint16LE(bytes, GIF_IMAGE_LEFT);
     pushUint16LE(bytes, GIF_IMAGE_TOP);
     pushUint16LE(bytes, stage.width);
     pushUint16LE(bytes, stage.height);
-    bytes.push(0, GIF_LZW_MINIMUM_CODE_SIZE);
+    bytes.push(GIF_IMAGE_FLAGS, GIF_LZW_MINIMUM_CODE_SIZE);
     for (
       let offset = 0;
       offset < packed.length;
@@ -203,9 +218,9 @@ export async function createAnimatedGifBlob(
       const block = packed.slice(offset, offset + GIF_DATA_BLOCK_LIMIT);
       bytes.push(block.length, ...block);
     }
-    bytes.push(0);
+    bytes.push(GIF_BLOCK_TERMINATOR);
     onProgress?.(frameIndex + 1, frames.length);
-    await waitFor(0, signal);
+    await waitFor(YIELD_DELAY_MS, signal);
   }
   bytes.push(GIF_TRAILER);
   return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });

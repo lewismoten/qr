@@ -9,6 +9,8 @@ const LETTER_HEIGHT_POINTS = 792;
 const SHEET_MARGIN_POINTS = 36;
 const SHEET_GAP_POINTS = 10;
 const DEFAULT_PRINT_WIDTH_INCHES = 1.65;
+const PDF_RESERVED_ROOT_OBJECTS = 2;
+const UNASSIGNED_PDF_OBJECT = null;
 
 export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const jpegBlob = await canvasToBlob(
@@ -141,10 +143,10 @@ export function createPdfSheetBlob(frames) {
     cellHeight,
     printWidth,
   } = getPdfSheetLayout(frames);
-  const objects = [null, null];
+  const objects = Array(PDF_RESERVED_ROOT_OBJECTS).fill(UNASSIGNED_PDF_OBJECT);
   const pageReferences = [];
   const reserveObject = () => {
-    objects.push(null);
+    objects.push(UNASSIGNED_PDF_OBJECT);
     return objects.length;
   };
   const setObject = (reference, value) => {
