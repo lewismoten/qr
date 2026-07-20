@@ -22,6 +22,8 @@ test('throttles repetitive map progress while preserving other messages', () => 
   output.writeLine('Read 2.4 million features');
   output.writeLine('43.9% 5/8/12');
   output.writeLine('Reordering geometry: 98%');
+  output.writeLine('Merging index');
+  output.writeLine('Merging string pool');
   output.writeLine('A useful warning');
 
   assert.deepEqual(lines, ['Read 1.2 million features', 'A useful warning']);
@@ -30,7 +32,7 @@ test('throttles repetitive map progress while preserving other messages', () => 
   assert.deepEqual(lines, [
     'Read 1.2 million features',
     'A useful warning',
-    'Reordering geometry: 98%',
+    'Merging string pool',
   ]);
   output.finish();
 });

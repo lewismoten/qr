@@ -7,6 +7,7 @@ function errorDetails(error) {
     message: error?.message || String(error),
     stack: error?.stack,
     exitCode: error?.exitCode,
+    noData: error?.noData,
     workingLimitExceeded: error?.workingLimitExceeded,
   };
 }
@@ -152,7 +153,7 @@ export function recordArchiveAttempt(
 }
 
 export function recordCompletedArchive(log, result, durationMs) {
-  log.record('archive-complete', {
+  log.record(result.empty ? 'archive-empty' : 'archive-complete', {
     zoom: result.minimumZoom,
     shard: result.shard,
     file: path.basename(result.file),
@@ -167,6 +168,7 @@ export function recordCompletedArchive(log, result, durationMs) {
     configuredDetail: result.detail,
     archiveStats: result.archiveStats,
     naturalArchiveStats: result.naturalArchiveStats,
+    empty: result.empty || undefined,
   });
 }
 

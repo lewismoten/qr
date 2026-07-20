@@ -10,6 +10,8 @@ import {
   createProgressOutput,
 } from '../reporting/progress-output.mjs';
 
+export const TIPPECANOE_NO_DATA_EXIT_CODE = 110;
+
 export function validateTippecanoeExecutable(executable) {
   const available = spawnSync(executable, ['--version'], {
     encoding: 'utf8',
@@ -98,9 +100,18 @@ export async function runTippecanoe({
       } else if (code === 0) {
         resolve();
       } else {
-        const error = new Error(`Tippecanoe stopped by ${signal || code}.`);
+        const noData = code === TIPPECANOE_NO_DATA_EXIT_CODE;
+        const reason = noData
+          ? `Tippecanoe found no visible data for ${zoom}.`
+          : `Tippecanoe stopped by ${signal || code}.`;
+        const error = new Error(reason);
         error.exitCode = code;
-        log?.recordError('tippecanoe-error', error, context);
+        error.noData = noData;
+        if (noData) {
+          log?.record('tippecanoe-no-data', context);
+        } else {
+          log?.recordError('tippecanoe-error', error, context);
+        }
         reject(error);
       }
     });

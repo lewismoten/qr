@@ -22,6 +22,16 @@ export function archiveCandidate({
   };
 }
 
+export function emptyArchiveCandidate(level, allocatedBudgetBytes) {
+  return {
+    ...level,
+    allocatedBudgetBytes,
+    bytes: 0,
+    naturalBytes: 0,
+    empty: true,
+  };
+}
+
 export function finalizeArchiveQuality(level, result) {
   const retainedRatio = result.bytes / result.naturalBytes;
   if (retainedRatio < 0.5) {

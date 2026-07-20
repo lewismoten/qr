@@ -15,6 +15,7 @@ import {
   archiveCandidate,
   archiveFitsSoftTarget,
   acceptCompactedArchive,
+  emptyArchiveCandidate,
   finalizeArchiveQuality,
   warnForNonBindingTileLimit,
 } from './lifecycle/archive-quality.mjs';
@@ -26,16 +27,16 @@ import {
 } from './budget.mjs';
 import { buildArchiveSchedule } from './scheduling/archive-scheduler.mjs';
 import { createLevelPlanner } from './scheduling/level-planner.mjs';
-import { tippecanoeArguments } from './command.mjs';
 import {
   readPmtilesArchiveStats as readArchiveStats,
   smallestArchivePath,
   temporaryArchivePath,
   validatePmtilesArchive,
 } from './output.mjs';
-import { runTippecanoe, validateTippecanoeExecutable } from './runner.mjs';
+import { validateTippecanoeExecutable } from './runner.mjs';
 import { levelShardLabel } from './shards.mjs';
 import { finalizeArchiveSet } from './lifecycle/archive-set.mjs';
+import { createLevelRunner } from './lifecycle/level-runner.mjs';
 const options = readVectorBuildOptions();
 const {
   values,
@@ -82,35 +83,14 @@ const levels = planArchiveLevels({
   growth: budgetGrowth,
   minimumLevelBytes,
 });
-async function runLevel(level, settings) {
-  const temporary = temporaryArchivePath(level.file);
-  await rm(temporary, { force: true });
-  const args = tippecanoeArguments({
-    inputs,
-    output: temporary,
-    minimumZoom: level.minimumZoom,
-    maximumZoom: level.maximumZoom,
-    baseZoom,
-    clipBoundingBox: level.bounds,
-    ...settings,
-  });
-  const run = await runTippecanoe({
-    executable,
-    args,
-    temporary,
-    workingLimit: maximumWorkingBytes,
-    zoom: levelShardLabel(level),
-    log,
-    context: {
-      zoom: level.minimumZoom,
-      shard: level.shard,
-      maximumTileBytes: settings.maximumTileBytes,
-      configuredDetail: settings.detail,
-    },
-    threads: options.tippecanoeThreads,
-  });
-  return { temporary, ...run };
-}
+const runLevel = createLevelRunner({
+  inputs,
+  baseZoom,
+  executable,
+  maximumWorkingBytes,
+  log,
+  threads: options.tippecanoeThreads,
+});
 async function buildLevel(level, allocatedBudgetBytes) {
   const allocation = { ...level, budgetBytes: allocatedBudgetBytes };
   const smallestFile = smallestArchivePath(level.file);
@@ -141,6 +121,13 @@ async function buildLevel(level, allocatedBudgetBytes) {
     try {
       result = await runLevel(allocation, settings);
     } catch (error) {
+      if (error.noData) {
+        await rm(temporaryArchivePath(level.file), { force: true });
+        console.warn(
+          `${levelShardLabel(level)} has no visible data; omitting its archive.`,
+        );
+        return emptyArchiveCandidate(level, allocatedBudgetBytes);
+      }
       const recoverable = error.exitCode === 100 || error.workingLimitExceeded;
       if (recoverable && best) {
         await rm(temporaryArchivePath(level.file), { force: true });

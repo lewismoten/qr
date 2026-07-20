@@ -192,6 +192,33 @@ test('uses natural density and permits soft shard target variance', () => {
   assert.equal(planned.length, 4);
 });
 
+test('keeps an empty region eligible for later revealed geometry', () => {
+  const mib = 1024 * 1024;
+  const level = {
+    minimumZoom: 13,
+    budgetBytes: 10 * mib,
+    file: 'build/maps/local-z13.pmtiles',
+  };
+  const planned = planAdaptiveShardLevel(
+    level,
+    [
+      {
+        bytes: 0,
+        naturalBytes: 0,
+        empty: true,
+        shardGrid: 16,
+        shardColumn: 2,
+        shardRow: 7,
+      },
+    ],
+    { targetBytes: 10 * mib },
+  );
+
+  assert.equal(planned.length, 1);
+  assert.equal(planned[0].shard, 'g16-x2-y7');
+  assert.equal(planned[0].budgetBytes, level.budgetBytes);
+});
+
 test('passes surplus without shrinking initial budgets for debt', () => {
   let carryBytes = updateBudgetCarry({
     carryBytes: 0,

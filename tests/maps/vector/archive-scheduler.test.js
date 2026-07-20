@@ -107,3 +107,30 @@ test('shares a cumulative variance allowance across a wave', async () => {
   assert.deepEqual(allocations, [120, 120]);
   assert.equal(results.at(-1).carryBytes, -20);
 });
+
+test('carries empty regions forward without publishing archives', async () => {
+  const priorResults = [];
+  const completed = [];
+  const results = await buildArchiveSchedule({
+    levels: baseLevels(),
+    minimumLevelBytes: 10,
+    planLevel(level, previousResults) {
+      priorResults.push(previousResults);
+      return [{ ...level, shard: 'empty' }];
+    },
+    async build(level) {
+      if (level.minimumZoom === 13) {
+        return { ...level, bytes: 0, empty: true };
+      }
+      return { ...level, bytes: 20 };
+    },
+    onComplete(result) {
+      completed.push(result);
+    },
+  });
+
+  assert.equal(priorResults[1][0].empty, true);
+  assert.equal(completed.length, 2);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].minimumZoom, 14);
+});

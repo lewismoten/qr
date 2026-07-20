@@ -90,7 +90,7 @@ function expandRegion(level, parent, targetBytes, forecastMultiplier) {
   const maximumFactor = Math.max(1, 2 ** level.minimumZoom / parentGrid);
   const factor = Math.min(requested, maximumFactor);
   const childGrid = parentGrid * factor;
-  const childWeight = naturalBytes / factor ** 2;
+  const childWeight = (naturalBytes || targetBytes) / factor ** 2;
   const forecastBytes = projectedBytes / factor ** 2;
   const children = [];
   for (let row = factor - 1; row >= 0; row -= 1) {

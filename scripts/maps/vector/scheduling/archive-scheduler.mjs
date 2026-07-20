@@ -71,8 +71,8 @@ export async function buildArchiveSchedule({
           actualBytes: result.bytes,
         });
         result.carryBytes = carryBytes;
-        results.push(result);
         levelResults.push(result);
+        if (!result.empty) results.push(result);
         onComplete?.(result, durationMs);
       }
     }
