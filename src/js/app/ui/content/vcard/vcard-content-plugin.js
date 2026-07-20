@@ -1,4 +1,4 @@
-import { validateVCard } from './validation.js';
+import { validateVCard } from './vcard-content-validation.js';
 
 export function createVCardPlugin({ document, section }) {
   return {

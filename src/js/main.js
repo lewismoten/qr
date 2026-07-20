@@ -88,7 +88,7 @@ async function start() {
   translateDocument(document);
   setupExternalLinks();
   setupLanguagePicker({ onLocaleChange: changeLocale });
-  application = await import('./app/index.js');
+  application = await import('./app/app-controller.js');
   await completeMilestone('application');
   await application.applicationReady;
   await completeMilestone('render');

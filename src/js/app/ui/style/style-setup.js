@@ -54,8 +54,8 @@ export function createStyleSetup({
         shapeDrawing,
       ] = await Promise.all([
         loadFeatureStylesheet('style-modules'),
-        import('./modules/section.js'),
-        import('./eyes/section.js'),
+        import('./modules/module-style-section.js'),
+        import('./eyes/eye-style-section.js'),
         import('./drawing/shapes.js'),
       ]);
       installShapeDrawing(shapeDrawing);
@@ -94,7 +94,7 @@ export function createStyleSetup({
         shapeDrawing,
       ] = await Promise.all([
         loadFeatureStylesheet('style-colors'),
-        import('./colors/section.js'),
+        import('./colors/color-style-section.js'),
         import('./art/image-input.js'),
         import('./drawing/shapes.js'),
       ]);

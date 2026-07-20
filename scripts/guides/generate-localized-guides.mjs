@@ -56,7 +56,7 @@ function resolveSourceTarget(file, pathname) {
   const rootAsset = pathname.match(/(?:^|\/)dist\/(.+)$/);
   if (rootAsset) return path.join('dist', rootAsset[1]);
   let target = path.normalize(path.join(path.dirname(file), pathname));
-  if (target === 'guides') target = 'guides/index.html';
+  if (target === 'guides') target = 'guides/guide-directory.html';
   return target;
 }
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { createDownloadDocumentSection } from '../../src/js/app/ui/download/document/section.js';
-import { createDownloadImageSection } from '../../src/js/app/ui/download/image/section.js';
+import { createDownloadDocumentSection } from '../../src/js/app/ui/download/document/document-download-section.js';
+import { createDownloadImageSection } from '../../src/js/app/ui/download/image/image-download-section.js';
 
 const control = (value = '') => ({
   hidden: false,

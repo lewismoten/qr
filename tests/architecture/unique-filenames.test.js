@@ -13,12 +13,6 @@ const ignoredDirectories = new Set([
   'node_modules',
   'translations',
 ]);
-const allowedRepeatedStems = new Set([
-  'index',
-  'plugin',
-  'section',
-  'validation',
-]);
 
 async function collectFiles(directory, files = []) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -39,8 +33,6 @@ test('repository filenames are unique across folders', async () => {
   const files = await collectFiles(repositoryRoot);
   for (const file of files) {
     const filename = path.basename(file);
-    const stem = path.parse(filename).name;
-    if (allowedRepeatedStems.has(stem)) continue;
     const matches = filesByName.get(filename) ?? [];
     matches.push(file);
     filesByName.set(filename, matches);
@@ -56,7 +48,6 @@ test('repository filenames are unique across folders', async () => {
   assert.deepEqual(
     duplicates,
     [],
-    'Filenames must be unique across folders unless their stem is index, ' +
-      `plugin, section, or validation.\n${details}`,
+    `Filenames must be unique across folders.\n${details}`,
   );
 });

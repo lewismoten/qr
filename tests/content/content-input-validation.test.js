@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { describe, test } from 'node:test';
 import { LIMITS } from '../../src/js/app/configuration.js';
-import { validateEvent } from '../../src/js/app/ui/content/event/validation.js';
+import { validateEvent } from '../../src/js/app/ui/content/event/event-content-validation.js';
 import { parseCoordinate } from '../../src/js/app/ui/content/geo/coordinates.js';
-import { createWifiPlugin } from '../../src/js/app/ui/content/wifi/plugin.js';
+import { createWifiPlugin } from '../../src/js/app/ui/content/wifi/wifi-content-plugin.js';
 import {
   validateWifi,
   validateWifiValues,
-} from '../../src/js/app/ui/content/wifi/validation.js';
+} from '../../src/js/app/ui/content/wifi/wifi-content-validation.js';
 
 const hasError = (value) => assert.notEqual(value, '');
 

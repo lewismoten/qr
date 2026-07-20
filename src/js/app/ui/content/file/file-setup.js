@@ -2,7 +2,7 @@ import { createFileCache } from './transfer/cache.js';
 import { createFileCapacityCalculator } from './file-capacity.js';
 import { createFileManifestController } from './transfer/manifest.js';
 import { createFilePayloadBuilder } from './transfer/file-payload.js';
-import { createFileSection } from './section.js';
+import { createFileSection } from './file-content-section.js';
 import { createFileSettings } from './transfer/settings.js';
 import { createFilePayloadPreview } from './preview.js';
 

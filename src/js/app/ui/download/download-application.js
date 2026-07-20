@@ -48,21 +48,23 @@ export function createApplicationDownloadSetup({
   });
 
   const ensureImage = () =>
-    import('./image/section.js').then(({ createDownloadImageSection }) => {
-      image ??= createDownloadImageSection({
-        current: e.downloadCurrent,
-        format: e.downloadFormat,
-        qualityControls: e.downloadQualityControls,
-        quality: e.downloadQuality,
-        qualityValue: e.downloadQualityValue,
-        zip: e.downloadZip,
-        getFrameCount: frames.getFrameCount,
-      });
-      return image;
-    });
+    import('./image/image-download-section.js').then(
+      ({ createDownloadImageSection }) => {
+        image ??= createDownloadImageSection({
+          current: e.downloadCurrent,
+          format: e.downloadFormat,
+          qualityControls: e.downloadQualityControls,
+          quality: e.downloadQuality,
+          qualityValue: e.downloadQualityValue,
+          zip: e.downloadZip,
+          getFrameCount: frames.getFrameCount,
+        });
+        return image;
+      },
+    );
 
   const ensureDocument = () =>
-    import('./document/section.js').then(
+    import('./document/document-download-section.js').then(
       ({ createDownloadDocumentSection }) => {
         documentSection ??= createDownloadDocumentSection({
           allPdf: e.downloadAllPdf,
@@ -78,7 +80,7 @@ export function createApplicationDownloadSetup({
     if (animation) return Promise.resolve(animation);
     if (!animationRequest) {
       animationRequest = Promise.all([
-        import('./animation/section.js'),
+        import('./animation/animation-download-section.js'),
         import('../../media-support.js'),
       ])
         .then(([{ createAnimationSection }, { getSupportedMp4MimeType }]) => {

@@ -17,7 +17,7 @@ export function createContentSections({
   const region = e.tabPanels[0]?.parentElement;
   const eventLoader = createLazySection({
     region,
-    load: () => import('./event/section.js'),
+    load: () => import('./event/event-content-section.js'),
     create: ({ createEventSectionFromDocument }) => {
       const section = createEventSectionFromDocument(document);
       section.initialize();
@@ -27,7 +27,7 @@ export function createContentSections({
   });
   const geoLoader = createLazySection({
     region,
-    load: () => import('./geo/section.js'),
+    load: () => import('./geo/geo-content-section.js'),
     create: ({ createGeoSectionFromDocument }) =>
       createGeoSectionFromDocument(document, {
         isActive: () => e.qrFormat.value === 'geo',
@@ -36,7 +36,7 @@ export function createContentSections({
   });
   const numberLoader = createLazySection({
     region,
-    load: () => import('./simple/number/section.js'),
+    load: () => import('./simple/number/number-content-section.js'),
     create: ({ createNumberSectionFromDocument }) => {
       const section = createNumberSectionFromDocument(document, {
         maxFrames: limits.numberFrames,
@@ -49,7 +49,7 @@ export function createContentSections({
   });
   const phoneLoader = createLazySection({
     region,
-    load: () => import('./phone/section.js'),
+    load: () => import('./phone/phone-content-section.js'),
     create: ({ createPhoneSectionFromDocument }) => {
       const section = createPhoneSectionFromDocument(document, {
         onChange: () => runtime.render(),
@@ -75,7 +75,7 @@ export function createContentSections({
   });
   const wifiLoader = createLazySection({
     region,
-    load: () => import('./wifi/section.js'),
+    load: () => import('./wifi/wifi-content-section.js'),
     create: ({ createWifiSectionFromDocument }) => {
       const section = createWifiSectionFromDocument(document);
       section.sync();
@@ -84,7 +84,7 @@ export function createContentSections({
   });
   const vcardLoader = createLazySection({
     region,
-    load: () => import('./vcard/section.js'),
+    load: () => import('./vcard/vcard-content-section.js'),
     create: ({ createVCardSectionFromDocument }) =>
       createVCardSectionFromDocument(document),
   });
@@ -121,8 +121,8 @@ export function createContentSections({
   let registry;
   const loaders = {
     text: () =>
-      import('./simple/text/plugin.js').then(({ createTextPlugin }) =>
-        createTextPlugin(document),
+      import('./simple/text/text-content-plugin.js').then(
+        ({ createTextPlugin }) => createTextPlugin(document),
       ),
     number: () =>
       numberLoader.ensure().then((section) => ({
@@ -131,55 +131,66 @@ export function createContentSections({
         validate: section.getValidationState,
       })),
     wifi: () =>
-      Promise.all([wifiLoader.ensure(), import('./wifi/plugin.js')]).then(
-        ([section, { createWifiPlugin }]) =>
-          createWifiPlugin({ document, section }),
+      Promise.all([
+        wifiLoader.ensure(),
+        import('./wifi/wifi-content-plugin.js'),
+      ]).then(([section, { createWifiPlugin }]) =>
+        createWifiPlugin({ document, section }),
       ),
     email: () =>
-      Promise.all([sharedLoader.ensure(), import('./email/plugin.js')]).then(
-        ([section, { createEmailPlugin }]) =>
-          createEmailPlugin({
-            document,
-            section,
-            encoder,
-            runtime,
-            limits,
-            isActive: () => e.qrFormat.value === 'email',
-          }),
+      Promise.all([
+        sharedLoader.ensure(),
+        import('./email/email-content-plugin.js'),
+      ]).then(([section, { createEmailPlugin }]) =>
+        createEmailPlugin({
+          document,
+          section,
+          encoder,
+          runtime,
+          limits,
+          isActive: () => e.qrFormat.value === 'email',
+        }),
       ),
     phone: () =>
-      Promise.all([phoneLoader.ensure(), import('./phone/plugin.js')]).then(
-        ([section, { createPhonePlugin }]) =>
-          createPhonePlugin({ document, format: 'phone', section, limits }),
+      Promise.all([
+        phoneLoader.ensure(),
+        import('./phone/phone-content-plugin.js'),
+      ]).then(([section, { createPhonePlugin }]) =>
+        createPhonePlugin({ document, format: 'phone', section, limits }),
       ),
     sms: () =>
       Promise.all([phoneLoader.ensure(), sharedLoader.ensure()]).then(
         ([section]) =>
-          import('./phone/plugin.js').then(({ createPhonePlugin }) =>
-            createPhonePlugin({ document, format: 'sms', section, limits }),
+          import('./phone/phone-content-plugin.js').then(
+            ({ createPhonePlugin }) =>
+              createPhonePlugin({ document, format: 'sms', section, limits }),
           ),
       ),
     event: () =>
-      Promise.all([eventLoader.ensure(), import('./event/plugin.js')]).then(
-        ([section, { createEventPlugin }]) =>
-          createEventPlugin({ document, section, limits }),
+      Promise.all([
+        eventLoader.ensure(),
+        import('./event/event-content-plugin.js'),
+      ]).then(([section, { createEventPlugin }]) =>
+        createEventPlugin({ document, section, limits }),
       ),
     geo: () =>
-      Promise.all([geoLoader.ensure(), import('./geo/plugin.js')]).then(
-        ([section, { createGeoPlugin }]) =>
-          createGeoPlugin({ document, section }),
+      Promise.all([
+        geoLoader.ensure(),
+        import('./geo/geo-content-plugin.js'),
+      ]).then(([section, { createGeoPlugin }]) =>
+        createGeoPlugin({ document, section }),
       ),
     vcard: () =>
       Promise.all([
         phoneLoader.ensure(),
         sharedLoader.ensure(),
         vcardLoader.ensure(),
-        import('./vcard/plugin.js'),
+        import('./vcard/vcard-content-plugin.js'),
       ]).then(([, , section, { createVCardPlugin }]) =>
         createVCardPlugin({ document, section }),
       ),
     file: () =>
-      import('./file/plugin.js').then(({ createFilePlugin }) =>
+      import('./file/file-content-plugin.js').then(({ createFilePlugin }) =>
         createFilePlugin(file),
       ),
   };

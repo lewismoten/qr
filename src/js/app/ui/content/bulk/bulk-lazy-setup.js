@@ -1,4 +1,4 @@
-import { createBulkImportSection } from './section.js';
+import { createBulkImportSection } from './bulk-content-section.js';
 import { getBulkElements } from './bulk-elements.js';
 import { setupFilePicker } from '../../file-picker.js';
 

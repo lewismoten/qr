@@ -1,4 +1,4 @@
-import { validateGeo } from './validation.js';
+import { validateGeo } from './geo-content-validation.js';
 
 export function createGeoPlugin({ document, section }) {
   return {

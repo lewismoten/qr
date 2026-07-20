@@ -227,7 +227,7 @@ describe('fragment hash navigation', () => {
 
   test('debug mask setup receives the QR color provider', async () => {
     const source = await readFile(
-      new URL('../../src/js/app/index.js', import.meta.url),
+      new URL('../../src/js/app/app-controller.js', import.meta.url),
       { encoding: 'utf8' },
     );
     const facadeStart = source.indexOf('createDebugFacade({');

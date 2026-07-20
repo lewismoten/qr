@@ -1,4 +1,4 @@
-import { validatePhone } from './validation.js';
+import { validatePhone } from './phone-content-validation.js';
 
 export function createPhonePlugin({ document, format, section, limits }) {
   const sms = format === 'sms';

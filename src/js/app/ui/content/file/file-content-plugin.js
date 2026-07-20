@@ -1,4 +1,4 @@
-import { validateFile } from './validation.js';
+import { validateFile } from './file-content-validation.js';
 
 export function createFilePlugin(file) {
   return {

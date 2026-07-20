@@ -11,7 +11,7 @@ import {
   validateVCardTextValue,
 } from '../../../data/validation.js';
 import { parseCoordinate } from '../geo/coordinates.js';
-import { validateWifiValues } from '../wifi/validation.js';
+import { validateWifiValues } from '../wifi/wifi-content-validation.js';
 import { normalizeBulkWifiSecurity } from './bulk-payload.js';
 import { lookup } from '../../../../i18n/index.js';
 

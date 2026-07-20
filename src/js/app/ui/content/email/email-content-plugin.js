@@ -1,5 +1,5 @@
 import { createEmailCapacityFromDocument } from './email-capacity.js';
-import { validateEmail } from './validation.js';
+import { validateEmail } from './email-content-validation.js';
 
 export function createEmailPlugin({
   document,

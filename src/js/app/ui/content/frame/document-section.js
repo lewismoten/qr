@@ -1,5 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
-import { createFrameSection } from './section.js';
+import { createFrameSection } from './frame-content-section.js';
 
 export function createFrameSectionFromDocument(document, options) {
   const id = (name) => document.getElementById(name);

@@ -1,4 +1,4 @@
-import { validateWifi } from './validation.js';
+import { validateWifi } from './wifi-content-validation.js';
 
 export function createWifiPlugin({ document, section }) {
   return {

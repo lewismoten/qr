@@ -1,6 +1,6 @@
 import { formatBytes } from '../../../bytes.js';
 import { parseCsvAsync } from '../../../data/csv.js';
-import { validateBulkImport } from './validation.js';
+import { validateBulkImport } from './bulk-content-validation.js';
 import { getErrorText, lookup } from '../../../../i18n/index.js';
 import { createLocalizedError } from '../../../../localized-error.js';
 import { refreshFilePicker } from '../../file-picker.js';

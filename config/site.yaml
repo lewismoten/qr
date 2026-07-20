@@ -33,7 +33,7 @@ deployment:
 pages:
   index.html: index.html
 guides:
-  index: guides/index.html
+  index: guides/guide-directory.html
   about: about.html
   privacy: privacy.html
   spec: spec.html

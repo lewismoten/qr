@@ -1,4 +1,4 @@
-import { validateEvent } from './validation.js';
+import { validateEvent } from './event-content-validation.js';
 
 export function createEventPlugin({ document, section, limits }) {
   return {

@@ -24,7 +24,7 @@ describe('specification guide', () => {
       read('src/css/spec/references.css'),
     ]);
     assert.match(html, /<footer class="spec-footer">/);
-    assert.match(html, /href="guides\/index\.html">Guides</);
+    assert.match(html, /href="guides\/guide-directory\.html">Guides</);
     assert.match(base, /body \{[\s\S]*padding-bottom: 5rem;/);
     assert.match(references, /\.spec-footer \{[\s\S]*position: fixed;/);
     assert.match(references, /bottom: 0\.75rem;/);

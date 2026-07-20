@@ -174,10 +174,10 @@ export function getGuidePublicPath(route, locale = 'en-US') {
   const output = getGuideOutputPath(route, locale);
   return route === 'index' ? output.replace(/index\.html$/, '') : output;
 }
-
 export function getGuideRouteFromPath(value) {
   if (typeof value !== 'string') return null;
   const path = value.replace(/^\.\//, '').replace(/^\//, '');
+  if (path === 'guides/guide-directory.html') return 'index';
   for (const locale of GUIDE_LOCALES) {
     for (const route of GUIDE_ROUTES) {
       const output = getGuideOutputPath(route, locale);
