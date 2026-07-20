@@ -5,6 +5,18 @@ import { scanArchiveTileStatistics } from './pmtiles/archive-statistics.mjs';
 
 const PMTILES_MAGIC = 'PMTiles';
 const PMTILES_STATS_BYTES = 96;
+const PMTILES_PREFIX_BYTES = 8;
+const PMTILES_MAGIC_BYTES = 7;
+const PMTILES_VERSION_OFFSET = 7;
+const PMTILES_VERSION = 3;
+const KIBIBYTE = 1024;
+const MEBIBYTE = KIBIBYTE * KIBIBYTE;
+const HEADER_OFFSETS = {
+  tileDataBytes: 64,
+  addressedTiles: 72,
+  tileEntries: 80,
+  tileContents: 88,
+};
 
 export function temporaryArchivePath(output) {
   const parsed = path.parse(output);
@@ -19,9 +31,11 @@ export function smallestArchivePath(output) {
 export async function validatePmtilesArchive(file, maximumBytes) {
   const handle = await open(file, 'r');
   try {
-    const bytes = Buffer.alloc(8);
+    const bytes = Buffer.alloc(PMTILES_PREFIX_BYTES);
     await handle.read(bytes, 0, bytes.length, 0);
-    if (bytes.subarray(0, 7).toString() !== PMTILES_MAGIC || bytes[7] !== 3) {
+    const validMagic =
+      bytes.subarray(0, PMTILES_MAGIC_BYTES).toString() === PMTILES_MAGIC;
+    if (!validMagic || bytes[PMTILES_VERSION_OFFSET] !== PMTILES_VERSION) {
       throw new Error('Tippecanoe did not produce a PMTiles v3 archive.');
     }
   } finally {
@@ -30,8 +44,8 @@ export async function validatePmtilesArchive(file, maximumBytes) {
   const { size } = await stat(file);
   if (size > maximumBytes) {
     throw new Error(
-      `Map archive is ${(size / 1024 / 1024).toFixed(1)} MiB; ` +
-        `the budget is ${maximumBytes / 1024 / 1024} MiB.`,
+      `Map archive is ${(size / MEBIBYTE).toFixed(1)} MiB; ` +
+        `the budget is ${maximumBytes / MEBIBYTE} MiB.`,
     );
   }
   return size;
@@ -46,10 +60,18 @@ export async function readPmtilesArchiveStats(file, maximumTileBytes) {
       throw new Error('PMTiles header is incomplete.');
     }
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    const tileDataBytes = Number(view.getBigUint64(64, true));
-    const addressedTiles = Number(view.getBigUint64(72, true));
-    const tileEntries = Number(view.getBigUint64(80, true));
-    const tileContents = Number(view.getBigUint64(88, true));
+    const tileDataBytes = Number(
+      view.getBigUint64(HEADER_OFFSETS.tileDataBytes, true),
+    );
+    const addressedTiles = Number(
+      view.getBigUint64(HEADER_OFFSETS.addressedTiles, true),
+    );
+    const tileEntries = Number(
+      view.getBigUint64(HEADER_OFFSETS.tileEntries, true),
+    );
+    const tileContents = Number(
+      view.getBigUint64(HEADER_OFFSETS.tileContents, true),
+    );
     return {
       tileDataBytes,
       addressedTiles,

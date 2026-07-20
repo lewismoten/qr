@@ -3,6 +3,16 @@ import path from 'node:path';
 
 import { formatBytes } from '../tile-plan.mjs';
 
+const HISTORICAL_MINIMUM_RATIO = 0.8;
+const HISTORICAL_MAXIMUM_RATIO = 1.25;
+const PARENT_MINIMUM_RATIO = 0.55;
+const PARENT_MAXIMUM_RATIO = 1.15;
+const KIBIBYTE = 1024;
+const FALLBACK_MINIMUM_KIB = 4;
+const FALLBACK_MAXIMUM_KIB = 12;
+const SECONDS_PER_MINUTE = 60;
+const PERCENT_SCALE = 100;
+
 export async function readTileManifest(output) {
   try {
     return JSON.parse(
@@ -34,8 +44,8 @@ function historicalEstimate(level, files, candidates) {
   if (!level?.bytes) return null;
   const scale = level.candidates ? candidates / level.candidates : 1;
   return {
-    minimum: level.bytes * scale * 0.8,
-    maximum: level.bytes * scale * 1.25,
+    minimum: level.bytes * scale * HISTORICAL_MINIMUM_RATIO,
+    maximum: level.bytes * scale * HISTORICAL_MAXIMUM_RATIO,
     files,
     basis: 'previous output at the same level',
   };
@@ -47,8 +57,8 @@ function parentEstimate(parent, files) {
   if (!parentFiles) return null;
   const average = parent.bytes / parentFiles;
   return {
-    minimum: files * average * 0.55,
-    maximum: files * average * 1.15,
+    minimum: files * average * PARENT_MINIMUM_RATIO,
+    maximum: files * average * PARENT_MAXIMUM_RATIO,
     files,
     basis: 'parent-level output density',
   };
@@ -56,8 +66,8 @@ function parentEstimate(parent, files) {
 
 function fallbackEstimate(files) {
   return {
-    minimum: files * 4 * 1024,
-    maximum: files * 12 * 1024,
+    minimum: files * FALLBACK_MINIMUM_KIB * KIBIBYTE,
+    maximum: files * FALLBACK_MAXIMUM_KIB * KIBIBYTE,
     files,
     basis: 'bundle-aware first-build range',
   };
@@ -84,9 +94,9 @@ export function estimateTileOutput({ plan, bundleLevels, manifest }) {
 
 export function formatDuration(seconds) {
   if (!Number.isFinite(seconds) || seconds < 1) return '<1s';
-  if (seconds < 60) return `${Math.ceil(seconds)}s`;
-  const minutes = Math.floor(seconds / 60);
-  const remainder = Math.ceil(seconds % 60);
+  if (seconds < SECONDS_PER_MINUTE) return `${Math.ceil(seconds)}s`;
+  const minutes = Math.floor(seconds / SECONDS_PER_MINUTE);
+  const remainder = Math.ceil(seconds % SECONDS_PER_MINUTE);
   return `${minutes}m ${remainder}s`;
 }
 
@@ -123,7 +133,8 @@ export function reportTilePlan({
 export function progressText(current, total, elapsed) {
   const remaining = (elapsed / current) * (total - current);
   return (
-    `\r${Math.floor((current / total) * 100)}% ${current}/${total} | ` +
+    `\r${Math.floor((current / total) * PERCENT_SCALE)}% ` +
+    `${current}/${total} | ` +
     `ETA ${formatDuration(remaining)}\x1b[K`
   );
 }

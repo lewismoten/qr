@@ -1,5 +1,26 @@
 import { lookup } from '../../../../i18n/index.js';
 
+const MAXIMUM_QR_VERSION = 40;
+const BITS_PER_BYTE = 8;
+const MODE_INDICATOR_BITS = 4;
+const VERSION_BUCKET_ONE_MAXIMUM = 9;
+const VERSION_BUCKET_TWO_MAXIMUM = 26;
+const VERSION_BUCKET = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+};
+const CHARACTER_COUNT_BITS = {
+  numeric: { low: 10, medium: 12, high: 14 },
+  alphanumeric: { low: 9, medium: 11, high: 13 },
+  byte: { low: 8, medium: 16, high: 16 },
+  kanji: { low: 8, medium: 10, high: 12 },
+};
+const ALPHANUMERIC_PAIR_BITS = 11;
+const ALPHANUMERIC_SINGLE_BITS = 6;
+const ALPHANUMERIC_PAIR_CHARACTERS = 2;
+const MAXIMUM_BYTE_MODE_CHARACTERS = 8191;
+
 export function createEmailCapacity({
   body,
   hint,
@@ -22,20 +43,20 @@ export function createEmailCapacity({
     const emptyPayload = buildPayload(buildEmail(''));
     const cacheKey = JSON.stringify([options, emptyPayload]);
     if (cacheKey === cachedKey) return { current, max: cachedMax };
-    const version = options.version ?? 40;
+    const version = options.version ?? MAXIMUM_QR_VERSION;
     const capacityBits =
       encoder.internals.getDataCodewords(
         version,
         options.errorCorrectionLevel,
-      ) * 8;
+      ) * BITS_PER_BYTE;
     const getCountBits = (mode) => {
-      const bucket = version <= 9 ? 0 : version <= 26 ? 1 : 2;
-      return {
-        numeric: [10, 12, 14],
-        alphanumeric: [9, 11, 13],
-        byte: [8, 16, 16],
-        kanji: [8, 10, 12],
-      }[mode][bucket];
+      const bucket =
+        version <= VERSION_BUCKET_ONE_MAXIMUM
+          ? VERSION_BUCKET.low
+          : version <= VERSION_BUCKET_TWO_MAXIMUM
+            ? VERSION_BUCKET.medium
+            : VERSION_BUCKET.high;
+      return CHARACTER_COUNT_BITS[mode][bucket];
     };
     const sampleText = buildEmail('A');
     const samplePayload = buildPayload(sampleText);
@@ -48,8 +69,10 @@ export function createEmailCapacity({
           String(data).slice(0, -1),
         ).length;
         low =
-          Math.floor((capacityBits - 4 - getCountBits('byte')) / 8) -
-          prefixBytes;
+          Math.floor(
+            (capacityBits - MODE_INDICATOR_BITS - getCountBits('byte')) /
+              BITS_PER_BYTE,
+          ) - prefixBytes;
       }
     } else {
       const prefix = sampleText.slice(0, -1);
@@ -57,17 +80,30 @@ export function createEmailCapacity({
         .optimizeSegments(prefix, version)
         .reduce(
           (total, segment) =>
-            total + 4 + getCountBits(segment.mode) + segment.getBitsLength(),
+            total +
+            MODE_INDICATOR_BITS +
+            getCountBits(segment.mode) +
+            segment.getBitsLength(),
           0,
         );
       const availableBodyBits =
-        capacityBits - prefixBits - 4 - getCountBits('alphanumeric');
-      if (availableBodyBits >= 6) {
-        low = Math.floor(availableBodyBits / 11) * 2;
-        if (availableBodyBits % 11 >= 6) low += 1;
+        capacityBits -
+        prefixBits -
+        MODE_INDICATOR_BITS -
+        getCountBits('alphanumeric');
+      if (availableBodyBits >= ALPHANUMERIC_SINGLE_BITS) {
+        low =
+          Math.floor(availableBodyBits / ALPHANUMERIC_PAIR_BITS) *
+          ALPHANUMERIC_PAIR_CHARACTERS;
+        if (
+          availableBodyBits % ALPHANUMERIC_PAIR_BITS >=
+          ALPHANUMERIC_SINGLE_BITS
+        ) {
+          low += 1;
+        }
       }
     }
-    low = Math.min(8191, Math.max(0, low));
+    low = Math.min(MAXIMUM_BYTE_MODE_CHARACTERS, Math.max(0, low));
     cachedKey = cacheKey;
     cachedMax = low;
     return { current, max: low };

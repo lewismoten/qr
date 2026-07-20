@@ -1,9 +1,15 @@
 import path from 'node:path';
 import { availableParallelism } from 'node:os';
 
+const OPTION_PREFIX_CHARACTERS = 3;
+const DECIMAL_RADIX = 10;
+const KIBIBYTE = 1024;
+const MEBIBYTE = KIBIBYTE * KIBIBYTE;
+const PERCENT_TO_RATIO = 0.01;
+
 function option(values, name, fallback) {
   const exact = values.find((value) => value.startsWith(`--${name}=`));
-  if (exact) return exact.slice(name.length + 3);
+  if (exact) return exact.slice(name.length + OPTION_PREFIX_CHARACTERS);
   const index = values.indexOf(`--${name}`);
   return index >= 0 ? values[index + 1] : fallback;
 }
@@ -11,11 +17,11 @@ function option(values, name, fallback) {
 export function readVectorBuildOptions(values = process.argv.slice(2)) {
   const maximumArchiveMiB = Number.parseInt(
     option(values, 'max-archive-mib', '500'),
-    10,
+    DECIMAL_RADIX,
   );
   const maximumWorkingMiB = Number.parseInt(
     option(values, 'max-working-mib', String(maximumArchiveMiB * 2)),
-    10,
+    DECIMAL_RADIX,
   );
   const shardTargetMiB = Number.parseFloat(
     option(values, 'shard-target-mib', '10'),
@@ -23,7 +29,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
   const shardVariancePercent = Number.parseFloat(
     option(values, 'shard-variance-percent', '20'),
   );
-  const jobs = Number.parseInt(option(values, 'jobs', '1'), 10);
+  const jobs = Number.parseInt(option(values, 'jobs', '1'), DECIMAL_RADIX);
   const availableThreads = availableParallelism();
   const configuredThreads = option(
     values,
@@ -32,7 +38,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
   );
   const tippecanoeThreads = Number.parseInt(
     configuredThreads || String(availableThreads),
-    10,
+    DECIMAL_RADIX,
   );
   const archiveVariancePercent = Number.parseFloat(
     option(values, 'archive-variance-percent', '1'),
@@ -58,22 +64,35 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     input: path.resolve(option(values, 'input', '.cache/maps/vector-input')),
     output: path.resolve(option(values, 'output', 'build/maps/local.pmtiles')),
     logFile: option(values, 'log-file', ''),
-    minimumZoom: Number.parseInt(option(values, 'minimum-zoom', '1'), 10),
-    maximumZoom: Number.parseInt(option(values, 'maximum-zoom', '19'), 10),
-    baseZoom: Number.parseInt(option(values, 'base-zoom', '16'), 10),
+    minimumZoom: Number.parseInt(
+      option(values, 'minimum-zoom', '1'),
+      DECIMAL_RADIX,
+    ),
+    maximumZoom: Number.parseInt(
+      option(values, 'maximum-zoom', '19'),
+      DECIMAL_RADIX,
+    ),
+    baseZoom: Number.parseInt(option(values, 'base-zoom', '16'), DECIMAL_RADIX),
     maximumTileBytes:
-      Number.parseInt(option(values, 'max-tile-kib', '64'), 10) * 1024,
+      Number.parseInt(option(values, 'max-tile-kib', '64'), DECIMAL_RADIX) *
+      KIBIBYTE,
     maximumArchiveMiB,
     maximumWorkingMiB,
-    maximumArchiveBytes: maximumArchiveMiB * 1024 * 1024,
-    maximumWorkingBytes: maximumWorkingMiB * 1024 * 1024,
-    detail: Number.parseInt(option(values, 'detail', '11'), 10),
+    maximumArchiveBytes: maximumArchiveMiB * MEBIBYTE,
+    maximumWorkingBytes: maximumWorkingMiB * MEBIBYTE,
+    detail: Number.parseInt(option(values, 'detail', '11'), DECIMAL_RADIX),
     budgetGrowth: Number.parseFloat(option(values, 'budget-growth', '1.3')),
     minimumLevelBytes:
-      Number.parseInt(option(values, 'minimum-level-kib', '128'), 10) * 1024,
-    shardZoom: Number.parseInt(option(values, 'shard-zoom', '9'), 10),
+      Number.parseInt(
+        option(values, 'minimum-level-kib', '128'),
+        DECIMAL_RADIX,
+      ) * KIBIBYTE,
+    shardZoom: Number.parseInt(
+      option(values, 'shard-zoom', '9'),
+      DECIMAL_RADIX,
+    ),
     shardTargetMiB,
-    shardTargetBytes: shardTargetMiB * 1024 * 1024,
+    shardTargetBytes: shardTargetMiB * MEBIBYTE,
     shardVariancePercent,
     jobs,
     tippecanoeThreads,
@@ -81,7 +100,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     availableThreads,
     archiveVariancePercent,
     maximumDebtBytes:
-      maximumArchiveMiB * 1024 * 1024 * archiveVariancePercent * 0.01,
+      maximumArchiveMiB * MEBIBYTE * archiveVariancePercent * PERCENT_TO_RATIO,
     executable: process.env.TIPPECANOE || 'tippecanoe',
   };
 }

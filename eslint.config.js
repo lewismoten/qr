@@ -45,6 +45,7 @@ export default [
       'src/js/app/qr/encoding-units.js',
       'src/js/app/qr/qr-regions.js',
       'src/js/app/qr/qr-stream.js',
+      'src/js/app/ui/content/email/email-capacity.js',
       'src/js/app/ui/content/file/transfer/**/*.js',
       'src/js/app/ui/content/geo/mvt/**/*.js',
       'src/js/app/ui/content/geo/pmtiles/**/*.js',
@@ -92,6 +93,17 @@ export default [
     },
     rules: {
       'no-magic-numbers': ['warn', magicNumberOptions],
+    },
+  },
+  {
+    files: [
+      'scripts/maps/planning/output-estimate.mjs',
+      'scripts/maps/reporting/options.mjs',
+      'scripts/maps/vector/budget.mjs',
+      'scripts/maps/vector/output.mjs',
+    ],
+    rules: {
+      'no-magic-numbers': ['error', magicNumberOptions],
     },
   },
   {

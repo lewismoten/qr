@@ -6,6 +6,16 @@ const TIERS = [
   { minimumZoom: 13, maximumZoom: Infinity, weight: 81 },
 ];
 const MINIMUM_USEFUL_REDUCTION = 0.05;
+const KIBIBYTE = 1024;
+const DEFAULT_MINIMUM_LEVEL_KIB = 128;
+const MINIMUM_TILE_KIB = 4;
+const MINIMUM_VECTOR_DETAIL = 8;
+const FIRST_ATTEMPT_SAFETY_RATIO = 0.92;
+const RETRY_SAFETY_RATIO = 0.97;
+const MINIMUM_COMPACTION_RATIO = 0.2;
+const MAXIMUM_COMPACTION_RATIO = 0.95;
+const MINIMUM_TILE_REDUCTION_BYTES = 256;
+const PERCENT_SCALE = 100;
 
 function sourceMaximumZoom(inputs, fallback) {
   const values = inputs.flatMap((input) => {
@@ -22,7 +32,7 @@ export function planArchiveLevels({
   maximumArchiveBytes,
   output,
   growth = 1.3,
-  minimumLevelBytes = 128 * 1024,
+  minimumLevelBytes = DEFAULT_MINIMUM_LEVEL_KIB * KIBIBYTE,
   inputs = [],
 }) {
   const plannedMaximumZoom = Math.min(
@@ -85,18 +95,22 @@ export function compactBuildSettings({
   detail,
   attempt = 1,
 }) {
-  const minimumTileBytes = 4 * 1024;
+  const minimumTileBytes = MINIMUM_TILE_KIB * KIBIBYTE;
   if (maximumTileBytes <= minimumTileBytes) {
     return {
       maximumTileBytes: minimumTileBytes,
-      detail: Math.max(8, detail - 1),
+      detail: Math.max(MINIMUM_VECTOR_DETAIL, detail - 1),
     };
   }
-  const safety = attempt === 1 ? 0.92 : 0.97;
+  const safety =
+    attempt === 1 ? FIRST_ATTEMPT_SAFETY_RATIO : RETRY_SAFETY_RATIO;
   const measuredRatio = (budgetBytes / observedBytes) * safety;
-  const ratio = Math.max(0.2, Math.min(0.95, measuredRatio));
+  const ratio = Math.max(
+    MINIMUM_COMPACTION_RATIO,
+    Math.min(MAXIMUM_COMPACTION_RATIO, measuredRatio),
+  );
   const proportionalTarget = Math.floor(maximumTileBytes * ratio);
-  const minimumReduction = maximumTileBytes - 256;
+  const minimumReduction = maximumTileBytes - MINIMUM_TILE_REDUCTION_BYTES;
   return {
     maximumTileBytes: Math.max(
       minimumTileBytes,
@@ -119,7 +133,8 @@ export function archiveReductionWarning(label, previousBytes, currentBytes) {
   if (!previousBytes || isUsefulArchiveReduction(previousBytes, currentBytes)) {
     return null;
   }
-  const reduction = ((previousBytes - currentBytes) / previousBytes) * 100;
+  const reduction =
+    ((previousBytes - currentBytes) / previousBytes) * PERCENT_SCALE;
   return (
     `${label} compaction improved only ${reduction.toFixed(1)}%; ` +
     'accepting its smallest archive.'
@@ -129,7 +144,7 @@ export function archiveReductionWarning(label, previousBytes, currentBytes) {
 export function formatTileLimit(maximumTileBytes) {
   return maximumTileBytes == null
     ? 'no tile ceiling (recovery)'
-    : `${(maximumTileBytes / 1024).toFixed(1)} KiB tiles`;
+    : `${(maximumTileBytes / KIBIBYTE).toFixed(1)} KiB tiles`;
 }
 
 export function availableLevelBudget({
