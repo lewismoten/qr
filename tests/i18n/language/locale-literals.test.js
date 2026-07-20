@@ -30,6 +30,7 @@ const ASCII_CLOSE_PARENTHESIS = ')';
 const ASCII_COMMA = ',';
 const ASCII_COLON = ':';
 const ASCII_OPEN_PARENTHESIS = '(';
+const ASCII_QUESTION_MARK = '?';
 const ASCII_SEMICOLON = ';';
 const CHINESE_TECHNICAL_COLON_PATTERNS = [
   /https?:\/\//gu,
@@ -135,6 +136,7 @@ test('Chinese prose uses fullwidth punctuation', async () => {
     if (removeChineseTechnicalColons(message).includes(ASCII_COLON)) {
       findings.push('colon');
     }
+    if (message.includes(ASCII_QUESTION_MARK)) findings.push('question mark');
     if (message.includes(ASCII_SEMICOLON)) findings.push('semicolon');
     return findings.map(
       (punctuation) =>
@@ -145,6 +147,6 @@ test('Chinese prose uses fullwidth punctuation', async () => {
   assert.deepEqual(
     issues,
     [],
-    'Use （）, ，, ：, and ； in Chinese prose; retain ASCII only in syntax',
+    'Use （）, ，, ：, ；, and ？ in Chinese prose; retain ASCII in syntax',
   );
 });
