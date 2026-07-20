@@ -1,0 +1,47 @@
+@media print {
+  @page {
+    margin: 0.55in;
+  }
+
+  body {
+    background: #fff;
+    color: #111827;
+  }
+
+  .spec-header,
+  .spec-footer,
+  .hero-actions,
+  .guide-language-switcher {
+    display: none;
+  }
+
+  main {
+    width: auto;
+    margin: 0;
+  }
+
+  .hero,
+  .guide-section,
+  .palette {
+    border-color: #cbd5e1;
+    background: #fff;
+    box-shadow: none;
+    color: #111827;
+  }
+
+  .hero {
+    min-height: 0;
+  }
+
+  .guide-section,
+  .example-card,
+  figure,
+  table {
+    break-inside: avoid;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}

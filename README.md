@@ -62,6 +62,10 @@ Authored JavaScript also uses an 80-column target. URLs, regular expressions,
 and indivisible translated strings may exceed the column target without
 weakening the module-size limit.
 
+New HTML sources are also limited to 300 lines. The migration and shared
+print/PDF/ePub composition design are documented in
+[Long-form HTML documents](docs/html-documents.md).
+
 ## Local map assets
 
 The reproducible PMTiles sources, budgets, compaction behavior, reports, and

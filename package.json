@@ -29,7 +29,7 @@
     "lint:format": "prettier --config config/prettier.json --ignore-path config/prettier.ignore --check \"src/js/**/*.js\" \"scripts/**/*.mjs\" \"benchmarks/**/*.mjs\" \"tests/**/*.js\" \"eslint.config.js\"",
     "lint:js": "eslint .",
     "lint:css": "stylelint --config config/stylelint.json \"src/css/**/*.css\" && node scripts/lint/lint-css-limits.mjs",
-    "lint:html": "htmlhint --config config/htmlhint.json \"src/html/**/*.html\"",
+    "lint:html": "node scripts/lint/lint-html-limits.mjs && htmlhint --config config/htmlhint.json \"src/html/**/*.html\"",
     "lint:json": "node scripts/lint/lint-json.mjs",
     "lint:markdown": "node scripts/lint/lint-markdown.mjs && markdownlint-cli2 --config config/markdownlint.jsonc \"README.md\" \"docs/**/*.md\"",
     "lint:web-metadata": "node scripts/lint/lint-web-metadata.mjs",
