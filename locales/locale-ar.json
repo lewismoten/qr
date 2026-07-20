@@ -234,7 +234,7 @@
       "numeric": "يُخزَّن {value} كعدد ثنائي واحد بطول {bits} بت.",
       "alphanumeric": "{first} × {radix} + {second} = {result}، وتُخزَّن النتيجة في {bits} بت.",
       "byte": "يُرمَّز الحرف الظاهر في UTF-8 بالقيمة {encoding}، لذلك يكون العدد {count} وتشغل البيانات {bits} بت.",
-      "kanji": "تُحوَّل قيمة Shift JIS ‏{value} إلى قيمة كانجي QR بطول {bits} بت."
+      "kanji": "تُحوَّل قيمة Shift JIS \u200F{value} إلى قيمة كانجي QR بطول {bits} بت."
     },
     "modes": {
       "numeric": "رقمي",

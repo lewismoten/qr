@@ -1,6 +1,6 @@
 {
   "loading": "جارٍ تحميل أدوات الاستيراد المجمع.",
-  "warning": "صف الاستيراد {rowNumber}: ‏{message}",
+  "warning": "صف الاستيراد {rowNumber}: \u200F{message}",
   "requiredValues": "القيم المطلوبة: {values}",
   "status": {
     "empty": "لم يتم تحميل CSV.",
@@ -32,9 +32,9 @@
     "fieldRequired": "الحقل {field} مطلوب.",
     "textRequired": "الحقل text مطلوب.",
     "wholeNumber": "يجب أن يكون number عددًا صحيحًا.",
-    "security": "يجب أن تكون security ‏WPA أو WEP أو open.",
-    "booleanHidden": "يجب أن تكون hidden ‏true/false أو yes/no أو 1/0.",
-    "booleanAllDay": "يجب أن تكون all_day ‏true/false أو yes/no أو 1/0.",
+    "security": "يجب أن تكون security \u200FWPA أو WEP أو open.",
+    "booleanHidden": "يجب أن تكون hidden \u200Ftrue/false أو yes/no أو 1/0.",
+    "booleanAllDay": "يجب أن تكون all_day \u200Ftrue/false أو yes/no أو 1/0.",
     "dates": "يجب أن يكون start_date وend_date تاريخين صالحين بتنسيق YYYY-MM-DD.",
     "times": "يجب أن تكون الأوقات بتنسيق HH:MM ما لم تكن all_day تساوي true.",
     "eventOrder": "يجب أن تكون نهاية الحدث بعد بدايته.",
