@@ -121,6 +121,11 @@ total among only the active tiers.
 
 Each level is validated independently. An over-budget level is rebuilt with a
 lower tile-byte ceiling and geometry detail without degrading completed zooms.
+Unused bytes roll into the next level. If a level cannot shrink enough at the
+minimum settings, its smallest valid archive is retained and its overage is
+deducted from following levels. A level whose allowance becomes negative uses
+the configured minimum while passing the remaining debt forward. Unresolved
+debt at the final level prevents publication, preserving the total hard cap.
 All temporary archives must pass before the manifest atomically publishes the
 new set. Use `--budget-growth` and `--minimum-level-kib` to tune the curve.
 Tippecanoe is a build-time tool; on macOS install it with

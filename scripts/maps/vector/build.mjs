@@ -5,9 +5,11 @@ import path from 'node:path';
 import { validateVectorLayers } from './prepare.mjs';
 import { prepareVectorInputs } from './prepare.mjs';
 import {
+  availableLevelBudget,
   archiveManifestPath,
   compactBuildSettings,
   planArchiveLevels,
+  updateBudgetCarry,
 } from './budget.mjs';
 import { tippecanoeArguments } from './command.mjs';
 import { temporaryArchivePath, validatePmtilesArchive } from './output.mjs';
@@ -134,47 +136,89 @@ async function runLevel(level, settings) {
   return { temporary, observedBytes };
 }
 
-async function buildLevel(level) {
+async function buildLevel(level, allocatedBudgetBytes) {
+  const allocation = { ...level, budgetBytes: allocatedBudgetBytes };
   let settings = { maximumTileBytes, detail };
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const zoom = `z${level.minimumZoom}`;
     console.log(
       `Building ${zoom}, attempt ${attempt}, ` +
-        `${(level.budgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
+        `${(allocatedBudgetBytes / 1024 / 1024).toFixed(1)} MiB budget, ` +
         `${(settings.maximumTileBytes / 1024).toFixed(1)} KiB tiles...`,
     );
-    const result = await runLevel(level, settings);
-    if (result.observedBytes <= level.budgetBytes) {
+    const result = await runLevel(allocation, settings);
+    if (result.observedBytes <= allocatedBudgetBytes) {
       const bytes = await validatePmtilesArchive(
         result.temporary,
-        level.budgetBytes,
+        allocatedBudgetBytes,
       );
-      return { ...level, ...settings, bytes, temporary: result.temporary };
+      return {
+        ...level,
+        ...settings,
+        allocatedBudgetBytes,
+        bytes,
+        temporary: result.temporary,
+      };
     }
     const next = compactBuildSettings({
       ...settings,
-      budgetBytes: level.budgetBytes,
+      budgetBytes: allocatedBudgetBytes,
       observedBytes: result.observedBytes,
     });
-    await rm(result.temporary, { force: true });
-    if (
-      next.maximumTileBytes === settings.maximumTileBytes &&
-      next.detail === settings.detail
-    ) {
-      break;
+    const smallest =
+      attempt === 5 ||
+      (next.maximumTileBytes === settings.maximumTileBytes &&
+        next.detail === settings.detail);
+    if (smallest) {
+      const bytes = await validatePmtilesArchive(
+        result.temporary,
+        Number.MAX_SAFE_INTEGER,
+      );
+      console.warn(
+        `Zoom ${level.minimumZoom} cannot reach its allocation; ` +
+          `carrying ${((bytes - allocatedBudgetBytes) / 1024 / 1024).toFixed(
+            1,
+          )} MiB debt.`,
+      );
+      return {
+        ...level,
+        ...settings,
+        allocatedBudgetBytes,
+        bytes,
+        temporary: result.temporary,
+      };
     }
+    await rm(result.temporary, { force: true });
     settings = next;
   }
-  throw new Error(
-    `Unable to compact zoom ${level.minimumZoom} within ` +
-      `${(level.budgetBytes / 1024 / 1024).toFixed(1)} MiB.`,
-  );
+  throw new Error(`Unable to build zoom ${level.minimumZoom}.`);
 }
 
 const temporaryFiles = levels.map((level) => temporaryArchivePath(level.file));
 try {
   const results = [];
-  for (const level of levels) results.push(await buildLevel(level));
+  let carryBytes = 0;
+  for (const level of levels) {
+    const allocatedBudgetBytes = availableLevelBudget({
+      plannedBytes: level.budgetBytes,
+      carryBytes,
+      minimumLevelBytes,
+    });
+    const result = await buildLevel(level, allocatedBudgetBytes);
+    carryBytes = updateBudgetCarry({
+      carryBytes,
+      plannedBytes: level.budgetBytes,
+      actualBytes: result.bytes,
+    });
+    result.carryBytes = carryBytes;
+    results.push(result);
+  }
+  if (carryBytes < 0) {
+    throw new Error(
+      `Minimum map archives exceed the total budget by ` +
+        `${(-carryBytes / 1024 / 1024).toFixed(1)} MiB.`,
+    );
+  }
   for (const result of results) await rename(result.temporary, result.file);
   const manifest = {
     version: 1,
@@ -186,7 +230,9 @@ try {
       maximumZoom: result.maximumZoom,
       file: path.basename(result.file),
       bytes: result.bytes,
-      budgetBytes: result.budgetBytes,
+      plannedBudgetBytes: result.budgetBytes,
+      allocatedBudgetBytes: result.allocatedBudgetBytes,
+      carryBytes: result.carryBytes,
       maximumTileBytes: result.maximumTileBytes,
       detail: result.detail,
     })),

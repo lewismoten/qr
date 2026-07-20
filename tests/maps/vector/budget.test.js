@@ -5,8 +5,10 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
+  availableLevelBudget,
   compactBuildSettings,
   planArchiveLevels,
+  updateBudgetCarry,
 } from '../../../scripts/maps/vector/budget.mjs';
 import { publishDetailedMap } from '../../../scripts/maps/vector/publish.mjs';
 
@@ -54,6 +56,38 @@ test('reduces only an over-budget zoom level', () => {
       detail: 11,
     }),
     { maximumTileBytes: 7372, detail: 10 },
+  );
+});
+
+test('passes unused space and unavoidable debt between levels', () => {
+  let carryBytes = updateBudgetCarry({
+    carryBytes: 0,
+    plannedBytes: 100,
+    actualBytes: 60,
+  });
+  assert.equal(carryBytes, 40);
+  assert.equal(
+    availableLevelBudget({
+      plannedBytes: 100,
+      carryBytes,
+      minimumLevelBytes: 10,
+    }),
+    140,
+  );
+
+  carryBytes = updateBudgetCarry({
+    carryBytes: -30,
+    plannedBytes: 20,
+    actualBytes: 10,
+  });
+  assert.equal(carryBytes, -20);
+  assert.equal(
+    availableLevelBudget({
+      plannedBytes: 10,
+      carryBytes,
+      minimumLevelBytes: 8,
+    }),
+    8,
   );
 });
 

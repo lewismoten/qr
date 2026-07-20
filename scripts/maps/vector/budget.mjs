@@ -74,6 +74,18 @@ export function compactBuildSettings({
   };
 }
 
+export function availableLevelBudget({
+  plannedBytes,
+  carryBytes,
+  minimumLevelBytes,
+}) {
+  return Math.max(minimumLevelBytes, plannedBytes + carryBytes);
+}
+
+export function updateBudgetCarry({ carryBytes, plannedBytes, actualBytes }) {
+  return carryBytes + plannedBytes - actualBytes;
+}
+
 export function archiveManifestPath(output) {
   const parsed = path.parse(output);
   return path.join(parsed.dir, `${parsed.name}.json`);
