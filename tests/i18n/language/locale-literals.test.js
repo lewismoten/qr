@@ -11,7 +11,7 @@ const ALLOWED_NUMERIC_KEYS = new Set([
   'bulk.validation.booleanAllDay',
   'bulk.validation.booleanHidden',
   'bulk.validation.times',
-  'debugUi.encoding.alphanumericShort',
+  'debugUi.encoding.alphaShort',
   'debugUi.overlay.unitsHelp',
   'form.data.e164',
   'form.data.fileProtocolHint',

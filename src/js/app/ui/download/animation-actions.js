@@ -59,7 +59,7 @@ export function createAnimationDownloader(deps) {
     }
     if (format === 'gif' && perFrameMs > MAXIMUM_GIF_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
-        'download.gifDurationMaximum',
+        'download.gifMaxDuration',
         'GIF supports at most {duration} per image.',
         {
           duration: deps.formatAnimationDuration(MAXIMUM_GIF_FRAME_DURATION_MS),
@@ -69,7 +69,7 @@ export function createAnimationDownloader(deps) {
     }
     if (format === 'mp4' && perFrameMs < MINIMUM_MP4_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
-        'download.mp4DurationMinimum',
+        'download.mp4MinDuration',
         'MP4 needs at least {milliseconds} milliseconds per image.',
         { milliseconds: MINIMUM_MP4_FRAME_DURATION_MS },
       );

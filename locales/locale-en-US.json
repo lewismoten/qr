@@ -90,15 +90,15 @@
     "preview": "Preview",
     "loading": "Loading...",
     "loadError": "Unable to load the QR Code Generator.",
-    "fragmentLoadError": "Unable to load this section. Check your connection and try again.",
+    "fragmentError": "Unable to load this section. Check your connection and try again.",
     "noFileSelected": "No file selected",
     "sequence": "{current} of {total}",
     "count": "{current} / {total}"
   },
   "file": {
-    "compressionUnsupported": "Gzip transfer compression is not supported by this browser. Turn compression off to continue.",
+    "noCompression": "Gzip transfer compression is not supported by this browser. Turn compression off to continue.",
     "chunkFitError": "Unable to fit the current chunk protocol into this QR configuration.",
-    "manifestFieldLimit": "Manifest field {type} exceeds the {maxBytes}-byte limit.",
+    "manifestLimit": "Manifest field {type} exceeds the {maxBytes}-byte limit.",
     "metadataJson": "Custom file metadata must be valid JSON.",
     "capacity": {
       "download": "Loaded {loadedBytes} B ({loadedSize}) of about {maxBytes} B ({maxSize}) max ({percent}%). QR stores a shareable download URL with the file bytes, name, and MIME type.",
@@ -128,7 +128,7 @@
     "mono": "Mono",
     "monospace": "Monospace",
     "messageColor": "Message color",
-    "maximumLineHeight": "Maximum line height",
+    "maxLineHeight": "Maximum line height",
     "hint": "The message is embedded below the QR or given a tight contrasting outline when centered. Auto uses a concise, non-secret URL, phone number, email address, network name, contact, or file name.",
     "allDay": "All day",
     "wifi": "Wi-Fi {ssid}",
@@ -199,7 +199,7 @@
   },
   "art": {
     "protectOutline": "Protect with a light outline",
-    "protectBackground": "Protect with a light background",
+    "protectBg": "Protect with a light background",
     "outlineThickness": "Outline thickness",
     "editorLabel": "{width} by {height} pixel art editor",
     "pixelLabel": "Pixel {number}",

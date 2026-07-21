@@ -90,15 +90,15 @@
     "preview": "معاينة",
     "loading": "جارٍ التحميل...",
     "loadError": "تعذر تحميل منشئ رمز QR.",
-    "fragmentLoadError": "تعذر تحميل هذا القسم. تحقق من اتصالك وحاول مرة أخرى.",
+    "fragmentError": "تعذر تحميل هذا القسم. تحقق من اتصالك وحاول مرة أخرى.",
     "noFileSelected": "لم يتم اختيار ملف",
     "sequence": "{current} من {total}",
     "count": "{current} / {total}"
   },
   "file": {
-    "compressionUnsupported": "لا يدعم هذا المتصفح ضغط نقل gzip. أوقف الضغط للمتابعة.",
+    "noCompression": "لا يدعم هذا المتصفح ضغط نقل gzip. أوقف الضغط للمتابعة.",
     "chunkFitError": "تعذر احتواء بروتوكول الأجزاء في إعداد QR الحالي.",
-    "manifestFieldLimit": "يتجاوز حقل البيان {type} حد {maxBytes} بايت.",
+    "manifestLimit": "يتجاوز حقل البيان {type} حد {maxBytes} بايت.",
     "metadataJson": "يجب أن تكون بيانات الملف الوصفية المخصصة JSON صالحًا.",
     "capacity": {
       "download": "تم تحميل {loadedBytes} بايت ({loadedSize}) من حد أقصى يقارب {maxBytes} بايت ({maxSize})، بنسبة {percent}%. يخزن QR رابط تنزيل قابلًا للمشاركة يتضمن بايتات الملف واسمه ونوع MIME.",
@@ -128,7 +128,7 @@
     "mono": "أحادي",
     "monospace": "أحادي المسافة",
     "messageColor": "لون الرسالة",
-    "maximumLineHeight": "أقصى ارتفاع للسطر",
+    "maxLineHeight": "أقصى ارتفاع للسطر",
     "hint": "تُدمج الرسالة أسفل QR أو تُحاط بحد متباين عند توسيطها. يستخدم الوضع التلقائي رابطًا أو هاتفًا أو بريدًا أو شبكة أو جهة اتصال أو اسم ملف موجزًا وغير سري.",
     "allDay": "طوال اليوم",
     "wifi": "واي فاي {ssid}",
@@ -199,7 +199,7 @@
   },
   "art": {
     "protectOutline": "حماية بحد فاتح",
-    "protectBackground": "حماية بخلفية فاتحة",
+    "protectBg": "حماية بخلفية فاتحة",
     "outlineThickness": "سُمك الحد",
     "editorLabel": "محرر رسم بكسل {width} في {height}",
     "pixelLabel": "بكسل {number}",

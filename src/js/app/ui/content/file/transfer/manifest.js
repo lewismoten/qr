@@ -74,7 +74,7 @@ export function serializeManifest({
   fields.forEach((field) => {
     if (field.value.length > MAXIMUM_FIELD_LENGTH) {
       throw createLocalizedError(
-        'file.manifestFieldLimit',
+        'file.manifestLimit',
         'Manifest field {type} exceeds the {maxBytes}-byte limit.',
         { type: field.type, maxBytes: MAXIMUM_FIELD_LENGTH },
       );

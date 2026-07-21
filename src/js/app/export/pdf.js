@@ -80,7 +80,7 @@ export async function capturePdfFrame(sourceCanvas, quality, printWidthInches) {
 export function getPdfSheetLayout(frames) {
   if (frames.length === 0) {
     throw createLocalizedError(
-      'download.pdfFramesRequired',
+      'download.pdfNeedsFrames',
       'Add at least one QR code before creating a PDF sheet.',
       undefined,
       TypeError,

@@ -90,15 +90,15 @@
     "preview": "预览",
     "loading": "正在加载...",
     "loadError": "无法加载二维码生成器。",
-    "fragmentLoadError": "无法加载此部分。请检查网络连接后重试。",
+    "fragmentError": "无法加载此部分。请检查网络连接后重试。",
     "noFileSelected": "未选择文件",
     "sequence": "第 {current} 个，共 {total} 个",
     "count": "{current} / {total}"
   },
   "file": {
-    "compressionUnsupported": "此浏览器不支持 gzip 传输压缩，请关闭压缩后继续。",
+    "noCompression": "此浏览器不支持 gzip 传输压缩，请关闭压缩后继续。",
     "chunkFitError": "当前二维码配置无法容纳分块协议。",
-    "manifestFieldLimit": "清单字段 {type} 超过 {maxBytes} 字节限制。",
+    "manifestLimit": "清单字段 {type} 超过 {maxBytes} 字节限制。",
     "metadataJson": "自定义文件元数据必须是有效的 JSON。",
     "capacity": {
       "download": "已加载 {loadedBytes} B（{loadedSize}），最大约 {maxBytes} B（{maxSize}），占 {percent}%。二维码会保存包含文件字节、名称和 MIME 类型的可共享下载网址。",
@@ -128,7 +128,7 @@
     "mono": "等宽",
     "monospace": "等宽字体",
     "messageColor": "文字颜色",
-    "maximumLineHeight": "最大行高",
+    "maxLineHeight": "最大行高",
     "hint": "文字可嵌入二维码下方，居中时则使用紧凑的对比轮廓。自动模式使用简短且非敏感的网址、电话、邮箱、网络名、联系人或文件名。",
     "allDay": "全天",
     "wifi": "Wi-Fi {ssid}",
@@ -199,7 +199,7 @@
   },
   "art": {
     "protectOutline": "使用浅色轮廓保护",
-    "protectBackground": "使用浅色背景保护",
+    "protectBg": "使用浅色背景保护",
     "outlineThickness": "轮廓粗细",
     "editorLabel": "{width} × {height} 像素画编辑器",
     "pixelLabel": "像素 {number}",

@@ -28,7 +28,7 @@ export function createArtworkControls({ elements: e, pixelEditor }) {
     e.backgroundLabel.textContent =
       mode === 'emoji' || mode === 'pixel'
         ? lookup('art.protectOutline', 'Protect with a light outline')
-        : lookup('art.protectBackground', 'Protect with a light background');
+        : lookup('art.protectBg', 'Protect with a light background');
     pixelEditor.syncSizeLabel();
     syncOutline();
     syncEmoji();

@@ -8,7 +8,7 @@
   },
   "encoding": {
     "errorCorrection": "Error correction",
-    "aboutErrorCorrection": "About error correction",
+    "aboutEc": "About error correction",
     "damageRecovery": "Damage recovery",
     "inputMode": "Input mode",
     "aboutInputModes": "About input modes",
@@ -17,7 +17,7 @@
     "manualHelp": "Manual forces the selected mode and flags incompatible characters.",
     "autoDetect": "Auto-detect (excludes Kanji)",
     "manual": "Manual",
-    "alphanumericShort": "A-Z / 0-9",
+    "alphaShort": "A-Z / 0-9",
     "mode": "Mode",
     "version": "Version",
     "autoVersion": "Auto-pick QR version",

@@ -147,7 +147,7 @@ describe('PDF object builders', () => {
       () => getPdfSheetLayout([]),
       (error) => {
         assert.ok(error instanceof TypeError);
-        assert.equal(error.i18nKey, 'download.pdfFramesRequired');
+        assert.equal(error.i18nKey, 'download.pdfNeedsFrames');
         assert.equal(
           error.message,
           'Add at least one QR code before creating a PDF sheet.',

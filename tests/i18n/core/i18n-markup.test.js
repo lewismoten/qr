@@ -134,9 +134,9 @@ const runtimeErrorKeys = Object.keys(englishMessages).filter(
     key.startsWith('bulk.csv.') ||
     key.startsWith('bulk.validation.') ||
     [
-      'file.compressionUnsupported',
+      'file.noCompression',
       'file.chunkFitError',
-      'file.manifestFieldLimit',
+      'file.manifestLimit',
       'file.metadataJson',
     ].includes(key),
 );

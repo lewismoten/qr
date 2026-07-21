@@ -8,7 +8,7 @@
   },
   "encoding": {
     "errorCorrection": "त्रुटि सुधार",
-    "aboutErrorCorrection": "त्रुटि सुधार के बारे में",
+    "aboutEc": "त्रुटि सुधार के बारे में",
     "damageRecovery": "क्षति पुनर्प्राप्ति",
     "inputMode": "इनपुट मोड",
     "aboutInputModes": "इनपुट मोड के बारे में",
@@ -17,7 +17,7 @@
     "manualHelp": "मैनुअल चुने हुए मोड को लागू करता है और असंगत अक्षर चिह्नित करता है।",
     "autoDetect": "स्वतः पहचान (कांजी के बिना)",
     "manual": "मैनुअल",
-    "alphanumericShort": "A-Z / 0-9",
+    "alphaShort": "A-Z / 0-9",
     "mode": "मोड",
     "version": "संस्करण",
     "autoVersion": "QR संस्करण स्वतः चुनें",

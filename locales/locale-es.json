@@ -90,15 +90,15 @@
     "preview": "Vista previa",
     "loading": "Cargando...",
     "loadError": "No se pudo cargar el generador de códigos QR.",
-    "fragmentLoadError": "No se pudo cargar esta sección. Comprueba tu conexión e inténtalo de nuevo.",
+    "fragmentError": "No se pudo cargar esta sección. Comprueba tu conexión e inténtalo de nuevo.",
     "noFileSelected": "Ningún archivo seleccionado",
     "sequence": "{current} de {total}",
     "count": "{current} / {total}"
   },
   "file": {
-    "compressionUnsupported": "Este navegador no admite la compresión gzip. Desactívala para continuar.",
+    "noCompression": "Este navegador no admite la compresión gzip. Desactívala para continuar.",
     "chunkFitError": "El protocolo de fragmentos no cabe en esta configuración QR.",
-    "manifestFieldLimit": "El campo {type} del manifiesto supera el límite de {maxBytes} bytes.",
+    "manifestLimit": "El campo {type} del manifiesto supera el límite de {maxBytes} bytes.",
     "metadataJson": "Los metadatos personalizados deben ser JSON válido.",
     "capacity": {
       "download": "Cargados {loadedBytes} B ({loadedSize}) de unos {maxBytes} B ({maxSize}) como máximo ({percent}%). El QR guarda una URL de descarga compartible con los bytes, el nombre y el tipo MIME del archivo.",
@@ -128,7 +128,7 @@
     "mono": "Mono",
     "monospace": "Monoespaciada",
     "messageColor": "Color del mensaje",
-    "maximumLineHeight": "Altura máxima de línea",
+    "maxLineHeight": "Altura máxima de línea",
     "hint": "El mensaje se integra debajo del QR o recibe un contorno de contraste al centrarse. Automático usa una URL, teléfono, correo, red, contacto o archivo breve y no secreto.",
     "allDay": "Todo el día",
     "wifi": "Wi-Fi {ssid}",
@@ -199,7 +199,7 @@
   },
   "art": {
     "protectOutline": "Proteger con un contorno claro",
-    "protectBackground": "Proteger con un fondo claro",
+    "protectBg": "Proteger con un fondo claro",
     "outlineThickness": "Grosor del contorno",
     "editorLabel": "Editor de pixel art de {width} por {height}",
     "pixelLabel": "Píxel {number}",

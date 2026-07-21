@@ -84,7 +84,7 @@ export function createFileCache({
     }
     if (typeof CompressionStream !== 'function') {
       throw createLocalizedError(
-        'file.compressionUnsupported',
+        'file.noCompression',
         'Gzip transfer compression is not supported by this browser. Turn compression off to continue.',
       );
     }

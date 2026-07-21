@@ -8,7 +8,7 @@
   },
   "encoding": {
     "errorCorrection": "纠错",
-    "aboutErrorCorrection": "关于纠错",
+    "aboutEc": "关于纠错",
     "damageRecovery": "损坏恢复",
     "inputMode": "输入模式",
     "aboutInputModes": "关于输入模式",
@@ -17,7 +17,7 @@
     "manualHelp": "手动模式强制使用所选模式，并标出不兼容字符。",
     "autoDetect": "自动检测（不含汉字）",
     "manual": "手动",
-    "alphanumericShort": "A-Z / 0-9",
+    "alphaShort": "A-Z / 0-9",
     "mode": "模式",
     "version": "版本",
     "autoVersion": "自动选择二维码版本",

@@ -200,9 +200,7 @@ export function createDownloadActions(options) {
       triggerDownload(createPdfSheetBlob(frames), `qr-codes-${total}.pdf`);
       const pages = Math.ceil(total / framesPerPage);
       status.textContent = lookup(
-        pages === 1
-          ? 'download.pdfSheetReadyOne'
-          : 'download.pdfSheetReadyMany',
+        pages === 1 ? 'download.pdfSheetReadyOne' : 'download.pdfSheetsReady',
         pages === 1
           ? 'PDF ready with {total} QR codes on {pages} page.'
           : 'PDF ready with {total} QR codes on {pages} pages.',

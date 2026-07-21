@@ -89,7 +89,7 @@ async function addMapChecks(checks, config) {
     'map manifest',
     manifestFile,
     manifestBytes,
-    config.limits.mapManifestRawKiB * KIBIBYTE,
+    config.limits.mapIndexRawKiB * KIBIBYTE,
   );
   for (const archive of manifest.archives) {
     addCheck(
@@ -149,7 +149,7 @@ export async function evaluateAssetBudgets({
       'HTML route transfer',
       route.name,
       route.transfer,
-      config.limits.htmlRouteTransferKiB * KIBIBYTE,
+      config.limits.htmlWireKiB * KIBIBYTE,
     );
   }
 
@@ -163,8 +163,8 @@ export async function evaluateAssetBudgets({
       entry.name,
       initial ? entry.raw : entry.transfer,
       (initial
-        ? config.limits.initialJavaScriptRawKiB
-        : config.limits.lazyJavaScriptEntryTransferKiB) * KIBIBYTE,
+        ? config.limits.initialJsRawKiB
+        : config.limits.lazyEntryWireKiB) * KIBIBYTE,
     );
   }
 
@@ -187,7 +187,7 @@ export async function evaluateAssetBudgets({
       'application route transfer',
       route.name,
       route.transfer,
-      config.limits.appRouteTransferKiB * KIBIBYTE,
+      config.limits.appWireKiB * KIBIBYTE,
     );
   }
   const startup = appRoutes.find(({ name }) => name === 'content/data');
@@ -196,14 +196,14 @@ export async function evaluateAssetBudgets({
     'initial route raw',
     'index.html cold startup',
     startup.raw,
-    config.limits.initialRouteRawKiB * KIBIBYTE,
+    config.limits.initialRawKiB * KIBIBYTE,
   );
   addCheck(
     checks,
     'initial route transfer',
     'index.html cold startup',
     startup.transfer,
-    config.limits.initialRouteTransferKiB * KIBIBYTE,
+    config.limits.initialWireKiB * KIBIBYTE,
   );
 
   const chunks = await findFiles('dist/chunks', '.js');
@@ -214,7 +214,7 @@ export async function evaluateAssetBudgets({
       'lazy JavaScript chunk',
       file,
       raw,
-      config.limits.lazyJavaScriptChunkRawKiB * KIBIBYTE,
+      config.limits.lazyChunkRawKiB * KIBIBYTE,
     );
   }
   for (const file of await findFiles('dist', '.css')) {

@@ -124,7 +124,7 @@ export function ensurePanelFragment(
       const message = document.createElement('p');
       message.className = 'validation-message';
       message.textContent = lookup(
-        'common.fragmentLoadError',
+        'common.fragmentError',
         'Unable to load this section. Check your connection and try again.',
       );
       const children = helpLink ? [message, helpLink] : [message];

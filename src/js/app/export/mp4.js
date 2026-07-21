@@ -17,7 +17,7 @@ export async function createAnimatedMp4Blob(
   const mimeType = getSupportedMp4MimeType();
   if (!mimeType) {
     throw createLocalizedError(
-      'download.mp4EncoderUnavailable',
+      'download.mp4NoEncoder',
       'This browser does not provide an MP4 encoder. Animated GIF is available instead.',
     );
   }

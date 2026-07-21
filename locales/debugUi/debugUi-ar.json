@@ -8,7 +8,7 @@
   },
   "encoding": {
     "errorCorrection": "تصحيح الأخطاء",
-    "aboutErrorCorrection": "حول تصحيح الأخطاء",
+    "aboutEc": "حول تصحيح الأخطاء",
     "damageRecovery": "استعادة التلف",
     "inputMode": "وضع الإدخال",
     "aboutInputModes": "حول أوضاع الإدخال",
@@ -17,7 +17,7 @@
     "manualHelp": "يفرض الوضع اليدوي النمط المحدد ويشير إلى الأحرف غير المتوافقة.",
     "autoDetect": "اكتشاف تلقائي (باستثناء كانجي)",
     "manual": "يدوي",
-    "alphanumericShort": "A-Z / 0-9",
+    "alphaShort": "A-Z / 0-9",
     "mode": "الوضع",
     "version": "الإصدار",
     "autoVersion": "اختيار إصدار QR تلقائيًا",
