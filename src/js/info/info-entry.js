@@ -26,7 +26,7 @@ if (guideLocale) {
     locale: guideLocale,
     baseUrl: new URL(localeBase, document.baseURI),
   });
-  translateDocument(document);
+  await translateDocument(document);
   localizeDates(document, result.locale);
   syncLanguageSwitcher(result.locale);
 }

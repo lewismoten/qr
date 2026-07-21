@@ -7,7 +7,6 @@ import {
   normalizeLocaleEntries,
   selectLocale,
 } from './locale-resources.js';
-import { localizeGuideLinks } from './guide-path.js';
 
 const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title', 'value'];
 
@@ -72,6 +71,18 @@ export function getErrorText(error, defaultText = '') {
 
 export function getActiveLocale() {
   return activeLocale;
+}
+
+export async function getActiveGuidePath(path) {
+  if (activeLocale === DEFAULT_LOCALE) return path;
+  const { getLocalizedGuidePath } = await import('./guide-path.js');
+  return getLocalizedGuidePath(path, activeLocale);
+}
+
+async function localizeActiveGuideLinks(document) {
+  if (activeLocale === DEFAULT_LOCALE) return;
+  const { localizeGuideLinks } = await import('./guide-path.js');
+  localizeGuideLinks(document, activeLocale);
 }
 
 export function getAvailableLocales() {
@@ -181,7 +192,6 @@ export function translateDocument(document) {
     ? 'rtl'
     : 'ltr';
   document.documentElement.classList.toggle('i18n-debug', debugLanguage);
-  localizeGuideLinks(document, activeLocale);
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = lookup(element.dataset.i18n, element.textContent);
   });
@@ -205,4 +215,5 @@ export function translateDocument(document) {
       element.dataset.i18nAppliedValue = translated;
     });
   });
+  return localizeActiveGuideLinks(document);
 }

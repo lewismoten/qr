@@ -75,7 +75,7 @@ async function ensureDebugTooltip() {
 
 async function changeLocale(locale) {
   await initializeLanguage({ locale });
-  translateDocument(document);
+  await translateDocument(document);
   document.dispatchEvent(new Event('languagechange'));
   await ensureDebugTooltip();
   await application?.refreshLanguage();
@@ -88,7 +88,7 @@ async function start() {
   await initializeLanguage({ locale: getSavedLocale() });
   await completeMilestone('localization');
   await ensureDebugTooltip();
-  translateDocument(document);
+  await translateDocument(document);
   setupExternalLinks();
   setupLanguagePicker({ onLocaleChange: changeLocale });
   application = await import('./app/app-controller.js');

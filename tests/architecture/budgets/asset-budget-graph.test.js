@@ -99,6 +99,25 @@ test('cold-start budget includes independently requested assets', async () => {
   ]);
 });
 
+test('translated guide routing stays out of static startup imports', async () => {
+  const startupModules = [
+    'src/js/i18n/index.js',
+    'src/js/app/ui/fragment-loader.js',
+    'src/js/app/ui/navigation/location.js',
+  ];
+  for (const file of startupModules) {
+    const source = await readFile(file, 'utf8');
+    assert.doesNotMatch(source, /^import .*guide-(?:path|routes)/m, file);
+  }
+  const i18n = await readFile('src/js/i18n/index.js', 'utf8');
+  const navigation = await readFile(
+    'src/js/app/ui/navigation/location.js',
+    'utf8',
+  );
+  assert.match(i18n, /import\('\.\/guide-path\.js'\)/);
+  assert.match(navigation, /import\([\s\S]*guide-routes\.js/);
+});
+
 test('route budgets reject missing entry points', async () => {
   await assert.rejects(
     () =>

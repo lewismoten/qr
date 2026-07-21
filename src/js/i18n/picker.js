@@ -108,7 +108,7 @@ export function setupLanguagePicker({
   ],
   onLocaleChange = async (locale) => {
     await initializeLanguage({ locale });
-    translateDocument(document);
+    await translateDocument(document);
   },
 } = {}) {
   const picker = document?.getElementById('language-picker');

@@ -1,9 +1,8 @@
 import {
-  getActiveLocale,
+  getActiveGuidePath,
   lookup,
   translateDocument,
 } from '../../i18n/index.js';
-import { getLocalizedGuidePath } from '../../i18n/guide-path.js';
 import { MEDIA_TYPE_HTML } from '../media-types.js';
 
 const requests = new WeakMap();
@@ -86,11 +85,11 @@ export function ensurePanelFragment(
   const helpLink = panel.querySelector?.('[data-fragment-help-link]');
   panel.setAttribute('aria-busy', 'true');
   const request = Promise.resolve()
-    .then(() => {
+    .then(async () => {
       if (typeof fetcher !== 'function') {
         throw new Error('Fetch is unavailable.');
       }
-      const localizedUrl = getLocalizedGuidePath(url, getActiveLocale());
+      const localizedUrl = await getActiveGuidePath(url);
       return fetcher(new URL(localizedUrl, document.baseURI));
     })
     .then((response) => {
@@ -99,7 +98,7 @@ export function ensurePanelFragment(
       }
       return response.text();
     })
-    .then((source) => {
+    .then(async (source) => {
       const parsed = parse(source);
       const fragment = parsed.querySelector('[data-app-fragment]');
       if (!fragment) throw new Error('Fragment content is missing.');
@@ -109,7 +108,7 @@ export function ensurePanelFragment(
       if (helpLink) children.push(helpLink);
       panel.replaceChildren(...children);
       panel.dataset.fragmentLoaded = 'true';
-      translateDocument(document);
+      await translateDocument(document);
       installFragmentHelp({
         document,
         panel,

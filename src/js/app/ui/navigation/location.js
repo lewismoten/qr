@@ -1,5 +1,3 @@
-import { NAVIGATION_ALIASES } from '../../../i18n/guide-routes.js';
-
 const SUBTABS = Object.freeze({
   content: new Set(['data', 'format', 'frame']),
   style: new Set(['size', 'modules', 'colors', 'artwork']),
@@ -7,21 +5,21 @@ const SUBTABS = Object.freeze({
   debug: new Set(['encoding', 'mask', 'payload', 'overlay']),
 });
 
-export function readNavigationHash(hash) {
+export function readNavigationHash(hash, aliases = []) {
   const value = hash.startsWith('#') ? hash.slice(1) : hash;
   const parameters = new URLSearchParams(value);
   let tab = parameters.get('tab');
   let requestedSubtab = parameters.get('subtab');
   if (!tab) {
-    for (const aliases of Object.values(NAVIGATION_ALIASES)) {
-      const localizedTab = parameters.get(aliases.keys[0]);
+    for (const alias of aliases) {
+      const localizedTab = parameters.get(alias.keys[0]);
       if (!localizedTab) continue;
-      tab = Object.entries(aliases.tabs).find(
+      tab = Object.entries(alias.tabs).find(
         ([, translated]) => translated === localizedTab,
       )?.[0];
-      const localizedSubtab = parameters.get(aliases.keys[1]);
+      const localizedSubtab = parameters.get(alias.keys[1]);
       requestedSubtab =
-        Object.entries(aliases.subtabs).find(
+        Object.entries(alias.subtabs).find(
           ([, translated]) => translated === localizedSubtab,
         )?.[0] || localizedSubtab;
       break;
@@ -35,7 +33,12 @@ export function readNavigationHash(hash) {
 }
 
 export async function activateNavigationHash(navigation, hash) {
-  const target = readNavigationHash(hash);
+  let target = readNavigationHash(hash);
+  if (!target && hash && !/[#&]?tab=/.test(hash)) {
+    const { NAVIGATION_ALIASES } =
+      await import('../../../i18n/guide-routes.js');
+    target = readNavigationHash(hash, Object.values(NAVIGATION_ALIASES));
+  }
   if (!target) return false;
   await navigation.activateTab(target.tab);
   const activate = {
