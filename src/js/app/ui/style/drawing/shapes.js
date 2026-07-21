@@ -1,3 +1,17 @@
+import { COLOR_BLACK } from '../../../colors.js';
+import {
+  getFinderPatternPart,
+  isFinderPattern,
+} from '../../../qr/qr-finder-regions.js';
+import { HALF_TURN_DEGREES, STYLE_PERCENT_SCALE } from '../style-values.js';
+import { getEyeGeometry, getModuleGeometry } from './shape-geometry.js';
+
+const FINDER_OUTER_MODULES = 7;
+const FINDER_INNER_MODULES = 5;
+const FINDER_CENTER_MODULES = 3;
+
+export { getFinderPatternPart, isFinderPattern };
+
 function addRoundedRectPath(context, x, y, width, height, radius) {
   const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
   context.beginPath();
@@ -18,59 +32,39 @@ function addRoundedRectPath(context, x, y, width, height, radius) {
   context.closePath();
 }
 
-function getModuleGeometry(options = {}) {
-  if (options.type === 'rounded')
-    return { inset: 0, rounding: 32, rotation: 0 };
-  if (options.type === 'dots') return { inset: 8, rounding: 50, rotation: 0 };
-  if (options.type === 'diamond')
-    return { inset: 15, rounding: 0, rotation: 45 };
-  if (options.type !== 'custom') return null;
-  return {
-    inset: Math.min(30, Math.max(0, options.inset ?? 4)),
-    rounding: Math.min(50, Math.max(0, options.rounding ?? 25)),
-    rotation: Math.min(45, Math.max(-45, options.rotation ?? 0)),
-  };
-}
-
 export function drawQrModule(context, x, y, cellSize, options) {
   const geometry = getModuleGeometry(options);
   if (!geometry || cellSize < 2) {
     context.fillRect(x, y, Math.ceil(cellSize), Math.ceil(cellSize));
     return;
   }
-  const inset = cellSize * (geometry.inset / 100);
+  const inset = cellSize * (geometry.inset / STYLE_PERCENT_SCALE);
   const size = Math.max(0, cellSize - inset * 2);
   context.save();
   context.translate(x + cellSize / 2, y + cellSize / 2);
-  context.rotate((geometry.rotation * Math.PI) / 180);
+  context.rotate((geometry.rotation * Math.PI) / HALF_TURN_DEGREES);
   addRoundedRectPath(
     context,
     -size / 2,
     -size / 2,
     size,
     size,
-    size * (geometry.rounding / 100),
+    size * (geometry.rounding / STYLE_PERCENT_SCALE),
   );
   context.restore();
   context.fill();
 }
 
-function getEyeGeometry(options) {
-  if (options.type === 'square') return { outerRounding: 0, centerRounding: 0 };
-  if (options.type === 'rounded')
-    return { outerRounding: 18, centerRounding: 32 };
-  if (options.type === 'circle')
-    return { outerRounding: 50, centerRounding: 50 };
-  if (options.type !== 'custom') return null;
-  return {
-    outerRounding: Math.min(50, Math.max(0, options.outerRounding ?? 20)),
-    centerRounding: Math.min(50, Math.max(0, options.centerRounding ?? 35)),
-  };
-}
-
 export function fillEyeShape(context, x, y, size, rounding, fillStyle) {
   context.fillStyle = fillStyle;
-  addRoundedRectPath(context, x, y, size, size, size * (rounding / 100));
+  addRoundedRectPath(
+    context,
+    x,
+    y,
+    size,
+    size,
+    size * (rounding / STYLE_PERCENT_SCALE),
+  );
   context.fill();
 }
 
@@ -95,8 +89,8 @@ export function drawFinderEyes(
   if (!geometry) return;
   [
     [0, 0],
-    [0, moduleCount - 7],
-    [moduleCount - 7, 0],
+    [0, moduleCount - FINDER_OUTER_MODULES],
+    [moduleCount - FINDER_OUTER_MODULES, 0],
   ].forEach(([row, column]) => {
     const x = (column + marginModules) * cellSize;
     const y = (row + marginModules) * cellSize;
@@ -105,7 +99,7 @@ export function drawFinderEyes(
         context,
         x,
         y,
-        cellSize * 7,
+        cellSize * FINDER_OUTER_MODULES,
         geometry.outerRounding,
         imageFillOptions.pattern,
         imageFillOptions.darkFillStyle,
@@ -114,7 +108,7 @@ export function drawFinderEyes(
         context,
         x + cellSize,
         y + cellSize,
-        cellSize * 5,
+        cellSize * FINDER_INNER_MODULES,
         geometry.outerRounding,
         imageFillOptions.pattern,
         imageFillOptions.lightFillStyle,
@@ -123,7 +117,7 @@ export function drawFinderEyes(
         context,
         x + cellSize * 2,
         y + cellSize * 2,
-        cellSize * 3,
+        cellSize * FINDER_CENTER_MODULES,
         geometry.centerRounding,
         imageFillOptions.pattern,
         imageFillOptions.darkFillStyle,
@@ -134,7 +128,7 @@ export function drawFinderEyes(
       context,
       x,
       y,
-      cellSize * 7,
+      cellSize * FINDER_OUTER_MODULES,
       geometry.outerRounding,
       outerFillStyle,
     );
@@ -144,7 +138,7 @@ export function drawFinderEyes(
       context,
       x + cellSize,
       y + cellSize,
-      cellSize * 5,
+      cellSize * FINDER_INNER_MODULES,
       geometry.outerRounding,
       COLOR_BLACK,
     );
@@ -154,7 +148,7 @@ export function drawFinderEyes(
         context,
         x + cellSize,
         y + cellSize,
-        cellSize * 5,
+        cellSize * FINDER_INNER_MODULES,
         geometry.outerRounding,
         lightColor,
       );
@@ -163,7 +157,7 @@ export function drawFinderEyes(
       context,
       x + cellSize * 2,
       y + cellSize * 2,
-      cellSize * 3,
+      cellSize * FINDER_CENTER_MODULES,
       geometry.centerRounding,
       centerFillStyle,
     );
@@ -223,7 +217,7 @@ export function createQrModuleFill(
       (qrSize * Math.SQRT2) / 2,
     );
   } else {
-    const radians = (options.angle * Math.PI) / 180;
+    const radians = (options.angle * Math.PI) / HALF_TURN_DEGREES;
     const cosine = Math.cos(radians);
     const sine = Math.sin(radians);
     const extent = (qrSize / 2) * (Math.abs(cosine) + Math.abs(sine));
@@ -238,10 +232,3 @@ export function createQrModuleFill(
   gradient.addColorStop(1, options.endColor);
   return gradient;
 }
-import {
-  getFinderPatternPart,
-  isFinderPattern,
-} from '../../../qr/qr-finder-regions.js';
-
-export { getFinderPatternPart, isFinderPattern };
-import { COLOR_BLACK } from '../../../colors.js';

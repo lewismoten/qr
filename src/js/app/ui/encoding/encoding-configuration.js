@@ -1,5 +1,8 @@
 import { createLocalizedError } from '../../../localized-error.js';
 
+const DEFAULT_QR_SCALE = 4;
+const DEFAULT_QR_WIDTH_PX = 320;
+
 export function createQrConfiguration({
   elements: e,
   encoder,
@@ -10,13 +13,13 @@ export function createQrConfiguration({
     const base = {
       errorCorrectionLevel: helpers.getErrorLevel().value,
       margin: helpers.readInteger(e.qrMargin) ?? 1,
-      scale: helpers.readInteger(e.qrScale) ?? 4,
+      scale: helpers.readInteger(e.qrScale) ?? DEFAULT_QR_SCALE,
       color: {
         ...helpers.getQrColors(),
       },
     };
     if (!e.qrWidthAuto.checked)
-      base.width = helpers.readInteger(e.qrWidth) ?? 320;
+      base.width = helpers.readInteger(e.qrWidth) ?? DEFAULT_QR_WIDTH_PX;
     const chunked =
       e.qrFormat.value === 'file' && helpers.getFileMode() === 'chunked';
     const version = chunked

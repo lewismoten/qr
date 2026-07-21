@@ -1,6 +1,8 @@
 import { loadHandbookPages } from './pages.js';
 import { getHandbookCopy } from './copy.js';
 
+const PRINT_DIALOG_DELAY_MS = 250;
+
 const PRINT_CSS = `
 @page { margin: .6in; }
 body { color: #172033; font: 11pt/1.5 Georgia, serif; }
@@ -61,5 +63,5 @@ export async function printHandbook(locale, target) {
   target.document.body.textContent = copy.preparing;
   const pages = await loadHandbookPages(locale);
   buildPrintDocument(target.document, pages, locale, copy);
-  setTimeout(() => target.print(), 250);
+  setTimeout(() => target.print(), PRINT_DIALOG_DELAY_MS);
 }

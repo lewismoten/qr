@@ -25,6 +25,21 @@ export const COLORS = {
 };
 export const MIXED_TEXT = '1234567890HELLO-world';
 
+const LARGE_EXAMPLE_VERSION = 7;
+const VISUAL_PATH_LIMITS = Object.freeze({
+  header: 24,
+  payload: 56,
+  padding: 48,
+  errorCorrection: 80,
+  remainder: 8,
+  headerPayload: 12,
+});
+const ALIGNMENT_CROP_RADIUS = 3;
+const DARK_MODULE_ROW_OFFSET = 11;
+const VERSION_CROP_COLUMN_OFFSET = 13;
+const REMAINDER_CROP_PADDING = 3;
+const REMAINDER_CROP_MINIMUM = 10;
+
 const createDefinition = (text, version, errorCorrectionLevel = 'M') => {
   const qr = qrEncoder.create(text, { version, errorCorrectionLevel });
   return {
@@ -36,7 +51,7 @@ const createDefinition = (text, version, errorCorrectionLevel = 'M') => {
 
 const large = createDefinition(
   'QR SPEC VISUAL GUIDE 2026 / MODE + COUNT + PAYLOAD',
-  7,
+  LARGE_EXAMPLE_VERSION,
   'M',
 );
 const compact = createDefinition('QR GUIDE 123', 2, 'M');
@@ -77,15 +92,31 @@ export function getVisuals() {
   const largeSize = large.qr.modules.size;
   const compactSize = compact.qr.modules.size;
   const alignmentCenter = getAlignmentPatternCenters(large.qr.version).at(-1);
-  const headerIndexes = indexesForRoles(large, ['mode', 'charCount'], 24);
-  const payloadIndexes = indexesForRoles(large, ['payload'], 56);
+  const headerIndexes = indexesForRoles(
+    large,
+    ['mode', 'charCount'],
+    VISUAL_PATH_LIMITS.header,
+  );
+  const payloadIndexes = indexesForRoles(
+    large,
+    ['payload'],
+    VISUAL_PATH_LIMITS.payload,
+  );
   const paddingIndexes = indexesForRoles(
     large,
     ['terminator', 'bytePad', 'padByte'],
-    48,
+    VISUAL_PATH_LIMITS.padding,
   );
-  const ecIndexes = indexesForRoles(large, ['errorCorrection'], 80);
-  const remainderIndexes = indexesForRoles(compact, ['remainder'], 8);
+  const ecIndexes = indexesForRoles(
+    large,
+    ['errorCorrection'],
+    VISUAL_PATH_LIMITS.errorCorrection,
+  );
+  const remainderIndexes = indexesForRoles(
+    compact,
+    ['remainder'],
+    VISUAL_PATH_LIMITS.remainder,
+  );
   const mixedIndexes = indexesForRoles(mixed, ['mode', 'charCount', 'payload']);
 
   return {
@@ -101,8 +132,8 @@ export function getVisuals() {
     alignment: {
       definition: large,
       crop: {
-        row: alignmentCenter - 3,
-        column: alignmentCenter - 3,
+        row: alignmentCenter - ALIGNMENT_CROP_RADIUS,
+        column: alignmentCenter - ALIGNMENT_CROP_RADIUS,
         rows: 7,
         columns: 7,
       },
@@ -115,7 +146,12 @@ export function getVisuals() {
     },
     'dark-module': {
       definition: large,
-      crop: { row: largeSize - 11, column: 5, rows: 8, columns: 8 },
+      crop: {
+        row: largeSize - DARK_MODULE_ROW_OFFSET,
+        column: 5,
+        rows: 8,
+        columns: 8,
+      },
       focus: ['darkModule'],
     },
     format: {
@@ -125,7 +161,12 @@ export function getVisuals() {
     },
     version: {
       definition: large,
-      crop: { row: 0, column: largeSize - 13, rows: 10, columns: 13 },
+      crop: {
+        row: 0,
+        column: largeSize - VERSION_CROP_COLUMN_OFFSET,
+        rows: 10,
+        columns: VERSION_CROP_COLUMN_OFFSET,
+      },
       focus: ['version'],
     },
     header: {
@@ -133,12 +174,15 @@ export function getVisuals() {
       crop: cropAroundModules(
         modulesAtIndexes(large, [
           ...headerIndexes,
-          ...payloadIndexes.slice(0, 12),
+          ...payloadIndexes.slice(0, VISUAL_PATH_LIMITS.headerPayload),
         ]),
         largeSize,
       ),
       focus: ['mode', 'charCount', 'data'],
-      pathIndexes: [...headerIndexes, ...payloadIndexes.slice(0, 12)],
+      pathIndexes: [
+        ...headerIndexes,
+        ...payloadIndexes.slice(0, VISUAL_PATH_LIMITS.headerPayload),
+      ],
     },
     padding: {
       definition: large,
@@ -154,8 +198,8 @@ export function getVisuals() {
       crop: cropAroundModules(
         modulesAtIndexes(compact, remainderIndexes),
         compactSize,
-        3,
-        10,
+        REMAINDER_CROP_PADDING,
+        REMAINDER_CROP_MINIMUM,
       ),
       focus: ['remainder'],
       pathIndexes: remainderIndexes,

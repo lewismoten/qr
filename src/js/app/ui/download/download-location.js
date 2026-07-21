@@ -1,5 +1,7 @@
 import { base64UrlToBase64 } from '../content/file/transfer/protocol.js';
 
+const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
+
 export function restoreLocationDownload({ window, document }) {
   const hash = window.location.hash.startsWith('#')
     ? window.location.hash.slice(1)
@@ -25,7 +27,10 @@ export function restoreLocationDownload({ window, document }) {
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(
+      () => URL.revokeObjectURL(url),
+      OBJECT_URL_REVOCATION_DELAY_MS,
+    );
   } catch (error) {
     console.error(
       'Unable to restore downloadable file from the QR URL.',

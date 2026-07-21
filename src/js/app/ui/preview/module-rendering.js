@@ -6,6 +6,8 @@ import {
   isFinderPattern,
 } from './style-drawing.js';
 
+const DEBUG_OVERLAY_OPACITY = 0.5;
+
 export function drawQrMatrix(state) {
   const {
     context,
@@ -44,7 +46,10 @@ export function drawQrMatrix(state) {
           debugModel,
           'overlay',
         );
-        context.fillStyle = hexToRgba(debugColors[category].value, 0.5);
+        context.fillStyle = hexToRgba(
+          debugColors[category].value,
+          DEBUG_OVERLAY_OPACITY,
+        );
         context.fillRect(
           (column + marginModules) * cellSize,
           (row + marginModules) * cellSize,

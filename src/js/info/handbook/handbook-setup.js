@@ -1,12 +1,14 @@
 import { getHandbookCopy } from './copy.js';
 
+const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
+
 function download(blob, name) {
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.href = url;
   link.download = name;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setTimeout(() => URL.revokeObjectURL(url), OBJECT_URL_REVOCATION_DELAY_MS);
 }
 
 function action(label, run) {

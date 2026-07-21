@@ -1,4 +1,5 @@
 import { lookup } from '../../../../i18n/index.js';
+import { STYLE_DEFAULTS } from '../style-values.js';
 
 export function createEyeShapeSection({
   shape,
@@ -27,10 +28,10 @@ export function createEyeShapeSection({
   const getOptions = () => ({
     type: shape.value,
     outerRounding: Number.isNaN(Number.parseInt(outerRounding.value, 10))
-      ? 20
+      ? STYLE_DEFAULTS.eye.outerRounding
       : Number.parseInt(outerRounding.value, 10),
     centerRounding: Number.isNaN(Number.parseInt(centerRounding.value, 10))
-      ? 35
+      ? STYLE_DEFAULTS.eye.centerRounding
       : Number.parseInt(centerRounding.value, 10),
   });
 

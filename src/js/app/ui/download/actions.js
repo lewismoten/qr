@@ -1,6 +1,10 @@
 import { getErrorText, lookup } from '../../../i18n/index.js';
 import { createAnimationDownloader } from './animation-actions.js';
 
+const DEFAULT_EXPORT_QUALITY_PERCENT = 92;
+const PERCENT_SCALE = 100;
+const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
+
 let exportersPromise;
 const loadExporters = () => {
   exportersPromise ??= import('./exporters.js');
@@ -34,7 +38,8 @@ export function createDownloadActions(options) {
       button.disabled = disabled;
     });
   const getQuality = () =>
-    (Number.parseInt(options.qualityInput?.value, 10) || 92) / 100;
+    (Number.parseInt(options.qualityInput?.value, 10) ||
+      DEFAULT_EXPORT_QUALITY_PERCENT) / PERCENT_SCALE;
   const makePdf = async (sourceCanvas) => {
     const { createPdfBlob } = await loadExporters();
     return createPdfBlob(
@@ -67,7 +72,10 @@ export function createDownloadActions(options) {
     link.href = url;
     link.download = name;
     link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(
+      () => URL.revokeObjectURL(url),
+      OBJECT_URL_REVOCATION_DELAY_MS,
+    );
   };
   const getSuffix = () => {
     const total = getFrameCount();

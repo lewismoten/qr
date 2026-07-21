@@ -1,5 +1,6 @@
 import { COLOR_BLACK, COLOR_WHITE } from '../../../colors.js';
 import { lookup } from '../../../../i18n/index.js';
+import { STYLE_DEFAULTS, STYLE_LIMITS } from '../style-values.js';
 
 const PALETTE = [
   ['black', 'Black', COLOR_BLACK],
@@ -29,7 +30,7 @@ export function createPixelArtEditor({
   sizeValue,
   onChange,
 }) {
-  let size = 16;
+  let size = STYLE_DEFAULTS.pixelArt.size;
   let pixels = Array(size * size).fill(null);
   let activeColor = COLOR_BLACK;
   let paintValue = null;
@@ -127,7 +128,13 @@ export function createPixelArtEditor({
     scheduleRender();
   };
   const resize = (nextSize) => {
-    const normalized = Math.min(32, Math.max(8, nextSize - (nextSize % 2)));
+    const normalized = Math.min(
+      STYLE_LIMITS.pixelArt.maximumSize,
+      Math.max(
+        STYLE_LIMITS.pixelArt.minimumSize,
+        nextSize - (nextSize % STYLE_LIMITS.pixelArt.sizeStep),
+      ),
+    );
     if (normalized === size) return;
     const previousSize = size;
     const previousPixels = pixels;
@@ -165,7 +172,9 @@ export function createPixelArtEditor({
     syncPalette();
   });
   sizeInput.addEventListener('input', () =>
-    resize(Number.parseInt(sizeInput.value, 10) || 16),
+    resize(
+      Number.parseInt(sizeInput.value, 10) || STYLE_DEFAULTS.pixelArt.size,
+    ),
   );
   grid.addEventListener('pointerdown', (event) => {
     const cell = event.target.closest('.pixel-art-cell');

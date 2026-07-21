@@ -9,13 +9,24 @@ const MODE_LABELS = {
   byte: ['spec.modes.byte', 'Byte mode'],
   kanji: ['spec.modes.kanji', 'Kanji'],
 };
+const FIRST_VERSION_BUCKET_MAXIMUM = 9;
+const SECOND_VERSION_BUCKET_MAXIMUM = 26;
+const HEX_RADIX = 16;
+const HEX_BYTE_WIDTH = 2;
+const SHIFT_JIS_HEX_WIDTH = 4;
+const MODE_INDICATOR_BIT_COUNT = 4;
 
 function toBits(value, length) {
   return Number(value).toString(2).padStart(length, '0');
 }
 
 function getCountWidth(mode, version = 1) {
-  const bucket = version <= 9 ? 0 : version <= 26 ? 1 : 2;
+  const bucket =
+    version <= FIRST_VERSION_BUCKET_MAXIMUM
+      ? 0
+      : version <= SECOND_VERSION_BUCKET_MAXIMUM
+        ? 1
+        : 2;
   return COUNT_BITS[mode][bucket];
 }
 
@@ -44,7 +55,12 @@ function describeUnit(mode, value, segment) {
       'The visible character is UTF-8 {encoding}, so the count is {count} and the payload is {bits} bits.',
       {
         encoding: [...new TextEncoder().encode(value)]
-          .map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
+          .map((byte) =>
+            byte
+              .toString(HEX_RADIX)
+              .padStart(HEX_BYTE_WIDTH, '0')
+              .toUpperCase(),
+          )
           .join(' '),
         count: segment.characterCount,
         bits: segment.bits.length,
@@ -52,9 +68,9 @@ function describeUnit(mode, value, segment) {
     );
   const shiftJis = qrEncoder
     .toSJIS(value)
-    .toString(16)
+    .toString(HEX_RADIX)
     .toUpperCase()
-    .padStart(4, '0');
+    .padStart(SHIFT_JIS_HEX_WIDTH, '0');
   return lookup(
     'spec.units.kanji',
     'Shift JIS {value} is transformed into one {bits}-bit QR Kanji value.',
@@ -72,7 +88,7 @@ function renderUnitExample(example) {
   const segment = definition.segments[0];
   example.querySelector('[data-mode-bits]').textContent = toBits(
     MODE_BITS[mode],
-    4,
+    MODE_INDICATOR_BIT_COUNT,
   );
   example.querySelector('[data-count-bits]').textContent = toBits(
     segment.characterCount,
@@ -105,7 +121,7 @@ function createMixedSegment(segment, index) {
     'spec.mixed.fields',
     'mode {mode} | count {count} | payload: {bits} bits',
     {
-      mode: toBits(MODE_BITS[mode], 4),
+      mode: toBits(MODE_BITS[mode], MODE_INDICATOR_BIT_COUNT),
       count: toBits(segment.characterCount, getCountWidth(mode)),
       bits: segment.bits.length,
     },
@@ -117,7 +133,10 @@ function createMixedSegment(segment, index) {
 function getMixedBitCounts(segments) {
   const mixed = segments.reduce(
     (total, segment) =>
-      total + 4 + getCountWidth(segment.mode) + segment.bits.length,
+      total +
+      MODE_INDICATOR_BIT_COUNT +
+      getCountWidth(segment.mode) +
+      segment.bits.length,
     0,
   );
   const byteSegment = qrEncoder.create([{ mode: 'byte', data: MIXED_TEXT }], {
@@ -126,7 +145,10 @@ function getMixedBitCounts(segments) {
   }).segments[0];
   return {
     mixed,
-    bytes: 4 + getCountWidth('byte') + byteSegment.bits.length,
+    bytes:
+      MODE_INDICATOR_BIT_COUNT +
+      getCountWidth('byte') +
+      byteSegment.bits.length,
   };
 }
 

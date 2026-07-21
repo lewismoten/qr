@@ -1,8 +1,10 @@
+import { STYLE_DEFAULTS, STYLE_PERCENT_SCALE } from '../style-values.js';
+
 export function getPixelArtLayout(
   center,
   artSize,
   pixelArt,
-  outlinePercent = 25,
+  outlinePercent = STYLE_DEFAULTS.artwork.outlinePercent,
 ) {
   const pixelSize = artSize / pixelArt.size;
   const artX = center - artSize / 2;
@@ -22,7 +24,7 @@ export function getPixelArtLayout(
   });
 
   return {
-    outline: Math.max(1, pixelSize * (outlinePercent / 100)),
+    outline: Math.max(1, pixelSize * (outlinePercent / STYLE_PERCENT_SCALE)),
     pixels,
   };
 }

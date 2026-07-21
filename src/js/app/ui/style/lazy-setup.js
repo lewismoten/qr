@@ -1,3 +1,5 @@
+import { STYLE_DEFAULTS } from './style-values.js';
+
 export function createLazyStyleSetup(options) {
   let controller = null;
   let featureElements = null;
@@ -37,9 +39,9 @@ export function createLazyStyleSetup(options) {
       getOptions: () =>
         controller?.modules.getOptions() ?? {
           type: 'square',
-          rounding: 25,
-          inset: 4,
-          rotation: 0,
+          rounding: STYLE_DEFAULTS.module.rounding,
+          inset: STYLE_DEFAULTS.module.inset,
+          rotation: STYLE_DEFAULTS.module.rotation,
         },
     },
     eyes: {
@@ -47,8 +49,8 @@ export function createLazyStyleSetup(options) {
       getOptions: () =>
         controller?.eyes.getOptions() ?? {
           type: 'default',
-          outerRounding: 20,
-          centerRounding: 35,
+          outerRounding: STYLE_DEFAULTS.eye.outerRounding,
+          centerRounding: STYLE_DEFAULTS.eye.centerRounding,
         },
     },
     colors: {
@@ -84,16 +86,17 @@ export function createLazyStyleSetup(options) {
         mode: featureElements?.centerArtMode?.value ?? 'none',
         emoji: featureElements?.centerEmoji?.value.trim() ?? '',
         sizePercent: featureElements?.centerArtSize
-          ? Number.parseInt(featureElements.centerArtSize.value, 10) || 20
-          : 20,
+          ? Number.parseInt(featureElements.centerArtSize.value, 10) ||
+            STYLE_DEFAULTS.artwork.sizePercent
+          : STYLE_DEFAULTS.artwork.sizePercent,
         protectBackground:
           featureElements?.centerArtBackground?.checked ?? true,
         outlinePercent: featureElements?.centerArtOutlineThickness
           ? Number.parseInt(
               featureElements.centerArtOutlineThickness.value,
               10,
-            ) || 25
-          : 25,
+            ) || STYLE_DEFAULTS.artwork.outlinePercent
+          : STYLE_DEFAULTS.artwork.outlinePercent,
         matchModuleShape:
           featureElements?.pixelArtMatchModuleShape?.checked ?? false,
       }),
@@ -104,8 +107,10 @@ export function createLazyStyleSetup(options) {
       syncSizeLabel: () => controller?.pixelEditor.syncSizeLabel(),
       getState: () =>
         controller?.pixelEditor.getState() ?? {
-          size: 16,
-          pixels: Array(256).fill(null),
+          size: STYLE_DEFAULTS.pixelArt.size,
+          pixels: Array(
+            STYLE_DEFAULTS.pixelArt.size * STYLE_DEFAULTS.pixelArt.size,
+          ).fill(null),
         },
     },
     imageFill: { getImage: () => controller?.imageFill.getImage() ?? null },

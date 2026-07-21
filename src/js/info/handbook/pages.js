@@ -47,20 +47,23 @@ async function inlineImages(container) {
   );
 }
 
+const PAGE_RENDER_TIMEOUT_MS = 15_000;
+const PAGE_SETTLE_DELAY_MS = 300;
+
 function renderedDocument(url) {
   return new Promise((resolve, reject) => {
     const frame = document.createElement('iframe');
     const timer = setTimeout(() => {
       frame.remove();
       reject(new Error(`Timed out while rendering ${url.pathname}.`));
-    }, 15_000);
+    }, PAGE_RENDER_TIMEOUT_MS);
     frame.hidden = true;
     frame.setAttribute('aria-hidden', 'true');
     frame.addEventListener('load', () => {
       clearTimeout(timer);
       setTimeout(
         () => resolve({ document: frame.contentDocument, frame }),
-        300,
+        PAGE_SETTLE_DELAY_MS,
       );
     });
     frame.src = `${url.href}${url.search ? '&' : '?'}handbook-source=1`;

@@ -4,11 +4,12 @@ import {
 } from '../preview/style-drawing.js';
 import { COLOR_ACCENT } from '../../colors.js';
 import { loadFeatureStylesheet } from '../../../stylesheets.js';
-
-const readInteger = (input, fallback) => {
-  const value = Number.parseInt(input?.value, 10);
-  return Number.isNaN(value) ? fallback : value;
-};
+import {
+  getFallbackEyeOptions,
+  getFallbackModuleOptions,
+  getFallbackPixelArtState,
+  readStyleInteger,
+} from './style-values.js';
 
 export function createStyleSetup({
   document,
@@ -221,21 +222,12 @@ export function createStyleSetup({
   const modules = {
     sync: () => modulesSystem?.modules.sync(),
     getOptions: () =>
-      modulesSystem?.modules.getOptions() ?? {
-        type: e.moduleShape?.value ?? 'square',
-        rounding: readInteger(e.moduleRounding, 25),
-        inset: readInteger(e.moduleInset, 4),
-        rotation: readInteger(e.moduleRotation, 0),
-      },
+      modulesSystem?.modules.getOptions() ?? getFallbackModuleOptions(e),
   };
   const eyes = {
     sync: () => modulesSystem?.eyes.sync(),
     getOptions: () =>
-      modulesSystem?.eyes.getOptions() ?? {
-        type: e.eyeShape?.value ?? 'default',
-        outerRounding: readInteger(e.eyeOuterRounding, 20),
-        centerRounding: readInteger(e.eyeCenterRounding, 35),
-      },
+      modulesSystem?.eyes.getOptions() ?? getFallbackEyeOptions(e),
   };
   const colors = {
     sync: () => colorsSystem?.colors.sync(),
@@ -245,7 +237,7 @@ export function createStyleSetup({
     getGradientOptions: () =>
       colorsSystem?.colors.getGradientOptions() ?? {
         type: e.gradientType?.value ?? 'solid',
-        angle: readInteger(e.gradientAngle, 0),
+        angle: readStyleInteger(e.gradientAngle, 0),
         endColor: e.colorGradientEnd
           ? colorWithTransparency(
               e.colorGradientEnd.value.trim() || COLOR_ACCENT,
@@ -263,11 +255,7 @@ export function createStyleSetup({
     syncPalette: () => artworkSystem?.pixelEditor.syncPalette(),
     syncSizeLabel: () => artworkSystem?.pixelEditor.syncSizeLabel(),
     getState: () =>
-      artworkSystem?.pixelEditor.getState() ??
-      (() => {
-        const size = readInteger(e.pixelArtSizeInput, 16);
-        return { size, pixels: Array(size * size).fill(null) };
-      })(),
+      artworkSystem?.pixelEditor.getState() ?? getFallbackPixelArtState(e),
   };
 
   const load = async (name) => {

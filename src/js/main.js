@@ -8,6 +8,9 @@ import {
 import { getSavedLocale, setupLanguagePicker } from './i18n/picker.js';
 import { loadFeatureStylesheet } from './stylesheets.js';
 
+const INITIAL_BOOT_PROGRESS_PERCENT = 5;
+const FINAL_PROGRESS_PAINT_DELAY_MS = 160;
+
 const bootProgress = document.getElementById('boot-loading-progress');
 const bootPercent = document.getElementById('boot-loading-percent');
 const completedMilestones = new Set();
@@ -27,7 +30,7 @@ function completeMilestone(name) {
   if (completedMilestones.has(name)) return progressPaint;
   completedMilestones.add(name);
   const value =
-    5 +
+    INITIAL_BOOT_PROGRESS_PERCENT +
     [...completedMilestones].reduce(
       (total, milestone) => total + milestoneWeights[milestone],
       0,
@@ -93,7 +96,9 @@ async function start() {
   await application.applicationReady;
   await completeMilestone('render');
   await stylesReady;
-  await new Promise((resolve) => setTimeout(resolve, 160));
+  await new Promise((resolve) =>
+    setTimeout(resolve, FINAL_PROGRESS_PAINT_DELAY_MS),
+  );
 }
 
 const bootLoading = document.getElementById('boot-loading');

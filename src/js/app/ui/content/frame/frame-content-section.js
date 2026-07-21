@@ -1,13 +1,26 @@
 import { getActiveLocale, lookup } from '../../../../i18n/index.js';
 import { parseBoolean } from '../../../data/csv.js';
 
-function shorten(value, maximumLength = 64) {
+const FRAME_MESSAGE_MAXIMUM_LENGTH = 64;
+const EVENT_LINE_MAXIMUM_LENGTH = 80;
+const ELLIPSIS_LENGTH = 3;
+const ISO_YEAR_LENGTH = 4;
+const DATE_FORMAT_REFERENCE_YEAR = 2000;
+const DATE_FORMAT_NOON_HOUR = 12;
+const MINIMUM_FILE_NAME_LENGTH = 8;
+const FONT_WEIGHT_BOLD = 700;
+const FONT_WEIGHT_EXTRA_BOLD = 800;
+const DEFAULT_FRAME_LINE_HEIGHT = 18;
+
+function shorten(value, maximumLength = FRAME_MESSAGE_MAXIMUM_LENGTH) {
   const normalized = String(value || '')
     .replace(/\s+/g, ' ')
     .trim();
   return normalized.length <= maximumLength
     ? normalized
-    : `${normalized.slice(0, Math.max(0, maximumLength - 3)).trimEnd()}...`;
+    : `${normalized
+        .slice(0, Math.max(0, maximumLength - ELLIPSIS_LENGTH))
+        .trimEnd()}...`;
 }
 
 function shortText(value) {
@@ -41,7 +54,7 @@ function formatDate(value, includeYear = true) {
     month: 'short',
     day: 'numeric',
     ...(includeYear ? { year: 'numeric' } : {}),
-  }).format(new Date(year, month - 1, day, 12));
+  }).format(new Date(year, month - 1, day, DATE_FORMAT_NOON_HOUR));
 }
 
 function formatTime(value) {
@@ -51,7 +64,7 @@ function formatTime(value) {
   return new Intl.DateTimeFormat(getActiveLocale(), {
     hour: 'numeric',
     minute: '2-digit',
-  }).format(new Date(2000, 0, 1, hour, minute));
+  }).format(new Date(DATE_FORMAT_REFERENCE_YEAR, 0, 1, hour, minute));
 }
 
 export function createFrameSection(options) {
@@ -59,10 +72,11 @@ export function createFrameSection(options) {
     const { event } = options;
     const startDate = formatDate(event.startDate.value);
     if (!startDate || !event.endDate.value)
-      return shorten(event.title.value, 80);
+      return shorten(event.title.value, EVENT_LINE_MAXIMUM_LENGTH);
     const sameDate = event.startDate.value === event.endDate.value;
     const sameYear =
-      event.startDate.value.slice(0, 4) === event.endDate.value.slice(0, 4);
+      event.startDate.value.slice(0, ISO_YEAR_LENGTH) ===
+      event.endDate.value.slice(0, ISO_YEAR_LENGTH);
     const endDate = sameDate ? '' : formatDate(event.endDate.value);
     let schedule = sameDate
       ? startDate
@@ -77,8 +91,8 @@ export function createFrameSection(options) {
         : `${formatDate(event.startDate.value, !sameYear)} ${startTime} - ${endDate} ${endTime}`;
     }
     return joinMessageLines(
-      shorten(event.title.value, 80),
-      shorten(schedule, 80),
+      shorten(event.title.value, EVENT_LINE_MAXIMUM_LENGTH),
+      shorten(schedule, EVENT_LINE_MAXIMUM_LENGTH),
     );
   };
 
@@ -127,8 +141,8 @@ export function createFrameSection(options) {
           ? lookup('frame.allDay', 'All day')
           : `${row.start_time} - ${row.end_time}`;
         return joinMessageLines(
-          shorten(row.title, 80),
-          shorten(`${dates} | ${times}`, 80),
+          shorten(row.title, EVENT_LINE_MAXIMUM_LENGTH),
+          shorten(`${dates} | ${times}`, EVENT_LINE_MAXIMUM_LENGTH),
         );
       }
       case 'geo':
@@ -157,7 +171,11 @@ export function createFrameSection(options) {
       Math.max(1, Number.parseInt(options.fileIndex.value, 10) || 1),
     );
     const sequence = ` ${lookup('frame.sequence', '{current} of {total}', { current, total })}`;
-    return `${shorten(name, Math.max(8, 64 - sequence.length))}${sequence}`;
+    const availableNameLength = Math.max(
+      MINIMUM_FILE_NAME_LENGTH,
+      FRAME_MESSAGE_MAXIMUM_LENGTH - sequence.length,
+    );
+    return `${shorten(name, availableNameLength)}${sequence}`;
   };
 
   const getAutomaticMessage = () => {
@@ -234,7 +252,7 @@ export function createFrameSection(options) {
     options.customField.hidden = !custom;
     if (options.mode.value === 'none') return '';
     return custom
-      ? shorten(options.customMessage.value, 80)
+      ? shorten(options.customMessage.value, EVENT_LINE_MAXIMUM_LENGTH)
       : getAutomaticMessage();
   };
   const setCentered = (enabled) => {
@@ -247,19 +265,21 @@ export function createFrameSection(options) {
   };
   const getFont = (size) =>
     ({
-      sans: `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`,
-      rounded: `800 ${size}px "Arial Rounded MT Bold", "Trebuchet MS", sans-serif`,
-      serif: `700 ${size}px Georgia, "Times New Roman", serif`,
-      mono: `700 ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
+      sans: `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Avenir Next", "Segoe UI", sans-serif`,
+      rounded: `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Arial Rounded MT Bold", "Trebuchet MS", sans-serif`,
+      serif: `${FONT_WEIGHT_BOLD} ${size}px Georgia, "Times New Roman", serif`,
+      mono: `${FONT_WEIGHT_BOLD} ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
     })[options.font.value] ||
-    `800 ${size}px "Avenir Next", "Segoe UI", sans-serif`;
+    `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Avenir Next", "Segoe UI", sans-serif`;
 
   const sync = () => {
     options.customField.hidden = options.mode.value !== 'custom';
   };
   const getRenderOptions = () => ({
     centered: options.centerCheckbox.checked,
-    lineHeight: Number.parseInt(options.lineHeight.value, 10) || 18,
+    lineHeight:
+      Number.parseInt(options.lineHeight.value, 10) ||
+      DEFAULT_FRAME_LINE_HEIGHT,
     color: options.color.value,
   });
   return { getMessage, setCentered, getFont, getRenderOptions, sync };

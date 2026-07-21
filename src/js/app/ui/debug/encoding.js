@@ -1,6 +1,14 @@
 import { normalizeModeName } from '../../modes.js';
 import { lookup } from '../../../i18n/index.js';
 
+const FIRST_QR_KANJI_RANGE_START = 0x8140;
+const FIRST_QR_KANJI_RANGE_END = 0x9ffc;
+const SECOND_QR_KANJI_RANGE_START = 0xe040;
+const SECOND_QR_KANJI_RANGE_END = 0xebbf;
+const MAXIMUM_INVALID_POSITIONS_SHOWN = 20;
+const BITS_PER_BYTE = 8;
+const PERCENT_SCALE = 100;
+
 function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
   if (mode === 'byte') return [];
   if (mode === 'kanji') {
@@ -14,8 +22,10 @@ function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
       }
       const isQrKanji =
         Number.isInteger(shiftJisValue) &&
-        ((shiftJisValue >= 0x8140 && shiftJisValue <= 0x9ffc) ||
-          (shiftJisValue >= 0xe040 && shiftJisValue <= 0xebbf));
+        ((shiftJisValue >= FIRST_QR_KANJI_RANGE_START &&
+          shiftJisValue <= FIRST_QR_KANJI_RANGE_END) ||
+          (shiftJisValue >= SECOND_QR_KANJI_RANGE_START &&
+            shiftJisValue <= SECOND_QR_KANJI_RANGE_END));
       if (!isQrKanji) invalid.push({ char, index });
     });
     return invalid;
@@ -92,10 +102,11 @@ export function createEncodingDiagnostics({
 
     if (!message || !invalidIndexes.length) return;
     const shown = invalidIndexes
-      .slice(0, 20)
+      .slice(0, MAXIMUM_INVALID_POSITIONS_SHOWN)
       .map((index) => index + 1)
       .join(', ');
-    const suffix = invalidIndexes.length > 20 ? ', ...' : '';
+    const suffix =
+      invalidIndexes.length > MAXIMUM_INVALID_POSITIONS_SHOWN ? ', ...' : '';
     modeValidation.textContent = lookup(
       'encoding.invalidPositions',
       '{message} Positions: {positions}{suffix}.',
@@ -188,9 +199,11 @@ export function createEncodingDiagnostics({
     ).length;
     const unusedPercent =
       dataCodewords > 0
-        ? Math.round((unusedBits / (dataCodewords * 8)) * 100)
+        ? Math.round(
+            (unusedBits / (dataCodewords * BITS_PER_BYTE)) * PERCENT_SCALE,
+          )
         : 0;
-    const unusedBytes = unusedBits / 8;
+    const unusedBytes = unusedBits / BITS_PER_BYTE;
     const unusedByteLabel = Number.isInteger(unusedBytes)
       ? `${unusedBytes}`
       : unusedBytes.toFixed(1);

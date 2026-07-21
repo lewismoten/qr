@@ -1,10 +1,13 @@
 import { lookup } from '../../../../i18n/index.js';
+import { STYLE_DEFAULTS } from '../style-values.js';
 
 export function createLazyPixelArtEditor(options, { isActive, onReady }) {
   let editor = null;
   let request = null;
 
-  const getSize = () => Number.parseInt(options.sizeInput.value, 10) || 16;
+  const getSize = () =>
+    Number.parseInt(options.sizeInput.value, 10) ||
+    STYLE_DEFAULTS.pixelArt.size;
   const syncFallbackLabel = () => {
     const size = getSize();
     options.sizeValue.textContent = lookup(

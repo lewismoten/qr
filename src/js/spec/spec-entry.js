@@ -11,6 +11,31 @@ import { setupHandbookExports } from '../info/handbook/handbook-setup.js';
 import { renderEncodingExamples } from './encoding-examples.js';
 import { COLORS, getVisuals } from './visual-models.js';
 
+const FULL_CIRCLE_RADIANS = Math.PI * 2;
+const MODULE_CENTER_OFFSET = 0.5;
+const PATH_STYLE = Object.freeze({
+  minimumLineWidth: 1.5,
+  lineWidthScale: 0.11,
+  shadowBlurScale: 0.12,
+  minimumStartRadius: 2,
+  startRadiusScale: 0.16,
+});
+const CANVAS_LAYOUT = Object.freeze({
+  maximumPixelRatio: 2,
+  minimumWidth: 240,
+  fallbackWidth: 360,
+  minimumHeight: 150,
+  heightToWidthRatio: 0.625,
+  padding: 18,
+  focusedOpacity: 0.76,
+  unfocusedOpacity: 0.1,
+  gridMinimumModuleSize: 7,
+});
+const MASK_PREVIEW_LAYOUT = Object.freeze({
+  minimumWidth: 120,
+  fallbackWidth: 180,
+});
+
 const guideLocale = document.documentElement.dataset.guideLocale;
 if (guideLocale) {
   const localeBase = document.documentElement.dataset.localeBase || 'locales/';
@@ -52,26 +77,39 @@ function drawPath(context, visual, geometry) {
         module.column < crop.column + crop.columns,
     )
     .map((module) => ({
-      x: geometry.left + (module.column - crop.column + 0.5) * geometry.module,
-      y: geometry.top + (module.row - crop.row + 0.5) * geometry.module,
+      x:
+        geometry.left +
+        (module.column - crop.column + MODULE_CENTER_OFFSET) * geometry.module,
+      y:
+        geometry.top +
+        (module.row - crop.row + MODULE_CENTER_OFFSET) * geometry.module,
     }));
   if (points.length < 2) return;
   context.save();
   context.beginPath();
   context.moveTo(points[0].x, points[0].y);
   points.slice(1).forEach(({ x, y }) => context.lineTo(x, y));
-  context.lineWidth = Math.max(1.5, geometry.module * 0.11);
+  context.lineWidth = Math.max(
+    PATH_STYLE.minimumLineWidth,
+    geometry.module * PATH_STYLE.lineWidthScale,
+  );
   context.strokeStyle = 'rgba(255,255,255,0.9)';
   context.shadowColor = 'rgba(7,24,39,0.7)';
-  context.shadowBlur = Math.max(1, geometry.module * 0.12);
+  context.shadowBlur = Math.max(
+    1,
+    geometry.module * PATH_STYLE.shadowBlurScale,
+  );
   context.stroke();
   context.beginPath();
   context.arc(
     points[0].x,
     points[0].y,
-    Math.max(2, geometry.module * 0.16),
+    Math.max(
+      PATH_STYLE.minimumStartRadius,
+      geometry.module * PATH_STYLE.startRadiusScale,
+    ),
     0,
-    Math.PI * 2,
+    FULL_CIRCLE_RADIANS,
   );
   context.fillStyle = '#fff';
   context.fill();
@@ -79,11 +117,17 @@ function drawPath(context, visual, geometry) {
 }
 
 function renderVisual(canvas, visual) {
-  const ratio = Math.min(2, window.devicePixelRatio || 1);
-  const width = Math.max(240, Math.round(canvas.clientWidth || 360));
+  const ratio = Math.min(
+    CANVAS_LAYOUT.maximumPixelRatio,
+    window.devicePixelRatio || 1,
+  );
+  const width = Math.max(
+    CANVAS_LAYOUT.minimumWidth,
+    Math.round(canvas.clientWidth || CANVAS_LAYOUT.fallbackWidth),
+  );
   const height = Math.max(
-    150,
-    Math.round(canvas.clientHeight || width * 0.625),
+    CANVAS_LAYOUT.minimumHeight,
+    Math.round(canvas.clientHeight || width * CANVAS_LAYOUT.heightToWidthRatio),
   );
   canvas.width = Math.round(width * ratio);
   canvas.height = Math.round(height * ratio);
@@ -97,7 +141,10 @@ function renderVisual(canvas, visual) {
   const moduleSize = Math.max(
     1,
     Math.floor(
-      Math.min((width - 18) / crop.columns, (height - 18) / crop.rows),
+      Math.min(
+        (width - CANVAS_LAYOUT.padding) / crop.columns,
+        (height - CANVAS_LAYOUT.padding) / crop.rows,
+      ),
     ),
   );
   const matrixWidth = moduleSize * crop.columns;
@@ -122,14 +169,21 @@ function renderVisual(canvas, visual) {
         visual.showMaskEffect,
       );
       const focused = !visual.focus || visual.focus.includes(category);
-      context.globalAlpha = focused ? 0.76 : 0.1;
+      context.globalAlpha = focused
+        ? CANVAS_LAYOUT.focusedOpacity
+        : CANVAS_LAYOUT.unfocusedOpacity;
       context.fillStyle = COLORS[category] || COLORS.data;
       context.fillRect(x, y, moduleSize, moduleSize);
       context.globalAlpha = 1;
-      if (moduleSize >= 7) {
+      if (moduleSize >= CANVAS_LAYOUT.gridMinimumModuleSize) {
         context.strokeStyle = 'rgba(255,255,255,0.22)';
         context.lineWidth = 1;
-        context.strokeRect(x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1);
+        context.strokeRect(
+          x + MODULE_CENTER_OFFSET,
+          y + MODULE_CENTER_OFFSET,
+          moduleSize - 1,
+          moduleSize - 1,
+        );
       }
     }
   }
@@ -155,8 +209,14 @@ function renderMaskPreview(canvas) {
     maskPattern,
   });
   const model = buildDebugOverlayModel(qr, { errorCorrectionLevel: 'M' });
-  const ratio = Math.min(2, window.devicePixelRatio || 1);
-  const width = Math.max(120, Math.round(canvas.clientWidth || 180));
+  const ratio = Math.min(
+    CANVAS_LAYOUT.maximumPixelRatio,
+    window.devicePixelRatio || 1,
+  );
+  const width = Math.max(
+    MASK_PREVIEW_LAYOUT.minimumWidth,
+    Math.round(canvas.clientWidth || MASK_PREVIEW_LAYOUT.fallbackWidth),
+  );
   canvas.width = Math.round(width * ratio);
   canvas.height = Math.round(width * ratio);
   const context = canvas.getContext('2d');

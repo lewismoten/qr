@@ -15,6 +15,11 @@ import {
 } from '../../qr/qr-stream.js';
 import qrEncoder, { isMaskActive } from '@lewismoten/qr';
 
+const ERROR_CORRECTION_LEVEL_BIT_COUNT = 2;
+const MASK_PATTERN_BIT_END = 5;
+const VERSION_INFORMATION_MINIMUM_VERSION = 7;
+const BITS_PER_CODEWORD = 8;
+
 export function moduleIsDark(qrDefinition, row, column) {
   if (typeof qrDefinition.modules.get === 'function')
     return qrDefinition.modules.get(row, column);
@@ -73,18 +78,43 @@ function buildMetadataGroups(qrDefinition) {
   const size = qrDefinition.modules.size;
   const { primary, secondary } = getFormatInfoCoordinates(size);
   const groups = [];
-  pushMetadataGroups(groups, primary.slice(0, 2), 'ecLevel', 'ecLevel-primary');
-  pushMetadataGroups(groups, primary.slice(2, 5), 'mask', 'mask-primary');
-  pushMetadataGroups(groups, primary.slice(5), 'format', 'format-primary');
   pushMetadataGroups(
     groups,
-    secondary.slice(0, 2),
+    primary.slice(0, ERROR_CORRECTION_LEVEL_BIT_COUNT),
+    'ecLevel',
+    'ecLevel-primary',
+  );
+  pushMetadataGroups(
+    groups,
+    primary.slice(ERROR_CORRECTION_LEVEL_BIT_COUNT, MASK_PATTERN_BIT_END),
+    'mask',
+    'mask-primary',
+  );
+  pushMetadataGroups(
+    groups,
+    primary.slice(MASK_PATTERN_BIT_END),
+    'format',
+    'format-primary',
+  );
+  pushMetadataGroups(
+    groups,
+    secondary.slice(0, ERROR_CORRECTION_LEVEL_BIT_COUNT),
     'ecLevel',
     'ecLevel-secondary',
   );
-  pushMetadataGroups(groups, secondary.slice(2, 5), 'mask', 'mask-secondary');
-  pushMetadataGroups(groups, secondary.slice(5), 'format', 'format-secondary');
-  if (qrDefinition.version >= 7) {
+  pushMetadataGroups(
+    groups,
+    secondary.slice(ERROR_CORRECTION_LEVEL_BIT_COUNT, MASK_PATTERN_BIT_END),
+    'mask',
+    'mask-secondary',
+  );
+  pushMetadataGroups(
+    groups,
+    secondary.slice(MASK_PATTERN_BIT_END),
+    'format',
+    'format-secondary',
+  );
+  if (qrDefinition.version >= VERSION_INFORMATION_MINIMUM_VERSION) {
     const versionInfo = getVersionInfoCoordinates(size);
     pushMetadataGroups(
       groups,
@@ -133,11 +163,11 @@ export function buildDebugOverlayModel(qrDefinition, options) {
     target?.add(coordKey(module.row, module.column));
   });
   const codewords = [];
-  for (let index = 0; index < traversal.length; index += 8) {
-    const roles = bitRoles.slice(index, index + 8);
+  for (let index = 0; index < traversal.length; index += BITS_PER_CODEWORD) {
+    const roles = bitRoles.slice(index, index + BITS_PER_CODEWORD);
     codewords.push({
       kind: summarizeCodewordRoles(roles),
-      modules: traversal.slice(index, index + 8),
+      modules: traversal.slice(index, index + BITS_PER_CODEWORD),
       roles,
     });
   }
