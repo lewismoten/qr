@@ -72,7 +72,7 @@ test('tracking control removes detected parameters from its URL field', () => {
   input.ownerDocument = { defaultView: { Event } };
   input.closest = () => ({ querySelector: () => control });
 
-  setupUrlTrackingControl(input);
+  const tracking = setupUrlTrackingControl(input);
   assert.equal(control.hidden, false);
   assert.equal(names.textContent, 'fbclid');
 
@@ -88,4 +88,13 @@ test('tracking control removes detected parameters from its URL field', () => {
   assert.equal(control.hidden, true);
   assert.equal(dialog.open, false);
   assert.equal(dialog.returnValue, 'removed');
+
+  dialog.open = true;
+  tracking.sync();
+  assert.equal(dialog.open, false);
+  remove.dispatchEvent(new Event('click'));
+  assert.equal(dialog.returnValue, '');
+
+  const unavailable = setupUrlTrackingControl({ closest: () => null });
+  assert.doesNotThrow(() => unavailable.sync());
 });

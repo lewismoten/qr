@@ -66,6 +66,52 @@ function mockContent(ids, links) {
   };
 }
 
+function mockElement({ id = '', tagName = 'DIV', text = '', attributes = {} }) {
+  const values = new Map(Object.entries(attributes));
+  const children = [];
+  const element = {
+    id,
+    tagName,
+    textContent: text,
+    children,
+    get attributes() {
+      return [...values].map(([name, value]) => ({ name, value }));
+    },
+    get href() {
+      return values.get('href');
+    },
+    classList: { add: (value) => values.set('class', value) },
+    matches: (selector) => selector === 'a[href]' && values.has('href'),
+    setAttribute: (name, value) => values.set(name, value),
+    removeAttribute: (name) => values.delete(name),
+    querySelector: (selector) =>
+      selector.includes('indicator') ? children[0] || null : null,
+    querySelectorAll: (selector) =>
+      selector.includes('indicator') ? children : [],
+    append: (child) => children.push(child),
+    value: (name) => values.get(name),
+  };
+  return element;
+}
+
+function richContent({ ids = [], links = [], headings = [], elements = [] }) {
+  const ownerDocument = {
+    createElement: (tagName) => mockElement({ tagName: tagName.toUpperCase() }),
+  };
+  links.forEach((link) => (link.ownerDocument = ownerDocument));
+  return {
+    ownerDocument,
+    querySelectorAll(selector) {
+      if (selector === '[id]')
+        return [...ids, ...headings.filter(({ id }) => id)];
+      if (selector === 'a[href]') return links;
+      if (selector === 'h2, h3') return headings;
+      if (selector === '*') return [...ids, ...links, ...elements];
+      return [];
+    },
+  };
+}
+
 test('handbook links target namespaced chapters inside the output', () => {
   const targetId = { id: 'details' };
   const internal = {
@@ -97,6 +143,105 @@ test('handbook links target namespaced chapters inside the output', () => {
   assert.equal(targetId.id, `${chapter}-details`);
   assert.equal(internal.href, `content/email.xhtml#${chapter}-details`);
   assert.equal(external.href, 'https://example.com/');
+});
+
+test('handbook preparation rewrites identifiers, references, and links', () => {
+  const field = mockElement({ id: 'field' });
+  const reference = mockElement({
+    attributes: {
+      'aria-labelledby': 'field missing',
+      style: 'clip-path: url(#field)',
+      title: '#field',
+    },
+  });
+  const heading = mockElement({ tagName: 'H3', text: 'Details' });
+  const internal = mockElement({
+    tagName: 'A',
+    attributes: {
+      href: 'http://127.0.0.1/guides/content/email.html#field',
+      rel: 'external',
+      target: '_blank',
+    },
+  });
+  let removedIndicators = 0;
+  internal.children.push({ remove: () => (removedIndicators += 1) });
+  const malformedFragment = mockElement({
+    tagName: 'A',
+    attributes: { href: 'http://localhost/guides/content/email.html#%E0%A4%A' },
+  });
+  const external = mockElement({
+    tagName: 'A',
+    attributes: { href: 'https://example.com/' },
+  });
+  const malformed = mockElement({
+    tagName: 'A',
+    attributes: { href: 'http://[' },
+  });
+  const pages = [
+    {
+      route: 'content/text',
+      title: 'Text',
+      url: new URL('http://localhost/guides/content/text.html'),
+      content: richContent({
+        links: [internal, malformedFragment, external, malformed],
+      }),
+    },
+    {
+      route: 'content/email',
+      title: 'Email',
+      url: new URL('http://localhost/guides/content/email.html'),
+      content: richContent({
+        ids: [field],
+        headings: [heading],
+        elements: [reference],
+      }),
+    },
+  ];
+  prepareHandbookPages(pages, (page) => `${page.route}.xhtml`);
+  const chapter = getChapterId('content/email');
+  assert.equal(field.id, `${chapter}-field`);
+  assert.equal(heading.id, `${chapter}-section-1`);
+  assert.equal(reference.value('aria-labelledby'), `${chapter}-field missing`);
+  assert.equal(reference.value('style'), `clip-path: url(#${chapter}-field)`);
+  assert.equal(reference.value('title'), `#${chapter}-field`);
+  assert.equal(internal.href, `content/email.xhtml#${chapter}-field`);
+  assert.equal(internal.value('target'), undefined);
+  assert.equal(internal.value('rel'), undefined);
+  assert.equal(removedIndicators, 1);
+  assert.equal(malformedFragment.href, `content/email.xhtml#${chapter}`);
+  assert.equal(external.value('class'), 'handbook-external-link');
+  assert.equal(external.children[0].textContent, '\u2197');
+  assert.equal(malformed.href, 'http://[');
+  internal.setAttribute('href', 'http://localhost/guides/content/email.html');
+  prepareHandbookPages(pages);
+  assert.match(internal.href, /^#handbook-chapter-content-email/);
+});
+
+test('handbook outlines include nested headings and ungrouped third levels', () => {
+  const headings = [
+    mockElement({ tagName: 'H3', id: 'orphan', text: 'Orphan' }),
+    mockElement({ tagName: 'H2', id: 'parent', text: 'Parent' }),
+    mockElement({ tagName: 'H3', id: 'child', text: 'Child' }),
+  ];
+  const [outline] = buildHandbookOutline([
+    {
+      route: 'about',
+      title: 'About',
+      content: richContent({ headings }),
+    },
+  ]);
+  assert.deepEqual(outline.children, [
+    { title: 'Orphan', href: '#orphan', children: [] },
+    {
+      title: 'Parent',
+      href: '#parent',
+      children: [{ title: 'Child', href: '#child', children: [] }],
+    },
+  ]);
+  assert.equal(
+    getChapterId('Style/Pixel Art!'),
+    'handbook-chapter-Style-Pixel-Art-',
+  );
 });
 
 test('PDF export prints semantic HTML instead of page images', async () => {

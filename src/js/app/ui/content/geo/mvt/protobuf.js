@@ -70,8 +70,10 @@ export class ProtobufReader {
   skip(wire) {
     if (wire === WIRE_VARINT) this.varint();
     else if (wire === WIRE_FIXED_64) this.offset += FIXED_64_BYTES;
-    else if (wire === WIRE_LENGTH_DELIMITED) this.offset += this.varint();
-    else if (wire === WIRE_FIXED_32) this.offset += FIXED_32_BYTES;
+    else if (wire === WIRE_LENGTH_DELIMITED) {
+      const length = this.varint();
+      this.offset += length;
+    } else if (wire === WIRE_FIXED_32) this.offset += FIXED_32_BYTES;
     else throw new Error(`Unsupported MVT protobuf wire type: ${wire}.`);
     if (this.offset > this.bytes.length) {
       throw new Error('Truncated MVT protobuf field.');

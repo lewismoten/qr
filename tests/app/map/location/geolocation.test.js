@@ -37,6 +37,15 @@ test('normalizes browser location failures', async () => {
     );
   }
   await assert.rejects(
+    requestBrowserLocation({
+      getCurrentPosition(_success, failure) {
+        failure(null);
+      },
+    }),
+    (error) =>
+      error.reason === LOCATION_FAILURE.unavailable && error.cause === null,
+  );
+  await assert.rejects(
     requestBrowserLocation(null),
     (error) => error.reason === LOCATION_FAILURE.unsupported,
   );
@@ -47,6 +56,14 @@ test('rejects unusable coordinates from the browser', async () => {
     requestBrowserLocation({
       getCurrentPosition(success) {
         success({ coords: { latitude: Number.NaN, longitude: 0 } });
+      },
+    }),
+    (error) => error.reason === LOCATION_FAILURE.unavailable,
+  );
+  await assert.rejects(
+    requestBrowserLocation({
+      getCurrentPosition(success) {
+        success({});
       },
     }),
     (error) => error.reason === LOCATION_FAILURE.unavailable,

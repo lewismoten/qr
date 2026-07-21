@@ -3,11 +3,43 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 
+import {
+  COLOR_BLACK,
+  COLOR_DARK,
+  COLOR_WHITE,
+  colorWithTransparency,
+  getColorAlpha,
+  getContrastingHex,
+  hexToRgb,
+  hexToRgba,
+} from '../../src/js/app/colors.js';
+
 const KNOWN_COLORS = /['"]#(?:000000|ffffff|111827|0f766e|0ea5e9|60a5fa)['"]/gi;
 const MEDIA_TYPE_LITERAL = /['"](?:application|image|text)\/[a-z0-9.+-]+['"]/gi;
 const APPLICATION_TYPE_LITERAL = /['"]application\/[a-z0-9.+-]+/gi;
 const TEXT_TYPE_LITERAL = /['"]text\/[a-z0-9.+-]*/gi;
 const HINDI_LOCALE_PROPERTY = /['"]hi-IN['"]\s*:/g;
+
+test('color helpers normalize channels, alpha, and contrast', () => {
+  assert.equal(colorWithTransparency('#123456', { value: '25' }), '#123456bf');
+  assert.equal(
+    colorWithTransparency('invalid', { value: '-20' }),
+    `${COLOR_BLACK}ff`,
+  );
+  assert.equal(colorWithTransparency('#ffffff', { value: '120' }), '#ffffff00');
+  assert.equal(
+    colorWithTransparency('#ffffff', { value: 'invalid' }),
+    '#ffffffff',
+  );
+  assert.equal(getColorAlpha('transparent'), 0);
+  assert.equal(getColorAlpha('#00000080'), 128 / 255);
+  assert.equal(getColorAlpha('#000000'), 1);
+  assert.deepEqual(hexToRgb('#abc'), { red: 170, green: 187, blue: 204 });
+  assert.deepEqual(hexToRgb('123456'), { red: 18, green: 52, blue: 86 });
+  assert.equal(hexToRgba('#123456', 0.5), 'rgba(18, 52, 86, 0.5)');
+  assert.equal(getContrastingHex('#ffffff'), COLOR_DARK);
+  assert.equal(getContrastingHex('#000000'), COLOR_WHITE);
+});
 
 async function findJavaScript(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

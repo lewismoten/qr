@@ -10,6 +10,8 @@ import {
   createPdfPagesDictionary,
 } from '../../src/js/app/export/pdf-objects.js';
 import {
+  capturePdfFrame,
+  createPdfBlob,
   createPdfSheetBlob,
   getPdfSheetLayout,
 } from '../../src/js/app/export/pdf.js';
@@ -98,6 +100,46 @@ describe('PDF object builders', () => {
     assert.match(text, /\/Type \/Page/);
     assert.match(text, /xref/);
     assert.match(text, /%%EOF$/);
+  });
+
+  test('captures a flattened canvas and creates a single-page PDF', async () => {
+    const originalDocument = globalThis.document;
+    const calls = [];
+    globalThis.document = {
+      createElement(tag) {
+        assert.equal(tag, 'canvas');
+        return {
+          getContext: () => ({
+            set fillStyle(value) {
+              calls.push(['fillStyle', value]);
+            },
+            fillRect: (...values) => calls.push(['fillRect', ...values]),
+            drawImage: (...values) => calls.push(['drawImage', ...values]),
+          }),
+          toBlob(callback, type, quality) {
+            calls.push(['toBlob', type, quality]);
+            callback(new Blob([SAMPLE_JPEG], { type }));
+          },
+        };
+      },
+    };
+    const canvas = { width: 200, height: 100 };
+    try {
+      const frame = await capturePdfFrame(canvas, 0.8, 2);
+      assert.deepEqual(frame, {
+        width: 200,
+        height: 100,
+        printWidthInches: 2,
+        jpeg: SAMPLE_JPEG,
+      });
+      const blob = await createPdfBlob(canvas, 0.8, 2);
+      const text = decoder.decode(await blob.arrayBuffer());
+      assert.equal(blob.type, 'application/pdf');
+      assert.match(text, /\/MediaBox \[0 0 144\.000 72\.000\]/);
+      assert.equal(calls.filter(([name]) => name === 'drawImage').length, 2);
+    } finally {
+      globalThis.document = originalDocument;
+    }
   });
 
   test('rejects an empty PDF sheet before calculating layout', () => {
