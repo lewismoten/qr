@@ -22,10 +22,6 @@ export function readStyleInteger(input, fallback) {
   return Number.isNaN(value) ? fallback : value;
 }
 
-export function isImageFillSelected(gradientType) {
-  return gradientType?.value === 'image';
-}
-
 export function getFallbackModuleOptions(elements) {
   return {
     type: elements.moduleShape?.value ?? 'square',

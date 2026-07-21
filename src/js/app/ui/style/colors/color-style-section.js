@@ -18,6 +18,8 @@ export function createColorSection({
   endAlphaValue,
   imageControls,
   imageFillClear,
+  customEyeColors,
+  eyeColorControls,
   hasImageFill,
   withAlpha,
 }) {
@@ -36,10 +38,13 @@ export function createColorSection({
   const sync = () => {
     const isGradient =
       gradientType.value === 'linear' || gradientType.value === 'radial';
+    const isImage = gradientType.value === 'image';
     gradientControls.hidden = !isGradient;
     angleControls.hidden = gradientType.value !== 'linear';
-    imageControls.hidden = gradientType.value !== 'image';
+    imageControls.hidden = !isImage;
     imageFillClear.disabled = !hasImageFill();
+    customEyeColors.disabled = isImage;
+    eyeColorControls.hidden = isImage || !customEyeColors.checked;
     angleValue.textContent = lookup('units.degrees', '{value} degrees', {
       value: gradientAngle.value,
     });

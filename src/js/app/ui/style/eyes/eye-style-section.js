@@ -8,15 +8,9 @@ export function createEyeShapeSection({
   outerRoundValue,
   centerRounding,
   centerRoundValue,
-  customEyeColors,
-  colorControls,
-  isImageFill,
 }) {
   const sync = () => {
-    const imageFill = isImageFill();
     controls.hidden = shape.value !== 'custom';
-    customEyeColors.disabled = imageFill;
-    colorControls.hidden = imageFill || !customEyeColors.checked;
     outerRoundValue.textContent = lookup('units.percent', '{value}%', {
       value: outerRounding.value,
     });

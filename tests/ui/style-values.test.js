@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { createColorSection } from '../../src/js/app/ui/style/colors/color-style-section.js';
 import {
   getFallbackEyeOptions,
   getFallbackModuleOptions,
   getFallbackPixelArtState,
-  isImageFillSelected,
   readStyleInteger,
   STYLE_DEFAULTS,
   STYLE_LIMITS,
@@ -59,8 +59,40 @@ test('pixel-art fallback creates an independent empty square canvas', () => {
   );
 });
 
-test('image fill detection tolerates an unloaded colors fragment', () => {
-  assert.equal(isImageFillSelected(null), false);
-  assert.equal(isImageFillSelected({ value: 'solid' }), false);
-  assert.equal(isImageFillSelected({ value: 'image' }), true);
+test('image fills disable custom eye colors in the colors section', () => {
+  const control = (value = '') => ({ value, hidden: false, disabled: false });
+  const gradientType = control('image');
+  const customEyeColors = { checked: true, disabled: false };
+  const eyeColorControls = { hidden: false };
+  const colors = createColorSection({
+    darkColor: control('#000000'),
+    lightColor: control('#ffffff'),
+    darkTransparency: control('0'),
+    darkAlphaValue: control(),
+    lightAlpha: control('0'),
+    lightAlphaValue: control(),
+    gradientType,
+    gradientControls: control(),
+    angleControls: control(),
+    gradientAngle: control('0'),
+    angleValue: control(),
+    gradientEndColor: control('#000000'),
+    endAlpha: control('0'),
+    endAlphaValue: control(),
+    imageControls: control(),
+    imageFillClear: control(),
+    customEyeColors,
+    eyeColorControls,
+    hasImageFill: () => false,
+    withAlpha: (value) => value,
+  });
+
+  colors.sync();
+  assert.equal(customEyeColors.disabled, true);
+  assert.equal(eyeColorControls.hidden, true);
+
+  gradientType.value = 'solid';
+  colors.sync();
+  assert.equal(customEyeColors.disabled, false);
+  assert.equal(eyeColorControls.hidden, false);
 });

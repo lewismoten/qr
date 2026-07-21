@@ -8,7 +8,6 @@ import {
   getFallbackEyeOptions,
   getFallbackModuleOptions,
   getFallbackPixelArtState,
-  isImageFillSelected,
   readStyleInteger,
 } from './style-values.js';
 
@@ -78,9 +77,6 @@ export function createStyleSetup({
         outerRoundValue: e.outerRoundValue,
         centerRounding: e.centerRounding,
         centerRoundValue: e.centerRoundValue,
-        customEyeColors: e.customEyeColors,
-        colorControls: e.eyeColorControls,
-        isImageFill: () => isImageFillSelected(e.gradientType),
       });
       modulesSystem = { modules, eyes };
       modules.sync();
@@ -119,6 +115,8 @@ export function createStyleSetup({
         endAlphaValue: e.endAlphaValue,
         imageControls: e.imageControls,
         imageFillClear: e.imageFillClear,
+        customEyeColors: e.customEyeColors,
+        eyeColorControls: e.eyeColorControls,
         hasImageFill: () => Boolean(imageFill?.getImage()),
         withAlpha,
       });
