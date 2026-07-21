@@ -1,5 +1,8 @@
-import { lookup } from '../../../../i18n/index.js';
-import { FRAME_FONT_OPTIONS, getFrameFontOption } from './font-options.js';
+import { getActiveLocale, lookup } from '../../../../i18n/index.js';
+import {
+  getVisibleFrameFontOptions,
+  isFrameFontRecommended,
+} from './font-options.js';
 
 const DIALOG_ID = 'frame-font-dialog';
 
@@ -38,30 +41,35 @@ export function createFontPicker({ document, select, onSelect }) {
   close.type = 'button';
   close.className = 'secondary-button frame-font-close';
   close.addEventListener('click', () => dialog.close());
-  FRAME_FONT_OPTIONS.forEach((option) => {
-    grid.append(
-      createChoice(document, option, select, () => {
-        onSelect();
-        sync();
-        dialog.close(option.value);
-      }),
-    );
-  });
   shell.append(heading, grid, close);
   dialog.append(shell);
   document.body.append(dialog);
 
   const sync = () => {
     let selectedButton = null;
+    const locale = getActiveLocale();
     heading.textContent = lookup('frame.chooseFont', 'Choose a font');
     close.textContent = lookup('common.close', 'Close');
-    grid.querySelectorAll('[data-font-value]').forEach((button) => {
-      const option = getFrameFontOption(button.dataset.fontValue);
+    grid.replaceChildren();
+    getVisibleFrameFontOptions({
+      document,
+      locale,
+      selected: select.value,
+    }).forEach((option) => {
+      const button = createChoice(document, option, select, () => {
+        onSelect();
+        sync();
+        dialog.close(option.value);
+      });
       const active = option.value === select.value;
       button.textContent = getLabel(option);
+      if (isFrameFontRecommended(option, locale)) {
+        button.dataset.recommended = lookup('frame.recommended', 'Recommended');
+      }
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
       if (active) selectedButton = button;
+      grid.append(button);
     });
     return selectedButton;
   };

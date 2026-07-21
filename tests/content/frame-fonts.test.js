@@ -6,6 +6,8 @@ import {
   FRAME_FONT_OPTIONS,
   getFrameFont,
   getFrameFontOption,
+  getVisibleFrameFontOptions,
+  isFrameFontRecommended,
 } from '../../src/js/app/ui/content/frame/font-options.js';
 import { createFontPicker } from '../../src/js/app/ui/content/frame/font-picker.js';
 
@@ -37,6 +39,10 @@ class FakeElement {
 
   append(...children) {
     this.children.push(...children);
+  }
+
+  replaceChildren(...children) {
+    this.children = children;
   }
 
   setAttribute(name, value) {
@@ -79,11 +85,14 @@ class FakeElement {
   }
 }
 
-function createDocument() {
+function createDocument(availableFonts = []) {
   const listeners = new Map();
   const document = {
     body: new FakeElement('body'),
     defaultView: {},
+    fonts: {
+      check: (query) => availableFonts.some((font) => query.includes(font)),
+    },
     createElement: (name) => new FakeElement(name),
     addEventListener(name, listener) {
       listeners.set(name, listener);
@@ -102,15 +111,68 @@ function createDocument() {
 }
 
 test('frame font registry provides named stacks and a safe fallback', () => {
-  assert.equal(FRAME_FONT_OPTIONS.length, 12);
+  assert.equal(FRAME_FONT_OPTIONS.length, 24);
   assert.equal(getFrameFontOption('times').label, 'Times New Roman');
   assert.equal(getFrameFontOption('missing').value, 'sans');
   assert.match(getFrameFont('courier', 18), /^700 18px "Courier New"/);
   assert.match(getFrameFont('missing', 20), /^800 20px "Avenir Next"/);
 });
 
+test('available fonts prioritize the locale and retain a selection', () => {
+  const document = createDocument(['Arial', 'Geeza Pro']);
+  const arabic = getVisibleFrameFontOptions({
+    document,
+    locale: 'ar',
+    selected: 'sans',
+  });
+  assert.equal(arabic[0].value, 'geeza');
+  assert.equal(isFrameFontRecommended(arabic[0], 'ar-EG'), true);
+  assert.equal(isFrameFontRecommended(getFrameFontOption('sans'), 'ar'), false);
+  assert.ok(arabic.some(({ value }) => value === 'arial'));
+
+  const retained = getVisibleFrameFontOptions({
+    document: createDocument(),
+    locale: 'zh-CN',
+    selected: 'geeza',
+  });
+  assert.ok(retained.some(({ value }) => value === 'geeza'));
+  assert.equal(
+    retained.some(({ value }) => value === 'arial'),
+    false,
+  );
+  assert.doesNotThrow(() =>
+    getVisibleFrameFontOptions({
+      document: {
+        fonts: {
+          check: () => {
+            throw new Error('blocked');
+          },
+        },
+      },
+      locale: null,
+      selected: 'sans',
+    }),
+  );
+  assert.equal(
+    getVisibleFrameFontOptions({
+      document: {},
+      locale: 'en-US',
+      selected: 'sans',
+    }).some(({ value }) => value === 'arial'),
+    false,
+  );
+  assert.deepEqual(
+    getVisibleFrameFontOptions({
+      document: null,
+      locale: 'en-US',
+      selected: 'sans',
+    }).map(({ value }) => value),
+    ['sans', 'serif', 'mono'],
+  );
+});
+
 test('font picker reflects, changes, and closes the selected font', () => {
-  const document = createDocument();
+  const document = createDocument(['Arial', 'Times New Roman']);
   const select = new FakeElement('select');
   const events = [];
   let renders = 0;
@@ -125,25 +187,32 @@ test('font picker reflects, changes, and closes the selected font', () => {
   });
   const dialog = document.body.children[0];
   const [heading, grid, close] = dialog.children[0].children;
-  const choices = grid.querySelectorAll('[data-font-value]');
+  const getChoice = (value) =>
+    grid
+      .querySelectorAll('[data-font-value]')
+      .find((choice) => choice.dataset.fontValue === value);
 
   picker.open();
   picker.open();
+  let sans = getChoice('sans');
+  let arial = getChoice('arial');
   assert.equal(dialog.open, true);
   assert.equal(heading.textContent, 'Choose a font');
-  assert.equal(choices.length, FRAME_FONT_OPTIONS.length);
-  assert.equal(choices[0].classList.contains('is-active'), true);
-  assert.deepEqual(choices[0].focusOptions, { preventScroll: true });
+  assert.equal(sans.classList.contains('is-active'), true);
+  assert.deepEqual(sans.focusOptions, { preventScroll: true });
+  assert.equal(arial.dataset.recommended, 'Recommended');
 
-  choices[4].dispatch('click');
+  arial.dispatch('click');
   assert.equal(select.value, 'arial');
   assert.equal(events[0].type, 'change');
   assert.equal(events[0].bubbles, true);
   assert.equal(renders, 1);
-  assert.equal(choices[0].classList.contains('is-active'), false);
-  assert.equal(choices[0].attributes.get('aria-pressed'), 'false');
-  assert.equal(choices[4].classList.contains('is-active'), true);
-  assert.equal(choices[4].attributes.get('aria-pressed'), 'true');
+  sans = getChoice('sans');
+  arial = getChoice('arial');
+  assert.equal(sans.classList.contains('is-active'), false);
+  assert.equal(sans.attributes.get('aria-pressed'), 'false');
+  assert.equal(arial.classList.contains('is-active'), true);
+  assert.equal(arial.attributes.get('aria-pressed'), 'true');
   assert.equal(dialog.open, false);
   assert.equal(dialog.returnValue, 'arial');
 
@@ -151,8 +220,9 @@ test('font picker reflects, changes, and closes the selected font', () => {
   document.dispatch('languagechange');
   picker.sync();
   picker.open();
-  assert.equal(choices[7].classList.contains('is-active'), true);
-  assert.deepEqual(choices[7].focusOptions, { preventScroll: true });
+  const times = getChoice('times');
+  assert.equal(times.classList.contains('is-active'), true);
+  assert.deepEqual(times.focusOptions, { preventScroll: true });
   close.dispatch('click');
   assert.equal(dialog.open, false);
   picker.open();

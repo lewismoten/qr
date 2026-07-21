@@ -59,6 +59,7 @@
 }
 
 .frame-font-option {
+  position: relative;
   min-height: 3.4rem;
   padding: 0.7rem;
   border: 1px solid rgba(19, 34, 53, 0.12);
@@ -67,6 +68,24 @@
   color: #132235;
   font-size: 1rem;
   font-weight: 700;
+}
+
+.frame-font-option[data-recommended] {
+  padding-block-end: 1.35rem;
+}
+
+.frame-font-option[data-recommended]::after {
+  position: absolute;
+  inset-block-end: 0.35rem;
+  inset-inline: 0.45rem;
+  overflow: hidden;
+  color: #0f766e;
+  content: attr(data-recommended);
+  font: 800 0.58rem/1 sans-serif;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .frame-font-option:hover,
