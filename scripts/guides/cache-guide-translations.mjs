@@ -1,29 +1,18 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { getSourceMessage } from '../locales/source-message.mjs';
+
 const [locale, inputFile, outputFile] = process.argv.slice(2);
 
-const overrides = {
-  ar: {
-    Generator: 'المولد',
-    'Open generator': 'فتح المولد',
-  },
-  es: {
-    Generator: 'Generador',
-    'Open generator': 'Abrir generador',
-  },
-  'hi-IN': {
-    Generator: 'जनरेटर',
-    'Open generator': 'जनरेटर खोलें',
-  },
-  'zh-CN': {
-    Generator: '生成器',
-    'Open generator': '打开生成器',
-  },
-};
-
-function normalizeTranslation(source, translated) {
-  const overridden = overrides[locale]?.[source] ?? translated;
+async function normalizeTranslation(source, translated) {
+  const keys = {
+    Generator: 'info.guides.generator',
+    'Open generator': 'info.guides.openGenerator',
+  };
+  const overridden = keys[source]
+    ? await getSourceMessage(locale, keys[source], translated)
+    : translated;
   if (locale !== 'zh-CN') return overridden;
   return overridden
     .replaceAll('发电机', '生成器')
@@ -47,13 +36,15 @@ if (sources.length !== output.values.length) {
 }
 
 const translations = Object.fromEntries(
-  sources.map((value, index) => {
-    const translated = output.values[index]?.trim();
-    if (!translated) {
-      throw new Error(`Empty translation for ${locale}: ${value}`);
-    }
-    return [value, normalizeTranslation(value, translated)];
-  }),
+  await Promise.all(
+    sources.map(async (value, index) => {
+      const translated = output.values[index]?.trim();
+      if (!translated) {
+        throw new Error(`Empty translation for ${locale}: ${value}`);
+      }
+      return [value, await normalizeTranslation(value, translated)];
+    }),
+  ),
 );
 
 const directory = path.join('src', 'html', 'guides', 'translations');

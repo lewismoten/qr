@@ -1,0 +1,20 @@
+{
+  "handbook": {
+    "title": "Manual del generador de códigos QR",
+    "contents": "Índice",
+    "download": "Descargar el manual",
+    "choose": "Elija un formato de descarga.",
+    "pdf": "PDF",
+    "epub": "Descargar ePub",
+    "failed": "No se pudo crear el manual.",
+    "cancel": "Cancelar",
+    "creatingPdf": "Creando el manual en PDF...",
+    "creatingEpub": "Creando el manual en EPUB..."
+  },
+  "guides": {
+    "languages": "Idiomas",
+    "externalEnglish": "El recurso enlazado está disponible en inglés",
+    "generator": "Generador",
+    "openGenerator": "Abrir el generador"
+  }
+}

@@ -1,9 +1,16 @@
 export const MEDIA_TYPE_BINARY = 'application/octet-stream';
+export const MEDIA_TYPE_EPUB = 'application/epub+zip';
+export const MEDIA_TYPE_EPUB_PACKAGE = 'application/oebps-package+xml';
+export const MEDIA_TYPE_FORM = 'application/x-www-form-urlencoded';
 export const MEDIA_TYPE_GIF = 'image/gif';
 export const MEDIA_TYPE_HTML = 'text/html';
+export const MEDIA_TYPE_JAVASCRIPT = 'application/javascript';
 export const MEDIA_TYPE_JPEG = 'image/jpeg';
+export const MEDIA_TYPE_JSON = 'application/json';
 export const MEDIA_TYPE_PDF = 'application/pdf';
 export const MEDIA_TYPE_PM_TILES = 'application/vnd.pmtiles';
 export const MEDIA_TYPE_PNG = 'image/png';
 export const MEDIA_TYPE_SVG = 'image/svg+xml';
+export const MEDIA_TYPE_XHTML = 'application/xhtml+xml';
+export const MEDIA_TYPE_XML = 'application/xml';
 export const MEDIA_TYPE_ZIP = 'application/zip';

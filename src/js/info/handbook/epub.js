@@ -1,10 +1,14 @@
 import { createZipBlob } from '../../app/export/zip.js';
 import { throwIfAborted } from '../../app/abort.js';
+import {
+  MEDIA_TYPE_EPUB,
+  MEDIA_TYPE_EPUB_PACKAGE,
+  MEDIA_TYPE_XHTML,
+} from '../../app/media-types.js';
 import { getHandbookCopy } from './copy.js';
 import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
 import { loadHandbookPages } from './pages.js';
 
-const XHTML_TYPE = 'application/xhtml+xml';
 const PAGE_LOADING_PROGRESS_WEIGHT = 0.7;
 const ARCHIVE_PROGRESS_WEIGHT = 1 - PAGE_LOADING_PROGRESS_WEIGHT;
 
@@ -94,7 +98,8 @@ function packageDocument(pages, locale, identifier, copy) {
   const manifest = pages.map((page, index) => {
     return (
       `<item id="chapter-${index + 1}" ` +
-      `href="chapter-${index + 1}.xhtml" media-type="${XHTML_TYPE}"/>`
+      `href="chapter-${index + 1}.xhtml" ` +
+      `media-type="${MEDIA_TYPE_XHTML}"/>`
     );
   });
   const spine = pages.map((page, index) => {
@@ -110,7 +115,7 @@ function packageDocument(pages, locale, identifier, copy) {
     `<dc:language>${locale}</dc:language>` +
     `<meta property="dcterms:modified">${modified}</meta>` +
     '</metadata><manifest><item id="nav" href="nav.xhtml" ' +
-    `media-type="${XHTML_TYPE}" properties="nav"/>` +
+    `media-type="${MEDIA_TYPE_XHTML}" properties="nav"/>` +
     '<item id="styles" href="styles.css" media-type="text/css"/>' +
     `${manifest.join('')}</manifest><spine>${spine.join('')}</spine></package>`
   );
@@ -132,7 +137,7 @@ const CONTAINER =
   '<container version="1.0" ' +
   'xmlns="urn:oasis:names:tc:opendocument:xmlns:container">' +
   '<rootfiles><rootfile full-path="EPUB/package.opf" ' +
-  'media-type="application/oebps-package+xml"/></rootfiles></container>';
+  `media-type="${MEDIA_TYPE_EPUB_PACKAGE}"/></rootfiles></container>`;
 
 const EPUB_CSS = `
 body { color: ${HANDBOOK_TEXT_COLOR}; font: 1rem/1.55 serif; }
@@ -156,7 +161,7 @@ export async function createHandbookEpub(
   const assets = extractImages(pages, signal);
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
-    { name: 'mimetype', blob: textBlob('application/epub+zip') },
+    { name: 'mimetype', blob: textBlob(MEDIA_TYPE_EPUB) },
     { name: 'META-INF/container.xml', blob: textBlob(CONTAINER, 'text/xml') },
     {
       name: 'EPUB/package.opf',
@@ -170,12 +175,12 @@ export async function createHandbookEpub(
     },
     {
       name: 'EPUB/nav.xhtml',
-      blob: textBlob(navigation(pages, locale, copy), XHTML_TYPE),
+      blob: textBlob(navigation(pages, locale, copy), MEDIA_TYPE_XHTML),
     },
     { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, 'text/css') },
     ...pages.map((page, index) => ({
       name: `EPUB/chapter-${index + 1}.xhtml`,
-      blob: textBlob(chapterXhtml(page, index, locale), XHTML_TYPE),
+      blob: textBlob(chapterXhtml(page, index, locale), MEDIA_TYPE_XHTML),
     })),
     ...assets.map((asset) => ({
       name: `EPUB/assets/${asset.name}`,
@@ -193,6 +198,6 @@ export async function createHandbookEpub(
   });
   throwIfAborted(signal);
   return new Blob([await zip.arrayBuffer()], {
-    type: 'application/epub+zip',
+    type: MEDIA_TYPE_EPUB,
   });
 }

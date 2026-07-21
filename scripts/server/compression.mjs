@@ -1,9 +1,15 @@
 import { constants, createBrotliCompress, createGzip } from 'node:zlib';
 
+import {
+  MEDIA_TYPE_JAVASCRIPT,
+  MEDIA_TYPE_JSON,
+  MEDIA_TYPE_XML,
+} from '../../src/js/app/media-types.js';
+
 const COMPRESSIBLE_TYPES = [
-  'application/javascript',
-  'application/json',
-  'application/xml',
+  MEDIA_TYPE_JAVASCRIPT,
+  MEDIA_TYPE_JSON,
+  MEDIA_TYPE_XML,
   'image/svg+xml',
   'text/',
 ];

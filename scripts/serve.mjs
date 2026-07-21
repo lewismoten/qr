@@ -5,6 +5,13 @@ import { extname, join, normalize, resolve } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 
 import {
+  MEDIA_TYPE_BINARY,
+  MEDIA_TYPE_JSON,
+  MEDIA_TYPE_PM_TILES,
+  MEDIA_TYPE_XML,
+} from '../src/js/app/media-types.js';
+
+import {
   createContentEncoder,
   selectContentEncoding,
   shouldCompress,
@@ -43,14 +50,14 @@ const mimeTypes = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.js': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.map': 'application/json; charset=utf-8',
+  '.json': `${MEDIA_TYPE_JSON}; charset=utf-8`,
+  '.map': `${MEDIA_TYPE_JSON}; charset=utf-8`,
   '.png': 'image/png',
-  '.pmtiles': 'application/vnd.pmtiles',
+  '.pmtiles': MEDIA_TYPE_PM_TILES,
   '.svg': 'image/svg+xml',
   '.txt': 'text/plain; charset=utf-8',
   '.webp': 'image/webp',
-  '.xml': 'application/xml; charset=utf-8',
+  '.xml': `${MEDIA_TYPE_XML}; charset=utf-8`,
 };
 
 function safePath(root, relativePath) {
@@ -110,7 +117,7 @@ const server = createServer(async (request, response) => {
     return;
   }
   const contentType =
-    mimeTypes[extname(filePath).toLowerCase()] || 'application/octet-stream';
+    mimeTypes[extname(filePath).toLowerCase()] || MEDIA_TYPE_BINARY;
   const byteRange = parseByteRange(request.headers.range, fileStat.size);
   if (byteRange?.unsatisfiable) {
     response

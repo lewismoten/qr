@@ -57,7 +57,7 @@ export function selectLocale(requested, availableLocales, fallbackLocale) {
 
 export async function fetchJson(fetcher, url) {
   const response = await fetcher(url, {
-    headers: { Accept: 'application/json' },
+    headers: { Accept: MEDIA_TYPE_JSON },
   });
   if (!response.ok) {
     throw new Error(`Unable to load language resource: ${response.status}`);
@@ -122,3 +122,4 @@ export function findMessageIn(source, key) {
       source,
     );
 }
+import { MEDIA_TYPE_JSON } from '../app/media-types.js';

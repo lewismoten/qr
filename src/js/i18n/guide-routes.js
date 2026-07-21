@@ -192,15 +192,6 @@ export function getGuideRouteFromPath(value) {
   return null;
 }
 
-export const GUIDE_LANGUAGE_LABELS = Object.freeze({
-  'en-US': ['🇺🇸', 'English (US)'],
-  'en-GB': ['🇬🇧', 'English (UK)'],
-  es: ['🇪🇸', 'Español'],
-  ar: ['🇸🇦', 'العربية'],
-  'hi-IN': ['🇮🇳', 'हिन्दी'],
-  'zh-CN': ['🇨🇳', '简体中文'],
-});
-
 export const NAVIGATION_ALIASES = Object.freeze({
   es: {
     keys: ['pestana', 'subpestana'],

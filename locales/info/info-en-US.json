@@ -1,0 +1,20 @@
+{
+  "handbook": {
+    "title": "QR Code Generator Handbook",
+    "contents": "Contents",
+    "download": "Download handbook",
+    "choose": "Choose a download format.",
+    "pdf": "PDF",
+    "epub": "Download ePub",
+    "failed": "The handbook could not be created.",
+    "cancel": "Cancel",
+    "creatingPdf": "Creating PDF handbook...",
+    "creatingEpub": "Creating EPUB handbook..."
+  },
+  "guides": {
+    "languages": "Languages",
+    "externalEnglish": "The linked resource is available in English",
+    "generator": "Generator",
+    "openGenerator": "Open generator"
+  }
+}

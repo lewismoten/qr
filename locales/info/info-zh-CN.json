@@ -1,0 +1,20 @@
+{
+  "handbook": {
+    "title": "二维码生成器手册",
+    "contents": "目录",
+    "download": "下载手册",
+    "choose": "请选择下载格式。",
+    "pdf": "PDF",
+    "epub": "下载 ePub",
+    "failed": "无法创建手册。",
+    "cancel": "取消",
+    "creatingPdf": "正在创建 PDF 手册...",
+    "creatingEpub": "正在创建 EPUB 手册..."
+  },
+  "guides": {
+    "languages": "语言",
+    "externalEnglish": "链接的资源提供英语内容",
+    "generator": "生成器",
+    "openGenerator": "打开生成器"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "handbook": {
+    "title": "دليل مولّد رموز QR",
+    "contents": "المحتويات",
+    "download": "تنزيل الدليل",
+    "choose": "اختر تنسيق التنزيل.",
+    "pdf": "PDF",
+    "epub": "تنزيل ePub",
+    "failed": "تعذّر إنشاء الدليل.",
+    "cancel": "إلغاء",
+    "creatingPdf": "جارٍ إنشاء دليل PDF...",
+    "creatingEpub": "جارٍ إنشاء دليل EPUB..."
+  },
+  "guides": {
+    "languages": "اللغات",
+    "externalEnglish": "المورد المرتبط متاح باللغة الإنجليزية",
+    "generator": "المولد",
+    "openGenerator": "فتح المولد"
+  }
+}

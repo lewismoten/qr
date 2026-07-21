@@ -3,27 +3,33 @@
   "locales": [
     {
       "code": "en-US",
-      "flag": "🇺🇸"
+      "flag": "🇺🇸",
+      "nativeName": "English (US)"
     },
     {
       "code": "en-GB",
-      "flag": "🇬🇧"
+      "flag": "🇬🇧",
+      "nativeName": "English (UK)"
     },
     {
       "code": "zh-CN",
-      "flag": "🇨🇳"
+      "flag": "🇨🇳",
+      "nativeName": "简体中文"
     },
     {
       "code": "hi-IN",
-      "flag": "🇮🇳"
+      "flag": "🇮🇳",
+      "nativeName": "हिन्दी"
     },
     {
       "code": "es",
-      "flag": "🇪🇸"
+      "flag": "🇪🇸",
+      "nativeName": "Español"
     },
     {
       "code": "ar",
-      "flag": "🇸🇦"
+      "flag": "🇸🇦",
+      "nativeName": "العربية"
     },
     {
       "code": "en-XA",

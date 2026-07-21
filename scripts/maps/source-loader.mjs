@@ -9,6 +9,7 @@ import {
 } from 'node:fs/promises';
 import path from 'node:path';
 
+import { MEDIA_TYPE_FORM } from '../../src/js/app/media-types.js';
 import { parseGeoNames } from './sources/geonames.mjs';
 
 function parseCollection(content, url) {
@@ -148,7 +149,7 @@ async function downloadObjectIds(name, source, formatBytes) {
 async function downloadObjectIdPage(name, source, formatBytes, ids) {
   const request = {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: { 'content-type': MEDIA_TYPE_FORM },
     body: `objectIds=${ids.join(',')}`,
   };
   const content = await readResponse(

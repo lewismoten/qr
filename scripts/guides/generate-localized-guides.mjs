@@ -3,10 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
 
-import {
-  GUIDE_LANGUAGE_LABELS,
-  GUIDE_LOCALES,
-} from '../../src/js/i18n/guide-routes.js';
+import { GUIDE_LOCALES } from '../../src/js/i18n/guide-routes.js';
 import { formatLocalizedDate } from '../../src/js/i18n/date.js';
 import { localizeNavigationHash } from '../../src/js/i18n/guide-path.js';
 import {
@@ -22,22 +19,16 @@ import { writeGuideSitemap } from './guide-sitemap.mjs';
 import { updatePrivacyRevision } from './privacy-revision.mjs';
 import { annotateExternalResourceLanguages } from './links/resource-language.mjs';
 import { readHtmlWithIncludes } from '../html/includes.mjs';
-
+import {
+  getSourceGuideCopy,
+  getSourceLanguageLabels,
+} from '../locales/source-message.mjs';
 const SITE_URL = 'https://qr.lewismoten.com/';
 const GENERATED_LOCALES = ['en-GB', 'ar', 'es', 'hi-IN', 'zh-CN'];
-const LANGUAGE_HEADINGS = {
-  'en-US': 'Languages',
-  es: 'Idiomas',
-  ar: 'اللغات',
-  'hi-IN': 'भाषाएँ',
-  'zh-CN': '语言',
-};
-
 function relativeUrl(fromFile, target) {
   const value = path.relative(path.dirname(fromFile), target);
   return value.startsWith('.') ? value : `./${value}`;
 }
-
 function splitUrl(value) {
   const index = value.search(/[?#]/);
   return index < 0 ? [value, ''] : [value.slice(0, index), value.slice(index)];
@@ -173,7 +164,7 @@ function localizeDocumentDates(source, context) {
 
 function languageSwitcher(context) {
   const links = GUIDE_LOCALES.map((targetLocale) => {
-    const [flag, name] = GUIDE_LANGUAGE_LABELS[targetLocale];
+    const [flag, name] = context.languageLabels[targetLocale];
     const target = configuredGuidePath(
       context.config,
       context.route,
@@ -187,8 +178,8 @@ function languageSwitcher(context) {
       `<span aria-hidden="true">${flag}</span> ${name}</a>`
     );
   }).join('');
-  const heading = LANGUAGE_HEADINGS[context.locale] || 'Languages';
-  const [flag, name] = GUIDE_LANGUAGE_LABELS[context.locale];
+  const heading = context.guideCopy.languages;
+  const [flag, name] = context.languageLabels[context.locale];
   return (
     '<!-- generated-guide-languages:start -->' +
     '<details class="guide-language-switcher">' +
@@ -223,11 +214,16 @@ async function translate(source, context) {
 }
 
 async function writeGuide(source, context) {
+  context.guideCopy = await getSourceGuideCopy(context.locale);
   let result = await translate(stripGeneratedMarkup(source), context);
   result = localizeDocumentDates(result, context);
   result = localizeMetadata(result, context);
   result = rewriteLocalUrls(result, context);
-  result = annotateExternalResourceLanguages(result, context.locale);
+  result = annotateExternalResourceLanguages(
+    result,
+    context.locale,
+    context.guideCopy.externalEnglish,
+  );
   result = result.replace('</footer>', `${languageSwitcher(context)}</footer>`);
   result = await format(result, {
     parser: 'html',
@@ -252,6 +248,7 @@ async function copyPages(config) {
 
 export async function generateLocalizedGuides(options = {}) {
   const config = await loadHtmlConfig();
+  const languageLabels = await getSourceLanguageLabels();
   const privacyRevision = await updatePrivacyRevision();
   if (options.clean) {
     await rm(config.outputRoot, { force: true, recursive: true });
@@ -275,6 +272,7 @@ export async function generateLocalizedGuides(options = {}) {
           config,
           documentDates: { privacy: privacyRevision.lastUpdated },
           file: config.guides[route],
+          languageLabels,
           locale,
           output: configuredGuidePath(config, route, locale),
           route,

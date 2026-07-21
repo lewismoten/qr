@@ -1,10 +1,4 @@
 const SITE_ORIGIN = 'https://qr.lewismoten.com';
-const ENGLISH_LABELS = {
-  ar: 'المورد المرتبط متاح باللغة الإنجليزية',
-  es: 'El recurso enlazado está disponible en inglés',
-  'hi-IN': 'लिंक किया गया संसाधन अंग्रेज़ी में उपलब्ध है',
-  'zh-CN': '链接的资源提供英语内容',
-};
 const OSM_LOCALES = new Set(['ar', 'es', 'hi-IN', 'zh-CN']);
 const OSM_COPYRIGHT_LOCALES = new Set(['ar', 'es', 'zh-CN']);
 
@@ -41,7 +35,11 @@ function setAttribute(attributes, name, value) {
     : `${attributes}${attribute}`;
 }
 
-export function annotateExternalResourceLanguages(source, locale) {
+export function annotateExternalResourceLanguages(
+  source,
+  locale,
+  englishLabel = 'The linked resource is available in English',
+) {
   return source.replace(
     /<a\b([^>]*\bhref=(['"])(https?:\/\/[^'"]+)\2[^>]*)>([\s\S]*?)<\/a\s*>/gi,
     (link, originalAttributes, _quote, href, content) => {
@@ -59,10 +57,9 @@ export function annotateExternalResourceLanguages(source, locale) {
       if (language === locale || locale.startsWith('en')) {
         return `<a${attributes}>${content}</a>`;
       }
-      const label = ENGLISH_LABELS[locale] || ENGLISH_LABELS.es;
       const indicator =
         '<span class="resource-language-indicator" lang="en" ' +
-        `aria-label="${label}" title="${label}">EN</span>`;
+        `aria-label="${englishLabel}" title="${englishLabel}">EN</span>`;
       return `<a${attributes}>${content}${indicator}</a>`;
     },
   );
