@@ -1,6 +1,5 @@
 import { getActiveLocale, lookup } from '../../../../i18n/index.js';
 import { getFrameFontGroups } from './font-groups.js';
-import { isFrameFontRecommended } from './font-options.js';
 
 const DIALOG_ID = 'frame-font-dialog';
 
@@ -71,6 +70,12 @@ function createGroup(document, group) {
   flag.textContent = group.flag;
   label.textContent = getGroupLabel(group);
   heading.append(flag, label);
+  if (group.recommended) {
+    const badge = document.createElement('span');
+    badge.className = 'frame-font-group-badge';
+    badge.textContent = lookup('frame.recommended', 'Recommended');
+    heading.append(badge);
+  }
   grid.className = 'frame-font-choice-grid';
   section.append(heading, grid);
   return { grid, section };
@@ -121,12 +126,6 @@ export function createFontPicker({ document, select, onSelect }) {
         );
         const active = option.value === select.value;
         button.textContent = getLabel(option);
-        if (isFrameFontRecommended(option, locale)) {
-          button.dataset.recommended = lookup(
-            'frame.recommended',
-            'Recommended',
-          );
-        }
         button.classList.toggle('is-active', active);
         button.setAttribute('aria-pressed', String(active));
         if (active && installed) selectedButton = button;

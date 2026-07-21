@@ -68,6 +68,7 @@ export function getFrameFontGroups({ document, locale }) {
   });
   return orderedGroups.map((group) => ({
     ...group,
+    recommended: group === currentGroup,
     options: FRAME_FONT_OPTIONS.filter(
       (option) => getOptionGroup(option) === group,
     ).map((option) => ({

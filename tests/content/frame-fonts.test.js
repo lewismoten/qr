@@ -130,6 +130,8 @@ test('font groups prioritize the locale and report availability', () => {
   });
   assert.equal(groups[0].id, 'general');
   assert.equal(groups[1].id, 'arabic');
+  assert.equal(groups[0].recommended, false);
+  assert.equal(groups[1].recommended, true);
   assert.equal(groups[0].options.length, 3);
   const geeza = groups[1].options.find(
     ({ option }) => option.value === 'geeza',
@@ -186,7 +188,7 @@ test('font picker reflects, changes, and closes the selected font', () => {
   assert.equal(heading.textContent, 'Choose a font');
   assert.equal(sans.classList.contains('is-active'), true);
   assert.deepEqual(sans.focusOptions, { preventScroll: true });
-  assert.equal(arial.dataset.recommended, 'Recommended');
+  assert.equal(arial.dataset.recommended, undefined);
   assert.equal(
     groups.children[0].children[0].children[0].textContent,
     '\u{1F310}',
@@ -196,6 +198,10 @@ test('font picker reflects, changes, and closes the selected font', () => {
     'General',
   );
   assert.equal(groups.children[0].children[1].children.length, 3);
+  assert.equal(
+    groups.children[1].children[0].children[2].textContent,
+    'Recommended',
+  );
   assert.equal(getChoice('geeza').disabled, true);
   assert.ok(groups.querySelectorAll('a').length > 0);
   assert.equal(groups.querySelectorAll('a')[0].target, '_blank');
