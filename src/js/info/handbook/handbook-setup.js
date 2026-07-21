@@ -33,7 +33,7 @@ export function setupHandbookExports(locale = 'en-US') {
   const controls = document.createElement('div');
   controls.className = 'handbook-actions';
   controls.append(
-    action(copy.download, async () => {
+    action(copy.action, async () => {
       const { openHandbookExportDialog } =
         await import('./handbook-export-dialog.js');
       await openHandbookExportDialog(locale);
@@ -42,6 +42,7 @@ export function setupHandbookExports(locale = 'en-US') {
   controls.querySelectorAll('button').forEach((button) => {
     button.dataset.error = copy.failed;
   });
-  const language = footer.querySelector('.guide-language-switcher');
-  footer.insertBefore(controls, language);
+  const navigation = footer.querySelector(':scope > nav');
+  if (navigation) navigation.append(controls);
+  else footer.prepend(controls);
 }

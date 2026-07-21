@@ -32,13 +32,29 @@ export async function getSourceLanguageLabels() {
 }
 
 export async function getSourceGuideCopy(locale) {
-  const [externalEnglish, languages] = await Promise.all([
+  const entries = await Promise.all([
     getSourceMessage(
       locale,
       'info.guides.externalEnglish',
       'The linked resource is available in English',
     ),
     getSourceMessage(locale, 'info.guides.languages', 'Languages'),
+    getSourceMessage(locale, 'footer.navigationLabel', 'Site information'),
+    getSourceMessage(locale, 'info.guides.generator', 'Generator'),
+    getSourceMessage(locale, 'footer.guides', 'Guides'),
+    getSourceMessage(locale, 'footer.specification', 'QR spec'),
+    getSourceMessage(locale, 'footer.about', 'About'),
+    getSourceMessage(locale, 'footer.privacy', 'Privacy'),
   ]);
-  return { externalEnglish, languages };
+  const keys = [
+    'externalEnglish',
+    'languages',
+    'navigationLabel',
+    'generator',
+    'guides',
+    'spec',
+    'about',
+    'privacy',
+  ];
+  return Object.fromEntries(keys.map((key, index) => [key, entries[index]]));
 }

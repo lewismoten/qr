@@ -5,6 +5,7 @@ export function getHandbookCopy() {
     title: lookup('info.handbook.title', 'QR Code Generator Handbook'),
     contents: lookup('info.handbook.contents', 'Contents'),
     download: lookup('info.handbook.download', 'Download handbook'),
+    action: lookup('info.handbook.action', 'Handbook'),
     choose: lookup('info.handbook.choose', 'Choose a download format.'),
     pdf: lookup('info.handbook.pdf', 'PDF'),
     epub: lookup('info.handbook.epub', 'Download ePub'),

@@ -147,11 +147,7 @@
 }
 
 .spec-footer > span {
-  color: #5eead4;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: none;
 }
 
 .spec-footer .guide-language-switcher {

@@ -18,7 +18,7 @@ import {
 import { writeGuideSitemap } from './guide-sitemap.mjs';
 import { updatePrivacyRevision } from './privacy-revision.mjs';
 import { annotateExternalResourceLanguages } from './links/resource-language.mjs';
-import { annotateFooterActions } from './links/footer-actions.mjs';
+import { normalizeGuideFooter } from './links/footer-actions.mjs';
 import { readHtmlWithIncludes } from '../html/includes.mjs';
 import {
   getSourceGuideCopy,
@@ -223,10 +223,10 @@ async function translate(source, context) {
 async function writeGuide(source, context) {
   context.guideCopy = await getSourceGuideCopy(context.locale);
   let result = await translate(stripGeneratedMarkup(source), context);
-  result = annotateFooterActions(result, context);
   result = localizeDocumentDates(result, context);
   result = localizeMetadata(result, context);
   result = rewriteLocalUrls(result, context);
+  result = normalizeGuideFooter(result, context);
   result = annotateExternalResourceLanguages(
     result,
     context.locale,

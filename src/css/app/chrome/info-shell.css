@@ -167,18 +167,15 @@
 }
 
 .info-page-footer > span {
-  color: #5eead4;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  display: none;
 }
 
-.info-page-footer nav {
+.info-page-footer > nav {
+  flex: 1;
   min-width: 0;
   display: flex;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  overflow: visible;
 }
 
 .info-page-footer a {
@@ -275,7 +272,7 @@
     display: none;
   }
 
-  .info-page-footer nav {
+  .info-page-footer > nav {
     flex: 1;
     overflow: visible;
     flex-wrap: wrap;
