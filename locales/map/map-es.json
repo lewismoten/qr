@@ -20,6 +20,13 @@
   "tileOverlayHide": "Ocultar los límites de los mosaicos del mapa",
   "attribution": "© colaboradores de OpenStreetMap",
   "loadError": "No se pudo iniciar la vista previa del mapa.",
+  "useLocation": "Usar mi ubicación",
+  "locating": "Buscando su ubicación...",
+  "locationFound": "Ubicación actualizada.",
+  "locationDenied": "Se ha denegado el permiso de ubicación. Puede introducir las coordenadas manualmente.",
+  "locationTimeout": "La búsqueda de su ubicación está tardando demasiado. Inténtelo de nuevo.",
+  "locationUnavailable": "Su ubicación no está disponible en este momento.",
+  "locationUnsupported": "Este navegador no permite detectar la ubicación.",
   "guideLayers": {
     "title": "Capas del mapa local",
     "intro": "Estos ejemplos de Front Royal muestran el detalle generado actualmente en cada capa local y la dirección prevista para las capas más profundas. Las vistas no disponibles amplían la tesela generada más cercana.",

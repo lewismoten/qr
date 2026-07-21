@@ -11,6 +11,7 @@ const ignoredDirectories = new Set([
   'dist',
   'node_modules',
 ]);
+const ignoredFiles = new Set(['.DS_Store']);
 
 async function collectFiles(directory, files = []) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -19,7 +20,7 @@ async function collectFiles(directory, files = []) {
     const absolutePath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       await collectFiles(absolutePath, files);
-    } else if (entry.isFile()) {
+    } else if (entry.isFile() && !ignoredFiles.has(entry.name)) {
       files.push(path.relative(repositoryRoot, absolutePath));
     }
   }

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Use current location | Geographic QR codes</title>
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+  </head>
+  <body>
+    <div class="geo-location-action">
+      <button
+        id="geo-use-location"
+        class="secondary-button"
+        type="button"
+        aria-describedby="geo-location-status"
+        data-i18n="map.useLocation"
+      >
+        Use my location
+      </button>
+      <output
+        id="geo-location-status"
+        class="geo-location-status"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></output>
+    </div>
+  </body>
+</html>

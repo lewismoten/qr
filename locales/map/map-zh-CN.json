@@ -20,6 +20,13 @@
   "tileOverlayHide": "隐藏地图瓦片边界",
   "attribution": "© OpenStreetMap 贡献者",
   "loadError": "无法初始化地图预览。",
+  "useLocation": "使用我的位置",
+  "locating": "正在查找您的位置...",
+  "locationFound": "位置已更新。",
+  "locationDenied": "位置权限已被拒绝。您仍可手动输入坐标。",
+  "locationTimeout": "查找您的位置耗时过长。请重试。",
+  "locationUnavailable": "目前无法获取您的位置。",
+  "locationUnsupported": "此浏览器不支持位置检测。",
   "guideLayers": {
     "title": "本地地图图层",
     "intro": "这些 Front Royal 示例展示了各本地图层当前生成的细节，以及更深图层的规划方向。不可用的视图会放大最近的已生成图块。",

@@ -9,6 +9,10 @@ import {
 } from './map-consent.js';
 import { createWorldMap } from './world-map.js';
 import { loadLocalTileRange } from './tile-fallback.js';
+import {
+  LOCATION_FAILURE,
+  requestBrowserLocation,
+} from './location/browser-location.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
 const COORDINATE_DECIMAL_PLACES = 5;
@@ -22,6 +26,8 @@ export function createGeoSection({
   latitudeInput,
   longitudeInput,
   labelInput,
+  useLocationButton,
+  locationStatus,
   worldElement,
   mapElement,
   worldTab,
@@ -33,6 +39,7 @@ export function createGeoSection({
   isActive,
   onChange,
   storage,
+  geolocation = globalThis.navigator?.geolocation,
 }) {
   let map = null;
   let mapRequest = null;
@@ -191,6 +198,61 @@ export function createGeoSection({
     if (view === 'osm' && map) updateMap();
   };
 
+  const setLocationStatus = (message) => {
+    locationStatus.textContent = message;
+    locationStatus.hidden = !message;
+  };
+  const centerLocation = (coordinates) => {
+    const label = labelInput.value.trim();
+    world.setMarker(coordinates, label);
+    const worldView = world.getView();
+    if (view === 'osm' && map) {
+      map.setMarker(coordinates, label);
+      map.setView(coordinates, map.getZoom());
+    } else if (worldView) {
+      world.showDetail({ center: coordinates, zoom: worldView.zoom });
+    }
+  };
+  const locationErrorText = (reason) => {
+    const messages = {
+      [LOCATION_FAILURE.denied]: lookup(
+        'map.locationDenied',
+        'Location permission was denied. You can still enter coordinates.',
+      ),
+      [LOCATION_FAILURE.timeout]: lookup(
+        'map.locationTimeout',
+        'Finding your location took too long. Please try again.',
+      ),
+      [LOCATION_FAILURE.unavailable]: lookup(
+        'map.locationUnavailable',
+        'Your location is currently unavailable.',
+      ),
+      [LOCATION_FAILURE.unsupported]: lookup(
+        'map.locationUnsupported',
+        'Location detection is not supported by this browser.',
+      ),
+    };
+    return messages[reason] || messages[LOCATION_FAILURE.unavailable];
+  };
+  useLocationButton.addEventListener('click', async () => {
+    useLocationButton.disabled = true;
+    setLocationStatus(lookup('map.locating', 'Finding your location...'));
+    try {
+      const coordinates = await requestBrowserLocation(geolocation);
+      selectCoordinates(coordinates);
+      centerLocation(coordinates);
+      setLocationStatus(lookup('map.locationFound', 'Location updated.'));
+    } catch (error) {
+      setLocationStatus(locationErrorText(error.reason));
+    } finally {
+      useLocationButton.disabled = false;
+    }
+  });
+  if (!geolocation?.getCurrentPosition) {
+    useLocationButton.disabled = true;
+    setLocationStatus(locationErrorText(LOCATION_FAILURE.unsupported));
+  }
+
   update();
 
   return { buildPayload, buildPreview, getCoordinates, update };
@@ -201,6 +263,8 @@ export function createGeoSectionFromDocument(document, options) {
     latitudeInput: document.getElementById('geo-latitude'),
     longitudeInput: document.getElementById('geo-longitude'),
     labelInput: document.getElementById('geo-query'),
+    useLocationButton: document.getElementById('geo-use-location'),
+    locationStatus: document.getElementById('geo-location-status'),
     worldElement: document.getElementById('geo-world-map'),
     mapElement: document.getElementById('geo-map'),
     worldTab: document.getElementById('geo-world-tab'),

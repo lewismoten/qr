@@ -20,6 +20,13 @@
   "tileOverlayHide": "Hide map tile boundaries",
   "attribution": "© OpenStreetMap contributors",
   "loadError": "Unable to initialize the map preview.",
+  "useLocation": "Use my location",
+  "locating": "Finding your location...",
+  "locationFound": "Location updated.",
+  "locationDenied": "Location permission was denied. You can still enter coordinates.",
+  "locationTimeout": "Finding your location took too long. Please try again.",
+  "locationUnavailable": "Your location is currently unavailable.",
+  "locationUnsupported": "Location detection is not supported by this browser.",
   "guideLayers": {
     "title": "Local map layers",
     "intro": "These Front Royal samples show the detail currently generated at each local layer and the intended direction for deeper layers. Unavailable views enlarge the nearest generated tile.",
