@@ -120,13 +120,13 @@ for (const [stream, destination] of [
   });
 }
 const result = await new Promise((resolve) => child.once('exit', resolve));
-const failures =
-  result === 0
-    ? [
-        ...(coverageRequested ? findFileCoverageFailures(output) : []),
-        ...findTestDurationFailures(output),
-      ]
-    : [];
+const hasCoverageReport = output.includes('end of coverage report');
+const failures = [
+  ...(coverageRequested && hasCoverageReport
+    ? findFileCoverageFailures(output)
+    : []),
+  ...(coverageRequested ? [] : findTestDurationFailures(output)),
+];
 if (failures.length) {
   console.error(
     'Test requirements failed:\n' +
