@@ -1,9 +1,12 @@
 import { createZipBlob } from '../../app/export/zip.js';
+import { throwIfAborted } from '../../app/abort.js';
 import { getHandbookCopy } from './copy.js';
 import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
 import { loadHandbookPages } from './pages.js';
 
 const XHTML_TYPE = 'application/xhtml+xml';
+const PAGE_LOADING_PROGRESS_WEIGHT = 0.7;
+const ARCHIVE_PROGRESS_WEIGHT = 1 - PAGE_LOADING_PROGRESS_WEIGHT;
 
 function textBlob(value, type = 'text/plain') {
   return new Blob([value], { type });
@@ -40,10 +43,11 @@ function imageExtension(type) {
   }[type];
 }
 
-function extractImages(pages) {
+function extractImages(pages, signal) {
   const assets = [];
   for (const page of pages) {
     for (const image of page.content.querySelectorAll('img[src^="data:"]')) {
+      throwIfAborted(signal);
       const decoded = dataImage(image.src);
       const extension = decoded && imageExtension(decoded.type);
       if (!extension) continue;
@@ -137,10 +141,19 @@ img, svg { max-width: 100%; height: auto; }
 button, input, select, textarea, dialog, nav { display: none; }
 `;
 
-export async function createHandbookEpub(locale) {
+export async function createHandbookEpub(
+  locale,
+  { signal, onProgress = () => {} } = {},
+) {
   const copy = getHandbookCopy(locale);
-  const pages = await loadHandbookPages(locale);
-  const assets = extractImages(pages);
+  const pages = await loadHandbookPages(locale, undefined, {
+    signal,
+    onProgress: (fraction) => {
+      onProgress(fraction * PAGE_LOADING_PROGRESS_WEIGHT);
+    },
+  });
+  throwIfAborted(signal);
+  const assets = extractImages(pages, signal);
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
     { name: 'mimetype', blob: textBlob('application/epub+zip') },
@@ -169,7 +182,16 @@ export async function createHandbookEpub(locale) {
       blob: new Blob([asset.bytes], { type: asset.type }),
     })),
   ];
-  const zip = await createZipBlob(files);
+  const zip = await createZipBlob(files, {
+    signal,
+    onProgress: (completed, total) => {
+      onProgress(
+        PAGE_LOADING_PROGRESS_WEIGHT +
+          (completed / total) * ARCHIVE_PROGRESS_WEIGHT,
+      );
+    },
+  });
+  throwIfAborted(signal);
   return new Blob([await zip.arrayBuffer()], {
     type: 'application/epub+zip',
   });

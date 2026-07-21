@@ -6,6 +6,7 @@ import {
 } from '../bytes.js';
 import { getCrc32 } from '../checksum/crc32.js';
 import { MEDIA_TYPE_ZIP } from '../media-types.js';
+import { throwIfAborted, waitFor } from '../abort.js';
 
 const ZIP_LOCAL_HEADER_SIGNATURE = 0x04034b50;
 const ZIP_CENTRAL_HEADER_SIGNATURE = 0x02014b50;
@@ -25,11 +26,15 @@ const ZIP_CURRENT_DISK = 0;
 const ZIP_CENTRAL_DIRECTORY_DISK = 0;
 const ZIP_NO_ARCHIVE_COMMENT = 0;
 
-export async function createZipBlob(files) {
+export async function createZipBlob(
+  files,
+  { signal, onProgress = () => {} } = {},
+) {
   const localParts = [];
   const centralParts = [];
   let offset = 0;
-  for (const file of files) {
+  for (const [index, file] of files.entries()) {
+    throwIfAborted(signal);
     const name = textBytes(file.name);
     const data = new Uint8Array(await file.blob.arrayBuffer());
     const crc = getCrc32(data);
@@ -68,6 +73,8 @@ export async function createZipBlob(files) {
     pushUint32LE(central, offset);
     centralParts.push(concatBytes([new Uint8Array(central), name]));
     offset += localPart.length;
+    onProgress(index + 1, files.length);
+    await waitFor(0, signal);
   }
   const centralDirectory = concatBytes(centralParts);
   const end = [];

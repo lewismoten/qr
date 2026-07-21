@@ -1,16 +1,5 @@
 import { getHandbookCopy } from './copy.js';
 
-const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
-
-function download(blob, name) {
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  link.href = url;
-  link.download = name;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), OBJECT_URL_REVOCATION_DELAY_MS);
-}
-
 function action(label, run) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -37,21 +26,10 @@ export function setupHandbookExports(locale = 'en-US') {
   const controls = document.createElement('div');
   controls.className = 'handbook-actions';
   controls.append(
-    action(copy.print, async () => {
-      const target = window.open('', '_blank');
-      if (!target) throw new Error(copy.blocked);
-      const { printHandbook } = await import('./print.js');
-      try {
-        await printHandbook(locale, target);
-      } catch (error) {
-        target.close();
-        throw error;
-      }
-    }),
-    action(copy.epub, async () => {
-      const { createHandbookEpub } = await import('./epub.js');
-      const blob = await createHandbookEpub(locale);
-      download(blob, `qr-handbook-${locale}.epub`);
+    action(copy.download, async () => {
+      const { openHandbookExportDialog } =
+        await import('./handbook-export-dialog.js');
+      await openHandbookExportDialog(locale);
     }),
   );
   controls.querySelectorAll('button').forEach((button) => {

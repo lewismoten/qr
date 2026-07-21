@@ -122,3 +122,31 @@
   border-color: rgba(220, 38, 38, 0.22);
   color: #991b1b;
 }
+
+.handbook-export-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.handbook-export-choice,
+.handbook-export-close {
+  min-height: 2.8rem;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 0.85rem;
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.handbook-export-choice:hover,
+.handbook-export-choice:focus-visible {
+  background: rgba(15, 118, 110, 0.16);
+}
+
+.handbook-export-close {
+  grid-column: 1 / -1;
+  background: transparent;
+}

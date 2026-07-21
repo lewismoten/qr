@@ -1,4 +1,5 @@
 import { getGuideOutputPath, GUIDE_ROUTES } from '../../i18n/guide-routes.js';
+import { throwIfAborted, waitFor } from '../../app/abort.js';
 
 export const HANDBOOK_ROUTES = Object.freeze([
   'about',
@@ -33,14 +34,16 @@ function dataUrl(blob) {
   });
 }
 
-async function inlineImages(container) {
+async function inlineImages(container, signal) {
   await Promise.all(
     [...container.querySelectorAll('img[src]')].map(async (image) => {
+      throwIfAborted(signal);
       if (image.src.startsWith('data:')) return;
       try {
-        const response = await fetch(image.src);
+        const response = await fetch(image.src, { signal });
         if (response.ok) image.src = await dataUrl(await response.blob());
       } catch {
+        throwIfAborted(signal);
         // Preserve the absolute source if an optional image cannot be captured.
       }
     }),
@@ -48,30 +51,46 @@ async function inlineImages(container) {
 }
 
 const PAGE_RENDER_TIMEOUT_MS = 15_000;
-const PAGE_SETTLE_DELAY_MS = 300;
+const PAGE_SETTLE_DELAY_MS = 50;
 
-function renderedDocument(url) {
+function renderedDocument(url, signal) {
   return new Promise((resolve, reject) => {
+    throwIfAborted(signal);
     const frame = document.createElement('iframe');
+    const cleanup = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', cancel);
+    };
+    const cancel = () => {
+      cleanup();
+      frame.remove();
+      try {
+        throwIfAborted(signal);
+      } catch (error) {
+        reject(error);
+      }
+    };
     const timer = setTimeout(() => {
+      cleanup();
       frame.remove();
       reject(new Error(`Timed out while rendering ${url.pathname}.`));
     }, PAGE_RENDER_TIMEOUT_MS);
     frame.hidden = true;
     frame.setAttribute('aria-hidden', 'true');
     frame.addEventListener('load', () => {
-      clearTimeout(timer);
+      cleanup();
       setTimeout(
         () => resolve({ document: frame.contentDocument, frame }),
         PAGE_SETTLE_DELAY_MS,
       );
     });
+    signal?.addEventListener('abort', cancel, { once: true });
     frame.src = `${url.href}${url.search ? '&' : '?'}handbook-source=1`;
     document.body.append(frame);
   });
 }
 
-async function extractPage(document, url, route) {
+async function extractPage(document, url, route, signal) {
   const content =
     document.querySelector('.info-dialog-content') ||
     document.querySelector('main') ||
@@ -95,7 +114,7 @@ async function extractPage(document, url, route) {
     item.removeAttribute('hidden');
   });
   normalizeResources(clone, url);
-  await inlineImages(clone);
+  await inlineImages(clone, signal);
   const heading = clone.querySelector('h1, h2');
   return {
     route,
@@ -105,16 +124,23 @@ async function extractPage(document, url, route) {
   };
 }
 
-export async function loadHandbookPages(locale, root = new URL('/', location)) {
+export async function loadHandbookPages(
+  locale,
+  root = new URL('/', location),
+  { signal, onProgress = () => {} } = {},
+) {
   const pages = [];
-  for (const route of HANDBOOK_ROUTES) {
+  for (const [index, route] of HANDBOOK_ROUTES.entries()) {
+    throwIfAborted(signal);
     const url = new URL(getGuideOutputPath(route, locale), root);
-    const rendered = await renderedDocument(url);
+    const rendered = await renderedDocument(url, signal);
     try {
-      pages.push(await extractPage(rendered.document, url, route));
+      pages.push(await extractPage(rendered.document, url, route, signal));
     } finally {
       rendered.frame.remove();
     }
+    onProgress((index + 1) / HANDBOOK_ROUTES.length, route);
+    await waitFor(0, signal);
   }
   return pages;
 }

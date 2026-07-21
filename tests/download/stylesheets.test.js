@@ -36,7 +36,7 @@ describe('lazy feature stylesheets', () => {
   });
 
   test('recognizes an existing stylesheet', async () => {
-    const href = 'https://example.test/existing/dist/chunks/geo-map.min.css';
+    const href = 'https://example.test/dist/chunks/geo-map.min.css';
     const document = createDocument('existing', [{ href }]);
     await loadFeatureStylesheet('geo-map', { document });
     assert.equal(document.links.length, 0);
@@ -50,6 +50,10 @@ describe('lazy feature stylesheets', () => {
     assert.equal(document.links.length, 1);
     assert.equal(document.links[0].rel, 'stylesheet');
     assert.equal(document.links[0].dataset.featureStylesheet, 'download');
+    assert.equal(
+      document.links[0].href,
+      'https://example.test/dist/chunks/download.min.css',
+    );
     document.links[0].dispatchEvent(new Event('load'));
     await first;
   });

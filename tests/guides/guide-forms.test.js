@@ -77,9 +77,12 @@ describe('standalone guide forms', () => {
 
   test('uses a simplified local world map before network tiles', async () => {
     const geo = await read('src/html/guides/content/geo.html');
+    const builtGeo = await read('build/site/guides/content/geo.html');
     const world = await read('src/assets/maps/world.svg');
 
     assert.match(geo, /src="\/maps\/world\.svg"/);
+    assert.match(builtGeo, /src="\.\.\/\.\.\/maps\/world\.svg"/);
+    assert.doesNotMatch(builtGeo, /guides\/content\/maps\/world\.svg/);
     assert.match(world, /class="geo-world-land"/);
     assert.match(world, /viewBox="0 0 1000 500"/);
     assert.match(

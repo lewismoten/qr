@@ -1,7 +1,7 @@
 const requests = new Map();
 
 function getStylesheetUrl(name, document) {
-  return new URL(`dist/chunks/${name}.min.css`, document.baseURI).toString();
+  return new URL(`/dist/chunks/${name}.min.css`, document.baseURI).toString();
 }
 
 export function loadFeatureStylesheet(

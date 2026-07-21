@@ -40,4 +40,26 @@ assert.equal(
   'standard CRC-32 check value',
 );
 
+const progress = [];
+await createZipBlob(
+  [
+    { name: 'first.txt', blob: new Blob(['first']) },
+    { name: 'second.txt', blob: new Blob(['second']) },
+  ],
+  { onProgress: (completed, total) => progress.push([completed, total]) },
+);
+assert.deepEqual(progress, [
+  [1, 2],
+  [2, 2],
+]);
+
+const canceled = new AbortController();
+canceled.abort();
+await assert.rejects(
+  createZipBlob([{ name: 'canceled.txt', blob: new Blob(['data']) }], {
+    signal: canceled.signal,
+  }),
+  { name: 'AbortError' },
+);
+
 console.log('Export format tests passed.');

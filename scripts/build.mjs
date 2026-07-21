@@ -80,25 +80,17 @@ const builds = [
   },
   {
     ...shared,
-    entryPoints: ['src/js/spec/spec-entry.js'],
-    outfile: 'dist/spec.min.js',
+    entryPoints: {
+      'spec.min': 'src/js/spec/spec-entry.js',
+      'info.min': 'src/js/info/info-entry.js',
+      'geo-samples.min': 'src/js/info/geo-layer-samples.js',
+    },
+    outdir: 'dist',
+    chunkNames: 'chunks/[name]-[hash]',
     format: 'esm',
     platform: 'browser',
+    splitting: true,
     external: [qrPackageName],
-  },
-  {
-    ...shared,
-    entryPoints: ['src/js/info/info-entry.js'],
-    outfile: 'dist/info.min.js',
-    format: 'esm',
-    platform: 'browser',
-  },
-  {
-    ...shared,
-    entryPoints: ['src/js/info/geo-layer-samples.js'],
-    outfile: 'dist/geo-samples.min.js',
-    format: 'esm',
-    platform: 'browser',
   },
   {
     ...shared,
