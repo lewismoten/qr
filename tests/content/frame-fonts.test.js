@@ -6,9 +6,12 @@ import {
   FRAME_FONT_OPTIONS,
   getFrameFont,
   getFrameFontOption,
-  getVisibleFrameFontOptions,
   isFrameFontRecommended,
 } from '../../src/js/app/ui/content/frame/font-options.js';
+import {
+  getFrameFontGroups,
+  isFrameFontAvailable,
+} from '../../src/js/app/ui/content/frame/font-groups.js';
 import { createFontPicker } from '../../src/js/app/ui/content/frame/font-picker.js';
 
 class FakeClassList {
@@ -65,6 +68,7 @@ class FakeElement {
       if (selector === '[data-font-value]' && element.dataset.fontValue) {
         matches.push(element);
       }
+      if (selector === 'a' && element.tagName === 'a') matches.push(element);
       element.children.forEach(visit);
     };
     this.children.forEach(visit);
@@ -118,57 +122,38 @@ test('frame font registry provides named stacks and a safe fallback', () => {
   assert.match(getFrameFont('missing', 20), /^800 20px "Avenir Next"/);
 });
 
-test('available fonts prioritize the locale and retain a selection', () => {
+test('font groups prioritize the locale and report availability', () => {
   const document = createDocument(['Arial', 'Geeza Pro']);
-  const arabic = getVisibleFrameFontOptions({
+  const groups = getFrameFontGroups({
     document,
     locale: 'ar',
-    selected: 'sans',
   });
-  assert.equal(arabic[0].value, 'geeza');
-  assert.equal(isFrameFontRecommended(arabic[0], 'ar-EG'), true);
+  assert.equal(groups[0].id, 'arabic');
+  assert.equal(groups[1].id, 'general');
+  const geeza = groups[0].options.find(
+    ({ option }) => option.value === 'geeza',
+  );
+  assert.equal(geeza.installed, true);
+  assert.equal(isFrameFontRecommended(geeza.option, 'ar-EG'), true);
   assert.equal(isFrameFontRecommended(getFrameFontOption('sans'), 'ar'), false);
-  assert.ok(arabic.some(({ value }) => value === 'arial'));
-
-  const retained = getVisibleFrameFontOptions({
-    document: createDocument(),
-    locale: 'zh-CN',
-    selected: 'geeza',
-  });
-  assert.ok(retained.some(({ value }) => value === 'geeza'));
   assert.equal(
-    retained.some(({ value }) => value === 'arial'),
+    isFrameFontRecommended(getFrameFontOption('arial'), null),
     false,
   );
-  assert.doesNotThrow(() =>
-    getVisibleFrameFontOptions({
-      document: {
-        fonts: {
-          check: () => {
-            throw new Error('blocked');
-          },
+  assert.equal(groups.flatMap(({ options }) => options).length, 24);
+  assert.equal(isFrameFontAvailable(getFrameFontOption('sans'), null), true);
+  assert.equal(isFrameFontAvailable(getFrameFontOption('arial'), {}), false);
+  assert.equal(
+    isFrameFontAvailable(getFrameFontOption('arial'), {
+      fonts: {
+        check: () => {
+          throw new Error('blocked');
         },
       },
-      locale: null,
-      selected: 'sans',
     }),
-  );
-  assert.equal(
-    getVisibleFrameFontOptions({
-      document: {},
-      locale: 'en-US',
-      selected: 'sans',
-    }).some(({ value }) => value === 'arial'),
     false,
   );
-  assert.deepEqual(
-    getVisibleFrameFontOptions({
-      document: null,
-      locale: 'en-US',
-      selected: 'sans',
-    }).map(({ value }) => value),
-    ['sans', 'serif', 'mono'],
-  );
+  assert.equal(getFrameFontGroups({ document, locale: null })[0].id, 'general');
 });
 
 test('font picker reflects, changes, and closes the selected font', () => {
@@ -186,9 +171,9 @@ test('font picker reflects, changes, and closes the selected font', () => {
     },
   });
   const dialog = document.body.children[0];
-  const [heading, grid, close] = dialog.children[0].children;
+  const [heading, groups, close] = dialog.children[0].children;
   const getChoice = (value) =>
-    grid
+    groups
       .querySelectorAll('[data-font-value]')
       .find((choice) => choice.dataset.fontValue === value);
 
@@ -201,6 +186,17 @@ test('font picker reflects, changes, and closes the selected font', () => {
   assert.equal(sans.classList.contains('is-active'), true);
   assert.deepEqual(sans.focusOptions, { preventScroll: true });
   assert.equal(arial.dataset.recommended, 'Recommended');
+  assert.equal(
+    groups.children[0].children[0].children[0].textContent,
+    '\u{1F1FA}\u{1F1F8} \u{1F1EC}\u{1F1E7} ' + '\u{1F1EA}\u{1F1F8}',
+  );
+  assert.equal(
+    groups.children[0].children[0].children[1].textContent,
+    'English and Spanish',
+  );
+  assert.equal(getChoice('geeza').disabled, true);
+  assert.ok(groups.querySelectorAll('a').length > 0);
+  assert.equal(groups.querySelectorAll('a')[0].target, '_blank');
 
   arial.dispatch('click');
   assert.equal(select.value, 'arial');

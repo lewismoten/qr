@@ -1,6 +1,9 @@
+import { LANGUAGE_FONT_OPTIONS } from './font-language-options.js';
+
 const FONT_WEIGHT_BOLD = 700;
 const FONT_WEIGHT_EXTRA_BOLD = 800;
-const FONT_CHECK_SIZE_PX = 16;
+const MICROSOFT_FONT_INFO =
+  'https://learn.microsoft.com/en-us/typography/font-list/';
 
 export const FRAME_FONT_OPTIONS = Object.freeze([
   {
@@ -16,6 +19,8 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Round',
     family: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
     checkFamily: 'Arial Rounded MT Bold',
+    infoUrl: `${MICROSOFT_FONT_INFO}arial-rounded-mt`,
+    locales: ['en', 'es'],
     weight: FONT_WEIGHT_EXTRA_BOLD,
   },
   {
@@ -37,6 +42,7 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Arial',
     family: 'Arial, Helvetica, sans-serif',
     checkFamily: 'Arial',
+    infoUrl: `${MICROSOFT_FONT_INFO}arial`,
     locales: ['en', 'es'],
     weight: FONT_WEIGHT_EXTRA_BOLD,
   },
@@ -45,6 +51,7 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Verdana',
     family: 'Verdana, Geneva, sans-serif',
     checkFamily: 'Verdana',
+    infoUrl: `${MICROSOFT_FONT_INFO}verdana`,
     locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
@@ -53,6 +60,7 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Trebuchet MS',
     family: '"Trebuchet MS", sans-serif',
     checkFamily: 'Trebuchet MS',
+    infoUrl: `${MICROSOFT_FONT_INFO}trebuchet-ms`,
     locales: ['en', 'es'],
     weight: FONT_WEIGHT_EXTRA_BOLD,
   },
@@ -61,6 +69,7 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Times New Roman',
     family: '"Times New Roman", Times, serif',
     checkFamily: 'Times New Roman',
+    infoUrl: `${MICROSOFT_FONT_INFO}times-new-roman`,
     locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
@@ -69,6 +78,7 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Palatino',
     family: 'Palatino, "Palatino Linotype", serif',
     checkFamily: 'Palatino',
+    infoUrl: `${MICROSOFT_FONT_INFO}palatino-linotype`,
     locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
@@ -77,6 +87,8 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Courier New',
     family: '"Courier New", Courier, monospace',
     checkFamily: 'Courier New',
+    infoUrl: `${MICROSOFT_FONT_INFO}courier-new`,
+    locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
   {
@@ -84,6 +96,8 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Impact',
     family: 'Impact, Haettenschweiler, sans-serif',
     checkFamily: 'Impact',
+    infoUrl: `${MICROSOFT_FONT_INFO}impact`,
+    locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
   {
@@ -91,104 +105,11 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     label: 'Comic Sans MS',
     family: '"Comic Sans MS", "Bradley Hand", cursive',
     checkFamily: 'Comic Sans MS',
+    infoUrl: `${MICROSOFT_FONT_INFO}comic-sans-ms`,
+    locales: ['en', 'es'],
     weight: FONT_WEIGHT_BOLD,
   },
-  {
-    value: 'notoNaskh',
-    label: 'Noto Naskh Arabic',
-    family: '"Noto Naskh Arabic", serif',
-    checkFamily: 'Noto Naskh Arabic',
-    locales: ['ar'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'geeza',
-    label: 'Geeza Pro',
-    family: '"Geeza Pro", sans-serif',
-    checkFamily: 'Geeza Pro',
-    locales: ['ar'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'traditional',
-    label: 'Traditional Arabic',
-    family: '"Traditional Arabic", serif',
-    checkFamily: 'Traditional Arabic',
-    locales: ['ar'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'devanagari',
-    label: 'Noto Sans Devanagari',
-    family: '"Noto Sans Devanagari", sans-serif',
-    checkFamily: 'Noto Sans Devanagari',
-    locales: ['hi'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'kohinoor',
-    label: 'Kohinoor Devanagari',
-    family: '"Kohinoor Devanagari", sans-serif',
-    checkFamily: 'Kohinoor Devanagari',
-    locales: ['hi'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'nirmala',
-    label: 'Nirmala UI',
-    family: '"Nirmala UI", sans-serif',
-    checkFamily: 'Nirmala UI',
-    locales: ['hi'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'mangal',
-    label: 'Mangal',
-    family: 'Mangal, sans-serif',
-    checkFamily: 'Mangal',
-    locales: ['hi'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'pingfang',
-    label: 'PingFang SC',
-    family: '"PingFang SC", sans-serif',
-    checkFamily: 'PingFang SC',
-    locales: ['zh'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'yahei',
-    label: 'Microsoft YaHei',
-    family: '"Microsoft YaHei", sans-serif',
-    checkFamily: 'Microsoft YaHei',
-    locales: ['zh'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'notoCjk',
-    label: 'Noto Sans CJK SC',
-    family: '"Noto Sans CJK SC", sans-serif',
-    checkFamily: 'Noto Sans CJK SC',
-    locales: ['zh'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'simsun',
-    label: 'SimSun',
-    family: 'SimSun, serif',
-    checkFamily: 'SimSun',
-    locales: ['zh'],
-    weight: FONT_WEIGHT_BOLD,
-  },
-  {
-    value: 'kaiti',
-    label: 'KaiTi',
-    family: 'KaiTi, serif',
-    checkFamily: 'KaiTi',
-    locales: ['zh'],
-    weight: FONT_WEIGHT_BOLD,
-  },
+  ...LANGUAGE_FONT_OPTIONS,
 ]);
 
 function getLanguage(locale) {
@@ -199,28 +120,6 @@ function getLanguage(locale) {
 
 export function isFrameFontRecommended(option, locale) {
   return option.locales?.includes(getLanguage(locale)) === true;
-}
-
-function isFrameFontAvailable(option, document) {
-  if (!option.checkFamily) return true;
-  if (typeof document?.fonts?.check !== 'function') return false;
-  try {
-    const query = `${FONT_CHECK_SIZE_PX}px "${option.checkFamily}"`;
-    return document.fonts.check(query);
-  } catch {
-    return false;
-  }
-}
-
-export function getVisibleFrameFontOptions({ document, locale, selected }) {
-  return FRAME_FONT_OPTIONS.filter(
-    (option) =>
-      option.value === selected || isFrameFontAvailable(option, document),
-  ).sort(
-    (left, right) =>
-      Number(isFrameFontRecommended(right, locale)) -
-      Number(isFrameFontRecommended(left, locale)),
-  );
 }
 
 export function getFrameFontOption(value) {

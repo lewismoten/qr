@@ -51,11 +51,42 @@
 }
 
 .frame-font-options {
+  display: block;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.frame-font-group + .frame-font-group {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(19, 34, 53, 0.1);
+}
+
+.frame-font-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  color: #334155;
+  font: 800 0.82rem/1.2 sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.frame-font-group-flag {
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.frame-font-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
-  padding: 1rem;
-  overflow-y: auto;
+}
+
+.frame-font-entry {
+  display: grid;
+  align-content: start;
 }
 
 .frame-font-option {
@@ -100,6 +131,31 @@
   box-shadow: inset 0 0 0 2px rgba(13, 148, 136, 0.18);
 }
 
+.frame-font-option:disabled {
+  border-color: rgba(19, 34, 53, 0.08);
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.frame-font-status {
+  margin: 0.3rem 0.25rem 0;
+  color: #9a3412;
+  font: 700 0.7rem/1.25 sans-serif;
+}
+
+.frame-font-info {
+  margin: 0.15rem 0.25rem 0;
+  color: #0f766e;
+  font: 700 0.7rem/1.25 sans-serif;
+}
+
+.frame-font-info:hover,
+.frame-font-info:focus-visible {
+  color: #115e59;
+  text-decoration-thickness: 0.12em;
+}
+
 .frame-font-close {
   margin: 0 1rem 1rem;
 }
@@ -114,7 +170,7 @@
     text-align: start;
   }
 
-  .frame-font-options {
+  .frame-font-grid {
     grid-template-columns: 1fr;
   }
 }
