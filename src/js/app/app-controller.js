@@ -1,4 +1,4 @@
-import { colorWithTransparency } from './colors.js';
+import { withAlpha } from './colors.js';
 import {
   ERROR_LEVELS,
   FILE_PROTOCOL,
@@ -66,7 +66,7 @@ const styleSetup = createLazyStyleSetup({
   document,
   render: runtime.render,
   setFrameCentered: (...args) => runtime.setFrameCentered(...args),
-  colorWithTransparency,
+  withAlpha,
 });
 const contentSections = createContentSections({
   document,
@@ -81,7 +81,7 @@ const contentSections = createContentSections({
   },
   limits: { ...LIMITS, byteCapacity: MODE_CAPACITY.byte.L },
   encoder: qrEncoder,
-  alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+  alphaChars: QR_ALPHANUMERIC_CHARACTERS,
   validatePrintableText,
   file: {
     build: contentData.file.payload.build,
@@ -144,7 +144,7 @@ const contentEncoding = createContentEncodingSetup({
     build: contentData.buildBulkPayload,
     getError: contentData.getBulkParseError,
     getSchema: contentData.getBulkSchema,
-    getValidationState: contentData.getBulkValidationState,
+    getValidation: contentData.getBulkValidationState,
   },
   file: {
     getActive: contentData.getActiveFile,
@@ -164,12 +164,12 @@ const contentEncoding = createContentEncodingSetup({
   helpers: {
     getErrorLevel: runtimeHelpers.getErrorLevel,
     readInteger: runtimeHelpers.readInteger,
-    colorWithTransparency,
+    withAlpha,
     getQrColors: styleSetup.colors.getQrColors,
     getEncodingMode: runtimeHelpers.getEncodingMode,
   },
   config: {
-    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+    alphaChars: QR_ALPHANUMERIC_CHARACTERS,
   },
 });
 
@@ -193,7 +193,7 @@ const debugSetup = createDebugFacade({
   encoder: qrEncoder,
   config: {
     modeLabels: MODE_LABELS,
-    alphanumericCharacters: QR_ALPHANUMERIC_CHARACTERS,
+    alphaChars: QR_ALPHANUMERIC_CHARACTERS,
     maskValues: MASK_VALUES,
   },
   getCurrentMode: runtimeHelpers.getEncodingMode,

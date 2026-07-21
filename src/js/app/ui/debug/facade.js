@@ -61,8 +61,8 @@ export function createDebugFacade(options) {
     diagnostics: {
       setValidation: (...args) =>
         controller?.diagnostics.setValidation(...args),
-      validateManualMode: (...args) =>
-        controller?.diagnostics.validateManualMode(...args) ?? true,
+      validateMode: (...args) =>
+        controller?.diagnostics.validateMode(...args) ?? true,
       updateSummary: (...args) =>
         controller?.diagnostics.updateSummary(...args),
     },
@@ -73,8 +73,8 @@ export function createDebugFacade(options) {
           strokeColor: COLOR_WHITE,
           opacity: 0.7,
         },
-      getModuleContrastColor: (...args) =>
-        controller?.styles.getModuleContrastColor(...args) ?? COLOR_WHITE,
+      getContrastColor: (...args) =>
+        controller?.styles.getContrastColor(...args) ?? COLOR_WHITE,
     },
     masks: {
       ensure: (...args) => controller?.masks.ensure(...args),

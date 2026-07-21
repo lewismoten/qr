@@ -19,7 +19,7 @@ export function createColorSection({
   imageFillControls,
   imageFillClear,
   hasImageFill,
-  colorWithTransparency,
+  withAlpha,
 }) {
   const formatTransparency = () => {
     darkTransparencyValue.textContent = lookup('units.percent', '{value}%', {
@@ -52,7 +52,7 @@ export function createColorSection({
   const getGradientOptions = () => ({
     type: gradientType.value,
     angle: Number.parseInt(gradientAngle.value, 10) || 0,
-    endColor: colorWithTransparency(
+    endColor: withAlpha(
       gradientEndColor.value.trim() || COLOR_ACCENT,
       gradientEndTransparency,
     ),

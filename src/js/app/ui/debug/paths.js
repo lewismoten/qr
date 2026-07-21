@@ -122,7 +122,7 @@ export function drawCodewordPaths(
   marginModules,
   cellSize,
   outlineMode,
-  getModuleContrastColor,
+  getContrastColor,
 ) {
   const lineWidth = Math.max(
     CODEWORD_PATH_STYLE.minimumLineWidth,
@@ -157,7 +157,7 @@ export function drawCodewordPaths(
         ? getMetadataOffset(routeIndex, cellSize)
         : null;
     for (let pointIndex = 1; pointIndex < points.length; pointIndex += 1) {
-      const color = getModuleContrastColor(
+      const color = getContrastColor(
         group.modules[pointIndex],
         qrDefinition,
         model,
@@ -187,7 +187,7 @@ export function drawCodewordPaths(
       x: (next.column + marginModules + MODULE_CENTER_OFFSET) * cellSize,
       y: (next.row + marginModules + MODULE_CENTER_OFFSET) * cellSize,
     };
-    const color = getModuleContrastColor(next, qrDefinition, model);
+    const color = getContrastColor(next, qrDefinition, model);
     if (group.kind === 'metadata' && nextGroup.kind === 'metadata') {
       if (group.metadataSequenceId !== nextGroup.metadataSequenceId) return;
       drawMetadataBridge(

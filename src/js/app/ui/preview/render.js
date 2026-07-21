@@ -21,7 +21,7 @@ export function createRenderController(deps) {
     }
     if (requestId !== request) return;
 
-    deps.updateTextPreview(encodedText);
+    deps.updatePreview(encodedText);
     deps.syncMask();
     deps.renderMasks(encodedText);
     const validation = await deps.getValidation();

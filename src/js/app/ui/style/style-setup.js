@@ -15,7 +15,7 @@ export function createStyleSetup({
   document,
   elements: e,
   render,
-  colorWithTransparency,
+  withAlpha,
   setFrameCentered,
 }) {
   let modulesSystem = null;
@@ -119,7 +119,7 @@ export function createStyleSetup({
         imageFillControls: e.imageFillControls,
         imageFillClear: e.imageFillClear,
         hasImageFill: () => Boolean(imageFill?.getImage()),
-        colorWithTransparency,
+        withAlpha,
       });
       imageFill = createImageInputController({
         input: e.imageFillInput,
@@ -239,7 +239,7 @@ export function createStyleSetup({
         type: e.gradientType?.value ?? 'solid',
         angle: readStyleInteger(e.gradientAngle, 0),
         endColor: e.colorGradientEnd
-          ? colorWithTransparency(
+          ? withAlpha(
               e.colorGradientEnd.value.trim() || COLOR_ACCENT,
               e.colorGradientEndTransparency,
             )

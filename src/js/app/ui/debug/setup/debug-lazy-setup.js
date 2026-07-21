@@ -76,8 +76,7 @@ export function createLazyDebugSetup(options) {
     colors: colorElements,
     diagnostics: {
       setValidation: (...args) => diagnostics?.setValidation(...args),
-      validateManualMode: (...args) =>
-        diagnostics?.validateManualMode(...args) ?? true,
+      validateMode: (...args) => diagnostics?.validateMode(...args) ?? true,
       updateSummary: (...args) =>
         (isActive('encoding') || isActive('overlay')) &&
         diagnostics?.updateSummary(...args),
@@ -89,8 +88,8 @@ export function createLazyDebugSetup(options) {
           strokeColor: COLOR_WHITE,
           opacity: 0.7,
         },
-      getModuleContrastColor: (...args) =>
-        overlay?.styles.getModuleContrastColor(...args) ?? COLOR_WHITE,
+      getContrastColor: (...args) =>
+        overlay?.styles.getContrastColor(...args) ?? COLOR_WHITE,
     },
     masks: {
       ensure: (...args) => isActive('mask') && masks?.ensure(...args),

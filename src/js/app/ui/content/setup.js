@@ -11,7 +11,7 @@ export function createContentSections({
   runtime,
   encoder,
   limits,
-  alphanumericCharacters,
+  alphaChars,
   validatePrintableText,
   file,
 }) {
@@ -42,7 +42,7 @@ export function createContentSections({
     create: ({ createNumberSectionFromDocument }) => {
       const section = createNumberSectionFromDocument(document, {
         maxFrames: limits.numberFrames,
-        alphanumericCharacters,
+        alphaChars,
         validatePrintableText,
       });
       section.sync();
@@ -130,7 +130,7 @@ export function createContentSections({
       numberLoader.ensure().then((section) => ({
         build: section.getPayload,
         preview: section.getPayload,
-        validate: section.getValidationState,
+        validate: section.getValidation,
       })),
     wifi: () =>
       Promise.all([
@@ -240,7 +240,7 @@ export function createContentSections({
     getSequenceInfo: () =>
       numberLoader.get()?.getSequenceInfo() ?? { total: 1, current: 1 },
     getIndexInput: () => numberLoader.get()?.getIndexInput() ?? null,
-    getValidationState: () =>
+    getValidation: () =>
       registry.get('number')?.validate?.() ?? { error: '', warning: '' },
     sync: () => numberLoader.get()?.sync(),
   };

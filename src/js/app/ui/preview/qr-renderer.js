@@ -42,7 +42,7 @@ export function createQrRenderer(deps) {
     getCurrentFrameOptions,
     imageFillController,
     getCodewordStyle,
-    getModuleContrastColor,
+    getContrastColor,
     centerLogoController,
     pixelArtEditor,
     schedulePreviewViewportSync,
@@ -237,7 +237,7 @@ export function createQrRenderer(deps) {
       transparentLight,
       getActiveDebugOutlineMode,
       getCodewordStyle,
-      getModuleContrastColor,
+      getContrastColor,
     });
 
     const artworkOptions = getCurrentArtworkOptions();

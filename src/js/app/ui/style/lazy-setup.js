@@ -66,13 +66,13 @@ export function createLazyStyleSetup(options) {
         },
       getQrColors: () => ({
         dark: featureElements?.colorDark
-          ? options.colorWithTransparency(
+          ? options.withAlpha(
               featureElements.colorDark.value.trim() || COLOR_DARK,
               featureElements.colorDarkTransparency,
             )
           : COLOR_DARK_OPAQUE,
         light: featureElements?.colorLight
-          ? options.colorWithTransparency(
+          ? options.withAlpha(
               featureElements.colorLight.value.trim() || COLOR_WHITE,
               featureElements.colorLightTransparency,
             )

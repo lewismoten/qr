@@ -11,7 +11,7 @@ export function createDebugEncodingSetup({
   return createEncodingDiagnostics({
     encoder,
     modeLabels: config.modeLabels,
-    alphanumericCharacters: config.alphanumericCharacters,
+    alphaChars: config.alphaChars,
     elements: {
       detectedMode: e.detectedMode,
       segmentSummary: e.segmentSummary,

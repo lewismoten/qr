@@ -141,7 +141,7 @@ export function createContentDataSetup(options) {
     buildBulkPayload: (value) =>
       ensureBulk().then((system) => system.buildPayload(value)),
     getBulkValidationState: (value) =>
-      bulk?.getValidationState({ ...value, limits }) ?? {
+      bulk?.getValidation({ ...value, limits }) ?? {
         error: lookup('bulk.loading', 'Bulk Import tools are loading.'),
         warning: '',
       },

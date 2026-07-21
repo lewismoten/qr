@@ -5,6 +5,7 @@ import { stripVTControlCharacters } from 'node:util';
 
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
 import { buildLocaleResources } from './locales/resources.mjs';
+import { enforceObjectKeys } from '../tests/architecture/naming/object-key-check.js';
 
 const requested = new Set(process.argv.slice(2));
 const supported = new Set(['--coverage', '--watch']);
@@ -74,6 +75,7 @@ async function enforceBuildDuration() {
 }
 
 await enforceBuildDuration();
+await enforceObjectKeys();
 
 await generateLocalizedGuides({ clean: true });
 await buildLocaleResources();

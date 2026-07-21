@@ -4,17 +4,17 @@ import { getPixelArtLayout } from './pixel-layout.js';
 import { STYLE_DEFAULTS, STYLE_PERCENT_SCALE } from '../style-values.js';
 
 const EMOJI_DRAWING_STYLE = {
-  minimumOutlineWidth: 1.5,
+  minOutlineWidth: 1.5,
   outlineDivisor: 400,
-  outlineBufferMultiplier: 6,
+  bufferMultiplier: 6,
   initialFontScale: 0.82,
-  maximumWidthScale: 0.92,
-  baselineOffsetScale: 0.04,
+  maxWidthScale: 0.92,
+  baselineScale: 0.04,
   outlineSteps: 24,
 };
 const ARTWORK_STYLE = {
-  protectedPaddingScale: 0.13,
-  protectedBadgeRounding: 20,
+  paddingScale: 0.13,
+  badgeRounding: 20,
 };
 
 function drawOutlinedEmoji(
@@ -26,11 +26,11 @@ function drawOutlinedEmoji(
   outlinePercent = STYLE_DEFAULTS.artwork.outlinePercent,
 ) {
   const outlineWidth = Math.max(
-    EMOJI_DRAWING_STYLE.minimumOutlineWidth,
+    EMOJI_DRAWING_STYLE.minOutlineWidth,
     artSize * (outlinePercent / EMOJI_DRAWING_STYLE.outlineDivisor),
   );
   const bufferSize = Math.ceil(
-    artSize + outlineWidth * EMOJI_DRAWING_STYLE.outlineBufferMultiplier,
+    artSize + outlineWidth * EMOJI_DRAWING_STYLE.bufferMultiplier,
   );
   const emojiCanvas = document.createElement('canvas');
   const maskCanvas = document.createElement('canvas');
@@ -45,9 +45,8 @@ function drawOutlinedEmoji(
   const family = '"Apple Color Emoji", "Segoe UI Emoji", sans-serif';
   emojiContext.font = `${fontSize}px ${family}`;
   const measuredWidth = emojiContext.measureText(emoji).width;
-  if (measuredWidth > artSize * EMOJI_DRAWING_STYLE.maximumWidthScale) {
-    fontSize *=
-      (artSize * EMOJI_DRAWING_STYLE.maximumWidthScale) / measuredWidth;
+  if (measuredWidth > artSize * EMOJI_DRAWING_STYLE.maxWidthScale) {
+    fontSize *= (artSize * EMOJI_DRAWING_STYLE.maxWidthScale) / measuredWidth;
   }
   emojiContext.font = `${fontSize}px ${family}`;
   emojiContext.textAlign = 'center';
@@ -55,7 +54,7 @@ function drawOutlinedEmoji(
   emojiContext.fillText(
     emoji,
     bufferSize / 2,
-    bufferSize / 2 + fontSize * EMOJI_DRAWING_STYLE.baselineOffsetScale,
+    bufferSize / 2 + fontSize * EMOJI_DRAWING_STYLE.baselineScale,
   );
   maskContext.drawImage(emojiCanvas, 0, 0);
   maskContext.globalCompositeOperation = 'source-in';
@@ -132,7 +131,7 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
   const badgeSize = qrSize * (options.sizePercent / STYLE_PERCENT_SCALE);
   const center = qrStart + qrSize / 2;
   const artPadding = options.protectBackground
-    ? badgeSize * ARTWORK_STYLE.protectedPaddingScale
+    ? badgeSize * ARTWORK_STYLE.paddingScale
     : 0;
   const artSize = badgeSize - artPadding * 2;
   context.save();
@@ -146,7 +145,7 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
       center - badgeSize / 2,
       center - badgeSize / 2,
       badgeSize,
-      ARTWORK_STYLE.protectedBadgeRounding,
+      ARTWORK_STYLE.badgeRounding,
       getOpaqueArtworkBackground(options.lightColor),
     );
   }
@@ -183,7 +182,7 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
       context.fillText(
         options.emoji,
         center,
-        center + artSize * EMOJI_DRAWING_STYLE.baselineOffsetScale,
+        center + artSize * EMOJI_DRAWING_STYLE.baselineScale,
       );
     }
   } else drawPixelArt(context, center, artSize, options);

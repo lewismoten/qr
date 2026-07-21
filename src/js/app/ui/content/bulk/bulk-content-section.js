@@ -246,7 +246,7 @@ export function createBulkImportSection({
         format: format.value,
         ...options,
       }),
-    getValidationState: ({ rowNumber, limits }) =>
+    getValidation: ({ rowNumber, limits }) =>
       validateBulkImport({
         parseError,
         hasFile: Boolean(fileInput.files?.[0]),

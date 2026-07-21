@@ -29,7 +29,7 @@ export function createContentEncodingSetup({
       syncChoices: runtime.syncChoices,
       syncArtwork: runtime.syncArtwork,
     },
-    alphanumericCharacters: config.alphanumericCharacters,
+    alphaChars: config.alphaChars,
   });
   const qr = createQrConfiguration({
     elements: {
@@ -47,13 +47,13 @@ export function createContentEncodingSetup({
     helpers: {
       getErrorLevel: helpers.getErrorLevel,
       readInteger: helpers.readInteger,
-      colorWithTransparency: helpers.colorWithTransparency,
+      withAlpha: helpers.withAlpha,
       getQrColors: helpers.getQrColors,
       getFileMode: file.getMode,
       getChunkVersion: file.getChunkVersion,
       getEncodingMode: helpers.getEncodingMode,
     },
-    alphanumericCharacters: config.alphanumericCharacters,
+    alphaChars: config.alphaChars,
   });
   const emailCapacity = {
     getInfo: () =>
@@ -68,19 +68,19 @@ export function createContentEncodingSetup({
   };
   const validation = async () => {
     if (bulk.isMode()) {
-      return bulk.getValidationState({
+      return bulk.getValidation({
         rowNumber: runtime.getFrameIndex() + 1,
       });
     }
     const plugin = await sections.ensureFormat(e.qrFormat.value);
     return plugin?.validate?.() ?? { error: '', warning: '' };
   };
-  const updateTextPreview = (text) => {
+  const updatePreview = (text) => {
     const debugState = runtime.getDebugState();
     if (debugState.tab !== 'debug' || debugState.subtab !== 'payload') return;
     const preview = text || pipeline.payload.preview();
     const plugin = sections.plugins.get();
     e.encodedPreview.textContent = plugin?.maskPreview?.(preview) ?? preview;
   };
-  return { pipeline, qr, emailCapacity, validation, updateTextPreview };
+  return { pipeline, qr, emailCapacity, validation, updatePreview };
 }

@@ -7,7 +7,7 @@ export function createQrConfiguration({
   elements: e,
   encoder,
   helpers,
-  alphanumericCharacters,
+  alphaChars,
 }) {
   const buildOptions = () => {
     const base = {
@@ -42,9 +42,7 @@ export function createQrConfiguration({
     if (e.qrFormat.value === 'number' && e.modeAuto.checked && text.trim()) {
       const mode = /^\d+$/.test(text)
         ? 'numeric'
-        : [...text].every((character) =>
-              alphanumericCharacters.includes(character),
-            )
+        : [...text].every((character) => alphaChars.includes(character))
           ? 'alphanumeric'
           : 'byte';
       return [{ data: text, mode }];

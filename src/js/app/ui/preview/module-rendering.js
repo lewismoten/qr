@@ -33,7 +33,7 @@ export function drawQrMatrix(state) {
     transparentLight,
     getActiveDebugOutlineMode,
     getCodewordStyle,
-    getModuleContrastColor,
+    getContrastColor,
   } = state;
 
   if (debugActive) {
@@ -160,7 +160,7 @@ export function drawQrMatrix(state) {
     marginModules,
     cellSize,
     outlineMode,
-    getModuleContrastColor,
+    getContrastColor,
   );
   debugRenderer.drawFieldStarts(
     context,

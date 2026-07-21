@@ -9,12 +9,12 @@ export function createContentPipeline({
   file,
   plugins,
   runtime,
-  alphanumericCharacters,
+  alphaChars,
 }) {
   const buildBulkText = () =>
     bulk.build({
       frameIndex: runtime.getFrameIndex(),
-      alphanumericCharacters,
+      alphaChars,
     });
   const frameOptions = {
     format: e.format,

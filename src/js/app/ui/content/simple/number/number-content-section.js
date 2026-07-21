@@ -14,7 +14,7 @@ export function createNumberSection({
   indexInput,
   statusElement,
   maxFrames,
-  alphanumericCharacters,
+  alphaChars,
   validatePrintableText,
 }) {
   const getSequenceInfo = () => {
@@ -45,7 +45,7 @@ export function createNumberSection({
     const rawPayload = `${prefixInput.value}${getSequenceInfo().value}${suffixInput.value}`;
     const uppercasePayload = rawPayload.toUpperCase();
     return [...uppercasePayload].every((character) =>
-      alphanumericCharacters.includes(character),
+      alphaChars.includes(character),
     )
       ? uppercasePayload
       : rawPayload;
@@ -67,7 +67,7 @@ export function createNumberSection({
     );
   };
 
-  const getValidationState = () => {
+  const getValidation = () => {
     const { start, end, step, total } = getSequenceInfo();
     if (start === null)
       return {
@@ -130,7 +130,7 @@ export function createNumberSection({
     getPayload,
     getIndexInput: () => indexInput,
     sync,
-    getValidationState,
+    getValidation,
   };
 }
 

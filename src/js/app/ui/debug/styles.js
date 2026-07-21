@@ -80,7 +80,7 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
     return (colorByCategory[category] || colors.data).value;
   };
 
-  const getModuleContrastColor = (module, qrDefinition, debugModel) => {
+  const getContrastColor = (module, qrDefinition, debugModel) => {
     const category = getCategory(
       module.row,
       module.column,
@@ -91,5 +91,5 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
     return getContrastingHex(getCategoryOverlayColor(category));
   };
 
-  return { getCodewordStyle, getModuleContrastColor };
+  return { getCodewordStyle, getContrastColor };
 }

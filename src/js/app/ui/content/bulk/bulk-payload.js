@@ -20,12 +20,7 @@ export function normalizeBulkWifiSecurity(value) {
   return '';
 }
 
-export function serializeBulkRow({
-  row,
-  format,
-  frameIndex,
-  alphanumericCharacters,
-}) {
+export function serializeBulkRow({ row, format, frameIndex, alphaChars }) {
   if (!row) return '';
 
   switch (format) {
@@ -36,9 +31,7 @@ export function serializeBulkRow({
     case 'number': {
       const raw = `${row.prefix}${row.number}${row.suffix}`;
       const uppercase = raw.toUpperCase();
-      return [...uppercase].every((character) =>
-        alphanumericCharacters.includes(character),
-      )
+      return [...uppercase].every((character) => alphaChars.includes(character))
         ? uppercase
         : raw;
     }

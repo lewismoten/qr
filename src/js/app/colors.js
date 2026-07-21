@@ -21,7 +21,7 @@ const LUMINANCE_BLUE_WEIGHT = 114;
 const LUMINANCE_WEIGHT_TOTAL = 1000;
 const DARK_TEXT_LUMINANCE_THRESHOLD = 140;
 
-export function colorWithTransparency(color, transparencyInput) {
+export function withAlpha(color, transparencyInput) {
   const normalizedColor = /^#[0-9a-f]{6}$/i.test(color) ? color : COLOR_BLACK;
   const transparency = Math.min(
     PERCENT_MAXIMUM,

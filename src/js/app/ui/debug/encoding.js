@@ -10,7 +10,7 @@ const MAXIMUM_INVALID_POSITIONS_SHOWN = 20;
 const BITS_PER_BYTE = 8;
 const PERCENT_SCALE = 100;
 
-function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
+function getInvalidCharacters(text, mode, encoder, alphaChars) {
   if (mode === 'byte') return [];
   if (mode === 'kanji') {
     const invalid = [];
@@ -36,7 +36,7 @@ function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
   [...text].forEach((char, index) => {
     if (mode === 'numeric' && !/[0-9]/.test(char))
       invalid.push({ char, index });
-    if (mode === 'alphanumeric' && !alphanumericCharacters.includes(char))
+    if (mode === 'alphanumeric' && !alphaChars.includes(char))
       invalid.push({ char, index });
   });
   return invalid;
@@ -45,7 +45,7 @@ function getInvalidCharacters(text, mode, encoder, alphanumericCharacters) {
 export function createEncodingDiagnostics({
   encoder,
   modeLabels,
-  alphanumericCharacters,
+  alphaChars,
   elements,
   getCurrentMode,
   getFormat,
@@ -119,7 +119,7 @@ export function createEncodingDiagnostics({
     );
   };
 
-  const validateManualMode = (encodedText) => {
+  const validateMode = (encodedText) => {
     const mode = getCurrentMode();
     if (!mode || !encodedText) {
       setModeValidation('');
@@ -139,7 +139,7 @@ export function createEncodingDiagnostics({
       encodedText,
       mode,
       encoder,
-      alphanumericCharacters,
+      alphaChars,
     );
     if (!invalid.length) {
       setModeValidation('');
@@ -222,7 +222,7 @@ export function createEncodingDiagnostics({
 
   return {
     setValidation: setFormatValidation,
-    validateManualMode,
+    validateMode,
     updateSummary,
   };
 }

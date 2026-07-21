@@ -7,7 +7,7 @@ import {
   COLOR_BLACK,
   COLOR_DARK,
   COLOR_WHITE,
-  colorWithTransparency,
+  withAlpha,
   getColorAlpha,
   getContrastingHex,
   hexToRgb,
@@ -21,16 +21,10 @@ const TEXT_TYPE_LITERAL = /['"]text\/[a-z0-9.+-]*/gi;
 const HINDI_LOCALE_PROPERTY = /['"]hi-IN['"]\s*:/g;
 
 test('color helpers normalize channels, alpha, and contrast', () => {
-  assert.equal(colorWithTransparency('#123456', { value: '25' }), '#123456bf');
-  assert.equal(
-    colorWithTransparency('invalid', { value: '-20' }),
-    `${COLOR_BLACK}ff`,
-  );
-  assert.equal(colorWithTransparency('#ffffff', { value: '120' }), '#ffffff00');
-  assert.equal(
-    colorWithTransparency('#ffffff', { value: 'invalid' }),
-    '#ffffffff',
-  );
+  assert.equal(withAlpha('#123456', { value: '25' }), '#123456bf');
+  assert.equal(withAlpha('invalid', { value: '-20' }), `${COLOR_BLACK}ff`);
+  assert.equal(withAlpha('#ffffff', { value: '120' }), '#ffffff00');
+  assert.equal(withAlpha('#ffffff', { value: 'invalid' }), '#ffffffff');
   assert.equal(getColorAlpha('transparent'), 0);
   assert.equal(getColorAlpha('#00000080'), 128 / 255);
   assert.equal(getColorAlpha('#000000'), 1);
