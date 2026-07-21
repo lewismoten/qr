@@ -11,7 +11,8 @@ const PDF_FILE_HEADER = '%PDF-1.4\n';
 const PDF_OBJECT_END = '\nendobj\n';
 const PDF_XREF_OFFSET_WIDTH = 10;
 const PDF_FREE_OBJECT_ENTRY = '0000000000 65535 f \n';
-const PDF_CATALOG_REFERENCE = 1;
+export const PDF_CATALOG_REFERENCE = 1;
+export const PDF_PAGES_REFERENCE = 2;
 
 function createDictionary(entries) {
   return `<< ${entries.filter(Boolean).join(' ')} >>`;

@@ -5,6 +5,7 @@
   "creatingPdf": "جارٍ إنشاء PDF...",
   "pdfReady": "ملف PDF جاهز.",
   "pdfError": "تعذر إنشاء PDF.",
+  "pdfFramesRequired": "أضف رمز QR واحدًا على الأقل قبل إنشاء صفحة PDF.",
   "rendering": "جارٍ معالجة {frame} من {total}...",
   "buildingZip": "جارٍ إنشاء ZIP...",
   "zipReady": "ملف ZIP جاهز ويحتوي على {total} ملفات.",

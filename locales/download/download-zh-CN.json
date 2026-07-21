@@ -5,6 +5,7 @@
   "creatingPdf": "正在创建 PDF...",
   "pdfReady": "PDF 已准备好。",
   "pdfError": "无法创建 PDF。",
+  "pdfFramesRequired": "创建 PDF 页面前，请至少添加一个二维码。",
   "rendering": "正在渲染第 {frame} 个，共 {total} 个...",
   "buildingZip": "正在创建 ZIP...",
   "zipReady": "包含 {total} 个文件的 ZIP 已准备好。",

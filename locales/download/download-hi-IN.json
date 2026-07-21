@@ -5,6 +5,7 @@
   "creatingPdf": "PDF बनाया जा रहा है...",
   "pdfReady": "PDF तैयार है।",
   "pdfError": "PDF नहीं बनाया जा सका।",
+  "pdfFramesRequired": "PDF शीट बनाने से पहले कम से कम एक QR कोड जोड़ें।",
   "rendering": "{total} में से {frame} प्रस्तुत हो रहा है...",
   "buildingZip": "ZIP बनाया जा रहा है...",
   "zipReady": "{total} फ़ाइलों वाला ZIP तैयार है।",

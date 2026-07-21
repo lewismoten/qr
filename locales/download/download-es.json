@@ -5,6 +5,7 @@
   "creatingPdf": "Creando PDF...",
   "pdfReady": "PDF listo.",
   "pdfError": "No se pudo crear el PDF.",
+  "pdfFramesRequired": "Añada al menos un código QR antes de crear una hoja PDF.",
   "rendering": "Procesando {frame} de {total}...",
   "buildingZip": "Creando ZIP...",
   "zipReady": "ZIP listo con {total} archivos.",

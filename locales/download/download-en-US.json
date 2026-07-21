@@ -5,6 +5,7 @@
   "creatingPdf": "Creating PDF...",
   "pdfReady": "PDF ready.",
   "pdfError": "Unable to create PDF.",
+  "pdfFramesRequired": "Add at least one QR code before creating a PDF sheet.",
   "rendering": "Rendering {frame} of {total}...",
   "buildingZip": "Building ZIP...",
   "zipReady": "ZIP ready with {total} files.",

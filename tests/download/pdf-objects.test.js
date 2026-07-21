@@ -9,11 +9,15 @@ import {
   createPdfPageDictionary,
   createPdfPagesDictionary,
 } from '../../src/js/app/export/pdf-objects.js';
-import { createPdfSheetBlob } from '../../src/js/app/export/pdf.js';
+import {
+  createPdfSheetBlob,
+  getPdfSheetLayout,
+} from '../../src/js/app/export/pdf.js';
 
 const decoder = new TextDecoder();
 const FIRST_PAGE_REFERENCE = 3;
 const SECOND_PAGE_REFERENCE = 8;
+const LARGE_PRINT_WIDTH_INCHES = 7.5;
 const JPEG_START_MARKER = 0xff;
 const JPEG_START_OF_IMAGE = 0xd8;
 const SAMPLE_JPEG = new Uint8Array([
@@ -78,21 +82,36 @@ describe('PDF object builders', () => {
   });
 
   test('assembles a complete PDF sheet from captured frames', async () => {
-    const blob = createPdfSheetBlob([
-      {
-        width: 100,
-        height: 100,
-        printWidthInches: 1,
-        jpeg: SAMPLE_JPEG,
-      },
-    ]);
+    const frame = {
+      width: 100,
+      height: 100,
+      printWidthInches: LARGE_PRINT_WIDTH_INCHES,
+      jpeg: SAMPLE_JPEG,
+    };
+    const blob = createPdfSheetBlob([frame, frame]);
     const text = decoder.decode(await blob.arrayBuffer());
     assert.equal(blob.type, 'application/pdf');
     assert.match(text, /^%PDF-1\.4/);
     assert.match(text, /\/Type \/Catalog/);
     assert.match(text, /\/Type \/Pages/);
+    assert.match(text, /\/Kids \[3 0 R 6 0 R\] \/Count 2/);
     assert.match(text, /\/Type \/Page/);
     assert.match(text, /xref/);
     assert.match(text, /%%EOF$/);
+  });
+
+  test('rejects an empty PDF sheet before calculating layout', () => {
+    assert.throws(
+      () => getPdfSheetLayout([]),
+      (error) => {
+        assert.ok(error instanceof TypeError);
+        assert.equal(error.i18nKey, 'download.pdfFramesRequired');
+        assert.equal(
+          error.message,
+          'Add at least one QR code before creating a PDF sheet.',
+        );
+        return true;
+      },
+    );
   });
 });
