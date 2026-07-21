@@ -12,6 +12,7 @@ import {
 } from '../../helpers/locales.js';
 
 const localeRoot = localeSourceUrl;
+const resourceMetadata = new Set(['$debug', 'extends']);
 
 function flattenMessages(value, prefix = '', output = {}) {
   for (const [key, child] of Object.entries(value)) {
@@ -52,6 +53,33 @@ describe('locale completeness', () => {
 
       assert.deepEqual(missing, [], `${locale.code} is missing locale values`);
     }
+  });
+
+  test('locales do not define keys absent from en-US', async () => {
+    const manifest = await readSourceLocaleManifest();
+    const loadLocale = createLocaleLoader(
+      createLocaleSourceFetcher(),
+      localeRoot,
+    );
+    const baseline = flattenMessages(await loadLocale(DEFAULT_LOCALE));
+    const translatedLocales = manifest.locales.filter(
+      (locale) => locale.code !== DEFAULT_LOCALE,
+    );
+    const extras = {};
+
+    for (const locale of translatedLocales) {
+      const messages = flattenMessages(await loadLocale(locale.code));
+      const keys = Object.keys(messages).filter(
+        (key) => !resourceMetadata.has(key) && !Object.hasOwn(baseline, key),
+      );
+      if (keys.length) extras[locale.code] = keys;
+    }
+
+    assert.deepEqual(
+      extras,
+      {},
+      'Translation keys must also exist in the en-US locale.',
+    );
   });
 
   test('translated values preserve en-US interpolation tags', async () => {
