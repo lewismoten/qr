@@ -18,6 +18,7 @@ import {
 import { writeGuideSitemap } from './guide-sitemap.mjs';
 import { updatePrivacyRevision } from './privacy-revision.mjs';
 import { annotateExternalResourceLanguages } from './links/resource-language.mjs';
+import { annotateFooterActions } from './links/footer-actions.mjs';
 import { readHtmlWithIncludes } from '../html/includes.mjs';
 import {
   getSourceGuideCopy,
@@ -52,11 +53,17 @@ function resolveSourceTarget(file, pathname) {
   return target;
 }
 
+function routeForTarget(context, target) {
+  return (
+    context.routes.get(target) || context.routes.get(path.basename(target))
+  );
+}
+
 function rewriteLocalUrl(value, context) {
   if (/^(?:[a-z]+:|#|\/\/)/i.test(value)) return value;
   const [pathname, suffix] = splitUrl(value);
   const target = resolveSourceTarget(context.file, pathname);
-  const route = context.routes.get(target);
+  const route = routeForTarget(context, target);
   const outputTarget = route
     ? configuredGuidePath(context.config, route, context.locale)
     : target;
@@ -216,6 +223,7 @@ async function translate(source, context) {
 async function writeGuide(source, context) {
   context.guideCopy = await getSourceGuideCopy(context.locale);
   let result = await translate(stripGeneratedMarkup(source), context);
+  result = annotateFooterActions(result, context);
   result = localizeDocumentDates(result, context);
   result = localizeMetadata(result, context);
   result = rewriteLocalUrls(result, context);

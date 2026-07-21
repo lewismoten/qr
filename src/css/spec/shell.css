@@ -53,6 +53,27 @@
   background: rgba(94, 234, 212, 0.12);
 }
 
+.spec-footer .footer-action-icon {
+  margin-inline-end: 0.35rem;
+}
+
+@media (max-width: 34rem) {
+  .spec-footer a[data-footer-action] {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
+    justify-content: center;
+  }
+
+  .spec-footer .footer-action-icon {
+    margin-inline-end: 0;
+    font-size: 1.05rem;
+  }
+
+  .spec-footer .footer-action-label {
+    display: none;
+  }
+}
+
 main {
   width: min(calc(100% - 1.5rem), 76rem);
   margin: 1rem auto 3rem;

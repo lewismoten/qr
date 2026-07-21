@@ -7,6 +7,7 @@ import {
 } from './i18n/index.js';
 import { getSavedLocale, setupLanguagePicker } from './i18n/picker.js';
 import { loadFeatureStylesheet } from './stylesheets.js';
+import { setupFooterActions } from './info/footer-actions.js';
 
 const INITIAL_BOOT_PROGRESS_PERCENT = 5;
 const FINAL_PROGRESS_PAINT_DELAY_MS = 160;
@@ -76,6 +77,7 @@ async function ensureDebugTooltip() {
 async function changeLocale(locale) {
   await initializeLanguage({ locale });
   await translateDocument(document);
+  setupFooterActions();
   document.dispatchEvent(new Event('languagechange'));
   await ensureDebugTooltip();
   await application?.refreshLanguage();
@@ -89,6 +91,7 @@ async function start() {
   await completeMilestone('localization');
   await ensureDebugTooltip();
   await translateDocument(document);
+  setupFooterActions();
   setupExternalLinks();
   setupLanguagePicker({ onLocaleChange: changeLocale });
   application = await import('./app/app-controller.js');

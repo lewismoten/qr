@@ -85,3 +85,25 @@
 .site-footer a:focus-visible {
   background: rgba(94, 234, 212, 0.12);
 }
+
+.footer-action-icon {
+  margin-inline-end: 0.35rem;
+}
+
+@media (max-width: 34rem) {
+  .site-footer a[data-footer-action],
+  .info-page-footer a[data-footer-action] {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
+    justify-content: center;
+  }
+
+  .footer-action-icon {
+    margin-inline-end: 0;
+    font-size: 1.05rem;
+  }
+
+  .footer-action-label {
+    display: none;
+  }
+}
