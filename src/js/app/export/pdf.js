@@ -1,10 +1,18 @@
-import { concatBytes, textBytes } from '../bytes.js';
+import { textBytes } from '../bytes.js';
 import { canvasToBlob } from './canvas-export.js';
-import { MEDIA_TYPE_JPEG, MEDIA_TYPE_PDF } from '../media-types.js';
+import { MEDIA_TYPE_JPEG } from '../media-types.js';
+import {
+  createPdfCatalogDictionary,
+  createPdfContentStream,
+  createPdfDocumentBlob,
+  createPdfDrawImageCommand,
+  createPdfImageStream,
+  createPdfPageDictionary,
+  createPdfPagesDictionary,
+} from './pdf-objects.js';
 
 const PDF_POINTS_PER_INCH = 72;
 const PDF_DECIMAL_PLACES = 3;
-const PDF_XREF_OFFSET_WIDTH = 10;
 const LETTER_WIDTH_POINTS = 612;
 const LETTER_HEIGHT_POINTS = 792;
 const SHEET_MARGIN_POINTS = 36;
@@ -12,10 +20,12 @@ const SHEET_GAP_POINTS = 10;
 const DEFAULT_PRINT_WIDTH_INCHES = 1.65;
 const PDF_RESERVED_ROOT_OBJECTS = 2;
 const UNASSIGNED_PDF_OBJECT = null;
-const PDF_FILE_HEADER = '%PDF-1.4\n';
-const PDF_CATALOG_DICTIONARY = '<< /Type /Catalog /Pages 2 0 R >>';
-const PDF_STREAM_END = '\nendstream';
-const PDF_OBJECT_END = '\nendobj\n';
+const PDF_CATALOG_REFERENCE = 1;
+const PDF_PAGES_REFERENCE = 2;
+const SINGLE_PAGE_REFERENCE = 3;
+const SINGLE_IMAGE_REFERENCE = 4;
+const SINGLE_CONTENT_REFERENCE = 5;
+const SINGLE_IMAGE_NAME = 'Im0';
 
 export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const jpegBlob = await canvasToBlob(
@@ -29,49 +39,33 @@ export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const pixelHeight = sourceCanvas.height;
   const width = printWidthInches * PDF_POINTS_PER_INCH;
   const height = width * (pixelHeight / pixelWidth);
-  const content = `q\n${width.toFixed(PDF_DECIMAL_PLACES)} 0 0 ${height.toFixed(PDF_DECIMAL_PLACES)} 0 0 cm\n/Im0 Do\nQ\n`;
+  const content = createPdfDrawImageCommand({
+    name: SINGLE_IMAGE_NAME,
+    width,
+    height,
+  });
   const objects = [
-    textBytes(PDF_CATALOG_DICTIONARY),
-    textBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
+    textBytes(createPdfCatalogDictionary(PDF_PAGES_REFERENCE)),
+    textBytes(createPdfPagesDictionary([SINGLE_PAGE_REFERENCE])),
     textBytes(
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(PDF_DECIMAL_PLACES)} ${height.toFixed(PDF_DECIMAL_PLACES)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`,
+      createPdfPageDictionary({
+        parentReference: PDF_PAGES_REFERENCE,
+        width: width.toFixed(PDF_DECIMAL_PLACES),
+        height: height.toFixed(PDF_DECIMAL_PLACES),
+        images: [
+          { name: SINGLE_IMAGE_NAME, reference: SINGLE_IMAGE_REFERENCE },
+        ],
+        contentReference: SINGLE_CONTENT_REFERENCE,
+      }),
     ),
-    concatBytes([
-      textBytes(
-        `<< /Type /XObject /Subtype /Image /Width ${pixelWidth} /Height ${pixelHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,
-      ),
+    createPdfImageStream({
+      width: pixelWidth,
+      height: pixelHeight,
       jpeg,
-      textBytes(PDF_STREAM_END),
-    ]),
-    textBytes(
-      `<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`,
-    ),
+    }),
+    createPdfContentStream(content),
   ];
   return createPdfDocumentBlob(objects);
-}
-
-function createPdfDocumentBlob(objects) {
-  const parts = [textBytes(PDF_FILE_HEADER)];
-  const offsets = [0];
-  let length = parts[0].length;
-  objects.forEach((object, index) => {
-    offsets.push(length);
-    const part = concatBytes([
-      textBytes(`${index + 1} 0 obj\n`),
-      object,
-      textBytes(PDF_OBJECT_END),
-    ]);
-    parts.push(part);
-    length += part.length;
-  });
-  const xrefOffset = length;
-  let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  offsets.slice(1).forEach((offset) => {
-    xref += `${String(offset).padStart(PDF_XREF_OFFSET_WIDTH, '0')} 00000 n \n`;
-  });
-  xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-  parts.push(textBytes(xref));
-  return new Blob(parts, { type: MEDIA_TYPE_PDF });
 }
 
 export async function capturePdfFrame(sourceCanvas, quality, printWidthInches) {
@@ -167,7 +161,7 @@ export function createPdfSheetBlob(frames) {
     const pageReference = reserveObject();
     const contentReference = reserveObject();
     const imageReferences = pageFrames.map(() => reserveObject());
-    const resources = [];
+    const images = [];
     const commands = [];
 
     pageFrames.forEach((frame, index) => {
@@ -186,19 +180,23 @@ export function createPdfSheetBlob(frames) {
         pageHeight - margin - (row + 1) * cellHeight - row * gap;
       const y = cellBottom + (cellHeight - drawHeight) / 2;
       const imageName = `Im${index + 1}`;
-      resources.push(`/${imageName} ${imageReferences[index]} 0 R`);
+      images.push({ name: imageName, reference: imageReferences[index] });
       commands.push(
-        `q\n${drawWidth.toFixed(PDF_DECIMAL_PLACES)} 0 0 ${drawHeight.toFixed(PDF_DECIMAL_PLACES)} ${x.toFixed(PDF_DECIMAL_PLACES)} ${y.toFixed(PDF_DECIMAL_PLACES)} cm\n/${imageName} Do\nQ\n`,
+        createPdfDrawImageCommand({
+          name: imageName,
+          width: drawWidth,
+          height: drawHeight,
+          x,
+          y,
+        }),
       );
       setObject(
         imageReferences[index],
-        concatBytes([
-          textBytes(
-            `<< /Type /XObject /Subtype /Image /Width ${frame.width} /Height ${frame.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${frame.jpeg.length} >>\nstream\n`,
-          ),
-          frame.jpeg,
-          textBytes(PDF_STREAM_END),
-        ]),
+        createPdfImageStream({
+          width: frame.width,
+          height: frame.height,
+          jpeg: frame.jpeg,
+        }),
       );
     });
 
@@ -206,21 +204,24 @@ export function createPdfSheetBlob(frames) {
     setObject(
       pageReference,
       textBytes(
-        `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /XObject << ${resources.join(' ')} >> >> /Contents ${contentReference} 0 R >>`,
+        createPdfPageDictionary({
+          parentReference: PDF_PAGES_REFERENCE,
+          width: pageWidth,
+          height: pageHeight,
+          images,
+          contentReference,
+        }),
       ),
     );
-    setObject(
-      contentReference,
-      textBytes(
-        `<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`,
-      ),
-    );
+    setObject(contentReference, createPdfContentStream(content));
     pageReferences.push(pageReference);
   }
 
-  objects[0] = textBytes(PDF_CATALOG_DICTIONARY);
-  objects[1] = textBytes(
-    `<< /Type /Pages /Kids [${pageReferences.map((reference) => `${reference} 0 R`).join(' ')}] /Count ${pageReferences.length} >>`,
+  objects[PDF_CATALOG_REFERENCE - 1] = textBytes(
+    createPdfCatalogDictionary(PDF_PAGES_REFERENCE),
+  );
+  objects[PDF_PAGES_REFERENCE - 1] = textBytes(
+    createPdfPagesDictionary(pageReferences),
   );
   return createPdfDocumentBlob(objects);
 }
