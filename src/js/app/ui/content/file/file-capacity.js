@@ -6,9 +6,18 @@ import {
   getFileDownloadUrlPrefix,
 } from './transfer/protocol.js';
 
+const DEFAULT_INITIAL_PROBE_BYTES = 256;
+const BYTES_PER_KIBIBYTE = 1024;
+const BYTES_PER_MEBIBYTE = BYTES_PER_KIBIBYTE ** 2;
+const BASE64_SOURCE_BYTES = 3;
+const BASE64_ENCODED_CHARACTERS = 4;
+
 export function findMaximumEncodableBytes(
   canEncode,
-  { initialProbe = 256, maximumProbe = 1024 * 1024 } = {},
+  {
+    initialProbe = DEFAULT_INITIAL_PROBE_BYTES,
+    maximumProbe = BYTES_PER_MEBIBYTE,
+  } = {},
 ) {
   if (!canEncode(0)) return 0;
 
@@ -71,7 +80,8 @@ export function createFileCapacityCalculator({
     if (!options) return 0;
     const prefix = getFileDataUrlPrefix(cache.getFile());
     return findMaximumEncodableBytes((byteCount) => {
-      const base64Length = Math.ceil(byteCount / 3) * 4;
+      const base64Length =
+        Math.ceil(byteCount / BASE64_SOURCE_BYTES) * BASE64_ENCODED_CHARACTERS;
       return canEncode(`${prefix}${'A'.repeat(base64Length)}`, options);
     });
   };
@@ -81,7 +91,8 @@ export function createFileCapacityCalculator({
     if (!options) return 0;
     const prefix = getFileDownloadUrlPrefix(getShareableAppUrl(), file);
     return findMaximumEncodableBytes((byteCount) => {
-      const base64Length = Math.ceil(byteCount / 3) * 4;
+      const base64Length =
+        Math.ceil(byteCount / BASE64_SOURCE_BYTES) * BASE64_ENCODED_CHARACTERS;
       return canEncode(
         `${prefix}${base64ToBase64Url('A'.repeat(base64Length))}`,
         options,

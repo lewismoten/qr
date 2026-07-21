@@ -1,4 +1,7 @@
 const IGNORED_TARGETS = '.slippy-map-controls, .slippy-map-attribution';
+const DRAG_DISTANCE_THRESHOLD = 4;
+const PINCH_ZOOM_IN_RATIO = 1.35;
+const PINCH_ZOOM_OUT_RATIO = 0.74;
 
 export function attachMapPointerDrag(
   container,
@@ -36,15 +39,17 @@ export function attachMapPointerDrag(
       const point = toMapClient(event.clientX, event.clientY);
       const deltaX = point.clientX - drag.x;
       const deltaY = point.clientY - drag.y;
-      if (Math.hypot(deltaX, deltaY) > 4) drag.moved = true;
+      if (Math.hypot(deltaX, deltaY) > DRAG_DISTANCE_THRESHOLD) {
+        drag.moved = true;
+      }
       onPan(drag.center, deltaX, deltaY);
     } else if (pointers.size === 2) {
       const [first, second] = [...pointers.values()];
       const distance = Math.hypot(second.x - first.x, second.y - first.y);
-      if (distance > pinchDistance * 1.35) {
+      if (distance > pinchDistance * PINCH_ZOOM_IN_RATIO) {
         onZoom(1);
         pinchDistance = distance;
-      } else if (distance < pinchDistance * 0.74) {
+      } else if (distance < pinchDistance * PINCH_ZOOM_OUT_RATIO) {
         onZoom(-1);
         pinchDistance = distance;
       }

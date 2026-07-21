@@ -1,6 +1,8 @@
 import { formatBytes } from '../../../bytes.js';
 import { lookup } from '../../../../i18n/index.js';
 
+const PERCENT_SCALE = 100;
+
 export function createFileSection({
   format,
   mode,
@@ -51,7 +53,7 @@ export function createFileSection({
     if (selectedMode === 'blob') {
       const maxBytes = getDownloadUrlCapacity(file);
       const percent =
-        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * PERCENT_SCALE) : 0;
       capacityHint.textContent = file
         ? lookup(
             'file.capacity.download',
@@ -118,7 +120,7 @@ export function createFileSection({
     } else {
       const maxBytes = getDataUrlCapacity();
       const percent =
-        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * 100) : 0;
+        maxBytes > 0 ? Math.round((loadedBytes / maxBytes) * PERCENT_SCALE) : 0;
       capacityHint.textContent = file
         ? lookup(
             'file.capacity.data',

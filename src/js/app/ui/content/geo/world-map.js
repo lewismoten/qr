@@ -3,27 +3,39 @@ import {
   hasVisibleUsgsData,
 } from './data/attribution.js';
 import { createWheelZoomHandler } from './interaction/wheel-zoom.js';
+import {
+  clamp,
+  FULL_TURN_DEGREES,
+  HALF_TURN_DEGREES,
+  normalizeLongitude,
+} from './projection.js';
 
 const WIDTH = 1000;
 const HEIGHT = 500;
-
-const clamp = (value, minimum, maximum) =>
-  Math.min(maximum, Math.max(minimum, value));
-
-const normalizeLongitude = (value) =>
-  ((((value + 180) % 360) + 360) % 360) - 180;
+const MAXIMUM_LATITUDE = HALF_TURN_DEGREES / 2;
+const PERCENT_SCALE = 100;
 
 export function coordinatesToWorldPoint({ latitude, longitude }) {
   return {
-    x: ((normalizeLongitude(longitude) + 180) / 360) * WIDTH,
-    y: ((90 - clamp(latitude, -90, 90)) / 180) * HEIGHT,
+    x:
+      ((normalizeLongitude(longitude) + HALF_TURN_DEGREES) /
+        FULL_TURN_DEGREES) *
+      WIDTH,
+    y:
+      ((MAXIMUM_LATITUDE -
+        clamp(latitude, -MAXIMUM_LATITUDE, MAXIMUM_LATITUDE)) /
+        HALF_TURN_DEGREES) *
+      HEIGHT,
   };
 }
 
 export function worldPointToCoordinates({ x, y }) {
   return {
-    latitude: 90 - (clamp(y, 0, HEIGHT) / HEIGHT) * 180,
-    longitude: normalizeLongitude((clamp(x, 0, WIDTH) / WIDTH) * 360 - 180),
+    latitude:
+      MAXIMUM_LATITUDE - (clamp(y, 0, HEIGHT) / HEIGHT) * HALF_TURN_DEGREES,
+    longitude: normalizeLongitude(
+      (clamp(x, 0, WIDTH) / WIDTH) * FULL_TURN_DEGREES - HALF_TURN_DEGREES,
+    ),
   };
 }
 
@@ -57,8 +69,8 @@ export function createWorldMap(
     if (!markerCoordinates) return;
     const point = coordinatesToWorldPoint(markerCoordinates);
     marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
-    label.style.left = `${(point.x / WIDTH) * 100}%`;
-    label.style.top = `${(point.y / HEIGHT) * 100}%`;
+    label.style.left = `${(point.x / WIDTH) * PERCENT_SCALE}%`;
+    label.style.top = `${(point.y / HEIGHT) * PERCENT_SCALE}%`;
   };
 
   const showOverview = () => {

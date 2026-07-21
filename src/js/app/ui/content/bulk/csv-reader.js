@@ -4,11 +4,16 @@ import { lookup } from '../../../../i18n/index.js';
 
 export { isAbortError, throwIfAborted };
 
+export const CSV_READ_PROGRESS_SHARE = 0.55;
+
 export async function readCsvText(file, task) {
   if (!file.stream) {
     const text = await file.text();
     throwIfAborted(task.signal);
-    task.update(0.55, lookup('bulk.progress.parsing', 'Parsing CSV data...'));
+    task.update(
+      CSV_READ_PROGRESS_SHARE,
+      lookup('bulk.progress.parsing', 'Parsing CSV data...'),
+    );
     return text;
   }
 
@@ -24,7 +29,7 @@ export async function readCsvText(file, task) {
       loaded += value.byteLength;
       text += decoder.decode(value, { stream: true });
       task.update(
-        (loaded / Math.max(file.size, 1)) * 0.55,
+        (loaded / Math.max(file.size, 1)) * CSV_READ_PROGRESS_SHARE,
         lookup(
           'bulk.progress.readingBytes',
           'Reading {current} of {total}...',

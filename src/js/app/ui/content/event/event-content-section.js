@@ -4,6 +4,11 @@ import {
   serializeCalendarEvent,
 } from '../../../data/calendar.js';
 
+const SECONDS_PER_MINUTE = 60;
+const MILLISECONDS_PER_SECOND = 1000;
+const MILLISECONDS_PER_HOUR =
+  SECONDS_PER_MINUTE * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+
 export function createEventSection({
   title,
   allDay,
@@ -21,7 +26,7 @@ export function createEventSection({
     start.setSeconds(0, 0);
     start.setMinutes(0);
     start.setHours(start.getHours() + 1);
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const end = new Date(start.getTime() + MILLISECONDS_PER_HOUR);
     startDate.value = formatCalendarInputDate(start);
     startTime.value = formatCalendarInputTime(start);
     endDate.value = formatCalendarInputDate(end);

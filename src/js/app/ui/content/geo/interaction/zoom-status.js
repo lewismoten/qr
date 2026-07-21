@@ -1,11 +1,13 @@
 import { lookup } from '../../../../../i18n/index.js';
 import { createElement } from '../slippy-elements.js';
 
+const PERCENT_SCALE = 100;
+
 export function getZoomStatus(viewLayer, scale) {
   const zoom = viewLayer + Math.log2(scale);
   const lower = Math.floor(zoom);
   const upper = lower + 1;
-  const percent = Math.round((zoom - lower) * 100);
+  const percent = Math.round((zoom - lower) * PERCENT_SCALE);
   return {
     emptying: lower % 2 === 0,
     lower,

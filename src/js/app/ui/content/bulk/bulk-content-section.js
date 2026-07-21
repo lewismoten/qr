@@ -4,13 +4,20 @@ import { validateBulkImport } from './bulk-content-validation.js';
 import { getErrorText, lookup } from '../../../../i18n/index.js';
 import { createLocalizedError } from '../../../../localized-error.js';
 import { refreshFilePicker } from '../../file-picker.js';
-import { isAbortError, readCsvText, throwIfAborted } from './csv-reader.js';
+import {
+  CSV_READ_PROGRESS_SHARE,
+  isAbortError,
+  readCsvText,
+  throwIfAborted,
+} from './csv-reader.js';
 import { serializeBulkRow } from './bulk-payload.js';
 import {
   BULK_FORMAT_SCHEMAS,
   MAX_BULK_FILE_BYTES,
   MAX_BULK_ROWS,
 } from './schema.js';
+
+const CSV_PARSE_PROGRESS_SHARE = 0.4;
 
 export function createBulkImportSection({
   enabled,
@@ -49,7 +56,8 @@ export function createBulkImportSection({
       signal: task.signal,
       onProgress: (current, total) =>
         task.update(
-          0.55 + (total ? current / total : 1) * 0.4,
+          CSV_READ_PROGRESS_SHARE +
+            (total ? current / total : 1) * CSV_PARSE_PROGRESS_SHARE,
           lookup('bulk.progress.parsing', 'Parsing CSV data...'),
         ),
     });

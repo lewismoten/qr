@@ -1,12 +1,19 @@
 import { lookup } from '../../../../../i18n/index.js';
+import { HALF_TURN_DEGREES } from '../projection.js';
 import { createElement } from '../slippy-elements.js';
 
 const MAXIMUM_PITCH = 60;
 const PERSPECTIVE = 720;
 const PITCH_START_ZOOM = 5;
 const MAXIMUM_LOOKBACK_HEIGHTS = 7;
+const SMOOTHSTEP_LEADING_FACTOR = 3;
+const SMOOTHSTEP_TRAILING_FACTOR = 2;
+const HORIZON_SCREEN_INSET = 32;
 
-const smoothstep = (value) => value * value * (3 - 2 * value);
+const smoothstep = (value) =>
+  value *
+  value *
+  (SMOOTHSTEP_LEADING_FACTOR - SMOOTHSTEP_TRAILING_FACTOR * value);
 
 export function getMapPitch(zoom, minimumZoom, maximumZoom) {
   if (maximumZoom <= minimumZoom) return 0;
@@ -24,7 +31,7 @@ export function projectPitchedPoint(
   { height, pitch, width, perspective = PERSPECTIVE },
 ) {
   if (!pitch) return { ...point };
-  const radians = (pitch * Math.PI) / 180;
+  const radians = (pitch * Math.PI) / HALF_TURN_DEGREES;
   const relativeY = point.y - height;
   const depth = relativeY * Math.sin(radians);
   const factor = perspective / (perspective - depth);
@@ -39,7 +46,7 @@ export function unprojectPitchedPoint(
   { height, pitch, width, perspective = PERSPECTIVE },
 ) {
   if (!pitch) return { ...point };
-  const radians = (pitch * Math.PI) / 180;
+  const radians = (pitch * Math.PI) / HALF_TURN_DEGREES;
   const relativeY = point.y - height;
   const denominator =
     Math.cos(radians) * perspective + relativeY * Math.sin(radians);
@@ -57,9 +64,9 @@ export function getPitchedViewportBounds(
   perspective = PERSPECTIVE,
 ) {
   if (!pitch) return { bottom: height, left: 0, right: width, top: 0 };
-  const radians = (pitch * Math.PI) / 180;
+  const radians = (pitch * Math.PI) / HALF_TURN_DEGREES;
   const horizon = height - perspective / Math.tan(radians);
-  const screenTop = Math.max(0, horizon + 32);
+  const screenTop = Math.max(0, horizon + HORIZON_SCREEN_INSET);
   const rawTop = unprojectPitchedPoint(
     { x: width / 2, y: screenTop },
     { height, perspective, pitch, width },
