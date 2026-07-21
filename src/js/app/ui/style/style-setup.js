@@ -145,6 +145,7 @@ export function createStyleSetup({
         { createArtworkControls },
         { createImageInputController },
         { createLazyPixelArtEditor },
+        { installEmojiPicker },
         artworkDrawing,
         shapeDrawing,
       ] = await Promise.all([
@@ -152,6 +153,7 @@ export function createStyleSetup({
         import('./art/controls.js'),
         import('./art/image-input.js'),
         import('./art/lazy-pixel-editor.js'),
+        import('./art/emoji-picker-setup.js'),
         import('./art/drawing.js'),
         import('./drawing/shapes.js'),
       ]);
@@ -211,6 +213,16 @@ export function createStyleSetup({
           render();
         }),
       );
+      installEmojiPicker({
+        button: e.emojiMore,
+        document,
+        input: e.centerEmoji,
+        onSelect(value) {
+          e.centerEmoji.value = value;
+          artwork.syncEmoji();
+          render();
+        },
+      });
       pixelEditor.initialize();
       artwork.sync();
     });

@@ -52,6 +52,7 @@ export function getStyleElements(document) {
     emojiControls: id('center-emoji-controls'),
     centerEmoji: id('center-emoji'),
     emojiOptions: document.querySelectorAll('.emoji-option'),
+    emojiMore: id('center-emoji-more'),
     pixelControls: id('center-pixel-controls'),
     pixelArtColor: id('pixel-art-color'),
     pixelArtClear: id('pixel-art-clear'),
