@@ -28,6 +28,38 @@
   background: currentColor;
 }
 
+.eye-shape-grid [data-choice-value="square"],
+.eye-shape-grid [data-choice-value="rounded"],
+.eye-shape-grid [data-choice-value="circle"] {
+  display: grid;
+  grid-template-columns: 1.2rem minmax(0, auto);
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.eye-shape-grid [data-choice-value="square"]::before,
+.eye-shape-grid [data-choice-value="rounded"]::before,
+.eye-shape-grid [data-choice-value="circle"]::before {
+  content: "";
+  box-sizing: border-box;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 0.18rem solid currentColor;
+  background: linear-gradient(currentColor 0 0) center / 0.36rem 0.36rem
+    no-repeat;
+}
+
+.eye-shape-grid [data-choice-value="rounded"]::before {
+  border-radius: 0.3rem;
+  background-image: radial-gradient(circle, currentColor 65%, transparent 68%);
+}
+
+.eye-shape-grid [data-choice-value="circle"]::before {
+  border-radius: 50%;
+  background-image: radial-gradient(circle, currentColor 65%, transparent 68%);
+}
+
 .shape-rounded {
   border-radius: 0.32rem;
 }
