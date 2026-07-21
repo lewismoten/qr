@@ -5,7 +5,8 @@ import test from 'node:test';
 
 const KNOWN_COLORS = /['"]#(?:000000|ffffff|111827|0f766e|0ea5e9|60a5fa)['"]/gi;
 const MEDIA_TYPE_LITERAL = /['"](?:application|image|text)\/[a-z0-9.+-]+['"]/gi;
-const APPLICATION_TYPE_LITERAL = /['"]application\/[a-z0-9.+-]+['"]/gi;
+const APPLICATION_TYPE_LITERAL = /['"]application\/[a-z0-9.+-]+/gi;
+const TEXT_TYPE_LITERAL = /['"]text\/[a-z0-9.+-]*/gi;
 const HINDI_LOCALE_PROPERTY = /['"]hi-IN['"]\s*:/g;
 
 async function findJavaScript(directory) {
@@ -66,6 +67,16 @@ test('application MIME types are declared only in the registry', async () => {
     [path.resolve('src/js'), path.resolve('scripts')],
     registry,
     APPLICATION_TYPE_LITERAL,
+  );
+  assert.deepEqual(violations, []);
+});
+
+test('text MIME types are declared only in the registry', async () => {
+  const registry = path.resolve('src/js/app/media-types.js');
+  const violations = await findViolations(
+    [path.resolve('src/js'), path.resolve('scripts')],
+    registry,
+    TEXT_TYPE_LITERAL,
   );
   assert.deepEqual(violations, []);
 });

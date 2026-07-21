@@ -1,8 +1,11 @@
 import { createZipBlob } from '../../app/export/zip.js';
 import { throwIfAborted } from '../../app/abort.js';
 import {
+  MEDIA_TYPE_CSS,
   MEDIA_TYPE_EPUB,
   MEDIA_TYPE_EPUB_PACKAGE,
+  MEDIA_TYPE_PLAIN_TEXT,
+  MEDIA_TYPE_TEXT_XML,
   MEDIA_TYPE_XHTML,
 } from '../../app/media-types.js';
 import { getHandbookCopy } from './copy.js';
@@ -12,7 +15,7 @@ import { loadHandbookPages } from './pages.js';
 const PAGE_LOADING_PROGRESS_WEIGHT = 0.7;
 const ARCHIVE_PROGRESS_WEIGHT = 1 - PAGE_LOADING_PROGRESS_WEIGHT;
 
-function textBlob(value, type = 'text/plain') {
+function textBlob(value, type = MEDIA_TYPE_PLAIN_TEXT) {
   return new Blob([value], { type });
 }
 
@@ -116,7 +119,7 @@ function packageDocument(pages, locale, identifier, copy) {
     `<meta property="dcterms:modified">${modified}</meta>` +
     '</metadata><manifest><item id="nav" href="nav.xhtml" ' +
     `media-type="${MEDIA_TYPE_XHTML}" properties="nav"/>` +
-    '<item id="styles" href="styles.css" media-type="text/css"/>' +
+    `<item id="styles" href="styles.css" media-type="${MEDIA_TYPE_CSS}"/>` +
     `${manifest.join('')}</manifest><spine>${spine.join('')}</spine></package>`
   );
 }
@@ -162,7 +165,10 @@ export async function createHandbookEpub(
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
     { name: 'mimetype', blob: textBlob(MEDIA_TYPE_EPUB) },
-    { name: 'META-INF/container.xml', blob: textBlob(CONTAINER, 'text/xml') },
+    {
+      name: 'META-INF/container.xml',
+      blob: textBlob(CONTAINER, MEDIA_TYPE_TEXT_XML),
+    },
     {
       name: 'EPUB/package.opf',
       blob: textBlob(
@@ -170,14 +176,14 @@ export async function createHandbookEpub(
           '</manifest>',
           `${imageManifest(assets)}</manifest>`,
         ),
-        'text/xml',
+        MEDIA_TYPE_TEXT_XML,
       ),
     },
     {
       name: 'EPUB/nav.xhtml',
       blob: textBlob(navigation(pages, locale, copy), MEDIA_TYPE_XHTML),
     },
-    { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, 'text/css') },
+    { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, MEDIA_TYPE_CSS) },
     ...pages.map((page, index) => ({
       name: `EPUB/chapter-${index + 1}.xhtml`,
       blob: textBlob(chapterXhtml(page, index, locale), MEDIA_TYPE_XHTML),

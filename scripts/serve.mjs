@@ -6,8 +6,12 @@ import { pipeline } from 'node:stream/promises';
 
 import {
   MEDIA_TYPE_BINARY,
+  MEDIA_TYPE_CSS,
+  MEDIA_TYPE_HTML,
   MEDIA_TYPE_JSON,
   MEDIA_TYPE_PM_TILES,
+  MEDIA_TYPE_PLAIN_TEXT,
+  MEDIA_TYPE_TEXT_JAVASCRIPT,
   MEDIA_TYPE_XML,
 } from '../src/js/app/media-types.js';
 
@@ -43,19 +47,19 @@ const publicFiles = new Map([
   ['robots.txt', resolve(projectRoot, 'src/web/robots.txt')],
 ]);
 const mimeTypes = {
-  '.css': 'text/css; charset=utf-8',
+  '.css': `${MEDIA_TYPE_CSS}; charset=utf-8`,
   '.gif': 'image/gif',
-  '.html': 'text/html; charset=utf-8',
+  '.html': `${MEDIA_TYPE_HTML}; charset=utf-8`,
   '.ico': 'image/x-icon',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.js': 'text/javascript; charset=utf-8',
+  '.js': `${MEDIA_TYPE_TEXT_JAVASCRIPT}; charset=utf-8`,
   '.json': `${MEDIA_TYPE_JSON}; charset=utf-8`,
   '.map': `${MEDIA_TYPE_JSON}; charset=utf-8`,
   '.png': 'image/png',
   '.pmtiles': MEDIA_TYPE_PM_TILES,
   '.svg': 'image/svg+xml',
-  '.txt': 'text/plain; charset=utf-8',
+  '.txt': `${MEDIA_TYPE_PLAIN_TEXT}; charset=utf-8`,
   '.webp': 'image/webp',
   '.xml': `${MEDIA_TYPE_XML}; charset=utf-8`,
 };
@@ -106,7 +110,9 @@ const server = createServer(async (request, response) => {
   const match = await findFile(request.url);
   if (!match) {
     response
-      .writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
+      .writeHead(404, {
+        'Content-Type': `${MEDIA_TYPE_PLAIN_TEXT}; charset=utf-8`,
+      })
       .end('Not found');
     return;
   }
