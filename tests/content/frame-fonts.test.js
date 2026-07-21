@@ -73,6 +73,10 @@ class FakeElement {
     this.open = false;
     this.returnValue = value;
   }
+
+  focus(options) {
+    this.focusOptions = options;
+  }
 }
 
 function createDocument() {
@@ -129,12 +133,17 @@ test('font picker reflects, changes, and closes the selected font', () => {
   assert.equal(heading.textContent, 'Choose a font');
   assert.equal(choices.length, FRAME_FONT_OPTIONS.length);
   assert.equal(choices[0].classList.contains('is-active'), true);
+  assert.deepEqual(choices[0].focusOptions, { preventScroll: true });
 
   choices[4].dispatch('click');
   assert.equal(select.value, 'arial');
   assert.equal(events[0].type, 'change');
   assert.equal(events[0].bubbles, true);
   assert.equal(renders, 1);
+  assert.equal(choices[0].classList.contains('is-active'), false);
+  assert.equal(choices[0].attributes.get('aria-pressed'), 'false');
+  assert.equal(choices[4].classList.contains('is-active'), true);
+  assert.equal(choices[4].attributes.get('aria-pressed'), 'true');
   assert.equal(dialog.open, false);
   assert.equal(dialog.returnValue, 'arial');
 
@@ -143,11 +152,15 @@ test('font picker reflects, changes, and closes the selected font', () => {
   picker.sync();
   picker.open();
   assert.equal(choices[7].classList.contains('is-active'), true);
+  assert.deepEqual(choices[7].focusOptions, { preventScroll: true });
   close.dispatch('click');
   assert.equal(dialog.open, false);
   picker.open();
   dialog.dispatch('click', { target: dialog });
   assert.equal(dialog.open, false);
+  select.value = 'missing';
+  picker.open();
+  assert.equal(dialog.open, true);
 });
 
 test('frame guide exposes the font picker and selected value', async () => {
@@ -158,4 +171,19 @@ test('frame guide exposes the font picker and selected value', async () => {
   assert.match(source, /id="frame-font-more"/);
   assert.match(source, /id="frame-font-selected-value"/);
   assert.match(source, /data-i18n="frame\.selectedFont"/);
+});
+
+test('frame setup carries the render callback through the pipeline', async () => {
+  const [controller, encoding] = await Promise.all([
+    readFile(
+      new URL('../../src/js/app/app-controller.js', import.meta.url),
+      'utf8',
+    ),
+    readFile(
+      new URL('../../src/js/app/ui/content/encoding-setup.js', import.meta.url),
+      'utf8',
+    ),
+  ]);
+  assert.match(controller, /getFrameIndex:[^}]+render: runtime\.render/s);
+  assert.match(encoding, /getFrameIndex:[^}]+render: runtime\.render/s);
 });

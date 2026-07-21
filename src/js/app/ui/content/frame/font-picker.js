@@ -42,6 +42,7 @@ export function createFontPicker({ document, select, onSelect }) {
     grid.append(
       createChoice(document, option, select, () => {
         onSelect();
+        sync();
         dialog.close(option.value);
       }),
     );
@@ -51,6 +52,7 @@ export function createFontPicker({ document, select, onSelect }) {
   document.body.append(dialog);
 
   const sync = () => {
+    let selectedButton = null;
     heading.textContent = lookup('frame.chooseFont', 'Choose a font');
     close.textContent = lookup('common.close', 'Close');
     grid.querySelectorAll('[data-font-value]').forEach((button) => {
@@ -59,7 +61,9 @@ export function createFontPicker({ document, select, onSelect }) {
       button.textContent = getLabel(option);
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
+      if (active) selectedButton = button;
     });
+    return selectedButton;
   };
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
@@ -67,8 +71,9 @@ export function createFontPicker({ document, select, onSelect }) {
   document.addEventListener('languagechange', sync);
   return {
     open() {
-      sync();
+      const selectedButton = sync();
       if (!dialog.open) dialog.showModal();
+      selectedButton?.focus({ preventScroll: true });
     },
     sync,
   };

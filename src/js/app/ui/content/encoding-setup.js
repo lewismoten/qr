@@ -26,6 +26,7 @@ export function createContentEncodingSetup({
     plugins: sections.plugins,
     runtime: {
       getFrameIndex: runtime.getFrameIndex,
+      render: runtime.render,
       syncChoices: runtime.syncChoices,
       syncArtwork: runtime.syncArtwork,
     },

@@ -158,6 +158,7 @@ const contentEncoding = createContentEncodingSetup({
   sections: contentSections,
   runtime: {
     getFrameIndex: download.getCurrentFrame,
+    render: runtime.render,
     syncChoices: runtime.syncChoices,
     syncArtwork: styleSetup.artwork.sync,
     getDebugState: runtime.getDebugState,
