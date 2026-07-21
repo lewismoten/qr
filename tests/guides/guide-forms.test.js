@@ -19,6 +19,7 @@ describe('standalone guide forms', () => {
     );
     assert.match(css, /\.info-page-body \[data-app-fragment\]\.format-fields/);
     assert.match(css, /\.format-fields \{\s*display: grid;/);
+    assert.match(wifi, /<form>[\s\S]*type="password"[\s\S]*<\/form>/);
   });
 
   test('reveals conditional controls only within guide pages', async () => {

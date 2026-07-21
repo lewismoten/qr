@@ -5,6 +5,7 @@ import {
   MEDIA_TYPE_EPUB,
   MEDIA_TYPE_EPUB_PACKAGE,
   MEDIA_TYPE_PLAIN_TEXT,
+  MEDIA_TYPE_PNG,
   MEDIA_TYPE_SVG,
   MEDIA_TYPE_TEXT_XML,
   MEDIA_TYPE_XHTML,
@@ -19,6 +20,8 @@ import {
 } from './epub-documents.js';
 import {
   createCoverImage,
+  HANDBOOK_COVER_HEIGHT,
+  HANDBOOK_COVER_WIDTH,
   loadHandbookEncoder,
   loadHandbookMetadata,
 } from './front-matter.js';
@@ -29,6 +32,63 @@ const ARCHIVE_PROGRESS_WEIGHT = 1 - PAGE_LOADING_PROGRESS_WEIGHT;
 
 function textBlob(value, type = MEDIA_TYPE_PLAIN_TEXT) {
   return new Blob([value], { type });
+}
+
+function canvasBlob(canvas, type) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('Unable to render the EPUB cover image.'));
+    }, type);
+  });
+}
+
+function loadImage(image, url, signal) {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      image.removeEventListener('load', done);
+      image.removeEventListener('error', failed);
+      signal?.removeEventListener('abort', canceled);
+    };
+    const done = () => {
+      cleanup();
+      resolve();
+    };
+    const failed = () => {
+      cleanup();
+      reject(new Error('Unable to decode the EPUB cover artwork.'));
+    };
+    const canceled = () => {
+      cleanup();
+      try {
+        throwIfAborted(signal);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    image.addEventListener('load', done);
+    image.addEventListener('error', failed);
+    signal?.addEventListener('abort', canceled, { once: true });
+    image.src = url;
+  });
+}
+
+async function createCoverPng(svg, signal) {
+  const source = textBlob(svg, MEDIA_TYPE_SVG);
+  const url = URL.createObjectURL(source);
+  const image = document.createElement('img');
+  try {
+    await loadImage(image, url, signal);
+    throwIfAborted(signal);
+    const canvas = document.createElement('canvas');
+    canvas.width = HANDBOOK_COVER_WIDTH;
+    canvas.height = HANDBOOK_COVER_HEIGHT;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, HANDBOOK_COVER_WIDTH, HANDBOOK_COVER_HEIGHT);
+    return await canvasBlob(canvas, MEDIA_TYPE_PNG);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 function dataImage(source) {
@@ -111,6 +171,9 @@ export async function createHandbookEpub(
     metadata,
     qrEncoder,
   );
+  const coverSvg = createCoverImage(document, copy, metadata, qrEncoder);
+  const coverPng = await createCoverPng(coverSvg, signal);
+  throwIfAborted(signal);
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
     { name: 'mimetype', blob: textBlob(MEDIA_TYPE_EPUB) },
@@ -137,11 +200,8 @@ export async function createHandbookEpub(
     },
     { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, MEDIA_TYPE_CSS) },
     {
-      name: 'EPUB/assets/cover.svg',
-      blob: textBlob(
-        createCoverImage(document, copy, metadata, qrEncoder),
-        MEDIA_TYPE_SVG,
-      ),
+      name: 'EPUB/assets/cover.png',
+      blob: coverPng,
     },
     ...documents.map((bookDocument) => ({
       name: `EPUB/${bookDocument.name}`,

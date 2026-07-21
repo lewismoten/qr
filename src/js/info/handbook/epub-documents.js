@@ -1,6 +1,6 @@
 import {
   MEDIA_TYPE_CSS,
-  MEDIA_TYPE_SVG,
+  MEDIA_TYPE_PNG,
   MEDIA_TYPE_XHTML,
 } from '../../app/media-types.js';
 import { buildHandbookOutline } from './document-model.js';
@@ -10,6 +10,10 @@ import { HANDBOOK_DOCUMENT_CSS } from './handbook-styles.js';
 export const EPUB_CSS = `
 ${HANDBOOK_DOCUMENT_CSS}
 body { padding: 0.4rem; }
+.handbook-cover-image { margin: 0; padding: 0; text-align: center; }
+.handbook-cover-image img {
+  width: 100%; height: auto; max-height: 100vh; object-fit: contain;
+}
 .handbook-cover, .handbook-title-page, .handbook-preface,
 .handbook-division { min-height: 90vh; }
 .unit-example-grid, .visual-grid, .reference-links, .implementation-links,
@@ -57,10 +61,22 @@ function xhtml(title, content, locale) {
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
   return (
     '<?xml version="1.0" encoding="UTF-8"?>' +
-    `<html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}" ` +
+    `<html xmlns="http://www.w3.org/1999/xhtml" ` +
+    'xmlns:epub="http://www.idpf.org/2007/ops" ' +
+    `lang="${locale}" ` +
     `dir="${direction}"><head><title>${escapeXml(title)}</title>` +
     '<link rel="stylesheet" href="styles.css" /></head><body>' +
     `${content}</body></html>`
+  );
+}
+
+function coverXhtml(title, locale) {
+  return xhtml(
+    title,
+    '<section class="handbook-cover-image" epub:type="cover">' +
+      `<img src="assets/cover.png" alt="${escapeXml(title)}"/>` +
+      '</section>',
+    locale,
   );
 }
 
@@ -135,13 +151,16 @@ export function packageDocument(documents, locale, identifier, copy, metadata) {
     `<dc:title>${escapeXml(copy.title)}</dc:title>` +
     `<dc:creator>${escapeXml(metadata.author)}</dc:creator>` +
     `<dc:date>${modified}</dc:date><dc:language>${locale}</dc:language>` +
-    `<meta property="dcterms:modified">${modified}</meta></metadata>` +
+    `<meta property="dcterms:modified">${modified}</meta>` +
+    '<meta name="cover" content="cover-image"/></metadata>' +
     '<manifest><item id="nav" href="nav.xhtml" ' +
     `media-type="${MEDIA_TYPE_XHTML}" properties="nav"/>` +
-    '<item id="cover-image" href="assets/cover.svg" ' +
-    `media-type="${MEDIA_TYPE_SVG}" properties="cover-image"/>` +
+    '<item id="cover-image" href="assets/cover.png" ' +
+    `media-type="${MEDIA_TYPE_PNG}" properties="cover-image"/>` +
     `<item id="styles" href="styles.css" media-type="${MEDIA_TYPE_CSS}"/>` +
-    `${manifest.join('')}</manifest><spine>${spine.join('')}</spine></package>`
+    `${manifest.join('')}</manifest><spine>${spine.join('')}</spine>` +
+    '<guide><reference type="cover" title="Cover" ' +
+    'href="cover.xhtml"/></guide></package>'
   );
 }
 
@@ -159,8 +178,7 @@ export function createEpubDocuments(pages, locale, copy, metadata, qrEncoder) {
     {
       id: 'cover',
       name: 'cover.xhtml',
-      content: xhtml(copy.title, front.cover.outerHTML, locale),
-      properties: ' properties="svg"',
+      content: coverXhtml(copy.title, locale),
     },
     {
       id: 'title-page',

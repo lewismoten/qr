@@ -117,6 +117,16 @@ test('handbook exports include publication front matter', async () => {
   ]);
   assert.match(pdf, /createFrontMatter/);
   assert.match(epub, /createEpubDocuments/);
+  assert.match(epub, /createCoverPng/);
+  assert.doesNotMatch(epub, /createImageBitmap/);
+  assert.match(epub, /EPUB\/assets\/cover\.png/);
+  const epubDocuments = await readFile(
+    'src/js/info/handbook/epub-documents.js',
+    'utf8',
+  );
+  assert.match(epubDocuments, /properties="cover-image"/);
+  assert.match(epubDocuments, /name="cover" content="cover-image"/);
+  assert.match(epubDocuments, /epub:type="cover"/);
   assert.match(frontMatter, /Lewis Moten III/);
   assert.match(frontMatter, /createDivision/);
   assert.match(build, /site-metadata\.json/);

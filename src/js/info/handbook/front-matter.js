@@ -1,4 +1,6 @@
 export const HANDBOOK_AUTHOR = 'Lewis Moten III';
+export const HANDBOOK_COVER_WIDTH = 1200;
+export const HANDBOOK_COVER_HEIGHT = 1600;
 const HANDBOOK_URL = 'https://qr.lewismoten.com/';
 const QUIET_ZONE_MODULES = 4;
 let encoderRequest;
@@ -120,7 +122,12 @@ export function createCoverImage(document, copy, metadata, qrEncoder) {
   const namespace = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(namespace, 'svg');
   svg.setAttribute('xmlns', namespace);
-  svg.setAttribute('viewBox', '0 0 1200 1600');
+  svg.setAttribute('width', String(HANDBOOK_COVER_WIDTH));
+  svg.setAttribute('height', String(HANDBOOK_COVER_HEIGHT));
+  svg.setAttribute(
+    'viewBox',
+    `0 0 ${HANDBOOK_COVER_WIDTH} ${HANDBOOK_COVER_HEIGHT}`,
+  );
   const definitions = document.createElementNS(namespace, 'defs');
   const gradient = document.createElementNS(namespace, 'linearGradient');
   gradient.id = 'cover-gradient';
