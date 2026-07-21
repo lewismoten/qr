@@ -24,7 +24,7 @@ export function readVectorBuildOptions(values = process.argv.slice(2)) {
     DECIMAL_RADIX,
   );
   const shardTargetMiB = Number.parseFloat(
-    option(values, 'shard-target-mib', '10'),
+    option(values, 'shard-target-mib', '100'),
   );
   const shardVariancePercent = Number.parseFloat(
     option(values, 'shard-variance-percent', '20'),
@@ -124,7 +124,7 @@ Options:
   --budget-growth 1.3   Relative budget growth within each zoom tier
   --minimum-level-kib 128 Minimum budget reserved for every archive
   --shard-zoom 9        First zoom eligible for adaptive subdivision
-  --shard-target-mib 10 Target maximum before a region subdivides
+  --shard-target-mib 100 Target maximum before a region subdivides
   --shard-variance-percent 20 Soft variance before subdivision
   --archive-variance-percent 1 Allowed cumulative budget variance
   --jobs 1              Parallel archives built within each zoom

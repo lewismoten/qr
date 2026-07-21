@@ -55,18 +55,20 @@ source, removes unused source attributes, assigns feature zoom ranges, and asks
 Tippecanoe to build PMTiles archives plus `build/maps/local.json`. Zooms 1-8 use
 one world archive each. Beginning at `--shard-zoom 9`, the builder inspects the
 actual size of every region from the preceding zoom. A region larger than
-`--shard-target-mib 10` divides into four children for the next zoom. If four
+`--shard-target-mib 100` divides into four children for the next zoom. If four
 children would still average more than the target, it divides directly into
-16, 64, or another power-of-four count. Sparse regions retain their existing
-bounds while dense areas subdivide independently along exact Web Mercator tile
-boundaries.
+16, 64, or another power-of-four count. Complete groups of sparse siblings
+coalesce when their combined forecast fits the target, while dense areas
+subdivide independently along exact Web Mercator tile boundaries.
 
-Before each zoom is built, the planner forecasts 2x to 3x growth from the two
-previous zooms and features that first become visible at the new zoom. A
-region is subdivided in advance when its forecast exceeds the shard target,
-including multiple quadtree depths when one four-way split is insufficient.
-The default 20% soft variance permits a forecast up to 12 MiB before splitting
-a nominal 10 MiB region, avoiding unnecessary archives near the boundary.
+Before each zoom is built, the planner forecasts growth from the two previous
+zooms and features that are active at the new zoom. Both `minzoom` and
+`maxzoom` are honored, so a level can shrink and coalesce when detailed layers
+expire. A region is subdivided in advance when its forecast exceeds the shard
+target, including multiple quadtree depths when one four-way split is
+insufficient. The default 20% soft variance permits a forecast up to 120 MiB
+before splitting a nominal 100 MiB region, avoiding unnecessary archives near
+the boundary.
 
 Use `--jobs 4` to build up to four shards from the same zoom concurrently.
 Zoom levels remain ordered, and archive surplus or debt is reconciled between

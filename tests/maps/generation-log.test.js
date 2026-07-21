@@ -68,8 +68,8 @@ test('parses logging and generation command options', () => {
   assert.equal(options.maximumArchiveMiB, 500);
   assert.equal(options.maximumTileBytes, 64 * 1024);
   assert.equal(options.shardZoom, 9);
-  assert.equal(options.shardTargetMiB, 10);
-  assert.equal(options.shardTargetBytes, 10 * 1024 * 1024);
+  assert.equal(options.shardTargetMiB, 100);
+  assert.equal(options.shardTargetBytes, 100 * 1024 * 1024);
   assert.equal(options.shardVariancePercent, 20);
   assert.equal(options.jobs, 1);
   assert.ok(options.tippecanoeThreads >= 1);

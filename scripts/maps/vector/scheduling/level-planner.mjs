@@ -42,6 +42,7 @@ export function createLevelPlanner({
     );
     if (level.minimumZoom >= shardZoom) {
       const revealed = forecast.revealedFeatures.toLocaleString();
+      const expired = forecast.expiredFeatures.toLocaleString();
       const currentBytes = previousResults.reduce(
         (sum, result) => sum + result.bytes,
         0,
@@ -60,6 +61,7 @@ export function createLevelPlanner({
           `${size(currentBytes)} -> ${size(projectedBytes)}, ` +
           `${growth} regional growth, ` +
           `${revealed} newly visible features, ` +
+          `${expired} expired features, ` +
           `${planned.length} archive${planned.length === 1 ? '' : 's'}.`,
       );
     }

@@ -28,7 +28,10 @@ export function smallestArchivePath(output) {
   return path.join(parsed.dir, `${parsed.name}.smallest${parsed.ext}`);
 }
 
-export async function validatePmtilesArchive(file, maximumBytes) {
+export async function validatePmtilesArchive(
+  file,
+  maximumBytes = Number.MAX_SAFE_INTEGER,
+) {
   const handle = await open(file, 'r');
   try {
     const bytes = Buffer.alloc(PMTILES_PREFIX_BYTES);

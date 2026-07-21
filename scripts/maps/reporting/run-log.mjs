@@ -190,8 +190,10 @@ export function recordZoomPlan(log, levels, shardTargetBytes) {
     shardTargetBytes,
     forecastMultiplier: levels[0]?.multiplier,
     observedGrowth: levels[0]?.observedGrowth,
+    activeFeatureRatio: levels[0]?.activeRatio,
     visibleFeatures: levels[0]?.visibleFeatures,
     revealedFeatures: levels[0]?.revealedFeatures,
+    expiredFeatures: levels[0]?.expiredFeatures,
     revealedFeaturesByLayer: levels[0]?.revealedFeaturesByLayer,
     regions: levels.map((level) => ({
       shard: level.shard,

@@ -157,10 +157,7 @@ async function buildLevel(level, allocatedBudgetBytes, workload) {
     let bytes;
     let archiveStats;
     try {
-      bytes = await validatePmtilesArchive(
-        result.temporary,
-        Number.MAX_SAFE_INTEGER,
-      );
+      bytes = await validatePmtilesArchive(result.temporary);
       archiveStats = await readArchiveStats(result.temporary, maximumTileBytes);
     } catch (error) {
       await rm(result.temporary, { force: true });
@@ -170,6 +167,10 @@ async function buildLevel(level, allocatedBudgetBytes, workload) {
           'restoring its last valid archive.',
       );
       return acceptSmallest();
+    }
+    if (archiveStats.addressedTiles === 0) {
+      await rm(result.temporary, { force: true });
+      return emptyArchiveCandidate(level, allocatedBudgetBytes);
     }
     naturalBytes ??= bytes;
     naturalArchiveStats ??= archiveStats;
@@ -244,9 +245,7 @@ async function buildLevel(level, allocatedBudgetBytes, workload) {
       attempt === 5 ||
       (next.maximumTileBytes === settings.maximumTileBytes &&
         next.detail === settings.detail);
-    if (smallest) {
-      return acceptSmallest();
-    }
+    if (smallest) return acceptSmallest();
     settings = next;
   }
   throw new Error(`Unable to build ${levelShardLabel(level)}.`);
