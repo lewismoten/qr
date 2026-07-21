@@ -15,25 +15,13 @@ import {
 const localeRoot = localeSourceUrl;
 const resourceMetadata = new Set(['$debug', 'extends']);
 const inheritedLocales = new Set(['en-GB', 'en-XA']);
-// Standards, syntax examples, units, and sample contact data are not prose.
-const invariantKeys = new Set([
-  'formats.url',
-  'formats.vcard',
-  'formats.sms',
-  'formats.wifi',
-  'formats.geo',
+// Syntax, ratios, standards, and sample contact data are language-neutral.
+const commonInvariantKeys = new Set([
   'common.count',
-  'frame.wifi',
   'number.status',
-  'encoding.unused',
-  'encoding.modes.kanji',
   'preview.actualRatio',
-  'units.pixels',
-  'units.dimensions',
   'units.percent',
-  'spec.modes.kanji',
   'debugUi.encoding.alphaShort',
-  'form.placeholders.numberSuffix',
   'form.defaults.vcardName',
   'form.defaults.vcardOrg',
   'form.defaults.phone',
@@ -44,9 +32,39 @@ const invariantKeys = new Set([
   'form.data.wep',
   'form.data.e164',
   'info.handbook.pdf',
-  'art.colors.magenta',
-  'style.art.emoji',
 ]);
+const localeInvariantKeys = new Map([
+  [
+    'es',
+    new Set([
+      'formats.url',
+      'formats.vcard',
+      'formats.sms',
+      'formats.wifi',
+      'frame.wifi',
+      'encoding.unused',
+      'encoding.modes.kanji',
+      'art.colors.magenta',
+      'units.pixels',
+      'units.dimensions',
+      'spec.modes.kanji',
+      'form.placeholders.numberSuffix',
+      'style.art.emoji',
+    ]),
+  ],
+  ['hi-IN', new Set(['encoding.unused', 'units.pixels', 'units.dimensions'])],
+  [
+    'zh-CN',
+    new Set(['formats.wifi', 'frame.wifi', 'units.pixels', 'units.dimensions']),
+  ],
+]);
+
+function isInvariantTranslation(locale, key) {
+  return (
+    commonInvariantKeys.has(key) ||
+    localeInvariantKeys.get(locale)?.has(key) === true
+  );
+}
 
 function flattenMessages(value, prefix = '', output = {}) {
   for (const [key, child] of Object.entries(value)) {
@@ -130,7 +148,9 @@ describe('locale completeness', () => {
         (key) => !Object.hasOwn(messages, key),
       );
       const untranslated = Object.keys(baseline).filter(
-        (key) => !invariantKeys.has(key) && messages[key] === baseline[key],
+        (key) =>
+          !isInvariantTranslation(locale.code, key) &&
+          messages[key] === baseline[key],
       );
       if (missing.length || untranslated.length) {
         issues[locale.code] = { missing, untranslated };
