@@ -10,6 +10,7 @@ import { publishDetailedMap } from './maps/vector/publish.mjs';
 const watch = process.argv.includes('--watch');
 const htmlConfig = await loadHtmlConfig();
 const qrPackageName = '@lewismoten/qr';
+const browserQrModulePath = '/dist/qr.min.js';
 const qrSource = fileURLToPath(new URL('../src/js/qr-api.js', import.meta.url));
 const localQrPlugin = {
   name: 'local-qr-package',
@@ -46,7 +47,7 @@ const builds = [
     format: 'esm',
     platform: 'browser',
     splitting: true,
-    external: [qrPackageName],
+    external: [qrPackageName, browserQrModulePath],
     metafile: true,
   },
   {
@@ -56,6 +57,7 @@ const builds = [
     format: 'iife',
     platform: 'browser',
     plugins: [localQrPlugin],
+    external: [browserQrModulePath],
   },
   {
     ...shared,
@@ -90,7 +92,7 @@ const builds = [
     format: 'esm',
     platform: 'browser',
     splitting: true,
-    external: [qrPackageName],
+    external: [qrPackageName, browserQrModulePath],
   },
   {
     ...shared,
@@ -99,11 +101,20 @@ const builds = [
   },
 ];
 
+async function writeSiteMetadata() {
+  await mkdir(htmlConfig.outputRoot, { recursive: true });
+  await writeFile(
+    path.join(htmlConfig.outputRoot, 'site-metadata.json'),
+    `${JSON.stringify({ publishedAt: new Date().toISOString() }, null, 2)}\n`,
+  );
+}
+
 if (!watch) await rm('dist/chunks', { recursive: true, force: true });
 
 if (watch) {
   await generateLocalizedGuides({ clean: true });
   await buildLocaleResources();
+  await writeSiteMetadata();
   const contexts = await Promise.all(builds.map((options) => context(options)));
   await Promise.all(contexts.map((buildContext) => buildContext.watch()));
   console.log('Watching JavaScript and CSS sources...');
@@ -117,6 +128,7 @@ if (watch) {
   await generateLocalizedGuides({ clean: true });
   await buildLocaleResources();
   await mkdir(htmlConfig.outputRoot, { recursive: true });
+  await writeSiteMetadata();
   await Promise.all([
     cp('dist', path.join(htmlConfig.outputRoot, 'dist'), {
       recursive: true,

@@ -7,6 +7,7 @@ import { getHandbookCopy } from './copy.js';
 const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
 const PERCENT_MAXIMUM = 100;
 let controller;
+let controllerLocale;
 
 function element(document, name, className, text) {
   const result = document.createElement(name);
@@ -188,6 +189,9 @@ function createController(document, locale) {
 }
 
 export async function openHandbookExportDialog(locale = 'en-US') {
-  controller ??= createController(document, locale);
+  if (!controller || controllerLocale !== locale) {
+    controller = createController(document, locale);
+    controllerLocale = locale;
+  }
   await controller.open();
 }

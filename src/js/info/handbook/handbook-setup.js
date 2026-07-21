@@ -4,7 +4,11 @@ function action(label, run) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'handbook-action';
-  button.textContent = label;
+  const icon = document.createElement('span');
+  icon.className = 'handbook-action-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = '\u{1F4D6}';
+  button.append(icon, document.createTextNode(label));
   button.addEventListener('click', async () => {
     button.disabled = true;
     try {

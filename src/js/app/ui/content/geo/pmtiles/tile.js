@@ -72,7 +72,7 @@ export function createPmtilesTile({
     onUnavailable();
   };
 
-  findPmtilesTile({
+  element.slippyReady = findPmtilesTile({
     source,
     tile,
     maximumSourceZoom,

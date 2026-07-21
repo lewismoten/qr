@@ -4,6 +4,14 @@ import {
   prepareHandbookPages,
 } from './document-model.js';
 import { getHandbookCopy } from './copy.js';
+import {
+  createDivision,
+  createFrontMatter,
+  HANDBOOK_AUTHOR,
+  loadHandbookEncoder,
+  loadHandbookMetadata,
+} from './front-matter.js';
+import { HANDBOOK_DOCUMENT_CSS } from './handbook-styles.js';
 import { loadHandbookPages } from './pages.js';
 
 const LOAD_PROGRESS_WEIGHT = 0.9;
@@ -12,24 +20,7 @@ const PRINT_FRAME_LIFETIME_MS = 60_000;
 
 const PRINT_CSS = `
 @page { size: letter; margin: 0.65in; }
-html { color: #172033; font: 11pt/1.5 Georgia, serif; }
-body { margin: 0; }
-a { color: #075985; text-decoration: underline; }
-h1, h2, h3, h4 { font-family: Arial, sans-serif; break-after: avoid; }
-img, svg { max-width: 100%; height: auto; break-inside: avoid; }
-pre, code { font-family: monospace; white-space: pre-wrap; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 0.25rem; border: 1px solid #94a3b8; }
-button, input, select, textarea, dialog, footer, nav:not(.handbook-toc) {
-  display: none !important;
-}
-.handbook-title { margin-bottom: 0.2in; }
-.handbook-toc ol { margin: 0.15rem 0; padding-inline-start: 1.4rem; }
-.handbook-toc > ol { padding-inline-start: 1.1rem; }
-.handbook-toc li { margin: 0.12rem 0; }
-.handbook-toc-group { font-weight: 700; }
-.handbook-chapter { break-before: page; }
-.handbook-chapter > h1 { margin-top: 0; }
+${HANDBOOK_DOCUMENT_CSS}
 `;
 
 function appendOutline(document, parent, nodes) {
@@ -41,6 +32,13 @@ function appendOutline(document, parent, nodes) {
       link.href = `#${node.page.chapterId}`;
       link.textContent = node.title;
       item.append(link);
+      if (node.children?.length) appendOutline(document, item, node.children);
+    } else if (node.href) {
+      const link = document.createElement('a');
+      link.href = node.href;
+      link.textContent = node.title;
+      item.append(link);
+      if (node.children?.length) appendOutline(document, item, node.children);
     } else {
       const label = document.createElement('span');
       label.className = 'handbook-toc-group';
@@ -71,8 +69,26 @@ function appendContents(document, body, pages, copy) {
   body.append(title, navigation);
 }
 
-function appendChapters(document, body, pages) {
+function divisionFor(page) {
+  if (page.route === 'about') return 'about';
+  if (page.route === 'spec') return 'spec';
+  if (page.route === 'technology') return 'technology';
+  if (page.route === 'privacy') return 'privacy';
+  return 'guides';
+}
+
+function appendChapters(document, body, pages, copy) {
+  let previousDivision;
+  let divisionIndex = 0;
   pages.forEach((page) => {
+    const division = divisionFor(page);
+    if (division !== previousDivision) {
+      divisionIndex += 1;
+      body.append(
+        createDivision(document, copy.divisions[division], divisionIndex),
+      );
+      previousDivision = division;
+    }
     const chapter = document.createElement('section');
     chapter.className = 'handbook-chapter';
     chapter.id = page.chapterId;
@@ -88,7 +104,7 @@ function appendChapters(document, body, pages) {
   });
 }
 
-function createPrintFrame(locale, pages, copy) {
+function createPrintFrame(locale, pages, copy, handbookMetadata, qrEncoder) {
   const frame = document.createElement('iframe');
   frame.title = copy.title;
   frame.setAttribute('aria-hidden', 'true');
@@ -107,14 +123,28 @@ function createPrintFrame(locale, pages, copy) {
   printDocument.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
   const metadata = printDocument.createElement('meta');
   metadata.charset = 'utf-8';
+  const author = printDocument.createElement('meta');
+  author.name = 'author';
+  author.content = HANDBOOK_AUTHOR;
   const title = printDocument.createElement('title');
   title.textContent = copy.title;
   const style = printDocument.createElement('style');
   style.textContent = PRINT_CSS;
-  printDocument.head.replaceChildren(metadata, title, style);
+  printDocument.head.replaceChildren(metadata, author, title, style);
   printDocument.body.replaceChildren();
+  const frontMatter = createFrontMatter(
+    printDocument,
+    copy,
+    handbookMetadata,
+    qrEncoder,
+  );
+  printDocument.body.append(
+    frontMatter.cover,
+    frontMatter.title,
+    frontMatter.preface,
+  );
   appendContents(printDocument, printDocument.body, pages, copy);
-  appendChapters(printDocument, printDocument.body, pages);
+  appendChapters(printDocument, printDocument.body, pages, copy);
   return frame;
 }
 
@@ -151,13 +181,23 @@ export async function prepareHandbookPdfPrint(
   { signal, onProgress = () => {} } = {},
 ) {
   const copy = getHandbookCopy(locale);
+  const [handbookMetadata, qrEncoder] = await Promise.all([
+    loadHandbookMetadata(locale, signal),
+    loadHandbookEncoder(),
+  ]);
   const pages = await loadHandbookPages(locale, undefined, {
     signal,
     onProgress: (fraction) => onProgress(fraction * LOAD_PROGRESS_WEIGHT),
   });
   throwIfAborted(signal);
   prepareHandbookPages(pages);
-  const frame = createPrintFrame(locale, pages, copy);
+  const frame = createPrintFrame(
+    locale,
+    pages,
+    copy,
+    handbookMetadata,
+    qrEncoder,
+  );
   onProgress(COMPOSE_PROGRESS);
   try {
     await settlePrintFrame(frame, signal);

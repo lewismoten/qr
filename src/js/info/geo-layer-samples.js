@@ -28,6 +28,7 @@ function renderSample(sample, zoom, source, header) {
   const { centerTile, tiles } = getCenteredTileLayout(zoom);
   const caption = sample.querySelector('figcaption');
   const mosaic = document.createElement('span');
+  const requests = [];
   mosaic.className = 'geo-layer-sample-mosaic';
 
   for (const item of tiles) {
@@ -48,10 +49,12 @@ function renderSample(sample, zoom, source, header) {
     tile.style.left = `${item.left}%`;
     tile.style.top = `${item.top}%`;
     mosaic.append(tile);
+    requests.push(tile.slippyReady);
   }
 
   mosaic.append(createMarker());
   sample.prepend(mosaic);
+  return Promise.all(requests);
 }
 
 function loadArchive() {
@@ -91,8 +94,15 @@ export async function initializeGeoLayerSamples(root = document) {
   const { header, source } = archive;
   const load = (sample) => {
     const zoom = Number(sample.closest('tr')?.cells[0]?.textContent);
-    if (Number.isInteger(zoom)) renderSample(sample, zoom, source, header);
+    if (Number.isInteger(zoom))
+      return renderSample(sample, zoom, source, header);
+    return Promise.resolve();
   };
+
+  if (new URLSearchParams(location.search).has('handbook-source')) {
+    await Promise.all(samples.map(load));
+    return;
+  }
 
   if (!('IntersectionObserver' in globalThis)) {
     samples.forEach(load);
@@ -113,7 +123,10 @@ export async function initializeGeoLayerSamples(root = document) {
 }
 
 if (typeof document !== 'undefined') {
-  initializeGeoLayerSamples().catch(() => {
+  const request = initializeGeoLayerSamples().catch(() => {
     // Deferred SVG samples remain available without the PMTiles archive.
   });
+  if (new URLSearchParams(location.search).has('handbook-source')) {
+    globalThis.handbookPageReady = request;
+  }
 }

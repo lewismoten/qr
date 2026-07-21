@@ -20,7 +20,8 @@ test('handbook includes every helpful route exactly once', () => {
     if (route !== 'index') assert.ok(HANDBOOK_ROUTES.includes(route), route);
   }
   assert.equal(HANDBOOK_ROUTES[0], 'about');
-  assert.equal(HANDBOOK_ROUTES.at(-2), 'spec');
+  assert.equal(HANDBOOK_ROUTES.at(-3), 'spec');
+  assert.equal(HANDBOOK_ROUTES.at(-2), 'technology');
   assert.equal(HANDBOOK_ROUTES.at(-1), 'privacy');
 });
 
@@ -104,4 +105,21 @@ test('PDF export prints semantic HTML instead of page images', async () => {
   assert.doesNotMatch(source, /capturePdfFrame|createPdfSheetBlob|JPEG/);
   assert.match(source, /contentWindow/);
   assert.match(source, /\.print\(\)/);
+});
+
+test('handbook exports include publication front matter', async () => {
+  const [pdf, epub, frontMatter, build, progressStyles] = await Promise.all([
+    readFile('src/js/info/handbook/handbook-pdf.js', 'utf8'),
+    readFile('src/js/info/handbook/epub.js', 'utf8'),
+    readFile('src/js/info/handbook/front-matter.js', 'utf8'),
+    readFile('scripts/build.mjs', 'utf8'),
+    readFile('src/css/components/task-progress.css', 'utf8'),
+  ]);
+  assert.match(pdf, /createFrontMatter/);
+  assert.match(epub, /createEpubDocuments/);
+  assert.match(frontMatter, /Lewis Moten III/);
+  assert.match(frontMatter, /createDivision/);
+  assert.match(build, /site-metadata\.json/);
+  assert.match(build, /publishedAt/);
+  assert.match(progressStyles, /task-progress-card\[hidden\]/);
 });

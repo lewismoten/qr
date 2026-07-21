@@ -3,13 +3,26 @@ import { throwIfAborted, waitFor } from '../../app/abort.js';
 
 export const HANDBOOK_ROUTES = Object.freeze([
   'about',
-  'technology',
   ...GUIDE_ROUTES.filter((route) => {
     return !['index', 'about', 'privacy', 'spec', 'technology'].includes(route);
   }),
   'spec',
+  'technology',
   'privacy',
 ]);
+
+const PUBLIC_SITE_ORIGIN = 'https://qr.lewismoten.com';
+const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
+
+function publicUrl(value, base) {
+  const url = new URL(value, base);
+  if (LOCAL_HOSTS.has(url.hostname)) {
+    const publicOrigin = new URL(PUBLIC_SITE_ORIGIN);
+    url.protocol = publicOrigin.protocol;
+    url.host = publicOrigin.host;
+  }
+  return url;
+}
 
 function normalizeResources(container, pageUrl) {
   container.querySelectorAll('[href], [src]').forEach((element) => {
@@ -17,7 +30,7 @@ function normalizeResources(container, pageUrl) {
       const value = element.getAttribute(attribute);
       if (!value || value.startsWith('#')) continue;
       try {
-        element.setAttribute(attribute, new URL(value, pageUrl).href);
+        element.setAttribute(attribute, publicUrl(value, pageUrl).href);
       } catch {
         // Keep malformed authoring visible instead of aborting an export.
       }
@@ -77,12 +90,19 @@ function renderedDocument(url, signal) {
     }, PAGE_RENDER_TIMEOUT_MS);
     frame.hidden = true;
     frame.setAttribute('aria-hidden', 'true');
-    frame.addEventListener('load', () => {
-      cleanup();
-      setTimeout(
-        () => resolve({ document: frame.contentDocument, frame }),
-        PAGE_SETTLE_DELAY_MS,
-      );
+    frame.addEventListener('load', async () => {
+      try {
+        await frame.contentWindow.handbookPageReady;
+        cleanup();
+        setTimeout(
+          () => resolve({ document: frame.contentDocument, frame }),
+          PAGE_SETTLE_DELAY_MS,
+        );
+      } catch (error) {
+        cleanup();
+        frame.remove();
+        reject(error);
+      }
     });
     signal?.addEventListener('abort', cancel, { once: true });
     frame.src = `${url.href}${url.search ? '&' : '?'}handbook-source=1`;
@@ -109,6 +129,17 @@ async function extractPage(document, url, route, signal) {
   });
   clone.querySelectorAll('script, footer, .spec-footer').forEach((item) => {
     item.remove();
+  });
+  clone
+    .querySelectorAll('[data-handbook-exclude], [data-app-only]')
+    .forEach((item) => {
+      item.remove();
+    });
+  clone.querySelectorAll('img[data-fallback-src]').forEach((image) => {
+    if (!image.getAttribute('src')) {
+      image.setAttribute('src', image.dataset.fallbackSrc);
+    }
+    image.removeAttribute('data-fallback-src');
   });
   clone.querySelectorAll('[hidden]').forEach((item) => {
     item.removeAttribute('hidden');

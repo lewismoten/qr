@@ -17,6 +17,10 @@
   cursor: pointer;
 }
 
+.handbook-action-icon {
+  margin-inline-end: 0.35rem;
+}
+
 .handbook-action:hover,
 .handbook-action:focus-visible {
   background: rgba(94, 234, 212, 0.12);

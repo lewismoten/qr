@@ -32,6 +32,10 @@
     #fffaf0;
 }
 
+.task-progress-card[hidden] {
+  display: none !important;
+}
+
 .task-progress-card header {
   display: grid;
   gap: 0.25rem;

@@ -5,15 +5,23 @@ import {
   MEDIA_TYPE_EPUB,
   MEDIA_TYPE_EPUB_PACKAGE,
   MEDIA_TYPE_PLAIN_TEXT,
+  MEDIA_TYPE_SVG,
   MEDIA_TYPE_TEXT_XML,
   MEDIA_TYPE_XHTML,
 } from '../../app/media-types.js';
 import { getHandbookCopy } from './copy.js';
+import { prepareHandbookPages } from './document-model.js';
 import {
-  buildHandbookOutline,
-  prepareHandbookPages,
-} from './document-model.js';
-import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
+  createEpubDocuments,
+  EPUB_CSS,
+  navigation,
+  packageDocument,
+} from './epub-documents.js';
+import {
+  createCoverImage,
+  loadHandbookEncoder,
+  loadHandbookMetadata,
+} from './front-matter.js';
 import { loadHandbookPages } from './pages.js';
 
 const PAGE_LOADING_PROGRESS_WEIGHT = 0.7;
@@ -21,19 +29,6 @@ const ARCHIVE_PROGRESS_WEIGHT = 1 - PAGE_LOADING_PROGRESS_WEIGHT;
 
 function textBlob(value, type = MEDIA_TYPE_PLAIN_TEXT) {
   return new Blob([value], { type });
-}
-
-function escapeXml(value) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
-
-function serializeContent(content) {
-  return [...content.childNodes]
-    .map((node) => new XMLSerializer().serializeToString(node))
-    .join('');
 }
 
 function dataImage(source) {
@@ -70,79 +65,6 @@ function extractImages(pages, signal) {
   return assets;
 }
 
-function chapterXhtml(page, index, locale) {
-  const direction = locale === 'ar' ? 'rtl' : 'ltr';
-  const title = escapeXml(page.title);
-  return (
-    '<?xml version="1.0" encoding="UTF-8"?>' +
-    `<html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}" ` +
-    `dir="${direction}"><head><title>${title}</title>` +
-    '<link rel="stylesheet" href="styles.css" /></head><body>' +
-    `<section id="${page.chapterId}"><h1>${title}</h1>` +
-    `${serializeContent(page.content)}</section></body></html>`
-  );
-}
-
-function navigationItems(nodes, chapterNames) {
-  const items = nodes.map((node) => {
-    if (node.page) {
-      const name = chapterNames.get(node.page);
-      return (
-        `<li><a href="${name}#${node.page.chapterId}">` +
-        `${escapeXml(node.title)}</a></li>`
-      );
-    }
-    return (
-      `<li><span>${escapeXml(node.title)}</span>` +
-      `${navigationItems(node.children, chapterNames)}</li>`
-    );
-  });
-  return `<ol>${items.join('')}</ol>`;
-}
-
-function navigation(pages, locale, copy, chapterNames) {
-  const items = navigationItems(
-    buildHandbookOutline(pages, copy.sections),
-    chapterNames,
-  );
-  return (
-    '<?xml version="1.0" encoding="UTF-8"?>' +
-    `<html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}">` +
-    `<head><title>${escapeXml(copy.contents)}</title></head><body>` +
-    '<nav epub:type="toc" xmlns:epub="http://www.idpf.org/2007/ops">' +
-    `<h1>${escapeXml(copy.contents)}</h1>${items}` +
-    '</nav></body></html>'
-  );
-}
-
-function packageDocument(pages, locale, identifier, copy) {
-  const modified = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
-  const manifest = pages.map((page, index) => {
-    return (
-      `<item id="chapter-${index + 1}" ` +
-      `href="chapter-${index + 1}.xhtml" ` +
-      `media-type="${MEDIA_TYPE_XHTML}"/>`
-    );
-  });
-  const spine = pages.map((page, index) => {
-    return `<itemref idref="chapter-${index + 1}"/>`;
-  });
-  return (
-    '<?xml version="1.0" encoding="UTF-8"?>' +
-    '<package xmlns="http://www.idpf.org/2007/opf" version="3.0" ' +
-    `unique-identifier="book-id" xml:lang="${locale}"><metadata ` +
-    'xmlns:dc="http://purl.org/dc/elements/1.1/">' +
-    `<dc:identifier id="book-id">${identifier}</dc:identifier>` +
-    `<dc:title>${escapeXml(copy.title)}</dc:title>` +
-    `<dc:language>${locale}</dc:language>` +
-    `<meta property="dcterms:modified">${modified}</meta>` +
-    '</metadata><manifest><item id="nav" href="nav.xhtml" ' +
-    `media-type="${MEDIA_TYPE_XHTML}" properties="nav"/>` +
-    `<item id="styles" href="styles.css" media-type="${MEDIA_TYPE_CSS}"/>` +
-    `${manifest.join('')}</manifest><spine>${spine.join('')}</spine></package>`
-  );
-}
-
 function imageManifest(assets) {
   return assets
     .map((asset, index) => {
@@ -161,18 +83,15 @@ const CONTAINER =
   '<rootfiles><rootfile full-path="EPUB/package.opf" ' +
   `media-type="${MEDIA_TYPE_EPUB_PACKAGE}"/></rootfiles></container>`;
 
-const EPUB_CSS = `
-body { color: ${HANDBOOK_TEXT_COLOR}; font: 1rem/1.55 serif; }
-h1, h2, h3 { font-family: sans-serif; }
-img, svg { max-width: 100%; height: auto; }
-button, input, select, textarea, dialog, nav { display: none; }
-`;
-
 export async function createHandbookEpub(
   locale,
   { signal, onProgress = () => {} } = {},
 ) {
   const copy = getHandbookCopy(locale);
+  const [metadata, qrEncoder] = await Promise.all([
+    loadHandbookMetadata(locale, signal),
+    loadHandbookEncoder(),
+  ]);
   const pages = await loadHandbookPages(locale, undefined, {
     signal,
     onProgress: (fraction) => {
@@ -185,6 +104,13 @@ export async function createHandbookEpub(
   );
   prepareHandbookPages(pages, (page) => chapterNames.get(page));
   const assets = extractImages(pages, signal);
+  const documents = createEpubDocuments(
+    pages,
+    locale,
+    copy,
+    metadata,
+    qrEncoder,
+  );
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
     { name: 'mimetype', blob: textBlob(MEDIA_TYPE_EPUB) },
@@ -195,7 +121,7 @@ export async function createHandbookEpub(
     {
       name: 'EPUB/package.opf',
       blob: textBlob(
-        packageDocument(pages, locale, identifier, copy).replace(
+        packageDocument(documents, locale, identifier, copy, metadata).replace(
           '</manifest>',
           `${imageManifest(assets)}</manifest>`,
         ),
@@ -210,9 +136,16 @@ export async function createHandbookEpub(
       ),
     },
     { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, MEDIA_TYPE_CSS) },
-    ...pages.map((page, index) => ({
-      name: `EPUB/chapter-${index + 1}.xhtml`,
-      blob: textBlob(chapterXhtml(page, index, locale), MEDIA_TYPE_XHTML),
+    {
+      name: 'EPUB/assets/cover.svg',
+      blob: textBlob(
+        createCoverImage(document, copy, metadata, qrEncoder),
+        MEDIA_TYPE_SVG,
+      ),
+    },
+    ...documents.map((bookDocument) => ({
+      name: `EPUB/${bookDocument.name}`,
+      blob: textBlob(bookDocument.content, MEDIA_TYPE_XHTML),
     })),
     ...assets.map((asset) => ({
       name: `EPUB/assets/${asset.name}`,
