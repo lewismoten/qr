@@ -66,6 +66,10 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 .handbook-toc-group { font-weight: 700; }
 .handbook-chapter { break-before: page; page-break-before: always; }
 .handbook-chapter > h1 { margin-top: 0; }
+.handbook-chapter .guide-section {
+  break-before: page;
+  page-break-before: always;
+}
 .handbook-external-link { color: #9a3412; text-decoration-style: double; }
 .handbook-external-indicator { margin-inline-start: 0.25em; font-weight: 900; }
 .reference-links, .implementation-links {
