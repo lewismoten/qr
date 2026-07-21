@@ -75,7 +75,9 @@ function sampleRoot(samples, fallbacks = []) {
 
 const header = { minimumZoom: 1, maximumZoom: 19 };
 const source = {};
-const eagerSamples = [sample(4), sample('invalid')];
+const missingRow = sample('invalid');
+missingRow.closest = () => null;
+const eagerSamples = [sample(4), missingRow];
 const eagerRenders = [];
 await initializeGeoLayerSamples(sampleRoot(eagerSamples), {
   getArchive: async () => ({ header, source }),
@@ -84,6 +86,11 @@ await initializeGeoLayerSamples(sampleRoot(eagerSamples), {
 });
 assert.equal(eagerRenders.length, 1);
 assert.deepEqual(eagerRenders[0], [eagerSamples[0], 4, source, header]);
+await initializeGeoLayerSamples(sampleRoot(eagerSamples), {
+  getArchive: async () => {
+    throw new Error('initialized samples should be skipped');
+  },
+});
 
 const immediateSample = sample(5);
 let immediateRenders = 0;
@@ -177,6 +184,14 @@ await initializeGeoLayerSamples(
 assert.equal(startGeoLayerSamples(null), null);
 await startGeoLayerSamples(sampleRoot([]), '?handbook-source=1');
 assert.ok(globalThis.handbookPageReady instanceof Promise);
+const originalLocation = globalThis.location;
+globalThis.location = { search: '' };
+await initializeGeoLayerSamples(sampleRoot([]));
+await startGeoLayerSamples(sampleRoot([]));
+globalThis.location = originalLocation;
+await startGeoLayerSamples(sampleRoot([]), '', async () => {
+  throw new Error('optional samples failed');
+});
 
 const originalDocument = globalThis.document;
 globalThis.document = {
@@ -184,6 +199,7 @@ globalThis.document = {
     return {
       children: [],
       style: {},
+      classList: { add() {}, toggle() {} },
       append(child) {
         this.children.push(child);
       },
@@ -213,22 +229,59 @@ try {
           top: 0,
           tile: { zoom: 4, x: 2, y: 3 },
         },
+        {
+          isCenter: false,
+          left: 100,
+          top: 0,
+          tile: { zoom: 4, x: 3, y: 3 },
+        },
       ],
     }),
     createTile(options) {
       options.onLoad();
       options.onSourceChange(4);
       options.onSourceChange(3);
+      options.onSourceChange(undefined);
       const tile = { style: {}, slippyReady: Promise.resolve() };
       requests.push(options);
       return tile;
     },
   });
-  assert.deepEqual(classes, ['has-centered-map']);
+  assert.deepEqual(classes, ['has-centered-map', 'has-centered-map']);
   assert.equal(caption.textContent, 'L4 → L3 · 1/1');
   assert.equal(prepended.length, 1);
-  assert.equal(prepended[0].children.length, 2);
+  assert.equal(prepended[0].children.length, 3);
   assert.equal(requests[0].minimumSourceZoom, 1);
+
+  const noCaption = {
+    classList: { add() {} },
+    prepend() {},
+    querySelector: () => null,
+  };
+  await renderGeoLayerSample(noCaption, 4, source, header, {
+    getLayout: () => ({
+      centerTile: { zoom: 4, x: 2, y: 3 },
+      tiles: [
+        {
+          isCenter: true,
+          left: 0,
+          top: 0,
+          tile: { zoom: 4, x: 2, y: 3 },
+        },
+      ],
+    }),
+    createTile(options) {
+      options.onSourceChange(4);
+      return { style: {}, slippyReady: Promise.resolve() };
+    },
+  });
+
+  await renderGeoLayerSample(
+    noCaption,
+    1,
+    { getTile: async () => null },
+    { minimumZoom: 1, maximumZoom: 1 },
+  );
 } finally {
   globalThis.document = originalDocument;
 }

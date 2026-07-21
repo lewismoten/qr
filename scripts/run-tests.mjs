@@ -10,7 +10,7 @@ const supported = new Set(['--coverage', '--watch']);
 const unknown = [...requested].filter((option) => !supported.has(option));
 const coverageRequested = requested.has('--coverage');
 const minimumFileCoverage = 95;
-const maximumTestFileDurationMs = 400;
+const maximumTestFileDurationMs = 200;
 const qrRoot = new URL('../src/js/qr/', import.meta.url);
 
 function listQrFiles(directory = qrRoot, prefix = '') {

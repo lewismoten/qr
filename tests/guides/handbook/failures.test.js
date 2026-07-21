@@ -80,6 +80,19 @@ test('cleans up rejected and aborted handbook iframes', async () => {
     controller.abort();
     await assert.rejects(request, /aborted/i);
     assert.equal(waiting.removed(), 1);
+
+    const timedOut = iframeDocument({ load: false });
+    globalThis.document = timedOut.document;
+    await assert.rejects(
+      () =>
+        renderHandbookDocument(
+          new URL('https://qr.test/timed-out?mode=test'),
+          undefined,
+          { timeoutMs: 0 },
+        ),
+      /Timed out/,
+    );
+    assert.equal(timedOut.removed(), 1);
   } finally {
     globalThis.document = originalDocument;
   }

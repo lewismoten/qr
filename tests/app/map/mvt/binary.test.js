@@ -193,11 +193,18 @@ test('decodes all MVT property value types and ignores unknown fields', () => {
 
 test('rejects unknown and truncated MVT geometry commands', () => {
   assert.deepEqual(decodeGeometry([]), []);
+  assert.deepEqual(decodeGeometry([2]), []);
   assert.throws(() => decodeGeometry([3]), /Unknown/);
   assert.throws(() => decodeGeometry([9, 2]), /Truncated/);
   assert.deepEqual(decodeGeometry([15]), []);
   assert.deepEqual(decodeGeometry([10, 2, 2]), [
     { points: [{ x: 1, y: 1 }], closed: false },
+  ]);
+  assert.deepEqual(decodeGeometry([9, 1, 1]), [
+    { points: [{ x: -1, y: -1 }], closed: false },
+  ]);
+  assert.deepEqual(decodeGeometry([9, 0, 0, 15]), [
+    { points: [{ x: 0, y: 0 }], closed: true },
   ]);
 });
 

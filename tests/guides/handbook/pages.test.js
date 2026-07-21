@@ -38,8 +38,14 @@ test('normalizes local handbook links and resource URLs', () => {
       throw new Error('should not set malformed URLs');
     },
   };
+  const skipped = [null, '#chapter'].map((value) => ({
+    getAttribute: () => value,
+    setAttribute() {
+      throw new Error('should skip empty and fragment-only values');
+    },
+  }));
   normalizeHandbookResources(
-    { querySelectorAll: () => [element, malformed] },
+    { querySelectorAll: () => [element, malformed, ...skipped] },
     new URL('http://127.0.0.1:8080/guides/page.html'),
   );
   assert.equal(values.get('href'), 'https://qr.lewismoten.com/about.html');

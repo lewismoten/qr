@@ -137,4 +137,20 @@ describe('fragment help', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     assert.equal(panel.children.at(-1).open, true);
   });
+
+  test('skips lazy help features when no centered maps exist', async () => {
+    const { document, link, panel } = createEnvironment();
+    const source = createElement('section');
+    source.children.push(createElement('h2'));
+    await ensurePanelFragment(panel, {
+      document,
+      fetcher: async () => ({ ok: true, text: async () => '' }),
+      parse: () => ({
+        querySelector: () => ({ childNodes: [] }),
+        querySelectorAll: () => [source],
+      }),
+    });
+    link.listeners.get('click')({ preventDefault() {} });
+    assert.equal(panel.children.at(-1).open, true);
+  });
 });

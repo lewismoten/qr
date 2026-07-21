@@ -87,6 +87,10 @@ test('covers empty, oversized, and boundary directory entries', () => {
     () => decodeDirectory(new Uint8Array(varint(1_000_001))),
     /entry count/,
   );
+  assert.throws(
+    () => decodeDirectory(new Uint8Array([1, ...Array(10).fill(0x80), 0])),
+    /varint/,
+  );
   assert.deepEqual(decodeDirectory(new Uint8Array([1, 0, 0, 1, 0])), [
     { tileId: 0, runLength: 0, length: 1, offset: -1 },
   ]);

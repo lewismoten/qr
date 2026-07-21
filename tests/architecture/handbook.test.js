@@ -280,7 +280,7 @@ test('handbook exports include publication front matter', async () => {
   assert.match(pages, /context\.fillRect/);
   assert.match(pages, /image\.className = canvas\.className/);
   assert.match(pages, /MAP_SAMPLE_EXPORT_SIZE/);
-  assert.match(pages, /replaceMapSamples/);
+  assert.match(pages, /replaceHandbookMapSamples/);
   assert.match(frontMatter, /Lewis Moten III/);
   assert.match(frontMatter, /createDivision/);
   assert.match(build, /site-metadata\.json/);
