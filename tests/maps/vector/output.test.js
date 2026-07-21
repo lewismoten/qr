@@ -151,11 +151,18 @@ test('publishes the PMTiles archive into a new map directory', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'qr-map-publish-'));
   const archive = path.join(root, 'source', 'local.pmtiles');
   const outputRoot = path.join(root, 'site');
+  const missingManifest = path.join(root, 'missing.json');
+  const missingLegacyTiles = path.join(root, 'missing-tiles');
   try {
     await mkdir(path.dirname(archive), { recursive: true });
     await writeFile(archive, 'PMTiles');
     assert.equal(
-      await publishDetailedMap({ outputRoot, archive, legacyTiles: '' }),
+      await publishDetailedMap({
+        outputRoot,
+        archive,
+        manifest: missingManifest,
+        legacyTiles: missingLegacyTiles,
+      }),
       'pmtiles',
     );
     assert.equal(
