@@ -85,68 +85,67 @@ export function createWorldMap(
   const ensureDetailMap = () => {
     if (detailMap) return Promise.resolve(detailMap);
     if (!detailRequest) {
-      detailRequest = Promise.all([
-        loadSlippyMap(),
-        loadTileRange(),
-        loadPmtiles(),
-      ]).then(async ([{ createSlippyMap }, tileRange, pmtiles]) => {
-        let vector = null;
-        if (pmtiles) {
-          try {
-            let source;
+      detailRequest = Promise.all([loadSlippyMap(), loadPmtiles()]).then(
+        async ([{ createSlippyMap }, pmtiles]) => {
+          let vector = null;
+          if (pmtiles) {
             try {
-              source =
-                await pmtiles.createPmtilesArchiveSet('/maps/local.json');
+              let source;
+              try {
+                source =
+                  await pmtiles.createPmtilesArchiveSet('/maps/local.json');
+              } catch {
+                source = pmtiles.createPmtilesSource('/maps/local.pmtiles');
+              }
+              const header = await source.getHeader();
+              vector = { source, header };
             } catch {
-              source = pmtiles.createPmtilesSource('/maps/local.pmtiles');
+              // Deployments can retain the SVG tiles during the transition.
             }
-            const header = await source.getHeader();
-            vector = { source, header };
-          } catch {
-            // Deployments can retain the SVG tiles during the transition.
           }
-        }
-        detailMap = createSlippyMap(detail, {
-          center: markerCoordinates || { latitude: 0, longitude: 0 },
-          zoom: 1,
-          minimumZoom: 1,
-          maximumZoom: 19,
-          minimumSourceZoom: vector?.header.minimumZoom ?? tileRange.minimum,
-          maximumSourceZoom: vector?.header.maximumZoom ?? tileRange.maximum,
-          hasSourceTile: vector ? undefined : tileRange.hasTile,
-          getTileBundle: vector ? undefined : tileRange.getTileBundle,
-          tileFactory: vector
-            ? (options) =>
-                pmtiles.createPmtilesTile({
-                  ...options,
-                  source: vector.source,
-                  coverageMaximumZoom: vector.header.maximumZoom,
-                })
-            : undefined,
-          tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
-          attributionText: 'Natural Earth',
-          attributionUrl: 'https://www.naturalearthdata.com/',
-          additionalAttributions: [
-            {
-              text: 'GeoNames',
-              url: 'https://www.geonames.org/',
+          const tileRange = vector ? null : await loadTileRange();
+          detailMap = createSlippyMap(detail, {
+            center: markerCoordinates || { latitude: 0, longitude: 0 },
+            zoom: 1,
+            minimumZoom: 1,
+            maximumZoom: 19,
+            minimumSourceZoom: vector?.header.minimumZoom ?? tileRange.minimum,
+            maximumSourceZoom: vector?.header.maximumZoom ?? tileRange.maximum,
+            hasSourceTile: vector ? undefined : tileRange.hasTile,
+            getTileBundle: vector ? undefined : tileRange.getTileBundle,
+            tileFactory: vector
+              ? (options) =>
+                  pmtiles.createPmtilesTile({
+                    ...options,
+                    source: vector.source,
+                    coverageMaximumZoom: vector.header.maximumZoom,
+                  })
+              : undefined,
+            tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
+            attributionText: 'Natural Earth',
+            attributionUrl: 'https://www.naturalearthdata.com/',
+            additionalAttributions: [
+              {
+                text: 'GeoNames',
+                url: 'https://www.geonames.org/',
+              },
+              {
+                text: 'U.S. Geological Survey',
+                url: 'https://www.usgs.gov/national-hydrography/',
+                visible: hasVisibleUsgsData,
+              },
+            ],
+            secondaryAttribution: {
+              text: 'U.S. Census Bureau',
+              url: 'https://www.census.gov/geographies/mapping-files.html',
             },
-            {
-              text: 'U.S. Geological Survey',
-              url: 'https://www.usgs.gov/national-hydrography/',
-              visible: hasVisibleUsgsData,
-            },
-          ],
-          secondaryAttribution: {
-            text: 'U.S. Census Bureau',
-            url: 'https://www.census.gov/geographies/mapping-files.html',
-          },
-          showSecondaryAttribution: hasVisibleCensusData,
-          onMinimumZoomOut: showOverview,
-          onSelect,
-        });
-        return detailMap;
-      });
+            showSecondaryAttribution: hasVisibleCensusData,
+            onMinimumZoomOut: showOverview,
+            onSelect,
+          });
+          return detailMap;
+        },
+      );
     }
     return detailRequest;
   };

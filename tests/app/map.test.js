@@ -76,6 +76,7 @@ const detail = { hidden: true };
 const detailCalls = [];
 let detailView = { center: { latitude: 0, longitude: 0 }, zoom: 1 };
 let slippyOptions;
+let legacyRangeLoads = 0;
 const detailMap = {
   getView: () => detailView,
   setMarker(...values) {
@@ -123,7 +124,16 @@ const worldMap = createWorldMap(
         return detailMap;
       },
     }),
-    loadTileRange: async () => ({ minimum: 1, maximum: 6 }),
+    loadTileRange: async () => {
+      legacyRangeLoads += 1;
+      return { minimum: 1, maximum: 6 };
+    },
+    loadPmtiles: async () => ({
+      createPmtilesArchiveSet: async () => ({
+        getHeader: async () => ({ minimumZoom: 1, maximumZoom: 17 }),
+      }),
+      createPmtilesTile() {},
+    }),
   },
 );
 assert.equal(surface.hidden, false);
@@ -168,7 +178,8 @@ assert.equal(detail.hidden, false);
 assert.equal(slippyOptions.tileUrl, '/maps/tiles/{z}/{x}/{y}.svg');
 assert.equal(slippyOptions.minimumZoom, 1);
 assert.equal(slippyOptions.minimumSourceZoom, 1);
-assert.equal(slippyOptions.maximumSourceZoom, 6);
+assert.equal(slippyOptions.maximumSourceZoom, 17);
+assert.equal(legacyRangeLoads, 0);
 assert.equal(slippyOptions.resolveTileSource, undefined);
 assert.equal(slippyOptions.attributionText, 'Natural Earth');
 assert.equal(slippyOptions.secondaryAttribution.text, 'U.S. Census Bureau');
