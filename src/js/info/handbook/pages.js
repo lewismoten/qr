@@ -14,17 +14,18 @@ export const HANDBOOK_ROUTES = Object.freeze([
 const PUBLIC_SITE_ORIGIN = 'https://qr.lewismoten.com';
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost']);
 
-function publicUrl(value, base) {
+export function getHandbookPublicUrl(value, base) {
   const url = new URL(value, base);
   if (LOCAL_HOSTS.has(url.hostname)) {
     const publicOrigin = new URL(PUBLIC_SITE_ORIGIN);
     url.protocol = publicOrigin.protocol;
-    url.host = publicOrigin.host;
+    url.hostname = publicOrigin.hostname;
+    url.port = publicOrigin.port;
   }
   return url;
 }
 
-function normalizeResources(container, pageUrl) {
+export function normalizeHandbookResources(container, pageUrl) {
   container.querySelectorAll('[href], [src]').forEach((element) => {
     for (const attribute of ['href', 'src']) {
       const value = element.getAttribute(attribute);
@@ -32,7 +33,7 @@ function normalizeResources(container, pageUrl) {
       try {
         const resolved =
           attribute === 'href'
-            ? publicUrl(value, pageUrl)
+            ? getHandbookPublicUrl(value, pageUrl)
             : new URL(value, pageUrl);
         element.setAttribute(attribute, resolved.href);
       } catch {
@@ -51,7 +52,7 @@ function dataUrl(blob) {
   });
 }
 
-async function inlineImages(container, signal) {
+export async function inlineHandbookImages(container, signal) {
   await Promise.all(
     [...container.querySelectorAll('img[src]')].map(async (image) => {
       throwIfAborted(signal);
@@ -73,7 +74,7 @@ const MAP_CANVAS_CLASS = 'slippy-map-vector-tile';
 const MAP_WATER_COLOR = '#bfe3ed';
 const MAP_SAMPLE_EXPORT_SIZE = 512;
 
-function canvasImageSource(canvas) {
+export function getHandbookCanvasSource(canvas) {
   if (!canvas.classList.contains(MAP_CANVAS_CLASS)) {
     return canvas.toDataURL('image/png');
   }
@@ -87,7 +88,7 @@ function canvasImageSource(canvas) {
   return flattened.toDataURL('image/png');
 }
 
-function replaceCanvas(canvas, source) {
+export function replaceHandbookCanvas(canvas, source) {
   const image = document.createElement('img');
   image.src = source;
   image.alt = canvas.getAttribute('aria-label') || '';
@@ -103,7 +104,7 @@ function tileOffset(tile, property) {
   );
 }
 
-function mapSampleSource(mosaic) {
+export function getHandbookMapSampleSource(mosaic) {
   const output = document.createElement('canvas');
   output.width = MAP_SAMPLE_EXPORT_SIZE;
   output.height = MAP_SAMPLE_EXPORT_SIZE;
@@ -124,7 +125,7 @@ function mapSampleSource(mosaic) {
   return output.toDataURL('image/png');
 }
 
-function replaceMapSamples(content, clone) {
+export function replaceHandbookMapSamples(content, clone) {
   const sources = [...content.querySelectorAll('.geo-layer-sample-mosaic')];
   const targets = [...clone.querySelectorAll('.geo-layer-sample-mosaic')];
   targets.forEach((mosaic, index) => {
@@ -133,12 +134,19 @@ function replaceMapSamples(content, clone) {
     image.alt = '';
     image.width = MAP_SAMPLE_EXPORT_SIZE;
     image.height = MAP_SAMPLE_EXPORT_SIZE;
-    image.src = mapSampleSource(sources[index]);
+    image.src = getHandbookMapSampleSource(sources[index]);
     mosaic.replaceChildren(image);
   });
 }
 
-function renderedDocument(url, signal) {
+export function renderHandbookDocument(
+  url,
+  signal,
+  {
+    timeoutMs = PAGE_RENDER_TIMEOUT_MS,
+    settleDelayMs = PAGE_SETTLE_DELAY_MS,
+  } = {},
+) {
   return new Promise((resolve, reject) => {
     throwIfAborted(signal);
     const frame = document.createElement('iframe');
@@ -159,7 +167,7 @@ function renderedDocument(url, signal) {
       cleanup();
       frame.remove();
       reject(new Error(`Timed out while rendering ${url.pathname}.`));
-    }, PAGE_RENDER_TIMEOUT_MS);
+    }, timeoutMs);
     frame.hidden = true;
     frame.setAttribute('aria-hidden', 'true');
     frame.addEventListener('load', async () => {
@@ -168,7 +176,7 @@ function renderedDocument(url, signal) {
         cleanup();
         setTimeout(
           () => resolve({ document: frame.contentDocument, frame }),
-          PAGE_SETTLE_DELAY_MS,
+          settleDelayMs,
         );
       } catch (error) {
         cleanup();
@@ -182,19 +190,19 @@ function renderedDocument(url, signal) {
   });
 }
 
-async function extractPage(document, url, route, signal) {
+export async function extractHandbookPage(document, url, route, signal) {
   const content =
     document.querySelector('.info-dialog-content') ||
     document.querySelector('main') ||
     document.body;
   const clone = content.cloneNode(true);
-  replaceMapSamples(content, clone);
+  replaceHandbookMapSamples(content, clone);
   const canvases = [...content.querySelectorAll('canvas')].filter(
     (canvas) => !canvas.closest('.geo-layer-sample-mosaic'),
   );
   [...clone.querySelectorAll('canvas')].forEach((canvas, index) => {
     try {
-      replaceCanvas(canvas, canvasImageSource(canvases[index]));
+      replaceHandbookCanvas(canvas, getHandbookCanvasSource(canvases[index]));
     } catch {
       canvas.remove();
     }
@@ -220,8 +228,8 @@ async function extractPage(document, url, route, signal) {
   clone.querySelectorAll('[hidden]').forEach((item) => {
     item.removeAttribute('hidden');
   });
-  normalizeResources(clone, url);
-  await inlineImages(clone, signal);
+  normalizeHandbookResources(clone, url);
+  await inlineHandbookImages(clone, signal);
   const heading = clone.querySelector('h1, h2');
   return {
     route,
@@ -234,15 +242,20 @@ async function extractPage(document, url, route, signal) {
 export async function loadHandbookPages(
   locale,
   root = new URL('/', location),
-  { signal, onProgress = () => {} } = {},
+  {
+    signal,
+    onProgress = () => {},
+    render = renderHandbookDocument,
+    extract = extractHandbookPage,
+  } = {},
 ) {
   const pages = [];
   for (const [index, route] of HANDBOOK_ROUTES.entries()) {
     throwIfAborted(signal);
     const url = new URL(getGuideOutputPath(route, locale), root);
-    const rendered = await renderedDocument(url, signal);
+    const rendered = await render(url, signal);
     try {
-      pages.push(await extractPage(rendered.document, url, route, signal));
+      pages.push(await extract(rendered.document, url, route, signal));
     } finally {
       rendered.frame.remove();
     }

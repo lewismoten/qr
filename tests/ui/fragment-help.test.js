@@ -117,4 +117,24 @@ describe('fragment help', () => {
     );
     assert.equal(panel.children[1], link);
   });
+
+  test('initializes centered map help with the default lazy feature', async () => {
+    const { document, link, panel } = createEnvironment();
+    const source = createElement('section');
+    source.children.push(createElement('h2'));
+    await ensurePanelFragment(panel, {
+      document,
+      fetcher: async () => ({ ok: true, text: async () => '' }),
+      parse: () => ({
+        querySelector: () => ({ childNodes: [] }),
+        querySelectorAll: () => [source],
+      }),
+    });
+    const content = panel.children.at(-1).children[1];
+    content.querySelector = (selector) =>
+      selector === '[data-centered-map-samples]' ? {} : null;
+    link.listeners.get('click')({ preventDefault() {} });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(panel.children.at(-1).open, true);
+  });
 });

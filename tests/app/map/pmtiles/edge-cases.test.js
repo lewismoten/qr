@@ -94,6 +94,7 @@ test('covers empty, oversized, and boundary directory entries', () => {
     { tileId: 2, runLength: 0 },
     { tileId: 4, runLength: 1 },
   ];
+  assert.equal(findDirectoryEntry([], 0), null);
   assert.equal(findDirectoryEntry(entries, 1), null);
   assert.equal(findDirectoryEntry(entries, 2), entries[0]);
   assert.equal(findDirectoryEntry(entries, 5), null);

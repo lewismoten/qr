@@ -254,6 +254,7 @@ test('keeps map labels inside their owning vector tile', () => {
   });
   assert.equal(getLabelPlacement(-1, 20, 40, 256), null);
   assert.equal(getLabelPlacement(20, 3, 40, 256), null);
+  assert.equal(getLabelPlacement(128, 20, 300, 256), null);
 });
 
 test('projects parent vectors directly into an overzoomed child', () => {

@@ -89,6 +89,22 @@ test('composites parent and background PMTiles levels', async () => {
   });
 });
 
+test('deduplicates matching background and parent fallbacks', async () => {
+  await withDocument(async () => {
+    const tile = createPmtilesTile({
+      source: {
+        getTile: async (zoom) =>
+          [10, 17].includes(zoom) ? new Uint8Array() : null,
+      },
+      tile: { zoom: 17, x: 20, y: 30 },
+      minimumSourceZoom: 1,
+      maximumSourceZoom: 17,
+    });
+    await tile.slippyReady;
+    assert.equal(tile.classList.contains('is-loaded'), true);
+  });
+});
+
 test('marks fallback and unavailable PMTiles elements', async () => {
   await withDocument(async () => {
     const changes = [];
@@ -119,6 +135,14 @@ test('marks fallback and unavailable PMTiles elements', async () => {
     await missing.slippyReady;
     assert.equal(missing.slippyStatusSourceZoom, -1);
     assert.equal(unavailable, 1);
+
+    const defaultMissing = createPmtilesTile({
+      source: { getTile: async () => null },
+      tile: { zoom: 1, x: 0, y: 0 },
+      minimumSourceZoom: 1,
+      maximumSourceZoom: 1,
+    });
+    await defaultMissing.slippyReady;
 
     const failed = createPmtilesTile({
       source: {

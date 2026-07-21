@@ -18,19 +18,8 @@ const SECOND_QR_RANGE_OFFSET = 0xc140;
 const QR_KANJI_ROW_WIDTH = 0xc0;
 const BYTE_MASK = 0xff;
 
-function getShiftJisMap() {
-  if (shiftJisMap) return shiftJisMap;
-  let decoder;
-  try {
-    decoder = new TextDecoder('shift_jis', { fatal: true });
-  } catch {
-    throw createQrError(
-      'kanjiUnsupported',
-      'Native Kanji mode requires browser Shift JIS decoding support.',
-    );
-  }
-
-  shiftJisMap = new Map();
+export function buildShiftJisMap(decoder) {
+  const result = new Map();
   const leadRanges = [
     [FIRST_LEAD_RANGE_START, FIRST_LEAD_RANGE_END],
     [SECOND_LEAD_RANGE_START, SECOND_LEAD_RANGE_END],
@@ -48,9 +37,9 @@ function getShiftJisMap() {
           if (
             [...character].length === 1 &&
             character !== '\ufffd' &&
-            !shiftJisMap.has(character)
+            !result.has(character)
           ) {
-            shiftJisMap.set(character, (lead << BITS_PER_BYTE) | trail);
+            result.set(character, (lead << BITS_PER_BYTE) | trail);
           }
         } catch {
           // Unassigned Shift JIS byte pairs are not QR Kanji characters.
@@ -58,6 +47,22 @@ function getShiftJisMap() {
       }
     }
   });
+  return result;
+}
+
+function getShiftJisMap() {
+  if (shiftJisMap) return shiftJisMap;
+  let decoder;
+  try {
+    decoder = new TextDecoder('shift_jis', { fatal: true });
+  } catch {
+    throw createQrError(
+      'kanjiUnsupported',
+      'Native Kanji mode requires browser Shift JIS decoding support.',
+    );
+  }
+
+  shiftJisMap = buildShiftJisMap(decoder);
   return shiftJisMap;
 }
 
@@ -65,8 +70,7 @@ export function toShiftJis(character) {
   return getShiftJisMap().get(character);
 }
 
-export function getQrKanjiValue(character) {
-  const shiftJis = toShiftJis(character);
+export function getQrKanjiValueFromShiftJis(shiftJis) {
   if (!Number.isInteger(shiftJis)) return null;
   let adjusted;
   if (shiftJis >= FIRST_QR_RANGE_START && shiftJis <= FIRST_QR_RANGE_END) {
@@ -80,4 +84,8 @@ export function getQrKanjiValue(character) {
   return (
     (adjusted >>> BITS_PER_BYTE) * QR_KANJI_ROW_WIDTH + (adjusted & BYTE_MASK)
   );
+}
+
+export function getQrKanjiValue(character) {
+  return getQrKanjiValueFromShiftJis(toShiftJis(character));
 }

@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import { BitBuffer } from '../../src/js/qr/bit-buffer.js';
-import { getQrKanjiValue } from '../../src/js/qr/kanji.js';
+import {
+  buildShiftJisMap,
+  getQrKanjiValue,
+  getQrKanjiValueFromShiftJis,
+} from '../../src/js/qr/kanji.js';
 import { isMaskActive } from '../../src/js/qr/mask.js';
 import NativeQRCode from '../../src/js/qr/matrix-encoder.js';
 import { makeSegment } from '../../src/js/qr/segments/segment.js';
@@ -147,6 +151,22 @@ function testKanjiAndMixedModes() {
   } finally {
     globalThis.TextDecoder = OriginalTextDecoder;
   }
+
+  let decoded = 0;
+  const filtered = buildShiftJisMap({
+    decode() {
+      decoded += 1;
+      if (decoded === 1) return '\ufffd';
+      if (decoded === 2) return 'AB';
+      if (decoded === 3) throw new Error('unassigned');
+      return '字';
+    },
+  });
+  assert.equal(filtered.size, 1);
+  assert.equal(getQrKanjiValueFromShiftJis(0x8140), 0);
+  assert.equal(getQrKanjiValueFromShiftJis(0xe040), 0x1740);
+  assert.equal(getQrKanjiValueFromShiftJis(0xebc0), null);
+  assert.equal(getQrKanjiValueFromShiftJis(undefined), null);
 
   const kanji = NativeQRCode.create([{ data: 'あかが', mode: 'kanji' }], {
     errorCorrectionLevel: 'M',

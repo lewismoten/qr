@@ -24,15 +24,21 @@ function createMarker() {
   return marker;
 }
 
-function renderSample(sample, zoom, source, header) {
-  const { centerTile, tiles } = getCenteredTileLayout(zoom);
+export function renderGeoLayerSample(
+  sample,
+  zoom,
+  source,
+  header,
+  { createTile = createPmtilesTile, getLayout = getCenteredTileLayout } = {},
+) {
+  const { centerTile, tiles } = getLayout(zoom);
   const caption = sample.querySelector('figcaption');
   const mosaic = document.createElement('span');
   const requests = [];
   mosaic.className = 'geo-layer-sample-mosaic';
 
   for (const item of tiles) {
-    const tile = createPmtilesTile({
+    const tile = createTile({
       source,
       tile: item.tile,
       minimumSourceZoom: header.minimumZoom,
@@ -57,10 +63,13 @@ function renderSample(sample, zoom, source, header) {
   return Promise.all(requests);
 }
 
-function loadArchive() {
+export function loadGeoArchive({
+  archiveFactory = createPmtilesArchiveSet,
+  sourceFactory = createPmtilesSource,
+} = {}) {
   if (!archiveRequest) {
-    archiveRequest = createPmtilesArchiveSet('/maps/local.json')
-      .catch(() => createPmtilesSource('/maps/local.pmtiles'))
+    archiveRequest = archiveFactory('/maps/local.json')
+      .catch(() => sourceFactory('/maps/local.pmtiles'))
       .then(async (source) => ({ header: await source.getHeader(), source }));
   }
   return archiveRequest;
@@ -73,7 +82,15 @@ export function revealFallbackSamples(root = document) {
   });
 }
 
-export async function initializeGeoLayerSamples(root = document) {
+export async function initializeGeoLayerSamples(
+  root = document,
+  {
+    getArchive = loadGeoArchive,
+    render = renderGeoLayerSample,
+    Observer = globalThis.IntersectionObserver,
+    search = globalThis.location?.search ?? '',
+  } = {},
+) {
   const tables = [
     ...(root.querySelectorAll?.('[data-centered-map-samples]') ?? []),
   ];
@@ -85,7 +102,7 @@ export async function initializeGeoLayerSamples(root = document) {
   samples.forEach((sample) => initializedSamples.add(sample));
   let archive;
   try {
-    archive = await loadArchive();
+    archive = await getArchive();
   } catch (error) {
     samples.forEach((sample) => initializedSamples.delete(sample));
     revealFallbackSamples(root);
@@ -94,22 +111,21 @@ export async function initializeGeoLayerSamples(root = document) {
   const { header, source } = archive;
   const load = (sample) => {
     const zoom = Number(sample.closest('tr')?.cells[0]?.textContent);
-    if (Number.isInteger(zoom))
-      return renderSample(sample, zoom, source, header);
+    if (Number.isInteger(zoom)) return render(sample, zoom, source, header);
     return Promise.resolve();
   };
 
-  if (new URLSearchParams(location.search).has('handbook-source')) {
+  if (new URLSearchParams(search).has('handbook-source')) {
     await Promise.all(samples.map(load));
     return;
   }
 
-  if (!('IntersectionObserver' in globalThis)) {
+  if (!Observer) {
     samples.forEach(load);
     return;
   }
 
-  const observer = new IntersectionObserver(
+  const observer = new Observer(
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
@@ -122,11 +138,21 @@ export async function initializeGeoLayerSamples(root = document) {
   samples.forEach((sample) => observer.observe(sample));
 }
 
-if (typeof document !== 'undefined') {
-  const request = initializeGeoLayerSamples().catch(() => {
+export function startGeoLayerSamples(
+  root = globalThis.document,
+  search = globalThis.location?.search ?? '',
+  initialize = initializeGeoLayerSamples,
+) {
+  if (!root) return null;
+  const request = initialize(root, { search }).catch(() => {
     // Deferred SVG samples remain available without the PMTiles archive.
   });
-  if (new URLSearchParams(location.search).has('handbook-source')) {
+  if (new URLSearchParams(search).has('handbook-source')) {
     globalThis.handbookPageReady = request;
   }
+  return request;
+}
+
+if (typeof document !== 'undefined') {
+  startGeoLayerSamples();
 }

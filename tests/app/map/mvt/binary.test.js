@@ -4,6 +4,10 @@ import { test } from 'node:test';
 import { decodeMvt } from '../../../../src/js/app/ui/content/geo/mvt/decode.js';
 import { decodeGeometry } from '../../../../src/js/app/ui/content/geo/mvt/geometry.js';
 import {
+  isMvtFeatureVisible,
+  renderMvt,
+} from '../../../../src/js/app/ui/content/geo/mvt/mvt-renderer.js';
+import {
   packedVarints,
   ProtobufReader,
 } from '../../../../src/js/app/ui/content/geo/mvt/protobuf.js';
@@ -65,6 +69,70 @@ function valueTile() {
   return new Uint8Array([...field(1, 0, [1]), ...bytesField(3, layer)]);
 }
 
+function feature(properties, type, geometry) {
+  const entries = Object.entries(properties);
+  const tags = entries.flatMap((_, index) => [index, index]);
+  return {
+    bytes: [
+      ...bytesField(2, tags),
+      ...field(3, 0, [type]),
+      ...bytesField(4, geometry),
+    ],
+    entries,
+  };
+}
+
+function layer(name, features) {
+  const entries = features.flatMap((item) => item.entries);
+  const keys = entries.map(([key]) => stringField(3, key));
+  const values = entries.map(([, value]) =>
+    bytesField(4, stringField(1, value)),
+  );
+  let entryOffset = 0;
+  const encodedFeatures = features.map((item) => {
+    const tags = item.entries.flatMap((_, index) => [
+      entryOffset + index,
+      entryOffset + index,
+    ]);
+    entryOffset += item.entries.length;
+    return bytesField(2, [
+      ...bytesField(2, tags),
+      ...item.bytes.slice(item.bytes.indexOf(24)),
+    ]);
+  });
+  return bytesField(3, [
+    ...stringField(1, name),
+    ...encodedFeatures.flat(),
+    ...keys.flat(),
+    ...values.flat(),
+  ]);
+}
+
+function renderedTile() {
+  const polygon = [9, 20, 20, 18, 20, 0, 0, 20, 15];
+  const line = [9, 20, 20, 10, 20, 0];
+  const point = [9, ...varint(400), ...varint(400)];
+  return new Uint8Array([
+    ...layer('land', [feature({}, 3, polygon)]),
+    ...layer('road', [
+      feature({ class: 'secondary' }, 2, line),
+      feature({ class: 'local' }, 2, line),
+    ]),
+    ...layer('boundary', [feature({ class: 'county' }, 2, line)]),
+    ...layer('waterway', [
+      feature({ class: 'major' }, 2, line),
+      feature({ class: 'local' }, 2, line),
+      feature({ class: 'reference' }, 2, line),
+    ]),
+    ...layer('place', [
+      feature({ name: 'Town', name_es: 'Pueblo' }, 1, point),
+      feature({ name: 'Overlap' }, 1, point),
+      feature({}, 1, point),
+      feature({ name: 'Missing point' }, 1, []),
+    ]),
+  ]);
+}
+
 test('reads every supported protobuf wire representation', () => {
   const floats = new Uint8Array([
     ...floatingBytes('setFloat32', 4, 1.25),
@@ -124,10 +192,60 @@ test('decodes all MVT property value types and ignores unknown fields', () => {
 });
 
 test('rejects unknown and truncated MVT geometry commands', () => {
+  assert.deepEqual(decodeGeometry([]), []);
   assert.throws(() => decodeGeometry([3]), /Unknown/);
   assert.throws(() => decodeGeometry([9, 2]), /Truncated/);
   assert.deepEqual(decodeGeometry([15]), []);
   assert.deepEqual(decodeGeometry([10, 2, 2]), [
     { points: [{ x: 1, y: 1 }], closed: false },
   ]);
+});
+
+test('renders styled geometry and localized non-overlapping labels', () => {
+  const originalDocument = globalThis.document;
+  const calls = [];
+  const context = {
+    canvas: { width: 256, height: 256 },
+    beginPath: () => calls.push('beginPath'),
+    moveTo: (...args) => calls.push(['moveTo', ...args]),
+    lineTo: (...args) => calls.push(['lineTo', ...args]),
+    closePath: () => calls.push('closePath'),
+    clearRect: () => calls.push('clearRect'),
+    fill: (...args) => calls.push(['fill', ...args]),
+    stroke: () => calls.push('stroke'),
+    arc: (...args) => calls.push(['arc', ...args]),
+    measureText: (text) => ({ width: text.length * 4 }),
+    strokeText: (...args) => calls.push(['strokeText', ...args]),
+    fillText: (...args) => calls.push(['fillText', ...args]),
+  };
+  const canvas = { width: 256, height: 256, getContext: () => context };
+  globalThis.document = { documentElement: { lang: 'es-MX' } };
+  try {
+    const layers = renderMvt(renderedTile(), canvas, {
+      zoom: 10,
+      viewport: { zoom: 10, x: 300, y: 400 },
+    });
+    assert.equal(layers.length, 5);
+    assert.equal(calls.includes('closePath'), true);
+    assert.equal(
+      calls.some((call) => call[0] === 'fill'),
+      true,
+    );
+    assert.equal(calls.includes('stroke'), true);
+    assert.equal(
+      calls.some((call) => call[0] === 'fillText' && call[1] === 'Pueblo'),
+      true,
+    );
+    assert.equal(calls.filter((call) => call[0] === 'fillText').length, 1);
+    assert.equal(
+      isMvtFeatureVisible(
+        'waterway',
+        { class: 'reference' },
+        { zoom: 10, x: 289, y: 391 },
+      ),
+      false,
+    );
+  } finally {
+    globalThis.document = originalDocument;
+  }
 });

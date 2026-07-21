@@ -156,4 +156,13 @@ describe('PDF object builders', () => {
       },
     );
   });
+
+  test('uses the default print width and fits multiple cells', () => {
+    const layout = getPdfSheetLayout([
+      { width: 100, height: 50, printWidthInches: 0 },
+    ]);
+    assert.equal(layout.columns > 1, true);
+    assert.equal(layout.rows > 1, true);
+    assert.equal(layout.framesPerPage, layout.columns * layout.rows);
+  });
 });
