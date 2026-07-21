@@ -15,11 +15,17 @@ export function getHandbookCopy() {
     cancel: lookup('info.handbook.cancel', 'Cancel'),
     creatingPdf: lookup(
       'info.handbook.creatingPdf',
-      'Creating PDF handbook...',
+      'Preparing handbook for PDF printing...',
     ),
     creatingEpub: lookup(
       'info.handbook.creatingEpub',
       'Creating EPUB handbook...',
     ),
+    sections: {
+      content: lookup('navigation.content', 'Content'),
+      style: lookup('navigation.style', 'Style'),
+      download: lookup('navigation.download', 'Download'),
+      debug: lookup('navigation.debug', 'Debug'),
+    },
   };
 }

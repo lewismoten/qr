@@ -8,7 +8,7 @@
     "epub": "下载 ePub",
     "failed": "无法创建手册。",
     "cancel": "取消",
-    "creatingPdf": "正在创建 PDF 手册...",
+    "creatingPdf": "正在准备手册以打印为 PDF...",
     "creatingEpub": "正在创建 EPUB 手册..."
   },
   "guides": {

@@ -8,7 +8,7 @@
     "epub": "تنزيل ePub",
     "failed": "تعذّر إنشاء الدليل.",
     "cancel": "إلغاء",
-    "creatingPdf": "جارٍ إنشاء دليل PDF...",
+    "creatingPdf": "جارٍ إعداد الدليل للطباعة بصيغة PDF...",
     "creatingEpub": "جارٍ إنشاء دليل EPUB..."
   },
   "guides": {

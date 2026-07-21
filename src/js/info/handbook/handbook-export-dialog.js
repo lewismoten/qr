@@ -141,15 +141,22 @@ function createController(document, locale) {
         format === 'pdf'
           ? await import('./handbook-pdf.js')
           : await import('./epub.js');
-      const create =
-        format === 'pdf' ? module.createHandbookPdf : module.createHandbookEpub;
-      const blob = await create(locale, {
+      const options = {
         signal: task.signal,
         onProgress: (fraction) => task.update(fraction, phase),
-      });
+      };
+      if (format === 'pdf') {
+        const print = await module.prepareHandbookPdfPrint(locale, options);
+        throwIfAborted(task.signal);
+        task.update(1, phase);
+        print();
+      } else {
+        const blob = await module.createHandbookEpub(locale, options);
+        throwIfAborted(task.signal);
+        task.update(1, phase);
+        download(document, blob, `qr-handbook-${locale}.${format}`);
+      }
       throwIfAborted(task.signal);
-      task.update(1, phase);
-      download(document, blob, `qr-handbook-${locale}.${format}`);
       completed = true;
     } catch (error) {
       if (!isAbortError(error)) {

@@ -8,7 +8,7 @@
     "epub": "Download ePub",
     "failed": "The handbook could not be created.",
     "cancel": "Cancel",
-    "creatingPdf": "Creating PDF handbook...",
+    "creatingPdf": "Preparing handbook for PDF printing...",
     "creatingEpub": "Creating EPUB handbook..."
   },
   "guides": {

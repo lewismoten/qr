@@ -9,6 +9,10 @@ import {
   MEDIA_TYPE_XHTML,
 } from '../../app/media-types.js';
 import { getHandbookCopy } from './copy.js';
+import {
+  buildHandbookOutline,
+  prepareHandbookPages,
+} from './document-model.js';
 import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
 import { loadHandbookPages } from './pages.js';
 
@@ -74,25 +78,40 @@ function chapterXhtml(page, index, locale) {
     `<html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}" ` +
     `dir="${direction}"><head><title>${title}</title>` +
     '<link rel="stylesheet" href="styles.css" /></head><body>' +
-    `<section id="chapter-${index + 1}"><h1>${title}</h1>` +
+    `<section id="${page.chapterId}"><h1>${title}</h1>` +
     `${serializeContent(page.content)}</section></body></html>`
   );
 }
 
-function navigation(pages, locale, copy) {
-  const items = pages.map((page, index) => {
+function navigationItems(nodes, chapterNames) {
+  const items = nodes.map((node) => {
+    if (node.page) {
+      const name = chapterNames.get(node.page);
+      return (
+        `<li><a href="${name}#${node.page.chapterId}">` +
+        `${escapeXml(node.title)}</a></li>`
+      );
+    }
     return (
-      `<li><a href="chapter-${index + 1}.xhtml">` +
-      `${escapeXml(page.title)}</a></li>`
+      `<li><span>${escapeXml(node.title)}</span>` +
+      `${navigationItems(node.children, chapterNames)}</li>`
     );
   });
+  return `<ol>${items.join('')}</ol>`;
+}
+
+function navigation(pages, locale, copy, chapterNames) {
+  const items = navigationItems(
+    buildHandbookOutline(pages, copy.sections),
+    chapterNames,
+  );
   return (
     '<?xml version="1.0" encoding="UTF-8"?>' +
     `<html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}">` +
     `<head><title>${escapeXml(copy.contents)}</title></head><body>` +
     '<nav epub:type="toc" xmlns:epub="http://www.idpf.org/2007/ops">' +
-    `<h1>${escapeXml(copy.contents)}</h1><ol>` +
-    `${items.join('')}</ol></nav></body></html>`
+    `<h1>${escapeXml(copy.contents)}</h1>${items}` +
+    '</nav></body></html>'
   );
 }
 
@@ -161,6 +180,10 @@ export async function createHandbookEpub(
     },
   });
   throwIfAborted(signal);
+  const chapterNames = new Map(
+    pages.map((page, index) => [page, `chapter-${index + 1}.xhtml`]),
+  );
+  prepareHandbookPages(pages, (page) => chapterNames.get(page));
   const assets = extractImages(pages, signal);
   const identifier = `urn:uuid:${crypto.randomUUID()}`;
   const files = [
@@ -181,7 +204,10 @@ export async function createHandbookEpub(
     },
     {
       name: 'EPUB/nav.xhtml',
-      blob: textBlob(navigation(pages, locale, copy), MEDIA_TYPE_XHTML),
+      blob: textBlob(
+        navigation(pages, locale, copy, chapterNames),
+        MEDIA_TYPE_XHTML,
+      ),
     },
     { name: 'EPUB/styles.css', blob: textBlob(EPUB_CSS, MEDIA_TYPE_CSS) },
     ...pages.map((page, index) => ({

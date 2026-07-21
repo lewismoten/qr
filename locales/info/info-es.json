@@ -8,7 +8,7 @@
     "epub": "Descargar ePub",
     "failed": "No se pudo crear el manual.",
     "cancel": "Cancelar",
-    "creatingPdf": "Creando el manual en PDF...",
+    "creatingPdf": "Preparando el manual para imprimirlo como PDF...",
     "creatingEpub": "Creando el manual en EPUB..."
   },
   "guides": {

@@ -1,296 +1,170 @@
 import { throwIfAborted, waitFor } from '../../app/abort.js';
-import { COLOR_WHITE } from '../../app/colors.js';
-import { capturePdfFrame, createPdfSheetBlob } from '../../app/export/pdf.js';
-import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
+import {
+  buildHandbookOutline,
+  prepareHandbookPages,
+} from './document-model.js';
 import { getHandbookCopy } from './copy.js';
 import { loadHandbookPages } from './pages.js';
 
-const PAGE_WIDTH_PIXELS = 816;
-const PAGE_HEIGHT_PIXELS = 1056;
-const PAGE_MARGIN_PIXELS = 58;
-const BODY_FONT_PIXELS = 16;
-const BODY_LINE_HEIGHT_PIXELS = 24;
-const HEADING_FONT_PIXELS = 24;
-const HEADING_LINE_HEIGHT_PIXELS = 32;
-const CHAPTER_FONT_PIXELS = 30;
-const CHAPTER_LINE_HEIGHT_PIXELS = 40;
-const BLOCK_GAP_PIXELS = 10;
-const MAXIMUM_VISUAL_HEIGHT_PIXELS = 420;
-const PRINT_WIDTH_INCHES = 7.5;
-const JPEG_QUALITY = 0.78;
-const LOAD_PROGRESS_WEIGHT = 0.6;
-const RENDER_PROGRESS_WEIGHT = 0.25;
-const CAPTURE_PROGRESS_WEIGHT = 0.15;
-const YIELD_BLOCK_INTERVAL = 20;
-const BLOCK_SELECTOR = 'h1,h2,h3,h4,p,li,pre,figcaption,dt,dd,th,td,img,svg';
+const LOAD_PROGRESS_WEIGHT = 0.9;
+const COMPOSE_PROGRESS = 0.95;
+const PRINT_FRAME_LIFETIME_MS = 60_000;
 
-function createPage(document, locale) {
-  const canvas = document.createElement('canvas');
-  canvas.width = PAGE_WIDTH_PIXELS;
-  canvas.height = PAGE_HEIGHT_PIXELS;
-  const context = canvas.getContext('2d');
-  context.fillStyle = COLOR_WHITE;
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = HANDBOOK_TEXT_COLOR;
-  context.textBaseline = 'top';
-  context.direction = locale === 'ar' ? 'rtl' : 'ltr';
-  context.textAlign = locale === 'ar' ? 'right' : 'left';
-  return { canvas, context, y: PAGE_MARGIN_PIXELS };
+const PRINT_CSS = `
+@page { size: letter; margin: 0.65in; }
+html { color: #172033; font: 11pt/1.5 Georgia, serif; }
+body { margin: 0; }
+a { color: #075985; text-decoration: underline; }
+h1, h2, h3, h4 { font-family: Arial, sans-serif; break-after: avoid; }
+img, svg { max-width: 100%; height: auto; break-inside: avoid; }
+pre, code { font-family: monospace; white-space: pre-wrap; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.25rem; border: 1px solid #94a3b8; }
+button, input, select, textarea, dialog, footer, nav:not(.handbook-toc) {
+  display: none !important;
 }
+.handbook-title { margin-bottom: 0.2in; }
+.handbook-toc ol { margin: 0.15rem 0; padding-inline-start: 1.4rem; }
+.handbook-toc > ol { padding-inline-start: 1.1rem; }
+.handbook-toc li { margin: 0.12rem 0; }
+.handbook-toc-group { font-weight: 700; }
+.handbook-chapter { break-before: page; }
+.handbook-chapter > h1 { margin-top: 0; }
+`;
 
-function textSegments(text, locale) {
-  if (globalThis.Intl?.Segmenter) {
-    const segmenter = new Intl.Segmenter(locale, { granularity: 'word' });
-    return [...segmenter.segment(text)].map(({ segment }) => segment);
-  }
-  return /\s/.test(text) ? text.split(/(\s+)/) : [...text];
-}
-
-function wrapText(context, text, width, locale) {
-  const lines = [];
-  let line = '';
-  for (const segment of textSegments(text, locale)) {
-    const candidate = line + segment;
-    if (line && context.measureText(candidate).width > width) {
-      lines.push(line.trim());
-      line = segment.trimStart();
+function appendOutline(document, parent, nodes) {
+  const list = document.createElement('ol');
+  nodes.forEach((node) => {
+    const item = document.createElement('li');
+    if (node.page) {
+      const link = document.createElement('a');
+      link.href = `#${node.page.chapterId}`;
+      link.textContent = node.title;
+      item.append(link);
     } else {
-      line = candidate;
+      const label = document.createElement('span');
+      label.className = 'handbook-toc-group';
+      label.textContent = node.title;
+      item.append(label);
+      appendOutline(document, item, node.children);
     }
-  }
-  if (line.trim()) lines.push(line.trim());
-  return lines.length ? lines : [''];
-}
-
-function blockStyle(element) {
-  if (element.matches('h1')) {
-    return {
-      font: `700 ${CHAPTER_FONT_PIXELS}px Georgia, serif`,
-      lineHeight: CHAPTER_LINE_HEIGHT_PIXELS,
-    };
-  }
-  if (element.matches('h2, h3, h4')) {
-    return {
-      font: `700 ${HEADING_FONT_PIXELS}px Georgia, serif`,
-      lineHeight: HEADING_LINE_HEIGHT_PIXELS,
-    };
-  }
-  if (element.matches('pre')) {
-    return {
-      font: `${BODY_FONT_PIXELS - 2}px monospace`,
-      lineHeight: BODY_LINE_HEIGHT_PIXELS,
-    };
-  }
-  return {
-    font: `${BODY_FONT_PIXELS}px Georgia, serif`,
-    lineHeight: BODY_LINE_HEIGHT_PIXELS,
-  };
-}
-
-function readableBlocks(page) {
-  return [...page.content.querySelectorAll(BLOCK_SELECTOR)].filter(
-    (element) => {
-      if (element.querySelector(BLOCK_SELECTOR)) return false;
-      if (element.matches('img, svg')) return true;
-      return element.textContent.trim();
-    },
-  );
-}
-
-function visualSource(element) {
-  if (element.matches('img')) {
-    return element.src.startsWith('data:') ? element.src : null;
-  }
-  const source = new XMLSerializer().serializeToString(element);
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(source)}`;
-}
-
-function loadVisual(element, signal) {
-  const source = visualSource(element);
-  if (!source) return Promise.resolve(null);
-  return new Promise((resolve, reject) => {
-    throwIfAborted(signal);
-    const image = new Image();
-    const cleanup = () => signal?.removeEventListener('abort', cancel);
-    const cancel = () => {
-      cleanup();
-      try {
-        throwIfAborted(signal);
-      } catch (error) {
-        reject(error);
-      }
-    };
-    image.addEventListener(
-      'load',
-      () => {
-        cleanup();
-        resolve(image);
-      },
-      { once: true },
-    );
-    image.addEventListener(
-      'error',
-      () => {
-        cleanup();
-        resolve(null);
-      },
-      { once: true },
-    );
-    signal?.addEventListener('abort', cancel, { once: true });
-    image.src = source;
+    list.append(item);
   });
+  parent.append(list);
 }
 
-async function drawVisual(page, element, locale, signal, output) {
-  const image = await loadVisual(element, signal);
-  if (!image || !image.naturalWidth || !image.naturalHeight) return page;
-  const maximumWidth = PAGE_WIDTH_PIXELS - PAGE_MARGIN_PIXELS * 2;
-  const scale = Math.min(
-    maximumWidth / image.naturalWidth,
-    MAXIMUM_VISUAL_HEIGHT_PIXELS / image.naturalHeight,
-    1,
+function appendContents(document, body, pages, copy) {
+  const title = document.createElement('h1');
+  title.className = 'handbook-title';
+  title.textContent = copy.title;
+  const navigation = document.createElement('nav');
+  navigation.className = 'handbook-toc';
+  navigation.setAttribute('aria-label', copy.contents);
+  const heading = document.createElement('h2');
+  heading.textContent = copy.contents;
+  navigation.append(heading);
+  appendOutline(
+    document,
+    navigation,
+    buildHandbookOutline(pages, copy.sections),
   );
-  const width = image.naturalWidth * scale;
-  const height = image.naturalHeight * scale;
-  if (needsPage(page, height)) {
-    page = createPage(document, locale);
-    output.push(page.canvas);
-  }
-  const x =
-    locale === 'ar'
-      ? PAGE_WIDTH_PIXELS - PAGE_MARGIN_PIXELS - width
-      : PAGE_MARGIN_PIXELS;
-  page.context.drawImage(image, x, page.y, width, height);
-  page.y += height + BLOCK_GAP_PIXELS;
-  return page;
+  body.append(title, navigation);
 }
 
-function drawLine(page, line, lineHeight, locale) {
-  const x =
-    locale === 'ar'
-      ? PAGE_WIDTH_PIXELS - PAGE_MARGIN_PIXELS
-      : PAGE_MARGIN_PIXELS;
-  page.context.fillText(line, x, page.y);
-  page.y += lineHeight;
-}
-
-function needsPage(page, lineHeight) {
-  return page.y + lineHeight > PAGE_HEIGHT_PIXELS - PAGE_MARGIN_PIXELS;
-}
-
-function drawWrappedText(page, text, style, locale, output) {
-  page.context.font = style.font;
-  const width = PAGE_WIDTH_PIXELS - PAGE_MARGIN_PIXELS * 2;
-  for (const line of wrapText(page.context, text, width, locale)) {
-    if (needsPage(page, style.lineHeight)) {
-      page = createPage(document, locale);
-      page.context.font = style.font;
-      output.push(page.canvas);
-    }
-    drawLine(page, line, style.lineHeight, locale);
-  }
-  page.y += BLOCK_GAP_PIXELS;
-  return page;
-}
-
-function renderContents(pages, locale, output) {
-  const copy = getHandbookCopy(locale);
-  let page = createPage(document, locale);
-  output.push(page.canvas);
-  page = drawWrappedText(
-    page,
-    copy.title,
-    {
-      font: `700 ${CHAPTER_FONT_PIXELS}px Georgia, serif`,
-      lineHeight: CHAPTER_LINE_HEIGHT_PIXELS,
-    },
-    locale,
-    output,
-  );
-  page = drawWrappedText(
-    page,
-    copy.contents,
-    {
-      font: `700 ${HEADING_FONT_PIXELS}px Georgia, serif`,
-      lineHeight: HEADING_LINE_HEIGHT_PIXELS,
-    },
-    locale,
-    output,
-  );
-  pages.forEach((chapter, index) => {
-    page = drawWrappedText(
-      page,
-      `${index + 1}. ${chapter.title}`,
-      {
-        font: `${BODY_FONT_PIXELS}px Georgia, serif`,
-        lineHeight: BODY_LINE_HEIGHT_PIXELS,
-      },
-      locale,
-      output,
-    );
-  });
-}
-
-async function renderPages(pages, locale, signal, onProgress) {
-  const output = [];
-  renderContents(pages, locale, output);
-  let current = createPage(document, locale);
-  output.push(current.canvas);
-  const totalBlocks = pages.reduce(
-    (total, page) => total + readableBlocks(page).length + 1,
-    0,
-  );
-  let completedBlocks = 0;
-
-  for (const chapter of pages) {
+function appendChapters(document, body, pages) {
+  pages.forEach((page) => {
+    const chapter = document.createElement('section');
+    chapter.className = 'handbook-chapter';
+    chapter.id = page.chapterId;
     const heading = document.createElement('h1');
-    heading.textContent = chapter.title;
-    const blocks = [heading, ...readableBlocks(chapter)];
-    for (const block of blocks) {
-      throwIfAborted(signal);
-      if (block.matches('img, svg')) {
-        current = await drawVisual(current, block, locale, signal, output);
-        completedBlocks += 1;
-        onProgress(completedBlocks / totalBlocks);
-        continue;
-      }
-      const style = blockStyle(block);
-      const text = block.textContent.replace(/\s+/g, ' ').trim();
-      current = drawWrappedText(current, text, style, locale, output);
-      completedBlocks += 1;
-      onProgress(completedBlocks / totalBlocks);
-      if (completedBlocks % YIELD_BLOCK_INTERVAL === 0) {
-        await waitFor(0, signal);
-      }
+    heading.textContent = page.title;
+    const content = document.importNode(page.content, true);
+    const originalHeading = content.querySelector('h1, h2');
+    if (originalHeading?.textContent.trim() === page.title) {
+      originalHeading.remove();
     }
-  }
-  return output;
+    chapter.append(heading, content);
+    body.append(chapter);
+  });
 }
 
-export async function createHandbookPdf(
+function createPrintFrame(locale, pages, copy) {
+  const frame = document.createElement('iframe');
+  frame.title = copy.title;
+  frame.setAttribute('aria-hidden', 'true');
+  Object.assign(frame.style, {
+    position: 'fixed',
+    inset: 'auto 0 0 auto',
+    width: '1px',
+    height: '1px',
+    border: '0',
+    opacity: '0',
+    pointerEvents: 'none',
+  });
+  document.body.append(frame);
+  const printDocument = frame.contentDocument;
+  printDocument.documentElement.lang = locale;
+  printDocument.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const metadata = printDocument.createElement('meta');
+  metadata.charset = 'utf-8';
+  const title = printDocument.createElement('title');
+  title.textContent = copy.title;
+  const style = printDocument.createElement('style');
+  style.textContent = PRINT_CSS;
+  printDocument.head.replaceChildren(metadata, title, style);
+  printDocument.body.replaceChildren();
+  appendContents(printDocument, printDocument.body, pages, copy);
+  appendChapters(printDocument, printDocument.body, pages);
+  return frame;
+}
+
+async function settlePrintFrame(frame, signal) {
+  const printDocument = frame.contentDocument;
+  await Promise.all(
+    [...printDocument.images].map((image) => {
+      if (image.complete) return Promise.resolve();
+      return image.decode?.().catch(() => {}) || Promise.resolve();
+    }),
+  );
+  await printDocument.fonts?.ready;
+  throwIfAborted(signal);
+  await waitFor(0, signal);
+}
+
+function printAndScheduleRemoval(frame) {
+  const printWindow = frame.contentWindow;
+  if (!printWindow) throw new Error('The print frame is unavailable.');
+  let removed = false;
+  const remove = () => {
+    if (removed) return;
+    removed = true;
+    frame.remove();
+  };
+  printWindow.addEventListener('afterprint', remove, { once: true });
+  setTimeout(remove, PRINT_FRAME_LIFETIME_MS);
+  printWindow.focus();
+  printWindow.print();
+}
+
+export async function prepareHandbookPdfPrint(
   locale,
   { signal, onProgress = () => {} } = {},
 ) {
+  const copy = getHandbookCopy(locale);
   const pages = await loadHandbookPages(locale, undefined, {
     signal,
     onProgress: (fraction) => onProgress(fraction * LOAD_PROGRESS_WEIGHT),
   });
-  const canvases = await renderPages(pages, locale, signal, (fraction) => {
-    onProgress(LOAD_PROGRESS_WEIGHT + fraction * RENDER_PROGRESS_WEIGHT);
-  });
-  const frames = [];
-  for (const [index, canvas] of canvases.entries()) {
-    throwIfAborted(signal);
-    frames.push(
-      await capturePdfFrame(canvas, JPEG_QUALITY, PRINT_WIDTH_INCHES),
-    );
-    onProgress(
-      LOAD_PROGRESS_WEIGHT +
-        RENDER_PROGRESS_WEIGHT +
-        ((index + 1) / canvases.length) * CAPTURE_PROGRESS_WEIGHT,
-    );
-    await waitFor(0, signal);
-  }
   throwIfAborted(signal);
-  return createPdfSheetBlob(frames);
+  prepareHandbookPages(pages);
+  const frame = createPrintFrame(locale, pages, copy);
+  onProgress(COMPOSE_PROGRESS);
+  try {
+    await settlePrintFrame(frame, signal);
+  } catch (error) {
+    frame.remove();
+    throw error;
+  }
+  onProgress(1);
+  return () => printAndScheduleRemoval(frame);
 }
