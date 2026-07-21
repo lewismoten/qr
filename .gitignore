@@ -4,3 +4,4 @@ benchmark-results/
 dist/
 build/
 .cache/
+/scripts/one-time/

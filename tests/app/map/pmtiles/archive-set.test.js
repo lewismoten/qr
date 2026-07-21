@@ -36,6 +36,34 @@ test('selects a tile from a deeper four-by-four archive grid', () => {
   assert.equal(findArchiveForTile(archives, 13, 8191, 8191).shard, 'grid-15');
 });
 
+test('prefers regional detail over an overlapping consolidated world pack', () => {
+  const archives = [
+    {
+      minimumZoom: 1,
+      maximumZoom: 13,
+      file: 'world.pmtiles',
+    },
+    {
+      minimumZoom: 13,
+      maximumZoom: 16,
+      shard: 'detail',
+      shardGrid: 2,
+      shardColumn: 0,
+      shardRow: 0,
+      file: 'detail.pmtiles',
+    },
+  ];
+
+  assert.equal(
+    findArchiveForTile(archives, 13, 100, 100).file,
+    'detail.pmtiles',
+  );
+  assert.equal(
+    findArchiveForTile(archives, 13, 8000, 8000).file,
+    'world.pmtiles',
+  );
+});
+
 test('routes zooms across a budgeted PMTiles archive set', async () => {
   const requests = [];
   const manifest = {
