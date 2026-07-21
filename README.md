@@ -32,10 +32,10 @@ that file rather than embedding the encoder in a hashed application chunk. It
 can also be downloaded or imported independently:
 
 ```js
-import QRCode, { create } from "./dist/qr.min.js";
+import QRCode, { create } from './dist/qr.min.js';
 
-const qr = create("https://qr.lewismoten.com");
-const sameQr = QRCode.create("https://qr.lewismoten.com");
+const qr = create('https://qr.lewismoten.com');
+const sameQr = QRCode.create('https://qr.lewismoten.com');
 ```
 
 During development, rebuild automatically when JavaScript or CSS changes:
@@ -73,10 +73,12 @@ localized HTML page, every lazy JavaScript entry and chunk, CSS, PMTiles tile
 ranges, individual map archives, and the total map set. Shared JavaScript chunks
 are counted once per route.
 
-The universal transfer target is 64 KiB. Current hard regression ceilings live
-in `config/asset-budgets.json`; known target misses remain visible in every
-report even when they are inside those temporary ceilings. Lower the ceilings
-as assets are optimized rather than raising them to hide regressions.
+The universal raw-payload target is 64 KiB. The report separately estimates
+Brotli transfer size and aggregates every cold-start request, including locale
+files, the controller graph, shared chunks, and the QR library. Current hard
+regression ceilings live in `config/asset-budgets.json`; known target misses
+remain visible even when inside those temporary ceilings. Lower the ceilings as
+assets are optimized rather than raising them to hide regressions.
 
 Authored JavaScript and Markdown files are limited to 300 physical lines.
 Authored JavaScript also uses an 80-column target. URLs, regular expressions,

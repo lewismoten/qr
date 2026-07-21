@@ -1,9 +1,12 @@
 {
-  "targetTransferKiB": 64,
+  "targetRawKiB": 64,
   "limits": {
-    "initialRouteTransferKiB": 64,
+    "initialRouteRawKiB": 300,
+    "initialRouteTransferKiB": 84,
+    "htmlRouteRawKiB": 300,
     "htmlRouteTransferKiB": 64,
-    "appRouteTransferKiB": 72,
+    "appRouteRawKiB": 384,
+    "appRouteTransferKiB": 96,
     "initialJavaScriptRawKiB": 64,
     "lazyJavaScriptEntryTransferKiB": 64,
     "lazyJavaScriptChunkRawKiB": 64,
@@ -14,15 +17,16 @@
     "mapArchiveMiB": 32,
     "mapTotalMiB": 3400
   },
+  "startupFiles": [
+    "build/site/index.html",
+    "dist/app.min.css",
+    "src/assets/favicon.ico",
+    "build/locales/manifest.json",
+    "build/locales/en-US.json"
+  ],
   "appRoutes": {
-    "content/data": [
-      "src/js/main.js",
-      "src/js/app/app-controller.js"
-    ],
-    "content/format": [
-      "src/js/main.js",
-      "src/js/app/app-controller.js"
-    ],
+    "content/data": ["src/js/main.js", "src/js/app/app-controller.js"],
+    "content/format": ["src/js/main.js", "src/js/app/app-controller.js"],
     "content/frame": [
       "src/js/main.js",
       "src/js/app/app-controller.js",

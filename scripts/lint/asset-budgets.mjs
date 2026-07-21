@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { brotliCompressSync, constants } from 'node:zlib';
 import {
   measureAppRoutes,
+  measureHtmlRoutes,
   measureJavaScriptEntries,
 } from './asset-budget-graph.mjs';
 import { printAssetBudgetReport } from './asset-budget-output.mjs';
@@ -62,29 +63,6 @@ function createFileMeasurer() {
   };
 }
 
-function localHtmlReferences(source) {
-  const references = new Set();
-  const patterns = [
-    /<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi,
-    /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi,
-    /<link\b[^>]*\b(?:href)=["']([^"']+)["'][^>]*>/gi,
-  ];
-  for (const pattern of patterns) {
-    for (const match of source.matchAll(pattern)) references.add(match[1]);
-  }
-  return [...references].filter((reference) => {
-    return !/^(?:[a-z]+:|\/\/|#)/i.test(reference);
-  });
-}
-
-function resolveRouteAsset(siteRoot, htmlFile, reference) {
-  const clean = reference.split(/[?#]/)[0];
-  if (!clean) return null;
-  return clean.startsWith('/')
-    ? path.join(siteRoot, clean.slice(1))
-    : path.resolve(path.dirname(htmlFile), clean);
-}
-
 async function measureFiles(files, measureFile) {
   const unique = [...new Set(files)];
   const sizes = await Promise.all(unique.map(measureFile));
@@ -94,40 +72,6 @@ async function measureFiles(files, measureFile) {
       transfer: total.transfer + size.transfer,
     }),
     { raw: 0, transfer: 0 },
-  );
-}
-
-async function existingFiles(files) {
-  const results = await Promise.all(
-    files.map(async (file) => {
-      return stat(file)
-        .then(() => file)
-        .catch((error) => {
-          if (error.code === 'ENOENT') return null;
-          throw error;
-        });
-    }),
-  );
-  return results.filter(Boolean);
-}
-
-async function measureHtmlRoutes(siteRoot, measureFile) {
-  const htmlFiles = await findFiles(siteRoot, '.html');
-  return Promise.all(
-    htmlFiles.map(async (file) => {
-      const source = await readFile(file, 'utf8');
-      const assets = localHtmlReferences(source)
-        .map((reference) => resolveRouteAsset(siteRoot, file, reference))
-        .filter(Boolean);
-      if (path.relative(siteRoot, file) === 'index.html') {
-        assets.push(path.join(siteRoot, 'dist/app.min.js'));
-      }
-      const availableAssets = await existingFiles(assets);
-      return {
-        name: path.relative(siteRoot, file),
-        ...(await measureFiles([file, ...availableAssets], measureFile)),
-      };
-    }),
   );
 }
 
@@ -184,24 +128,32 @@ export async function evaluateAssetBudgets({
 } = {}) {
   const config = await readJson(configFile);
   const measureFile = createFileMeasurer();
+  const measureOutputFiles = (files) => measureFiles(files, measureFile);
   const checks = [];
-  const routes = await measureHtmlRoutes(siteRoot, measureFile);
+  const routes = await measureHtmlRoutes({
+    siteRoot,
+    findFiles,
+    measureFiles: measureOutputFiles,
+  });
   for (const route of routes) {
-    const initial = route.name === 'index.html';
-    const limit = initial
-      ? config.limits.initialRouteTransferKiB
-      : config.limits.htmlRouteTransferKiB;
+    if (route.name === 'index.html') continue;
     addCheck(
       checks,
-      initial ? 'initial route' : 'HTML route',
+      'HTML route raw',
+      route.name,
+      route.raw,
+      config.limits.htmlRouteRawKiB * KIBIBYTE,
+    );
+    addCheck(
+      checks,
+      'HTML route transfer',
       route.name,
       route.transfer,
-      limit * KIBIBYTE,
+      config.limits.htmlRouteTransferKiB * KIBIBYTE,
     );
   }
 
   const metadata = await readJson(metafile);
-  const measureOutputFiles = (files) => measureFiles(files, measureFile);
   const entries = await measureJavaScriptEntries(metadata, measureOutputFiles);
   for (const entry of entries) {
     const initial = entry.file === 'dist/app.min.js';
@@ -219,18 +171,40 @@ export async function evaluateAssetBudgets({
   const appRoutes = await measureAppRoutes({
     routes: config.appRoutes,
     entries,
-    baseFiles: [path.join(siteRoot, 'index.html'), 'dist/app.min.css'],
+    baseFiles: config.startupFiles,
     measureFiles: measureOutputFiles,
   });
   for (const route of appRoutes) {
     addCheck(
       checks,
-      'application route',
+      'application route raw',
+      route.name,
+      route.raw,
+      config.limits.appRouteRawKiB * KIBIBYTE,
+    );
+    addCheck(
+      checks,
+      'application route transfer',
       route.name,
       route.transfer,
       config.limits.appRouteTransferKiB * KIBIBYTE,
     );
   }
+  const startup = appRoutes.find(({ name }) => name === 'content/data');
+  addCheck(
+    checks,
+    'initial route raw',
+    'index.html cold startup',
+    startup.raw,
+    config.limits.initialRouteRawKiB * KIBIBYTE,
+  );
+  addCheck(
+    checks,
+    'initial route transfer',
+    'index.html cold startup',
+    startup.transfer,
+    config.limits.initialRouteTransferKiB * KIBIBYTE,
+  );
 
   const chunks = await findFiles('dist/chunks', '.js');
   for (const file of chunks) {
@@ -256,14 +230,20 @@ export async function evaluateAssetBudgets({
     );
   }
   const maps = await addMapChecks(checks, config);
-  const target = config.targetTransferKiB * KIBIBYTE;
+  const target = config.targetRawKiB * KIBIBYTE;
   const targetMisses = [
-    ...routes.map(({ name, transfer }) => ({ name, bytes: transfer })),
-    ...entries.map(({ name, transfer }) => ({ name, bytes: transfer })),
-    ...appRoutes.map(({ name, transfer }) => ({ name, bytes: transfer })),
+    ...routes.map(({ name, raw }) => ({ name, bytes: raw })),
+    ...entries.map(({ name, raw }) => ({ name, bytes: raw })),
+    ...appRoutes.map(({ name, raw }) => ({ name, bytes: raw })),
     ...maps.targetMisses,
   ].filter(({ bytes }) => bytes > target);
-  return { checks, target, targetMisses, mapsAvailable: maps.available };
+  return {
+    checks,
+    target,
+    targetMisses,
+    startup,
+    mapsAvailable: maps.available,
+  };
 }
 
 const currentFile = fileURLToPath(import.meta.url);

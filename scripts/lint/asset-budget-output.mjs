@@ -17,7 +17,12 @@ export function printAssetBudgetReport(report) {
       `${report.checks.length} enforced checks pass.`,
   );
   console.log(
-    `64 KiB transfer target: ${report.targetMisses.length} paths remain over.`,
+    `64 KiB raw target: ${report.targetMisses.length} paths remain over.`,
+  );
+  console.log(
+    `Cold startup (${report.startup.files.length} resources): ` +
+      `${formatBytes(report.startup.raw)} raw; ` +
+      `${formatBytes(report.startup.transfer)} Brotli.`,
   );
   largestMisses.forEach(({ name, bytes }) => {
     console.log(`  ${formatBytes(bytes)}  ${name}`);

@@ -82,6 +82,23 @@ test('every application tab and subtab has a configured route budget', async () 
   assert.deepEqual(missing, []);
 });
 
+test('cold-start budget includes independently requested assets', async () => {
+  const config = JSON.parse(
+    await readFile('config/asset-budgets.json', 'utf8'),
+  );
+  assert.deepEqual(config.startupFiles, [
+    'build/site/index.html',
+    'dist/app.min.css',
+    'src/assets/favicon.ico',
+    'build/locales/manifest.json',
+    'build/locales/en-US.json',
+  ]);
+  assert.deepEqual(config.appRoutes['content/data'], [
+    'src/js/main.js',
+    'src/js/app/app-controller.js',
+  ]);
+});
+
 test('route budgets reject missing entry points', async () => {
   await assert.rejects(
     () =>
