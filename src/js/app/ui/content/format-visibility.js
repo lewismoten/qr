@@ -11,6 +11,12 @@ export function createFormatVisibility({
   return function sync() {
     syncBulk();
     const format = e.format.value;
+    const formatButton = document.querySelector(
+      `[data-choice-target="qr-format"]` + `[data-choice-value="${format}"]`,
+    );
+    if (formatButton && e.dataTab) {
+      e.dataTab.dataset.formatEmoji = formatButton.dataset.formatEmoji;
+    }
     void prepareFormat(format)
       .then(() => {
         syncFile();

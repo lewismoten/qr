@@ -87,6 +87,14 @@
   opacity: 0.5;
 }
 
+.choice-button[data-format-emoji]::before,
+.subtab-button[data-format-emoji]::before {
+  content: attr(data-format-emoji);
+  margin-inline-end: 0.3rem;
+  font-size: 1.05em;
+  line-height: 1;
+}
+
 .field-label {
   font-weight: 800;
 }

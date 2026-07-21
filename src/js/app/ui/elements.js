@@ -32,6 +32,7 @@ export function getApplicationElements(document) {
     tabPanels: document.querySelectorAll('.tab-panel'),
     subtabButtons: document.querySelectorAll('.content-subtab-button'),
     subtabPanels: document.querySelectorAll('.content-subtab-panel'),
+    contentDataTab: document.querySelector('[data-content-subtab="data"]'),
     urlInput: document.getElementById('url-input'),
   };
 }

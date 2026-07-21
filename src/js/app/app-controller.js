@@ -97,6 +97,7 @@ const setFormatVisibility = createFormatVisibility({
   elements: {
     format: elements.qrFormat,
     bulkEnabled: elements.bulkEnabled,
+    dataTab: elements.contentDataTab,
   },
   syncBulk: contentData.syncBulkControls,
   syncFile: contentData.syncFileModeVisibility,
