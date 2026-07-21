@@ -139,8 +139,7 @@ test('Chinese prose uses fullwidth punctuation', async () => {
     if (message.includes(ASCII_QUESTION_MARK)) findings.push('question mark');
     if (message.includes(ASCII_SEMICOLON)) findings.push('semicolon');
     return findings.map(
-      (punctuation) =>
-        `zh-CN.${key}: ASCII ${punctuation} in "${message}"`,
+      (punctuation) => `zh-CN.${key}: ASCII ${punctuation} in "${message}"`,
     );
   });
 

@@ -1,0 +1,161 @@
+{
+  "targetTransferKiB": 64,
+  "limits": {
+    "initialRouteTransferKiB": 64,
+    "htmlRouteTransferKiB": 64,
+    "appRouteTransferKiB": 72,
+    "initialJavaScriptRawKiB": 64,
+    "lazyJavaScriptEntryTransferKiB": 64,
+    "lazyJavaScriptChunkRawKiB": 64,
+    "initialCssRawKiB": 48,
+    "lazyCssRawKiB": 16,
+    "mapManifestRawKiB": 2048,
+    "mapTileKiB": 64,
+    "mapArchiveMiB": 32,
+    "mapTotalMiB": 3400
+  },
+  "appRoutes": {
+    "content/data": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js"
+    ],
+    "content/format": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js"
+    ],
+    "content/frame": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/frame/document-section.js"
+    ],
+    "format/number": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/simple/number/number-content-section.js"
+    ],
+    "format/wifi": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/wifi/wifi-content-section.js",
+      "src/js/app/ui/content/wifi/wifi-content-plugin.js"
+    ],
+    "format/email": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/shared-fields.js",
+      "src/js/app/ui/content/email/email-content-plugin.js"
+    ],
+    "format/phone-sms": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/phone/phone-content-section.js",
+      "src/js/app/ui/content/phone/phone-content-plugin.js"
+    ],
+    "format/event": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/event/event-content-section.js",
+      "src/js/app/ui/content/event/event-content-plugin.js"
+    ],
+    "format/geo": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/geo/geo-content-section.js",
+      "src/js/app/ui/content/geo/geo-content-plugin.js"
+    ],
+    "format/vcard": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/vcard/vcard-content-section.js",
+      "src/js/app/ui/content/vcard/vcard-content-plugin.js"
+    ],
+    "format/file": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/file/file-content-plugin.js",
+      "src/js/app/ui/content/file/file-lazy-setup.js",
+      "src/js/app/ui/content/file/file-setup.js"
+    ],
+    "format/bulk": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/content/bulk/bulk-lazy-setup.js"
+    ],
+    "style/modules": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/style/style-setup.js",
+      "src/js/app/ui/style/style-elements.js",
+      "src/js/app/ui/style/modules/module-style-section.js",
+      "src/js/app/ui/style/eyes/eye-style-section.js"
+    ],
+    "style/size": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/style/style-setup.js",
+      "src/js/app/ui/style/style-elements.js"
+    ],
+    "style/colors": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/style/style-setup.js",
+      "src/js/app/ui/style/style-elements.js",
+      "src/js/app/ui/style/colors/color-style-section.js"
+    ],
+    "style/artwork": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/style/style-setup.js",
+      "src/js/app/ui/style/style-elements.js",
+      "src/js/app/ui/style/art/controls.js",
+      "src/js/app/ui/style/art/image-input.js",
+      "src/js/app/ui/style/art/lazy-pixel-editor.js",
+      "src/js/app/ui/style/art/drawing.js"
+    ],
+    "download/image": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/download/download-application.js",
+      "src/js/app/ui/download/download-elements.js",
+      "src/js/app/ui/download/image/image-download-section.js"
+    ],
+    "download/document": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/download/download-application.js",
+      "src/js/app/ui/download/download-elements.js",
+      "src/js/app/ui/download/document/document-download-section.js"
+    ],
+    "download/animation": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/download/download-application.js",
+      "src/js/app/ui/download/download-elements.js",
+      "src/js/app/ui/download/animation/animation-download-section.js"
+    ],
+    "debug/encoding": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/debug/setup/debug-lazy-setup.js",
+      "src/js/app/ui/debug/setup/debug-encoding-setup.js"
+    ],
+    "debug/payload": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/debug/setup/debug-lazy-setup.js",
+      "src/js/app/ui/debug/setup/debug-encoding-setup.js"
+    ],
+    "debug/mask": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/debug/setup/debug-lazy-setup.js",
+      "src/js/app/ui/debug/setup/mask-setup.js"
+    ],
+    "debug/overlay": [
+      "src/js/main.js",
+      "src/js/app/app-controller.js",
+      "src/js/app/ui/debug/setup/debug-lazy-setup.js",
+      "src/js/app/ui/debug/setup/overlay-setup.js"
+    ]
+  }
+}

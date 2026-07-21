@@ -1,5 +1,5 @@
 import { build, context } from 'esbuild';
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
@@ -47,6 +47,7 @@ const builds = [
     platform: 'browser',
     splitting: true,
     external: [qrPackageName],
+    metafile: true,
   },
   {
     ...shared,
@@ -115,7 +116,12 @@ if (watch) {
   await Promise.all(contexts.map((buildContext) => buildContext.watch()));
   console.log('Watching JavaScript and CSS sources...');
 } else {
-  await Promise.all(builds.map((options) => build(options)));
+  const results = await Promise.all(builds.map((options) => build(options)));
+  await mkdir('build/reports', { recursive: true });
+  await writeFile(
+    'build/reports/app-metafile.json',
+    JSON.stringify(results[1].metafile, null, 2),
+  );
   await generateLocalizedGuides({ clean: true });
   await buildLocaleResources();
   await mkdir(htmlConfig.outputRoot, { recursive: true });

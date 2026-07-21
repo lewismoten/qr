@@ -50,12 +50,33 @@ Run linting, tests with coverage thresholds, and a production build together:
 npm run verify
 ```
 
-`verify` runs source linting, tests and the production build. Run only the
-JavaScript, CSS, HTML, JSON, Markdown, sitemap and robots checks with:
+`verify` runs source linting, tests, the production build, and asset-budget
+checks. Run only the JavaScript, CSS, HTML, JSON, Markdown, sitemap and robots
+checks with:
 
 ```sh
 npm run lint
 ```
+
+### Asset budgets
+
+Run the built-site size audit independently after `npm run build`:
+
+```sh
+npm run test:size
+```
+
+The audit measures raw artifact sizes and estimates transferred HTML, CSS, and
+JavaScript using the same Brotli quality as the local server. It checks the
+initial application, every configured app tab or content route, every generated
+localized HTML page, every lazy JavaScript entry and chunk, CSS, PMTiles tile
+ranges, individual map archives, and the total map set. Shared JavaScript chunks
+are counted once per route.
+
+The universal transfer target is 64 KiB. Current hard regression ceilings live
+in `config/asset-budgets.json`; known target misses remain visible in every
+report even when they are inside those temporary ceilings. Lower the ceilings
+as assets are optimized rather than raising them to hide regressions.
 
 Authored JavaScript and Markdown files are limited to 300 physical lines.
 Authored JavaScript also uses an 80-column target. URLs, regular expressions,
