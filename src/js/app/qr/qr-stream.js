@@ -10,6 +10,23 @@ const BITS_PER_BYTE = 8;
 const MODE_INDICATOR_BITS = 4;
 const TERMINATOR_MAXIMUM_BITS = 4;
 
+export const QR_STREAM_ROLE = Object.freeze({
+  mode: 'mode',
+  characterCount: 'charCount',
+  payload: 'payload',
+  terminator: 'terminator',
+  byteAlignment: 'bytePad',
+  paddingCodeword: 'padByte',
+  errorCorrection: 'errorCorrection',
+  remainder: 'remainder',
+});
+
+export const QR_STREAM_GROUP = Object.freeze({
+  data: 'data',
+  header: 'header',
+  padding: 'padding',
+});
+
 function getCharCountBits(mode, version) {
   const bucket =
     version <= SMALL_VERSION_MAXIMUM
@@ -30,7 +47,7 @@ export function classifyTraversalBits(
     getRawDataModules(qrDefinition.version) / BITS_PER_BYTE,
   );
   const totalCodewordBits = totalCodewords * BITS_PER_BYTE;
-  const roles = Array(traversalLength).fill('remainder');
+  const roles = Array(traversalLength).fill(QR_STREAM_ROLE.remainder);
   let cursor = 0;
 
   qrDefinition.segments.forEach((segment) => {
@@ -41,7 +58,7 @@ export function classifyTraversalBits(
       index < MODE_INDICATOR_BITS && cursor < dataCapacityBits;
       index += 1
     ) {
-      roles[cursor++] = 'mode';
+      roles[cursor++] = QR_STREAM_ROLE.mode;
     }
 
     const charCountBits = getCharCountBits(mode, qrDefinition.version);
@@ -50,7 +67,7 @@ export function classifyTraversalBits(
       index < charCountBits && cursor < dataCapacityBits;
       index += 1
     ) {
-      roles[cursor++] = 'charCount';
+      roles[cursor++] = QR_STREAM_ROLE.characterCount;
     }
 
     const payloadBits = segment.getBitsLength();
@@ -59,7 +76,7 @@ export function classifyTraversalBits(
       index < payloadBits && cursor < dataCapacityBits;
       index += 1
     ) {
-      roles[cursor++] = 'payload';
+      roles[cursor++] = QR_STREAM_ROLE.payload;
     }
   });
 
@@ -72,11 +89,11 @@ export function classifyTraversalBits(
     index < terminatorBits && cursor < dataCapacityBits;
     index += 1
   ) {
-    roles[cursor++] = 'terminator';
+    roles[cursor++] = QR_STREAM_ROLE.terminator;
   }
 
   while (cursor < dataCapacityBits && cursor % BITS_PER_BYTE !== 0) {
-    roles[cursor++] = 'bytePad';
+    roles[cursor++] = QR_STREAM_ROLE.byteAlignment;
   }
 
   while (cursor < dataCapacityBits) {
@@ -85,7 +102,7 @@ export function classifyTraversalBits(
       index < BITS_PER_BYTE && cursor < dataCapacityBits;
       index += 1
     ) {
-      roles[cursor++] = 'padByte';
+      roles[cursor++] = QR_STREAM_ROLE.paddingCodeword;
     }
   }
 
@@ -94,61 +111,81 @@ export function classifyTraversalBits(
     index < Math.min(totalCodewordBits, traversalLength);
     index += 1
   ) {
-    roles[index] = 'errorCorrection';
+    roles[index] = QR_STREAM_ROLE.errorCorrection;
   }
 
   return roles;
 }
 
 export function summarizeCodewordRoles(roles) {
-  if (roles.every((role) => role === 'errorCorrection')) {
-    return 'errorCorrection';
+  if (roles.every((role) => role === QR_STREAM_ROLE.errorCorrection)) {
+    return QR_STREAM_ROLE.errorCorrection;
   }
-  if (roles.every((role) => role === 'remainder')) {
-    return 'remainder';
+  if (roles.every((role) => role === QR_STREAM_ROLE.remainder)) {
+    return QR_STREAM_ROLE.remainder;
   }
-  if (roles.every((role) => role === 'padByte')) {
-    return 'padByte';
-  }
-  if (roles.some((role) => role === 'mode' || role === 'charCount')) {
-    return 'header';
+  if (roles.every((role) => role === QR_STREAM_ROLE.paddingCodeword)) {
+    return QR_STREAM_ROLE.paddingCodeword;
   }
   if (
     roles.some(
       (role) =>
-        role === 'terminator' || role === 'bytePad' || role === 'padByte',
+        role === QR_STREAM_ROLE.mode || role === QR_STREAM_ROLE.characterCount,
     )
   ) {
-    return 'padding';
+    return QR_STREAM_GROUP.header;
   }
-  return 'data';
+  if (
+    roles.some(
+      (role) =>
+        role === QR_STREAM_ROLE.terminator ||
+        role === QR_STREAM_ROLE.byteAlignment ||
+        role === QR_STREAM_ROLE.paddingCodeword,
+    )
+  ) {
+    return QR_STREAM_GROUP.padding;
+  }
+  return QR_STREAM_GROUP.data;
 }
 
 export function summarizeGroupRoles(roles) {
-  if (roles.every((role) => role === 'errorCorrection')) {
-    return 'errorCorrection';
+  if (roles.every((role) => role === QR_STREAM_ROLE.errorCorrection)) {
+    return QR_STREAM_ROLE.errorCorrection;
   }
-  if (roles.every((role) => role === 'remainder')) {
-    return 'remainder';
+  if (roles.every((role) => role === QR_STREAM_ROLE.remainder)) {
+    return QR_STREAM_ROLE.remainder;
   }
-  if (roles.every((role) => role === 'padByte' || role === 'bytePad')) {
-    return 'padByte';
+  if (
+    roles.every(
+      (role) =>
+        role === QR_STREAM_ROLE.paddingCodeword ||
+        role === QR_STREAM_ROLE.byteAlignment,
+    )
+  ) {
+    return QR_STREAM_ROLE.paddingCodeword;
   }
-  if (roles.every((role) => role === 'terminator')) {
-    return 'terminator';
+  if (roles.every((role) => role === QR_STREAM_ROLE.terminator)) {
+    return QR_STREAM_ROLE.terminator;
   }
   if (
     roles.some(
       (role) =>
-        role === 'terminator' || role === 'bytePad' || role === 'padByte',
+        role === QR_STREAM_ROLE.terminator ||
+        role === QR_STREAM_ROLE.byteAlignment ||
+        role === QR_STREAM_ROLE.paddingCodeword,
     )
   ) {
-    return 'padding';
+    return QR_STREAM_GROUP.padding;
   }
-  if (roles.some((role) => role === 'mode' || role === 'charCount')) {
-    return 'header';
+  if (
+    roles.some(
+      (role) =>
+        role === QR_STREAM_ROLE.mode || role === QR_STREAM_ROLE.characterCount,
+    )
+  ) {
+    return QR_STREAM_GROUP.header;
   }
-  return 'data';
+  return QR_STREAM_GROUP.data;
 }
 
 export function buildPostHeaderStreamGroups(traversal, bitRoles) {
@@ -156,10 +193,10 @@ export function buildPostHeaderStreamGroups(traversal, bitRoles) {
 
   bitRoles.forEach((role, index) => {
     if (
-      role === 'payload' ||
-      role === 'terminator' ||
-      role === 'bytePad' ||
-      role === 'padByte'
+      role === QR_STREAM_ROLE.payload ||
+      role === QR_STREAM_ROLE.terminator ||
+      role === QR_STREAM_ROLE.byteAlignment ||
+      role === QR_STREAM_ROLE.paddingCodeword
     ) {
       streamBitIndexes.push(index);
     }
@@ -196,9 +233,9 @@ export function buildEncodingUnitGroups(qrDefinition, traversal) {
       const modules = traversal.slice(start, start + bitLength);
       if (modules.length > 0) {
         groups.push({
-          kind: 'data',
+          kind: QR_STREAM_GROUP.data,
           modules,
-          roles: Array(modules.length).fill('payload'),
+          roles: Array(modules.length).fill(QR_STREAM_ROLE.payload),
           encodingMode: mode,
           segmentIndex,
           unitIndex,

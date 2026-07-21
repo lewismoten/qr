@@ -1,5 +1,6 @@
 import { getErrorText, lookup } from '../../../i18n/index.js';
 import { createAnimationDownloader } from './animation-actions.js';
+import { MEDIA_TYPE_JPEG, MEDIA_TYPE_PNG } from '../../media-types.js';
 
 const DEFAULT_EXPORT_QUALITY_PERCENT = 92;
 const PERCENT_SCALE = 100;
@@ -60,11 +61,11 @@ export function createDownloadActions(options) {
     const { canvasToBlob, createGifBlob, createSvgBlob } =
       await loadExporters();
     if (format === 'jpg')
-      return canvasToBlob(sourceCanvas, 'image/jpeg', getQuality(), true);
+      return canvasToBlob(sourceCanvas, MEDIA_TYPE_JPEG, getQuality(), true);
     if (format === 'gif') return createGifBlob(sourceCanvas);
     if (format === 'svg') return createSvgBlob(sourceCanvas);
     if (format === 'pdf') return makePdf(sourceCanvas);
-    return canvasToBlob(sourceCanvas, 'image/png');
+    return canvasToBlob(sourceCanvas, MEDIA_TYPE_PNG);
   };
   const triggerDownload = (blob, name) => {
     const url = URL.createObjectURL(blob);

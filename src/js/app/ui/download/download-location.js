@@ -1,4 +1,5 @@
 import { base64UrlToBase64 } from '../content/file/transfer/protocol.js';
+import { MEDIA_TYPE_BINARY } from '../../media-types.js';
 
 const OBJECT_URL_REVOCATION_DELAY_MS = 1000;
 
@@ -16,7 +17,7 @@ export function restoreLocationDownload({ window, document }) {
       character.charCodeAt(0),
     );
     const blob = new Blob([bytes], {
-      type: params.get('type') || 'application/octet-stream',
+      type: params.get('type') || MEDIA_TYPE_BINARY,
     });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

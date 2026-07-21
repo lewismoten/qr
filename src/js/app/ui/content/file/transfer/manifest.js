@@ -1,5 +1,6 @@
 import { hexToBytes, uint64Bytes } from '../../../../bytes.js';
 import { createLocalizedError } from '../../../../../localized-error.js';
+import { MEDIA_TYPE_BINARY } from '../../../../media-types.js';
 
 const VERSION_OFFSET = 4;
 const FLAGS_OFFSET = 5;
@@ -20,7 +21,7 @@ export function buildManifestFields({
     { type: fieldTypes.name, value: encoder.encode(file?.name || 'file.bin') },
     {
       type: fieldTypes.mimeType,
-      value: encoder.encode(file?.type?.trim() || 'application/octet-stream'),
+      value: encoder.encode(file?.type?.trim() || MEDIA_TYPE_BINARY),
     },
     {
       type: fieldTypes.modifiedAt,

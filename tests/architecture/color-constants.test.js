@@ -3,7 +3,8 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 
-const KNOWN_COLORS = /['"]#(?:000000|ffffff|111827|0f766e)['"]/gi;
+const KNOWN_COLORS = /['"]#(?:000000|ffffff|111827|0f766e|0ea5e9|60a5fa)['"]/gi;
+const MEDIA_TYPE_LITERAL = /['"](?:application|image|text)\/[a-z0-9.+-]+['"]/gi;
 
 async function findJavaScript(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -26,6 +27,21 @@ test('app code imports canonical colors instead of repeating hex values', async 
     const source = await readFile(file, 'utf8');
     if (KNOWN_COLORS.test(source)) violations.push(path.relative(root, file));
     KNOWN_COLORS.lastIndex = 0;
+  }
+  assert.deepEqual(violations, []);
+});
+
+test('app code imports exact MIME types from the registry', async () => {
+  const root = path.resolve('src/js/app');
+  const definition = path.join(root, 'media-types.js');
+  const violations = [];
+  for (const file of await findJavaScript(root)) {
+    if (file === definition) continue;
+    const source = await readFile(file, 'utf8');
+    if (MEDIA_TYPE_LITERAL.test(source)) {
+      violations.push(path.relative(root, file));
+    }
+    MEDIA_TYPE_LITERAL.lastIndex = 0;
   }
   assert.deepEqual(violations, []);
 });

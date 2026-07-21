@@ -13,6 +13,15 @@ import { COLORS, getVisuals } from './visual-models.js';
 
 const FULL_CIRCLE_RADIANS = Math.PI * 2;
 const MODULE_CENTER_OFFSET = 0.5;
+const SPEC_CANVAS_COLORS = Object.freeze({
+  background: '#f8faf9',
+  darkModule: '#071827',
+  lightModule: '#fffaf0',
+  path: 'rgba(255,255,255,0.9)',
+  pathOrigin: '#fff',
+  pathShadow: 'rgba(7,24,39,0.7)',
+  moduleGrid: 'rgba(255,255,255,0.22)',
+});
 const PATH_STYLE = Object.freeze({
   minimumLineWidth: 1.5,
   lineWidthScale: 0.11,
@@ -93,8 +102,8 @@ function drawPath(context, visual, geometry) {
     PATH_STYLE.minimumLineWidth,
     geometry.module * PATH_STYLE.lineWidthScale,
   );
-  context.strokeStyle = 'rgba(255,255,255,0.9)';
-  context.shadowColor = 'rgba(7,24,39,0.7)';
+  context.strokeStyle = SPEC_CANVAS_COLORS.path;
+  context.shadowColor = SPEC_CANVAS_COLORS.pathShadow;
   context.shadowBlur = Math.max(
     1,
     geometry.module * PATH_STYLE.shadowBlurScale,
@@ -111,7 +120,7 @@ function drawPath(context, visual, geometry) {
     0,
     FULL_CIRCLE_RADIANS,
   );
-  context.fillStyle = '#fff';
+  context.fillStyle = SPEC_CANVAS_COLORS.pathOrigin;
   context.fill();
   context.restore();
 }
@@ -151,7 +160,7 @@ function renderVisual(canvas, visual) {
   const matrixHeight = moduleSize * crop.rows;
   const left = Math.round((width - matrixWidth) / 2);
   const top = Math.round((height - matrixHeight) / 2);
-  context.fillStyle = '#f8faf9';
+  context.fillStyle = SPEC_CANVAS_COLORS.background;
   context.fillRect(left, top, matrixWidth, matrixHeight);
 
   for (let localRow = 0; localRow < crop.rows; localRow += 1) {
@@ -160,7 +169,9 @@ function renderVisual(canvas, visual) {
       const column = crop.column + localColumn;
       const x = left + localColumn * moduleSize;
       const y = top + localRow * moduleSize;
-      context.fillStyle = moduleIsDark(qr, row, column) ? '#071827' : '#fffaf0';
+      context.fillStyle = moduleIsDark(qr, row, column)
+        ? SPEC_CANVAS_COLORS.darkModule
+        : SPEC_CANVAS_COLORS.lightModule;
       context.fillRect(x, y, moduleSize, moduleSize);
       const category = getCategory(
         visual.definition,
@@ -176,7 +187,7 @@ function renderVisual(canvas, visual) {
       context.fillRect(x, y, moduleSize, moduleSize);
       context.globalAlpha = 1;
       if (moduleSize >= CANVAS_LAYOUT.gridMinimumModuleSize) {
-        context.strokeStyle = 'rgba(255,255,255,0.22)';
+        context.strokeStyle = SPEC_CANVAS_COLORS.moduleGrid;
         context.lineWidth = 1;
         context.strokeRect(
           x + MODULE_CENTER_OFFSET,
@@ -222,7 +233,7 @@ function renderMaskPreview(canvas) {
   const context = canvas.getContext('2d');
   context.scale(ratio, ratio);
   context.imageSmoothingEnabled = false;
-  context.fillStyle = '#f8faf9';
+  context.fillStyle = SPEC_CANVAS_COLORS.background;
   context.fillRect(0, 0, width, width);
   const margin = 1;
   const moduleSize = Math.max(
@@ -238,7 +249,7 @@ function renderMaskPreview(canvas) {
       const y = offset + row * moduleSize;
       const category = getDebugCategory(row, column, qr, model, 'overlay');
       if (MASK_LANDMARKS.has(category) && moduleIsDark(qr, row, column)) {
-        context.fillStyle = '#071827';
+        context.fillStyle = SPEC_CANVAS_COLORS.darkModule;
         context.fillRect(x, y, moduleSize, moduleSize);
       } else if (
         !isFunctionModule(qr, row, column) &&

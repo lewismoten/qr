@@ -1,5 +1,6 @@
 import { getContrastingHex, hexToRgba } from '../../colors.js';
 import { coordKey } from '../../qr/qr-regions.js';
+import { QR_STREAM_GROUP, QR_STREAM_ROLE } from '../../qr/qr-stream.js';
 import { getDebugCategory } from './model.js';
 
 const HIGHLIGHT_BOUNDARY_STYLE = {
@@ -146,12 +147,16 @@ export function drawCodewordOutlines(
   );
   const groups = getActiveOutlineGroups(model, outlineMode);
   const outlinedKinds = new Set([
-    'header',
-    'data',
-    'errorCorrection',
+    QR_STREAM_GROUP.header,
+    QR_STREAM_GROUP.data,
+    QR_STREAM_ROLE.errorCorrection,
     'metadata',
   ]);
-  if (outlineMode === 'codewords') outlinedKinds.add('padding').add('padByte');
+  if (outlineMode === 'codewords') {
+    outlinedKinds
+      .add(QR_STREAM_GROUP.padding)
+      .add(QR_STREAM_ROLE.paddingCodeword);
+  }
   groups.forEach((group, index) => {
     if (group.modules.length === 0) return;
     const style = getStyle(group);

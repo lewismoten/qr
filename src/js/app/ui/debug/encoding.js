@@ -1,5 +1,6 @@
 import { normalizeModeName } from '../../modes.js';
 import { lookup } from '../../../i18n/index.js';
+import { QR_STREAM_ROLE } from '../../qr/qr-stream.js';
 
 const FIRST_QR_KANJI_RANGE_START = 0x8140;
 const FIRST_QR_KANJI_RANGE_END = 0x9ffc;
@@ -195,7 +196,9 @@ export function createEncodingDiagnostics({
     const debugModel = buildDebugModel(qrDefinition, options);
     const unusedBits = debugModel.bitRoles.filter(
       (role) =>
-        role === 'terminator' || role === 'bytePad' || role === 'padByte',
+        role === QR_STREAM_ROLE.terminator ||
+        role === QR_STREAM_ROLE.byteAlignment ||
+        role === QR_STREAM_ROLE.paddingCodeword,
     ).length;
     const unusedPercent =
       dataCodewords > 0

@@ -1,9 +1,12 @@
 import { isMaskActive } from '@lewismoten/qr';
-import { COLOR_DARK, COLOR_WHITE } from '../../colors.js';
+import {
+  COLOR_DARK,
+  COLOR_DEBUG_MASK_EFFECT,
+  COLOR_WHITE,
+} from '../../colors.js';
 import { isFunctionModule } from '../../qr/qr-regions.js';
 import { lookup } from '../../../i18n/index.js';
 
-const MASK_BLUE = '#60a5fa';
 const MASK_PREVIEW_TEXT = 'MASK PREVIEW';
 
 function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
@@ -45,7 +48,7 @@ function drawQrThumbnail(targetCanvas, qrDefinition, options, moduleIsDark) {
         !isMaskActive(qrDefinition.maskPattern, row, column)
       )
         continue;
-      context.fillStyle = MASK_BLUE;
+      context.fillStyle = COLOR_DEBUG_MASK_EFFECT;
       context.fillRect(
         offsetX + (column + margin) * moduleSize,
         offsetY + (row + margin) * moduleSize,

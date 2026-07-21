@@ -2,6 +2,8 @@ export const COLOR_BLACK = '#000000';
 export const COLOR_WHITE = '#ffffff';
 export const COLOR_DARK = '#111827';
 export const COLOR_ACCENT = '#0f766e';
+export const COLOR_DEBUG_DATA = '#0ea5e9';
+export const COLOR_DEBUG_MASK_EFFECT = '#60a5fa';
 export const COLOR_DARK_OPAQUE = '#111827ff';
 export const COLOR_WHITE_OPAQUE = '#ffffffff';
 

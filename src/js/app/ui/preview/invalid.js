@@ -10,6 +10,10 @@ const MINIMUM_MESSAGE_FONT_PX = 10;
 const MESSAGE_FONT_RATIO = 0.027;
 const MAXIMUM_MESSAGE_CHARACTERS = 80;
 const MESSAGE_VERTICAL_OFFSET_PX = 16;
+const INVALID_PREVIEW_COLORS = Object.freeze({
+  veil: 'rgba(255, 255, 255, 0.64)',
+  banner: 'rgba(153, 27, 27, 0.92)',
+});
 
 export function createInvalidPreviewRenderer({
   canvas,
@@ -24,9 +28,9 @@ export function createInvalidPreviewRenderer({
       MINIMUM_BANNER_HEIGHT_PX,
       height * BANNER_HEIGHT_RATIO,
     );
-    context.fillStyle = 'rgba(255, 255, 255, 0.64)';
+    context.fillStyle = INVALID_PREVIEW_COLORS.veil;
     context.fillRect(0, 0, width, height);
-    context.fillStyle = 'rgba(153, 27, 27, 0.92)';
+    context.fillStyle = INVALID_PREVIEW_COLORS.banner;
     context.fillRect(0, (height - bannerHeight) / 2, width, bannerHeight);
     context.fillStyle = COLOR_WHITE;
     context.textAlign = 'center';

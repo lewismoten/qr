@@ -1,4 +1,5 @@
 import { getContrastingHex, hexToRgba } from '../../colors.js';
+import { QR_STREAM_GROUP, QR_STREAM_ROLE } from '../../qr/qr-stream.js';
 import { getActiveOutlineGroups } from './boundaries.js';
 
 const METADATA_ROUTE_STYLE = {
@@ -217,9 +218,16 @@ export function drawCodewordPaths(
 }
 
 function getRoleCategory(role) {
-  if (role === 'payload') return 'data';
-  if (role === 'bytePad' || role === 'padByte') return 'padding';
-  if (role === 'errorCorrection') return 'errorCorrection';
+  if (role === QR_STREAM_ROLE.payload) return QR_STREAM_GROUP.data;
+  if (
+    role === QR_STREAM_ROLE.byteAlignment ||
+    role === QR_STREAM_ROLE.paddingCodeword
+  ) {
+    return QR_STREAM_GROUP.padding;
+  }
+  if (role === QR_STREAM_ROLE.errorCorrection) {
+    return QR_STREAM_ROLE.errorCorrection;
+  }
   return role;
 }
 

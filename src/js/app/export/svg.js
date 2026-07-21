@@ -1,3 +1,5 @@
+import { MEDIA_TYPE_SVG } from '../media-types.js';
+
 const RGBA_CHANNEL_COUNT = 4;
 const GREEN_CHANNEL_OFFSET = 1;
 const BLUE_CHANNEL_OFFSET = 2;
@@ -90,5 +92,5 @@ export async function createSvgBlob(sourceCanvas) {
     parts.push(`<path fill="${hex}"${opacity} d="${paths.join('')}"/>`);
   });
   parts.push(SVG_END);
-  return new Blob(parts, { type: 'image/svg+xml' });
+  return new Blob(parts, { type: MEDIA_TYPE_SVG });
 }

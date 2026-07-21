@@ -11,6 +11,8 @@ import {
   buildEncodingUnitGroups,
   buildPostHeaderStreamGroups,
   classifyTraversalBits,
+  QR_STREAM_GROUP,
+  QR_STREAM_ROLE,
   summarizeCodewordRoles,
 } from '../../qr/qr-stream.js';
 import qrEncoder, { isMaskActive } from '@lewismoten/qr';
@@ -144,13 +146,13 @@ export function buildDebugOverlayModel(qrDefinition, options) {
     traversal.length,
   );
   const roleSets = {
-    mode: new Set(),
-    charCount: new Set(),
-    payload: new Set(),
-    terminator: new Set(),
-    bytePad: new Set(),
-    errorCorrection: new Set(),
-    remainder: new Set(),
+    [QR_STREAM_ROLE.mode]: new Set(),
+    [QR_STREAM_ROLE.characterCount]: new Set(),
+    [QR_STREAM_ROLE.payload]: new Set(),
+    [QR_STREAM_ROLE.terminator]: new Set(),
+    [QR_STREAM_ROLE.byteAlignment]: new Set(),
+    [QR_STREAM_ROLE.errorCorrection]: new Set(),
+    [QR_STREAM_ROLE.remainder]: new Set(),
   };
   const fieldStarts = [];
   bitRoles.forEach((role, index) => {
@@ -159,7 +161,10 @@ export function buildDebugOverlayModel(qrDefinition, options) {
   });
   traversal.forEach((module, index) => {
     const role = bitRoles[index];
-    const target = role === 'padByte' ? roleSets.bytePad : roleSets[role];
+    const target =
+      role === QR_STREAM_ROLE.paddingCodeword
+        ? roleSets[QR_STREAM_ROLE.byteAlignment]
+        : roleSets[role];
     target?.add(coordKey(module.row, module.column));
   });
   const codewords = [];
@@ -175,13 +180,13 @@ export function buildDebugOverlayModel(qrDefinition, options) {
     qrDefinition.modules.size,
   );
   return {
-    modeBits: roleSets.mode,
-    charCountBits: roleSets.charCount,
-    payloadBits: roleSets.payload,
-    terminatorBits: roleSets.terminator,
-    bytePadBits: roleSets.bytePad,
-    errorCorrectionBits: roleSets.errorCorrection,
-    remainderBits: roleSets.remainder,
+    modeBits: roleSets[QR_STREAM_ROLE.mode],
+    charCountBits: roleSets[QR_STREAM_ROLE.characterCount],
+    payloadBits: roleSets[QR_STREAM_ROLE.payload],
+    terminatorBits: roleSets[QR_STREAM_ROLE.terminator],
+    bytePadBits: roleSets[QR_STREAM_ROLE.byteAlignment],
+    errorCorrectionBits: roleSets[QR_STREAM_ROLE.errorCorrection],
+    remainderBits: roleSets[QR_STREAM_ROLE.remainder],
     ecLevelBits,
     maskBits,
     bitRoles,
@@ -202,13 +207,13 @@ export function getDebugCategory(
 ) {
   const key = coordKey(row, column);
   const categories = [
-    ['errorCorrection', model.errorCorrectionBits],
-    ['mode', model.modeBits],
-    ['charCount', model.charCountBits],
-    ['data', model.payloadBits],
-    ['terminator', model.terminatorBits],
-    ['padding', model.bytePadBits],
-    ['remainder', model.remainderBits],
+    [QR_STREAM_ROLE.errorCorrection, model.errorCorrectionBits],
+    [QR_STREAM_ROLE.mode, model.modeBits],
+    [QR_STREAM_ROLE.characterCount, model.charCountBits],
+    [QR_STREAM_GROUP.data, model.payloadBits],
+    [QR_STREAM_ROLE.terminator, model.terminatorBits],
+    [QR_STREAM_GROUP.padding, model.bytePadBits],
+    [QR_STREAM_ROLE.remainder, model.remainderBits],
   ];
   const match = categories.find(([, coordinates]) => coordinates.has(key));
   if (match) return match[0];
@@ -220,13 +225,13 @@ export function getDebugCategory(
     purpose === 'overlay' &&
     model.codewords.some(
       (codeword) =>
-        codeword.kind === 'remainder' &&
+        codeword.kind === QR_STREAM_ROLE.remainder &&
         codeword.modules.some(
           (module) => module.row === row && module.column === column,
         ),
     )
   ) {
-    return 'remainder';
+    return QR_STREAM_ROLE.remainder;
   }
   return getModuleCategory(qrDefinition, row, column);
 }

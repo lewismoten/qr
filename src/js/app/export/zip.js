@@ -5,6 +5,7 @@ import {
   textBytes,
 } from '../bytes.js';
 import { getCrc32 } from '../checksum/crc32.js';
+import { MEDIA_TYPE_ZIP } from '../media-types.js';
 
 const ZIP_LOCAL_HEADER_SIGNATURE = 0x04034b50;
 const ZIP_CENTRAL_HEADER_SIGNATURE = 0x02014b50;
@@ -79,6 +80,6 @@ export async function createZipBlob(files) {
   pushUint32LE(end, offset);
   pushUint16LE(end, ZIP_NO_ARCHIVE_COMMENT);
   return new Blob([...localParts, centralDirectory, new Uint8Array(end)], {
-    type: 'application/zip',
+    type: MEDIA_TYPE_ZIP,
   });
 }

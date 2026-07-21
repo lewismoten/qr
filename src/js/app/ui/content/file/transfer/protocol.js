@@ -1,3 +1,5 @@
+import { MEDIA_TYPE_BINARY } from '../../../../media-types.js';
+
 const BASE64_CHUNK_BYTES = 0x8000;
 const BASE64_GROUP_BYTES = 3;
 const BASE64_GROUP_CHARACTERS = 4;
@@ -5,6 +7,12 @@ const BASE64_ALIGNMENT = 4;
 const FILE_ID_BYTES = 16;
 const MAXIMUM_EXTENSION_CHARACTERS = 8;
 const DECIMAL_RADIX = 10;
+export const FILE_PROTOCOL_PREFIX = 'FILE';
+export const FILE_PROTOCOL_VERSION = '1';
+export const FILE_SINGLE_FRAME_KIND = 'S';
+export const FILE_CHUNK_FRAME_KIND = 'C';
+export const FILE_MANIFEST_FLAG = 'M';
+export const FILE_NO_MANIFEST_FLAG = '-';
 
 export function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
@@ -36,7 +44,7 @@ export function createCompactFileId() {
 }
 
 export function getFileDataUrlPrefix(file) {
-  return `data:${file?.type?.trim() || 'application/octet-stream'};base64,`;
+  return `data:${file?.type?.trim() || MEDIA_TYPE_BINARY};base64,`;
 }
 
 export function getCompactFileExtension(value) {
@@ -63,12 +71,12 @@ export function encodeStreamPosition(value, streamLength) {
 }
 
 export function getFileManifestFlag(includeManifest) {
-  return includeManifest ? 'M' : '-';
+  return includeManifest ? FILE_MANIFEST_FLAG : FILE_NO_MANIFEST_FLAG;
 }
 
 export function getFileDownloadUrlPrefix(appUrl, file) {
   const name = file?.name || 'file.bin';
-  const type = file?.type?.trim() || 'application/octet-stream';
+  const type = file?.type?.trim() || MEDIA_TYPE_BINARY;
   return `${appUrl}#download=1&name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}&data=`;
 }
 
@@ -76,10 +84,15 @@ export function buildSingleFileFrame({
   data,
   file,
   includeManifest,
-  prefix = 'FILE',
-  version = '1',
+  prefix = FILE_PROTOCOL_PREFIX,
+  version = FILE_PROTOCOL_VERSION,
 }) {
-  const parts = [prefix, version, 'S', getFileManifestFlag(includeManifest)];
+  const parts = [
+    prefix,
+    version,
+    FILE_SINGLE_FRAME_KIND,
+    getFileManifestFlag(includeManifest),
+  ];
   if (!includeManifest) parts.push(getCompactFileExtension(file?.name));
   parts.push(data);
   return parts.join(':');
@@ -92,13 +105,13 @@ export function buildChunkFileFrame({
   offset,
   streamLength,
   includeManifest,
-  prefix = 'FILE',
-  version = '1',
+  prefix = FILE_PROTOCOL_PREFIX,
+  version = FILE_PROTOCOL_VERSION,
 }) {
   return [
     prefix,
     version,
-    'C',
+    FILE_CHUNK_FRAME_KIND,
     getFileManifestFlag(includeManifest),
     id,
     getCompactFileExtension(file?.name),

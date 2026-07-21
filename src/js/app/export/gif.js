@@ -2,6 +2,7 @@ import { pushUint16LE, textBytes } from '../bytes.js';
 import { encodeGifLzw } from '../compression/lzw.js';
 import { throwIfAborted, waitFor } from '../abort.js';
 import { COLOR_WHITE } from '../colors.js';
+import { MEDIA_TYPE_GIF } from '../media-types.js';
 
 const RGB_CHANNEL_COUNT = 3;
 const RGBA_CHANNEL_COUNT = 4;
@@ -44,6 +45,8 @@ const GIF_LOOP_SUBBLOCK_ID = 1;
 const GIF_LOOP_FOREVER = 0;
 const GIF_MINIMUM_DELAY = 1;
 const YIELD_DELAY_MS = 0;
+const GIF_FILE_SIGNATURE = 'GIF89a';
+const GIF_LOOP_APPLICATION_ID = 'NETSCAPE2.0';
 
 function getGifPaletteAndIndexes(stage, context) {
   const palette = new Uint8Array(COLOR_TABLE_SIZE * RGB_CHANNEL_COUNT);
@@ -88,7 +91,7 @@ export function createGifBlob(sourceCanvas) {
 
   const packed = encodeGifLzw(indexes);
 
-  const bytes = [...textBytes('GIF89a')];
+  const bytes = [...textBytes(GIF_FILE_SIGNATURE)];
   pushUint16LE(bytes, sourceCanvas.width);
   pushUint16LE(bytes, sourceCanvas.height);
   bytes.push(
@@ -117,7 +120,7 @@ export function createGifBlob(sourceCanvas) {
     bytes.push(block.length, ...block);
   }
   bytes.push(GIF_BLOCK_TERMINATOR, GIF_TRAILER);
-  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
+  return new Blob([new Uint8Array(bytes)], { type: MEDIA_TYPE_GIF });
 }
 
 export function cloneCanvas(sourceCanvas) {
@@ -170,7 +173,7 @@ export async function createAnimatedGifBlob(
       Math.round(frameDurationMs / MILLISECONDS_PER_GIF_DELAY),
     ),
   );
-  const bytes = [...textBytes('GIF89a')];
+  const bytes = [...textBytes(GIF_FILE_SIGNATURE)];
   pushUint16LE(bytes, stage.width);
   pushUint16LE(bytes, stage.height);
   bytes.push(
@@ -181,7 +184,7 @@ export async function createAnimatedGifBlob(
     GIF_EXTENSION,
     GIF_APPLICATION_EXTENSION,
     GIF_APPLICATION_BLOCK_SIZE,
-    ...textBytes('NETSCAPE2.0'),
+    ...textBytes(GIF_LOOP_APPLICATION_ID),
     GIF_LOOP_BLOCK_SIZE,
     GIF_LOOP_SUBBLOCK_ID,
   );
@@ -224,5 +227,5 @@ export async function createAnimatedGifBlob(
     await waitFor(YIELD_DELAY_MS, signal);
   }
   bytes.push(GIF_TRAILER);
-  return new Blob([new Uint8Array(bytes)], { type: 'image/gif' });
+  return new Blob([new Uint8Array(bytes)], { type: MEDIA_TYPE_GIF });
 }

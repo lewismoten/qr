@@ -3,10 +3,18 @@ import { hasUsgsTile } from '../data/attribution.js';
 
 const STYLES = {
   boundary: { stroke: '#7d916f', width: 0.75 },
+  countyBoundary: { stroke: '#aab59a', width: 0.45 },
   land: { fill: '#d9e9c3', stroke: '#5d8069', width: 0.5 },
+  localRoad: { stroke: '#dcb69c', width: 0.3 },
   park: { fill: '#acd493', stroke: '#4f8657', width: 0.55 },
+  place: {
+    marker: '#e11d48',
+    outline: 'rgba(255,255,255,.92)',
+    text: '#243547',
+  },
   railway: { stroke: '#59636f', width: 0.55 },
   road: { stroke: '#c56f43', width: 0.75 },
+  secondaryRoad: { stroke: '#d39772', width: 0.45 },
   water: { fill: '#bfe3ed', stroke: '#75adbd', width: 0.45 },
   waterway: { stroke: '#75adbd', width: 0.45 },
   urban: { fill: 'rgba(216,210,189,.55)' },
@@ -135,16 +143,13 @@ function drawLayer(context, layer, viewport) {
       continue;
     const featureStyle = { ...style };
     if (layer.name === 'road' && feature.properties.class === 'secondary') {
-      featureStyle.stroke = '#d39772';
-      featureStyle.width = 0.45;
+      Object.assign(featureStyle, STYLES.secondaryRoad);
     }
     if (layer.name === 'road' && feature.properties.class === 'local') {
-      featureStyle.stroke = '#dcb69c';
-      featureStyle.width = 0.3;
+      Object.assign(featureStyle, STYLES.localRoad);
     }
     if (layer.name === 'boundary' && feature.properties.class === 'county') {
-      featureStyle.stroke = '#aab59a';
-      featureStyle.width = 0.45;
+      Object.assign(featureStyle, STYLES.countyBoundary);
     }
     if (layer.name === 'waterway' && feature.properties.class === 'major') {
       featureStyle.width = 0.65;
@@ -211,13 +216,13 @@ function drawPlaces(context, layer, zoom, viewport) {
     occupied.push(box);
     context.beginPath();
     context.arc(x, y, 2, 0, Math.PI * 2);
-    context.fillStyle = '#e11d48';
+    context.fillStyle = STYLES.place.marker;
     context.fill();
     context.textAlign = placement.textAlign;
     context.lineWidth = 2.5;
-    context.strokeStyle = 'rgba(255,255,255,.92)';
+    context.strokeStyle = STYLES.place.outline;
     context.strokeText(name, placement.textX, y);
-    context.fillStyle = '#243547';
+    context.fillStyle = STYLES.place.text;
     context.fillText(name, placement.textX, y);
   }
 }

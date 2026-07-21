@@ -1,5 +1,6 @@
 import { createZipBlob } from '../../app/export/zip.js';
 import { getHandbookCopy } from './copy.js';
+import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
 import { loadHandbookPages } from './pages.js';
 
 const XHTML_TYPE = 'application/xhtml+xml';
@@ -130,7 +131,7 @@ const CONTAINER =
   'media-type="application/oebps-package+xml"/></rootfiles></container>';
 
 const EPUB_CSS = `
-body { color: #172033; font: 1rem/1.55 serif; }
+body { color: ${HANDBOOK_TEXT_COLOR}; font: 1rem/1.55 serif; }
 h1, h2, h3 { font-family: sans-serif; }
 img, svg { max-width: 100%; height: auto; }
 button, input, select, textarea, dialog, nav { display: none; }

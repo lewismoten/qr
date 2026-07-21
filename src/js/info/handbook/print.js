@@ -1,11 +1,12 @@
 import { loadHandbookPages } from './pages.js';
 import { getHandbookCopy } from './copy.js';
+import { HANDBOOK_TEXT_COLOR } from './handbook-styles.js';
 
 const PRINT_DIALOG_DELAY_MS = 250;
 
 const PRINT_CSS = `
 @page { margin: .6in; }
-body { color: #172033; font: 11pt/1.5 Georgia, serif; }
+body { color: ${HANDBOOK_TEXT_COLOR}; font: 11pt/1.5 Georgia, serif; }
 h1, h2, h3 { break-after: avoid; font-family: sans-serif; }
 a { color: inherit; }
 .toc { break-after: page; }

@@ -1,3 +1,5 @@
+import { QR_STREAM_GROUP, QR_STREAM_ROLE } from '../../qr/qr-stream.js';
+
 const CODEWORD_OPACITY = {
   default: 0.7,
   header: 0.9,
@@ -10,32 +12,32 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
     const rolePriority = [
       ['version', colors.version.value],
       ['format', colors.format.value],
-      ['errorCorrection', colors.errorCorrection.value],
-      ['terminator', colors.terminator.value],
-      ['charCount', colors.charCount.value],
-      ['mode', colors.mode.value],
-      ['payload', colors.data.value],
-      ['bytePad', colors.padding.value],
-      ['padByte', colors.padding.value],
-      ['remainder', colors.remainder.value],
+      [QR_STREAM_ROLE.errorCorrection, colors.errorCorrection.value],
+      [QR_STREAM_ROLE.terminator, colors.terminator.value],
+      [QR_STREAM_ROLE.characterCount, colors.charCount.value],
+      [QR_STREAM_ROLE.mode, colors.mode.value],
+      [QR_STREAM_ROLE.payload, colors.data.value],
+      [QR_STREAM_ROLE.byteAlignment, colors.padding.value],
+      [QR_STREAM_ROLE.paddingCodeword, colors.padding.value],
+      [QR_STREAM_ROLE.remainder, colors.remainder.value],
     ];
     for (const [role, color] of rolePriority) {
       if (group.roles?.includes(role)) return color;
     }
 
     switch (group.kind) {
-      case 'errorCorrection':
+      case QR_STREAM_ROLE.errorCorrection:
         return colors.errorCorrection.value;
       case 'metadata':
         return colors.format.value;
-      case 'remainder':
+      case QR_STREAM_ROLE.remainder:
         return colors.remainder.value;
-      case 'padding':
-      case 'padByte':
+      case QR_STREAM_GROUP.padding:
+      case QR_STREAM_ROLE.paddingCodeword:
         return colors.padding.value;
-      case 'header':
+      case QR_STREAM_GROUP.header:
         return colors.mode.value;
-      case 'data':
+      case QR_STREAM_GROUP.data:
       default:
         return colors.data.value;
     }
@@ -44,10 +46,16 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
   const getCodewordStyle = (group) => {
     const color = getGroupBaseColor(group);
     let opacity = CODEWORD_OPACITY.default;
-    if (group.kind === 'header') opacity = CODEWORD_OPACITY.header;
-    else if (group.kind === 'padding' || group.kind === 'padByte')
+    if (group.kind === QR_STREAM_GROUP.header) {
+      opacity = CODEWORD_OPACITY.header;
+    } else if (
+      group.kind === QR_STREAM_GROUP.padding ||
+      group.kind === QR_STREAM_ROLE.paddingCodeword
+    ) {
       opacity = CODEWORD_OPACITY.padding;
-    else if (group.kind === 'remainder') opacity = CODEWORD_OPACITY.remainder;
+    } else if (group.kind === QR_STREAM_ROLE.remainder) {
+      opacity = CODEWORD_OPACITY.remainder;
+    }
     return { color, strokeColor: getContrastingHex(color), opacity };
   };
 

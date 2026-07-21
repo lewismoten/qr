@@ -2,6 +2,7 @@ import { decompressPmtiles } from './compression.js';
 import { decodeDirectory, findDirectoryEntry } from './directory.js';
 import { INITIAL_RANGE_BYTES, parsePmtilesHeader } from './header.js';
 import { zxyToTileId } from './tile-id.js';
+import { MEDIA_TYPE_PM_TILES } from '../../../../media-types.js';
 
 const HTTP_OK = 200;
 const HTTP_PARTIAL_CONTENT = 206;
@@ -10,7 +11,7 @@ function createRangeReader(url, fetcher) {
   let etag = null;
   return async (offset, length) => {
     const headers = {
-      Accept: 'application/vnd.pmtiles',
+      Accept: MEDIA_TYPE_PM_TILES,
       Range: `bytes=${offset}-${offset + length - 1}`,
     };
     if (etag) headers['If-Match'] = etag;

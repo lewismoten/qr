@@ -4,6 +4,7 @@ import {
   translateDocument,
 } from '../../i18n/index.js';
 import { getLocalizedGuidePath } from '../../i18n/guide-path.js';
+import { MEDIA_TYPE_HTML } from '../media-types.js';
 
 const requests = new WeakMap();
 let helpDialogId = 0;
@@ -72,7 +73,7 @@ export function ensurePanelFragment(
     document = panel?.ownerDocument,
     fetcher = document?.defaultView?.fetch?.bind(document.defaultView),
     parse = (source) =>
-      getParser(document).parseFromString(source, 'text/html'),
+      getParser(document).parseFromString(source, MEDIA_TYPE_HTML),
     initializeHelp = initializeHelpFeatures,
   } = {},
 ) {

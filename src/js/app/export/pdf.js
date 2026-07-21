@@ -1,5 +1,6 @@
 import { concatBytes, textBytes } from '../bytes.js';
 import { canvasToBlob } from './canvas-export.js';
+import { MEDIA_TYPE_JPEG, MEDIA_TYPE_PDF } from '../media-types.js';
 
 const PDF_POINTS_PER_INCH = 72;
 const PDF_DECIMAL_PLACES = 3;
@@ -11,11 +12,15 @@ const SHEET_GAP_POINTS = 10;
 const DEFAULT_PRINT_WIDTH_INCHES = 1.65;
 const PDF_RESERVED_ROOT_OBJECTS = 2;
 const UNASSIGNED_PDF_OBJECT = null;
+const PDF_FILE_HEADER = '%PDF-1.4\n';
+const PDF_CATALOG_DICTIONARY = '<< /Type /Catalog /Pages 2 0 R >>';
+const PDF_STREAM_END = '\nendstream';
+const PDF_OBJECT_END = '\nendobj\n';
 
 export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const jpegBlob = await canvasToBlob(
     sourceCanvas,
-    'image/jpeg',
+    MEDIA_TYPE_JPEG,
     quality,
     true,
   );
@@ -26,7 +31,7 @@ export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
   const height = width * (pixelHeight / pixelWidth);
   const content = `q\n${width.toFixed(PDF_DECIMAL_PLACES)} 0 0 ${height.toFixed(PDF_DECIMAL_PLACES)} 0 0 cm\n/Im0 Do\nQ\n`;
   const objects = [
-    textBytes('<< /Type /Catalog /Pages 2 0 R >>'),
+    textBytes(PDF_CATALOG_DICTIONARY),
     textBytes('<< /Type /Pages /Kids [3 0 R] /Count 1 >>'),
     textBytes(
       `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width.toFixed(PDF_DECIMAL_PLACES)} ${height.toFixed(PDF_DECIMAL_PLACES)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`,
@@ -36,7 +41,7 @@ export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
         `<< /Type /XObject /Subtype /Image /Width ${pixelWidth} /Height ${pixelHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,
       ),
       jpeg,
-      textBytes('\nendstream'),
+      textBytes(PDF_STREAM_END),
     ]),
     textBytes(
       `<< /Length ${textBytes(content).length} >>\nstream\n${content}endstream`,
@@ -46,7 +51,7 @@ export async function createPdfBlob(sourceCanvas, quality, printWidthInches) {
 }
 
 function createPdfDocumentBlob(objects) {
-  const parts = [textBytes('%PDF-1.4\n')];
+  const parts = [textBytes(PDF_FILE_HEADER)];
   const offsets = [0];
   let length = parts[0].length;
   objects.forEach((object, index) => {
@@ -54,7 +59,7 @@ function createPdfDocumentBlob(objects) {
     const part = concatBytes([
       textBytes(`${index + 1} 0 obj\n`),
       object,
-      textBytes('\nendobj\n'),
+      textBytes(PDF_OBJECT_END),
     ]);
     parts.push(part);
     length += part.length;
@@ -66,13 +71,13 @@ function createPdfDocumentBlob(objects) {
   });
   xref += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
   parts.push(textBytes(xref));
-  return new Blob(parts, { type: 'application/pdf' });
+  return new Blob(parts, { type: MEDIA_TYPE_PDF });
 }
 
 export async function capturePdfFrame(sourceCanvas, quality, printWidthInches) {
   const jpegBlob = await canvasToBlob(
     sourceCanvas,
-    'image/jpeg',
+    MEDIA_TYPE_JPEG,
     quality,
     true,
   );
@@ -192,7 +197,7 @@ export function createPdfSheetBlob(frames) {
             `<< /Type /XObject /Subtype /Image /Width ${frame.width} /Height ${frame.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${frame.jpeg.length} >>\nstream\n`,
           ),
           frame.jpeg,
-          textBytes('\nendstream'),
+          textBytes(PDF_STREAM_END),
         ]),
       );
     });
@@ -213,7 +218,7 @@ export function createPdfSheetBlob(frames) {
     pageReferences.push(pageReference);
   }
 
-  objects[0] = textBytes('<< /Type /Catalog /Pages 2 0 R >>');
+  objects[0] = textBytes(PDF_CATALOG_DICTIONARY);
   objects[1] = textBytes(
     `<< /Type /Pages /Kids [${pageReferences.map((reference) => `${reference} 0 R`).join(' ')}] /Count ${pageReferences.length} >>`,
   );

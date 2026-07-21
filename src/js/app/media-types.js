@@ -1,0 +1,9 @@
+export const MEDIA_TYPE_BINARY = 'application/octet-stream';
+export const MEDIA_TYPE_GIF = 'image/gif';
+export const MEDIA_TYPE_HTML = 'text/html';
+export const MEDIA_TYPE_JPEG = 'image/jpeg';
+export const MEDIA_TYPE_PDF = 'application/pdf';
+export const MEDIA_TYPE_PM_TILES = 'application/vnd.pmtiles';
+export const MEDIA_TYPE_PNG = 'image/png';
+export const MEDIA_TYPE_SVG = 'image/svg+xml';
+export const MEDIA_TYPE_ZIP = 'application/zip';

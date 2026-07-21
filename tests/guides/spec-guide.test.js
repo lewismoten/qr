@@ -5,6 +5,8 @@ import { describe, test } from 'node:test';
 import { readLocaleSource } from '../helpers/locales.js';
 import { readHtmlWithIncludes } from '../../scripts/html/includes.mjs';
 
+const MINIMUM_SPECIFICATION_SOURCE_LINKS = 10;
+
 const read = (file) => {
   if (file.endsWith('.html')) return readHtmlWithIncludes(file);
   return readFile(new URL('../../' + file, import.meta.url), 'utf8');
@@ -31,14 +33,20 @@ describe('specification guide', () => {
   });
 
   test('shares the mask-preview blue throughout its visuals', async () => {
-    const sources = await Promise.all([
+    const [html, base, visuals, selector, colors] = await Promise.all([
       read('src/html/spec.html'),
       read('src/css/spec/spec-base.css'),
       read('src/js/spec/visual-models.js'),
       read('src/js/app/ui/debug/mask-selector.js'),
+      read('src/js/app/colors.js'),
     ]);
-    sources.forEach((source) => assert.match(source, /#60a5fa/i));
-    sources.forEach((source) => assert.doesNotMatch(source, /#2563eb/i));
+    [html, base, visuals, colors].forEach((source) => {
+      assert.match(source, /#60a5fa/i);
+    });
+    assert.match(selector, /COLOR_DEBUG_MASK_EFFECT/);
+    [html, base, visuals, selector, colors].forEach((source) => {
+      assert.doesNotMatch(source, /#2563eb/i);
+    });
   });
 
   test('links only to repository source files that exist', async () => {
@@ -48,7 +56,7 @@ describe('specification guide', () => {
       .map((match) => match[1])
       .filter((href) => href.startsWith(prefix))
       .map((href) => href.slice(prefix.length));
-    assert.ok(paths.length >= 10);
+    assert.ok(paths.length >= MINIMUM_SPECIFICATION_SOURCE_LINKS);
     await Promise.all(
       paths.map((path) => access(new URL('../../' + path, import.meta.url))),
     );
