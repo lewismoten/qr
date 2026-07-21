@@ -30,7 +30,11 @@ function normalizeResources(container, pageUrl) {
       const value = element.getAttribute(attribute);
       if (!value || value.startsWith('#')) continue;
       try {
-        element.setAttribute(attribute, publicUrl(value, pageUrl).href);
+        const resolved =
+          attribute === 'href'
+            ? publicUrl(value, pageUrl)
+            : new URL(value, pageUrl);
+        element.setAttribute(attribute, resolved.href);
       } catch {
         // Keep malformed authoring visible instead of aborting an export.
       }
@@ -136,10 +140,14 @@ async function extractPage(document, url, route, signal) {
       item.remove();
     });
   clone.querySelectorAll('img[data-fallback-src]').forEach((image) => {
-    if (!image.getAttribute('src')) {
-      image.setAttribute('src', image.dataset.fallbackSrc);
-    }
-    image.removeAttribute('data-fallback-src');
+    image.remove();
+  });
+  clone.querySelectorAll('.process-list li').forEach((item) => {
+    const number = item.querySelector(':scope > span');
+    const title = item.querySelector('strong');
+    if (!number || !title) return;
+    title.prepend(`${number.textContent.trim()}. `);
+    number.remove();
   });
   clone.querySelectorAll('[hidden]').forEach((item) => {
     item.removeAttribute('hidden');

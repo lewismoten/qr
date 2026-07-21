@@ -26,7 +26,7 @@ th, td { padding: 0.25rem; border: 1px solid #94a3b8; }
 button, input, select, textarea, dialog, footer, .spec-footer,
 .info-page-header, nav:not(.handbook-toc) { display: none !important; }
 .handbook-cover, .handbook-title-page, .handbook-preface,
-.handbook-division { break-after: page; min-height: 8.25in; }
+.handbook-division { break-before: page; break-after: page; min-height: 8.25in; }
 .handbook-cover, .handbook-division {
   box-sizing: border-box;
   padding: 0.65in;
@@ -64,7 +64,7 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 .handbook-toc ol { margin: 0.12rem 0; padding-inline-start: 1.35rem; }
 .handbook-toc li { margin: 0.1rem 0; }
 .handbook-toc-group { font-weight: 700; }
-.handbook-chapter { break-before: page; }
+.handbook-chapter { break-before: page; page-break-before: always; }
 .handbook-chapter > h1 { margin-top: 0; }
 .handbook-external-link { color: #9a3412; text-decoration-style: double; }
 .handbook-external-indicator { margin-inline-start: 0.25em; font-weight: 900; }
@@ -76,15 +76,23 @@ button, input, select, textarea, dialog, footer, .spec-footer,
   border: 1px solid #99c9c2; border-radius: 0.45rem; text-decoration: none;
 }
 .reference-links a span { display: block; font-size: 8pt; }
-.unit-example-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.35rem; }
-.unit-example { padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 0.4rem; }
+.unit-example-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem;
+}
+.unit-example {
+  min-width: 0; padding: 0.35rem; overflow: hidden;
+  border: 1px solid #cbd5e1; border-radius: 0.4rem;
+}
+.payload-units-card { grid-column: 1 / -1; }
 .unit-stream { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 0.15rem; }
 .unit-stream > span { padding: 0.25rem; color: white; border-radius: 0.25rem; }
 .unit-stream .mode { background: var(--mode); }
 .unit-stream .count { background: var(--count); }
 .unit-stream .data { background: var(--data); }
 .unit-stream small { display: block; font-size: 6pt; }
-.unit-stream code { color: inherit; font-size: 7pt; }
+.unit-stream code {
+  color: inherit; font-size: 7pt; overflow-wrap: anywhere; word-break: break-all;
+}
 .mixed-mode-stream { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.2rem; }
 .mixed-segment { padding: 0.3rem; background: #0f766e; color: white; }
 .mixed-segment.alphanumeric { background: #0d9488; }
@@ -107,8 +115,20 @@ button, input, select, textarea, dialog, footer, .spec-footer,
   break-inside: avoid;
 }
 .hero img { max-height: 3in; object-fit: contain; }
-.geo-world-map { min-height: 0 !important; height: auto !important; aspect-ratio: 2 / 1; }
+.geo-world-map {
+  min-height: 0 !important; height: auto !important; position: relative;
+  overflow: hidden; aspect-ratio: 2 / 1; background: #bde6ed;
+}
 .geo-world-map img { width: 100%; height: 100%; object-fit: contain; }
+.geo-world-overlay, .geo-world-marker, .geo-world-label,
+.geo-world-map .slippy-map-controls { display: none !important; }
+.geo-world-map .slippy-map-attribution {
+  position: absolute; z-index: 2; inset: auto 0 0 auto; padding: 0.1rem 0.2rem;
+  background: rgba(255, 255, 255, 0.9); font-size: 6pt;
+}
+.geo-layer-table { table-layout: fixed; font-size: 8pt; }
+.geo-layer-table tr { break-inside: avoid; page-break-inside: avoid; }
+.geo-layer-table p { margin: 0; overflow-wrap: anywhere; }
 .geo-layer-sample {
   width: 0.8in; margin: auto; position: relative; overflow: hidden;
   border: 1px solid #94a3b8; aspect-ratio: 1; background: #dbeafe;
@@ -124,9 +144,7 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 }
 .geo-layer-sample-mosaic canvas { width: 100%; height: 100%; }
 .geo-layer-sample-marker {
-  width: 0.12in; height: 0.12in; position: absolute; z-index: 2;
-  inset: 50% auto auto 50%; transform: translate(-50%, -50%);
-  border: 1px solid white; border-radius: 50%; background: #e11d48;
+  display: none;
 }
 .geo-layer-sample figcaption {
   position: absolute; z-index: 3; inset: auto 0 0; padding: 0.05rem;
@@ -135,4 +153,11 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 }
 .guide-pixel-sample { width: 2.6in !important; max-height: 3in; margin-inline: auto; }
 .guide-pixel-sample svg, .guide-pixel-sample img { max-height: 3in; }
+.process-list { padding: 0; list-style: none; }
+.process-list li {
+  margin-bottom: 0.35rem; padding: 0.35rem;
+  border: 1px solid #cbd5e1; break-inside: avoid;
+}
+.process-list strong { color: var(--book-teal); }
+.process-list p { margin: 0.15rem 0 0; }
 `;

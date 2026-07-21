@@ -12,6 +12,13 @@ ${HANDBOOK_DOCUMENT_CSS}
 body { padding: 0.4rem; }
 .handbook-cover, .handbook-title-page, .handbook-preface,
 .handbook-division { min-height: 90vh; }
+.unit-example-grid, .visual-grid, .reference-links, .implementation-links,
+.mixed-example-layout { display: block; }
+.unit-example, .visual-card, .reference-links a { margin-bottom: 0.65rem; }
+.unit-stream { display: block; }
+.unit-stream > span { margin-bottom: 0.18rem; display: block; }
+.mask-formula-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.geo-layer-table { font-size: 0.72rem; }
 `;
 
 const escapeXml = (value) =>
@@ -98,6 +105,7 @@ export function packageDocument(documents, locale, identifier, copy, metadata) {
     );
   });
   const spine = documents.map((item) => `<itemref idref="${item.id}"/>`);
+  spine.splice(Math.min(3, spine.length), 0, '<itemref idref="nav"/>');
   return (
     '<?xml version="1.0" encoding="UTF-8"?>' +
     '<package xmlns="http://www.idpf.org/2007/opf" version="3.0" ' +
