@@ -4,6 +4,10 @@ import { test } from 'node:test';
 import { createPmtilesArchiveSet } from '../../../../src/js/app/ui/content/geo/pmtiles/archive-set.js';
 import { decompressPmtiles } from '../../../../src/js/app/ui/content/geo/pmtiles/compression.js';
 import {
+  decodeDirectory,
+  findDirectoryEntry,
+} from '../../../../src/js/app/ui/content/geo/pmtiles/directory.js';
+import {
   HEADER_BYTES,
   INITIAL_RANGE_BYTES,
   parsePmtilesHeader,
@@ -11,6 +15,18 @@ import {
 import { createPmtilesSource } from '../../../../src/js/app/ui/content/geo/pmtiles/source.js';
 
 const encoder = new TextEncoder();
+
+function varint(value) {
+  const bytes = [];
+  let remaining = value;
+  do {
+    let byte = remaining % 128;
+    remaining = Math.floor(remaining / 128);
+    if (remaining) byte |= 0x80;
+    bytes.push(byte);
+  } while (remaining);
+  return bytes;
+}
 
 function archiveHeader({
   rootOffset = HEADER_BYTES,
@@ -63,6 +79,24 @@ test('rejects invalid PMTiles header identity and ranges', () => {
     true,
   );
   assert.throws(() => parsePmtilesHeader(unsafeOffset), /integer range/);
+});
+
+test('covers empty, oversized, and boundary directory entries', () => {
+  assert.throws(() => decodeDirectory(new Uint8Array([0])), /empty/);
+  assert.throws(
+    () => decodeDirectory(new Uint8Array(varint(1_000_001))),
+    /entry count/,
+  );
+  assert.deepEqual(decodeDirectory(new Uint8Array([1, 0, 0, 1, 0])), [
+    { tileId: 0, runLength: 0, length: 1, offset: -1 },
+  ]);
+  const entries = [
+    { tileId: 2, runLength: 0 },
+    { tileId: 4, runLength: 1 },
+  ];
+  assert.equal(findDirectoryEntry(entries, 1), null);
+  assert.equal(findDirectoryEntry(entries, 2), entries[0]);
+  assert.equal(findDirectoryEntry(entries, 5), null);
 });
 
 test('reports unavailable browser gzip decompression', async () => {

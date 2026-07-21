@@ -127,4 +127,7 @@ test('rejects unknown and truncated MVT geometry commands', () => {
   assert.throws(() => decodeGeometry([3]), /Unknown/);
   assert.throws(() => decodeGeometry([9, 2]), /Truncated/);
   assert.deepEqual(decodeGeometry([15]), []);
+  assert.deepEqual(decodeGeometry([10, 2, 2]), [
+    { points: [{ x: 1, y: 1 }], closed: false },
+  ]);
 });
