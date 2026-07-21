@@ -12,8 +12,8 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="canonical" href="https://qr.lewismoten.com/privacy.html" />
     <script>
-      if (new URLSearchParams(location.search).has('embed'))
-        document.documentElement.classList.add('is-embedded');
+      if (new URLSearchParams(location.search).has("embed"))
+        document.documentElement.classList.add("is-embedded");
     </script>
     <link rel="stylesheet" href="dist/app.min.css" />
   </head>
@@ -99,6 +99,34 @@
               how it will be displayed, shared and stored. Hiding a password in
               the on-screen payload preview does not encrypt the generated QR
               code.
+            </p>
+          </section>
+
+          <section>
+            <h2>Location permission and accuracy</h2>
+            <p>
+              The application requests location only after you select Use my
+              location. Your browser or operating system decides how to estimate
+              it and may use GPS, nearby Wi-Fi networks, mobile network signals,
+              an IP-address estimate or other device and platform signals. Those
+              location services are controlled by the browser, operating system
+              and device provider, not by this application, and may have their
+              own privacy practices.
+            </p>
+            <p>
+              If permission is granted, the application receives the latitude
+              and longitude returned by the browser, places them in the Geo
+              fields, and centers a detailed map when that view supports it. It
+              does not continuously track your position or intentionally send
+              those coordinates to this site's server. If you open the
+              OpenStreetMap view, however, requested tiles can reveal the
+              approximate map area as described below.
+            </p>
+            <p>
+              Browser-provided coordinates may be approximate, stale or
+              incorrect, especially when GPS is unavailable or the estimate
+              relies on network information. Check important coordinates before
+              generating or sharing a QR code.
             </p>
           </section>
 

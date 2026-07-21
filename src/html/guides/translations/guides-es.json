@@ -1,4 +1,5 @@
 {
+  "Use my location asks your browser for permission only when you select the button. If permission is granted, the returned latitude and longitude replace the fields and marker; a detailed active map also centers on that position. The application does not continuously track your location.": "Usar mi ubicación solicita permiso al navegador únicamente cuando usted pulsa el botón. Si concede el permiso, la latitud y la longitud obtenidas sustituyen los valores de los campos y la posición del marcador; si hay un mapa detallado activo, también se centra en esa ubicación. La aplicación no realiza un seguimiento continuo de su posición.",
   "About the QR Code Generator": "Acerca del generador de códigos QR",
   "Learn what the QR Code Generator creates, how QR codes work, how customization affects reliability, and how browser-based processing protects privacy.": "Aprenda lo que crea el generador de códigos QR, cómo funcionan los códigos QR, cómo la personalización afecta la fiabilidad y cómo el procesamiento basado en el navegador protege la privacidad.",
   "Inside the matrix": "Dentro de la matriz",
