@@ -26,6 +26,14 @@
     "vcardEmail": "lewismoten@gmail.com",
     "vcardWebsite": "https://lewismoten.com"
   },
+  "tracking": {
+    "open": "Review tracking parameters",
+    "title": "Tracking parameters found",
+    "explanation": "These parameters are commonly used to measure clicks or campaigns. They are not required by most destination pages, but removing them can sometimes change a link. Review the list before continuing.",
+    "detected": "Detected parameters:",
+    "keep": "Keep URL unchanged",
+    "remove": "Remove tracking parameters"
+  },
   "data": {
     "bulkFileUnavailable": "File format is unavailable in Bulk Import. Use the dedicated File format for binary data.",
     "bulkHeaders": "The first row must contain these field names:",

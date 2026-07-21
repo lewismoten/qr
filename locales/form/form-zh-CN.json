@@ -26,6 +26,14 @@
     "vcardEmail": "lewismoten@gmail.com",
     "vcardWebsite": "https://lewismoten.com"
   },
+  "tracking": {
+    "open": "查看跟踪参数",
+    "title": "发现跟踪参数",
+    "explanation": "这些参数通常用于衡量点击或推广活动。大多数目标页面并不需要这些参数，但移除参数有时可能改变链接。请先检查列表，再决定是否继续。",
+    "detected": "检测到的参数：",
+    "keep": "保留原网址",
+    "remove": "移除跟踪参数"
+  },
   "data": {
     "bulkFileUnavailable": "批量导入不支持文件格式。请使用专用文件格式处理二进制数据。",
     "bulkHeaders": "第一行必须包含以下字段名：",

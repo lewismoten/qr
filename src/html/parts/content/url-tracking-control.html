@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL tracking parameter controls</title>
+    <link rel="stylesheet" href="../../../dist/app.min.css" />
+  </head>
+  <body>
+    <div class="url-tracking-control" data-url-tracking-control hidden>
+      <button
+        class="url-tracking-warning"
+        type="button"
+        data-url-tracking-open
+        aria-haspopup="dialog"
+      >
+        <span aria-hidden="true">⚠</span>
+        <span class="sr-only" data-i18n="form.tracking.open"
+          >Review tracking parameters</span
+        >
+      </button>
+      <dialog
+        class="url-tracking-dialog"
+        data-url-tracking-dialog
+        aria-label="Tracking parameters found"
+        data-i18n-aria-label="form.tracking.title"
+      >
+        <div class="url-tracking-dialog-content">
+          <h2 data-i18n="form.tracking.title">Tracking parameters found</h2>
+          <p data-i18n="form.tracking.explanation">
+            These parameters are commonly used to measure clicks or campaigns.
+            They are not required by most destination pages, but removing them
+            can sometimes change a link. Review the list before continuing.
+          </p>
+          <p>
+            <span data-i18n="form.tracking.detected">Detected parameters:</span>
+            <code data-url-tracking-names></code>
+          </p>
+          <div class="url-tracking-dialog-actions">
+            <button
+              class="secondary-button"
+              type="button"
+              data-url-tracking-keep
+              data-i18n="form.tracking.keep"
+            >
+              Keep URL unchanged
+            </button>
+            <button
+              class="secondary-button url-tracking-remove"
+              type="button"
+              data-url-tracking-remove
+              data-i18n="form.tracking.remove"
+            >
+              Remove tracking parameters
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  </body>
+</html>

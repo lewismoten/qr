@@ -1,0 +1,66 @@
+.url-label-with-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.url-tracking-control {
+  flex: 0 0 auto;
+}
+
+.url-tracking-warning {
+  display: grid;
+  width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(180, 83, 9, 0.28);
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.14);
+  color: #92400e;
+  font-size: 0.9rem;
+}
+
+.url-tracking-warning:hover,
+.url-tracking-warning:focus-visible {
+  background: rgba(245, 158, 11, 0.24);
+}
+
+.url-tracking-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid rgba(19, 34, 53, 0.14);
+  border-radius: 1rem;
+  box-shadow: 0 1.25rem 3rem rgba(19, 34, 53, 0.24);
+}
+
+.url-tracking-dialog::backdrop {
+  background: rgba(19, 34, 53, 0.38);
+}
+
+.url-tracking-dialog-content {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem;
+}
+
+.url-tracking-dialog h2,
+.url-tracking-dialog p {
+  margin: 0;
+}
+
+.url-tracking-dialog code {
+  overflow-wrap: anywhere;
+}
+
+.url-tracking-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.url-tracking-remove {
+  border-color: rgba(180, 83, 9, 0.28);
+  color: #92400e;
+}

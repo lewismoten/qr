@@ -3,6 +3,7 @@ import {
   formatCalendarInputTime,
   serializeCalendarEvent,
 } from '../../../data/calendar.js';
+import { setupUrlTrackingControl } from '../simple/url-tracking-control.js';
 
 const SECONDS_PER_MINUTE = 60;
 const MILLISECONDS_PER_SECOND = 1000;
@@ -21,6 +22,7 @@ export function createEventSection({
   url,
   timeFields,
 }) {
+  setupUrlTrackingControl(url);
   const initialize = () => {
     const start = new Date();
     start.setSeconds(0, 0);

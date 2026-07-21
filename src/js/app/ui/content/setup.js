@@ -3,6 +3,7 @@ import { createContentPluginRegistry } from './plugin-registry.js';
 import { ensurePanelFragment } from '../fragment-loader.js';
 import { lookup } from '../../../i18n/index.js';
 import { validateUrl } from './simple/url-validation.js';
+import { setupUrlTrackingControl } from './simple/url-tracking-control.js';
 
 export function createContentSections({
   document,
@@ -14,6 +15,7 @@ export function createContentSections({
   validatePrintableText,
   file,
 }) {
+  const urlTracking = setupUrlTrackingControl(e.urlInput);
   const region = e.tabPanels[0]?.parentElement;
   const eventLoader = createLazySection({
     region,
@@ -273,6 +275,7 @@ export function createContentSections({
     number,
     phone,
     shared,
+    urlTracking,
     vcard,
     plugins: registry,
     ensureFormat,

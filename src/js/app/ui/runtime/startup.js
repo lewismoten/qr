@@ -52,6 +52,7 @@ export async function startApplication({
 
   systems.contentSections.event.initialize();
   elements.urlInput.value = runtime.getDefaultUrl();
+  systems.contentSections.urlTracking.sync();
   systems.output.sync();
   systems.syncFormat();
   systems.contentSections.phone.initialize();

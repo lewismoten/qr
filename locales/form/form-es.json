@@ -26,6 +26,14 @@
     "vcardEmail": "lewismoten@gmail.com",
     "vcardWebsite": "https://lewismoten.com"
   },
+  "tracking": {
+    "open": "Revisar los parámetros de seguimiento",
+    "title": "Se han encontrado parámetros de seguimiento",
+    "explanation": "Estos parámetros suelen utilizarse para medir clics o campañas. La mayoría de las páginas de destino no los necesitan, pero eliminarlos puede modificar algunos enlaces. Revise la lista antes de continuar.",
+    "detected": "Parámetros detectados:",
+    "keep": "Conservar la URL sin cambios",
+    "remove": "Eliminar los parámetros de seguimiento"
+  },
   "data": {
     "bulkFileUnavailable": "El formato Archivo no está disponible en la importación masiva. Usa el formato Archivo para datos binarios.",
     "bulkHeaders": "La primera fila debe contener estos nombres de campo:",
