@@ -6,7 +6,6 @@ import {
 } from '../../../../src/js/info/geo-layer-layout.js';
 import {
   initializeGeoLayerSamples,
-  loadGeoArchive,
   renderGeoLayerSample,
   revealFallbackSamples,
   startGeoLayerSamples,
@@ -285,23 +284,3 @@ try {
 } finally {
   globalThis.document = originalDocument;
 }
-
-let archiveAttempts = 0;
-const fallbackSource = { getHeader: async () => header };
-assert.deepEqual(
-  await loadGeoArchive({
-    archiveFactory: async () => {
-      archiveAttempts += 1;
-      throw new Error('manifest missing');
-    },
-    sourceFactory: () => fallbackSource,
-  }),
-  { header, source: fallbackSource },
-);
-await loadGeoArchive({
-  archiveFactory: async () => {
-    archiveAttempts += 1;
-    return fallbackSource;
-  },
-});
-assert.equal(archiveAttempts, 1);

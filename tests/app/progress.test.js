@@ -38,14 +38,14 @@ const elements = createElements();
 const wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
 const progress = createTaskProgress(elements, () => performance.now(), {
-  showDelay: 10,
-  completionHold: 15,
+  showDelay: 1,
+  completionHold: 2,
   windowObject: globalThis,
 });
 
 const quick = progress.start({ title: 'Quick', phase: 'Working' });
 quick.finish({ completed: true });
-await wait(20);
+await wait(3);
 assert.equal(
   elements.dialog.open,
   false,
@@ -53,7 +53,7 @@ assert.equal(
 );
 
 const long = progress.start({ title: 'Long', phase: 'Working' });
-await wait(12);
+await wait(2);
 assert.equal(elements.dialog.open, true, 'long tasks should display progress');
 long.update(0.8, 'Almost done');
 long.finish({ completed: true });
@@ -67,7 +67,7 @@ assert.equal(
   true,
   'completed state should remain visible briefly',
 );
-await wait(20);
+await wait(3);
 assert.equal(
   elements.dialog.open,
   false,
@@ -99,7 +99,7 @@ replaced.finish({ completed: true });
 replacement.finish();
 
 const incomplete = progress.start({ title: 'Incomplete', phase: 'Working' });
-await wait(12);
+await wait(2);
 assert.equal(elements.dialog.open, true);
 incomplete.finish();
 assert.equal(
@@ -114,14 +114,14 @@ assert.equal(directCancel.signal.aborted, true);
 directCancel.finish();
 
 const visibleOld = progress.start({ title: 'Visible old', phase: 'Working' });
-await wait(12);
+await wait(2);
 const visibleNew = progress.start({ title: 'Visible new', phase: 'Working' });
 assert.equal(visibleOld.signal.aborted, true);
 assert.equal(elements.dialog.open, false);
 visibleNew.finish();
 
 const holding = progress.start({ title: 'Holding', phase: 'Working' });
-await wait(12);
+await wait(2);
 holding.finish({ completed: true });
 const afterHold = progress.start({ title: 'After hold', phase: 'Working' });
 assert.equal(elements.dialog.open, false);
