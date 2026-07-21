@@ -1,0 +1,15 @@
+{
+  "app": {
+    "legacyCount": 366,
+    "legacyDigest": "3bd99529978d4e72ac18f56564afd49548743f72d9c00b0d0a12f4d88142770f"
+  },
+  "json": {
+    "legacyCount": 205,
+    "legacyDigest": "9a5f02e86ac422f39941208a5012e4a0169689d15c9fa7bb1957e7484942a7ec"
+  },
+  "tooling": {
+    "legacyCount": 515,
+    "legacyDigest": "f81a7e22b6bf42823835ee580bc66c5c8284e3c0a2b7f93d31c455dbb93c24bd"
+  },
+  "maximumLength": 16
+}
