@@ -127,6 +127,12 @@ test('handbook exports include publication front matter', async () => {
   assert.match(epubDocuments, /properties="cover-image"/);
   assert.match(epubDocuments, /name="cover" content="cover-image"/);
   assert.match(epubDocuments, /epub:type="cover"/);
+  const pages = await readFile('src/js/info/handbook/pages.js', 'utf8');
+  assert.match(pages, /MAP_WATER_COLOR/);
+  assert.match(pages, /context\.fillRect/);
+  assert.match(pages, /image\.className = canvas\.className/);
+  assert.match(pages, /MAP_SAMPLE_EXPORT_SIZE/);
+  assert.match(pages, /replaceMapSamples/);
   assert.match(frontMatter, /Lewis Moten III/);
   assert.match(frontMatter, /createDivision/);
   assert.match(build, /site-metadata\.json/);

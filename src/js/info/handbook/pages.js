@@ -69,6 +69,74 @@ async function inlineImages(container, signal) {
 
 const PAGE_RENDER_TIMEOUT_MS = 15_000;
 const PAGE_SETTLE_DELAY_MS = 50;
+const MAP_CANVAS_CLASS = 'slippy-map-vector-tile';
+const MAP_WATER_COLOR = '#bfe3ed';
+const MAP_SAMPLE_EXPORT_SIZE = 512;
+
+function canvasImageSource(canvas) {
+  if (!canvas.classList.contains(MAP_CANVAS_CLASS)) {
+    return canvas.toDataURL('image/png');
+  }
+  const flattened = document.createElement('canvas');
+  flattened.width = canvas.width;
+  flattened.height = canvas.height;
+  const context = flattened.getContext('2d');
+  context.fillStyle = MAP_WATER_COLOR;
+  context.fillRect(0, 0, flattened.width, flattened.height);
+  context.drawImage(canvas, 0, 0);
+  return flattened.toDataURL('image/png');
+}
+
+function replaceCanvas(canvas, source) {
+  const image = document.createElement('img');
+  image.src = source;
+  image.alt = canvas.getAttribute('aria-label') || '';
+  image.className = canvas.className;
+  image.setAttribute('width', String(canvas.width));
+  image.setAttribute('height', String(canvas.height));
+  canvas.replaceWith(image);
+}
+
+function tileOffset(tile, property) {
+  return (
+    (Number.parseFloat(tile.style[property]) / 100) * MAP_SAMPLE_EXPORT_SIZE
+  );
+}
+
+function mapSampleSource(mosaic) {
+  const output = document.createElement('canvas');
+  output.width = MAP_SAMPLE_EXPORT_SIZE;
+  output.height = MAP_SAMPLE_EXPORT_SIZE;
+  const context = output.getContext('2d');
+  context.fillStyle = MAP_WATER_COLOR;
+  context.fillRect(0, 0, output.width, output.height);
+  for (const tile of mosaic.querySelectorAll('.slippy-map-tile')) {
+    const canvas = tile.querySelector(`canvas.${MAP_CANVAS_CLASS}`);
+    if (!canvas) continue;
+    context.drawImage(
+      canvas,
+      tileOffset(tile, 'left'),
+      tileOffset(tile, 'top'),
+      MAP_SAMPLE_EXPORT_SIZE,
+      MAP_SAMPLE_EXPORT_SIZE,
+    );
+  }
+  return output.toDataURL('image/png');
+}
+
+function replaceMapSamples(content, clone) {
+  const sources = [...content.querySelectorAll('.geo-layer-sample-mosaic')];
+  const targets = [...clone.querySelectorAll('.geo-layer-sample-mosaic')];
+  targets.forEach((mosaic, index) => {
+    const image = document.createElement('img');
+    image.className = 'geo-layer-sample-composite';
+    image.alt = '';
+    image.width = MAP_SAMPLE_EXPORT_SIZE;
+    image.height = MAP_SAMPLE_EXPORT_SIZE;
+    image.src = mapSampleSource(sources[index]);
+    mosaic.replaceChildren(image);
+  });
+}
 
 function renderedDocument(url, signal) {
   return new Promise((resolve, reject) => {
@@ -120,13 +188,13 @@ async function extractPage(document, url, route, signal) {
     document.querySelector('main') ||
     document.body;
   const clone = content.cloneNode(true);
-  const canvases = [...content.querySelectorAll('canvas')];
+  replaceMapSamples(content, clone);
+  const canvases = [...content.querySelectorAll('canvas')].filter(
+    (canvas) => !canvas.closest('.geo-layer-sample-mosaic'),
+  );
   [...clone.querySelectorAll('canvas')].forEach((canvas, index) => {
     try {
-      const image = document.createElement('img');
-      image.src = canvases[index].toDataURL('image/png');
-      image.alt = canvases[index].getAttribute('aria-label') || '';
-      canvas.replaceWith(image);
+      replaceCanvas(canvas, canvasImageSource(canvases[index]));
     } catch {
       canvas.remove();
     }

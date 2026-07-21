@@ -156,7 +156,11 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 .geo-layer-sample-mosaic .slippy-map-tile {
   position: absolute; width: 100%; height: 100%; overflow: hidden;
 }
-.geo-layer-sample-mosaic canvas { width: 100%; height: 100%; }
+.geo-layer-sample-mosaic canvas,
+.geo-layer-sample-mosaic .slippy-map-vector-tile,
+.geo-layer-sample-mosaic .geo-layer-sample-composite {
+  width: 100%; max-width: none; height: 100%; display: block;
+}
 .geo-layer-sample-marker {
   display: none;
 }
