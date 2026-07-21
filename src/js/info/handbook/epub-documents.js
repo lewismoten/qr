@@ -18,7 +18,19 @@ body { padding: 0.4rem; }
 .unit-stream { display: block; }
 .unit-stream > span { margin-bottom: 0.18rem; display: block; }
 .mask-formula-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.geo-layer-table { font-size: 0.72rem; }
+.geo-layer-table, .geo-layer-table tbody { width: 100%; display: block; }
+.geo-layer-table thead { display: none; }
+.geo-layer-table tr {
+  margin-bottom: 0.7rem; padding: 0.45rem; display: block;
+  border: 1px solid #94a3b8; border-radius: 0.4rem;
+  break-inside: avoid !important; page-break-inside: avoid !important;
+  -webkit-column-break-inside: avoid;
+}
+.geo-layer-table td { padding: 0.2rem; display: block; border: 0; }
+.geo-layer-table td:first-child {
+  color: var(--book-teal); font: 700 1rem/1.2 sans-serif;
+}
+.geo-layer-table .geo-layer-sample { margin: 0.35rem auto 0; }
 `;
 
 const escapeXml = (value) =>

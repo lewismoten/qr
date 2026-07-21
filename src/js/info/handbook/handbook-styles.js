@@ -141,7 +141,9 @@ button, input, select, textarea, dialog, footer, .spec-footer,
   width: calc(var(--sample-scale, 1) * 100%); max-width: none;
   height: calc(var(--sample-scale, 1) * 100%); object-fit: cover;
 }
-.geo-layer-sample-mosaic { position: absolute; display: block; overflow: hidden; inset: 0; }
+.geo-layer-sample-mosaic {
+  position: absolute; display: block; overflow: hidden; inset: 0 0 0.18in;
+}
 .geo-layer-sample.has-centered-map > img { visibility: hidden; }
 .geo-layer-sample-mosaic .slippy-map-tile {
   position: absolute; width: 100%; height: 100%; overflow: hidden;
@@ -152,7 +154,8 @@ button, input, select, textarea, dialog, footer, .spec-footer,
 }
 .geo-layer-sample figcaption {
   position: absolute; z-index: 3; inset: auto 0 0; padding: 0.05rem;
-  background: rgba(19, 34, 53, 0.82); color: white; font-size: 5pt;
+  border-top: 1px solid #94a3b8; background: #f8fafc;
+  color: #334155; font-size: 5pt;
   text-align: center;
 }
 .guide-pixel-sample { width: 2.6in !important; max-height: 3in; margin-inline: auto; }
