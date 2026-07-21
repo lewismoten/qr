@@ -157,6 +157,8 @@
 .spec-footer .guide-language-switcher {
   position: relative;
   flex: 0 0 auto;
+  margin-inline-start: auto;
+  order: 3;
 }
 
 .spec-footer .guide-language-switcher summary {

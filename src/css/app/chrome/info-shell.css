@@ -203,6 +203,8 @@
 .info-page-footer .guide-language-switcher {
   position: relative;
   flex: 0 0 auto;
+  margin-inline-start: auto;
+  order: 3;
 }
 
 .info-page-footer .guide-language-switcher summary {
@@ -274,7 +276,20 @@
   }
 
   .info-page-footer nav {
-    width: 100%;
+    flex: 1;
+    overflow: visible;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .info-page-footer .guide-language-switcher summary {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
     justify-content: center;
+    font-size: 0;
+  }
+
+  .info-page-footer .guide-language-switcher summary span {
+    font-size: 1.2rem;
   }
 }

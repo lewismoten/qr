@@ -33,8 +33,21 @@
 
 @media (max-width: 42rem) {
   .handbook-actions {
-    order: 2;
-    width: 100%;
-    overflow-x: auto;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .handbook-action {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
+  }
+
+  .handbook-action-icon {
+    margin-inline-end: 0;
+    font-size: 1.1rem;
+  }
+
+  .handbook-action-label {
+    display: none;
   }
 }

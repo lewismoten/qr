@@ -108,13 +108,15 @@ test('PDF export prints semantic HTML instead of page images', async () => {
 });
 
 test('handbook exports include publication front matter', async () => {
-  const [pdf, epub, frontMatter, build, progressStyles] = await Promise.all([
-    readFile('src/js/info/handbook/handbook-pdf.js', 'utf8'),
-    readFile('src/js/info/handbook/epub.js', 'utf8'),
-    readFile('src/js/info/handbook/front-matter.js', 'utf8'),
-    readFile('scripts/build.mjs', 'utf8'),
-    readFile('src/css/components/task-progress.css', 'utf8'),
-  ]);
+  const [pdf, epub, frontMatter, build, progressStyles, setup] =
+    await Promise.all([
+      readFile('src/js/info/handbook/handbook-pdf.js', 'utf8'),
+      readFile('src/js/info/handbook/epub.js', 'utf8'),
+      readFile('src/js/info/handbook/front-matter.js', 'utf8'),
+      readFile('scripts/build.mjs', 'utf8'),
+      readFile('src/css/components/task-progress.css', 'utf8'),
+      readFile('src/js/info/handbook/handbook-setup.js', 'utf8'),
+    ]);
   assert.match(pdf, /createFrontMatter/);
   assert.match(epub, /createEpubDocuments/);
   assert.match(epub, /createCoverPng/);
@@ -138,4 +140,5 @@ test('handbook exports include publication front matter', async () => {
   assert.match(build, /site-metadata\.json/);
   assert.match(build, /publishedAt/);
   assert.match(progressStyles, /task-progress-card\[hidden\]/);
+  assert.match(setup, /handbook-action-label/);
 });

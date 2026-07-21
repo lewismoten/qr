@@ -27,16 +27,9 @@
 
   .site-footer nav {
     min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    flex-wrap: nowrap;
+    overflow: visible;
+    flex-wrap: wrap;
     justify-content: flex-start;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .site-footer nav::-webkit-scrollbar {
-    display: none;
   }
 
   .site-footer p {

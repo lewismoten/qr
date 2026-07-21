@@ -17,6 +17,10 @@
   cursor: pointer;
 }
 
+.spec-footer .handbook-action-icon {
+  margin-inline-end: 0.35rem;
+}
+
 .spec-footer .handbook-action:hover,
 .spec-footer .handbook-action:focus-visible {
   background: rgba(94, 234, 212, 0.12);
@@ -25,4 +29,20 @@
 .spec-footer .handbook-action:disabled {
   opacity: 0.5;
   cursor: wait;
+}
+
+@media (max-width: 42rem) {
+  .spec-footer .handbook-action {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
+  }
+
+  .spec-footer .handbook-action-icon {
+    margin-inline-end: 0;
+    font-size: 1.1rem;
+  }
+
+  .spec-footer .handbook-action-label {
+    display: none;
+  }
 }
