@@ -130,7 +130,9 @@
       "cornerRounding": "⭕",
       "spacing": "↔️",
       "rotation": "🔄",
-      "eyes": "👁️"
+      "eyes": "👁️",
+      "outerRounding": "⭕",
+      "centerRounding": "⏺️"
     },
     "colors": {
       "legend": "🎨",
