@@ -17,6 +17,8 @@ body { padding: 0.4rem; }
 .unit-example, .visual-card, .reference-links a { margin-bottom: 0.65rem; }
 .unit-stream { display: block; }
 .unit-stream > span { margin-bottom: 0.18rem; display: block; }
+.mixed-mode-stream { display: block; }
+.mixed-segment { margin-bottom: 0.4rem; display: block; break-inside: avoid; }
 .mask-formula-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .geo-layer-table, .geo-layer-table tbody { width: 100%; display: block; }
 .geo-layer-table thead { display: none; }

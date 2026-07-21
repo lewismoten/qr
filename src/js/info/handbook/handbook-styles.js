@@ -98,9 +98,17 @@ button, input, select, textarea, dialog, footer, .spec-footer,
   color: inherit; font-size: 7pt; overflow-wrap: anywhere; word-break: break-all;
 }
 .mixed-mode-stream { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.2rem; }
-.mixed-segment { padding: 0.3rem; background: #0f766e; color: white; }
-.mixed-segment.alphanumeric { background: #0d9488; }
-.mixed-segment.byte { background: #0ea5e9; }
+.mixed-segment {
+  min-width: 0; padding: 0.3rem; border-inline-start: 0.3rem solid #0f766e;
+  background-color: #ccfbf1; color: #134e4a;
+}
+.mixed-segment.alphanumeric {
+  border-inline-start-color: #2563eb; background-color: #dbeafe; color: #1e3a8a;
+}
+.mixed-segment.byte {
+  border-inline-start-color: #0284c7; background-color: #e0f2fe; color: #0c4a6e;
+}
+.mixed-segment code { color: inherit; overflow-wrap: anywhere; word-break: break-all; }
 .mask-guide { break-before: page; }
 .mask-formula-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem;
