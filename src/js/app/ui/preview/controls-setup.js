@@ -13,7 +13,7 @@ export function createPreviewControlsSetup({
   document,
   elements: e,
   pixelsPerInch,
-  minPrintModuleInches,
+  minModuleInches,
 }) {
   let renderedWidth = null;
   let moduleScale = null;
@@ -85,7 +85,7 @@ export function createPreviewControlsSetup({
       Math.max(
         MINIMUM_PRINT_WIDTH_INCHES,
         pixelWidth / pixelsPerInch,
-        totalModules * minPrintModuleInches,
+        totalModules * minModuleInches,
       ),
     );
   };
@@ -150,7 +150,7 @@ export function createPreviewControlsSetup({
             elements: getSizeElements(),
             getMetrics,
             pixelsPerInch,
-            minPrintModuleInches,
+            minModuleInches,
           });
           size.syncLabels();
           return size;

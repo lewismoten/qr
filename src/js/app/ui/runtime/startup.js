@@ -6,7 +6,7 @@ export async function startApplication({
   document,
   window,
   elements,
-  defaultChunkVersion,
+  defaultVersion,
   systems,
   runtime,
 }) {
@@ -46,7 +46,7 @@ export async function startApplication({
   bindApplicationEvents({
     elements,
     actions: eventActions,
-    defaultChunkVersion,
+    defaultVersion,
   });
   initializeLazyDialogs({ document, window });
 

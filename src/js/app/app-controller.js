@@ -33,8 +33,8 @@ const runtime = createRuntimeContext();
 const previewControls = createPreviewControlsSetup({
   document,
   elements,
-  pixelsPerInch: LIMITS.printPixelsPerInch,
-  minPrintModuleInches: LIMITS.minPrintModuleInches,
+  pixelsPerInch: LIMITS.printPpi,
+  minModuleInches: LIMITS.minModuleInches,
 });
 const runtimeHelpers = createRuntimeHelpers({
   window,
@@ -266,7 +266,7 @@ export const applicationReady = startApplication({
   document,
   window,
   elements,
-  defaultChunkVersion: FILE_PROTOCOL.defaultChunkVersion,
+  defaultVersion: FILE_PROTOCOL.defaultVersion,
   systems: {
     contentData,
     contentSections,

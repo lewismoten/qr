@@ -11,13 +11,13 @@ const HIGHLIGHT_BOUNDARY_STYLE = {
 const CODEWORD_OUTLINE_STYLE = {
   minimumLineWidth: 1.25,
   lineWidthScale: 0.14,
-  perimeterOpacityBoost: 0.18,
-  startOpacityBoost: 0.1,
-  moduleCenterOffset: 0.5,
-  metadataMinimumRadius: 2.2,
-  regularMinimumRadius: 1.4,
-  metadataRadiusScale: 0.24,
-  regularRadiusScale: 0.18,
+  perimeterBoost: 0.18,
+  startBoost: 0.1,
+  centerOffset: 0.5,
+  metaMinRadius: 2.2,
+  dataMinRadius: 1.4,
+  metaRadiusScale: 0.24,
+  dataRadiusScale: 0.18,
 };
 
 function getOverlayColor(category, colors) {
@@ -168,10 +168,7 @@ export function drawCodewordOutlines(
         cellSize,
         hexToRgba(
           style.strokeColor,
-          Math.min(
-            1,
-            style.opacity + CODEWORD_OUTLINE_STYLE.perimeterOpacityBoost,
-          ),
+          Math.min(1, style.opacity + CODEWORD_OUTLINE_STYLE.perimeterBoost),
         ),
         lineWidth,
       );
@@ -187,24 +184,22 @@ export function drawCodewordOutlines(
     if (!first || !drawStart) return;
     context.fillStyle = hexToRgba(
       style.strokeColor,
-      Math.min(1, style.opacity + CODEWORD_OUTLINE_STYLE.startOpacityBoost),
+      Math.min(1, style.opacity + CODEWORD_OUTLINE_STYLE.startBoost),
     );
     context.beginPath();
     context.arc(
-      (first.column +
-        marginModules +
-        CODEWORD_OUTLINE_STYLE.moduleCenterOffset) *
+      (first.column + marginModules + CODEWORD_OUTLINE_STYLE.centerOffset) *
         cellSize,
-      (first.row + marginModules + CODEWORD_OUTLINE_STYLE.moduleCenterOffset) *
+      (first.row + marginModules + CODEWORD_OUTLINE_STYLE.centerOffset) *
         cellSize,
       Math.max(
         group.kind === 'metadata'
-          ? CODEWORD_OUTLINE_STYLE.metadataMinimumRadius
-          : CODEWORD_OUTLINE_STYLE.regularMinimumRadius,
+          ? CODEWORD_OUTLINE_STYLE.metaMinRadius
+          : CODEWORD_OUTLINE_STYLE.dataMinRadius,
         cellSize *
           (group.kind === 'metadata'
-            ? CODEWORD_OUTLINE_STYLE.metadataRadiusScale
-            : CODEWORD_OUTLINE_STYLE.regularRadiusScale),
+            ? CODEWORD_OUTLINE_STYLE.metaRadiusScale
+            : CODEWORD_OUTLINE_STYLE.dataRadiusScale),
       ),
       0,
       Math.PI * 2,

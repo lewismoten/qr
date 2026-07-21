@@ -107,7 +107,7 @@ export function createContentDataSetup(options) {
       getChunkIndex: () => file?.getIndex() ?? null,
     },
     settings: {
-      getVersion: () => file?.getVersion() ?? protocol.defaultChunkVersion,
+      getVersion: () => file?.getVersion() ?? protocol.defaultVersion,
       syncVersion: () =>
         isFile() && fileAction((system) => system.syncVersion()),
       syncChunkLabel: () => file?.syncChunkLabel(),

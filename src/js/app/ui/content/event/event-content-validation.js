@@ -88,7 +88,7 @@ export function validateEvent(document, limits) {
   }
   for (const [name, label, maxLength, multiline] of [
     ['event-location', 'location', limits.calendarLocation, false],
-    ['event-description', 'description', limits.calendarDescription, true],
+    ['event-description', 'description', limits.calendarDesc, true],
   ]) {
     const error = validateCalendarText(id(name).value, {
       label: lookup(`fields.${label}`, label),

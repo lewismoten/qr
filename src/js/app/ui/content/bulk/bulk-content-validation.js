@@ -207,7 +207,7 @@ export function validateBulkImport({
     if (locationError) return fail(detail(locationError));
     const descriptionError = validateCalendarText(row.description, {
       label: lookup('fields.description', 'description'),
-      maxLength: limits.calendarDescription,
+      maxLength: limits.calendarDesc,
       multiline: true,
     });
     if (descriptionError) return fail(detail(descriptionError));

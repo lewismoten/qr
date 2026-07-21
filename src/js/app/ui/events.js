@@ -1,7 +1,7 @@
 export function bindApplicationEvents({
   elements: e,
   actions: a,
-  defaultChunkVersion,
+  defaultVersion,
 }) {
   e.form.addEventListener('submit', (event) => event.preventDefault());
   e.form.addEventListener('input', (event) => {
@@ -54,7 +54,7 @@ export function bindApplicationEvents({
       e.qrFormat.value === 'file' &&
       a.getFileMode() === 'chunked'
     ) {
-      e.qrVersion.value = String(defaultChunkVersion);
+      e.qrVersion.value = String(defaultVersion);
       a.scheduleChunkRefresh({ resetChunkIndex: true, delay: 0 });
     }
     a.syncChunkVersion();

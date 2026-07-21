@@ -5,13 +5,13 @@ import { getActiveOutlineGroups } from './boundaries.js';
 const METADATA_ROUTE_STYLE = {
   minimumOffset: 1.25,
   offsetScale: 0.18,
-  shallowVectorScale: 0.35,
-  steepVectorScale: 0.6,
+  shallowScale: 0.35,
+  steepScale: 0.6,
   normalNudge: 0.2,
-  bridgeHorizontalScale: 0.7,
-  bridgeHorizontalMinimum: 7,
-  bridgeVerticalScale: 1.3,
-  bridgeVerticalMinimum: 12,
+  bridgeXScale: 0.7,
+  bridgeXMin: 7,
+  bridgeYScale: 1.3,
+  bridgeYMin: 12,
   opacity: 0.78,
   minimumLineWidth: 0.8,
   lineWidthScale: 0.11,
@@ -19,16 +19,16 @@ const METADATA_ROUTE_STYLE = {
 const CODEWORD_PATH_STYLE = {
   minimumLineWidth: 1,
   lineWidthScale: 0.18,
-  connectorLineWidthScale: 0.1,
-  primaryDataOpacity: 0.25,
-  secondaryDataOpacity: 0.5,
+  connectorScale: 0.1,
+  primaryOpacity: 0.25,
+  secondaryOpacity: 0.5,
   otherOpacity: 0.5,
 };
 const FIELD_START_STYLE = {
   opacity: 0.95,
-  outerMinimumRadius: 2,
+  outerMinRadius: 2,
   outerRadiusScale: 0.28,
-  innerMinimumRadius: 0.9,
+  innerMinRadius: 0.9,
   innerRadiusScale: 0.12,
 };
 const MODULE_CENTER_OFFSET = 0.5;
@@ -41,11 +41,11 @@ function getMetadataOffset(routeIndex, cellSize) {
   const vectors = [
     {
       x: -offset,
-      y: -offset * METADATA_ROUTE_STYLE.shallowVectorScale,
+      y: -offset * METADATA_ROUTE_STYLE.shallowScale,
     },
-    { x: offset, y: offset * METADATA_ROUTE_STYLE.shallowVectorScale },
-    { x: -offset * METADATA_ROUTE_STYLE.steepVectorScale, y: offset },
-    { x: offset * METADATA_ROUTE_STYLE.steepVectorScale, y: -offset },
+    { x: offset, y: offset * METADATA_ROUTE_STYLE.shallowScale },
+    { x: -offset * METADATA_ROUTE_STYLE.steepScale, y: offset },
+    { x: offset * METADATA_ROUTE_STYLE.steepScale, y: -offset },
   ];
   return vectors[
     ((routeIndex % vectors.length) + vectors.length) % vectors.length
@@ -99,15 +99,15 @@ function drawMetadataBridge(
     (from.x + to.x) / 2 +
       direction *
         Math.max(
-          cellSize * METADATA_ROUTE_STYLE.bridgeHorizontalScale,
-          METADATA_ROUTE_STYLE.bridgeHorizontalMinimum,
+          cellSize * METADATA_ROUTE_STYLE.bridgeXScale,
+          METADATA_ROUTE_STYLE.bridgeXMin,
         ) *
         METADATA_ROUTE_STYLE.normalNudge,
     Math.min(from.y, to.y) +
       curveDirection *
         Math.max(
-          cellSize * METADATA_ROUTE_STYLE.bridgeVerticalScale,
-          METADATA_ROUTE_STYLE.bridgeVerticalMinimum,
+          cellSize * METADATA_ROUTE_STYLE.bridgeYScale,
+          METADATA_ROUTE_STYLE.bridgeYMin,
         ),
     to.x,
     to.y,
@@ -138,8 +138,8 @@ export function drawCodewordPaths(
     const strokeOpacity =
       group.kind === 'data'
         ? index % 2 === 0
-          ? CODEWORD_PATH_STYLE.primaryDataOpacity
-          : CODEWORD_PATH_STYLE.secondaryDataOpacity
+          ? CODEWORD_PATH_STYLE.primaryOpacity
+          : CODEWORD_PATH_STYLE.secondaryOpacity
         : CODEWORD_PATH_STYLE.otherOpacity;
     const effectiveWidth =
       group.kind === 'metadata'
@@ -207,7 +207,7 @@ export function drawCodewordPaths(
       context.strokeStyle = hexToRgba(color, strokeOpacity);
       context.lineWidth = Math.max(
         CODEWORD_PATH_STYLE.minimumLineWidth,
-        cellSize * CODEWORD_PATH_STYLE.connectorLineWidthScale,
+        cellSize * CODEWORD_PATH_STYLE.connectorScale,
       );
       context.beginPath();
       context.moveTo(from.x, from.y);
@@ -253,7 +253,7 @@ export function drawStreamFieldStarts(
       x,
       y,
       Math.max(
-        FIELD_START_STYLE.outerMinimumRadius,
+        FIELD_START_STYLE.outerMinRadius,
         cellSize * FIELD_START_STYLE.outerRadiusScale,
       ),
       0,
@@ -266,7 +266,7 @@ export function drawStreamFieldStarts(
       x,
       y,
       Math.max(
-        FIELD_START_STYLE.innerMinimumRadius,
+        FIELD_START_STYLE.innerMinRadius,
         cellSize * FIELD_START_STYLE.innerRadiusScale,
       ),
       0,

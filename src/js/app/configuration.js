@@ -47,18 +47,18 @@ export const LIMITS = {
   emailSubject: 120,
   numberFrames: 10000,
   qrTargetWidth: 2048,
-  printPixelsPerInch: 192,
-  minPrintModuleInches: 0.02,
+  printPpi: 192,
+  minModuleInches: 0.02,
   calendarTitle: 120,
   calendarLocation: 160,
-  calendarDescription: 500,
+  calendarDesc: 500,
 };
 export const QR_ALPHANUMERIC_CHARACTERS =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
 export const FILE_PROTOCOL = {
   version: '1',
   magic: 'FILE',
-  defaultChunkVersion: 8,
+  defaultVersion: 8,
   headerBytes: 10,
   fieldHeaderBytes: 3,
   flags: { gzip: 0x01 },

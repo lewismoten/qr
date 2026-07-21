@@ -42,7 +42,7 @@ function bindFileEvents(file, e, runtime, protocol) {
   e.chunkVersionAuto.addEventListener('change', () => {
     e.versionAuto.checked = e.chunkVersionAuto.checked;
     if (e.chunkVersionAuto.checked) {
-      e.qrVersion.value = String(protocol.defaultChunkVersion);
+      e.qrVersion.value = String(protocol.defaultVersion);
     }
     runtime.formatVersion();
     file.settings.syncVersion();
@@ -59,7 +59,7 @@ function bindFileEvents(file, e, runtime, protocol) {
     .forEach((button) => {
       button.addEventListener('click', () => {
         if (button.dataset.choiceValue === 'chunked' && e.versionAuto.checked) {
-          e.qrVersion.value = String(protocol.defaultChunkVersion);
+          e.qrVersion.value = String(protocol.defaultVersion);
         }
         file.settings.syncVersion();
         runtime.formatVersion();

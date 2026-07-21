@@ -85,7 +85,7 @@ export function createFileSetup({
     cancelRender: runtime.cancelRender,
     render: runtime.render,
     syncCapacity: section.syncCapacity,
-    defaultVersion: protocol.defaultChunkVersion,
+    defaultVersion: protocol.defaultVersion,
   });
   const payload = createFilePayloadBuilder({
     cache,

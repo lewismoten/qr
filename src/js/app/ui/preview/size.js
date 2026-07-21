@@ -13,7 +13,7 @@ export function createPreviewSizeControls({
   elements: e,
   getMetrics,
   pixelsPerInch,
-  minPrintModuleInches,
+  minModuleInches,
 }) {
   const getAutomaticPrintWidth = (source = canvas) => {
     const metrics = getMetrics();
@@ -32,7 +32,7 @@ export function createPreviewSizeControls({
       Math.max(
         MINIMUM_PRINT_WIDTH_INCHES,
         pixelWidth / pixelsPerInch,
-        totalModules * minPrintModuleInches,
+        totalModules * minModuleInches,
       ),
     );
   };
