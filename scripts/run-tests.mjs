@@ -10,7 +10,7 @@ const supported = new Set(['--coverage', '--watch']);
 const unknown = [...requested].filter((option) => !supported.has(option));
 const coverageRequested = requested.has('--coverage');
 const minimumFileCoverage = 95;
-const maximumTestFileDurationMs = 1000;
+const maximumTestFileDurationMs = 400;
 const qrRoot = new URL('../src/js/qr/', import.meta.url);
 
 function listQrFiles(directory = qrRoot, prefix = '') {
@@ -103,10 +103,9 @@ function findTestDurationFailures(output) {
 
 let output = '';
 const stdio = ['inherit', 'pipe', 'pipe'];
-const environment =
-  coverageRequested && !('NO_COLOR' in process.env)
-    ? { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR || '1' }
-    : process.env;
+const environment = !('NO_COLOR' in process.env)
+  ? { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR || '1' }
+  : process.env;
 const child = spawn(process.execPath, nodeOptions, {
   stdio,
   env: environment,
