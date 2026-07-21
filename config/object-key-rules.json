@@ -1,15 +1,16 @@
 {
   "app": {
-    "legacyCount": 307,
-    "legacyDigest": "315e6a3ba08645d05136d561573e575e1c58b105cbd4e989c8bb9fa765845dbb"
+    "legacyCount": 152,
+    "legacyDigest": "fdcd9acbb558be923d4737352fa6ae7cfa83489fb179571a83ccc5497eb84ef4"
   },
   "json": {
     "legacyCount": 205,
     "legacyDigest": "9a5f02e86ac422f39941208a5012e4a0169689d15c9fa7bb1957e7484942a7ec"
   },
   "tooling": {
-    "legacyCount": 515,
-    "legacyDigest": "f81a7e22b6bf42823835ee580bc66c5c8284e3c0a2b7f93d31c455dbb93c24bd"
+    "legacyCount": 490,
+    "legacyDigest": "1c1ef26ea7705e9a6a7edf5eae2a67d07474a58ccea9bcd8ed3921694ebf60a8"
   },
+  "functionLength": 40,
   "maximumLength": 16
 }

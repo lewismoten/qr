@@ -62,22 +62,22 @@ export function createStyleSetup({
       installShapeDrawing(shapeDrawing);
       const modules = createModuleShapeSection({
         shape: e.moduleShape,
-        controls: e.moduleCustomControls,
+        controls: e.moduleControls,
         rounding: e.moduleRounding,
-        roundingValue: e.moduleRoundingValue,
+        roundingValue: e.roundingValue,
         inset: e.moduleInset,
         insetValue: e.moduleInsetValue,
         rotation: e.moduleRotation,
-        rotationValue: e.moduleRotationValue,
+        rotationValue: e.rotationValue,
       });
       const eyes = createEyeShapeSection({
         shape: e.eyeShape,
-        controls: e.eyeCustomControls,
+        controls: e.eyeControls,
         outerRounding: e.eyeOuterRounding,
-        outerRoundingValue: e.eyeOuterRoundingValue,
-        centerRounding: e.eyeCenterRounding,
-        centerRoundingValue: e.eyeCenterRoundingValue,
-        customColorsEnabled: e.eyeCustomColorsEnabled,
+        outerRoundValue: e.outerRoundValue,
+        centerRounding: e.centerRounding,
+        centerRoundValue: e.centerRoundValue,
+        customEyeColors: e.customEyeColors,
         colorControls: e.eyeColorControls,
         isImageFill: () => e.gradientType.value === 'image',
       });
@@ -104,19 +104,19 @@ export function createStyleSetup({
       const colors = createColorSection({
         darkColor: e.colorDark,
         lightColor: e.colorLight,
-        darkTransparency: e.colorDarkTransparency,
-        darkTransparencyValue: e.colorDarkTransparencyValue,
-        lightTransparency: e.colorLightTransparency,
-        lightTransparencyValue: e.colorLightTransparencyValue,
+        darkTransparency: e.darkAlpha,
+        darkAlphaValue: e.darkAlphaValue,
+        lightAlpha: e.lightAlpha,
+        lightAlphaValue: e.lightAlphaValue,
         gradientType: e.gradientType,
         gradientControls: e.gradientControls,
-        gradientAngleControls: e.gradientAngleControls,
+        angleControls: e.angleControls,
         gradientAngle: e.gradientAngle,
-        gradientAngleValue: e.gradientAngleValue,
+        angleValue: e.angleValue,
         gradientEndColor: e.colorGradientEnd,
-        gradientEndTransparency: e.colorGradientEndTransparency,
-        gradientEndTransparencyValue: e.colorGradientEndTransparencyValue,
-        imageFillControls: e.imageFillControls,
+        endAlpha: e.endAlpha,
+        endAlphaValue: e.endAlphaValue,
+        imageControls: e.imageControls,
         imageFillClear: e.imageFillClear,
         hasImageFill: () => Boolean(imageFill?.getImage()),
         withAlpha,
@@ -131,7 +131,7 @@ export function createStyleSetup({
         },
       });
       colorsSystem = { colors, imageFill };
-      e.imageFillRecommended.addEventListener('click', () => {
+      e.imageRecommend.addEventListener('click', () => {
         colors.applyRecommendedImageContrast();
         render();
       });
@@ -164,8 +164,8 @@ export function createStyleSetup({
           customColorInput: e.pixelArtColor,
           clearButton: e.pixelArtClear,
           grid: e.pixelArtGrid,
-          sizeInput: e.pixelArtSizeInput,
-          sizeValue: e.pixelArtSizeValue,
+          sizeInput: e.pixelSizeInput,
+          sizeValue: e.pixelSizeValue,
           onChange: render,
         },
         {
@@ -176,17 +176,17 @@ export function createStyleSetup({
       const artwork = createArtworkControls({
         elements: {
           mode: e.centerArtMode,
-          controls: e.centerArtControls,
-          logoControls: e.centerLogoControls,
-          emojiControls: e.centerEmojiControls,
-          pixelControls: e.centerPixelControls,
+          controls: e.artControls,
+          logoControls: e.logoControls,
+          emojiControls: e.emojiControls,
+          pixelControls: e.pixelControls,
           size: e.centerArtSize,
-          sizeValue: e.centerArtSizeValue,
-          background: e.centerArtBackground,
-          backgroundLabel: e.centerArtBackgroundLabel,
-          outlineControls: e.centerArtOutlineControls,
-          outlineThickness: e.centerArtOutlineThickness,
-          outlineThicknessValue: e.centerArtOutlineThicknessValue,
+          sizeValue: e.artSizeValue,
+          background: e.artBackground,
+          backgroundLabel: e.artBgLabel,
+          outlineControls: e.outlineControls,
+          outlineThickness: e.outlineThickness,
+          outlineValue: e.outlineValue,
           emoji: e.centerEmoji,
           emojiOptions: e.emojiOptions,
         },
@@ -199,11 +199,8 @@ export function createStyleSetup({
       });
       artworkSystem = { artwork, centerLogo, pixelEditor };
       const frameCenter = document.getElementById('frame-message-center-art');
-      e.centerArtBackground.addEventListener('input', artwork.syncOutline);
-      e.centerArtOutlineThickness.addEventListener(
-        'input',
-        artwork.syncOutline,
-      );
+      e.artBackground.addEventListener('input', artwork.syncOutline);
+      e.outlineThickness.addEventListener('input', artwork.syncOutline);
       frameCenter.addEventListener('input', () => {
         setFrameCentered(frameCenter.checked);
         render();
@@ -241,7 +238,7 @@ export function createStyleSetup({
         endColor: e.colorGradientEnd
           ? withAlpha(
               e.colorGradientEnd.value.trim() || COLOR_ACCENT,
-              e.colorGradientEndTransparency,
+              e.endAlpha,
             )
           : COLOR_ACCENT,
       },

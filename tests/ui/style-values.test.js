@@ -38,7 +38,7 @@ test('style values use inputs when valid and documented defaults otherwise', () 
     getFallbackEyeOptions({
       eyeShape: { value: 'rounded' },
       eyeOuterRounding: { value: '30' },
-      eyeCenterRounding: { value: '45' },
+      centerRounding: { value: '45' },
     }),
     { type: 'rounded', outerRounding: 30, centerRounding: 45 },
   );
@@ -50,7 +50,7 @@ test('pixel-art fallback creates an independent empty square canvas', () => {
   assert.equal(fallback.pixels.length, fallback.size ** 2);
   assert.ok(fallback.pixels.every((pixel) => pixel === null));
   assert.deepEqual(
-    getFallbackPixelArtState({ pixelArtSizeInput: { value: '8' } }),
+    getFallbackPixelArtState({ pixelSizeInput: { value: '8' } }),
     {
       size: STYLE_LIMITS.pixelArt.minimumSize,
       pixels: Array(STYLE_LIMITS.pixelArt.minimumSize ** 2).fill(null),

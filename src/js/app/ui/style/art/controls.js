@@ -12,7 +12,7 @@ export function createArtworkControls({ elements: e, pixelEditor }) {
       e.mode.value === 'emoji' || e.mode.value === 'pixel';
     e.outlineControls.hidden = !supportsOutline;
     e.outlineThickness.disabled = !e.background.checked;
-    e.outlineThicknessValue.textContent = lookup('units.percent', '{value}%', {
+    e.outlineValue.textContent = lookup('units.percent', '{value}%', {
       value: e.outlineThickness.value,
     });
   };

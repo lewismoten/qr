@@ -5,48 +5,44 @@ export function createColorSection({
   darkColor,
   lightColor,
   darkTransparency,
-  darkTransparencyValue,
-  lightTransparency,
-  lightTransparencyValue,
+  darkAlphaValue,
+  lightAlpha,
+  lightAlphaValue,
   gradientType,
   gradientControls,
-  gradientAngleControls,
+  angleControls,
   gradientAngle,
-  gradientAngleValue,
+  angleValue,
   gradientEndColor,
-  gradientEndTransparency,
-  gradientEndTransparencyValue,
-  imageFillControls,
+  endAlpha,
+  endAlphaValue,
+  imageControls,
   imageFillClear,
   hasImageFill,
   withAlpha,
 }) {
   const formatTransparency = () => {
-    darkTransparencyValue.textContent = lookup('units.percent', '{value}%', {
+    darkAlphaValue.textContent = lookup('units.percent', '{value}%', {
       value: darkTransparency.value,
     });
-    lightTransparencyValue.textContent = lookup('units.percent', '{value}%', {
-      value: lightTransparency.value,
+    lightAlphaValue.textContent = lookup('units.percent', '{value}%', {
+      value: lightAlpha.value,
     });
-    gradientEndTransparencyValue.textContent = lookup(
-      'units.percent',
-      '{value}%',
-      { value: gradientEndTransparency.value },
-    );
+    endAlphaValue.textContent = lookup('units.percent', '{value}%', {
+      value: endAlpha.value,
+    });
   };
 
   const sync = () => {
     const isGradient =
       gradientType.value === 'linear' || gradientType.value === 'radial';
     gradientControls.hidden = !isGradient;
-    gradientAngleControls.hidden = gradientType.value !== 'linear';
-    imageFillControls.hidden = gradientType.value !== 'image';
+    angleControls.hidden = gradientType.value !== 'linear';
+    imageControls.hidden = gradientType.value !== 'image';
     imageFillClear.disabled = !hasImageFill();
-    gradientAngleValue.textContent = lookup(
-      'units.degrees',
-      '{value} degrees',
-      { value: gradientAngle.value },
-    );
+    angleValue.textContent = lookup('units.degrees', '{value} degrees', {
+      value: gradientAngle.value,
+    });
   };
 
   const getGradientOptions = () => ({
@@ -54,7 +50,7 @@ export function createColorSection({
     angle: Number.parseInt(gradientAngle.value, 10) || 0,
     endColor: withAlpha(
       gradientEndColor.value.trim() || COLOR_ACCENT,
-      gradientEndTransparency,
+      endAlpha,
     ),
   });
 
@@ -62,7 +58,7 @@ export function createColorSection({
     darkColor.value = COLOR_BLACK;
     darkTransparency.value = '75';
     lightColor.value = COLOR_WHITE;
-    lightTransparency.value = '25';
+    lightAlpha.value = '25';
     formatTransparency();
   };
 

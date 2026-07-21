@@ -25,3 +25,16 @@ test('object-key policy identifies every prohibited key shape', () => {
     expectedJson.map((value) => value.replace('json|', 'javascript|')),
   );
 });
+
+test('function names may use up to forty characters', () => {
+  const validName = `get${'A'.repeat(37)}`;
+  const invalidName = `get${'A'.repeat(38)}`;
+  const source =
+    `const ${validName} = () => true;` +
+    `const ${invalidName} = () => true;` +
+    `const methods = { ${validName}, ${invalidName} };`;
+  assert.deepEqual(collectJavascriptViolations(source), [
+    `function|length|${invalidName}`,
+    `function|length|${invalidName}`,
+  ]);
+});

@@ -68,13 +68,13 @@ export function createLazyStyleSetup(options) {
         dark: featureElements?.colorDark
           ? options.withAlpha(
               featureElements.colorDark.value.trim() || COLOR_DARK,
-              featureElements.colorDarkTransparency,
+              featureElements.darkAlpha,
             )
           : COLOR_DARK_OPAQUE,
         light: featureElements?.colorLight
           ? options.withAlpha(
               featureElements.colorLight.value.trim() || COLOR_WHITE,
-              featureElements.colorLightTransparency,
+              featureElements.lightAlpha,
             )
           : COLOR_WHITE_OPAQUE,
       }),
@@ -89,16 +89,12 @@ export function createLazyStyleSetup(options) {
           ? Number.parseInt(featureElements.centerArtSize.value, 10) ||
             STYLE_DEFAULTS.artwork.sizePercent
           : STYLE_DEFAULTS.artwork.sizePercent,
-        protectBackground:
-          featureElements?.centerArtBackground?.checked ?? true,
-        outlinePercent: featureElements?.centerArtOutlineThickness
-          ? Number.parseInt(
-              featureElements.centerArtOutlineThickness.value,
-              10,
-            ) || STYLE_DEFAULTS.artwork.outlinePercent
+        protectBackground: featureElements?.artBackground?.checked ?? true,
+        outlinePercent: featureElements?.outlineThickness
+          ? Number.parseInt(featureElements.outlineThickness.value, 10) ||
+            STYLE_DEFAULTS.artwork.outlinePercent
           : STYLE_DEFAULTS.artwork.outlinePercent,
-        matchModuleShape:
-          featureElements?.pixelArtMatchModuleShape?.checked ?? false,
+        matchModuleShape: featureElements?.matchPixelShape?.checked ?? false,
       }),
     },
     pixelEditor: {
@@ -116,7 +112,7 @@ export function createLazyStyleSetup(options) {
     imageFill: { getImage: () => controller?.imageFill.getImage() ?? null },
     centerLogo: { getImage: () => controller?.centerLogo.getImage() ?? null },
     getEyeColors: () => ({
-      enabled: featureElements?.eyeCustomColorsEnabled?.checked ?? false,
+      enabled: featureElements?.customEyeColors?.checked ?? false,
       outer: featureElements?.eyeOuterColor?.value ?? COLOR_ACCENT,
       center: featureElements?.eyeCenterColor?.value ?? COLOR_DARK,
     }),

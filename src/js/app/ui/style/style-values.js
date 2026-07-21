@@ -45,7 +45,7 @@ export function getFallbackEyeOptions(elements) {
       STYLE_DEFAULTS.eye.outerRounding,
     ),
     centerRounding: readStyleInteger(
-      elements.eyeCenterRounding,
+      elements.centerRounding,
       STYLE_DEFAULTS.eye.centerRounding,
     ),
   };
@@ -53,7 +53,7 @@ export function getFallbackEyeOptions(elements) {
 
 export function getFallbackPixelArtState(elements) {
   const size = readStyleInteger(
-    elements.pixelArtSizeInput,
+    elements.pixelSizeInput,
     STYLE_DEFAULTS.pixelArt.size,
   );
   return { size, pixels: Array(size * size).fill(null) };

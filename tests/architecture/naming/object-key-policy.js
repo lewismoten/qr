@@ -27,6 +27,8 @@ const externalJsonFiles = new Set([
 ]);
 const identifierPattern = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 const camelCasePattern = /^[a-z][A-Za-z0-9]*$/;
+const functionVerbPattern =
+  /^(?:add|apply|assert|bind|build|calculate|cancel|check|clear|collect|compose|connect|convert|create|decode|delete|detect|download|draw|encode|enforce|ensure|estimate|export|extract|fetch|find|format|generate|get|handle|has|hide|initialize|install|invalidate|is|list|load|make|normalize|open|parse|prepare|publish|read|remove|render|request|reset|resolve|restore|run|save|scan|select|serialize|set|show|start|stop|sync|toggle|transform|update|validate|verify|write)[A-Z]/;
 
 export async function findFiles(directory, extensions) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -46,9 +48,9 @@ export async function findFiles(directory, extensions) {
   return nested.flat();
 }
 
-function getReasons(key) {
+function getReasons(key, maximumLength = rules.maximumLength) {
   const reasons = [];
-  if (key.length > rules.maximumLength) reasons.push('length');
+  if (key.length > maximumLength) reasons.push('length');
   if (!identifierPattern.test(key)) reasons.push('identifierSafe');
   else if (!camelCasePattern.test(key)) reasons.push('lowerCamelCase');
   return reasons;
@@ -69,15 +71,68 @@ export function collectJavascriptViolations(source) {
     sourceType: 'module',
   });
   const violations = [];
+  const functionBindings = new Set();
+  function collectBindings(node) {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'FunctionDeclaration' && node.id) {
+      functionBindings.add(node.id.name);
+    }
+    if (
+      node.type === 'VariableDeclarator' &&
+      node.id.type === 'Identifier' &&
+      ['ArrowFunctionExpression', 'FunctionExpression'].includes(
+        node.init?.type,
+      )
+    ) {
+      functionBindings.add(node.id.name);
+    }
+    for (const value of Object.values(node)) {
+      if (Array.isArray(value)) value.forEach(collectBindings);
+      else collectBindings(value);
+    }
+  }
+  collectBindings(ast);
+  const addViolations = (kind, key, maximumLength) => {
+    for (const reason of getReasons(key, maximumLength)) {
+      violations.push(`${kind}|${reason}|${key}`);
+    }
+  };
   function visit(node) {
     if (!node || typeof node !== 'object') return;
+    if (node.type === 'FunctionDeclaration' && node.id) {
+      addViolations('function', node.id.name, rules.functionLength);
+    }
+    if (
+      node.type === 'VariableDeclarator' &&
+      node.id.type === 'Identifier' &&
+      functionBindings.has(node.id.name)
+    ) {
+      addViolations('function', node.id.name, rules.functionLength);
+    }
+    if (node.type === 'MethodDefinition' && !node.computed) {
+      const key =
+        node.key.type === 'Identifier' || node.key.type === 'PrivateIdentifier'
+          ? node.key.name
+          : String(node.key.value);
+      addViolations('function', key, rules.functionLength);
+    }
     if (node.type === 'ObjectExpression') {
       for (const property of node.properties) {
         const key = getStaticPropertyKey(property);
         if (key === null) continue;
-        for (const reason of getReasons(key)) {
-          violations.push(`javascript|${reason}|${key}`);
-        }
+        const callable =
+          property.method ||
+          ['ArrowFunctionExpression', 'FunctionExpression'].includes(
+            property.value.type,
+          ) ||
+          functionVerbPattern.test(key) ||
+          (property.value.type === 'Identifier' &&
+            functionBindings.has(property.value.name));
+        addViolations(
+          callable ? 'function' : 'javascript',
+          key,
+          callable ? rules.functionLength : rules.maximumLength,
+        );
       }
     }
     for (const value of Object.values(node)) {
@@ -122,8 +177,9 @@ export function assertBaseline(name, violations) {
   assert.deepEqual(
     actual,
     rules[name],
-    'Object keys must be at most 16 characters, identifier-safe, and ' +
-      'lower camel case. Update keys rather than the legacy baseline.',
+    'Data keys must be at most 16 characters and function names at most ' +
+      '40; all names must be identifier-safe lower camel case. Update names ' +
+      'rather than the legacy baseline.',
   );
 }
 
