@@ -1,13 +1,50 @@
 import { getContrastingHex, hexToRgba } from '../../colors.js';
 import { getActiveOutlineGroups } from './boundaries.js';
 
+const METADATA_ROUTE_STYLE = {
+  minimumOffset: 1.25,
+  offsetScale: 0.18,
+  shallowVectorScale: 0.35,
+  steepVectorScale: 0.6,
+  normalNudge: 0.2,
+  bridgeHorizontalScale: 0.7,
+  bridgeHorizontalMinimum: 7,
+  bridgeVerticalScale: 1.3,
+  bridgeVerticalMinimum: 12,
+  opacity: 0.78,
+  minimumLineWidth: 0.8,
+  lineWidthScale: 0.11,
+};
+const CODEWORD_PATH_STYLE = {
+  minimumLineWidth: 1,
+  lineWidthScale: 0.18,
+  connectorLineWidthScale: 0.1,
+  primaryDataOpacity: 0.25,
+  secondaryDataOpacity: 0.5,
+  otherOpacity: 0.5,
+};
+const FIELD_START_STYLE = {
+  opacity: 0.95,
+  outerMinimumRadius: 2,
+  outerRadiusScale: 0.28,
+  innerMinimumRadius: 0.9,
+  innerRadiusScale: 0.12,
+};
+const MODULE_CENTER_OFFSET = 0.5;
+
 function getMetadataOffset(routeIndex, cellSize) {
-  const offset = Math.max(1.25, cellSize * 0.18);
+  const offset = Math.max(
+    METADATA_ROUTE_STYLE.minimumOffset,
+    cellSize * METADATA_ROUTE_STYLE.offsetScale,
+  );
   const vectors = [
-    { x: -offset, y: -offset * 0.35 },
-    { x: offset, y: offset * 0.35 },
-    { x: -offset * 0.6, y: offset },
-    { x: offset * 0.6, y: -offset },
+    {
+      x: -offset,
+      y: -offset * METADATA_ROUTE_STYLE.shallowVectorScale,
+    },
+    { x: offset, y: offset * METADATA_ROUTE_STYLE.shallowVectorScale },
+    { x: -offset * METADATA_ROUTE_STYLE.steepVectorScale, y: offset },
+    { x: offset * METADATA_ROUTE_STYLE.steepVectorScale, y: -offset },
   ];
   return vectors[
     ((routeIndex % vectors.length) + vectors.length) % vectors.length
@@ -22,8 +59,12 @@ function drawMetadataSegment(context, from, to, color, opacity, offset) {
     length === 0
       ? offset
       : {
-          x: (-dy / length) * offset.x + offset.x * 0.2,
-          y: (dx / length) * offset.y + offset.y * 0.2,
+          x:
+            (-dy / length) * offset.x +
+            offset.x * METADATA_ROUTE_STYLE.normalNudge,
+          y:
+            (dx / length) * offset.y +
+            offset.y * METADATA_ROUTE_STYLE.normalNudge,
         };
   context.strokeStyle = hexToRgba(color, opacity);
   context.beginPath();
@@ -54,8 +95,19 @@ function drawMetadataBridge(
   context.beginPath();
   context.moveTo(from.x, from.y);
   context.quadraticCurveTo(
-    (from.x + to.x) / 2 + direction * Math.max(cellSize * 0.7, 7) * 0.2,
-    Math.min(from.y, to.y) + curveDirection * Math.max(cellSize * 1.3, 12),
+    (from.x + to.x) / 2 +
+      direction *
+        Math.max(
+          cellSize * METADATA_ROUTE_STYLE.bridgeHorizontalScale,
+          METADATA_ROUTE_STYLE.bridgeHorizontalMinimum,
+        ) *
+        METADATA_ROUTE_STYLE.normalNudge,
+    Math.min(from.y, to.y) +
+      curveDirection *
+        Math.max(
+          cellSize * METADATA_ROUTE_STYLE.bridgeVerticalScale,
+          METADATA_ROUTE_STYLE.bridgeVerticalMinimum,
+        ),
     to.x,
     to.y,
   );
@@ -71,18 +123,30 @@ export function drawCodewordPaths(
   outlineMode,
   getModuleContrastColor,
 ) {
-  const lineWidth = Math.max(1, cellSize * 0.18);
+  const lineWidth = Math.max(
+    CODEWORD_PATH_STYLE.minimumLineWidth,
+    cellSize * CODEWORD_PATH_STYLE.lineWidthScale,
+  );
   const groups = getActiveOutlineGroups(model, outlineMode);
   groups.forEach((group, index) => {
     if (group.modules.length === 0) return;
     const points = group.modules.map(({ row, column }) => ({
-      x: (column + marginModules + 0.5) * cellSize,
-      y: (row + marginModules + 0.5) * cellSize,
+      x: (column + marginModules + MODULE_CENTER_OFFSET) * cellSize,
+      y: (row + marginModules + MODULE_CENTER_OFFSET) * cellSize,
     }));
     const strokeOpacity =
-      group.kind === 'data' ? (index % 2 === 0 ? 0.25 : 0.5) : 0.5;
+      group.kind === 'data'
+        ? index % 2 === 0
+          ? CODEWORD_PATH_STYLE.primaryDataOpacity
+          : CODEWORD_PATH_STYLE.secondaryDataOpacity
+        : CODEWORD_PATH_STYLE.otherOpacity;
     const effectiveWidth =
-      group.kind === 'metadata' ? Math.max(0.8, cellSize * 0.11) : lineWidth;
+      group.kind === 'metadata'
+        ? Math.max(
+            METADATA_ROUTE_STYLE.minimumLineWidth,
+            cellSize * METADATA_ROUTE_STYLE.lineWidthScale,
+          )
+        : lineWidth;
     context.lineWidth = effectiveWidth;
     context.lineJoin = 'round';
     context.lineCap = 'round';
@@ -103,7 +167,7 @@ export function drawCodewordPaths(
           points[pointIndex - 1],
           points[pointIndex],
           color,
-          0.78,
+          METADATA_ROUTE_STYLE.opacity,
           offset,
         );
       } else {
@@ -119,8 +183,8 @@ export function drawCodewordPaths(
     const from = points.at(-1);
     const next = nextGroup.modules[0];
     const to = {
-      x: (next.column + marginModules + 0.5) * cellSize,
-      y: (next.row + marginModules + 0.5) * cellSize,
+      x: (next.column + marginModules + MODULE_CENTER_OFFSET) * cellSize,
+      y: (next.row + marginModules + MODULE_CENTER_OFFSET) * cellSize,
     };
     const color = getModuleContrastColor(next, qrDefinition, model);
     if (group.kind === 'metadata' && nextGroup.kind === 'metadata') {
@@ -130,14 +194,20 @@ export function drawCodewordPaths(
         from,
         to,
         color,
-        0.78,
-        Math.max(0.8, cellSize * 0.11),
+        METADATA_ROUTE_STYLE.opacity,
+        Math.max(
+          METADATA_ROUTE_STYLE.minimumLineWidth,
+          cellSize * METADATA_ROUTE_STYLE.lineWidthScale,
+        ),
         routeIndex,
         cellSize,
       );
     } else if (group.kind !== 'metadata' && nextGroup.kind !== 'metadata') {
       context.strokeStyle = hexToRgba(color, strokeOpacity);
-      context.lineWidth = Math.max(1, cellSize * 0.1);
+      context.lineWidth = Math.max(
+        CODEWORD_PATH_STYLE.minimumLineWidth,
+        cellSize * CODEWORD_PATH_STYLE.connectorLineWidthScale,
+      );
       context.beginPath();
       context.moveTo(from.x, from.y);
       context.lineTo(to.x, to.y);
@@ -167,15 +237,33 @@ export function drawStreamFieldStarts(
     const category = getRoleCategory(role);
     const color = colors[category]?.value ?? colors.data.value;
     const contrast = getContrastingHex(color);
-    const x = (module.column + marginModules + 0.5) * cellSize;
-    const y = (module.row + marginModules + 0.5) * cellSize;
-    context.fillStyle = hexToRgba(contrast, 0.95);
+    const x = (module.column + marginModules + MODULE_CENTER_OFFSET) * cellSize;
+    const y = (module.row + marginModules + MODULE_CENTER_OFFSET) * cellSize;
+    context.fillStyle = hexToRgba(contrast, FIELD_START_STYLE.opacity);
     context.beginPath();
-    context.arc(x, y, Math.max(2, cellSize * 0.28), 0, Math.PI * 2);
+    context.arc(
+      x,
+      y,
+      Math.max(
+        FIELD_START_STYLE.outerMinimumRadius,
+        cellSize * FIELD_START_STYLE.outerRadiusScale,
+      ),
+      0,
+      Math.PI * 2,
+    );
     context.fill();
-    context.fillStyle = hexToRgba(color, 0.95);
+    context.fillStyle = hexToRgba(color, FIELD_START_STYLE.opacity);
     context.beginPath();
-    context.arc(x, y, Math.max(0.9, cellSize * 0.12), 0, Math.PI * 2);
+    context.arc(
+      x,
+      y,
+      Math.max(
+        FIELD_START_STYLE.innerMinimumRadius,
+        cellSize * FIELD_START_STYLE.innerRadiusScale,
+      ),
+      0,
+      Math.PI * 2,
+    );
     context.fill();
   });
 }

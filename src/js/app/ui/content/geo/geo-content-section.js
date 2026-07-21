@@ -11,9 +11,11 @@ import { createWorldMap } from './world-map.js';
 import { loadLocalTileRange } from './tile-fallback.js';
 
 const DEFAULT_CENTER = { latitude: 38.9182, longitude: -78.1944 };
+const COORDINATE_DECIMAL_PLACES = 5;
+const DEFAULT_DETAIL_ZOOM = 13;
 
 function formatCoordinate(value) {
-  return value.toFixed(5);
+  return value.toFixed(COORDINATE_DECIMAL_PLACES);
 }
 
 export function createGeoSection({
@@ -97,7 +99,7 @@ export function createGeoSection({
         .then(({ createSlippyMap }) => {
           map = createSlippyMap(mapElement, {
             center: DEFAULT_CENTER,
-            zoom: 13,
+            zoom: DEFAULT_DETAIL_ZOOM,
             onSelect: selectCoordinates,
           });
           return map;
@@ -111,7 +113,10 @@ export function createGeoSection({
     const label = labelInput.value.trim();
     if (!coordinates) {
       map.setMarker(null);
-      map.setView(viewState?.center || DEFAULT_CENTER, viewState?.zoom ?? 13);
+      map.setView(
+        viewState?.center || DEFAULT_CENTER,
+        viewState?.zoom ?? DEFAULT_DETAIL_ZOOM,
+      );
       return;
     }
 

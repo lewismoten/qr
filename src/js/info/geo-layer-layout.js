@@ -8,6 +8,8 @@ export const FRONT_ROYAL = {
   longitude: -78.1944,
 };
 
+const PERCENT_SCALE = 100;
+
 export function getCenteredTileLayout(zoom, center = FRONT_ROYAL) {
   const point = projectCoordinates(center, zoom);
   const half = TILE_SIZE / 2;
@@ -27,9 +29,9 @@ export function getCenteredTileLayout(zoom, center = FRONT_ROYAL) {
     for (let x = firstX; x <= lastX; x += 1) {
       tiles.push({
         isCenter: x === centerX && y === centerY,
-        left: ((x * TILE_SIZE - point.x + half) / TILE_SIZE) * 100,
+        left: ((x * TILE_SIZE - point.x + half) / TILE_SIZE) * PERCENT_SCALE,
         tile: { zoom, x, y },
-        top: ((y * TILE_SIZE - point.y + half) / TILE_SIZE) * 100,
+        top: ((y * TILE_SIZE - point.y + half) / TILE_SIZE) * PERCENT_SCALE,
       });
     }
   }

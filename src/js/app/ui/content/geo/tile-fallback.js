@@ -4,6 +4,7 @@ import { createTileBundleResolver } from './data/tile-bundles.js';
 import { setTileDebugCoordinates } from './data/tile-debug.js';
 
 const DEFAULT_RANGE = { minimum: 1, maximum: 6 };
+const TILE_TONE_COUNT = 4;
 
 export function getFallbackTile(tile, sourceZoom) {
   const tileCount = 2 ** tile.zoom;
@@ -42,7 +43,8 @@ export function createFallbackTile({
   let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
   element.className = 'slippy-map-tile';
   element.dataset.tile = `${tile.zoom}/${tile.x}/${tile.y}`;
-  const tone = (((tile.x + tile.y) % 4) + 4) % 4;
+  const tone =
+    (((tile.x + tile.y) % TILE_TONE_COUNT) + TILE_TONE_COUNT) % TILE_TONE_COUNT;
   element.classList.add(`tile-tone-${tone}`);
   image.className = 'slippy-map-tile-source';
   image.alt = '';

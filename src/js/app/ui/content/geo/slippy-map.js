@@ -21,7 +21,10 @@ import {
 import { createDynamicAttribution } from './data/attribution.js';
 import { positionMarker } from './data/marker-position.js';
 import { renderTileLayer } from './data/tile-layer.js';
+
 const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const KEYBOARD_PAN_PIXELS = 64;
+
 export function createSlippyMap(
   container,
   {
@@ -208,10 +211,10 @@ export function createSlippyMap(
     if (event.target.closest('.slippy-map-controls, .slippy-map-attribution'))
       return;
     const movements = {
-      ArrowLeft: [-64, 0],
-      ArrowRight: [64, 0],
-      ArrowUp: [0, -64],
-      ArrowDown: [0, 64],
+      ArrowLeft: [-KEYBOARD_PAN_PIXELS, 0],
+      ArrowRight: [KEYBOARD_PAN_PIXELS, 0],
+      ArrowUp: [0, -KEYBOARD_PAN_PIXELS],
+      ArrowDown: [0, KEYBOARD_PAN_PIXELS],
     };
     if (event.key === '+' || event.key === '=') setZoom(currentZoom + 1);
     else if (event.key === '-' || event.key === '_') setZoom(currentZoom - 1);

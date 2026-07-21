@@ -8,25 +8,26 @@ import { createAttribution } from '../slippy-elements.js';
 
 const CENSUS_ZOOM = 6;
 const USGS_ZOOM = 9;
+const TILE_CENTER_OFFSET = 0.5;
 const CENSUS_REGIONS = [
-  [-125, 24, -66, 50],
-  [-180, 51, -129, 72],
-  [170, 51, 180, 72],
-  [-161, 18, -154, 23],
-  [-68, 17, -64, 19],
-  [144, 13, 146, 21],
-  [-171, -15, -168, -13],
+  { west: -125, south: 24, east: -66, north: 50 },
+  { west: -180, south: 51, east: -129, north: 72 },
+  { west: 170, south: 51, east: 180, north: 72 },
+  { west: -161, south: 18, east: -154, north: 23 },
+  { west: -68, south: 17, east: -64, north: 19 },
+  { west: 144, south: 13, east: 146, north: 21 },
+  { west: -171, south: -15, east: -168, north: -13 },
 ];
 
 function intersectsViewport(bounds, view) {
   const worldSize = getWorldSize(view.zoom);
   const center = projectCoordinates(view.center, view.zoom);
   const northWest = projectCoordinates(
-    { latitude: bounds[3], longitude: bounds[0] },
+    { latitude: bounds.north, longitude: bounds.west },
     view.zoom,
   );
   const southEast = projectCoordinates(
-    { latitude: bounds[1], longitude: bounds[2] },
+    { latitude: bounds.south, longitude: bounds.east },
     view.zoom,
   );
   if (southEast.x < northWest.x) southEast.x += worldSize;
@@ -61,15 +62,18 @@ export function hasUsgsTile({ zoom, x, y } = {}) {
     return false;
   }
   const center = unprojectPoint(
-    { x: (x + 0.5) * TILE_SIZE, y: (y + 0.5) * TILE_SIZE },
+    {
+      x: (x + TILE_CENTER_OFFSET) * TILE_SIZE,
+      y: (y + TILE_CENTER_OFFSET) * TILE_SIZE,
+    },
     zoom,
   );
   return CENSUS_REGIONS.some(
-    ([west, south, east, north]) =>
-      center.longitude >= west &&
-      center.longitude <= east &&
-      center.latitude >= south &&
-      center.latitude <= north,
+    (bounds) =>
+      center.longitude >= bounds.west &&
+      center.longitude <= bounds.east &&
+      center.latitude >= bounds.south &&
+      center.latitude <= bounds.north,
   );
 }
 

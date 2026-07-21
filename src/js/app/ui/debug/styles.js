@@ -1,3 +1,10 @@
+const CODEWORD_OPACITY = {
+  default: 0.7,
+  header: 0.9,
+  padding: 0.75,
+  remainder: 0.78,
+};
+
 export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
   const getGroupBaseColor = (group) => {
     const rolePriority = [
@@ -36,11 +43,11 @@ export function createDebugStyles({ colors, getContrastingHex, getCategory }) {
 
   const getCodewordStyle = (group) => {
     const color = getGroupBaseColor(group);
-    let opacity = 0.7;
-    if (group.kind === 'header') opacity = 0.9;
+    let opacity = CODEWORD_OPACITY.default;
+    if (group.kind === 'header') opacity = CODEWORD_OPACITY.header;
     else if (group.kind === 'padding' || group.kind === 'padByte')
-      opacity = 0.75;
-    else if (group.kind === 'remainder') opacity = 0.78;
+      opacity = CODEWORD_OPACITY.padding;
+    else if (group.kind === 'remainder') opacity = CODEWORD_OPACITY.remainder;
     return { color, strokeColor: getContrastingHex(color), opacity };
   };
 

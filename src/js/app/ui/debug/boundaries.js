@@ -2,6 +2,23 @@ import { getContrastingHex, hexToRgba } from '../../colors.js';
 import { coordKey } from '../../qr/qr-regions.js';
 import { getDebugCategory } from './model.js';
 
+const HIGHLIGHT_BOUNDARY_STYLE = {
+  minimumLineWidth: 0.8,
+  lineWidthScale: 0.08,
+  opacity: 0.75,
+};
+const CODEWORD_OUTLINE_STYLE = {
+  minimumLineWidth: 1.25,
+  lineWidthScale: 0.14,
+  perimeterOpacityBoost: 0.18,
+  startOpacityBoost: 0.1,
+  moduleCenterOffset: 0.5,
+  metadataMinimumRadius: 2.2,
+  regularMinimumRadius: 1.4,
+  metadataRadiusScale: 0.24,
+  regularRadiusScale: 0.18,
+};
+
 function getOverlayColor(category, colors) {
   return colors[category]?.value ?? colors.data.value;
 }
@@ -15,7 +32,10 @@ export function drawHighlightedBoundaries(
   colors,
 ) {
   const size = qrDefinition.modules.size;
-  const lineWidth = Math.max(0.8, cellSize * 0.08);
+  const lineWidth = Math.max(
+    HIGHLIGHT_BOUNDARY_STYLE.minimumLineWidth,
+    cellSize * HIGHLIGHT_BOUNDARY_STYLE.lineWidthScale,
+  );
   for (let row = 0; row < size; row += 1) {
     for (let column = 0; column < size; column += 1) {
       const category = getDebugCategory(
@@ -50,7 +70,7 @@ export function drawHighlightedBoundaries(
       };
       context.strokeStyle = hexToRgba(
         getContrastingHex(getOverlayColor(category, colors)),
-        0.75,
+        HIGHLIGHT_BOUNDARY_STYLE.opacity,
       );
       context.lineWidth = lineWidth;
       context.lineCap = 'round';
@@ -120,7 +140,10 @@ export function drawCodewordOutlines(
   outlineMode,
   getStyle,
 ) {
-  const lineWidth = Math.max(1.25, cellSize * 0.14);
+  const lineWidth = Math.max(
+    CODEWORD_OUTLINE_STYLE.minimumLineWidth,
+    cellSize * CODEWORD_OUTLINE_STYLE.lineWidthScale,
+  );
   const groups = getActiveOutlineGroups(model, outlineMode);
   const outlinedKinds = new Set([
     'header',
@@ -138,7 +161,13 @@ export function drawCodewordOutlines(
         group.modules,
         marginModules,
         cellSize,
-        hexToRgba(style.strokeColor, Math.min(1, style.opacity + 0.18)),
+        hexToRgba(
+          style.strokeColor,
+          Math.min(
+            1,
+            style.opacity + CODEWORD_OUTLINE_STYLE.perimeterOpacityBoost,
+          ),
+        ),
         lineWidth,
       );
     }
@@ -153,15 +182,24 @@ export function drawCodewordOutlines(
     if (!first || !drawStart) return;
     context.fillStyle = hexToRgba(
       style.strokeColor,
-      Math.min(1, style.opacity + 0.1),
+      Math.min(1, style.opacity + CODEWORD_OUTLINE_STYLE.startOpacityBoost),
     );
     context.beginPath();
     context.arc(
-      (first.column + marginModules + 0.5) * cellSize,
-      (first.row + marginModules + 0.5) * cellSize,
+      (first.column +
+        marginModules +
+        CODEWORD_OUTLINE_STYLE.moduleCenterOffset) *
+        cellSize,
+      (first.row + marginModules + CODEWORD_OUTLINE_STYLE.moduleCenterOffset) *
+        cellSize,
       Math.max(
-        group.kind === 'metadata' ? 2.2 : 1.4,
-        cellSize * (group.kind === 'metadata' ? 0.24 : 0.18),
+        group.kind === 'metadata'
+          ? CODEWORD_OUTLINE_STYLE.metadataMinimumRadius
+          : CODEWORD_OUTLINE_STYLE.regularMinimumRadius,
+        cellSize *
+          (group.kind === 'metadata'
+            ? CODEWORD_OUTLINE_STYLE.metadataRadiusScale
+            : CODEWORD_OUTLINE_STYLE.regularRadiusScale),
       ),
       0,
       Math.PI * 2,
