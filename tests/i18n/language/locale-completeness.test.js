@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
+import emojiMessages from '../../../src/js/i18n/emoji.json' with { type: 'json' };
 import {
   createLocaleLoader,
   DEFAULT_LOCALE,
@@ -132,6 +133,15 @@ describe('locale completeness', () => {
       {},
       'Translation keys must also exist in the en-US locale.',
     );
+  });
+
+  test('semantic emoji keys exist in en-US', async () => {
+    const baseline = flattenMessages(await readLocaleSource(DEFAULT_LOCALE));
+    const unknown = Object.keys(flattenMessages(emojiMessages)).filter(
+      (key) => !Object.hasOwn(baseline, key),
+    );
+
+    assert.deepEqual(unknown, []);
   });
 
   test('standalone locales translate every en-US value', async () => {

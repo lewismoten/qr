@@ -1,3 +1,5 @@
+import { getEmoji } from '../../../i18n/emoji.js';
+
 export function createFormatVisibility({
   document,
   elements: e,
@@ -11,12 +13,7 @@ export function createFormatVisibility({
   return function sync() {
     syncBulk();
     const format = e.format.value;
-    const formatButton = document.querySelector(
-      `[data-choice-target="qr-format"]` + `[data-choice-value="${format}"]`,
-    );
-    if (formatButton && e.dataTab) {
-      e.dataTab.dataset.formatEmoji = formatButton.dataset.formatEmoji;
-    }
+    if (e.dataTab) e.dataTab.dataset.i18nEmoji = getEmoji(`formats.${format}`);
     void prepareFormat(format)
       .then(() => {
         syncFile();

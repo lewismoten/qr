@@ -24,19 +24,10 @@ const fields = {
   wifi: fieldset(),
 };
 const secretToggle = fieldset();
-const formatEmojis = new Map([
-  ['event', { dataset: { formatEmoji: '📅' } }],
-  ['url', { dataset: { formatEmoji: '🔗' } }],
-  ['wifi', { dataset: { formatEmoji: '📶' } }],
-]);
 const document = {
   getElementById: () => secretToggle,
   querySelector(selector) {
     if (selector === '.format-fields.is-active') return fields.url;
-    if (selector.includes('[data-choice-target="qr-format"]')) {
-      const format = selector.match(/data-choice-value="([^"]+)/)?.[1];
-      return formatEmojis.get(format) ?? null;
-    }
     const format = selector.match(/data-format-fields="([^"]+)/)?.[1];
     return fields[format] ?? null;
   },
@@ -44,7 +35,7 @@ const document = {
 const controls = {
   format: { value: 'event' },
   bulkEnabled: { checked: false },
-  dataTab: { dataset: { formatEmoji: '🔗' } },
+  dataTab: { dataset: { i18nEmoji: '🔗' } },
 };
 let releasePreparation;
 let fileSyncs = 0;
@@ -72,7 +63,7 @@ const sync = createFormatVisibility({
 });
 
 sync();
-assert.equal(controls.dataTab.dataset.formatEmoji, '📅');
+assert.equal(controls.dataTab.dataset.i18nEmoji, '📅');
 assert.equal(fields.url.hidden, true);
 assert.equal(fields.event.hidden, false);
 assert.equal(fields.event.attributes.get('aria-hidden'), 'false');
@@ -86,7 +77,7 @@ assert.equal(eventSyncs, 1);
 
 controls.format.value = 'wifi';
 sync();
-assert.equal(controls.dataTab.dataset.formatEmoji, '📶');
+assert.equal(controls.dataTab.dataset.i18nEmoji, '📶');
 releasePreparation();
 await Promise.resolve();
 assert.equal(fields.event.hidden, true);

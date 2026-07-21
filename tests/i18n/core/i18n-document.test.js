@@ -65,6 +65,8 @@ function createFetcher(resources) {
 test('document translation applies text, attributes, direction, and values', async () => {
   const text = new Element({ dataset: { i18n: 'screen.title' } });
   text.textContent = 'Fallback title';
+  const format = new Element({ dataset: { i18n: 'formats.url' } });
+  format.textContent = 'URL';
   const label = new Element({
     attributes: {
       'aria-label': 'Fallback label',
@@ -91,7 +93,7 @@ test('document translation applies text, attributes, direction, and values', asy
     },
   });
   const document = createDocument({
-    '[data-i18n]': [text],
+    '[data-i18n]': [text, format],
     '[data-i18n-aria-label]': [label],
     '[data-i18n-placeholder]': [placeholder],
     '[data-i18n-title]': [title],
@@ -121,11 +123,16 @@ test('document translation applies text, attributes, direction, and values', asy
   assert.equal(document.documentElement.lang, 'ar');
   assert.equal(document.documentElement.dir, 'rtl');
   assert.equal(text.textContent, 'عنوان');
+  assert.equal(format.dataset.i18nEmoji, '🔗');
   assert.equal(label.getAttribute('aria-label'), 'تسمية');
   assert.equal(placeholder.getAttribute('placeholder'), 'عنصر نائب');
   assert.equal(title.getAttribute('title'), 'تلميح');
   assert.equal(input.value, 'قيمة');
   assert.equal(input.defaultValue, 'قيمة');
+
+  format.dataset.i18n = 'screen.title';
+  translateDocument(document);
+  assert.equal(format.dataset.i18nEmoji, undefined);
 
   input.value = 'User edit';
   await initializeLanguage({ locale: 'en-US', baseUrl, fetcher });

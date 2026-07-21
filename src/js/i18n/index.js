@@ -7,6 +7,7 @@ import {
   normalizeLocaleEntries,
   selectLocale,
 } from './locale-resources.js';
+import { applyEmoji } from './emoji.js';
 
 const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title', 'value'];
 
@@ -193,7 +194,9 @@ export function translateDocument(document) {
     : 'ltr';
   document.documentElement.classList.toggle('i18n-debug', debugLanguage);
   document.querySelectorAll('[data-i18n]').forEach((element) => {
-    element.textContent = lookup(element.dataset.i18n, element.textContent);
+    const key = element.dataset.i18n;
+    element.textContent = lookup(key, element.textContent);
+    applyEmoji(element, key);
   });
   TRANSLATED_ATTRIBUTES.forEach((attribute) => {
     const dataAttribute = `data-i18n-${attribute}`;

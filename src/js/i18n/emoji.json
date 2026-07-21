@@ -1,0 +1,238 @@
+{
+  "navigation": {
+    "content": "🧩",
+    "style": "🎨",
+    "download": "💾",
+    "debug": "🐞"
+  },
+  "content": {
+    "format": "🧭",
+    "frame": "🖼️"
+  },
+  "formats": {
+    "url": "🔗",
+    "text": "📝",
+    "number": "🔢",
+    "numberRange": "🔢",
+    "wifi": "📶",
+    "email": "✉️",
+    "phone": "📞",
+    "sms": "💬",
+    "event": "📅",
+    "calendarEvent": "📅",
+    "geo": "📍",
+    "vcard": "👤",
+    "file": "📁"
+  },
+  "common": {
+    "close": "✖️",
+    "help": "❓",
+    "auto": "🤖",
+    "none": "🚫",
+    "loading": "⏳",
+    "noFileSelected": "📭"
+  },
+  "footer": {
+    "about": "ℹ️",
+    "specification": "🔬",
+    "privacy": "🛡️",
+    "guides": "📚"
+  },
+  "fields": {
+    "title": "🏷️",
+    "location": "📍",
+    "description": "📝",
+    "recipientEmail": "✉️",
+    "fullName": "👤",
+    "organization": "🏢",
+    "vcardPhone": "📞",
+    "vcardEmail": "✉️",
+    "smsPhone": "📱",
+    "emailAddress": "✉️",
+    "telephoneNumber": "📞",
+    "subject": "🏷️",
+    "body": "📝",
+    "message": "💬",
+    "prefix": "⏮️",
+    "suffix": "⏭️"
+  },
+  "form": {
+    "format": {
+      "payloadFormat": "📦",
+      "qrFormat": "🧭",
+      "bulkImport": "📚"
+    },
+    "tracking": {
+      "open": "⚠️",
+      "keep": "🔗",
+      "remove": "🧹"
+    },
+    "data": {
+      "chooseCsv": "📄",
+      "clearCsv": "🧹",
+      "urlContent": "🔗",
+      "textContent": "📝",
+      "textPayload": "📝",
+      "numberSeries": "🔢",
+      "start": "▶️",
+      "end": "⏹️",
+      "step": "⏩",
+      "prefixOptional": "⏮️",
+      "suffixOptional": "⏭️",
+      "networkName": "📶",
+      "security": "🔒",
+      "hiddenNetwork": "🙈",
+      "to": "📨",
+      "subjectOptional": "🏷️",
+      "bodyOptional": "📝",
+      "phoneFormat": "📞",
+      "smsPhoneFormat": "📱",
+      "textMessage": "💬",
+      "allDayEvent": "🌞",
+      "startDate": "📅",
+      "startTime": "🕐",
+      "endDate": "📅",
+      "endTime": "🕐",
+      "locationOptional": "📍",
+      "optionalDesc": "📝",
+      "websiteOptional": "🌐",
+      "latitude": "↕️",
+      "longitude": "↔️",
+      "label": "🏷️",
+      "website": "🌐",
+      "transport": "🚚",
+      "chooseFile": "📁",
+      "autoPickVersion": "🤖",
+      "targetVersion": "🎯",
+      "includeManifest": "📋",
+      "compressTransfer": "🗜️",
+      "customMetadata": "🏷️",
+      "clearFile": "🧹"
+    }
+  },
+  "style": {
+    "tabs": {
+      "size": "📐",
+      "modules": "◼️",
+      "colors": "🎨",
+      "art": "🖼️"
+    },
+    "size": {
+      "legend": "📐",
+      "targetWidth": "↔️",
+      "fromScale": "🔍",
+      "minimumPixels": "🔲",
+      "margin": "⬜"
+    },
+    "modules": {
+      "legend": "◼️",
+      "shape": "🔷",
+      "cornerRounding": "⭕",
+      "spacing": "↔️",
+      "rotation": "🔄",
+      "eyes": "👁️"
+    },
+    "colors": {
+      "legend": "🎨",
+      "dark": "⬛",
+      "light": "⬜",
+      "transparency": "🔳",
+      "gradientEnd": "🏁",
+      "direction": "🧭",
+      "fillImage": "🖼️",
+      "clearImage": "🧹"
+    },
+    "art": {
+      "legend": "🖼️",
+      "logo": "🏷️",
+      "emoji": "😀",
+      "pixelArt": "👾",
+      "size": "📐",
+      "logoImage": "🖼️",
+      "clearLogo": "🧹",
+      "quickPicks": "⚡",
+      "canvasWidth": "↔️",
+      "customColor": "🎨",
+      "clear": "🧹"
+    }
+  },
+  "downloadUi": {
+    "tabs": {
+      "image": "🖼️",
+      "document": "📄",
+      "animation": "🎞️"
+    },
+    "image": {
+      "legend": "🖼️",
+      "format": "🧭",
+      "quality": "✨",
+      "download": "⬇️",
+      "current": "⬇️",
+      "allZip": "🗜️"
+    },
+    "document": {
+      "legend": "📄",
+      "autoSize": "🤖",
+      "printedWidth": "↔️",
+      "download": "⬇️",
+      "current": "⬇️",
+      "allPdf": "⬇️"
+    },
+    "animation": {
+      "legend": "🎞️",
+      "mode": "🧭",
+      "perImage": "🖼️",
+      "totalDuration": "⏱️",
+      "minutes": "⏱️",
+      "seconds": "⏱️",
+      "milliseconds": "⏱️",
+      "gif": "⬇️",
+      "mp4": "⬇️"
+    }
+  },
+  "debugUi": {
+    "tabs": {
+      "encoding": "🔤",
+      "mask": "🎭",
+      "payload": "📦",
+      "overlay": "🧩"
+    },
+    "encoding": {
+      "errorCorrection": "🛡️",
+      "inputMode": "⌨️",
+      "mode": "🔤",
+      "version": "🔢",
+      "target": "🎯"
+    },
+    "mask": {
+      "legend": "🎭"
+    },
+    "payload": {
+      "legend": "📦",
+      "reveal": "👁️"
+    },
+    "overlay": {
+      "legend": "🧩",
+      "persist": "📌",
+      "unmask": "🎭",
+      "segments": "🧱",
+      "unused": "📭",
+      "outlineGrouping": "🔲"
+    }
+  },
+  "frame": {
+    "message": "💬",
+    "mode": "🧭",
+    "customMessage": "✏️",
+    "font": "🔤",
+    "messageColor": "🎨",
+    "maxLineHeight": "↕️"
+  },
+  "wifi": {
+    "password": "🔑"
+  },
+  "preview": {
+    "fit": "🔲",
+    "actualRatio": "🔍"
+  }
+}
