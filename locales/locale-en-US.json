@@ -46,10 +46,8 @@
     "navigationLabel": "Site information",
     "about": "About",
     "specification": "QR spec",
-    "technology": "Technology",
     "privacy": "Privacy",
-    "guides": "Guides",
-    "source": "Source"
+    "guides": "Guides"
   },
   "specDialog": {
     "kicker": "Visual specification",
@@ -87,7 +85,6 @@
     "auto": "Auto",
     "autoLower": "auto",
     "none": "none",
-    "preview": "Preview",
     "loading": "Loading...",
     "loadError": "Unable to load the QR Code Generator.",
     "fragmentError": "Unable to load this section. Check your connection and try again.",

@@ -1,4 +1,5 @@
 import { assembleLocaleResource, readLocaleManifest } from './resources.mjs';
+import { GUIDE_COPY_KEYS } from '../../src/js/i18n/guide-copy-keys.js';
 
 const resources = new Map();
 
@@ -35,10 +36,10 @@ export async function getSourceGuideCopy(locale) {
   const entries = await Promise.all([
     getSourceMessage(
       locale,
-      'info.guides.externalEnglish',
+      GUIDE_COPY_KEYS.externalEnglish,
       'The linked resource is available in English',
     ),
-    getSourceMessage(locale, 'info.guides.languages', 'Languages'),
+    getSourceMessage(locale, GUIDE_COPY_KEYS.languages, 'Languages'),
     getSourceMessage(locale, 'footer.navigationLabel', 'Site information'),
     getSourceMessage(locale, 'info.guides.generator', 'Generator'),
     getSourceMessage(locale, 'footer.guides', 'Guides'),

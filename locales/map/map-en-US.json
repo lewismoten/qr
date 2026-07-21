@@ -48,10 +48,6 @@
     "finestRoutes": "Finest generated roads, including Main Streets, plus waterways, rail lines, parks, and ranked places.",
     "rankedRoads": "Ranked county, numbered, and long named roads supplement the existing map detail.",
     "detailedRoads": "A sparse overlay adds another tier of long municipal roads.",
-    "streets": "Planned: named streets and local context.",
-    "blocks": "Planned: blocks, paths, and detailed streets.",
-    "buildings": "Planned: building footprints and service roads.",
-    "entrances": "Planned: entrances, paths, and fine geometry.",
     "precise": "Planned: precise structures and pedestrian detail.",
     "maximum": "Planned: maximum supported local detail.",
     "fallback": "Currently displays the nearest generated tile."

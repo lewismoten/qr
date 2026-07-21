@@ -2,13 +2,14 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { getSourceMessage } from '../locales/source-message.mjs';
+import { GUIDE_COPY_KEYS } from '../../src/js/i18n/guide-copy-keys.js';
 
 const [locale, inputFile, outputFile] = process.argv.slice(2);
 
 async function normalizeTranslation(source, translated) {
   const keys = {
     Generator: 'info.guides.generator',
-    'Open generator': 'info.guides.openGenerator',
+    'Open generator': GUIDE_COPY_KEYS.openGenerator,
   };
   const overridden = keys[source]
     ? await getSourceMessage(locale, keys[source], translated)

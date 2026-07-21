@@ -46,10 +46,8 @@
     "navigationLabel": "Información del sitio",
     "about": "Acerca de",
     "specification": "Especificación QR",
-    "technology": "Tecnología",
     "privacy": "Privacidad",
-    "guides": "Guías",
-    "source": "Código fuente"
+    "guides": "Guías"
   },
   "specDialog": {
     "kicker": "Especificación visual",
@@ -87,7 +85,6 @@
     "auto": "Automático",
     "autoLower": "automático",
     "none": "ninguno",
-    "preview": "Vista previa",
     "loading": "Cargando...",
     "loadError": "No se pudo cargar el generador de códigos QR.",
     "fragmentError": "No se pudo cargar esta sección. Comprueba tu conexión e inténtalo de nuevo.",

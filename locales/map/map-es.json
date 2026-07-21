@@ -48,10 +48,6 @@
     "finestRoutes": "Vista generada más detallada de carreteras, incluidas las calles principales llamadas Main Street, además de cursos de agua, líneas ferroviarias, parques y lugares clasificados.",
     "rankedRoads": "Las rutas de condado, otras rutas numeradas y las carreteras largas con nombre complementan el detalle existente del mapa.",
     "detailedRoads": "Una superposición dispersa añade otro nivel de carreteras municipales largas.",
-    "streets": "Previsto: calles con nombre y contexto local.",
-    "blocks": "Previsto: manzanas, senderos y calles detalladas.",
-    "buildings": "Previsto: contornos de edificios y vías de servicio.",
-    "entrances": "Previsto: accesos, senderos y geometría detallada.",
     "precise": "Previsto: estructuras precisas y detalles peatonales.",
     "maximum": "Previsto: máximo detalle local compatible.",
     "fallback": "Actualmente muestra la tesela generada más cercana."

@@ -46,10 +46,8 @@
     "navigationLabel": "معلومات الموقع",
     "about": "حول",
     "specification": "مواصفات QR",
-    "technology": "التقنية",
     "privacy": "الخصوصية",
-    "guides": "الأدلة",
-    "source": "المصدر"
+    "guides": "الأدلة"
   },
   "specDialog": {
     "kicker": "مواصفات مرئية",
@@ -87,7 +85,6 @@
     "auto": "تلقائي",
     "autoLower": "تلقائي",
     "none": "لا شيء",
-    "preview": "معاينة",
     "loading": "جارٍ التحميل...",
     "loadError": "تعذر تحميل منشئ رمز QR.",
     "fragmentError": "تعذر تحميل هذا القسم. تحقق من اتصالك وحاول مرة أخرى.",
