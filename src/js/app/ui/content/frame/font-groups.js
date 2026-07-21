@@ -60,10 +60,10 @@ export function getFrameFontGroups({ document, locale }) {
     group.languages.includes(language),
   );
   const orderedGroups = [...GROUPS].sort((left, right) => {
-    if (left === currentGroup) return -1;
-    if (right === currentGroup) return 1;
     if (left.id === 'general') return -1;
     if (right.id === 'general') return 1;
+    if (left === currentGroup) return -1;
+    if (right === currentGroup) return 1;
     return 0;
   });
   return orderedGroups.map((group) => ({

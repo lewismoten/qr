@@ -115,7 +115,7 @@ function createDocument(availableFonts = []) {
 }
 
 test('frame font registry provides named stacks and a safe fallback', () => {
-  assert.equal(FRAME_FONT_OPTIONS.length, 24);
+  assert.equal(FRAME_FONT_OPTIONS.length, 23);
   assert.equal(getFrameFontOption('times').label, 'Times New Roman');
   assert.equal(getFrameFontOption('missing').value, 'sans');
   assert.match(getFrameFont('courier', 18), /^700 18px "Courier New"/);
@@ -128,9 +128,10 @@ test('font groups prioritize the locale and report availability', () => {
     document,
     locale: 'ar',
   });
-  assert.equal(groups[0].id, 'arabic');
-  assert.equal(groups[1].id, 'general');
-  const geeza = groups[0].options.find(
+  assert.equal(groups[0].id, 'general');
+  assert.equal(groups[1].id, 'arabic');
+  assert.equal(groups[0].options.length, 3);
+  const geeza = groups[1].options.find(
     ({ option }) => option.value === 'geeza',
   );
   assert.equal(geeza.installed, true);
@@ -140,7 +141,7 @@ test('font groups prioritize the locale and report availability', () => {
     isFrameFontRecommended(getFrameFontOption('arial'), null),
     false,
   );
-  assert.equal(groups.flatMap(({ options }) => options).length, 24);
+  assert.equal(groups.flatMap(({ options }) => options).length, 23);
   assert.equal(isFrameFontAvailable(getFrameFontOption('sans'), null), true);
   assert.equal(isFrameFontAvailable(getFrameFontOption('arial'), {}), false);
   assert.equal(
@@ -188,12 +189,13 @@ test('font picker reflects, changes, and closes the selected font', () => {
   assert.equal(arial.dataset.recommended, 'Recommended');
   assert.equal(
     groups.children[0].children[0].children[0].textContent,
-    '\u{1F1FA}\u{1F1F8} \u{1F1EC}\u{1F1E7} ' + '\u{1F1EA}\u{1F1F8}',
+    '\u{1F310}',
   );
   assert.equal(
     groups.children[0].children[0].children[1].textContent,
-    'English and Spanish',
+    'General',
   );
+  assert.equal(groups.children[0].children[1].children.length, 3);
   assert.equal(getChoice('geeza').disabled, true);
   assert.ok(groups.querySelectorAll('a').length > 0);
   assert.equal(groups.querySelectorAll('a')[0].target, '_blank');
@@ -237,6 +239,8 @@ test('frame guide exposes the font picker and selected value', async () => {
   assert.match(source, /id="frame-font-more"/);
   assert.match(source, /id="frame-font-selected-value"/);
   assert.match(source, /data-i18n="frame\.selectedFont"/);
+  assert.equal(source.match(/data-choice-target="frame-font"/g)?.length, 3);
+  assert.doesNotMatch(source, /data-choice-value="rounded"/);
 });
 
 test('frame setup carries the render callback through the pipeline', async () => {

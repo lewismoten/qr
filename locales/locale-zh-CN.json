@@ -132,7 +132,6 @@
     "fontInfo": "字体信息 \u2197",
     "aboutFont": "关于 {font} 的信息",
     "sans": "无衬线",
-    "round": "圆体",
     "serif": "衬线",
     "mono": "等宽",
     "monospace": "等宽字体",

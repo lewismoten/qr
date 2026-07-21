@@ -14,16 +14,6 @@ export const FRAME_FONT_OPTIONS = Object.freeze([
     weight: FONT_WEIGHT_EXTRA_BOLD,
   },
   {
-    value: 'rounded',
-    key: 'frame.round',
-    label: 'Round',
-    family: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
-    checkFamily: 'Arial Rounded MT Bold',
-    infoUrl: `${MICROSOFT_FONT_INFO}arial-rounded-mt`,
-    locales: ['en', 'es'],
-    weight: FONT_WEIGHT_EXTRA_BOLD,
-  },
-  {
     value: 'serif',
     key: 'frame.serif',
     label: 'Serif',

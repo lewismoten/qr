@@ -71,7 +71,7 @@ function createGroup(document, group) {
   flag.textContent = group.flag;
   label.textContent = getGroupLabel(group);
   heading.append(flag, label);
-  grid.className = 'frame-font-grid';
+  grid.className = 'frame-font-choice-grid';
   section.append(heading, grid);
   return { grid, section };
 }

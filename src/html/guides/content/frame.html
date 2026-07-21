@@ -162,16 +162,6 @@
                   </button>
                   <button
                     type="button"
-                    class="choice-button frame-font-rounded"
-                    data-choice-target="frame-font"
-                    data-choice-value="rounded"
-                    aria-pressed="false"
-                    data-i18n="frame.round"
-                  >
-                    Round
-                  </button>
-                  <button
-                    type="button"
                     class="choice-button frame-font-serif"
                     data-choice-target="frame-font"
                     data-choice-value="serif"
@@ -190,6 +180,16 @@
                   >
                     Mono
                   </button>
+                  <button
+                    id="frame-font-more"
+                    type="button"
+                    class="choice-button frame-font-more-button"
+                    aria-haspopup="dialog"
+                    aria-controls="frame-font-dialog"
+                    data-i18n="frame.moreFonts"
+                  >
+                    More fonts
+                  </button>
                 </div>
                 <select
                   id="frame-font"
@@ -201,32 +201,17 @@
                   <option value="sans" selected data-i18n="frame.sans">
                     Sans
                   </option>
-                  <option value="rounded" data-i18n="style.values.rounded">
-                    Rounded
-                  </option>
                   <option value="serif" data-i18n="frame.serif">Serif</option>
                   <option value="mono" data-i18n="frame.monospace">
                     Monospace
                   </option>
                 </select>
-                <div class="frame-font-more-row">
-                  <button
-                    id="frame-font-more"
-                    type="button"
-                    class="secondary-button"
-                    aria-haspopup="dialog"
-                    aria-controls="frame-font-dialog"
-                    data-i18n="frame.moreFonts"
+                <output id="frame-font-selected" for="frame-font">
+                  <span data-i18n="frame.selectedFont">Selected font:</span>
+                  <strong id="frame-font-selected-value" data-i18n="frame.sans"
+                    >Sans</strong
                   >
-                    More fonts
-                  </button>
-                  <output id="frame-font-selected" for="frame-font">
-                    <span data-i18n="frame.selectedFont">Selected font:</span>
-                    <strong id="frame-font-selected-value" data-i18n="frame.sans"
-                      >Sans</strong
-                    >
-                  </output>
-                </div>
+                </output>
                 <div class="frame-color-field">
                   <label
                     for="frame-message-color"
