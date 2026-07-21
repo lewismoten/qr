@@ -8,11 +8,45 @@ import {
 import {
   createLocaleSourceFetcher,
   localeSourceUrl,
+  readLocaleSource,
   readSourceLocaleManifest,
 } from '../../helpers/locales.js';
 
 const localeRoot = localeSourceUrl;
 const resourceMetadata = new Set(['$debug', 'extends']);
+const inheritedLocales = new Set(['en-GB', 'en-XA']);
+// Standards, syntax examples, units, and sample contact data are not prose.
+const invariantKeys = new Set([
+  'formats.url',
+  'formats.vcard',
+  'formats.sms',
+  'formats.wifi',
+  'formats.geo',
+  'common.count',
+  'frame.wifi',
+  'number.status',
+  'encoding.unused',
+  'encoding.modes.kanji',
+  'preview.actualRatio',
+  'units.pixels',
+  'units.dimensions',
+  'units.percent',
+  'spec.modes.kanji',
+  'debugUi.encoding.alphaShort',
+  'form.placeholders.numberSuffix',
+  'form.defaults.vcardName',
+  'form.defaults.vcardOrg',
+  'form.defaults.phone',
+  'form.defaults.vcardEmail',
+  'form.defaults.vcardWebsite',
+  'form.data.wpa',
+  'form.data.wpaLong',
+  'form.data.wep',
+  'form.data.e164',
+  'info.handbook.pdf',
+  'art.colors.magenta',
+  'style.art.emoji',
+]);
 
 function flattenMessages(value, prefix = '', output = {}) {
   for (const [key, child] of Object.entries(value)) {
@@ -79,6 +113,34 @@ describe('locale completeness', () => {
       extras,
       {},
       'Translation keys must also exist in the en-US locale.',
+    );
+  });
+
+  test('standalone locales translate every en-US value', async () => {
+    const manifest = await readSourceLocaleManifest();
+    const baseline = flattenMessages(await readLocaleSource(DEFAULT_LOCALE));
+    const locales = manifest.locales.filter(
+      ({ code }) => code !== DEFAULT_LOCALE && !inheritedLocales.has(code),
+    );
+    const issues = {};
+
+    for (const locale of locales) {
+      const messages = flattenMessages(await readLocaleSource(locale.code));
+      const missing = Object.keys(baseline).filter(
+        (key) => !Object.hasOwn(messages, key),
+      );
+      const untranslated = Object.keys(baseline).filter(
+        (key) => !invariantKeys.has(key) && messages[key] === baseline[key],
+      );
+      if (missing.length || untranslated.length) {
+        issues[locale.code] = { missing, untranslated };
+      }
+    }
+
+    assert.deepEqual(
+      issues,
+      {},
+      'Standalone locales need every en-US key and translated prose.',
     );
   });
 

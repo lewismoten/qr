@@ -46,7 +46,7 @@
     "type": "Tipo de arte central",
     "logo": "Logotipo",
     "emoji": "Emoji",
-    "pixelArt": "Pixel art",
+    "pixelArt": "Arte pixelado",
     "size": "Tamaño del arte",
     "logoImage": "Imagen del logotipo",
     "clearLogo": "Borrar logotipo",
@@ -94,7 +94,7 @@
     "circle": "Círculo",
     "solid": "Sólido",
     "linear": "Lineal",
-    "radial": "Radial",
+    "radial": "Degradado radial",
     "image": "Imagen",
     "customImage": "Imagen personalizada"
   }

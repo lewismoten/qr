@@ -16,7 +16,7 @@
     "autoHelp": "La detección automática elige segmentos numéricos, alfanuméricos o de bytes según el coste total en bits. Kanji sigue siendo manual.",
     "manualHelp": "El modo manual fuerza el modo elegido y marca los caracteres incompatibles.",
     "autoDetect": "Detección automática (sin Kanji)",
-    "manual": "Manual",
+    "manual": "Modo manual",
     "alphaShort": "A-Z / 0-9",
     "mode": "Modo",
     "version": "Versión",
