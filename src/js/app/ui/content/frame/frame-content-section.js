@@ -1,5 +1,6 @@
 import { getActiveLocale, lookup } from '../../../../i18n/index.js';
 import { parseBoolean } from '../../../data/csv.js';
+import { getFrameFont } from './font-options.js';
 
 const FRAME_MESSAGE_MAXIMUM_LENGTH = 64;
 const EVENT_LINE_MAXIMUM_LENGTH = 80;
@@ -8,8 +9,6 @@ const ISO_YEAR_LENGTH = 4;
 const DATE_FORMAT_REFERENCE_YEAR = 2000;
 const DATE_FORMAT_NOON_HOUR = 12;
 const MINIMUM_FILE_NAME_LENGTH = 8;
-const FONT_WEIGHT_BOLD = 700;
-const FONT_WEIGHT_EXTRA_BOLD = 800;
 const DEFAULT_FRAME_LINE_HEIGHT = 18;
 
 function shorten(value, maximumLength = FRAME_MESSAGE_MAXIMUM_LENGTH) {
@@ -263,14 +262,7 @@ export function createFrameSection(options) {
       options.onDisableArtwork();
     }
   };
-  const getFont = (size) =>
-    ({
-      sans: `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Avenir Next", "Segoe UI", sans-serif`,
-      rounded: `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Arial Rounded MT Bold", "Trebuchet MS", sans-serif`,
-      serif: `${FONT_WEIGHT_BOLD} ${size}px Georgia, "Times New Roman", serif`,
-      mono: `${FONT_WEIGHT_BOLD} ${size}px "SFMono-Regular", Consolas, "Liberation Mono", monospace`,
-    })[options.font.value] ||
-    `${FONT_WEIGHT_EXTRA_BOLD} ${size}px "Avenir Next", "Segoe UI", sans-serif`;
+  const getFont = (size) => getFrameFont(options.font.value, size);
 
   const sync = () => {
     options.customField.hidden = options.mode.value !== 'custom';

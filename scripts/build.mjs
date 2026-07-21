@@ -8,6 +8,7 @@ import { buildLocaleResources } from './locales/resources.mjs';
 import { publishDetailedMap } from './maps/vector/publish.mjs';
 
 const watch = process.argv.includes('--watch');
+const contentFrameEntry = 'chunks/content-frame.min';
 const compileOnly = process.argv.includes('--compile-only');
 const quiet = process.argv.includes('--quiet');
 const htmlConfig = await loadHtmlConfig();
@@ -73,6 +74,7 @@ const builds = [
       'chunks/debug-mask.min': 'src/css/features/debug/mask.css',
       'chunks/debug-overlay.min': 'src/css/features/debug/overlay.css',
       'chunks/download.min': 'src/css/features/download/index.css',
+      [contentFrameEntry]: 'src/css/features/content/frame.css',
       'chunks/geo-map.min': 'src/css/features/content/geo-map.css',
       'chunks/i18n-debug.min': 'src/css/components/i18n-debug.css',
       'chunks/style-artwork.min': 'src/css/features/style/artwork.css',

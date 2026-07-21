@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import {
+  COLOR_ACCENT,
+  COLOR_BLACK,
+  COLOR_WHITE,
+} from '../../src/js/app/colors.js';
 import { createColorSection } from '../../src/js/app/ui/style/colors/color-style-section.js';
 import {
   getFallbackEyeOptions,
@@ -64,14 +69,13 @@ test('image fills disable custom eye colors in the colors section', () => {
   const gradientType = control('image');
   const customEyeColors = { checked: true, disabled: false };
   const eyeColorControls = { hidden: false };
-  const colors = createColorSection({
+  const fields = {
     darkColor: control('#000000'),
     lightColor: control('#ffffff'),
     darkTransparency: control('0'),
     darkAlphaValue: control(),
     lightAlpha: control('0'),
     lightAlphaValue: control(),
-    gradientType,
     gradientControls: control(),
     angleControls: control(),
     gradientAngle: control('0'),
@@ -81,18 +85,78 @@ test('image fills disable custom eye colors in the colors section', () => {
     endAlphaValue: control(),
     imageControls: control(),
     imageFillClear: control(),
+  };
+  const {
+    angleControls,
+    angleValue,
+    darkAlphaValue,
+    darkColor,
+    darkTransparency,
+    endAlpha,
+    endAlphaValue,
+    gradientAngle,
+    gradientControls,
+    gradientEndColor,
+    imageControls,
+    imageFillClear,
+    lightAlpha,
+    lightAlphaValue,
+    lightColor,
+  } = fields;
+  let hasImage = false;
+  const colors = createColorSection({
+    ...fields,
+    gradientType,
     customEyeColors,
     eyeColorControls,
-    hasImageFill: () => false,
-    withAlpha: (value) => value,
+    hasImageFill: () => hasImage,
+    withAlpha: (value, alpha) => `${value}:${alpha.value}`,
   });
 
   colors.sync();
   assert.equal(customEyeColors.disabled, true);
   assert.equal(eyeColorControls.hidden, true);
+  gradientEndColor.value = '';
+  assert.equal(colors.getGradientOptions().angle, 0);
+  assert.equal(colors.getGradientOptions().endColor, `${COLOR_ACCENT}:0`);
 
-  gradientType.value = 'solid';
+  gradientType.value = 'linear';
+  gradientAngle.value = '45';
+  gradientEndColor.value = '#123456';
+  hasImage = true;
   colors.sync();
   assert.equal(customEyeColors.disabled, false);
   assert.equal(eyeColorControls.hidden, false);
+  assert.equal(gradientControls.hidden, false);
+  assert.equal(angleControls.hidden, false);
+  assert.equal(imageControls.hidden, true);
+  assert.equal(imageFillClear.disabled, false);
+  assert.equal(angleValue.textContent, '45 degrees');
+  assert.deepEqual(colors.getGradientOptions(), {
+    type: 'linear',
+    angle: 45,
+    endColor: '#123456:0',
+  });
+
+  gradientType.value = 'radial';
+  customEyeColors.checked = false;
+  colors.sync();
+  assert.equal(angleControls.hidden, true);
+  assert.equal(eyeColorControls.hidden, true);
+
+  darkTransparency.value = '60';
+  lightAlpha.value = '15';
+  endAlpha.value = '30';
+  colors.formatTransparency();
+  assert.equal(darkAlphaValue.textContent, '60%');
+  assert.equal(lightAlphaValue.textContent, '15%');
+  assert.equal(endAlphaValue.textContent, '30%');
+
+  colors.applyRecommendedImageContrast();
+  assert.equal(darkColor.value, COLOR_BLACK);
+  assert.equal(darkTransparency.value, '75');
+  assert.equal(lightColor.value, COLOR_WHITE);
+  assert.equal(lightAlpha.value, '25');
+  assert.equal(darkAlphaValue.textContent, '75%');
+  assert.equal(lightAlphaValue.textContent, '25%');
 });

@@ -227,6 +227,8 @@
     "mode": "🧭",
     "customMessage": "✏️",
     "font": "🔤",
+    "moreFonts": "🔠",
+    "selectedFont": "✅",
     "messageColor": "🎨",
     "maxLineHeight": "↕️"
   },

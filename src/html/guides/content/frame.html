@@ -209,6 +209,24 @@
                     Monospace
                   </option>
                 </select>
+                <div class="frame-font-more-row">
+                  <button
+                    id="frame-font-more"
+                    type="button"
+                    class="secondary-button"
+                    aria-haspopup="dialog"
+                    aria-controls="frame-font-dialog"
+                    data-i18n="frame.moreFonts"
+                  >
+                    More fonts
+                  </button>
+                  <output id="frame-font-selected" for="frame-font">
+                    <span data-i18n="frame.selectedFont">Selected font:</span>
+                    <strong id="frame-font-selected-value" data-i18n="frame.sans"
+                      >Sans</strong
+                    >
+                  </output>
+                </div>
                 <div class="frame-color-field">
                   <label
                     for="frame-message-color"
