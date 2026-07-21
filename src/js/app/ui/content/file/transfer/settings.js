@@ -33,7 +33,7 @@ export function createFileSettings({
     e.chunkVersion.value = e.qrVersion.value || String(defaultVersion);
     const chunked = e.format.value === 'file' && getMode() === 'chunked';
     e.chunkVersion.disabled = !chunked || e.chunkVersionAuto.checked;
-    e.chunkVersionValue.textContent = `V${getVersion()}`;
+    e.versionLabel.textContent = `V${getVersion()}`;
   };
   const resetDerived = () => {
     cache.resetDerived();

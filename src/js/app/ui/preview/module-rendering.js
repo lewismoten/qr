@@ -21,14 +21,14 @@ export function drawQrMatrix(state) {
     debugColors,
     debugUnmask,
     customEyesActive,
-    customEyeColorsActive,
+    customEyes,
     imageFillActive,
     imageFillLayer,
     moduleFillStyle,
-    moduleShapeOptions,
+    shapeOptions,
     eyeShapeOptions,
-    eyeOuterFillStyle,
-    eyeCenterFillStyle,
+    outerEyeFill,
+    centerEyeFill,
     lightColor,
     transparentLight,
     getActiveDebugOutlineMode,
@@ -88,10 +88,10 @@ export function drawQrMatrix(state) {
         );
         fillStyle = hexToRgba(debugColors[category].value, 1);
       }
-      if (customEyeColorsActive) {
+      if (customEyes) {
         const eyePart = getFinderPatternPart(moduleCount, row, column);
-        if (eyePart === 'outer') fillStyle = eyeOuterFillStyle;
-        else if (eyePart === 'center') fillStyle = eyeCenterFillStyle;
+        if (eyePart === 'outer') fillStyle = outerEyeFill;
+        else if (eyePart === 'center') fillStyle = centerEyeFill;
       }
       if (imageFillActive) {
         context.fillStyle = imageFillLayer.pattern;
@@ -100,7 +100,7 @@ export function drawQrMatrix(state) {
           (column + marginModules) * cellSize,
           (row + marginModules) * cellSize,
           cellSize,
-          moduleShapeOptions,
+          shapeOptions,
         );
       }
       context.fillStyle = fillStyle;
@@ -109,7 +109,7 @@ export function drawQrMatrix(state) {
         (column + marginModules) * cellSize,
         (row + marginModules) * cellSize,
         cellSize,
-        moduleShapeOptions,
+        shapeOptions,
       );
     }
   }
@@ -121,8 +121,8 @@ export function drawQrMatrix(state) {
       marginModules,
       cellSize,
       eyeShapeOptions,
-      eyeOuterFillStyle,
-      eyeCenterFillStyle,
+      outerEyeFill,
+      centerEyeFill,
       lightColor,
       transparentLight,
       imageFillActive

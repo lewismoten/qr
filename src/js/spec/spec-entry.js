@@ -27,19 +27,19 @@ const PATH_STYLE = Object.freeze({
   minimumLineWidth: 1.5,
   lineWidthScale: 0.11,
   shadowBlurScale: 0.12,
-  minimumStartRadius: 2,
+  minStartRadius: 2,
   startRadiusScale: 0.16,
 });
 const CANVAS_LAYOUT = Object.freeze({
-  maximumPixelRatio: 2,
+  maxPixelRatio: 2,
   minimumWidth: 240,
   fallbackWidth: 360,
   minimumHeight: 150,
-  heightToWidthRatio: 0.625,
+  aspectRatio: 0.625,
   padding: 18,
   focusedOpacity: 0.76,
   unfocusedOpacity: 0.1,
-  gridMinimumModuleSize: 7,
+  minGridModule: 7,
 });
 const MASK_PREVIEW_LAYOUT = Object.freeze({
   minimumWidth: 120,
@@ -116,7 +116,7 @@ function drawPath(context, visual, geometry) {
     points[0].x,
     points[0].y,
     Math.max(
-      PATH_STYLE.minimumStartRadius,
+      PATH_STYLE.minStartRadius,
       geometry.module * PATH_STYLE.startRadiusScale,
     ),
     0,
@@ -129,7 +129,7 @@ function drawPath(context, visual, geometry) {
 
 function renderVisual(canvas, visual) {
   const ratio = Math.min(
-    CANVAS_LAYOUT.maximumPixelRatio,
+    CANVAS_LAYOUT.maxPixelRatio,
     window.devicePixelRatio || 1,
   );
   const width = Math.max(
@@ -138,7 +138,7 @@ function renderVisual(canvas, visual) {
   );
   const height = Math.max(
     CANVAS_LAYOUT.minimumHeight,
-    Math.round(canvas.clientHeight || width * CANVAS_LAYOUT.heightToWidthRatio),
+    Math.round(canvas.clientHeight || width * CANVAS_LAYOUT.aspectRatio),
   );
   canvas.width = Math.round(width * ratio);
   canvas.height = Math.round(height * ratio);
@@ -188,7 +188,7 @@ function renderVisual(canvas, visual) {
       context.fillStyle = COLORS[category] || COLORS.data;
       context.fillRect(x, y, moduleSize, moduleSize);
       context.globalAlpha = 1;
-      if (moduleSize >= CANVAS_LAYOUT.gridMinimumModuleSize) {
+      if (moduleSize >= CANVAS_LAYOUT.minGridModule) {
         context.strokeStyle = SPEC_CANVAS_COLORS.moduleGrid;
         context.lineWidth = 1;
         context.strokeRect(
@@ -223,7 +223,7 @@ function renderMaskPreview(canvas) {
   });
   const model = buildDebugOverlayModel(qr, { errorCorrectionLevel: 'M' });
   const ratio = Math.min(
-    CANVAS_LAYOUT.maximumPixelRatio,
+    CANVAS_LAYOUT.maxPixelRatio,
     window.devicePixelRatio || 1,
   );
   const width = Math.max(

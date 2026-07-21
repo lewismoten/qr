@@ -109,8 +109,8 @@ export function createWorldMap(
             zoom: 1,
             minimumZoom: 1,
             maximumZoom: 19,
-            minimumSourceZoom: vector?.header.minimumZoom ?? tileRange.minimum,
-            maximumSourceZoom: vector?.header.maximumZoom ?? tileRange.maximum,
+            minSourceZoom: vector?.header.minimumZoom ?? tileRange.minimum,
+            maxSourceZoom: vector?.header.maximumZoom ?? tileRange.maximum,
             hasSourceTile: vector ? undefined : tileRange.hasTile,
             getTileBundle: vector ? undefined : tileRange.getTileBundle,
             tileFactory: vector
@@ -118,13 +118,13 @@ export function createWorldMap(
                   pmtiles.createPmtilesTile({
                     ...options,
                     source: vector.source,
-                    coverageMaximumZoom: vector.header.maximumZoom,
+                    coverageMaxZoom: vector.header.maximumZoom,
                   })
               : undefined,
             tileUrl: '/maps/tiles/{z}/{x}/{y}.svg',
             attributionText: 'Natural Earth',
             attributionUrl: 'https://www.naturalearthdata.com/',
-            additionalAttributions: [
+            extraCredits: [
               {
                 text: 'GeoNames',
                 url: 'https://www.geonames.org/',
@@ -135,7 +135,7 @@ export function createWorldMap(
                 visible: hasVisibleUsgsData,
               },
             ],
-            secondaryAttribution: {
+            secondaryCredit: {
               text: 'U.S. Census Bureau',
               url: 'https://www.census.gov/geographies/mapping-files.html',
             },

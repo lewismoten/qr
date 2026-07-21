@@ -16,11 +16,11 @@ function sameTile(left, right) {
 export async function findPmtilesTile({
   source,
   tile,
-  minimumSourceZoom,
-  maximumSourceZoom,
+  minSourceZoom,
+  maxSourceZoom,
 }) {
-  let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
-  while (sourceZoom >= minimumSourceZoom) {
+  let sourceZoom = Math.min(tile.zoom, maxSourceZoom);
+  while (sourceZoom >= minSourceZoom) {
     const sourceTile = getFallbackTile(tile, sourceZoom);
     const bytes = await source.getTile(
       sourceTile.zoom,
@@ -33,21 +33,17 @@ export async function findPmtilesTile({
   return null;
 }
 
-export function getPmtilesStatusZoom(
-  requestedZoom,
-  maximumSourceZoom,
-  sourceTile,
-) {
+export function getPmtilesStatusZoom(requestedZoom, maxSourceZoom, sourceTile) {
   if (!sourceTile) return -1;
-  return requestedZoom <= maximumSourceZoom ? requestedZoom : sourceTile.zoom;
+  return requestedZoom <= maxSourceZoom ? requestedZoom : sourceTile.zoom;
 }
 
 export function createPmtilesTile({
   source,
   tile,
-  minimumSourceZoom,
-  maximumSourceZoom,
-  coverageMaximumZoom = maximumSourceZoom,
+  minSourceZoom,
+  maxSourceZoom,
+  coverageMaxZoom = maxSourceZoom,
   compositeMinimumZoom = 17,
   onLoad = () => {},
   onUnavailable = () => {},
@@ -63,8 +59,8 @@ export function createPmtilesTile({
   const tone =
     (((tile.x + tile.y) % TILE_TONE_COUNT) + TILE_TONE_COUNT) % TILE_TONE_COUNT;
   element.classList.add(`tile-tone-${tone}`);
-  element.slippySourceZoom = Math.min(tile.zoom, maximumSourceZoom);
-  element.slippyStatusSourceZoom = Math.min(tile.zoom, coverageMaximumZoom);
+  element.slippySourceZoom = Math.min(tile.zoom, maxSourceZoom);
+  element.slippyStatusSourceZoom = Math.min(tile.zoom, coverageMaxZoom);
 
   const unavailable = () => {
     element.slippyStatusSourceZoom = -1;
@@ -75,8 +71,8 @@ export function createPmtilesTile({
   element.slippyReady = findPmtilesTile({
     source,
     tile,
-    maximumSourceZoom,
-    minimumSourceZoom,
+    maxSourceZoom,
+    minSourceZoom,
   })
     .then(async (result) => {
       if (!result) {
@@ -88,7 +84,7 @@ export function createPmtilesTile({
       element.slippySourceZoom = sourceTile.zoom;
       element.slippyStatusSourceZoom = getPmtilesStatusZoom(
         tile.zoom,
-        coverageMaximumZoom,
+        coverageMaxZoom,
         sourceTile,
       );
       setTileDebugCoordinates(element, {
@@ -103,8 +99,8 @@ export function createPmtilesTile({
         background = await findPmtilesTile({
           source,
           tile,
-          minimumSourceZoom,
-          maximumSourceZoom: BACKGROUND_MAXIMUM_ZOOM,
+          minSourceZoom,
+          maxSourceZoom: BACKGROUND_MAXIMUM_ZOOM,
         });
       }
       let parent = null;
@@ -112,8 +108,8 @@ export function createPmtilesTile({
         parent = await findPmtilesTile({
           source,
           tile,
-          minimumSourceZoom,
-          maximumSourceZoom: sourceTile.zoom - 1,
+          minSourceZoom,
+          maxSourceZoom: sourceTile.zoom - 1,
         });
       }
       if (background) {

@@ -79,7 +79,7 @@ export function createFrontMatter(document, copy, metadata, qrEncoder) {
   const preface = element(document, 'section', 'handbook-preface');
   preface.append(
     element(document, 'h1', '', copy.prefaceTitle),
-    element(document, 'p', '', copy.prefaceIntroduction),
+    element(document, 'p', '', copy.prefaceIntro),
     element(document, 'p', '', copy.prefaceCaveat),
   );
   return { cover, title, preface };

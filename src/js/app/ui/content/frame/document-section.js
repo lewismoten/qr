@@ -27,7 +27,7 @@ export function createFrameSectionFromDocument(document, options) {
     customField: id('custom-frame-message-field'),
     customMessage: id('custom-frame-message'),
     centerCheckbox: id('frame-message-center'),
-    artCenterCheckbox: deferredControl('frame-message-center-art', false),
+    artCenterToggle: deferredControl('frame-message-center-art', false),
     artMode: deferredControl('center-art-mode', 'none'),
     font: id('frame-font'),
     lineHeight,

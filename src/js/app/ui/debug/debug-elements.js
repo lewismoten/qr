@@ -11,6 +11,6 @@ export function getDebugElements(document, core) {
     bulkFields: id('bulk-fields'),
     debugEnabled: id('debug-enabled'),
     debugUnmask: id('debug-unmask'),
-    debugOutlineModeButtons: document.querySelectorAll('.outline-mode-button'),
+    outlineButtons: document.querySelectorAll('.outline-mode-button'),
   };
 }

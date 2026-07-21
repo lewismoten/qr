@@ -15,8 +15,8 @@ export function createApplicationNavigation({
     elements: {
       tabs: e.tabButtons,
       tabPanels: e.tabPanels,
-      contentTabs: e.contentSubtabButtons,
-      contentPanels: e.contentSubtabPanels,
+      contentTabs: e.subtabButtons,
+      contentPanels: e.subtabPanels,
       form: e.form,
     },
     document,

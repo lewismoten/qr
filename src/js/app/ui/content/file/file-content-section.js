@@ -85,15 +85,15 @@ export function createFileSection({
         ? lookup(
             'file.capacity.autoVersion',
             'auto-selected uniform V{version}',
-            { version: info.configuredChunkVersion },
+            { version: info.targetVersion },
           )
         : lookup('file.capacity.version', 'uniform V{version}', {
-            version: info.configuredChunkVersion,
+            version: info.targetVersion,
           });
       const transfer = isCompressionEnabled()
         ? lookup('file.capacity.gzip', 'gzip transfer is {bytes} B ({size})', {
-            bytes: info.transferByteLength.toLocaleString(),
-            size: formatBytes(info.transferByteLength),
+            bytes: info.transferSize.toLocaleString(),
+            size: formatBytes(info.transferSize),
           })
         : lookup('file.capacity.noCompression', 'transfer compression is off');
       capacityHint.textContent = file

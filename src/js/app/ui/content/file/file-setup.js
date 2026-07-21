@@ -72,7 +72,7 @@ export function createFileSetup({
     elements: {
       chunkVersion: e.chunkVersion,
       chunkVersionAuto: e.chunkVersionAuto,
-      chunkVersionValue: e.chunkVersionValue,
+      versionLabel: e.versionLabel,
       chunkIndex: e.chunkIndex,
       chunkIndexValue: e.chunkIndexValue,
       versionAuto: e.versionAuto,

@@ -69,7 +69,7 @@ function pushMetadataGroups(groups, coordinates, role, sequenceId) {
       modules: run.map(([row, column]) => ({ row, column })),
       roles: [role],
       metadataRole: role,
-      metadataSequenceId: sequenceId,
+      metadataSeqId: sequenceId,
       metadataRunIndex: runIndex,
       metadataRunCount: runs.length,
     });
@@ -185,7 +185,7 @@ export function buildDebugOverlayModel(qrDefinition, options) {
     payloadBits: roleSets[QR_STREAM_ROLE.payload],
     terminatorBits: roleSets[QR_STREAM_ROLE.terminator],
     bytePadBits: roleSets[QR_STREAM_ROLE.byteAlignment],
-    errorCorrectionBits: roleSets[QR_STREAM_ROLE.errorCorrection],
+    ecBits: roleSets[QR_STREAM_ROLE.errorCorrection],
     remainderBits: roleSets[QR_STREAM_ROLE.remainder],
     ecLevelBits,
     maskBits,
@@ -193,7 +193,7 @@ export function buildDebugOverlayModel(qrDefinition, options) {
     fieldStarts,
     codewords,
     streamGroups: buildPostHeaderStreamGroups(traversal, bitRoles),
-    encodingUnitGroups: buildEncodingUnitGroups(qrDefinition, traversal),
+    unitGroups: buildEncodingUnitGroups(qrDefinition, traversal),
     metadataGroups: buildMetadataGroups(qrDefinition),
   };
 }
@@ -207,7 +207,7 @@ export function getDebugCategory(
 ) {
   const key = coordKey(row, column);
   const categories = [
-    [QR_STREAM_ROLE.errorCorrection, model.errorCorrectionBits],
+    [QR_STREAM_ROLE.errorCorrection, model.ecBits],
     [QR_STREAM_ROLE.mode, model.modeBits],
     [QR_STREAM_ROLE.characterCount, model.charCountBits],
     [QR_STREAM_GROUP.data, model.payloadBits],

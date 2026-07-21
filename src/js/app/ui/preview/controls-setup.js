@@ -19,11 +19,11 @@ export function createPreviewControlsSetup({
   let moduleScale = null;
   let printElements = null;
   const viewport = createPreviewViewport({
-    viewport: e.qrPreviewViewport,
+    viewport: e.qrViewport,
     canvas: e.canvas,
-    controls: e.previewViewControls,
+    controls: e.viewControls,
     fitButton: e.previewViewFit,
-    actualButton: e.previewViewActual,
+    actualButton: e.actualView,
     getRenderMetrics: () => ({ renderedWidth, moduleScale }),
   });
   let size = null;

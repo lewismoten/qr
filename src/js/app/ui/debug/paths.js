@@ -189,7 +189,7 @@ export function drawCodewordPaths(
     };
     const color = getContrastColor(next, qrDefinition, model);
     if (group.kind === 'metadata' && nextGroup.kind === 'metadata') {
-      if (group.metadataSequenceId !== nextGroup.metadataSequenceId) return;
+      if (group.metadataSeqId !== nextGroup.metadataSeqId) return;
       drawMetadataBridge(
         context,
         from,

@@ -122,8 +122,8 @@ const sourceChanges = [];
 const fallbackElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
-  minimumSourceZoom: 5,
-  maximumSourceZoom: 6,
+  minSourceZoom: 5,
+  maxSourceZoom: 6,
   onLoad: () => (loaded += 1),
   onUnavailable: () => (unavailable += 1),
   onSourceChange: (sourceZoom) => sourceChanges.push(sourceZoom),
@@ -154,8 +154,8 @@ assert.equal(unavailable, 1);
 const indexedElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
-  minimumSourceZoom: 5,
-  maximumSourceZoom: 6,
+  minSourceZoom: 5,
+  maxSourceZoom: 6,
   hasSourceTile: ({ zoom }) => zoom === 5,
 });
 assert.equal(indexedElement.children[0].src, '/maps/tiles/5/9/12.svg');
@@ -164,8 +164,8 @@ let indexedUnavailable = 0;
 const absentElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
-  minimumSourceZoom: 5,
-  maximumSourceZoom: 6,
+  minSourceZoom: 5,
+  maxSourceZoom: 6,
   hasSourceTile: () => false,
   onUnavailable: () => (indexedUnavailable += 1),
 });
@@ -176,8 +176,8 @@ assert.equal(indexedUnavailable, 1);
 const bundledElement = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 8, x: 73, y: 99 },
-  minimumSourceZoom: 6,
-  maximumSourceZoom: 6,
+  minSourceZoom: 6,
+  maxSourceZoom: 6,
   getTileBundle: bundledRange.getTileBundle,
 });
 const bundledImage = bundledElement.children[0];
@@ -200,8 +200,8 @@ const renderOptions = {
   layer: renderedLayer,
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 6, x: 18, y: 24 },
-  minimumSourceZoom: 1,
-  maximumSourceZoom: 6,
+  minSourceZoom: 1,
+  maxSourceZoom: 6,
   origin: { x: 4500, y: 6100 },
 };
 const renderedTile = renderTile(renderOptions);
@@ -223,8 +223,8 @@ assert.equal(renderedTile.style.top, '43.5px');
 const defaultLoadTile = createFallbackTile({
   template: '/maps/tiles/{z}/{x}/{y}.svg',
   tile: { zoom: 1, x: 0, y: 0 },
-  minimumSourceZoom: 1,
-  maximumSourceZoom: 1,
+  minSourceZoom: 1,
+  maxSourceZoom: 1,
 });
 assert.equal(defaultLoadTile.slippySourceZoom, 1);
 assert.equal(defaultLoadTile.classList.values.has('is-fallback'), false);

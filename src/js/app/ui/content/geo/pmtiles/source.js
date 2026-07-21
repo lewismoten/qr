@@ -45,7 +45,7 @@ export function createPmtilesSource(url, { fetcher = globalThis.fetch } = {}) {
           header.rootOffset + header.rootLength,
         );
         const root = decodeDirectory(
-          await decompressPmtiles(compressed, header.internalCompression),
+          await decompressPmtiles(compressed, header.internalCodec),
         );
         return { header, root };
       });
@@ -61,7 +61,7 @@ export function createPmtilesSource(url, { fetcher = globalThis.fetch } = {}) {
         read(header.leafOffset + entry.offset, entry.length).then(
           async (bytes) =>
             decodeDirectory(
-              await decompressPmtiles(bytes, header.internalCompression),
+              await decompressPmtiles(bytes, header.internalCodec),
             ),
         ),
       );

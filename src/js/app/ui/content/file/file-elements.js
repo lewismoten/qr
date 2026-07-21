@@ -9,7 +9,7 @@ export function getFileElements(document, core) {
     chunkControls: id('file-chunk-controls'),
     chunkVersionAuto: id('file-chunk-version-auto'),
     chunkVersion: id('file-chunk-version'),
-    chunkVersionValue: id('file-chunk-version-value'),
+    versionLabel: id('file-chunk-version-value'),
     includeManifest: id('file-include-manifest'),
     compressTransfer: id('file-compress-transfer'),
     customMetadata: id('file-custom-metadata'),

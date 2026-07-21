@@ -102,8 +102,7 @@ export function createFileCapacityCalculator({
 
   const getEmptyChunkInfo = () => ({
     chunkCapacity: 0,
-    naturalChunkCapacity: 0,
-    configuredChunkVersion: getConfiguredVersion(),
+    targetVersion: getConfiguredVersion(),
     autoVersion: isAutoVersion(),
     totalChunks: 1,
     currentChunk: 1,
@@ -114,9 +113,9 @@ export function createFileCapacityCalculator({
     const options = getEncodingOptions();
     if (!options) return getEmptyChunkInfo();
 
-    const configuredChunkVersion = getConfiguredVersion();
+    const targetVersion = getConfiguredVersion();
     const autoVersion = isAutoVersion();
-    const capacityOptions = { ...options, version: configuredChunkVersion };
+    const capacityOptions = { ...options, version: targetVersion };
     const cacheKey = JSON.stringify({
       file: {
         name: file.name,
@@ -125,7 +124,7 @@ export function createFileCapacityCalculator({
         lastModified: file.lastModified,
       },
       options: capacityOptions,
-      configuredChunkVersion,
+      targetVersion,
       autoVersion,
       includeManifest: includeManifest(),
       compressTransfer: isCompressionEnabled(),
@@ -140,10 +139,9 @@ export function createFileCapacityCalculator({
       };
     }
 
-    const transferByteLength =
-      cache.getCachedTransferBytes()?.length ?? file.size;
+    const transferSize = cache.getCachedTransferBytes()?.length ?? file.size;
     const manifestLength = getManifestLength(file);
-    const streamLength = transferByteLength + manifestLength;
+    const streamLength = transferSize + manifestLength;
     const isSingleFrame = canEncode(
       buildSingleFileFrameTemplate(streamLength, {
         file,
@@ -169,12 +167,11 @@ export function createFileCapacityCalculator({
       : Math.max(1, Math.ceil(streamLength / Math.max(chunkCapacity, 1)));
     const capacityInfo = {
       chunkCapacity,
-      naturalChunkCapacity: chunkCapacity,
-      configuredChunkVersion,
+      targetVersion,
       autoVersion,
       streamLength,
       manifestLength,
-      transferByteLength,
+      transferSize,
       isSingleFrame,
       totalChunks,
       currentChunk: Math.min(getCurrentChunk(), totalChunks),

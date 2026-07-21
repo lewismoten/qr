@@ -16,7 +16,7 @@ export function getHandbookCopy() {
     author: lookup('info.handbook.author', 'Author'),
     published: lookup('info.handbook.published', 'Published'),
     prefaceTitle: lookup('info.handbook.prefaceTitle', 'About this edition'),
-    prefaceIntroduction: lookup(
+    prefaceIntro: lookup(
       'info.handbook.prefaceIntroduction',
       'This handbook is generated from the QR Code Generator website for offline reading.',
     ),

@@ -30,8 +30,8 @@ function tileUrl(template, tile) {
 export function createFallbackTile({
   template,
   tile,
-  minimumSourceZoom,
-  maximumSourceZoom,
+  minSourceZoom,
+  maxSourceZoom,
   hasSourceTile,
   getTileBundle,
   onLoad = () => {},
@@ -40,7 +40,7 @@ export function createFallbackTile({
 }) {
   const element = document.createElement('div');
   const image = document.createElement('img');
-  let sourceZoom = Math.min(tile.zoom, maximumSourceZoom);
+  let sourceZoom = Math.min(tile.zoom, maxSourceZoom);
   element.className = 'slippy-map-tile';
   element.dataset.tile = `${tile.zoom}/${tile.x}/${tile.y}`;
   const tone =
@@ -54,7 +54,7 @@ export function createFallbackTile({
   element.appendChild(image);
 
   function useParent() {
-    if (sourceZoom > minimumSourceZoom) {
+    if (sourceZoom > minSourceZoom) {
       sourceZoom -= 1;
       load();
       return;
@@ -65,7 +65,7 @@ export function createFallbackTile({
   function load() {
     let source = getFallbackTile(tile, sourceZoom);
     while (hasSourceTile && !hasSourceTile(source)) {
-      if (sourceZoom <= minimumSourceZoom) {
+      if (sourceZoom <= minSourceZoom) {
         element.classList.add('is-missing');
         onUnavailable?.();
         return;

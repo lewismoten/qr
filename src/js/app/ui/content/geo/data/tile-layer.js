@@ -12,8 +12,8 @@ export function renderTileLayer({
   width,
   height,
   scale,
-  minimumSourceZoom,
-  maximumSourceZoom,
+  minSourceZoom,
+  maxSourceZoom,
   hasSourceTile,
   getTileBundle,
   origin,
@@ -59,8 +59,8 @@ export function renderTileLayer({
       visible.add(
         getTileLod({
           lastY: detailRange.lastY,
-          maximumSourceZoom,
-          minimumSourceZoom,
+          maxSourceZoom,
+          minSourceZoom,
           x,
           y,
           zoom,
@@ -73,8 +73,8 @@ export function renderTileLayer({
     for (let x = range.firstX; x <= range.lastX; x += 1) {
       const lod = getTileLod({
         lastY: detailRange.lastY,
-        maximumSourceZoom,
-        minimumSourceZoom,
+        maxSourceZoom,
+        minSourceZoom,
         x,
         y,
         zoom,
@@ -85,8 +85,8 @@ export function renderTileLayer({
         layer,
         template,
         tile: { zoom, x, y },
-        minimumSourceZoom,
-        maximumSourceZoom: lod.sourceZoom,
+        minSourceZoom,
+        maxSourceZoom: lod.sourceZoom,
         hasSourceTile,
         getTileBundle,
         origin,

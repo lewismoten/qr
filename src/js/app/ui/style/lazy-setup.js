@@ -89,7 +89,7 @@ export function createLazyStyleSetup(options) {
           ? Number.parseInt(featureElements.centerArtSize.value, 10) ||
             STYLE_DEFAULTS.artwork.sizePercent
           : STYLE_DEFAULTS.artwork.sizePercent,
-        protectBackground: featureElements?.artBackground?.checked ?? true,
+        protectBg: featureElements?.artBackground?.checked ?? true,
         outlinePercent: featureElements?.outlineThickness
           ? Number.parseInt(featureElements.outlineThickness.value, 10) ||
             STYLE_DEFAULTS.artwork.outlinePercent

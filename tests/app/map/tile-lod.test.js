@@ -4,8 +4,8 @@ import { getTileLod } from '../../../src/js/app/ui/content/geo/data/tile-lod.js'
 
 const options = {
   lastY: 100,
-  maximumSourceZoom: 9,
-  minimumSourceZoom: 1,
+  maxSourceZoom: 9,
+  minSourceZoom: 1,
   x: 72,
   zoom: 16,
 };
@@ -23,7 +23,7 @@ assert.equal(getTileLod({ ...options, y: 101 }).sourceZoom, 9);
 assert.equal(
   getTileLod({
     ...options,
-    maximumSourceZoom: 19,
+    maxSourceZoom: 19,
     y: 100,
     zoom: 6,
   }).sourceZoom,

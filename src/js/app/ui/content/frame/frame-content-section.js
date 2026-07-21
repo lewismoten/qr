@@ -257,7 +257,7 @@ export function createFrameSection(options) {
   };
   const setCentered = (enabled) => {
     options.centerCheckbox.checked = enabled;
-    options.artCenterCheckbox.checked = enabled;
+    options.artCenterToggle.checked = enabled;
     if (enabled && options.artMode.value !== 'none') {
       options.artMode.value = 'none';
       options.onDisableArtwork();

@@ -41,8 +41,8 @@ export function renderGeoLayerSample(
     const tile = createTile({
       source,
       tile: item.tile,
-      minimumSourceZoom: header.minimumZoom,
-      maximumSourceZoom: header.maximumZoom,
+      minSourceZoom: header.minimumZoom,
+      maxSourceZoom: header.maximumZoom,
       onLoad() {
         sample.classList.add('has-centered-map');
       },

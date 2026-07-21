@@ -23,11 +23,11 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel }) {
 
   function formatErrorCorrection() {
     const selected = getErrorLevel();
-    e.errorCorrectionLabel.textContent = lookup(
+    e.ecLabel.textContent = lookup(
       `errorCorrection.${selected.value}.label`,
       selected.label,
     );
-    e.errorCorrectionHelp.textContent = lookup(
+    e.ecHelp.textContent = lookup(
       `errorCorrection.${selected.value}.detail`,
       selected.detail,
       { recovery: selected.recovery },
@@ -53,7 +53,7 @@ export function createOutputSetup({ elements: e, systems, getErrorLevel }) {
     formatErrorCorrection();
     e.qrVersion.disabled = e.versionAuto.checked;
     e.encodingMode.disabled = e.modeAuto.checked;
-    e.encodingModeButtons.forEach((button) => {
+    e.modeButtons.forEach((button) => {
       button.disabled = e.modeAuto.checked;
       button.setAttribute('aria-disabled', String(e.modeAuto.checked));
     });

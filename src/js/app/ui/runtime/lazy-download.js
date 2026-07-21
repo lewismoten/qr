@@ -32,7 +32,7 @@ export function createLazyDownloadSetup({
     syncNumberSequenceControls: number.sync,
     maxNumberFrames,
     navigation: e.chunkPreviewNav,
-    status: e.chunkPreviewStatus,
+    status: e.chunkStatus,
     previousButton: e.chunkPreviewPrev,
     nextButton: e.chunkPreviewNext,
     onStateChange: () => controller?.syncControls(),

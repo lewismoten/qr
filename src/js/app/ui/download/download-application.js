@@ -32,11 +32,7 @@ export function createApplicationDownloadSetup({
   };
 
   e.downloadQuality?.addEventListener('input', syncControls);
-  for (const input of [
-    e.animationMinutes,
-    e.animationSeconds,
-    e.animationMilliseconds,
-  ]) {
+  for (const input of [e.animationMinutes, e.animationSeconds, e.millisInput]) {
     input?.addEventListener('input', () => animation?.sync());
   }
   document.getElementById('qr-form').addEventListener('click', (event) => {
@@ -44,7 +40,7 @@ export function createApplicationDownloadSetup({
     if (!button) return;
     const target = document.getElementById(button.dataset.choiceTarget);
     if (target === e.downloadFormat) syncControls();
-    if (target === e.animationTimingMode) animation?.sync();
+    if (target === e.timingMode) animation?.sync();
   });
 
   const ensureImage = () =>
@@ -85,11 +81,11 @@ export function createApplicationDownloadSetup({
       ])
         .then(([{ createAnimationSection }, { getSupportedMp4MimeType }]) => {
           animation = createAnimationSection({
-            timingMode: e.animationTimingMode,
+            timingMode: e.timingMode,
             minutesInput: e.animationMinutes,
             secondsInput: e.animationSeconds,
-            millisecondsInput: e.animationMilliseconds,
-            summary: e.animationDurationSummary,
+            millisInput: e.millisInput,
+            summary: e.durationSummary,
             mp4Button: e.downloadAnimationMp4,
             getFrameCount: frames.getFrameCount,
             getSupportedMp4MimeType,
@@ -125,7 +121,7 @@ export function createApplicationDownloadSetup({
       render: () => runtime.render(),
       getAnimationTiming: (count) =>
         animation?.getTiming(count) ?? {
-          enteredDurationMs: 0,
+          durationMs: 0,
           perFrameMs: 0,
           totalDurationMs: 0,
         },

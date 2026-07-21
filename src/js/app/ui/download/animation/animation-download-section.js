@@ -14,7 +14,7 @@ export function createAnimationSection({
   timingMode,
   minutesInput,
   secondsInput,
-  millisecondsInput,
+  millisInput,
   summary,
   mp4Button,
   getFrameCount,
@@ -31,18 +31,18 @@ export function createAnimationSection({
     );
     const milliseconds = Math.min(
       MAXIMUM_MILLISECONDS,
-      Math.max(0, Number.parseInt(millisecondsInput.value, DECIMAL_RADIX) || 0),
+      Math.max(0, Number.parseInt(millisInput.value, DECIMAL_RADIX) || 0),
     );
-    const enteredDurationMs =
+    const durationMs =
       minutes * MILLISECONDS_PER_MINUTE +
       seconds * MILLISECONDS_PER_SECOND +
       milliseconds;
     const perFrameMs =
       timingMode.value === 'total'
-        ? enteredDurationMs / Math.max(1, frameCount)
-        : enteredDurationMs;
+        ? durationMs / Math.max(1, frameCount)
+        : durationMs;
     return {
-      enteredDurationMs,
+      durationMs,
       perFrameMs,
       totalDurationMs: perFrameMs * Math.max(1, frameCount),
     };

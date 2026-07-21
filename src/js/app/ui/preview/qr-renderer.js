@@ -40,10 +40,10 @@ export function createQrRenderer(deps) {
     getCurrentEyeColors,
     getCurrentArtworkOptions,
     getCurrentFrameOptions,
-    imageFillController,
+    fillController,
     getCodewordStyle,
     getContrastColor,
-    centerLogoController,
+    logoController,
     pixelArtEditor,
     schedulePreviewViewportSync,
     setRenderMetrics,
@@ -137,16 +137,15 @@ export function createQrRenderer(deps) {
     const debugModel = debugActive
       ? debugRenderer.buildModel(qrDefinition, options)
       : null;
-    const moduleShapeOptions = getCurrentModuleShapeOptions();
+    const shapeOptions = getCurrentModuleShapeOptions();
     const eyeShapeOptions = getCurrentEyeShapeOptions();
     const customEyesActive = !debugActive && eyeShapeOptions.type !== 'default';
     const gradientOptions = getCurrentGradientOptions();
     const eyeColors = getCurrentEyeColors();
-    const imageFillImage = imageFillController.getImage();
+    const imageFillImage = fillController.getImage();
     const imageFillActive =
       !debugActive && gradientOptions.type === 'image' && imageFillImage;
-    const customEyeColorsActive =
-      !debugActive && !imageFillActive && eyeColors.enabled;
+    const customEyes = !debugActive && !imageFillActive && eyeColors.enabled;
     const lightAlpha = getColorAlpha(options.color.light);
     const gradientHasTransparency =
       (gradientOptions.type === 'linear' ||
@@ -205,12 +204,8 @@ export function createQrRenderer(deps) {
       moduleCount,
       cellSize,
     );
-    const eyeOuterFillStyle = customEyeColorsActive
-      ? eyeColors.outer
-      : moduleFillStyle;
-    const eyeCenterFillStyle = customEyeColorsActive
-      ? eyeColors.center
-      : moduleFillStyle;
+    const outerEyeFill = customEyes ? eyeColors.outer : moduleFillStyle;
+    const centerEyeFill = customEyes ? eyeColors.center : moduleFillStyle;
 
     drawQrMatrix({
       context,
@@ -224,14 +219,14 @@ export function createQrRenderer(deps) {
       debugColors,
       debugUnmask: isDebugUnmasked(),
       customEyesActive,
-      customEyeColorsActive,
+      customEyes,
       imageFillActive,
       imageFillLayer,
       moduleFillStyle,
-      moduleShapeOptions,
+      shapeOptions,
       eyeShapeOptions,
-      eyeOuterFillStyle,
-      eyeCenterFillStyle,
+      outerEyeFill,
+      centerEyeFill,
       lightColor: options.color.light,
       darkColor: options.color.dark,
       transparentLight,
@@ -247,16 +242,15 @@ export function createQrRenderer(deps) {
       moduleCount * cellSize,
       {
         mode: artworkOptions.mode,
-        logo: centerLogoController.getImage(),
+        logo: logoController.getImage(),
         emoji: artworkOptions.emoji,
         pixelArt: pixelArtEditor.getState(),
         sizePercent: artworkOptions.sizePercent,
-        protectBackground: artworkOptions.protectBackground,
+        protectBg: artworkOptions.protectBg,
         outlinePercent: artworkOptions.outlinePercent,
         lightColor: options.color.light,
         matchModuleShape:
-          artworkOptions.matchModuleShape &&
-          moduleShapeOptions.type !== 'square',
+          artworkOptions.matchModuleShape && shapeOptions.type !== 'square',
         moduleShape: getCurrentModuleShapeOptions(),
       },
     );

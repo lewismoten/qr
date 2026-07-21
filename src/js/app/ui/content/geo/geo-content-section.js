@@ -26,7 +26,7 @@ export function createGeoSection({
   latitudeInput,
   longitudeInput,
   labelInput,
-  useLocationButton,
+  locationButton,
   locationStatus,
   worldElement,
   mapElement,
@@ -234,8 +234,8 @@ export function createGeoSection({
     };
     return messages[reason] || messages[LOCATION_FAILURE.unavailable];
   };
-  useLocationButton.addEventListener('click', async () => {
-    useLocationButton.disabled = true;
+  locationButton.addEventListener('click', async () => {
+    locationButton.disabled = true;
     setLocationStatus(lookup('map.locating', 'Finding your location...'));
     try {
       const coordinates = await requestBrowserLocation(geolocation);
@@ -245,11 +245,11 @@ export function createGeoSection({
     } catch (error) {
       setLocationStatus(locationErrorText(error.reason));
     } finally {
-      useLocationButton.disabled = false;
+      locationButton.disabled = false;
     }
   });
   if (!geolocation?.getCurrentPosition) {
-    useLocationButton.disabled = true;
+    locationButton.disabled = true;
     setLocationStatus(locationErrorText(LOCATION_FAILURE.unsupported));
   }
 
@@ -263,7 +263,7 @@ export function createGeoSectionFromDocument(document, options) {
     latitudeInput: document.getElementById('geo-latitude'),
     longitudeInput: document.getElementById('geo-longitude'),
     labelInput: document.getElementById('geo-query'),
-    useLocationButton: document.getElementById('geo-use-location'),
+    locationButton: document.getElementById('geo-use-location'),
     locationStatus: document.getElementById('geo-location-status'),
     worldElement: document.getElementById('geo-world-map'),
     mapElement: document.getElementById('geo-map'),

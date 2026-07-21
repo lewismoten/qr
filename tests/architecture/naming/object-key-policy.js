@@ -28,7 +28,7 @@ const externalJsonFiles = new Set([
 const identifierPattern = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 const camelCasePattern = /^[a-z][A-Za-z0-9]*$/;
 const functionVerbPattern =
-  /^(?:add|apply|assert|bind|build|calculate|cancel|check|clear|collect|compose|connect|convert|create|decode|delete|detect|download|draw|encode|enforce|ensure|estimate|export|extract|fetch|find|format|generate|get|handle|has|hide|initialize|install|invalidate|is|list|load|make|normalize|open|parse|prepare|publish|read|remove|render|request|reset|resolve|restore|run|save|scan|select|serialize|set|show|start|stop|sync|toggle|transform|update|validate|verify|write)[A-Z]/;
+  /^(?:add|apply|assert|bind|build|calculate|cancel|check|clear|collect|compose|connect|convert|create|decode|delete|detect|download|draw|encode|enforce|ensure|estimate|export|extract|fetch|find|format|generate|get|handle|has|hide|initialize|install|invalidate|is|list|load|make|normalize|open|parse|prepare|publish|read|remove|render|request|reset|resolve|restore|run|save|scan|schedule|select|serialize|set|show|start|stop|sync|toggle|transform|update|validate|verify|write)[A-Z]/;
 
 export async function findFiles(directory, extensions) {
   const entries = await readdir(directory, { withFileTypes: true });

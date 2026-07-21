@@ -93,7 +93,7 @@ export function drawHighlightedBoundaries(
 
 export function getActiveOutlineGroups(model, mode) {
   if (mode === 'stream') return model.streamGroups;
-  if (mode === 'units') return model.encodingUnitGroups;
+  if (mode === 'units') return model.unitGroups;
   if (mode === 'metadata') return model.metadataGroups;
   return model.codewords;
 }
@@ -176,7 +176,7 @@ export function drawCodewordOutlines(
     const previous = groups[index - 1];
     const metadataStart =
       group.kind === 'metadata' &&
-      (!previous || previous.metadataSequenceId !== group.metadataSequenceId);
+      (!previous || previous.metadataSeqId !== group.metadataSeqId);
     const drawStart =
       outlinedKinds.has(group.kind) &&
       (group.kind !== 'metadata' || metadataStart);

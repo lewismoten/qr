@@ -63,8 +63,8 @@ test('falls back from a PMTiles manifest to one archive', async () => {
   });
   handlers.zoom();
   await new Promise((resolve) => setTimeout(resolve, 0));
-  assert.equal(calls[0].minimumSourceZoom, 2);
-  assert.equal(calls[0].maximumSourceZoom, 15);
+  assert.equal(calls[0].minSourceZoom, 2);
+  assert.equal(calls[0].maxSourceZoom, 15);
   assert.equal(typeof calls[0].tileFactory, 'function');
   calls[0].tileFactory({ tile: {} });
   await map.showDetail();
@@ -100,7 +100,7 @@ test('uses SVG ranges when vector archives are unavailable', async () => {
   handlers.zoom();
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(rangeLoads, 1);
-  assert.equal(calls[0].minimumSourceZoom, 3);
+  assert.equal(calls[0].minSourceZoom, 3);
   assert.equal(typeof calls[0].hasSourceTile, 'function');
   assert.equal(typeof calls[0].getTileBundle, 'function');
   assert.equal(calls[0].tileFactory, undefined);
@@ -118,5 +118,5 @@ test('supports no PMTiles module and no selection callback', async () => {
   });
   handlers.zoom();
   await new Promise((resolve) => setTimeout(resolve, 0));
-  assert.equal(calls[0].maximumSourceZoom, 4);
+  assert.equal(calls[0].maxSourceZoom, 4);
 });

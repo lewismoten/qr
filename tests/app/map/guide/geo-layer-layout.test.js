@@ -250,7 +250,7 @@ try {
   assert.equal(caption.textContent, 'L4 → L3 · 1/1');
   assert.equal(prepended.length, 1);
   assert.equal(prepended[0].children.length, 3);
-  assert.equal(requests[0].minimumSourceZoom, 1);
+  assert.equal(requests[0].minSourceZoom, 1);
 
   const noCaption = {
     classList: { add() {} },

@@ -6,9 +6,9 @@ const EMPTY_CHUNK_INFO = Object.freeze({
   currentChunk: 1,
   chunkCapacity: 0,
   streamLength: 0,
-  transferByteLength: 0,
+  transferSize: 0,
   manifestLength: 0,
-  configuredChunkVersion: 1,
+  targetVersion: 1,
   autoVersion: true,
   isSingleFrame: true,
 });

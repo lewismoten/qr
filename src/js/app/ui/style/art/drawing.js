@@ -110,7 +110,7 @@ function drawPixelArt(context, center, artSize, options) {
   );
 
   context.imageSmoothingEnabled = false;
-  if (options.protectBackground) {
+  if (options.protectBg) {
     context.fillStyle = getOpaqueArtworkBackground(options.lightColor);
     layout.pixels.forEach((pixel) => {
       drawPixelShape(context, pixel, options, layout.outline);
@@ -130,13 +130,13 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
   if (!hasArtwork) return;
   const badgeSize = qrSize * (options.sizePercent / STYLE_PERCENT_SCALE);
   const center = qrStart + qrSize / 2;
-  const artPadding = options.protectBackground
+  const artPadding = options.protectBg
     ? badgeSize * ARTWORK_STYLE.paddingScale
     : 0;
   const artSize = badgeSize - artPadding * 2;
   context.save();
   if (
-    options.protectBackground &&
+    options.protectBg &&
     options.mode !== 'emoji' &&
     options.mode !== 'pixel'
   ) {
@@ -166,7 +166,7 @@ export function drawCenterArtwork(context, qrStart, qrSize, options) {
       height,
     );
   } else if (options.mode === 'emoji') {
-    if (options.protectBackground) {
+    if (options.protectBg) {
       drawOutlinedEmoji(
         context,
         options.emoji,

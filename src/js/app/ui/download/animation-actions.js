@@ -47,9 +47,9 @@ export function createAnimationDownloader(deps) {
       );
       return;
     }
-    const { enteredDurationMs, perFrameMs, totalDurationMs } =
+    const { durationMs, perFrameMs, totalDurationMs } =
       deps.getAnimationTiming(total);
-    if (enteredDurationMs <= 0 || perFrameMs < MINIMUM_FRAME_DURATION_MS) {
+    if (durationMs <= 0 || perFrameMs < MINIMUM_FRAME_DURATION_MS) {
       deps.status.textContent = lookup(
         'download.durationMinimum',
         'Choose a duration that provides at least {milliseconds} milliseconds per image.',

@@ -49,8 +49,8 @@ test('creates a loaded PMTiles element for an exact vector tile', async () => {
     const tile = createPmtilesTile({
       source: { getTile: async () => new Uint8Array() },
       tile: { zoom: 8, x: 2, y: 3 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 8,
+      minSourceZoom: 1,
+      maxSourceZoom: 8,
       onLoad: () => events.push('loaded'),
       onSourceChange: (zoom) => events.push(zoom),
     });
@@ -73,8 +73,8 @@ test('composites parent and background PMTiles levels', async () => {
         },
       },
       tile: { zoom: 17, x: 20, y: 30 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 17,
+      minSourceZoom: 1,
+      maxSourceZoom: 17,
     });
     await tile.slippyReady;
     assert.equal(tile.classList.contains('is-loaded'), true);
@@ -97,8 +97,8 @@ test('deduplicates matching background and parent fallbacks', async () => {
           [10, 17].includes(zoom) ? new Uint8Array() : null,
       },
       tile: { zoom: 17, x: 20, y: 30 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 17,
+      minSourceZoom: 1,
+      maxSourceZoom: 17,
     });
     await tile.slippyReady;
     assert.equal(tile.classList.contains('is-loaded'), true);
@@ -113,8 +113,8 @@ test('marks fallback and unavailable PMTiles elements', async () => {
         getTile: async (zoom) => (zoom === 12 ? new Uint8Array() : null),
       },
       tile: { zoom: 13, x: 20, y: 30 },
-      minimumSourceZoom: 12,
-      maximumSourceZoom: 13,
+      minSourceZoom: 12,
+      maxSourceZoom: 13,
       onSourceChange: (zoom) => changes.push(zoom),
     });
     await fallback.slippyReady;
@@ -126,8 +126,8 @@ test('marks fallback and unavailable PMTiles elements', async () => {
     const missing = createPmtilesTile({
       source: { getTile: async () => null },
       tile: { zoom: 2, x: 0, y: 0 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 2,
+      minSourceZoom: 1,
+      maxSourceZoom: 2,
       onUnavailable: () => {
         unavailable += 1;
       },
@@ -139,8 +139,8 @@ test('marks fallback and unavailable PMTiles elements', async () => {
     const defaultMissing = createPmtilesTile({
       source: { getTile: async () => null },
       tile: { zoom: 1, x: 0, y: 0 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 1,
+      minSourceZoom: 1,
+      maxSourceZoom: 1,
     });
     await defaultMissing.slippyReady;
 
@@ -151,8 +151,8 @@ test('marks fallback and unavailable PMTiles elements', async () => {
         },
       },
       tile: { zoom: 1, x: 0, y: 0 },
-      minimumSourceZoom: 1,
-      maximumSourceZoom: 1,
+      minSourceZoom: 1,
+      maxSourceZoom: 1,
       onUnavailable: () => {
         unavailable += 1;
       },

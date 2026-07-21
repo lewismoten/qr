@@ -154,8 +154,8 @@ test('finds the nearest PMTiles parent in a variable-depth pyramid', async () =>
   const result = await findPmtilesTile({
     source,
     tile: { zoom: 13, x: 2316, y: 3133 },
-    maximumSourceZoom: 13,
-    minimumSourceZoom: 1,
+    maxSourceZoom: 13,
+    minSourceZoom: 1,
   });
   assert.deepEqual(requests, [
     '13/2316/3133',

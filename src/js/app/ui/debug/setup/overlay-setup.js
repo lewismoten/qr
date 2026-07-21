@@ -25,7 +25,7 @@ export function createDebugOverlaySetup({
     getCategory: getDebugCategory,
   });
   const outlines = createOutlineSelector({
-    buttons: e.debugOutlineModeButtons,
+    buttons: e.outlineButtons,
     defaultValue: runtime.getOutlineMode(),
     onChange(value) {
       runtime.setOutlineMode(value);
