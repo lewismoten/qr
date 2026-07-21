@@ -8,6 +8,7 @@ import {
   getFallbackEyeOptions,
   getFallbackModuleOptions,
   getFallbackPixelArtState,
+  isImageFillSelected,
   readStyleInteger,
 } from './style-values.js';
 
@@ -79,7 +80,7 @@ export function createStyleSetup({
         centerRoundValue: e.centerRoundValue,
         customEyeColors: e.customEyeColors,
         colorControls: e.eyeColorControls,
-        isImageFill: () => e.gradientType.value === 'image',
+        isImageFill: () => isImageFillSelected(e.gradientType),
       });
       modulesSystem = { modules, eyes };
       modules.sync();

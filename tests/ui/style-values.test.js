@@ -5,6 +5,7 @@ import {
   getFallbackEyeOptions,
   getFallbackModuleOptions,
   getFallbackPixelArtState,
+  isImageFillSelected,
   readStyleInteger,
   STYLE_DEFAULTS,
   STYLE_LIMITS,
@@ -56,4 +57,10 @@ test('pixel-art fallback creates an independent empty square canvas', () => {
       pixels: Array(STYLE_LIMITS.pixelArt.minimumSize ** 2).fill(null),
     },
   );
+});
+
+test('image fill detection tolerates an unloaded colors fragment', () => {
+  assert.equal(isImageFillSelected(null), false);
+  assert.equal(isImageFillSelected({ value: 'solid' }), false);
+  assert.equal(isImageFillSelected({ value: 'image' }), true);
 });
