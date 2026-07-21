@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { readdirSync } from 'node:fs';
+import { performance } from 'node:perf_hooks';
 import { stripVTControlCharacters } from 'node:util';
 
 import { generateLocalizedGuides } from './guides/generate-localized-guides.mjs';
@@ -10,6 +11,7 @@ const supported = new Set(['--coverage', '--watch']);
 const unknown = [...requested].filter((option) => !supported.has(option));
 const coverageRequested = requested.has('--coverage');
 const minimumFileCoverage = 95;
+const maximumBuildDurationMs = 1_000;
 const maximumTestFileDurationMs = 200;
 const qrRoot = new URL('../src/js/qr/', import.meta.url);
 
@@ -38,6 +40,40 @@ if (unknown.length) {
 if (coverageRequested && requested.has('--watch')) {
   throw new Error('Coverage and watch modes cannot run together.');
 }
+
+async function enforceBuildDuration() {
+  const startedAt = performance.now();
+  const child = spawn(
+    process.execPath,
+    ['scripts/build.mjs', '--compile-only', '--quiet'],
+    { stdio: ['ignore', 'pipe', 'pipe'] },
+  );
+  let output = '';
+  for (const stream of [child.stdout, child.stderr]) {
+    stream.on('data', (chunk) => {
+      output += chunk;
+    });
+  }
+  const result = await new Promise((resolve) => child.once('exit', resolve));
+  const durationMs = performance.now() - startedAt;
+  console.log(
+    `Production build: ${durationMs.toFixed(2)}ms ` +
+      `(limit ${maximumBuildDurationMs}ms)`,
+  );
+  if (result) {
+    throw new Error(
+      `Production build exited with status ${result}.\n${output.trim()}`,
+    );
+  }
+  if (durationMs > maximumBuildDurationMs) {
+    throw new Error(
+      `Production build took ${durationMs.toFixed(2)}ms; maximum is ` +
+        `${maximumBuildDurationMs}ms.`,
+    );
+  }
+}
+
+await enforceBuildDuration();
 
 await generateLocalizedGuides({ clean: true });
 await buildLocaleResources();

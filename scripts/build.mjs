@@ -8,6 +8,8 @@ import { buildLocaleResources } from './locales/resources.mjs';
 import { publishDetailedMap } from './maps/vector/publish.mjs';
 
 const watch = process.argv.includes('--watch');
+const compileOnly = process.argv.includes('--compile-only');
+const quiet = process.argv.includes('--quiet');
 const htmlConfig = await loadHtmlConfig();
 const qrPackageName = '@lewismoten/qr';
 const browserQrModulePath = '/dist/qr.min.js';
@@ -27,7 +29,7 @@ const shared = {
   sourcesContent: true,
   target: ['es2022'],
   legalComments: 'none',
-  logLevel: 'info',
+  logLevel: quiet ? 'silent' : 'info',
 };
 
 const builds = [
@@ -125,6 +127,7 @@ if (watch) {
     'build/reports/app-metafile.json',
     JSON.stringify(results[1].metafile, null, 2),
   );
+  if (compileOnly) process.exit(0);
   await generateLocalizedGuides({ clean: true });
   await buildLocaleResources();
   await mkdir(htmlConfig.outputRoot, { recursive: true });
