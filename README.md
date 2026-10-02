@@ -4,6 +4,8 @@
 
 Simple QR Code Builder
 
+![Screenshot](./docs/screenshot.jpg)
+
 ## Source
 
 Browse the canonical repository at
