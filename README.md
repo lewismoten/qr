@@ -244,5 +244,5 @@ npm test
 The random-order frame syntax, binary manifest, validation fields, and assembly
 rules are documented in [FILE chunked transport](docs/file-transport.md).
 
-![QR Code Generator](./docs/logo.jpg)
+![QR Code Generator](./docs/logo.png)
 
